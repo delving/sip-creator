@@ -31,7 +31,7 @@
     <artifactId>metameta</artifactId>
     <packaging>jar</packaging>
     <name>Meta-Meta</name>
-    <version>0.2.9-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
     <description>
         Minimal classes shared by all code of the Delving Framework
     </description>
@@ -68,8 +68,8 @@
 
     <parent>
         <groupId>eu.delving</groupId>
-        <artifactId>parent</artifactId>
-        <version>0.2.9</version>
+        <artifactId>sip-parent</artifactId>
+        <version>0.3.0</version>
     </parent>
 
     <!--<build>-->
