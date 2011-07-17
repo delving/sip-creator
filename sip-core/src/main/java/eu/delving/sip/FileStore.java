@@ -21,17 +21,18 @@
 
 package eu.delving.sip;
 
-import eu.delving.metadata.Facts;
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.RecordMapping;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.zip.ZipInputStream;
+
+import eu.delving.metadata.Facts;
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.RecordMapping;
 
 /**
  * This interface describes how files are stored by the sip-creator
@@ -81,6 +82,8 @@ public interface FileStore {
 
         void setRecordMapping(RecordMapping recordMapping) throws FileStoreException;
 
+        void setRecordHashes(Properties hashes) throws FileStoreException;
+
         void setFacts(Facts facts) throws FileStoreException;
 
         MappingOutput createMappingOutput(RecordMapping recordMapping, File normalizedDirectory) throws FileStoreException;
@@ -88,6 +91,8 @@ public interface FileStore {
         void delete() throws FileStoreException;
 
         File getFactsFile();
+
+        File getRecordHashesFile();
 
         File getSourceFile();
 
@@ -114,6 +119,7 @@ public interface FileStore {
     String APP_CONFIG_FILE_NAME = "app-config.xml";
     String SOURCE_FILE_NAME = "source.xml.gz";
     String STATISTICS_FILE_NAME = "statistics.ser";
+    String HASH_FILE_NAME = "hashes.txt";
     String FACTS_FILE_NAME = "facts.txt";
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
     String MAPPING_FILE_PREFIX = "mapping_";

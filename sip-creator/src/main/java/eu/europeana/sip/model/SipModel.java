@@ -21,6 +21,19 @@
 
 package eu.europeana.sip.model;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.swing.*;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldDefinition;
@@ -46,23 +59,6 @@ import eu.europeana.sip.xml.MetadataParser;
 import eu.europeana.sip.xml.Normalizer;
 import eu.europeana.sip.xml.RecordAnalyzer;
 import org.apache.log4j.Logger;
-
-import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * This model is behind the whole sip creator, as a facade for all the models related to a data set
@@ -329,11 +325,11 @@ public class SipModel {
         executor.execute(new AnalysisParser(dataSetStore, new AnalysisParser.Listener() {
 
             @Override
-            public void success(final List<FieldStatistics> list) {
+            public void success(final Object list) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        setStatisticsList(list);
+                        setStatisticsList((List<FieldStatistics>) list);
                     }
                 });
                 listener.finished(true);

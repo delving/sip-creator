@@ -21,6 +21,17 @@
 
 package eu.europeana.sip.gui;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.swing.*;
+
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.DataSetClient;
 import eu.delving.sip.DataSetCommand;
@@ -31,36 +42,8 @@ import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileType;
 import eu.delving.sip.ProgressListener;
 import eu.europeana.sip.model.SipModel;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-import javax.swing.ProgressMonitor;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.HeadlessException;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import eu.europeana.sip.xml.AbstractRecordParser;
+import eu.europeana.sip.xml.HashParser;
 
 /**
  * All the actions that can be launched when a data set is selected
@@ -77,6 +60,7 @@ public class DataSetActions {
     private SipModel sipModel;
     private DataSetClient dataSetClient;
     private Runnable refreshList;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
     private DataSetListModel.Entry entry;
     private List<DataSetAction> localActions = new ArrayList<DataSetAction>();
     private List<DataSetAction> remoteActions = new ArrayList<DataSetAction>();
@@ -382,15 +366,40 @@ public class DataSetActions {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 final FileStore.DataSetStore store = entry.getDataSetStore();
-                ProgressMonitor progressMonitor = new ProgressMonitor(frame, "Uploading", String.format("Uploading source for %s", store.getSpec()), 0, 100);
-                final ProgressListener progressListener = new ProgressListener.Adapter(progressMonitor) {
+                // TODO FIXME this one does not work yet
+                ProgressMonitor hashProgressMonitor = new ProgressMonitor(frame, "Analyzing", String.format("Analyzing state for %s", store.getSpec()), 0, 100);
+                final ProgressListener hashProgressListener = new ProgressListener.Adapter(hashProgressMonitor) {
                     @Override
                     public void swingFinished(boolean success) {
                         setEnabled(!success);
                     }
                 };
+                ProgressMonitor uploadProgressMonitor = new ProgressMonitor(frame, "Uploading", String.format("Uploading source for %s", store.getSpec()), 0, 100);
+                final ProgressListener uploadProgressListener = new ProgressListener.Adapter(uploadProgressMonitor) {
+                    @Override
+                    public void swingFinished(boolean success) {
+                        setEnabled(!success);
+                    }
+                };
+
                 sipModel.setDataSetStore(store);
-                dataSetClient.uploadFile(FileType.SOURCE, store.getSpec(), store.getSourceFile(), progressListener);
+                executor.execute(new HashParser(store, new AbstractRecordParser.Listener() {
+                    @Override
+                    public void success(Object payload) {
+                        hashProgressListener.finished(true);
+                        dataSetClient.uploadFile(FileType.SOURCE, store.getSpec(), store.getSourceFile(), uploadProgressListener);
+                    }
+
+                    @Override
+                    public void failure(Exception exception) {
+                        hashProgressListener.finished(false);
+                    }
+
+                    @Override
+                    public void progress(long elementCount) {
+                        hashProgressListener.setProgress(new Long(elementCount).intValue());
+                    }
+                }));
             }
 
             @Override

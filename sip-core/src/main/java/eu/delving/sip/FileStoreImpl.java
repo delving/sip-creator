@@ -21,6 +21,40 @@
 
 package eu.delving.sip;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import com.thoughtworks.xstream.XStream;
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
@@ -30,20 +64,6 @@ import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 import org.apache.commons.io.IOUtils;
-
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * This interface describes how files are stored by the sip-creator
@@ -387,6 +407,17 @@ public class FileStoreImpl implements FileStore {
         }
 
         @Override
+        public void setRecordHashes(Properties hashes) throws FileStoreException {
+            File hashFile = new File(directory, HASH_FILE_NAME);
+            try {
+                hashes.store(new FileOutputStream(hashFile), "Record hashes");
+            }
+            catch (IOException e) {
+                throw new FileStoreException(String.format("Unable to save record hashes to %s", hashFile.getAbsolutePath()), e);
+            }
+        }
+
+        @Override
         public void setFacts(Facts facts) throws FileStoreException {
             File factsFile = new File(directory, FACTS_FILE_NAME);
             try {
@@ -413,6 +444,11 @@ public class FileStoreImpl implements FileStore {
         @Override
         public File getFactsFile() {
             return findFactsFile(directory);
+        }
+
+        @Override
+        public File getRecordHashesFile() {
+            return findHashFile(directory);
         }
 
         @Override
@@ -607,6 +643,23 @@ public class FileStoreImpl implements FileStore {
         }
     }
 
+    private File findHashFile(File dir) {
+        File[] files = dir.listFiles(new FactsFileFilter());
+        switch (files.length) {
+            case 0:
+                return new File(dir, HASH_FILE_NAME);
+            case 1:
+                return files[0];
+            default:
+                for (File file : files) {
+                    if (Hasher.extractHash(file) == null) {
+                        return file;
+                    }
+                }
+                return getMostRecent(files);
+        }
+    }
+
     private File findSourceFile(File dir) {
         File[] files = dir.listFiles(new SourceFileFilter());
         switch (files.length) {
@@ -666,6 +719,13 @@ public class FileStoreImpl implements FileStore {
         @Override
         public boolean accept(File file) {
             return file.isFile() && FACTS_FILE_NAME.equals(Hasher.extractFileName(file));
+        }
+    }
+
+    private class HashFileFilter implements FileFilter {
+        @Override
+        public boolean accept(File file) {
+            return file.isFile() && HASH_FILE_NAME.equals(Hasher.extractFileName(file));
         }
     }
 

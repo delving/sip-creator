@@ -21,22 +21,19 @@
 
 package eu.europeana.sip.xml;
 
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.Tag;
-import eu.delving.sip.FileStore;
-import org.apache.log4j.Logger;
-import org.codehaus.stax2.XMLInputFactory2;
-import org.codehaus.stax2.XMLStreamReader2;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.XMLEvent;
+
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.Path;
+import eu.delving.sip.FileStore;
+import eu.delving.sip.FileStoreException;
+import org.codehaus.stax2.XMLStreamReader2;
 
 /**
  * Analyze xml input and compile statistics.
@@ -45,56 +42,23 @@ import java.util.Map;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 
-public class AnalysisParser implements Runnable {
-    private static final int ELEMENT_STEP = 10000;
-    private final Logger LOG = Logger.getLogger(getClass());
-    private Path path = new Path();
+public class AnalysisParser extends AbstractRecordParser {
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
-    private Listener listener;
-    private FileStore.DataSetStore dataSetStore;
-    private boolean abort;
-
-    public interface Listener {
-
-        void success(List<FieldStatistics> list);
-
-        void failure(Exception exception);
-
-        void progress(long elementCount);
-    }
 
     public AnalysisParser(FileStore.DataSetStore dataSetStore, Listener listener) {
-        this.dataSetStore = dataSetStore;
-        this.listener = listener;
+        super(dataSetStore, listener);
     }
 
-    public void abort() {
-        abort = true;
-    }
-
-    @Override
-    public void run() {
-        try {
-            XMLInputFactory2 xmlif = (XMLInputFactory2) XMLInputFactory2.newInstance();
-            xmlif.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-            xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
-            xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
-            xmlif.configureForSpeed();
-            XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), dataSetStore.createXmlInputStream());
-            StringBuilder text = new StringBuilder();
-            long count = 0;
-            while (!abort) {
-                switch (input.getEventType()) {
-                    case XMLEvent.START_DOCUMENT:
-                        LOG.info("Starting document");
-                        break;
-                    case XMLEvent.START_ELEMENT:
-                        if (++count % ELEMENT_STEP == 0) {
-                            if (null != listener) {
-                                listener.progress(count);
-                            }
-                        }
-                        path.push(Tag.create(input.getName().getPrefix(),input.getName().getLocalPart()));
+    protected void parse(XMLStreamReader2 input) throws XMLStreamException, FileStoreException {
+        StringBuilder text = new StringBuilder();
+        while (!abort) {
+            switch (input.getEventType()) {
+                case XMLEvent.START_DOCUMENT:
+                    LOG.info("Starting document");
+                    break;
+                case XMLEvent.START_ELEMENT:
+                    reportProgress();
+                    pushTag(input);
 //                        if (input.getAttributeCount() > 0) {
 //                            for (int walk = 0; walk < input.getAttributeCount(); walk++) {
 //                                QName attributeName = input.getAttributeName(walk);
@@ -103,40 +67,41 @@ public class AnalysisParser implements Runnable {
 //                                path.pop();
 //                            }
 //                        }
-                        break;
-                    case XMLEvent.CHARACTERS:
-                        text.append(input.getText());
-                        break;
-                    case XMLEvent.CDATA:
-                        text.append(input.getText());
-                        break;
-                    case XMLEvent.END_ELEMENT:
-                        recordValue(text.toString());
-                        text.setLength(0);
-                        path.pop();
-                        break;
-                    case XMLEvent.END_DOCUMENT: {
-                        LOG.info("Ending document");
-                        break;
-                    }
-                }
-                if (!input.hasNext()) {
+                    break;
+                case XMLEvent.CHARACTERS:
+                    text.append(input.getText());
+                    break;
+                case XMLEvent.CDATA:
+                    text.append(input.getText());
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    recordValue(text.toString());
+                    text.setLength(0);
+                    path.pop();
+                    break;
+                case XMLEvent.END_DOCUMENT: {
+                    LOG.info("Ending document");
                     break;
                 }
-                input.next();
             }
-            List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
-            Collections.sort(fieldStatisticsList);
-            for (FieldStatistics fieldStatistics : fieldStatisticsList) {
-                fieldStatistics.finish();
+            if (!input.hasNext()) {
+                break;
             }
-            dataSetStore.setStatistics(fieldStatisticsList);
-            listener.success(fieldStatisticsList);
+            input.next();
         }
-        catch (Exception e) {
-            LOG.error("Analysis Failed!", e);
-            listener.failure(e);
+        List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
+        Collections.sort(fieldStatisticsList);
+        for (FieldStatistics fieldStatistics : fieldStatisticsList) {
+            fieldStatistics.finish();
         }
+        dataSetStore.setStatistics(fieldStatisticsList);
+        listener.success(fieldStatisticsList);
+    }
+
+
+    @Override
+    protected void handleException(Exception e) {
+        LOG.error("Analysis Failed!", e);
     }
 
     private void recordValue(String value) {

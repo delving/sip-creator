@@ -11,6 +11,9 @@ public enum FileType {
     FACTS(
             "text/plain"
     ),
+    HASHES(
+            "text/plain"
+    ),
     SOURCE(
             "application/x-gzip"
     ),
