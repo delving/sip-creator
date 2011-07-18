@@ -24,6 +24,9 @@ public class DataSetResponse {
     @XStreamAlias("changed-records-keys")
     private String changedRecords = new String();
 
+    @XStreamAlias("errorMessage")
+    private String errorMessage;
+
     public DataSetResponse(DataSetResponseCode responseCode) {
         this.responseCode = responseCode.toString();
     }

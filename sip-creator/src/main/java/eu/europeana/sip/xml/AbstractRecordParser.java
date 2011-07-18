@@ -1,5 +1,6 @@
 package eu.europeana.sip.xml;
 
+import java.io.IOException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 
@@ -48,7 +49,7 @@ public abstract class AbstractRecordParser implements Runnable {
         }
     }
 
-    protected abstract void parse(XMLStreamReader2 input) throws XMLStreamException, FileStoreException;
+    protected abstract void parse(XMLStreamReader2 input) throws IOException, XMLStreamException, FileStoreException;
 
     protected XMLStreamReader2 initializeParser() throws XMLStreamException, FileStoreException {
         XMLInputFactory2 xmlif = (XMLInputFactory2) XMLInputFactory2.newInstance();

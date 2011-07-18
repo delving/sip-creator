@@ -63,7 +63,7 @@ public class HashParser extends AbstractRecordParser {
                 case END_ELEMENT:
                     if (path.equals(uniqueElementPath)) {
                         unique = elementText.toString();
-                        elementText.setLength(0);
+                        elementText = null;
                     }
                     if (path.equals(rootPath)) {
                         hashMap.put(unique, hasher.getHashString(xmlBuffer.toString()));

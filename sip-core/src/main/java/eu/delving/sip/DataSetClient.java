@@ -12,6 +12,7 @@ import java.io.Reader;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipInputStream;
 import javax.swing.*;
 
@@ -25,6 +26,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
@@ -85,9 +87,14 @@ public class DataSetClient {
         executor.execute(new CommandSender(spec, command));
     }
 
-    public void uploadFile(FileType fileType, String spec, File file, ProgressListener progressListener, UploadCallback callback) {
-        executor.execute(new FileUploader(fileType, spec, file, progressListener, callback));
+    public void uploadFile(FileType fileType, String spec, File file, boolean zipStream, ProgressListener progressListener, UploadCallback callback) {
+        executor.execute(new FileUploader(fileType, spec, file, zipStream, progressListener, callback));
     }
+
+    public void uploadXMLStream(InputStream stream, String spec, String uploadType, String contentType, String contentName, ProgressListener progressListener, UploadCallback callback) {
+        executor.execute(new XMLStreamUploader(stream, spec, uploadType, contentType, contentName, progressListener, callback));
+    }
+
 
     public void downloadDataSet(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
         executor.execute(new DataSetDownloader(dataSetStore, progressListener));
@@ -159,7 +166,7 @@ public class DataSetClient {
     }
 
     /**
-     *  Uploads things
+     * Uploads things
      *
      * @author Gerald de Jong <geralddejong@gmail.com>
      * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
@@ -169,17 +176,13 @@ public class DataSetClient {
         protected String spec;
         protected ProgressListener progressListener;
         protected UploadCallback callback;
-        protected String contentType;
         protected String uploadType;
-        protected String contentName;
 
-        public Uploader(String spec, String uploadType, String contentType, String contentName, ProgressListener progressListener, UploadCallback callback) {
+        public Uploader(String spec, String uploadType, ProgressListener progressListener, UploadCallback callback) {
             this.spec = spec;
             this.callback = callback;
-            this.contentType = contentType;
             this.progressListener = progressListener;
             this.uploadType = uploadType;
-            this.contentName = contentName;
         }
 
         @Override
@@ -210,7 +213,7 @@ public class DataSetClient {
                     context.getServerUrl(),
                     spec,
                     uploadType,
-                    contentName,
+                    getContentName(),
                     context.getAccessKey()
             );
         }
@@ -228,6 +231,10 @@ public class DataSetClient {
         protected abstract void handleException(Exception e);
 
         protected abstract int getTotalSize();
+
+        protected abstract String getContentName();
+
+        protected abstract String getContentType();
     }
 
     /**
@@ -241,11 +248,13 @@ public class DataSetClient {
 
         private File file;
         private FileType fileType;
+        private boolean zipStream;
 
-        public FileUploader(FileType fileType, String spec, File file, ProgressListener progressListener, UploadCallback callback) {
-            super(spec, fileType.toString(), fileType.getContentType(), file.getName(), progressListener, callback);
+        public FileUploader(FileType fileType, String spec, File file, boolean zipStream, ProgressListener progressListener, UploadCallback callback) {
+            super(spec, fileType.toString(), progressListener, callback);
             this.fileType = fileType;
             this.file = file;
+            this.zipStream = zipStream;
         }
 
         @Override
@@ -260,8 +269,18 @@ public class DataSetClient {
         }
 
         @Override
+        protected String getContentName() {
+            return file.getName();
+        }
+
+        @Override
+        protected String getContentType() {
+            return zipStream ? "application/x-gzip" : fileType.getContentType();
+        }
+
+        @Override
         protected HttpEntity createPayload() {
-            FileEntity fileEntity = new FileEntity(file, fileType.getContentType());
+            FileEntity fileEntity = new FileEntity(file, getContentType(), zipStream);
             fileEntity.setChunked(true);
             return fileEntity;
         }
@@ -277,12 +296,14 @@ public class DataSetClient {
             private long bytesSent;
             private int blocksReported;
             private boolean abort = false;
+            private final boolean gzip;
 
-            public FileEntity(final File file, final String contentType) {
+            public FileEntity(final File file, final String contentType, final boolean gzip) {
                 if (file == null) {
                     throw new IllegalArgumentException("File may not be null");
                 }
                 this.file = file;
+                this.gzip = gzip;
                 setContentType(contentType);
             }
 
@@ -302,12 +323,13 @@ public class DataSetClient {
                 if (outputStream == null) {
                     throw new IllegalArgumentException("Output stream may not be null");
                 }
+                final OutputStream stream = gzip ? new GZIPOutputStream(outputStream) : outputStream;
                 InputStream inputStream = new FileInputStream(this.file);
                 try {
                     byte[] buffer = new byte[BLOCK_SIZE];
                     int bytes;
                     while (!abort && (bytes = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytes);
+                        stream.write(buffer, 0, bytes);
                         bytesSent += bytes;
                         int blocks = (int) (bytesSent / BLOCK_SIZE);
                         if (blocks > blocksReported) {
@@ -322,7 +344,7 @@ public class DataSetClient {
                             });
                         }
                     }
-                    outputStream.flush();
+                    stream.flush();
                 } finally {
                     inputStream.close();
                 }
@@ -356,10 +378,50 @@ public class DataSetClient {
      *
      * @author Manuel Bernhardt <bernhardt.manuel@gmail.com/>
      */
-    public class XMLStreamUploader implements Runnable {
+    public class XMLStreamUploader extends Uploader {
+
+        final private String contenType;
+        final private String contentName;
+        final private InputStream stream;
+
+        public XMLStreamUploader(InputStream stream, String spec, String uploadType, String contentType, String contentName, ProgressListener progressListener, UploadCallback callback) {
+            super(spec, uploadType, progressListener, callback);
+            this.stream = stream;
+            this.contentName = contentName;
+            this.contenType = contentType;
+        }
+
 
         @Override
-        public void run() {
+        protected void beforeUpload() throws Exception {
+            log.info("Uploading XML stream...");
+        }
+
+        @Override
+        protected String getContentType() {
+            return contenType;
+        }
+
+        @Override
+        protected String getContentName() {
+            return contentName;
+        }
+
+        @Override
+        protected HttpEntity createPayload() {
+            InputStreamEntity payload = new InputStreamEntity(stream, -1);
+            payload.setContentType(getContentType());
+            return payload;
+        }
+
+        @Override
+        protected void handleException(Exception e) {
+            log.warn("Unable to upload stream", e);
+        }
+
+        @Override
+        protected int getTotalSize() {
+            return -1; // we don't know
         }
     }
 
@@ -396,6 +458,7 @@ public class DataSetClient {
                 context.tellUser("Unable to download source");
             }
         }
+
     }
 
     private DataSetResponse execute(HttpGet httpGet) {

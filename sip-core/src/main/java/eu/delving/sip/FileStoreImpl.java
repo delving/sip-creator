@@ -644,7 +644,7 @@ public class FileStoreImpl implements FileStore {
     }
 
     private File findHashFile(File dir) {
-        File[] files = dir.listFiles(new FactsFileFilter());
+        File[] files = dir.listFiles(new HashFileFilter());
         switch (files.length) {
             case 0:
                 return new File(dir, HASH_FILE_NAME);

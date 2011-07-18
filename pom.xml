@@ -215,7 +215,12 @@
                 <artifactId>joda-time</artifactId>
                 <version>1.6</version>
             </dependency>
-
+            
+            <dependency>
+                <groupId>org.ostermiller</groupId>
+                <artifactId>utils</artifactId>
+                <version>1.07.00</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.scalatest</groupId>

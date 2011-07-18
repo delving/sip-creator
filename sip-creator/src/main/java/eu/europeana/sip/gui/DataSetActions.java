@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.*;
 
+import com.Ostermiller.util.CircularByteBuffer;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.DataSetClient;
 import eu.delving.sip.DataSetCommand;
@@ -45,6 +46,7 @@ import eu.delving.sip.ProgressListener;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.xml.AbstractRecordParser;
 import eu.europeana.sip.xml.HashParser;
+import eu.europeana.sip.xml.RecordFilterParser;
 
 /**
  * All the actions that can be launched when a data set is selected
@@ -121,8 +123,7 @@ public class DataSetActions {
         if (entry != null) {
             if (dataSetInfo == null) {
                 setEntry(null);
-            }
-            else if (entry.getDataSetInfo() != null && entry.getDataSetInfo().spec.equals(dataSetInfo.spec)) {
+            } else if (entry.getDataSetInfo() != null && entry.getDataSetInfo().spec.equals(dataSetInfo.spec)) {
                 setEntry(entry);
             }
         }
@@ -201,8 +202,7 @@ public class DataSetActions {
         void setEntry(DataSetListModel.Entry entry) {
             if (entry == null) {
                 setEnabled(false);
-            }
-            else {
+            } else {
                 setEnabled(isEnabled(entry));
             }
         }
@@ -243,8 +243,7 @@ public class DataSetActions {
                     FileStore.DataSetStore store = sipModel.getFileStore().createDataSetStore(info.spec);
                     dataSetClient.downloadDataSet(store, progressListener);
                     entry.setDataSetStore(store);
-                }
-                catch (FileStoreException e) {
+                } catch (FileStoreException e) {
                     sipModel.getUserNotifier().tellUser(String.format("Unable to create data set %s", info.spec));
                 }
             }
@@ -305,12 +304,10 @@ public class DataSetActions {
                         entry.getDataSetStore().delete();
                         if (entry.getDataSetInfo() == null) {
                             refreshList.run();
-                        }
-                        else {
+                        } else {
                             entry.setDataSetStore(null);
                         }
-                    }
-                    catch (FileStoreException e) {
+                    } catch (FileStoreException e) {
                         sipModel.getUserNotifier().tellUser("Unable to delete data set", e);
                     }
                 }
@@ -351,7 +348,7 @@ public class DataSetActions {
                     }
                 };
                 sipModel.setDataSetStore(store);
-                dataSetClient.uploadFile(FileType.FACTS, store.getSpec(), store.getFactsFile(), progressListener, null);
+                dataSetClient.uploadFile(FileType.FACTS, store.getSpec(), store.getFactsFile(), false, progressListener, null);
             }
 
             @Override
@@ -367,7 +364,10 @@ public class DataSetActions {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 final FileStore.DataSetStore store = entry.getDataSetStore();
-                // TODO FIXME this one does not work yet
+
+                // TODO move all this someplace else, it should not be here in the GUI code
+                // TODO figure out a way to handle all the progress monitors for all those tasks
+
                 ProgressMonitor hashProgressMonitor = new ProgressMonitor(frame, "Analyzing", String.format("Analyzing state for %s", store.getSpec()), 0, 100);
                 final ProgressListener hashProgressListener = new ProgressListener.Adapter(hashProgressMonitor) {
                     @Override
@@ -389,14 +389,36 @@ public class DataSetActions {
                     @Override
                     public void success(Object payload) {
                         hashProgressListener.finished(true);
-                        dataSetClient.uploadFile(FileType.HASHES, store.getSpec(), store.getRecordHashesFile(), null, new DataSetClient.UploadCallback() {
+                        dataSetClient.uploadFile(FileType.HASHES, store.getSpec(), store.getRecordHashesFile(), false, uploadProgressListener, new DataSetClient.UploadCallback() {
                             @Override
                             public void onResponseReceived(DataSetResponse response) {
                                 String[] recordKeys = response.getChangedRecords().split(",");
+
+                                CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+
+                                RecordFilterParser recordFilterParser = new RecordFilterParser(cbb.getOutputStream(), recordKeys, store, new AbstractRecordParser.Listener() {
+                                    @Override
+                                    public void success(Object payload) {
+                                        // TODO
+                                        System.out.println("success!!!");
+                                    }
+
+                                    @Override
+                                    public void failure(Exception exception) {
+                                        // TODO
+                                        exception.printStackTrace();
+                                    }
+
+                                    @Override
+                                    public void progress(long elementCount) {
+                                        // TODO
+                                        System.out.println("count " + elementCount);
+                                    }
+                                });
+                                executor.execute(recordFilterParser);
+                                dataSetClient.uploadXMLStream(cbb.getInputStream(), store.getSpec(), "RECORDSTREAM", "application/x-gzip", "records", uploadProgressListener, null);
                             }
                         });
-
-//                        dataSetClient.uploadFile(FileType.SOURCE, store.getSpec(), store.getSourceFile(), uploadProgressListener, null);
                     }
 
                     @Override
@@ -434,7 +456,7 @@ public class DataSetActions {
                     }
                 };
                 sipModel.setDataSetStore(store);
-                dataSetClient.uploadFile(FileType.MAPPING, store.getSpec(), store.getMappingFile(prefix), progressListener, null);
+                dataSetClient.uploadFile(FileType.MAPPING, store.getSpec(), store.getMappingFile(prefix), false, progressListener, null);
             }
 
             @Override
@@ -477,8 +499,7 @@ public class DataSetActions {
                 DataSetInfo info = entry.getDataSetInfo();
                 if (info == null) {
                     return false;
-                }
-                else switch (DataSetState.valueOf(info.state)) {
+                } else switch (DataSetState.valueOf(info.state)) {
                     case INCOMPLETE:
                         switch (command) {
                             case DELETE:
