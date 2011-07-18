@@ -1,10 +1,10 @@
 package eu.delving.sip;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * An enumeration of the responses that can be returned from the DataSetController
@@ -20,6 +20,9 @@ public class DataSetResponse {
 
     @XStreamAlias("data-set-list")
     private List<DataSetInfo> dataSetList = new ArrayList<DataSetInfo>();
+
+    @XStreamAlias("changed-records-keys")
+    private String changedRecords = new String();
 
     public DataSetResponse(DataSetResponseCode responseCode) {
         this.responseCode = responseCode.toString();
@@ -44,6 +47,10 @@ public class DataSetResponse {
 
     public List<DataSetInfo> getDataSetList() {
         return dataSetList;
+    }
+
+    public String getChangedRecords() {
+        return changedRecords;
     }
 
     public String toString() {

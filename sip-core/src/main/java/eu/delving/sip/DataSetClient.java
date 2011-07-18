@@ -1,20 +1,5 @@
 package eu.delving.sip;
 
-import com.thoughtworks.xstream.XStream;
-import eu.delving.metadata.Hasher;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
-
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -28,6 +13,20 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipInputStream;
+import javax.swing.*;
+
+import com.thoughtworks.xstream.XStream;
+import eu.delving.metadata.Hasher;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Logger;
 
 /**
  * The tab related to interacting with the metadata repository
@@ -73,8 +72,7 @@ public class DataSetClient {
         if (enable) {
             executor.execute(new ListFetcher());
             periodicListFetchTimer.restart();
-        }
-        else {
+        } else {
             periodicListFetchTimer.stop();
         }
     }
@@ -87,8 +85,8 @@ public class DataSetClient {
         executor.execute(new CommandSender(spec, command));
     }
 
-    public void uploadFile(FileType fileType, String spec, File file, ProgressListener progressListener) {
-        executor.execute(new FileUploader(fileType, spec, file, progressListener));
+    public void uploadFile(FileType fileType, String spec, File file, ProgressListener progressListener, UploadCallback callback) {
+        executor.execute(new FileUploader(fileType, spec, file, progressListener, callback));
     }
 
     public void downloadDataSet(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
@@ -114,8 +112,7 @@ public class DataSetClient {
                             periodicListFetchTimer.restart();
                         }
                     });
-                }
-                else {
+                } else {
                     fetching = false;
                     periodicListFetchTimer.stop();
                     notifyUser(response.getResponseCode());
@@ -154,12 +151,83 @@ public class DataSetClient {
                             context.setInfo(response.getDataSetList().get(0));
                         }
                     });
-                }
-                else {
+                } else {
                     notifyUser(response);
                 }
             } // otherwise we will have disconnected
         }
+    }
+
+    /**
+     *  Uploads things
+     *
+     * @author Gerald de Jong <geralddejong@gmail.com>
+     * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
+     */
+    public abstract class Uploader implements Runnable {
+        protected Logger log = Logger.getLogger(getClass());
+        protected String spec;
+        protected ProgressListener progressListener;
+        protected UploadCallback callback;
+        protected String contentType;
+        protected String uploadType;
+        protected String contentName;
+
+        public Uploader(String spec, String uploadType, String contentType, String contentName, ProgressListener progressListener, UploadCallback callback) {
+            this.spec = spec;
+            this.callback = callback;
+            this.contentType = contentType;
+            this.progressListener = progressListener;
+            this.uploadType = uploadType;
+            this.contentName = contentName;
+        }
+
+        @Override
+        public void run() {
+            progressListener.setTotal(getTotalSize());
+            try {
+                beforeUpload();
+                final DataSetResponse response = doUpload();
+                boolean success = response != null && response.getResponseCode() == DataSetResponseCode.THANK_YOU;
+                progressListener.finished(success);
+                if (!success) {
+                    notifyUser(response);
+                }
+                if (callback != null) {
+                    callback.onResponseReceived(response);
+                }
+
+            } catch (Exception e) {
+                handleException(e);
+                progressListener.finished(false);
+                notifyUser(e);
+            }
+        }
+
+        protected String createRequestUrl() {
+            return String.format(
+                    "%s/submit/%s/%s/%s?accessKey=%s",
+                    context.getServerUrl(),
+                    spec,
+                    uploadType,
+                    contentName,
+                    context.getAccessKey()
+            );
+        }
+
+        protected DataSetResponse doUpload() {
+            HttpPost httpPost = new HttpPost(createRequestUrl());
+            httpPost.setEntity(createPayload());
+            return execute(httpPost);
+        }
+
+        protected abstract void beforeUpload() throws Exception;
+
+        protected abstract HttpEntity createPayload();
+
+        protected abstract void handleException(Exception e);
+
+        protected abstract int getTotalSize();
     }
 
     /**
@@ -168,63 +236,39 @@ public class DataSetClient {
      * @author Gerald de Jong <geralddejong@gmail.com>
      */
 
-    public class FileUploader implements Runnable {
-        private static final int BLOCK_SIZE = 4096;
-        private Logger log = Logger.getLogger(getClass());
-        private File file;
-        private String spec;
-        private FileType fileType;
-        private ProgressListener progressListener;
+    public class FileUploader extends Uploader {
+        protected static final int BLOCK_SIZE = 4096;
 
-        public FileUploader(FileType fileType, String spec, File file, ProgressListener progressListener) {
+        private File file;
+        private FileType fileType;
+
+        public FileUploader(FileType fileType, String spec, File file, ProgressListener progressListener, UploadCallback callback) {
+            super(spec, fileType.toString(), fileType.getContentType(), file.getName(), progressListener, callback);
             this.fileType = fileType;
-            this.spec = spec;
             this.file = file;
-            this.progressListener = progressListener;
         }
 
         @Override
-        public void run() {
-            final int totalBlocks = (int) (file.length() / BLOCK_SIZE);
-            progressListener.setTotal(totalBlocks);
-            try {
-                file = Hasher.ensureFileHashed(file);
-                log.info("Uploading " + file);
-                final DataSetResponse response = uploadFile();
-                boolean success = response != null && response.getResponseCode() == DataSetResponseCode.THANK_YOU;
-                progressListener.finished(success);
-                if (!success) {
-                    notifyUser(response);
-                }
-            }
-            catch (Exception e) {
-                log.warn("Unable to upload file " + file.getAbsolutePath(), e);
-                progressListener.finished(false);
-                notifyUser(e);
-            }
+        protected int getTotalSize() {
+            return (int) (file.length() / BLOCK_SIZE);
         }
 
-        private DataSetResponse uploadFile() {
-            HttpPost httpPost = new HttpPost(createRequestUrl());
-            httpPost.setEntity(createEntity());
-            return execute(httpPost);
+        @Override
+        protected void beforeUpload() throws Exception {
+            file = Hasher.ensureFileHashed(file);
+            log.info("Uploading " + file);
         }
 
-        private FileEntity createEntity() {
+        @Override
+        protected HttpEntity createPayload() {
             FileEntity fileEntity = new FileEntity(file, fileType.getContentType());
             fileEntity.setChunked(true);
             return fileEntity;
         }
 
-        private String createRequestUrl() {
-            return String.format(
-                    "%s/submit/%s/%s/%s?accessKey=%s",
-                    context.getServerUrl(),
-                    spec,
-                    fileType,
-                    file.getName(),
-                    context.getAccessKey()
-            );
+        @Override
+        protected void handleException(Exception e) {
+            log.warn("Unable to upload file " + file.getAbsolutePath(), e);
         }
 
         private class FileEntity extends AbstractHttpEntity implements Cloneable {
@@ -279,8 +323,7 @@ public class DataSetClient {
                         }
                     }
                     outputStream.flush();
-                }
-                finally {
+                } finally {
                     inputStream.close();
                 }
             }
@@ -301,6 +344,25 @@ public class DataSetClient {
             }
         }
     }
+
+    public interface UploadCallback {
+
+        void onResponseReceived(DataSetResponse response);
+
+    }
+
+    /**
+     * Uploads an XML Stream
+     *
+     * @author Manuel Bernhardt <bernhardt.manuel@gmail.com/>
+     */
+    public class XMLStreamUploader implements Runnable {
+
+        @Override
+        public void run() {
+        }
+    }
+
 
     private class DataSetDownloader implements Runnable {
         private FileStore.DataSetStore dataSetStore;
@@ -326,12 +388,10 @@ public class DataSetClient {
                     HttpEntity entity = httpResponse.getEntity();
                     ZipInputStream zipInputStream = new ZipInputStream(entity.getContent());
                     dataSetStore.acceptSipZip(zipInputStream, progressListener);
+                } else {
+                    log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
                 }
-                else {
-                    log.warn("Unable to download source. HTTP response "+httpResponse.getStatusLine().getReasonPhrase());
-                }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.warn("Unable to download source", e);
                 context.tellUser("Unable to download source");
             }
@@ -342,18 +402,15 @@ public class DataSetClient {
         HttpClient httpClient = new DefaultHttpClient();
         try {
             return translate(httpClient.execute(httpGet));
-        }
-        catch (HttpHostConnectException e) {
+        } catch (HttpHostConnectException e) {
             log.warn("Problem executing get (connecting)", e);
             forceDisconnect();
             return null;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.warn("Problem executing get (I/O)", e);
             forceDisconnect();
             return null;
-        }
-        finally {
+        } finally {
             httpClient.getConnectionManager().shutdown();
         }
     }
@@ -363,13 +420,11 @@ public class DataSetClient {
         HttpClient httpClient = new DefaultHttpClient();
         try {
             return translate(httpClient.execute(httpPost));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.warn("Problem executing post", e);
             forceDisconnect();
             return null;
-        }
-        finally {
+        } finally {
             httpClient.getConnectionManager().shutdown();
         }
     }
@@ -381,8 +436,7 @@ public class DataSetClient {
             DataSetResponse response = (DataSetResponse) xstream().fromXML(reader);
             entity.consumeContent();
             return response;
-        }
-        else {
+        } else {
             throw new IOException("Response not OK: " + httpResponse.getStatusLine());
         }
     }

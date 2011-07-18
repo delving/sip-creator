@@ -36,6 +36,7 @@ import eu.delving.metadata.Hasher;
 import eu.delving.sip.DataSetClient;
 import eu.delving.sip.DataSetCommand;
 import eu.delving.sip.DataSetInfo;
+import eu.delving.sip.DataSetResponse;
 import eu.delving.sip.DataSetState;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
@@ -350,7 +351,7 @@ public class DataSetActions {
                     }
                 };
                 sipModel.setDataSetStore(store);
-                dataSetClient.uploadFile(FileType.FACTS, store.getSpec(), store.getFactsFile(), progressListener);
+                dataSetClient.uploadFile(FileType.FACTS, store.getSpec(), store.getFactsFile(), progressListener, null);
             }
 
             @Override
@@ -374,6 +375,7 @@ public class DataSetActions {
                         setEnabled(!success);
                     }
                 };
+
                 ProgressMonitor uploadProgressMonitor = new ProgressMonitor(frame, "Uploading", String.format("Uploading source for %s", store.getSpec()), 0, 100);
                 final ProgressListener uploadProgressListener = new ProgressListener.Adapter(uploadProgressMonitor) {
                     @Override
@@ -387,7 +389,14 @@ public class DataSetActions {
                     @Override
                     public void success(Object payload) {
                         hashProgressListener.finished(true);
-                        dataSetClient.uploadFile(FileType.SOURCE, store.getSpec(), store.getSourceFile(), uploadProgressListener);
+                        dataSetClient.uploadFile(FileType.HASHES, store.getSpec(), store.getRecordHashesFile(), null, new DataSetClient.UploadCallback() {
+                            @Override
+                            public void onResponseReceived(DataSetResponse response) {
+                                String[] recordKeys = response.getChangedRecords().split(",");
+                            }
+                        });
+
+//                        dataSetClient.uploadFile(FileType.SOURCE, store.getSpec(), store.getSourceFile(), uploadProgressListener, null);
                     }
 
                     @Override
@@ -425,7 +434,7 @@ public class DataSetActions {
                     }
                 };
                 sipModel.setDataSetStore(store);
-                dataSetClient.uploadFile(FileType.MAPPING, store.getSpec(), store.getMappingFile(prefix), progressListener);
+                dataSetClient.uploadFile(FileType.MAPPING, store.getSpec(), store.getMappingFile(prefix), progressListener, null);
             }
 
             @Override
