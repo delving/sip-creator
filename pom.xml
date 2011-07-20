@@ -107,7 +107,6 @@
     <pluginRepositories/>
 
     <modules>
-        <module>metameta</module>
         <module>sip-core</module>
         <module>sip-creator</module>
     </modules>
