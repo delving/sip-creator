@@ -21,18 +21,15 @@
 
 package eu.europeana.sip.gui;
 
-import eu.delving.sip.AppConfig;
-import eu.europeana.sip.model.AppConfigModel;
-import eu.europeana.sip.model.SipModel;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import javax.swing.*;
+
+import eu.delving.sip.AppConfig;
+import eu.delving.sip.OAuth2Client;
+import eu.europeana.sip.model.AppConfigModel;
+import eu.europeana.sip.model.SipModel;
 
 /**
  * @author Gerald de Jong, Delving BV <gerald@delving.eu>
@@ -41,11 +38,13 @@ import java.util.List;
 public class RepositoryMenu extends JMenu {
     private Component parent;
     private SipModel sipModel;
+    private OAuth2Client oauth2Client;
 
-    public RepositoryMenu(Component parent, SipModel sipModel) {
+    public RepositoryMenu(Component parent, SipModel sipModel, OAuth2Client client) {
         super("Repository");
         this.parent = parent;
         this.sipModel = sipModel;
+        this.oauth2Client = client;
         sipModel.getAppConfigModel().addListener(new AppConfigModel.Listener() {
             @Override
             public void appConfigUpdated(AppConfig appConfig) {
@@ -58,7 +57,7 @@ public class RepositoryMenu extends JMenu {
     private void refresh() {
         removeAll();
         add(new ServerHostPortAction());
-        add(new AccessKeyAction());
+        add(new LoginAction());
         addSeparator();
         add(new SaveAction());
         add(new DeleteAction());
@@ -91,19 +90,31 @@ public class RepositoryMenu extends JMenu {
         }
     }
 
-    private class AccessKeyAction extends AbstractAction {
+    private class LoginAction extends AbstractAction {
 
-        public AccessKeyAction() {
-            super("Access Key");
+        public LoginAction() {
+            super("Login");
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            JPasswordField passwordField = new JPasswordField(sipModel.getAppConfigModel().getAccessKey(), 35);
-            Object[] msg = {"Server Access Key", passwordField};
+            // TODO this location is hijacked for performing the login. It should in fact happen in a different place / at the first connection.
+            JPanel loginPanel = new JPanel(new GridLayout(2, 1));
+            JLabel usernameLabel = new JLabel("Username");
+            JLabel passwordLabel = new JLabel("Password");
+            JTextField usernameField = new JTextField(35);
+            JPasswordField passwordField = new JPasswordField(35);
+            loginPanel.add(usernameLabel);
+            loginPanel.add(usernameField);
+            loginPanel.add(passwordLabel);
+            loginPanel.add(passwordField);
+            Object[] msg = { loginPanel };
             int result = JOptionPane.showConfirmDialog(parent, msg, "Permission", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                sipModel.getAppConfigModel().setServerAccessKey(new String(passwordField.getPassword()));
+                boolean loginSuccessful = oauth2Client.requestAccess(sipModel.getAppConfigModel().getServerHostPort(), usernameField.getText(), new String(passwordField.getPassword()));
+                if(!loginSuccessful) {
+                    JOptionPane.showMessageDialog(parent, "Error while logging in", "Permission error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }

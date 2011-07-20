@@ -394,7 +394,7 @@ public class DataSetActions {
                             public void onResponseReceived(DataSetResponse response) {
                                 String[] recordKeys = response.getChangedRecords().split(",");
 
-                                CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+                                final CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
 
                                 RecordFilterParser recordFilterParser = new RecordFilterParser(cbb.getOutputStream(), recordKeys, store, new AbstractRecordParser.Listener() {
                                     @Override
@@ -413,6 +413,7 @@ public class DataSetActions {
                                     public void progress(long elementCount) {
                                         // TODO
                                         System.out.println("count " + elementCount);
+                                        System.out.println("available " + cbb.getAvailable());
                                     }
                                 });
                                 executor.execute(recordFilterParser);

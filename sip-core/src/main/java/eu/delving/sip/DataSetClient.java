@@ -47,7 +47,7 @@ public class DataSetClient {
     public interface Context {
         String getServerUrl();
 
-        String getAccessKey();
+        String getAccessToken();
 
         void setInfo(DataSetInfo dataSetInfo);
 
@@ -107,7 +107,7 @@ public class DataSetClient {
             String url = String.format(
                     "%s?accessKey=%s",
                     context.getServerUrl(),
-                    context.getAccessKey()
+                    context.getAccessToken()
             );
             final DataSetResponse response = execute(new HttpGet(url));
             if (response != null) {
@@ -144,7 +144,7 @@ public class DataSetClient {
                     context.getServerUrl(),
                     spec,
                     command,
-                    context.getAccessKey()
+                    context.getAccessToken()
             );
             final DataSetResponse response = execute(new HttpGet(url));
             if (response != null) {
@@ -214,7 +214,7 @@ public class DataSetClient {
                     spec,
                     uploadType,
                     getContentName(),
-                    context.getAccessKey()
+                    context.getAccessToken()
             );
         }
 
@@ -443,7 +443,7 @@ public class DataSetClient {
                         "%s/fetch/%s-sip.zip?accessKey=%s",
                         context.getServerUrl(),
                         dataSetStore.getSpec(),
-                        context.getAccessKey()
+                        context.getAccessToken()
                 ));
                 HttpResponse httpResponse = httpClient.execute(method);
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -458,7 +458,6 @@ public class DataSetClient {
                 context.tellUser("Unable to download source");
             }
         }
-
     }
 
     private DataSetResponse execute(HttpGet httpGet) {

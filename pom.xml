@@ -215,7 +215,14 @@
                 <artifactId>joda-time</artifactId>
                 <version>1.6</version>
             </dependency>
-            
+
+            <!-- OAuth2 client -->
+            <dependency>
+                <groupId>org.apache.amber</groupId>
+                <artifactId>oauth2-client</artifactId>
+                <version>0.2-SNAPSHOT</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.ostermiller</groupId>
                 <artifactId>utils</artifactId>
