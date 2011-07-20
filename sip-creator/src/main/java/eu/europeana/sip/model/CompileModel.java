@@ -32,8 +32,6 @@ import eu.europeana.sip.core.MappingException;
 import eu.europeana.sip.core.MappingRunner;
 import eu.europeana.sip.core.MetadataRecord;
 import eu.europeana.sip.core.RecordValidationException;
-import groovy.util.Node;
-import groovy.xml.XmlUtil;
 import org.apache.log4j.Logger;
 
 import javax.swing.SwingUtilities;
@@ -271,8 +269,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, mappingCode);
             try {
                 try {
-                    Node outputNode = mappingRunner.runMapping(metadataRecord);
-                    String output = XmlUtil.serialize(outputNode);
+                    String output = mappingRunner.runMapping(metadataRecord);
+//                    Node outputNode = mappingRunner.runMapping(metadataRecord);
+//                    String output = XmlUtil.serialize(outputNode);
                     if (recordValidator != null) {
                         List<String> problems = new ArrayList<String>();
                         String validated = recordValidator.validateRecord(output, problems);

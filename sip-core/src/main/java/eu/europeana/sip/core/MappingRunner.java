@@ -25,8 +25,7 @@ import eu.delving.metadata.MetadataNamespace;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
-import groovy.util.Node;
-import groovy.util.NodeBuilder;
+import groovy.xml.MarkupBuilder;
 import groovy.xml.NamespaceBuilder;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
@@ -54,13 +53,15 @@ public class MappingRunner {
         this.code = code;
     }
 
-    public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
+    public String runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
         if (metadataRecord == null) {
             throw new RuntimeException("Null input metadata record");
         }
         try {
             Binding binding = new Binding();
-            NodeBuilder builder = NodeBuilder.newInstance();
+            StringWriter writer = new StringWriter();
+            MarkupBuilder builder = new MarkupBuilder(writer);
+//            NodeBuilder builder = NodeBuilder.newInstance();
             NamespaceBuilder xmlns = new NamespaceBuilder(builder);
             binding.setVariable("output", builder);
             for (MetadataNamespace ns : MetadataNamespace.values()) {
@@ -71,7 +72,9 @@ public class MappingRunner {
                 script = groovyCodeResource.createShell().parse(code);
             }
             script.setBinding(binding);
-            return (Node) script.run();
+//            return (Node) script.run();
+            script.run();
+            return writer.toString();
         }
         catch (DiscardRecordException e) {
             throw e;
