@@ -270,6 +270,8 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             try {
                 try {
                     String output = mappingRunner.runMapping(metadataRecord);
+//                    Node outputNode = mappingRunner.runMapping(metadataRecord);
+//                    String output = XmlUtil.serialize(outputNode);
                     if (recordValidator != null) {
                         List<String> problems = new ArrayList<String>();
                         String validated = recordValidator.validateRecord(output, problems);

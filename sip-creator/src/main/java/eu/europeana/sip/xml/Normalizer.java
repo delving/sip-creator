@@ -123,6 +123,8 @@ public class Normalizer implements Runnable {
                 try {
                     long before = System.currentTimeMillis();
                     String output = mappingRunner.runMapping(record);
+//                    Node outputNode = mappingRunner.runMapping(record);
+//                    String output = XmlUtil.serialize(outputNode);
                     totalMappingTime += System.currentTimeMillis() - before;
                     List<String> problems = new ArrayList<String>();
                     before = System.currentTimeMillis();

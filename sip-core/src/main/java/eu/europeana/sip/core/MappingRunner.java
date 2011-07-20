@@ -61,6 +61,7 @@ public class MappingRunner {
             Binding binding = new Binding();
             StringWriter writer = new StringWriter();
             MarkupBuilder builder = new MarkupBuilder(writer);
+//            NodeBuilder builder = NodeBuilder.newInstance();
             NamespaceBuilder xmlns = new NamespaceBuilder(builder);
             binding.setVariable("output", builder);
             for (MetadataNamespace ns : MetadataNamespace.values()) {
@@ -71,6 +72,7 @@ public class MappingRunner {
                 script = groovyCodeResource.createShell().parse(code);
             }
             script.setBinding(binding);
+//            return (Node) script.run();
             script.run();
             return writer.toString();
         }

@@ -1,6 +1,6 @@
+import eu.europeana.sip.core.DiscardRecordException
 import eu.europeana.sip.core.GroovyList
 import eu.europeana.sip.core.GroovyNode
-import eu.europeana.sip.core.DiscardRecordException
 
 // MappingCategory is a class used as a Groovy Category to add methods to existing classes
 
@@ -169,7 +169,7 @@ public class MappingCategory {
     return sanitize(list.toString())
   }
 
-  static String sanitize(String text) { // same effect as in eu.delving.metadata.Sanitizer.sanitizeGroovy, except apostrophe removal
+  static String sanitize(String text) { // same effect as in Sanitizer.sanitizeGroovy, except apostrophe removal
     text = (text =~ /\n/).replaceAll(' ')
     text = (text =~ / +/).replaceAll(' ')
     return text
