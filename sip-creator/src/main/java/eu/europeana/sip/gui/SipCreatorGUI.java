@@ -29,6 +29,7 @@ import eu.delving.sip.DataSetInfo;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileStoreImpl;
+import eu.delving.sip.OAuth2Client;
 import eu.europeana.sip.core.GroovyCodeResource;
 import eu.europeana.sip.core.RecordValidationException;
 import eu.europeana.sip.model.AppConfigModel;
@@ -96,6 +97,7 @@ public class SipCreatorGUI extends JFrame {
     private JLabel titleLabel = new JLabel(LOCAL_SETS, JLabel.CENTER);
     private JTextField filter = new JTextField(10);
     private Timer filterTimer;
+    private OAuth2Client oauth2Client;
     private DataSetClient dataSetClient;
     private JCheckBox connectedBox;
     private DataSetListModel dataSetListModel;
@@ -117,6 +119,7 @@ public class SipCreatorGUI extends JFrame {
         });
         this.dataSetList = new JList(dataSetListModel);
         this.sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, new PopupExceptionHandler());
+        this.oauth2Client = new OAuth2Client();
         this.dataSetClient = new DataSetClient(new DataSetClient.Context() {
 
             @Override
@@ -125,8 +128,8 @@ public class SipCreatorGUI extends JFrame {
             }
 
             @Override
-            public String getAccessKey() {
-                return sipModel.getAppConfigModel().getAccessKey();
+            public String getAccessToken() {
+                return oauth2Client.getAccessToken(sipModel.getAppConfigModel().getServerHostPort());
             }
 
             @Override
@@ -358,7 +361,7 @@ public class SipCreatorGUI extends JFrame {
                 }
             }
         }));
-        bar.add(new RepositoryMenu(this, sipModel));
+        bar.add(new RepositoryMenu(this, sipModel, oauth2Client));
         bar.add(dataSetActions.createPrefixActivationMenu());
         return bar;
     }
