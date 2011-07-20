@@ -66,11 +66,8 @@ public class OAuth2Client {
 
             OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
 
-            TokenConnection connection = connections.get(tokenLocation);
-            if (connection == null) {
-                connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
-                connections.put(tokenLocation, connection);
-            }
+            TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
+            connections.put(tokenLocation, connection);
 
             return true;
 
