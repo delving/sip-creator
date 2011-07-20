@@ -26,6 +26,7 @@ import eu.delving.metadata.Tag;
 import eu.delving.sip.ProgressListener;
 import eu.europeana.sip.core.GroovyNode;
 import eu.europeana.sip.core.MetadataRecord;
+import eu.europeana.sip.core.MetadataRecordFactory;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
@@ -52,7 +53,7 @@ public class MetadataParser {
     private int recordIndex, recordCount;
     private Path path = new Path();
     private Map<String, String> namespaces = new TreeMap<String, String>();
-    private MetadataRecord.Factory factory = new MetadataRecord.Factory(namespaces);
+    private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;
 
     public MetadataParser(InputStream inputStream, Path recordRoot, int recordCount) throws XMLStreamException {
