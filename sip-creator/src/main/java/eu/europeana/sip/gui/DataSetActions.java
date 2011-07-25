@@ -392,32 +392,37 @@ public class DataSetActions {
                         dataSetClient.uploadFile(FileType.HASHES, store.getSpec(), store.getRecordHashesFile(), false, uploadProgressListener, new DataSetClient.UploadCallback() {
                             @Override
                             public void onResponseReceived(DataSetResponse response) {
-                                String[] recordKeys = response.getChangedRecords().split(",");
+                                String[] missingRecordKeys = response.getChangedRecords().split(",");
 
-                                final CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+                                if(missingRecordKeys.length == 1 && missingRecordKeys[0].equals("all")) {
+                                    dataSetClient.uploadFile(FileType.SOURCE, store.getSpec(), store.getSourceFile(), false, uploadProgressListener, null);
+                                } else {
+                                    final CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
 
-                                RecordFilterParser recordFilterParser = new RecordFilterParser(cbb.getOutputStream(), recordKeys, store, new AbstractRecordParser.Listener() {
-                                    @Override
-                                    public void success(Object payload) {
-                                        // TODO
-                                        System.out.println("success!!!");
-                                    }
+                                    RecordFilterParser recordFilterParser = new RecordFilterParser(cbb.getOutputStream(), missingRecordKeys, store, new AbstractRecordParser.Listener() {
+                                        @Override
+                                        public void success(Object payload) {
+                                            // TODO
+                                            System.out.println("success!!!");
+                                        }
 
-                                    @Override
-                                    public void failure(Exception exception) {
-                                        // TODO
-                                        exception.printStackTrace();
-                                    }
+                                        @Override
+                                        public void failure(Exception exception) {
+                                            // TODO
+                                            exception.printStackTrace();
+                                        }
 
-                                    @Override
-                                    public void progress(long elementCount) {
-                                        // TODO
-                                        System.out.println("count " + elementCount);
-                                        System.out.println("available " + cbb.getAvailable());
-                                    }
-                                });
-                                executor.execute(recordFilterParser);
-                                dataSetClient.uploadXMLStream(cbb.getInputStream(), store.getSpec(), "RECORDSTREAM", "application/x-gzip", "records", uploadProgressListener, null);
+                                        @Override
+                                        public void progress(long elementCount) {
+                                            // TODO
+                                            System.out.println("count " + elementCount);
+                                            System.out.println("available " + cbb.getAvailable());
+                                        }
+                                    });
+                                    executor.execute(recordFilterParser);
+                                    dataSetClient.uploadXMLStream(cbb.getInputStream(), store.getSpec(), "RECORDSTREAM", "application/x-gzip", "records", uploadProgressListener, null);
+                                }
+
                             }
                         });
                     }
