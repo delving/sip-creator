@@ -411,6 +411,7 @@ public class DataSetClient {
         protected HttpEntity createPayload() {
             InputStreamEntity payload = new InputStreamEntity(stream, -1);
             payload.setContentType(getContentType());
+            payload.setChunked(true);
             return payload;
         }
 

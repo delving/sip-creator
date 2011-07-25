@@ -394,8 +394,13 @@ public class DataSetActions {
                             public void onResponseReceived(DataSetResponse response) {
                                 String[] missingRecordKeys = response.getChangedRecords().split(",");
 
-                                if(missingRecordKeys.length == 1 && missingRecordKeys[0].equals("all")) {
+                                final boolean allAreMissing = missingRecordKeys.length == 1 && missingRecordKeys[0].equals("all");
+                                final boolean noneIsMissing = missingRecordKeys.length == 1 && missingRecordKeys[0].equals("none");
+
+                                if(allAreMissing) {
                                     dataSetClient.uploadFile(FileType.SOURCE, store.getSpec(), store.getSourceFile(), false, uploadProgressListener, null);
+                                } else if(noneIsMissing) {
+                                    // nothing to do here
                                 } else {
                                     final CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
 
