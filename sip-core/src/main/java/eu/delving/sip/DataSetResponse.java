@@ -44,6 +44,10 @@ public class DataSetResponse {
         return DataSetResponseCode.THANK_YOU == getResponseCode();
     }
 
+    public boolean isAccessTokenExpired() {
+        return DataSetResponseCode.ACCESS_KEY_EXPIRED == getResponseCode();
+    }
+
     public void addDataSetInfo(DataSetInfo dataSetInfo) {
         dataSetList.add(dataSetInfo);
     }

@@ -33,16 +33,7 @@ public class OAuth2Client {
 
     private Map<String, TokenConnection> connections = new HashMap<String, TokenConnection>();
 
-    public boolean requestAccess(String location, String username, String password) {
-        String tokenLocation = getTokenLocation(location);
-        try {
-            OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
-                    .setGrantType(GrantType.PASSWORD)
-                    .setUsername(username)
-                    .setPassword(password)
-                    .buildQueryMessage();
-
-            OAuthClient client = new OAuthClient(new org.apache.amber.oauth2.client.HttpClient() {
+    private final OAuthClient client = new OAuthClient(new org.apache.amber.oauth2.client.HttpClient() {
                 @Override
                 public <T extends OAuthClientResponse> T execute(OAuthClientRequest request, Map<String, String> headers, String requestMethod, Class<T> responseClass) throws OAuthSystemException, OAuthProblemException {
 
@@ -63,6 +54,14 @@ public class OAuth2Client {
                 }
             });
 
+    public boolean requestAccess(String location, String username, String password) {
+        String tokenLocation = getTokenLocation(location);
+        try {
+            OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
+                    .setGrantType(GrantType.PASSWORD)
+                    .setUsername(username)
+                    .setPassword(password)
+                    .buildQueryMessage();
 
             OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
 
@@ -78,8 +77,33 @@ public class OAuth2Client {
         }
         return false;
     }
+    
+    private boolean requestRefresh(String location, String refreshToken) {
+        String tokenLocation = getTokenLocation(location);
+        try {
+            OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
+                    .setGrantType(GrantType.REFRESH_TOKEN)
+                    .setRefreshToken(refreshToken)
+                    .buildQueryMessage();
+
+            OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
+
+            TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
+            connections.put(tokenLocation, connection);
+            return true;
+
+        } catch (Throwable t) {
+            log.error("Problem while using refresh token", t);
+            connections.remove(tokenLocation);
+        }
+        return false;
+    }
 
     public String getAccessToken(String location) {
+
+        // TODO (Serkan?): we return null here when there is a problem with fetching an access token, in other words when the client needs to login again (with user & password)
+        // in case this happens, the login should be triggered ( probably somewhere near SIPCreatorGui#getAccessToken() )
+
         String tokenLocation = getTokenLocation(location);
 
         if (!connections.containsKey(tokenLocation)) {
@@ -88,9 +112,12 @@ public class OAuth2Client {
 
         TokenConnection connection = connections.get(tokenLocation);
         if (connection.isTokenExpired()) {
-            // time to refresh
-            // TODO not yet implemented
-            return connection.getAccessToken();
+            boolean refreshSuccessful = requestRefresh(location, connection.getRefreshToken());
+            if(refreshSuccessful) {
+                return connection.getAccessToken();
+            } else {
+                return null;
+            }
         } else {
             return connection.getAccessToken();
         }
@@ -117,8 +144,12 @@ public class OAuth2Client {
             return accessToken;
         }
 
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+
         public boolean isTokenExpired() {
-            return System.currentTimeMillis() - requestTimeStamp < expiresIn * 1000;
+            return System.currentTimeMillis() - requestTimeStamp > expiresIn * 1000;
         }
     }
 

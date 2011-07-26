@@ -103,6 +103,10 @@ public class DataSetClient {
     private class ListFetcher implements Runnable {
         @Override
         public void run() {
+            doRun();
+        }
+
+        private void doRun() {
             fetching = true;
             String url = String.format(
                     "%s?accessKey=%s",
@@ -119,6 +123,9 @@ public class DataSetClient {
                             periodicListFetchTimer.restart();
                         }
                     });
+                } else if(response.isAccessTokenExpired()) {
+                    // the OAuth2 client will handle this
+                    doRun();
                 } else {
                     fetching = false;
                     periodicListFetchTimer.stop();
@@ -139,6 +146,10 @@ public class DataSetClient {
 
         @Override
         public void run() {
+            doRun();
+        }
+
+        private void doRun() {
             String url = String.format(
                     "%s/%s/%s?accessKey=%s",
                     context.getServerUrl(),
@@ -158,6 +169,9 @@ public class DataSetClient {
                             context.setInfo(response.getDataSetList().get(0));
                         }
                     });
+                } else if(response.isAccessTokenExpired()) {
+                    // the OAuth2 client will handle this
+                    doRun();
                 } else {
                     notifyUser(response);
                 }
