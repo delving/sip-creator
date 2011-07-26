@@ -365,19 +365,33 @@ public class DataSetActions {
             public void actionPerformed(ActionEvent actionEvent) {
                 final FileStore.DataSetStore store = entry.getDataSetStore();
 
-                // TODO move all this someplace else, it should not be here in the GUI code
-                // TODO figure out a way to handle all the progress monitors for all those tasks
-
-                ProgressMonitor hashProgressMonitor = new ProgressMonitor(frame, "Analyzing", String.format("Analyzing state for %s", store.getSpec()), 0, 100);
-                final ProgressListener hashProgressListener = new ProgressListener.Adapter(hashProgressMonitor) {
+                ProgressMonitor uploadProgressMonitor = new ProgressMonitor(frame, "Uploading", String.format("Uploading source for %s", store.getSpec()), 0, 100);
+                final ProgressListener uploadProgressListener = new ProgressListener.Adapter(uploadProgressMonitor) {
                     @Override
                     public void swingFinished(boolean success) {
                         setEnabled(!success);
                     }
                 };
 
-                ProgressMonitor uploadProgressMonitor = new ProgressMonitor(frame, "Uploading", String.format("Uploading source for %s", store.getSpec()), 0, 100);
-                final ProgressListener uploadProgressListener = new ProgressListener.Adapter(uploadProgressMonitor) {
+                sipModel.setDataSetStore(store);
+                dataSetClient.uploadFile(FileType.SOURCE, store.getSpec(), store.getSourceFile(), false, uploadProgressListener, null);
+            }
+
+            @Override
+            boolean isEnabled(DataSetListModel.Entry entry) {
+                FileStore.DataSetStore store = entry.getDataSetStore();
+                return store != null &&
+                        canUpload(FileType.SOURCE, entry.getDataSetStore().getSourceFile(), entry) &&
+                        !canUpload(FileType.FACTS, entry.getDataSetStore().getFactsFile(), entry);
+            }
+
+
+            private void uploadStream(final FileStore.DataSetStore store, final ProgressListener uploadProgressListener) {
+                // TODO move the uploading code someplace else, separated from the GUI
+                // TODO figure out a way to handle all the progress monitors for all those tasks
+
+                ProgressMonitor hashProgressMonitor = new ProgressMonitor(frame, "Analyzing", String.format("Analyzing state for %s", store.getSpec()), 0, 100);
+                final ProgressListener hashProgressListener = new ProgressListener.Adapter(hashProgressMonitor) {
                     @Override
                     public void swingFinished(boolean success) {
                         setEnabled(!success);
@@ -444,13 +458,8 @@ public class DataSetActions {
                 }));
             }
 
-            @Override
-            boolean isEnabled(DataSetListModel.Entry entry) {
-                FileStore.DataSetStore store = entry.getDataSetStore();
-                return store != null &&
-                        canUpload(FileType.SOURCE, entry.getDataSetStore().getSourceFile(), entry) &&
-                        !canUpload(FileType.FACTS, entry.getDataSetStore().getFactsFile(), entry);
-            }
+
+
         };
     }
 
