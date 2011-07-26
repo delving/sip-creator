@@ -21,11 +21,11 @@
 
 package eu.europeana.sip.model;
 
-import eu.delving.sip.AppConfig;
-
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import eu.delving.sip.AppConfig;
 
 /**
  * @author Gerald de Jong <gerald@delving.eu>
@@ -57,15 +57,15 @@ public class AppConfigModel {
     }
 
     public String getServerUrl() {
-        return String.format("http://%s/services/dataset", appConfig.getServerHostPort());
+        return String.format("http://%s/%s/dataset", appConfig.getServerHostPort(), appConfig.getUsername());
     }
 
-    public String getAccessKey() {
-        return appConfig.getAccessKey();
+    public String getUsername() {
+        return appConfig.getUsername();
     }
 
-    public void setServerAccessKey(String key) {
-        appConfig.setAccessKey(key);
+    public void setUsername(String username) {
+        appConfig.setUsername(username);
         fireChangeEvent();
     }
 

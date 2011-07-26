@@ -114,6 +114,8 @@ public class RepositoryMenu extends JMenu {
                 boolean loginSuccessful = oauth2Client.requestAccess(sipModel.getAppConfigModel().getServerHostPort(), usernameField.getText(), new String(passwordField.getPassword()));
                 if(!loginSuccessful) {
                     JOptionPane.showMessageDialog(parent, "Error while logging in", "Permission error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    sipModel.getAppConfigModel().setUsername(usernameField.getText());
                 }
             }
         }

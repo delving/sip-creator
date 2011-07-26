@@ -55,7 +55,7 @@ public class OAuth2Client {
             });
 
     public boolean requestAccess(String location, String username, String password) {
-        String tokenLocation = getTokenLocation(location);
+        String tokenLocation = toTokenLocation(location);
         try {
             OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
                     .setGrantType(GrantType.PASSWORD)
@@ -66,7 +66,7 @@ public class OAuth2Client {
             OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
 
             TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
-            connections.put(tokenLocation, connection);
+            connections.put(connectionKey(username, location), connection);
 
             return true;
 
@@ -78,8 +78,9 @@ public class OAuth2Client {
         return false;
     }
     
-    private boolean requestRefresh(String location, String refreshToken) {
-        String tokenLocation = getTokenLocation(location);
+    private boolean requestRefresh(String connectionKey, String refreshToken) {
+        String location = connectionKey.split("#")[1];
+        String tokenLocation = toTokenLocation(location);
         try {
             OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
                     .setGrantType(GrantType.REFRESH_TOKEN)
@@ -89,30 +90,30 @@ public class OAuth2Client {
             OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
 
             TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
-            connections.put(tokenLocation, connection);
+            connections.put(connectionKey, connection);
             return true;
 
         } catch (Throwable t) {
             log.error("Problem while using refresh token", t);
-            connections.remove(tokenLocation);
+            connections.remove(connectionKey);
         }
         return false;
     }
 
-    public String getAccessToken(String location) {
+    public String getAccessToken(String location, String username) {
 
         // TODO (Serkan?): we return null here when there is a problem with fetching an access token, in other words when the client needs to login again (with user & password)
         // in case this happens, the login should be triggered ( probably somewhere near SIPCreatorGui#getAccessToken() )
 
-        String tokenLocation = getTokenLocation(location);
+        String tokenLocation = toTokenLocation(location);
 
-        if (!connections.containsKey(tokenLocation)) {
+        if (!connections.containsKey(connectionKey(username, location))) {
             return null;
         }
 
-        TokenConnection connection = connections.get(tokenLocation);
+        TokenConnection connection = connections.get(connectionKey(username, location));
         if (connection.isTokenExpired()) {
-            boolean refreshSuccessful = requestRefresh(location, connection.getRefreshToken());
+            boolean refreshSuccessful = requestRefresh(connectionKey(username, location), connection.getRefreshToken());
             if(refreshSuccessful) {
                 return connection.getAccessToken();
             } else {
@@ -123,9 +124,14 @@ public class OAuth2Client {
         }
     }
 
-    private String getTokenLocation(String location) {
+    private String toTokenLocation(String location) {
         return "http://" + location + OAUTH2_ENDPOINT_PATH;
     }
+
+    private String connectionKey(String username, String location) {
+        return String.format("%s.#.%s", username, location);
+    }
+
 
     private static class TokenConnection {
         private String accessToken = null;

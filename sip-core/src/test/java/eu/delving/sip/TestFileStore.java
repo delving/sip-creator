@@ -21,6 +21,11 @@
 
 package eu.delving.sip;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MappingModel;
@@ -32,11 +37,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Make sure the file store is working
@@ -86,11 +86,11 @@ public class TestFileStore {
     @Test
     public void manipulateAppConfig() throws FileStoreException {
         AppConfig appConfig = fileStore.getAppConfig();
-        Assert.assertTrue("should be no access key", appConfig.getAccessKey().isEmpty());
-        appConfig.setAccessKey("gumby");
+        Assert.assertTrue("should have no username", appConfig.getUsername().isEmpty());
+        appConfig.setUsername("pokey");
         fileStore.setAppConfig(appConfig);
         appConfig = fileStore.getAppConfig();
-        Assert.assertEquals("Should have saved access key", "gumby", appConfig.getAccessKey());
+        Assert.assertEquals("Should have saved username", "pokey", appConfig.getUsername());
     }
 
     @Test

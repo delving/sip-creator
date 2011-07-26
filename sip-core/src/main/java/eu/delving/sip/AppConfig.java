@@ -21,11 +21,11 @@
 
 package eu.delving.sip;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * This class
@@ -38,6 +38,7 @@ import java.util.List;
 public class AppConfig {
     private String serverHostPort;
     private String accessKey;
+    private String username;
     private String recentDirectory;
     private String normalizeDirectory;
     private List<String> activeMetadataPrefixes;
@@ -56,6 +57,7 @@ public class AppConfig {
         this.serverHostPort = serverHostPort;
     }
 
+    // TODO remove this when we all switch to the new config
     public String getAccessKey() {
         if (accessKey == null) {
             accessKey = "";
@@ -68,28 +70,37 @@ public class AppConfig {
         saveConnection();
     }
 
+    public String getUsername() {
+        if(username == null) {
+            username = "";
+        }
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+        saveConnection();
+     }
+
     public void saveConnection() {
         for (RepositoryConnection connection : getRepositoryConnections()) {
             if (connection.serverHostPort.equals(getServerHostPort())) {
-                connection.accessKey = getAccessKey();
+                connection.username = username;
                 return;
             }
         }
-        RepositoryConnection connection = new RepositoryConnection();
-        connection.serverHostPort = getServerHostPort();
-        connection.accessKey = getAccessKey();
+        RepositoryConnection connection = new RepositoryConnection(getServerHostPort(), getUsername());
         repositoryConnections.add(connection);
     }
 
     public void deleteConnection() {
-        repositoryConnections = filter(getServerHostPort(), repositoryConnections);
+        repositoryConnections = filter(getServerHostPort(), getUsername(), repositoryConnections);
     }
 
     public void selectConnection(String serverHostPort) {
         for (RepositoryConnection connection : getRepositoryConnections()) {
             if (connection.serverHostPort.equals(serverHostPort)) {
                 this.serverHostPort = connection.serverHostPort;
-                this.accessKey = connection.accessKey;
                 return;
             }
         }
@@ -143,16 +154,22 @@ public class AppConfig {
 
     @XStreamAlias("repository-connection")
     public static class RepositoryConnection {
+        public String accessKey; // TODO remove once we all switch to new config
         public String serverHostPort;
-        public String accessKey;
+        public String username;
+
+        public RepositoryConnection(String serverHostPort, String username) {
+            this.serverHostPort = serverHostPort;
+            this.username = username;
+        }
     }
 
-    private static List<RepositoryConnection> filter(String serverHostPort, List<RepositoryConnection> original) {
+    private static List<RepositoryConnection> filter(String serverHostPort, String username, List<RepositoryConnection> original) {
         List<RepositoryConnection> list = new ArrayList<RepositoryConnection>(original);
         Iterator<RepositoryConnection> walk = list.iterator();
         while (walk.hasNext()) {
             RepositoryConnection connection = walk.next();
-            if (serverHostPort.equals(connection.serverHostPort)) {
+            if (serverHostPort.equals(connection.serverHostPort) && username.equals(connection.username)) {
                 walk.remove();
             }
         }
