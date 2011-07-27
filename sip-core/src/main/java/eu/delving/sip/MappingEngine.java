@@ -1,21 +1,11 @@
 package eu.delving.sip;
 
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.MetadataModelImpl;
-import eu.delving.metadata.RecordMapping;
-import eu.delving.metadata.RecordValidator;
-import eu.europeana.sip.core.DiscardRecordException;
-import eu.europeana.sip.core.GroovyCodeResource;
-import eu.europeana.sip.core.MappingException;
-import eu.europeana.sip.core.MappingRunner;
-import eu.europeana.sip.core.MetadataRecord;
-import eu.europeana.sip.core.MetadataRecordFactory;
+import eu.delving.metadata.*;
+import eu.europeana.sip.core.*;
+import org.apache.commons.io.IOUtils;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +26,15 @@ public class MappingEngine {
         MetadataModel metadataModel = loadMetadataModel();
         FileInputStream is = new FileInputStream(mappingFile);
         RecordMapping recordMapping = RecordMapping.read(is, metadataModel);
+        mappingRunner = new MappingRunner(new GroovyCodeResource(), recordMapping.toCompileCode(metadataModel));
+        metadataRecordFactory = new MetadataRecordFactory(namespaces);
+        recordValidator = new RecordValidator(metadataModel.getRecordDefinition(recordMapping.getPrefix()));
+    }
+
+    public MappingEngine(String mappingFileAsString, Map<String, String> namespaces) throws IOException, MetadataException {
+        MetadataModel metadataModel = loadMetadataModel();
+        InputStream mappingFileAsStream = IOUtils.toInputStream(mappingFileAsString, "UTF-8");
+        RecordMapping recordMapping = RecordMapping.read(mappingFileAsStream, metadataModel);
         mappingRunner = new MappingRunner(new GroovyCodeResource(), recordMapping.toCompileCode(metadataModel));
         metadataRecordFactory = new MetadataRecordFactory(namespaces);
         recordValidator = new RecordValidator(metadataModel.getRecordDefinition(recordMapping.getPrefix()));
