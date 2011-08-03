@@ -21,6 +21,7 @@
 
 package eu.delving.metadata;
 
+import groovy.util.Node;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -79,6 +80,12 @@ public class RecordValidator {
         this.idUniqueness = uniqueness;
     }
 
+    public Node validateRecord(Node record, List<String> problems) {
+        return record;
+    }
+
+    @Deprecated
+    /** @deprecated switch to node */
     public String validateRecord(String recordString, List<String> problems) {
         if (!recordString.contains("<")) {
             return recordString;

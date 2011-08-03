@@ -11,6 +11,7 @@ import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
+import groovy.util.Node;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
@@ -49,12 +50,12 @@ public class MappingEngine {
      * @throws MappingException something important went wrong with mapping, beyond validation problems
      */
 
-    public String executeMapping(String originalRecord) throws MappingException {
+    public Node executeMapping(String originalRecord) throws MappingException {
         try {
             MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
-            String recordString = mappingRunner.runMapping(metadataRecord);
+            Node recordString = mappingRunner.runMapping(metadataRecord);
             List<String> problems = new ArrayList<String>();
-            String validated = recordValidator.validateRecord(recordString, problems);
+            Node validated = recordValidator.validateRecord(recordString, problems);
             return problems.isEmpty() ? validated : null;
         }
         catch (DiscardRecordException e) {
@@ -65,7 +66,7 @@ public class MappingEngine {
         }
     }
 
-    private static MetadataModel loadMetadataModel() {
+    public static MetadataModel loadMetadataModel() {
         try {
             MetadataModelImpl metadataModel = new MetadataModelImpl();
             metadataModel.setRecordDefinitionResources(Arrays.asList(

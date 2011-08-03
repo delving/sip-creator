@@ -35,6 +35,8 @@ import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.ProgressListener;
 import eu.europeana.sip.model.SipModel;
+import groovy.util.Node;
+import groovy.xml.XmlUtil;
 import org.apache.log4j.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -122,9 +124,8 @@ public class Normalizer implements Runnable {
             while ((record = parser.nextRecord()) != null && running) {
                 try {
                     long before = System.currentTimeMillis();
-                    String output = mappingRunner.runMapping(record);
-//                    Node outputNode = mappingRunner.runMapping(record);
-//                    String output = XmlUtil.serialize(outputNode);
+                    Node outputNode = mappingRunner.runMapping(record);
+                    String output = XmlUtil.serialize(outputNode);
                     totalMappingTime += System.currentTimeMillis() - before;
                     List<String> problems = new ArrayList<String>();
                     before = System.currentTimeMillis();
