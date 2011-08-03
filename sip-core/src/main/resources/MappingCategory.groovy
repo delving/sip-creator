@@ -1,6 +1,6 @@
-import eu.europeana.sip.core.DiscardRecordException
-import eu.europeana.sip.core.GroovyList
-import eu.europeana.sip.core.GroovyNode
+import eu.delving.groovy.DiscardRecordException
+import eu.delving.groovy.GroovyList
+import eu.delving.groovy.GroovyNode
 
 // MappingCategory is a class used as a Groovy Category to add methods to existing classes
 

@@ -1,4 +1,4 @@
-package eu.delving.core
+package eu.delving.groovy
 
 import _root_.java.io.PrintWriter
 import _root_.java.net.URL

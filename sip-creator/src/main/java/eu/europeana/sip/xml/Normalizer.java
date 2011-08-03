@@ -21,6 +21,12 @@
 
 package eu.europeana.sip.xml;
 
+import eu.delving.groovy.DiscardRecordException;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.RecordValidationException;
 import eu.delving.metadata.MetadataNamespace;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
@@ -28,12 +34,6 @@ import eu.delving.metadata.Uniqueness;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.ProgressListener;
-import eu.europeana.sip.core.DiscardRecordException;
-import eu.europeana.sip.core.GroovyCodeResource;
-import eu.europeana.sip.core.MappingException;
-import eu.europeana.sip.core.MappingRunner;
-import eu.europeana.sip.core.MetadataRecord;
-import eu.europeana.sip.core.RecordValidationException;
 import eu.europeana.sip.model.SipModel;
 import org.apache.log4j.Logger;
 

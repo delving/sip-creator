@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -19,24 +19,17 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.core;
+package eu.delving.groovy;
 
 /**
- * Something identifiable went wrong during mapping
+ * Discard a record outright for some good reason
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class MappingException extends Exception {
+public class DiscardRecordException extends RuntimeException {
 
-    private MetadataRecord metadataRecord;
-
-    public MappingException(MetadataRecord metadataRecord, String message, Throwable cause) {
-        super(message, cause);
-        this.metadataRecord = metadataRecord;
-    }
-
-    public MetadataRecord getMetadataRecord() {
-        return metadataRecord;
+    public DiscardRecordException(String reason) {
+        super("Record Discarded because: "+reason);
     }
 }

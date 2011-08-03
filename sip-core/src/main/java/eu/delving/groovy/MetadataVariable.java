@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Delving BV
+ * Copyright 2007 EDL FOUNDATION
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -19,17 +19,32 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.core;
+package eu.delving.groovy;
 
 /**
- * Discard a record outright for some good reason
+ * Holding a variable name and value
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class DiscardRecordException extends RuntimeException {
+public class MetadataVariable {
+    private String name;
+    private String value;
 
-    public DiscardRecordException(String reason) {
-        super("Record Discarded because: "+reason);
+    public MetadataVariable(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String toString() {
+        return name + "= \"" + value+"\"";
     }
 }

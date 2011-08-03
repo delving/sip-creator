@@ -21,9 +21,9 @@
 
 package eu.europeana.sip.xml;
 
+import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.ProgressListener;
-import eu.europeana.sip.core.MetadataRecord;
 import eu.europeana.sip.model.SipModel;
 import groovy.lang.GroovyClassLoader;
 import groovy.xml.MarkupBuilder;

@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.core;
+package eu.delving.groovy;
 
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;

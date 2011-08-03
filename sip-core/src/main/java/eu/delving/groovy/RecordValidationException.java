@@ -1,4 +1,4 @@
-package eu.europeana.sip.core;
+package eu.delving.groovy;
 
 import java.util.ArrayList;
 import java.util.List;

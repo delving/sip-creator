@@ -21,17 +21,17 @@
 
 package eu.europeana.sip.model;
 
+import eu.delving.groovy.DiscardRecordException;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.RecordValidationException;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
-import eu.europeana.sip.core.DiscardRecordException;
-import eu.europeana.sip.core.GroovyCodeResource;
-import eu.europeana.sip.core.MappingException;
-import eu.europeana.sip.core.MappingRunner;
-import eu.europeana.sip.core.MetadataRecord;
-import eu.europeana.sip.core.RecordValidationException;
 import org.apache.log4j.Logger;
 
 import javax.swing.SwingUtilities;

@@ -19,32 +19,24 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.core;
+package eu.delving.groovy;
 
 /**
- * Holding a variable name and value
+ * Something identifiable went wrong during mapping
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class MetadataVariable {
-    private String name;
-    private String value;
+public class MappingException extends Exception {
 
-    public MetadataVariable(String name, String value) {
-        this.name = name;
-        this.value = value;
+    private MetadataRecord metadataRecord;
+
+    public MappingException(MetadataRecord metadataRecord, String message, Throwable cause) {
+        super(message, cause);
+        this.metadataRecord = metadataRecord;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public String toString() {
-        return name + "= \"" + value+"\"";
+    public MetadataRecord getMetadataRecord() {
+        return metadataRecord;
     }
 }

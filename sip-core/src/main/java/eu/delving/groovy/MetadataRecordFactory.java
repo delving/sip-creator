@@ -1,4 +1,4 @@
-package eu.europeana.sip.core;
+package eu.delving.groovy;
 
 import com.ctc.wstx.exc.WstxParsingException;
 import org.codehaus.stax2.XMLInputFactory2;

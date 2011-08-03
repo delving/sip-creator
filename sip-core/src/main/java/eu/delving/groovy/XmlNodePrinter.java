@@ -1,4 +1,4 @@
-package eu.europeana.sip.core;
+package eu.delving.groovy;
 
 import groovy.util.IndentPrinter;
 import groovy.util.Node;

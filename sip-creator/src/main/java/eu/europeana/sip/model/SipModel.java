@@ -21,19 +21,10 @@
 
 package eu.europeana.sip.model;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.RecordValidationException;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldDefinition;
@@ -50,15 +41,26 @@ import eu.delving.sip.AppConfig;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.ProgressListener;
-import eu.europeana.sip.core.GroovyCodeResource;
-import eu.europeana.sip.core.MappingException;
-import eu.europeana.sip.core.MetadataRecord;
-import eu.europeana.sip.core.RecordValidationException;
 import eu.europeana.sip.xml.AnalysisParser;
 import eu.europeana.sip.xml.MetadataParser;
 import eu.europeana.sip.xml.Normalizer;
 import eu.europeana.sip.xml.RecordAnalyzer;
 import org.apache.log4j.Logger;
+
+import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This model is behind the whole sip creator, as a facade for all the models related to a data set

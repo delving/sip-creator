@@ -1,16 +1,16 @@
 package eu.delving.sip;
 
+import eu.delving.groovy.DiscardRecordException;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
-import eu.europeana.sip.core.DiscardRecordException;
-import eu.europeana.sip.core.GroovyCodeResource;
-import eu.europeana.sip.core.MappingException;
-import eu.europeana.sip.core.MappingRunner;
-import eu.europeana.sip.core.MetadataRecord;
-import eu.europeana.sip.core.MetadataRecordFactory;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;

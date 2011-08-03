@@ -21,8 +21,8 @@
 
 package eu.europeana.sip.gui;
 
+import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.ProgressListener;
-import eu.europeana.sip.core.MetadataRecord;
 import eu.europeana.sip.model.SipModel;
 
 import javax.swing.JLabel;

@@ -21,12 +21,12 @@
 
 package eu.europeana.sip.xml;
 
+import eu.delving.groovy.GroovyNode;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.ProgressListener;
-import eu.europeana.sip.core.GroovyNode;
-import eu.europeana.sip.core.MetadataRecord;
-import eu.europeana.sip.core.MetadataRecordFactory;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
