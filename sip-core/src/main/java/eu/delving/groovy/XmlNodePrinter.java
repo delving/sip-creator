@@ -22,6 +22,7 @@ public class XmlNodePrinter {
     private String quote;
     private boolean namespaceAware = true;
     private boolean preserveWhitespace = false;
+    private boolean showNamespaceUri;
 
     public XmlNodePrinter(PrintWriter out) {
         this(out, "  ");
@@ -240,7 +241,7 @@ public class XmlNodePrinter {
                 String namespaceUri = qname.getNamespaceURI();
                 if (namespaceUri != null) {
                     String prefix = qname.getPrefix();
-                    if (!ctx.isPrefixRegistered(prefix, namespaceUri)) {
+                    if (!ctx.isPrefixRegistered(prefix, namespaceUri) && showNamespaceUri) {
                         ctx.registerNamespacePrefix(prefix, namespaceUri);
                         out.print(" ");
                         out.print("xmlns");
@@ -341,6 +342,10 @@ public class XmlNodePrinter {
                     out.print(c);
             }
         }
+    }
+
+    public void setShowNamespaceUri(boolean showNamespaceUri) {
+        this.showNamespaceUri = showNamespaceUri;
     }
 
     protected class NamespaceContext {
