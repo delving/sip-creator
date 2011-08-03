@@ -144,8 +144,10 @@ public class XmlNodePrinter {
         Object value = node.value();
         if (value instanceof List) {
             printName(node, ctx, true, isListOfSimple((List) value));
+            printLineEnd();
             printList((List) value, ctx);
             printName(node, ctx, false, isListOfSimple((List) value));
+            printLineEnd();
             out.flush();
             return;
         }
@@ -154,6 +156,7 @@ public class XmlNodePrinter {
         printName(node, ctx, true, preserveWhitespace);
         printSimpleItemWithIndent(value);
         printName(node, ctx, false, preserveWhitespace);
+        printLineEnd();
         out.flush();
     }
 
@@ -199,9 +202,7 @@ public class XmlNodePrinter {
     }
 
     protected void printSimpleItem(Object value) {
-        if (!preserveWhitespace) printLineBegin();
         printEscaped(InvokerHelper.toString(value));
-        if (!preserveWhitespace) printLineEnd();
     }
 
     protected void printName(Node node, NamespaceContext ctx, boolean begin, boolean preserve) {
@@ -212,7 +213,7 @@ public class XmlNodePrinter {
         if (name == null) {
             throw new NullPointerException("Name must not be null.");
         }
-        if (!preserve || begin) printLineBegin();
+        if(begin)printLineBegin();
         out.print("<");
         if (!begin) {
             out.print("/");
@@ -225,7 +226,6 @@ public class XmlNodePrinter {
             printNameAttributes(node.attributes(), ctx);
         }
         out.print(">");
-        if (!preserve || !begin) printLineEnd();
     }
 
     protected boolean printSpecialNode(Node node) {
@@ -283,10 +283,7 @@ public class XmlNodePrinter {
         if (node == null) {
             throw new IllegalArgumentException("Node must not be null!");
         }
-        if (!node.children().isEmpty()) {
-            return false;
-        }
-        return node.text().length() == 0;
+        return node.children().isEmpty() && node.text().length() == 0;
     }
 
     private String getName(Object object) {

@@ -21,12 +21,7 @@
 
 package eu.europeana.sip.xml;
 
-import eu.delving.groovy.DiscardRecordException;
-import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingException;
-import eu.delving.groovy.MappingRunner;
-import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.RecordValidationException;
+import eu.delving.groovy.*;
 import eu.delving.metadata.MetadataNamespace;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
@@ -40,10 +35,7 @@ import groovy.xml.XmlUtil;
 import org.apache.log4j.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -125,7 +117,10 @@ public class Normalizer implements Runnable {
                 try {
                     long before = System.currentTimeMillis();
                     Node outputNode = mappingRunner.runMapping(record);
-                    String output = XmlUtil.serialize(outputNode);
+                    StringWriter writer = new StringWriter();
+                    XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+                    xmlNodePrinter.print(outputNode);
+                    String output = writer.toString();
                     totalMappingTime += System.currentTimeMillis() - before;
                     List<String> problems = new ArrayList<String>();
                     before = System.currentTimeMillis();

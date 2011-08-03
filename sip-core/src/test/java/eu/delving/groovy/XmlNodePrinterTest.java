@@ -39,12 +39,8 @@ public class XmlNodePrinterTest {
 
     private static final Logger LOG = Logger.getRootLogger();
     private static final String EXPECTED = "<record>\n" +
-            "  <europeana:uri>\n" +
-            "    http://doesntexist\n" +
-            "  </europeana:uri>\n" +
-            "  <europeana:type>\n" +
-            "    IMAGE\n" +
-            "  </europeana:type>\n" +
+            "  <europeana:uri>http://doesntexist</europeana:uri>\n" +
+            "  <europeana:type>IMAGE</europeana:type>\n" +
             "</record>\n";
     private String prefix = "europeana";
     private String namespace = "http://www.europeana.eu/schemas/ese";
@@ -57,6 +53,7 @@ public class XmlNodePrinterTest {
         StringWriter writer = new StringWriter();
         XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
         xmlNodePrinter.print(rootNode);
+        LOG.info("Result :\n" + writer.toString());
         Assert.assertEquals(EXPECTED, writer.toString());
     }
 

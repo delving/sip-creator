@@ -34,13 +34,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Parse, filter, validate a record
@@ -81,7 +75,7 @@ public class RecordValidator {
     }
 
     public Node validateRecord(Node record, List<String> problems) {
-        return record;
+        throw new NoSuchMethodError("Method not implemented (yet)");
     }
 
     @Deprecated
