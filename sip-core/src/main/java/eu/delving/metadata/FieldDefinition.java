@@ -146,6 +146,7 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
         public String requiredGroup;
 
         @XStreamAsAttribute
+        @Deprecated /** @deprecated use Validator */
         public boolean url;
 
         @XStreamAsAttribute
@@ -166,9 +167,17 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
         @XStreamAsAttribute
         public boolean required;
 
+        @XStreamAsAttribute
+        public int minOccurrence;
+
+        @XStreamAsAttribute
+        public int maxOccurrence;
+
         public List<String> options;
 
         public Converter converter;
+
+        public Validator validator;
 
         @XStreamOmitField
         public FactDefinition factDefinition;
@@ -231,5 +240,11 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
 
         @XStreamAsAttribute
         public String call;
+    }
+
+    public static class Validator {
+
+        @XStreamAsAttribute
+        public String name;
     }
 }

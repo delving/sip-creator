@@ -52,9 +52,12 @@
             <validation requiredGroup="Collection Title" factName="name"/>
         </field>
         <field prefix="europeana" localName="country" systemField="true" fulldoc="false"> <!-- facetPrefix="count"-->
-            <validation requiredGroup="Country" factName="country"/>
+            <validation requiredGroup="Country" factName="country">
+                <validator name="country"/>
+            </validation>
         </field>
-        <field prefix="europeana" localName="dataProvider" facetPrefix="dapr" systemField="true" fulldoc="true" briefdoc="true">
+        <field prefix="europeana" localName="dataProvider" facetPrefix="dapr" systemField="true" fulldoc="true"
+               briefdoc="true">
             <validation requiredGroup="Data Provider" factName="dataProvider"/>
         </field>
         <field prefix="europeana" localName="isShownAt" fulldoc="true" fieldType="string">
@@ -64,7 +67,9 @@
             <validation url="true" requiredGroup="Shown-at or Shown-by"/>
         </field>
         <field prefix="europeana" localName="language" fieldType="string" facetName="language" searchField="language">
-            <validation requiredGroup="Language" factName="language"/>
+            <validation requiredGroup="Language" factName="language">
+                <validator name="language"/>
+            </validation>
         </field>
         <field prefix="europeana" localName="object" briefdoc="true">
             <validation object="true" url="true"/>
@@ -73,7 +78,7 @@
             <validation requiredGroup="Provider" factName="provider"/>
         </field>
         <field prefix="europeana" localName="rights">
-            <validation requiredGroup="Rights" factName="rights"/>
+            <validation requiredGroup="Rights" factName="rights" url="true" minOccurrence="1" maxOccurrence="1"/>
         </field>
         <field prefix="europeana" localName="source"/> <!-- to be deleted is unused -->
         <field prefix="europeana" localName="type" fieldType="string" facetPrefix="tp" facetName="type">

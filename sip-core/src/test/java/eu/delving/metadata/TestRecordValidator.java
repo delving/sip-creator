@@ -1,6 +1,7 @@
 package eu.delving.metadata;
 
 import junit.framework.Assert;
+import static junit.framework.Assert.assertEquals;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,8 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static junit.framework.Assert.assertEquals;
 
 /**
  * Test that the validator is working properly
@@ -94,7 +93,7 @@ public class TestRecordValidator {
         );
     }
 
-    private void problem(String [] inputArray, String problemContains, boolean includeRequired) {
+    private void problem(String[] inputArray, String problemContains, boolean includeRequired) {
         List<String> inputList = new ArrayList<String>(Arrays.asList(inputArray));
         if (includeRequired) {
             inputList.addAll(validFields);
@@ -105,7 +104,7 @@ public class TestRecordValidator {
         Assert.assertFalse("Expected problems", problems.isEmpty());
         boolean found = false;
         for (String problem : problems) {
-            log.info("Problem: "+problem);
+            log.info("Problem: " + problem);
             if (problem.contains(problemContains)) {
                 found = true;
             }
@@ -192,7 +191,7 @@ public class TestRecordValidator {
                 true
         );
     }
-    
+
     @Test
     public void uniqueness() {
         validate(
@@ -283,4 +282,11 @@ public class TestRecordValidator {
 
     }
 
+    @Test
+    public void testCardinality() throws Exception {
+        problem(new String[]{
+                "<europeana:rights>http://creativecommons.org/licenses/by-nc/3.0/de/</europeana:rights>",
+                "<europeana:rights>http://creativecommons.org/licenses/by-nc/3.0/de/</europeana:rights>"
+        }, "Duplicate field [Rights], exactly one allowed", true);
+    }
 }
