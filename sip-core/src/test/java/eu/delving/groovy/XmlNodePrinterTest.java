@@ -56,7 +56,6 @@ public class XmlNodePrinterTest {
         rootNode.append(createChildNode("type", "IMAGE"));
         StringWriter writer = new StringWriter();
         XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
-        xmlNodePrinter.setShowNamespaceUri(true);
         xmlNodePrinter.print(rootNode);
         Assert.assertEquals(EXPECTED, writer.toString());
     }

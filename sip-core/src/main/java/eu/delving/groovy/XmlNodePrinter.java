@@ -22,7 +22,7 @@ public class XmlNodePrinter {
     private String quote;
     private boolean namespaceAware = true;
     private boolean preserveWhitespace = false;
-    private boolean showNamespaceUri;
+    private boolean showNamespaceUri = false;
 
     public XmlNodePrinter(PrintWriter out) {
         this(out, "  ");
