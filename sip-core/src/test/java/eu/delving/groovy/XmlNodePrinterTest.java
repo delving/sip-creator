@@ -38,15 +38,23 @@ import java.io.StringWriter;
 public class XmlNodePrinterTest {
 
     private static final Logger LOG = Logger.getRootLogger();
-    private static final String EXPECTED = "<record>\n" +
+    private static final String SINGLE_EXPECTED = "<record>\n" +
             "  <europeana:uri>http://doesntexist</europeana:uri>\n" +
             "  <europeana:type>IMAGE</europeana:type>\n" +
+            "</record>\n";
+    private static final String DOUBLE_EXPECTED = "<record>\n" +
+            "  <europeana:uri>http://doesntexist</europeana:uri>\n" +
+            "  <europeana:type>IMAGE</europeana:type>\n" +
+            "</record>\n" +
+            "<record>\n" +
+            "  <europeana:uri>http://fake</europeana:uri>\n" +
+            "  <europeana:type>SOUND</europeana:type>\n" +
             "</record>\n";
     private String prefix = "europeana";
     private String namespace = "http://www.europeana.eu/schemas/ese";
 
     @Test
-    public void testPrint() throws Exception {
+    public void testSingleNodePrint() throws Exception {
         Node rootNode = new Node(null, "record");
         rootNode.append(createChildNode("uri", "http://doesntexist"));
         rootNode.append(createChildNode("type", "IMAGE"));
@@ -54,7 +62,24 @@ public class XmlNodePrinterTest {
         XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
         xmlNodePrinter.print(rootNode);
         LOG.info("Result :\n" + writer.toString());
-        Assert.assertEquals(EXPECTED, writer.toString());
+        Assert.assertEquals(SINGLE_EXPECTED, writer.toString());
+    }
+
+    @Test
+    public void testMultiNodePrint() throws Exception {
+        StringWriter writer = new StringWriter();
+        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+        Node rootNode;
+        rootNode = new Node(null, "record");
+        rootNode.append(createChildNode("uri", "http://doesntexist"));
+        rootNode.append(createChildNode("type", "IMAGE"));
+        xmlNodePrinter.print(rootNode);
+        rootNode = new Node(null, "record");
+        rootNode.append(createChildNode("uri", "http://fake"));
+        rootNode.append(createChildNode("type", "SOUND"));
+        xmlNodePrinter.print(rootNode);
+        LOG.info("Result :\n" + writer.toString());
+        Assert.assertEquals(DOUBLE_EXPECTED, writer.toString());
     }
 
     private Node createChildNode(String name, String value) {
