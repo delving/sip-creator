@@ -27,7 +27,6 @@ import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import groovy.util.Node;
 import groovy.util.NodeBuilder;
-import groovy.xml.MarkupBuilder;
 import groovy.xml.NamespaceBuilder;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;

@@ -117,6 +117,10 @@ public class RecordMapping {
         }
     }
 
+    public Map<String, String> getFacts() {
+        return facts;
+    }
+
     public Set<FieldMapping> getFieldMappings() {
         return new TreeSet<FieldMapping>(fieldMappings.values());
     }
