@@ -38,10 +38,12 @@ import java.io.StringWriter;
 public class XmlNodePrinterTest {
 
     private static final Logger LOG = Logger.getRootLogger();
+
     private static final String SINGLE_EXPECTED = "<record>\n" +
             "  <europeana:uri>http://doesntexist</europeana:uri>\n" +
             "  <europeana:type>IMAGE</europeana:type>\n" +
             "</record>\n";
+
     private static final String DOUBLE_EXPECTED = "<record>\n" +
             "  <europeana:uri>http://doesntexist</europeana:uri>\n" +
             "  <europeana:type>IMAGE</europeana:type>\n" +
@@ -50,6 +52,7 @@ public class XmlNodePrinterTest {
             "  <europeana:uri>http://fake</europeana:uri>\n" +
             "  <europeana:type>SOUND</europeana:type>\n" +
             "</record>\n";
+
     private String prefix = "europeana";
     private String namespace = "http://www.europeana.eu/schemas/ese";
 

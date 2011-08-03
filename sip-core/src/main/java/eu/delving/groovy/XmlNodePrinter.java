@@ -12,9 +12,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Adapted from
+ * This class is adapted from the groovy.util package and slightly differs from the original.
+ * <ul>
+ * <li>The flag 'showNamespaceUri' has been added to remove the namespace URIs. The 'namespaceAware' flag
+ * didn't do the job as it also removes the prefix.</li>
+ * <li>Indentation; linebreaks only after the closing element.</li>
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Serkan Demirel <serkan@blackbuilt.nl>
+ * @see groovy.util.XmlNodePrinter
  */
 
 public class XmlNodePrinter {
@@ -213,7 +219,7 @@ public class XmlNodePrinter {
         if (name == null) {
             throw new NullPointerException("Name must not be null.");
         }
-        if(begin)printLineBegin();
+        if (begin) printLineBegin();
         out.print("<");
         if (!begin) {
             out.print("/");

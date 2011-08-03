@@ -263,6 +263,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             try {
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
+                    if(null == outputNode) {
+                        return;
+                    }
                     StringWriter writer = new StringWriter();
                     XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
                     xmlNodePrinter.print(outputNode);
