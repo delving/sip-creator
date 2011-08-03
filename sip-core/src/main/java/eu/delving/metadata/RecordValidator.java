@@ -124,7 +124,6 @@ public class RecordValidator {
                 requiredGroupMap.put(fieldDefinition.validation.requiredGroup, false);
             }
             Counter counter = counters.get(fieldDefinition.path);
-            log.info("Counter  : " + (null != counter ? counter.count : -1)+" : "+fieldDefinition.path);
             if (!fieldDefinition.validation.multivalued && counter != null && counter.count > 1) {
                 problems.add(String.format("Single-valued field [%s] has more than one value", fieldDefinition.path));
             }
