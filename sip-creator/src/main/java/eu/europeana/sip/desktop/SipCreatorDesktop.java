@@ -31,20 +31,32 @@ import java.awt.event.WindowEvent;
 /**
  * This is the main window of the SIP-Creator.
  *
+ * The SIP-Creator contains the following windows:
+ *
+ * <ul>
+ * <li>DataSet window</li>
+ * <li>Analysis window</li>
+ * <li>Mapping window</li>
+ * <li>Log window</li>
+ * <ul>
+ *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class SipCreatorDesktop extends JDesktopPane {
+public class SipCreatorDesktop {
 
     private SipCreatorPreferences sipCreatorPreferences;
+    private JDesktopPane desktopPane = new JDesktopPane();
 
     {
         buildLayout();
+        buildNavigation();
         sipCreatorPreferences = new SipCreatorPreferencesImpl(
                 new SipCreatorPreferences.Listener() {
 
                     @Override
                     public void windowStateFound(SipCreatorPreferences.WindowState windowState) {
                         // todo: ask to restore window state.
+                        restoreWindows(windowState);
                     }
 
                     @Override
@@ -56,10 +68,25 @@ public class SipCreatorDesktop extends JDesktopPane {
     }
 
     private void buildLayout() {
-        AuthenticationWindow authenticationWindow = new AuthenticationWindow();
-        authenticationWindow.setVisible(true);
-        authenticationWindow.setSize(new Dimension(300, 200));
-        add(authenticationWindow);
+        WelcomeWindow welcomeWindow = new WelcomeWindow();
+        welcomeWindow.setVisible(true);
+        desktopPane.setLayout(new BorderLayout());
+        desktopPane.add(welcomeWindow, BorderLayout.CENTER);
+    }
+
+    private void restoreWindows(SipCreatorPreferences.WindowState windowState) {
+        for (JInternalFrame window : windowState.getWindows()) {
+            desktopPane.add(window);
+        }
+    }
+
+    private JComponent buildNavigation() {
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new Navigation(), desktopPane);
+        splitPane.setBorder(null);
+        splitPane.setSize(new Dimension(400, 400));
+        splitPane.setDividerLocation(200);
+        splitPane.setVisible(true);
+        return splitPane;
     }
 
     public SipCreatorPreferences getSipCreatorPreferences() {
@@ -69,8 +96,8 @@ public class SipCreatorDesktop extends JDesktopPane {
     public static void main(String... args) {
         final SipCreatorDesktop sipCreatorDesktop = new SipCreatorDesktop();
         JFrame main = new JFrame();
-        main.getContentPane().add(sipCreatorDesktop, BorderLayout.CENTER);
-        main.setSize(new Dimension(1200, 800));
+        main.getContentPane().add(sipCreatorDesktop.buildNavigation(), BorderLayout.CENTER);
+        main.setExtendedState(Frame.MAXIMIZED_BOTH);
         main.setLocationRelativeTo(null);
         main.setVisible(true);
         main.addWindowListener(

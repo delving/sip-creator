@@ -85,6 +85,8 @@ public class SipCreatorPreferencesImpl implements SipCreatorPreferences {
     @Override
     public void saveWindowState(WindowState windowState) {
         // todo: add body and return void;
+        // todo: store Window ID and Point
+        // todo: collect them with JDesktopPane.getAllFrames()
     }
 }
 

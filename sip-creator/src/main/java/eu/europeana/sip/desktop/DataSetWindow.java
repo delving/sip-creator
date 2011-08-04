@@ -21,19 +21,43 @@
 
 package eu.europeana.sip.desktop;
 
+import eu.europeana.sip.util.GridBagAdapter;
+
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Contains the following elements:
  *
  * <ul>
- * <li>List of datasets</li>
+ * <li>List of data sets</li>
  * <li>Search component for datasets</li>
  * <li>Change log</li>
  * <ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class DataSetWindow extends JInternalFrame {
+public class DataSetWindow extends JPanel {
 
+    private static final String TITLE_LABEL = "Data sets";
+    private JLabel title = new JLabel(TITLE_LABEL);
+    private JList dataSets;
+
+    public DataSetWindow() {
+        setLayout(new GridBagLayout());
+        buildLayout();
+    }
+
+    private void buildLayout() {
+        GridBagAdapter gba = new GridBagAdapter();
+        gba.reset();
+        add(title, gba);
+        dataSets = new JList(fetchListModel());
+        gba.line();
+        add(dataSets, gba);
+    }
+
+    private Object[] fetchListModel() {
+        return new String[]{"Fries Museum", "Princessehof"};
+    }
 }

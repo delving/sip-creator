@@ -21,6 +21,9 @@
 
 package eu.europeana.sip.desktop;
 
+import javax.swing.*;
+import java.util.List;
+
 /**
  * Load the local preferences for the SIP-Creator.
  *
@@ -29,6 +32,7 @@ package eu.europeana.sip.desktop;
  * <ul>
  * <li>Credentials</li>
  * <li>Window states</li>
+ * <li>Data sets</li>
  * </ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
@@ -50,7 +54,7 @@ public interface SipCreatorPreferences {
     }
 
     interface WindowState {
-        // todo: define states to remember.
+        List<JInternalFrame> getWindows();
     }
 
     /**
