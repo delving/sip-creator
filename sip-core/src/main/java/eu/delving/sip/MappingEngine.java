@@ -45,7 +45,7 @@ public class MappingEngine {
      *
      * @param originalRecord a string of XML, without namespaces
      * @return the mapped record XML, or NULL if the record is invalid or discarded.
-     * @throws MappingException something important went wrong with mapping, beyond validation problems
+     * @throws MappingException    something important went wrong with mapping, beyond validation problems
      * @throws ValidationException the record is invalid by the criteria in the record definition
      */
 
@@ -57,9 +57,9 @@ public class MappingEngine {
      * Execute the mapping on the string format of the original record to turn it into the mapped record
      *
      * @param originalRecord a string of XML, without namespaces
-     * @param recordNumber which record was it
+     * @param recordNumber   which record was it
      * @return the mapped record XML, or NULL if the record is invalid or discarded.
-     * @throws MappingException something important went wrong with mapping, beyond validation problems
+     * @throws MappingException    something important went wrong with mapping, beyond validation problems
      * @throws ValidationException the record is invalid by the criteria in the record definition
      */
 
@@ -67,7 +67,12 @@ public class MappingEngine {
         try {
             MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
             Node record = mappingRunner.runMapping(metadataRecord);
-            recordValidator.validateRecord(record, recordNumber);
+            try {
+                recordValidator.validateRecord(record, recordNumber);
+            }
+            catch (ValidationException e) {
+                throw e;
+            }
             return record;
         }
         catch (DiscardRecordException e) {

@@ -1,5 +1,7 @@
 package eu.delving.metadata;
 
+import groovy.util.Node;
+
 /**
  * An assertion error wrapped in a checked exception
  *
@@ -10,16 +12,22 @@ public class ValidationException extends Exception {
     private static final String ASSERT = "assert ";
     private static final String EXPRESSION = ". Expression: "; // note: pretty specific to Groovy's whim
     private AssertionError assertionError;
+    private Node record;
     private int recordNumber;
 
-    public ValidationException(AssertionError assertionError, int recordNumber) {
+    public ValidationException(AssertionError assertionError, Node record, int recordNumber) {
         super("Record Invalid.");
         this.assertionError = assertionError;
+        this.record = record;
         this.recordNumber = recordNumber;
     }
 
     public AssertionError getAssertionError() {
         return assertionError;
+    }
+
+    public Node getRecord() {
+        return record;
     }
 
     @Override
