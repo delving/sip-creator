@@ -21,6 +21,8 @@
 
 package eu.europeana.sip.desktop.windows;
 
+import javax.swing.*;
+
 /**
  * The analyze window will present the following data:
  *
@@ -33,11 +35,24 @@ package eu.europeana.sip.desktop.windows;
  */
 public class AnalyzeWindow extends DesktopWindow {
 
+    private JTabbedPane tabbedPane = new JTabbedPane();
+
     public AnalyzeWindow(WindowId id) {
         super(id);
         buildLayout();
     }
 
     private void buildLayout() {
+        tabbedPane.addTab("Statistics", new StatisticsPanel());
+        tabbedPane.addTab("Document stucture", new DocumentStructurePanel());
+        add(tabbedPane);
+    }
+
+    private class StatisticsPanel extends JPanel {
+
+    }
+
+    private class DocumentStructurePanel extends JPanel {
+
     }
 }

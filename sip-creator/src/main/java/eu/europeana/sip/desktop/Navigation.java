@@ -40,10 +40,11 @@ public class Navigation extends JPanel {
     private static final Dimension DEFAULT_BUTTON_SIZE = new Dimension(200, 80);
     private DesktopManager desktopManager;
     private static final Logger LOG = Logger.getRootLogger();
+    private JPanel vertical;
 
     public Navigation(DesktopManager desktopManager) {
         this.desktopManager = desktopManager;
-        JPanel vertical = new JPanel();
+        vertical = new JPanel();
         vertical.setLayout(new GridLayout(8, 0));
         vertical.add(new NavigationButton(DesktopWindow.WindowId.ANALYZE));
         vertical.add(new NavigationButton(DesktopWindow.WindowId.MAPPING));
@@ -51,6 +52,14 @@ public class Navigation extends JPanel {
         vertical.add(new NavigationButton(DesktopWindow.WindowId.PREVIEW));
         vertical.add(new NavigationButton(DesktopWindow.WindowId.UPLOAD));
         add(vertical);
+    }
+
+    public void setEnabled(boolean enabled) {
+        for (Component component : vertical.getComponents()) {
+            if (component instanceof NavigationButton) {
+                component.setEnabled(enabled);
+            }
+        }
     }
 
     private class NavigationButton extends JButton {

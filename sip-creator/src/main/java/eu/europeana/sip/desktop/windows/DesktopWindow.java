@@ -36,13 +36,14 @@ public abstract class DesktopWindow extends JInternalFrame {
     public static final Dimension DEFAULT_SIZE = new Dimension(600, 350);
     private WindowState windowState;
     private WindowId id;
+    private boolean preferencesTransient;
 
     public enum WindowId {
 
         ANALYZE("Analyze", true),
-        DATA_SET("Select data set", true),
+        DATA_SET("Open data set", true),
         WELCOME("Welcome", true),
-        AUTHENTICATION("Authentication", true),
+        AUTHENTICATION("Authentication", false),
         MAPPING("Mapping", true),
         PREVIEW("Preview", true),
         UPLOAD("Upload", true),
@@ -51,9 +52,13 @@ public abstract class DesktopWindow extends JInternalFrame {
         private String title;
         private boolean draggable;
 
-        private WindowId(String title, boolean draggable) {
+        private WindowId(String title, @Deprecated boolean draggable) {
             this.title = title;
             this.draggable = draggable;
+        }
+
+        public String getTitle() {
+            return title;
         }
     }
 
@@ -74,6 +79,14 @@ public abstract class DesktopWindow extends JInternalFrame {
 
     public WindowId getId() {
         return id;
+    }
+
+    public void setPreferencesTransient(boolean preferencesTransient) {
+        this.preferencesTransient = preferencesTransient;
+    }
+
+    public boolean isPreferencesTransient() {
+        return preferencesTransient;
     }
 
     @Override

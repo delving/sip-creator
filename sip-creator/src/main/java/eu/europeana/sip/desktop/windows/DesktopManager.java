@@ -72,6 +72,9 @@ public class DesktopManager {
     }
 
     public void add(DesktopWindow desktopWindow) {
+        if (!windows.containsKey(desktopWindow.getId())) {
+            windows.put(desktopWindow.getId(), desktopWindow);
+        }
         add(desktopWindow.getId());
     }
 
@@ -97,7 +100,8 @@ public class DesktopManager {
         List<DesktopWindow> windows = new ArrayList<DesktopWindow>();
         for (JInternalFrame frame : allFrames) {
             if (frame instanceof DesktopWindow) {
-                windows.add((DesktopWindow) frame);
+                DesktopWindow window = (DesktopWindow) frame;
+                windows.add(window);
             }
         }
         return windows;

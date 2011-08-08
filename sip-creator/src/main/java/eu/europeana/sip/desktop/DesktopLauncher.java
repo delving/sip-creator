@@ -21,7 +21,8 @@
 
 package eu.europeana.sip.desktop;
 
-import eu.europeana.sip.desktop.windows.DataSetWindow;
+import eu.europeana.sip.desktop.navigation.NavigationMenu;
+import eu.europeana.sip.desktop.windows.AuthenticationWindow;
 import eu.europeana.sip.desktop.windows.DesktopManager;
 import eu.europeana.sip.desktop.windows.DesktopWindow;
 import eu.europeana.sip.localization.Constants;
@@ -29,8 +30,6 @@ import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
@@ -55,27 +54,57 @@ public class DesktopLauncher {
     private static final Logger LOG = Logger.getRootLogger();
     private final DesktopManager desktopManager = DesktopManager.getInstance();
     private DesktopPreferences desktopPreferences;
+    private DesktopPreferences.DesktopState desktopState;
+    private Navigation navigation;
+    // todo: create user object
+    private Object user;
+    private AuthenticationWindow authenticationWindow;
+    private DesktopPreferences.Credentials credentials;
 
     {
-        buildLayout();
-        buildNavigation();
         desktopPreferences = new DesktopPreferencesImpl(
                 new DesktopPreferences.Listener() {
 
                     @Override
                     public void desktopStateFound(DesktopPreferences.DesktopState desktopState) {
-                        restoreWindows(desktopState);
+                        DesktopLauncher.this.desktopState = desktopState;
                     }
 
                     @Override
                     public void credentialsFound(DesktopPreferences.Credentials credentials) {
-                        // todo: pass to User object.
+                        LOG.info("Received credentials : " + credentials);
+                        DesktopLauncher.this.credentials = credentials;
                     }
                 }
         );
+        buildLayout();
+        buildNavigation();
     }
 
     private void buildLayout() {
+        authenticationWindow = new AuthenticationWindow(DesktopWindow.WindowId.AUTHENTICATION,
+                new AuthenticationWindow.Listener() {
+
+                    @Override
+                    public void success(Object user) {
+                        DesktopLauncher.this.user = user;
+                        navigation.setEnabled(true);
+                        if (null != desktopState) {
+                            restoreWindows(desktopState);
+                        }
+                    }
+
+                    @Override
+                    public void failed(Exception exception) {
+                        // todo: show error window
+                        LOG.error("Authentication failed", exception);
+                    }
+                }, desktopPreferences
+        );
+        if (null != credentials) {
+            authenticationWindow.setCredentials(credentials);
+        }
+        desktopManager.add(authenticationWindow);
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
@@ -100,7 +129,9 @@ public class DesktopLauncher {
     }
 
     private JComponent buildNavigation() {
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new Navigation(desktopManager), desktopManager.getDesktop());
+        navigation = new Navigation(desktopManager);
+        navigation.setEnabled(false);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigation, desktopManager.getDesktop());
         splitPane.setBorder(null);
         splitPane.setSize(new Dimension(400, 400));
         splitPane.setDividerLocation(200);
@@ -112,43 +143,13 @@ public class DesktopLauncher {
         return desktopPreferences;
     }
 
-    // todo: move to class
-    private JMenuBar createMenu() {
-        JMenuBar menuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
-        menuBar.add(fileMenu);
-        JMenuItem loadDataSet = new JMenuItem(new DataSetAction("Load data set"));
-        loadDataSet.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK));
-        fileMenu.add(loadDataSet);
-        return menuBar;
-    }
-
-    class DataSetAction extends AbstractAction {
-
-        public DataSetAction(String title) {
-            super(title);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            showDataSetWindow();
-        }
-    }
-
-    private void showDataSetWindow() {
-        DataSetWindow dataSetWindow = new DataSetWindow();
-        desktopManager.add(DesktopWindow.WindowId.DATA_SET);
-        dataSetWindow.setVisible(true);
-        dataSetWindow.moveToFront();
-    }
-
     public static void main(String... args) {
         final DesktopLauncher desktopLauncher = new DesktopLauncher();
         final JFrame main = new JFrame(Constants.SIP_CREATOR_TITLE);
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
         main.setExtendedState(Frame.MAXIMIZED_BOTH);
         main.setLocationRelativeTo(null);
-        main.setJMenuBar(desktopLauncher.createMenu());
+        main.setJMenuBar(new NavigationMenu(desktopLauncher.desktopManager));
         main.setVisible(true);
         main.addWindowListener(
                 new WindowAdapter() {
@@ -159,19 +160,15 @@ public class DesktopLauncher {
                             case JOptionPane.NO_OPTION:
                                 return;
                             case JOptionPane.YES_OPTION:
+                                if (null == desktopLauncher.user) {
+                                    System.exit(0);
+                                }
                                 desktopLauncher.getDesktopPreferences().saveDesktopState(
                                         new DesktopPreferences.DesktopState() {
 
-                                            private List<DesktopWindow> windows;
-
-                                            {
-                                                // todo: doesn't get iconified windows
-                                                windows = desktopLauncher.desktopManager.getAllWindows();
-                                            }
-
                                             @Override
                                             public List<DesktopWindow> getWindows() {
-                                                return windows;
+                                                return desktopLauncher.desktopManager.getAllWindows();
                                             }
                                         }
                                 );

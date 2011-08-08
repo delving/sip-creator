@@ -124,6 +124,10 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         List<WindowState> windowStates = new ArrayList<WindowState>();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         for (DesktopWindow window : desktopState.getWindows()) {
+            if (window.isPreferencesTransient()) {
+                LOG.info("Skipping transient window : " + window.getId());
+                continue;
+            }
             WindowState windowState = new WindowState(window);
             windowStates.add(windowState);
         }
