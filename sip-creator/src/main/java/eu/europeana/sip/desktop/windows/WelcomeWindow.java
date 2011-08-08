@@ -19,14 +19,20 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.localization;
+package eu.europeana.sip.desktop.windows;
+
+import javax.swing.*;
 
 /**
- * todo: add description
+ * Display when user opened the SIP-Creator for the first time.
+ * It will contain an introduction to the SIP-Creator and the documentation.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public interface Constants {
-    String SIP_CREATOR_TITLE = "Delving SIP-Creator 2.0";
-    String CLOSE = "Are you sure?";
+public class WelcomeWindow extends DesktopWindow {
+
+    public WelcomeWindow(WindowId windowId) {
+        super(windowId);
+        add(new JLabel("Welcome!"));
+    }
 }

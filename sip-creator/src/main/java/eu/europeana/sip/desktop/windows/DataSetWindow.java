@@ -19,9 +19,9 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop;
+package eu.europeana.sip.desktop.windows;
 
-import eu.europeana.sip.util.GridBagAdapter;
+import eu.europeana.sip.util.GridBagHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,24 +37,32 @@ import java.awt.*;
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class DataSetWindow extends JPanel {
+public class DataSetWindow extends DesktopWindow {
 
     private static final String TITLE_LABEL = "Data sets";
     private JLabel title = new JLabel(TITLE_LABEL);
     private JList dataSets;
+    private JTextField filter = new JTextField("Filter");
+    private JButton select = new JButton("Select");
+    private JButton cancel = new JButton("Cancel");
 
     public DataSetWindow() {
+        super(DesktopWindow.WindowId.DATA_SET);
         setLayout(new GridBagLayout());
         buildLayout();
     }
 
     private void buildLayout() {
-        GridBagAdapter gba = new GridBagAdapter();
+        GridBagHelper gba = new GridBagHelper();
         gba.reset();
         add(title, gba);
         dataSets = new JList(fetchListModel());
         gba.line();
         add(dataSets, gba);
+        gba.line();
+        add(cancel, gba);
+        gba.right();
+        add(select, gba);
     }
 
     private Object[] fetchListModel() {

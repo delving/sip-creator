@@ -19,32 +19,25 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.util;
-
-import java.awt.*;
+package eu.europeana.sip.desktop.windows;
 
 /**
- * Just speeding up the usage GridBagConstraints.
+ * The analyze window will present the following data:
+ *
+ * <ul>
+ * <li>Statistics</li>
+ * <li>Document structure</li>
+ * </ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class GridBagAdapter extends GridBagConstraints {
+public class AnalyzeWindow extends DesktopWindow {
 
-    public void reset() {
-        gridx = gridy = 0;
+    public AnalyzeWindow(WindowId id) {
+        super(id);
+        buildLayout();
     }
 
-    public void cell(int x, int y) {
-        gridx = x;
-        gridy = y;
-    }
-
-    public void line() {
-        gridx = 0;
-        gridy++;
-    }
-
-    public void right() {
-        gridx++;
+    private void buildLayout() {
     }
 }

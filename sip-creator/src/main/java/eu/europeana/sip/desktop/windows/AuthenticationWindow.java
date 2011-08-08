@@ -19,9 +19,9 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop;
+package eu.europeana.sip.desktop.windows;
 
-import eu.europeana.sip.util.GridBagAdapter;
+import eu.europeana.sip.util.GridBagHelper;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -56,7 +56,7 @@ public class AuthenticationWindow extends JInternalFrame {
     }
 
     private void buildLayout() {
-        GridBagAdapter gbc = new GridBagAdapter();
+        GridBagHelper gbc = new GridBagHelper();
         gbc.fill = GridBagConstraints.BOTH;
         gbc.reset();
         add(usernameLabel, gbc);

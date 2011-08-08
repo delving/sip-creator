@@ -21,11 +21,12 @@
 
 package eu.europeana.sip.desktop;
 
-import javax.swing.*;
+import eu.europeana.sip.desktop.windows.DesktopWindow;
+
 import java.util.List;
 
 /**
- * Load the local preferences for the SIP-Creator.
+ * Load the preferences for the desktop.
  *
  * The following properties will be loaded:
  *
@@ -37,11 +38,11 @@ import java.util.List;
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public interface SipCreatorPreferences {
+public interface DesktopPreferences {
 
     interface Listener {
 
-        void windowStateFound(WindowState windowState);
+        void desktopStateFound(DesktopState desktopState);
 
         void credentialsFound(Credentials credentials);
     }
@@ -53,8 +54,9 @@ public interface SipCreatorPreferences {
         String getPassword();
     }
 
-    interface WindowState {
-        List<JInternalFrame> getWindows();
+    interface DesktopState {
+
+        List<DesktopWindow> getWindows();
     }
 
     /**
@@ -67,7 +69,7 @@ public interface SipCreatorPreferences {
     /**
      * Remember the window state.
      *
-     * @param windowState The last window state.
+     * @param desktopState The last window state.
      */
-    void saveWindowState(WindowState windowState);
+    void saveDesktopState(DesktopState desktopState);
 }

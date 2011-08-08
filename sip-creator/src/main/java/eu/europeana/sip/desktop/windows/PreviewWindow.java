@@ -19,14 +19,15 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.localization;
+package eu.europeana.sip.desktop.windows;
 
 /**
  * todo: add description
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public interface Constants {
-    String SIP_CREATOR_TITLE = "Delving SIP-Creator 2.0";
-    String CLOSE = "Are you sure?";
+public class PreviewWindow extends DesktopWindow {
+    public PreviewWindow(WindowId id) {
+        super(id);
+    }
 }

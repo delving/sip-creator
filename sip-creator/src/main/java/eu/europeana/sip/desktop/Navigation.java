@@ -21,19 +21,51 @@
 
 package eu.europeana.sip.desktop;
 
+import eu.europeana.sip.desktop.windows.*;
+import eu.europeana.sip.desktop.windows.DesktopManager;
+import org.apache.log4j.Logger;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
- * todo: add description
+ * The navigation bar on the left side of the screen which controls the actions on a data set.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class Navigation extends JComponent {
+public class Navigation extends JPanel {
 
-    private DataSetWindow dataSetWindow;
+    private static final Dimension DEFAULT_BUTTON_SIZE = new Dimension(200, 80);
+    private DesktopManager desktopManager;
+    private static final Logger LOG = Logger.getRootLogger();
 
-    public Navigation() {
-        dataSetWindow = new DataSetWindow();
-        add(dataSetWindow);
+    public Navigation(DesktopManager desktopManager) {
+        this.desktopManager = desktopManager;
+        JPanel vertical = new JPanel();
+        vertical.setLayout(new GridLayout(8, 0));
+        vertical.add(new NavigationButton(DesktopWindow.WindowId.ANALYZE));
+        vertical.add(new NavigationButton(DesktopWindow.WindowId.MAPPING));
+        vertical.add(new NavigationButton(DesktopWindow.WindowId.NORMALIZE));
+        vertical.add(new NavigationButton(DesktopWindow.WindowId.PREVIEW));
+        vertical.add(new NavigationButton(DesktopWindow.WindowId.UPLOAD));
+        add(vertical);
+    }
+
+    private class NavigationButton extends JButton {
+
+        public NavigationButton(final DesktopWindow.WindowId windowId) {
+            super(windowId.name());
+            setPreferredSize(DEFAULT_BUTTON_SIZE);
+            addActionListener(
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            desktopManager.add(windowId);
+                        }
+                    }
+            );
+        }
     }
 }

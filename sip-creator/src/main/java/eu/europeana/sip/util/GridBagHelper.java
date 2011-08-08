@@ -19,14 +19,32 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.localization;
+package eu.europeana.sip.util;
+
+import java.awt.*;
 
 /**
- * todo: add description
+ * Just speeding up the usage GridBagConstraints.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public interface Constants {
-    String SIP_CREATOR_TITLE = "Delving SIP-Creator 2.0";
-    String CLOSE = "Are you sure?";
+public class GridBagHelper extends GridBagConstraints {
+
+    public void reset() {
+        gridx = gridy = 0;
+    }
+
+    public void cell(int x, int y) {
+        gridx = x;
+        gridy = y;
+    }
+
+    public void line() {
+        gridx = 0;
+        gridy++;
+    }
+
+    public void right() {
+        gridx++;
+    }
 }
