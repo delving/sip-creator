@@ -101,15 +101,15 @@ public class ElementDefinition {
     public void setFactDefinitions() throws MetadataException {
         if (fields != null) {
             for (FieldDefinition fieldDefinition : fields) {
-                if (fieldDefinition.validation != null && fieldDefinition.validation.factName != null) {
+                if (fieldDefinition.factName != null) {
                     for (FactDefinition factDefinition : Facts.definitions()) {
-                        if (fieldDefinition.validation.factName.equals(factDefinition.name)) {
-                            fieldDefinition.validation.factDefinition = factDefinition;
+                        if (fieldDefinition.factName.equals(factDefinition.name)) {
+                            fieldDefinition.factDefinition = factDefinition;
                             break;
                         }
                     }
-                    if (fieldDefinition.validation.factDefinition == null) {
-                        throw new MetadataException(String.format("Record Definition %s requires fact %s", prefix, fieldDefinition.validation.factName));
+                    if (fieldDefinition.factDefinition == null) {
+                        throw new MetadataException(String.format("Record Definition %s requires fact %s", prefix, fieldDefinition.factName));
                     }
                 }
             }

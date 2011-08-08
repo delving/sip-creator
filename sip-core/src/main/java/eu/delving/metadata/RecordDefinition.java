@@ -51,6 +51,8 @@ public class RecordDefinition {
 
     public ElementDefinition root;
 
+    public String validation;
+
     void initialize() throws MetadataException {
         root.setPaths(new Path());
         root.setFactDefinitions();

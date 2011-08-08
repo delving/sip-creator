@@ -7,6 +7,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -377,5 +378,12 @@ public class XmlNodePrinter {
             Object uri = namespaceMap.get(prefix);
             return (uri == null) ? null : uri.toString();
         }
+    }
+
+    public static String serialize(Node outputNode) {
+        StringWriter writer = new StringWriter();
+        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+        xmlNodePrinter.print(outputNode);
+        return writer.toString();
     }
 }

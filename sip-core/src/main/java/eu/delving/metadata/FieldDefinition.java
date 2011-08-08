@@ -48,6 +48,9 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     public String localName;
 
     @XStreamAsAttribute
+    public String factName;
+
+    @XStreamAsAttribute
     public boolean briefDoc;
 
     @XStreamAsAttribute
@@ -68,7 +71,11 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     @XStreamAsAttribute
     public String searchField;
 
-    public Validation validation;
+    public boolean identifierField;
+
+    public Converter converter;
+
+    public List<String> options;
 
     @XStreamOmitField
     public Path path;
@@ -77,6 +84,9 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
 
     @XStreamOmitField
     private Tag tag;
+
+    @XStreamOmitField
+    public FactDefinition factDefinition;
 
     public Tag getTag() {
         if (tag == null) {
@@ -123,113 +133,61 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     }
 
     public String addOptionalConverter(String variable) {
-        if (validation != null && validation.converter != null) {
-            return variable + validation.converter.call;
+        if (converter != null) {
+            return variable + converter.call;
         }
         else {
             return variable;
         }
     }
 
-    @XStreamAlias("validation")
-    public static class Validation {
+    public boolean hasOptions() {
+        return options != null || factDefinition != null && factDefinition.options != null;
+    }
 
-        public Validation() {
-            multivalued = true;
-            required = true;
-        }
-
-        @XStreamAsAttribute
-        public String factName;
-
-        @XStreamAsAttribute
-        public String requiredGroup;
-
-        @XStreamAsAttribute
-        @Deprecated /** @deprecated use Validator */
-        public boolean url;
-
-        @XStreamAsAttribute
-        public boolean object;
-
-        @XStreamAsAttribute
-        public boolean unique;
-
-        @XStreamAsAttribute
-        public boolean id;
-
-        @XStreamAsAttribute
-        public boolean type;
-
-        @XStreamAsAttribute
-        public boolean multivalued;
-
-        @XStreamAsAttribute
-        public boolean required;
-
-        @XStreamAsAttribute
-        public int minOccurrence;
-
-        @XStreamAsAttribute
-        public int maxOccurrence;
-
-        public List<String> options;
-
-        public Converter converter;
-
-        public Validator validator;
-
-        @XStreamOmitField
-        public FactDefinition factDefinition;
-
-        public boolean hasOptions() {
-            return options != null || factDefinition != null && factDefinition.options != null;
-        }
-
-        public boolean allowOption(String value) {
-            for (String option : getOptions()) {
-                if (option.endsWith(":")) {
-                    int colon = value.indexOf(':');
-                    if (colon > 0) {
-                        if (option.equals(value.substring(0, colon + 1))) {
-                            return true;
-                        }
-                    }
-                    else {
-                        if (option.equals(value) || option.substring(0, option.length() - 1).equals(value)) {
-                            return true;
-                        }
+    public boolean allowOption(String value) {
+        for (String option : getOptions()) {
+            if (option.endsWith(":")) {
+                int colon = value.indexOf(':');
+                if (colon > 0) {
+                    if (option.equals(value.substring(0, colon + 1))) {
+                        return true;
                     }
                 }
-                else if (option.equals(value)) {
-                    return true;
+                else {
+                    if (option.equals(value) || option.substring(0, option.length() - 1).equals(value)) {
+                        return true;
+                    }
                 }
             }
-            return false;
+            else if (option.equals(value)) {
+                return true;
+            }
         }
+        return false;
+    }
 
-        public String getOptionsString() {
-            StringBuilder enumString = new StringBuilder();
-            Iterator<String> walk = getOptions().iterator();
-            while (walk.hasNext()) {
-                enumString.append(walk.next());
-                if (walk.hasNext()) {
-                    enumString.append(',');
-                }
+    public String getOptionsString() {
+        StringBuilder enumString = new StringBuilder();
+        Iterator<String> walk = getOptions().iterator();
+        while (walk.hasNext()) {
+            enumString.append(walk.next());
+            if (walk.hasNext()) {
+                enumString.append(',');
             }
-            return enumString.toString();
         }
+        return enumString.toString();
+    }
 
-        public List<String> getOptions() {
-            if (options != null) {
-                return options;
-            }
-            else if (factDefinition != null) {
-                return factDefinition.options;
-            }
-            else {
-                return null;
-            }
+    public List<String> getOptions() {
+        if (options != null) {
+            return options;
+        }
+        else if (factDefinition != null) {
+            return factDefinition.options;
+        }
+        else {
+            return null;
         }
     }
 
@@ -240,11 +198,5 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
 
         @XStreamAsAttribute
         public String call;
-    }
-
-    public static class Validator {
-
-        @XStreamAsAttribute
-        public String name;
     }
 }

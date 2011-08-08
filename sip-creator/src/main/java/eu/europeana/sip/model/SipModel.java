@@ -24,7 +24,6 @@ package eu.europeana.sip.model;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.RecordValidationException;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldDefinition;
@@ -37,6 +36,7 @@ import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.SourceVariable;
+import eu.delving.metadata.ValidationException;
 import eu.delving.sip.AppConfig;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
@@ -251,7 +251,7 @@ public class SipModel {
                         @Override
                         public void run() {
                             mappingModel.setRecordMapping(recordMapping);
-                            recordCompileModel.setRecordValidator(new RecordValidator(getRecordDefinition()));
+                            recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
                             seekFirstRecord();
                             if (recordMapping != null) {
                                 if (getRecordRoot() != null) {
@@ -376,12 +376,12 @@ public class SipModel {
                     }
 
                     @Override
-                    public void invalidOutput(final RecordValidationException exception) {
+                    public void invalidOutput(final ValidationException exception) {
                         userNotifier.tellUser("Invalid output record", exception);
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                seekRecordNumber(exception.getMetadataRecord().getRecordNumber(), progressListener);
+                                seekRecordNumber(exception.getRecordNumber(), progressListener);
                             }
                         });
                     }

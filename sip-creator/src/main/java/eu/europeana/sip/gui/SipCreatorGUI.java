@@ -22,9 +22,9 @@
 package eu.europeana.sip.gui;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.RecordValidationException;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
+import eu.delving.metadata.ValidationException;
 import eu.delving.sip.AppConfig;
 import eu.delving.sip.DataSetClient;
 import eu.delving.sip.DataSetInfo;
@@ -394,13 +394,10 @@ public class SipCreatorGUI extends JFrame {
                     String html = exception != null ?
                             String.format("<html><h3>%s</h3><p>%s</p></html>", message, exception.getMessage()) :
                             String.format("<html><h3>%s</h3></html>", message);
-                    if (exception instanceof RecordValidationException) {
-                        RecordValidationException rve = (RecordValidationException) exception;
-                        StringBuilder problemHtml = new StringBuilder(String.format("<html><h3>%s</h3><ul>", message));
-                        for (String problem : rve.getProblems()) {
-                            problemHtml.append(String.format("<li>%s</li>", problem));
-                        }
-                        problemHtml.append("</ul></html>");
+                    if (exception instanceof ValidationException) {
+                        StringBuilder problemHtml = new StringBuilder(String.format("<html><h3>%s</h3><pre>", message));
+                        problemHtml.append(exception.getMessage());
+                        problemHtml.append("</pre></html>");
                         html = problemHtml.toString();
                     }
                     JOptionPane.showMessageDialog(null, html);

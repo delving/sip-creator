@@ -342,7 +342,7 @@ public class DictionaryDialog extends JDialog {
     }
 
     private class ValueModel extends AbstractListModel implements ComboBoxModel {
-        private List<String> values = new ArrayList<String>(fieldMapping.getDefinition().validation.getOptions());
+        private List<String> values = new ArrayList<String>(fieldMapping.getDefinition().getOptions());
         private Object selectedItem = COPY_VERBATIM;
 
         private ValueModel() {
