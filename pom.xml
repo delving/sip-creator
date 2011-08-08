@@ -82,8 +82,6 @@
 
         <!--had to add these to the default repositories in Nexus: -->
         <!--  spring-releases: http://repository.springsource.com/maven/bundles/release/-->
-        <!--  scala-tools.releases: http://scala-tools.org/repo-releases/-->
-        <!--  scala-tools.snapshots: http://scala-tools.org/repo-snapshots/-->
         <!--had to add manually to 3rd-party hosted in Nexus:-->
         <!--  javax.jnlp:jnlp-api:1.5.0-->
 
@@ -113,33 +111,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <phase>compile</phase>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                        <phase>test-compile</phase>
-                    </execution>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.0.2</version>
@@ -229,26 +200,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest_2.9.0</artifactId>
-                <version>${scalaTest.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.scala-lang</groupId>
-                <artifactId>scala-compiler</artifactId>
-                <version>${scala.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.scala-lang</groupId>
-                <artifactId>scala-library</artifactId>
-                <version>${scala.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>1.7.3</version>
+                <version>${groovy.version}</version>
             </dependency>
 
             <dependency>
@@ -264,8 +218,7 @@
         <jdkLevel>1.6</jdkLevel>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <scala.version>2.9.0-1</scala.version>
-        <scalaTest.version>1.6.1</scalaTest.version>
+        <groovy.version>1.7.3</groovy.version>
     </properties>
 
 </project>
