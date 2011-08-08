@@ -21,6 +21,8 @@
 
 package eu.europeana.sip.desktop;
 
+import eu.europeana.sip.desktop.navigation.Actions;
+import eu.europeana.sip.desktop.navigation.Navigation;
 import eu.europeana.sip.desktop.navigation.NavigationMenu;
 import eu.europeana.sip.desktop.windows.AuthenticationWindow;
 import eu.europeana.sip.desktop.windows.DesktopManager;
@@ -60,8 +62,10 @@ public class DesktopLauncher {
     private Object user;
     private AuthenticationWindow authenticationWindow;
     private DesktopPreferences.Credentials credentials;
+    private Actions actions;
 
     {
+        actions = new Actions(desktopManager);
         desktopPreferences = new DesktopPreferencesImpl(
                 new DesktopPreferences.Listener() {
 
@@ -78,7 +82,6 @@ public class DesktopLauncher {
                 }
         );
         buildLayout();
-        buildNavigation();
     }
 
     private void buildLayout() {
@@ -88,7 +91,7 @@ public class DesktopLauncher {
                     @Override
                     public void success(Object user) {
                         DesktopLauncher.this.user = user;
-                        navigation.setEnabled(true);
+                        actions.setEnabled(true);
                         if (null != desktopState) {
                             restoreWindows(desktopState);
                         }
@@ -129,8 +132,8 @@ public class DesktopLauncher {
     }
 
     private JComponent buildNavigation() {
-        navigation = new Navigation(desktopManager);
-        navigation.setEnabled(false);
+        navigation = new Navigation(actions);
+        actions.setEnabled(false);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigation, desktopManager.getDesktop());
         splitPane.setBorder(null);
         splitPane.setSize(new Dimension(400, 400));
@@ -149,7 +152,7 @@ public class DesktopLauncher {
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
         main.setExtendedState(Frame.MAXIMIZED_BOTH);
         main.setLocationRelativeTo(null);
-        main.setJMenuBar(new NavigationMenu(desktopLauncher.desktopManager));
+        main.setJMenuBar(new NavigationMenu(desktopLauncher.desktopManager, desktopLauncher.actions));
         main.setVisible(true);
         main.addWindowListener(
                 new WindowAdapter() {

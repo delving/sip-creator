@@ -36,18 +36,26 @@ import java.awt.event.KeyEvent;
 public class NavigationMenu extends JMenuBar {
 
     private DesktopManager desktopManager;
+    private Actions actions;
 
-    {
-        createMenus();
-    }
-
-    public NavigationMenu(DesktopManager desktopManager) {
+    public NavigationMenu(DesktopManager desktopManager, Actions actions) {
         this.desktopManager = desktopManager;
+        this.actions = actions;
+        createMenus();
     }
 
     private void createMenus() {
         add(createFileMenu());
         add(createAccountMenu());
+        add(createSipMenu());
+    }
+
+    private JMenu createSipMenu() {
+        JMenu menu = new JMenu("SIP");
+        for(AbstractAction action : actions.getNavigationActions().values()) {
+            menu.add(action);
+        }
+        return menu;
     }
 
     private JMenu createAccountMenu() {
