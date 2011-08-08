@@ -11,15 +11,13 @@ import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
+import eu.delving.metadata.ValidationException;
 import groovy.util.Node;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,13 +31,13 @@ public class MappingEngine {
     private MappingRunner mappingRunner;
     private RecordValidator recordValidator;
 
-    public MappingEngine(File mappingFile, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
+    public MappingEngine(InputStream mappingFile, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
         MetadataModel metadataModel = loadMetadataModel();
-        FileInputStream is = new FileInputStream(mappingFile);
-        RecordMapping recordMapping = RecordMapping.read(is, metadataModel);
-        mappingRunner = new MappingRunner(new GroovyCodeResource(), recordMapping.toCompileCode(metadataModel));
+        RecordMapping recordMapping = RecordMapping.read(mappingFile, metadataModel);
+        GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
+        mappingRunner = new MappingRunner(groovyCodeResource, recordMapping.toCompileCode(metadataModel));
         metadataRecordFactory = new MetadataRecordFactory(namespaces);
-        recordValidator = new RecordValidator(metadataModel.getRecordDefinition(recordMapping.getPrefix()));
+        recordValidator = new RecordValidator(groovyCodeResource, metadataModel.getRecordDefinition(recordMapping.getPrefix()));
     }
 
     /**
@@ -48,15 +46,29 @@ public class MappingEngine {
      * @param originalRecord a string of XML, without namespaces
      * @return the mapped record XML, or NULL if the record is invalid or discarded.
      * @throws MappingException something important went wrong with mapping, beyond validation problems
+     * @throws ValidationException the record is invalid by the criteria in the record definition
      */
 
-    public Node executeMapping(String originalRecord) throws MappingException {
+    public Node executeMapping(String originalRecord) throws MappingException, ValidationException {
+        return executeMapping(originalRecord, -1);
+    }
+
+    /**
+     * Execute the mapping on the string format of the original record to turn it into the mapped record
+     *
+     * @param originalRecord a string of XML, without namespaces
+     * @param recordNumber which record was it
+     * @return the mapped record XML, or NULL if the record is invalid or discarded.
+     * @throws MappingException something important went wrong with mapping, beyond validation problems
+     * @throws ValidationException the record is invalid by the criteria in the record definition
+     */
+
+    public Node executeMapping(String originalRecord, int recordNumber) throws MappingException, ValidationException {
         try {
             MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
-            Node recordString = mappingRunner.runMapping(metadataRecord);
-            List<String> problems = new ArrayList<String>();
-            Node validated = recordValidator.validateRecord(recordString, problems);
-            return problems.isEmpty() ? validated : null;
+            Node record = mappingRunner.runMapping(metadataRecord);
+            recordValidator.validateRecord(record, recordNumber);
+            return record;
         }
         catch (DiscardRecordException e) {
             return null;

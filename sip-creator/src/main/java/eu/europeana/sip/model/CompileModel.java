@@ -21,12 +21,23 @@
 
 package eu.europeana.sip.model;
 
-import eu.delving.groovy.*;
-import eu.delving.metadata.*;
+import eu.delving.groovy.DiscardRecordException;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlNodePrinter;
+import eu.delving.metadata.FieldMapping;
+import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.MetadataModel;
+import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.RecordValidator;
+import eu.delving.metadata.ValidationException;
 import groovy.util.Node;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
@@ -35,10 +46,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -263,24 +271,16 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             try {
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
-                    if(null == outputNode) {
+                    if (null == outputNode) {
                         return;
                     }
-                    StringWriter writer = new StringWriter();
-                    XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
-                    xmlNodePrinter.print(outputNode);
-                    String output = writer.toString();
                     if (recordValidator != null) {
-                        List<String> problems = new ArrayList<String>();
-                        String validated = recordValidator.validateRecord(output, problems);
-                        if (problems.isEmpty()) {
-                            compilationComplete(validated);
-                        }
-                        else {
-                            throw new RecordValidationException(metadataRecord, problems);
-                        }
+                        recordValidator.validateRecord(outputNode, metadataRecord.getRecordNumber());
+                        String output = XmlNodePrinter.serialize(outputNode);
+                        compilationComplete(output);
                     }
                     else {
+                        String output = XmlNodePrinter.serialize(outputNode);
                         compilationComplete(output);
                         if (editedCode == null) {
                             notifyStateChange(State.PRISTINE);
@@ -319,7 +319,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                 compilationComplete(e.getMessage());
                 notifyStateChange(State.ERROR);
             }
-            catch (RecordValidationException e) {
+            catch (ValidationException e) {
                 compilationComplete(e.toString());
                 notifyStateChange(State.ERROR);
             }

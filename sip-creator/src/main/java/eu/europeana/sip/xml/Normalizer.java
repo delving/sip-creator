@@ -21,23 +21,30 @@
 
 package eu.europeana.sip.xml;
 
-import eu.delving.groovy.*;
+import eu.delving.groovy.DiscardRecordException;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.metadata.MetadataNamespace;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.Uniqueness;
+import eu.delving.metadata.ValidationException;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.ProgressListener;
 import eu.europeana.sip.model.SipModel;
 import groovy.util.Node;
-import groovy.xml.XmlUtil;
 import org.apache.log4j.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Set;
 
 /**
@@ -60,7 +67,7 @@ public class Normalizer implements Runnable {
     public interface Listener {
         void invalidInput(MappingException exception);
 
-        void invalidOutput(RecordValidationException exception);
+        void invalidOutput(ValidationException exception);
 
         void finished(boolean success);
     }
@@ -85,7 +92,7 @@ public class Normalizer implements Runnable {
         FileStore.MappingOutput fileSetOutput = null;
         boolean store = normalizeDirectory != null;
         Uniqueness uniqueness = new Uniqueness();
-        RecordValidator recordValidator = new RecordValidator(sipModel.getRecordDefinition());
+        RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
         try {
             RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
@@ -120,21 +127,15 @@ public class Normalizer implements Runnable {
                     StringWriter writer = new StringWriter();
                     XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
                     xmlNodePrinter.print(outputNode);
-                    String output = writer.toString();
                     totalMappingTime += System.currentTimeMillis() - before;
-                    List<String> problems = new ArrayList<String>();
                     before = System.currentTimeMillis();
-                    String validated = recordValidator.validateRecord(output, problems);
+                    recordValidator.validateRecord(outputNode, record.getRecordNumber());
+                    String validated = XmlNodePrinter.serialize(outputNode);
                     totalValidationTime += System.currentTimeMillis() - before;
-                    if (problems.isEmpty()) {
-                        if (store) {
-                            fileSetOutput.getOutputWriter().write(validated);
-                        }
-                        fileSetOutput.recordNormalized();
+                    if (store) {
+                        fileSetOutput.getOutputWriter().write(validated);
                     }
-                    else {
-                        throw new RecordValidationException(record, problems);
-                    }
+                    fileSetOutput.recordNormalized();
                 }
                 catch (MappingException e) {
                     if (discardInvalid) {
@@ -156,7 +157,7 @@ public class Normalizer implements Runnable {
                         abort();
                     }
                 }
-                catch (RecordValidationException e) {
+                catch (ValidationException e) {
                     if (discardInvalid) {
                         if (store) {
                             try {
@@ -205,7 +206,7 @@ public class Normalizer implements Runnable {
                     if (countdown-- == 0) break;
                     out.append(line).append("<br>");
                 }
-                sipModel.getUserNotifier().tellUser(String.format("<html>Identifier should be unique, but there were %d repeats, including:<br> ", repeated.size())+out);
+                sipModel.getUserNotifier().tellUser(String.format("<html>Identifier should be unique, but there were %d repeats, including:<br> ", repeated.size()) + out);
             }
             fileSetOutput.close(!running);
         }
@@ -231,7 +232,6 @@ public class Normalizer implements Runnable {
         finally {
             log.info(String.format("Mapping Time %d", totalMappingTime));
             log.info(String.format("Validating Time %d", totalValidationTime));
-            recordValidator.report();
             listener.finished(running);
             uniqueness.destroy();
             if (!running) { // aborted, so metadataparser will not call finished()

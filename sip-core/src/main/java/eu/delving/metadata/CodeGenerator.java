@@ -34,9 +34,7 @@ import java.util.List;
 public class CodeGenerator {
 
     public static boolean isDictionaryPossible(FieldDefinition fieldDefinition, AnalysisTree.Node node) {
-        return fieldDefinition.validation != null &&
-                fieldDefinition.validation.hasOptions() &&
-                node.getStatistics().getHistogramValues() != null;
+        return fieldDefinition.hasOptions() && node.getStatistics().getHistogramValues() != null;
     }
 
     public List<FieldMapping> createObviousMappings(List<FieldDefinition> unmappedFieldDefinitions, List<SourceVariable> variables) {
@@ -46,7 +44,7 @@ public class CodeGenerator {
             fieldMappings.add(uniqueMapping);
         }
         for (FieldDefinition fieldDefinition : unmappedFieldDefinitions) {
-            if (fieldDefinition.validation != null && fieldDefinition.validation.factName != null) {
+            if (fieldDefinition.factName != null) {
                 FieldMapping fieldMapping = createObviousMappingFromFact(fieldDefinition);
                 if (fieldMapping != null) {
                     fieldMappings.add(fieldMapping);
@@ -114,7 +112,7 @@ public class CodeGenerator {
         for (SourceVariable variable : variables) {
             if (variable.getNode().isUniqueElement()) {
                 for (FieldDefinition definition : unmappedFieldDefinitions) {
-                    if (definition.validation != null && definition.validation.id) {
+                    if (definition.identifierField) {
                         FieldMapping fieldMapping = new FieldMapping(definition);
                         eachBlock(fieldMapping, variable.getNode().getVariableName());
                         return fieldMapping;
@@ -128,7 +126,7 @@ public class CodeGenerator {
     private FieldMapping createObviousMappingFromFact(FieldDefinition fieldDefinition) {
         FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
         for (FactDefinition factDefinition : Facts.definitions()) {
-            if (factDefinition.name.equals(fieldDefinition.validation.factName)) {
+            if (factDefinition.name.equals(fieldDefinition.factName)) {
                 line(fieldMapping, factDefinition.name);
             }
         }

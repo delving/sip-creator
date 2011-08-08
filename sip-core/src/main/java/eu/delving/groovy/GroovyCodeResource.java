@@ -38,13 +38,18 @@ import java.net.URL;
  */
 
 public class GroovyCodeResource {
-    private static final URL MAPPING_CATEGORY_RESOURCE = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
+    private static final URL[] CATEGORY_RESOURCES = {
+            GroovyCodeResource.class.getResource("/MappingCategory.groovy"),
+            GroovyCodeResource.class.getResource("/ValidationCategory.groovy")
+    };
     private GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
 
     public GroovyCodeResource() {
         try {
-            String code = readResourceCode(MAPPING_CATEGORY_RESOURCE);
-            classLoader.parseClass(code);
+            for (URL resourceUrl : CATEGORY_RESOURCES) {
+                String code = readResourceCode(resourceUrl);
+                classLoader.parseClass(code);
+            }
         }
         catch (Exception e) {
             throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
@@ -56,9 +61,6 @@ public class GroovyCodeResource {
     }
 
     private String readResourceCode(URL resource) throws IOException {
-        if (MAPPING_CATEGORY_RESOURCE == null) {
-            throw new IOException("Cannot find resource");
-        }
         InputStream in = resource.openStream();
         Reader reader = new InputStreamReader(in);
         return readCode(reader);

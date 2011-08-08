@@ -75,10 +75,6 @@ public class FieldListModel extends AbstractListModel {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             FieldDefinition fieldDefinition = (FieldDefinition) value;
             String string = fieldDefinition.getFieldNameString();
-            FieldDefinition.Validation validation = fieldDefinition.validation;
-            if (validation != null && validation.requiredGroup != null) {
-                string += " (required: " + validation.requiredGroup + ")";
-            }
             return super.getListCellRendererComponent(list, string, index, isSelected, cellHasFocus);
         }
     }
