@@ -19,40 +19,20 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
+package eu.delving.sip.desktop.windows;
 
 import javax.swing.*;
 
 /**
- * The analyze window will present the following data:
- *
- * <ul>
- * <li>Statistics</li>
- * <li>Document structure</li>
- * </ul>
+ * Display when user opened the SIP-Creator for the first time.
+ * It will contain an introduction to the SIP-Creator and the documentation.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class AnalyzeWindow extends DesktopWindow {
+public class WelcomeWindow extends DesktopWindow {
 
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    public AnalyzeWindow(WindowId id) {
-        super(id);
-        buildLayout();
-    }
-
-    private void buildLayout() {
-        tabbedPane.addTab("Statistics", new StatisticsPanel());
-        tabbedPane.addTab("Document stucture", new DocumentStructurePanel());
-        add(tabbedPane);
-    }
-
-    private class StatisticsPanel extends JPanel {
-
-    }
-
-    private class DocumentStructurePanel extends JPanel {
-
+    public WelcomeWindow(WindowId windowId) {
+        super(windowId);
+        add(new JLabel("Welcome!"));
     }
 }

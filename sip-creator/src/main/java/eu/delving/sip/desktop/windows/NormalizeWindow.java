@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
+package eu.delving.sip.desktop.windows;
 
 /**
  * todo: add description

@@ -19,9 +19,9 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.navigation;
+package eu.delving.sip.desktop.navigation;
 
-import eu.europeana.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.windows.WindowId;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -43,7 +43,7 @@ public class Navigation extends JPanel {
         this.actions = actions;
         JPanel vertical = new JPanel();
         vertical.setLayout(new GridLayout(8, 0));
-        for (Map.Entry<DesktopWindow.WindowId, AbstractAction> entry : actions.getBarActions().entrySet()) {
+        for (Map.Entry<WindowId, AbstractAction> entry : actions.getBarActions().entrySet()) {
             vertical.add(new JButton(entry.getValue()));
         }
         add(vertical);

@@ -19,10 +19,10 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.navigation;
+package eu.delving.sip.desktop.navigation;
 
-import eu.europeana.sip.desktop.windows.DesktopManager;
-import eu.europeana.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.windows.DesktopManager;
+import eu.delving.sip.desktop.windows.WindowId;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -38,11 +38,11 @@ import java.util.Map;
 public class Actions {
 
     private DesktopManager desktopManager;
-    private Map<DesktopWindow.WindowId, AbstractAction> navigationActions = new HashMap<DesktopWindow.WindowId, AbstractAction>();
+    private Map<WindowId, AbstractAction> navigationActions = new HashMap<WindowId, AbstractAction>();
     private static final Logger LOG = Logger.getRootLogger();
 
     {
-        for (DesktopWindow.WindowId windowId : DesktopWindow.WindowId.values()) {
+        for (WindowId windowId : WindowId.values()) {
             navigationActions.put(windowId, new GenericAction(windowId));
         }
     }
@@ -51,17 +51,17 @@ public class Actions {
         this.desktopManager = desktopManager;
     }
 
-    public Map<DesktopWindow.WindowId, AbstractAction> getMenuActions() {
+    public Map<WindowId, AbstractAction> getMenuActions() {
         return filterActions(Type.NAVIGATION_MENU);
     }
 
-    public Map<DesktopWindow.WindowId, AbstractAction> getBarActions() {
+    public Map<WindowId, AbstractAction> getBarActions() {
         return filterActions(Type.NAVIGATION_BAR);
     }
 
-    private Map<DesktopWindow.WindowId, AbstractAction> filterActions(Type type) {
-        Map<DesktopWindow.WindowId, AbstractAction> menuActions = new HashMap<DesktopWindow.WindowId, AbstractAction>();
-        for (Map.Entry<DesktopWindow.WindowId, AbstractAction> entry : navigationActions.entrySet()) {
+    private Map<WindowId, AbstractAction> filterActions(Type type) {
+        Map<WindowId, AbstractAction> menuActions = new HashMap<WindowId, AbstractAction>();
+        for (Map.Entry<WindowId, AbstractAction> entry : navigationActions.entrySet()) {
             if (type == entry.getKey().getType()) {
                 menuActions.put(entry.getKey(), entry.getValue());
             }
@@ -69,26 +69,26 @@ public class Actions {
         return menuActions;
     }
 
-    public Map<DesktopWindow.WindowId, AbstractAction> getNavigationActions() {
+    public Map<WindowId, AbstractAction> getNavigationActions() {
         return navigationActions;
     }
 
     public void setEnabled(boolean enabled) {
         LOG.info(String.format("Setting state to %s for %s%n", enabled, navigationActions.entrySet()));
-        for (Map.Entry<DesktopWindow.WindowId, AbstractAction> entry : navigationActions.entrySet()) {
+        for (Map.Entry<WindowId, AbstractAction> entry : navigationActions.entrySet()) {
             entry.getValue().setEnabled(enabled);
         }
     }
 
-    public AbstractAction getAction(DesktopWindow.WindowId windowId) {
+    public AbstractAction getAction(WindowId windowId) {
         return navigationActions.get(windowId);
     }
 
     private class GenericAction extends AbstractAction {
 
-        private DesktopWindow.WindowId windowId;
+        private WindowId windowId;
 
-        private GenericAction(DesktopWindow.WindowId windowId) {
+        private GenericAction(WindowId windowId) {
             super(windowId.getTitle());
             this.windowId = windowId;
             putValue(ACCELERATOR_KEY, windowId.getAccelerator());

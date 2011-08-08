@@ -19,11 +19,11 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop;
+package eu.delving.sip.desktop;
 
 
-import eu.europeana.sip.desktop.windows.DesktopManager;
-import eu.europeana.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.windows.DesktopManager;
+import eu.delving.sip.desktop.windows.DesktopWindow;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 

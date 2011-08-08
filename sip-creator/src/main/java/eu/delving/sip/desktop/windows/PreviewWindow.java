@@ -19,16 +19,15 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
+package eu.delving.sip.desktop.windows;
 
 /**
  * todo: add description
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class UploadWindow extends DesktopWindow {
-
-    public UploadWindow(WindowId id) {
+public class PreviewWindow extends DesktopWindow {
+    public PreviewWindow(WindowId id) {
         super(id);
     }
 }

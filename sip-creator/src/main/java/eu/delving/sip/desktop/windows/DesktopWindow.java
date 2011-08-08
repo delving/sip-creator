@@ -19,14 +19,12 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
+package eu.delving.sip.desktop.windows;
 
-import eu.europeana.sip.desktop.WindowState;
-import eu.europeana.sip.desktop.navigation.Actions;
+import eu.delving.sip.desktop.WindowState;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 /**
  * The base of all windows within the SIP-Creator.
@@ -40,42 +38,6 @@ public abstract class DesktopWindow extends JInternalFrame {
     private WindowId id;
     private boolean preferencesTransient;
 
-    public enum WindowId {
-
-        ANALYZE("Analyze", true, KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR),
-        DATA_SET("Open data set", true, KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_MENU),
-        WELCOME("Welcome", true, KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_MENU),
-        AUTHENTICATION("Authentication", false, KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_MENU),
-        MAPPING("Mapping", true, KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR),
-        PREVIEW("Preview", true, KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR),
-        UPLOAD("Upload", true, KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR),
-        NORMALIZE("Normalize", true, KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR);
-
-        private String title;
-        private boolean draggable;
-        private KeyStroke accelerator;
-        private Actions.Type type;
-
-        private WindowId(String title, @Deprecated boolean draggable, KeyStroke accelerator, Actions.Type type) {
-            this.title = title;
-            this.draggable = draggable;
-            this.accelerator = accelerator;
-            this.type = type;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public KeyStroke getAccelerator() {
-            return accelerator;
-        }
-
-        public Actions.Type getType() {
-            return type;
-        }
-    }
-
     public void setWindowState(WindowState windowState) {
         this.windowState = windowState;
     }
@@ -85,7 +47,7 @@ public abstract class DesktopWindow extends JInternalFrame {
     }
 
     public DesktopWindow(WindowId id) {
-        super(id.title, id.draggable, true, true, true);
+        super(id.getTitle(), id.isDraggable(), true, true, true);
         this.id = id;
         setPreferredSize(DEFAULT_SIZE);
         setLayout(new FlowLayout());

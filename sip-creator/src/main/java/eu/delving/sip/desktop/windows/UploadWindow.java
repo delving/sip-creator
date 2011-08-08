@@ -19,20 +19,16 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
-
-import javax.swing.*;
+package eu.delving.sip.desktop.windows;
 
 /**
- * Display when user opened the SIP-Creator for the first time.
- * It will contain an introduction to the SIP-Creator and the documentation.
+ * todo: add description
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class WelcomeWindow extends DesktopWindow {
+public class UploadWindow extends DesktopWindow {
 
-    public WelcomeWindow(WindowId windowId) {
-        super(windowId);
-        add(new JLabel("Welcome!"));
+    public UploadWindow(WindowId id) {
+        super(id);
     }
 }

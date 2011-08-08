@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
+package eu.delving.sip.desktop.windows;
 
 import org.apache.log4j.Logger;
 
@@ -40,16 +40,16 @@ public class DesktopManager {
 
     private static final Logger LOG = Logger.getRootLogger();
     private static DesktopManager instance;
-    private Map<DesktopWindow.WindowId, DesktopWindow> windows = new HashMap<DesktopWindow.WindowId, DesktopWindow>();
+    private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
 
     {
-        windows.put(DesktopWindow.WindowId.ANALYZE, new AnalyzeWindow(DesktopWindow.WindowId.ANALYZE));
-        windows.put(DesktopWindow.WindowId.MAPPING, new MappingWindow(DesktopWindow.WindowId.MAPPING));
-        windows.put(DesktopWindow.WindowId.PREVIEW, new PreviewWindow(DesktopWindow.WindowId.PREVIEW));
-        windows.put(DesktopWindow.WindowId.WELCOME, new WelcomeWindow(DesktopWindow.WindowId.WELCOME));
-        windows.put(DesktopWindow.WindowId.UPLOAD, new UploadWindow(DesktopWindow.WindowId.UPLOAD));
-        windows.put(DesktopWindow.WindowId.NORMALIZE, new NormalizeWindow(DesktopWindow.WindowId.NORMALIZE));
+        windows.put(WindowId.ANALYZE, new AnalyzeWindow(WindowId.ANALYZE));
+        windows.put(WindowId.MAPPING, new MappingWindow(WindowId.MAPPING));
+        windows.put(WindowId.PREVIEW, new PreviewWindow(WindowId.PREVIEW));
+        windows.put(WindowId.WELCOME, new WelcomeWindow(WindowId.WELCOME));
+        windows.put(WindowId.UPLOAD, new UploadWindow(WindowId.UPLOAD));
+        windows.put(WindowId.NORMALIZE, new NormalizeWindow(WindowId.NORMALIZE));
     }
 
     private DesktopManager() {
@@ -67,7 +67,7 @@ public class DesktopManager {
         return getInstance().desktop;
     }
 
-    public static DesktopWindow getWindow(DesktopWindow.WindowId windowId) {
+    public static DesktopWindow getWindow(WindowId windowId) {
         return getInstance().windows.get(windowId);
     }
 
@@ -78,7 +78,7 @@ public class DesktopManager {
         add(desktopWindow.getId());
     }
 
-    public void add(DesktopWindow.WindowId windowId) {
+    public void add(WindowId windowId) {
         DesktopWindow window = getWindow(windowId);
         if (getAllWindows().contains(window)) {
             window.moveToFront();

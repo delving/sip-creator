@@ -19,9 +19,9 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
+package eu.delving.sip.desktop.windows;
 
-import eu.europeana.sip.desktop.DesktopPreferences;
+import eu.delving.sip.desktop.DesktopPreferences;
 import eu.europeana.sip.util.GridBagHelper;
 import org.apache.log4j.Logger;
 

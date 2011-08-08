@@ -19,10 +19,10 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.navigation;
+package eu.delving.sip.desktop.navigation;
 
-import eu.europeana.sip.desktop.windows.DesktopManager;
-import eu.europeana.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.windows.DesktopManager;
+import eu.delving.sip.desktop.windows.WindowId;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -64,7 +64,7 @@ public class NavigationMenu extends JMenuBar {
                 new AbstractAction("Sign in") {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        desktopManager.add(DesktopWindow.WindowId.AUTHENTICATION);
+                        desktopManager.add(WindowId.AUTHENTICATION);
                     }
                 }
         );
@@ -86,7 +86,7 @@ public class NavigationMenu extends JMenuBar {
         );
         exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.ALT_MASK));
         JMenuItem loadDataSet = new JMenuItem(
-                new AbstractAction(DesktopWindow.WindowId.DATA_SET.getTitle()) {
+                new AbstractAction(WindowId.DATA_SET.getTitle()) {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         // todo: add data set window

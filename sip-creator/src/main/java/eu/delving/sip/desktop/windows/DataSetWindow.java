@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
+package eu.delving.sip.desktop.windows;
 
 import eu.europeana.sip.util.GridBagHelper;
 
@@ -47,7 +47,7 @@ public class DataSetWindow extends DesktopWindow {
     private JButton cancel = new JButton("Cancel");
 
     public DataSetWindow() {
-        super(DesktopWindow.WindowId.DATA_SET);
+        super(WindowId.DATA_SET);
         setLayout(new GridBagLayout());
         buildLayout();
     }

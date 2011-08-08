@@ -19,14 +19,15 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop;
+package eu.delving.sip.desktop;
 
-import eu.europeana.sip.desktop.navigation.Actions;
-import eu.europeana.sip.desktop.navigation.Navigation;
-import eu.europeana.sip.desktop.navigation.NavigationMenu;
-import eu.europeana.sip.desktop.windows.AuthenticationWindow;
-import eu.europeana.sip.desktop.windows.DesktopManager;
-import eu.europeana.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.navigation.Actions;
+import eu.delving.sip.desktop.navigation.Navigation;
+import eu.delving.sip.desktop.navigation.NavigationMenu;
+import eu.delving.sip.desktop.windows.AuthenticationWindow;
+import eu.delving.sip.desktop.windows.DesktopManager;
+import eu.delving.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.windows.WindowId;
 import eu.europeana.sip.localization.Constants;
 import org.apache.log4j.Logger;
 
@@ -85,7 +86,7 @@ public class DesktopLauncher {
     }
 
     private void buildLayout() {
-        authenticationWindow = new AuthenticationWindow(DesktopWindow.WindowId.AUTHENTICATION,
+        authenticationWindow = new AuthenticationWindow(WindowId.AUTHENTICATION,
                 new AuthenticationWindow.Listener() {
 
                     @Override

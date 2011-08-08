@@ -19,9 +19,10 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop;
+package eu.delving.sip.desktop;
 
-import eu.europeana.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.windows.WindowId;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -33,7 +34,7 @@ import java.io.Serializable;
  */
 public class WindowState implements Serializable {
 
-    private DesktopWindow.WindowId windowId;
+    private WindowId windowId;
     private Dimension size;
     private Point point;
     private boolean selected;
@@ -49,7 +50,7 @@ public class WindowState implements Serializable {
         return point;
     }
 
-    public DesktopWindow.WindowId getWindowId() {
+    public WindowId getWindowId() {
         return windowId;
     }
 

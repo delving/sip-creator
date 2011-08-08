@@ -19,15 +19,40 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop.windows;
+package eu.delving.sip.desktop.windows;
+
+import javax.swing.*;
 
 /**
- * todo: add description
+ * The analyze window will present the following data:
+ *
+ * <ul>
+ * <li>Statistics</li>
+ * <li>Document structure</li>
+ * </ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class PreviewWindow extends DesktopWindow {
-    public PreviewWindow(WindowId id) {
+public class AnalyzeWindow extends DesktopWindow {
+
+    private JTabbedPane tabbedPane = new JTabbedPane();
+
+    public AnalyzeWindow(WindowId id) {
         super(id);
+        buildLayout();
+    }
+
+    private void buildLayout() {
+        tabbedPane.addTab("Statistics", new StatisticsPanel());
+        tabbedPane.addTab("Document stucture", new DocumentStructurePanel());
+        add(tabbedPane);
+    }
+
+    private class StatisticsPanel extends JPanel {
+
+    }
+
+    private class DocumentStructurePanel extends JPanel {
+
     }
 }

@@ -19,9 +19,9 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.europeana.sip.desktop;
+package eu.delving.sip.desktop;
 
-import eu.europeana.sip.desktop.windows.DesktopWindow;
+import eu.delving.sip.desktop.windows.DesktopWindow;
 
 import java.util.List;
 
