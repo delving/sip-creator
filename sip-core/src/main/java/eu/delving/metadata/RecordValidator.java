@@ -22,16 +22,19 @@
 package eu.delving.metadata;
 
 import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.GroovyNode;
 import groovy.lang.Binding;
+import groovy.lang.GString;
 import groovy.lang.Script;
 import groovy.util.Node;
 import groovy.util.NodeList;
 import groovy.xml.QName;
 import org.apache.log4j.Logger;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Parse, filter, validate a record
@@ -67,119 +70,81 @@ public class RecordValidator {
     }
 
     private void sanitizeRecord(Node record) {
-        Path path = new Path();
-        Map<Path, Counter> counters = new TreeMap<Path, Counter>();
-        sanitizeNode(record, path, counters);
+        sanitizeNode(record);
     }
 
-    private void sanitizeNode(Node node, Path path, Map<Path, Counter> counters) {
-        if (node.name() instanceof String) {
-            path.push(Tag.create((String) node.name()));
-        }
-        else {
-            QName name = (QName) node.name();
-            path.push(Tag.create(name.getPrefix(), name.getLocalPart()));
-        }
+    @SuppressWarnings("unchecked")
+    private void sanitizeNode(Node node) {
         if (node.value() instanceof List) {
             for (Object nodeObject : new NodeList(((List) node.value()))) { // cloning to avoid concurrent modification
-                sanitizeNode((Node) nodeObject, path, counters);
+                sanitizeNode((Node) nodeObject);
+            }
+            List list = (List) node.value(); // after cleaning
+            Collections.sort(list, NODE_COMPARATOR);
+            Node current = null;
+            Iterator walk = list.iterator();
+            while (walk.hasNext()) {
+                Node next = (Node)walk.next();
+                if (current != null && current.name().equals(next.name()) && current.value().equals(next.value())) {
+                    walk.remove();
+                }
+                else {
+                    current = next;
+                }
             }
         }
         else {
-            String value = node.toString();
-            if (value.isEmpty()) {
+            String valueString = valueToString(node.value());
+            if (valueString.isEmpty()) {
                 node.parent().remove(node);
             }
             else {
-                node.setValue(value);
+                node.setValue(valueString);
             }
         }
-        path.pop();
     }
 
     private static class Counter {
         int count;
     }
 
-    /*
-    private void validateCardinalities(Map<Path, Counter> counters, List<String> problems) {
-        Map<String, Boolean> requiredGroupMap = new TreeMap<String, Boolean>();
-        for (FieldDefinition fieldDefinition : validatableFields) {
-            if (fieldDefinition.validation.requiredGroup != null) {
-                requiredGroupMap.put(fieldDefinition.validation.requiredGroup, false);
+    private static Comparator<Object> NODE_COMPARATOR = new Comparator<Object>() {
+        @Override
+        public int compare(Object a, Object b) {
+            Node nodeA = (Node) a;
+            Node nodeB = (Node) b;
+            QName nameA = (QName) nodeA.name();
+            QName nameB = (QName) nodeB.name();
+            int comp = nameA.toString().compareTo(nameB.toString());
+            if (comp != 0) {
+                return comp;
             }
-            Counter counter = counters.get(fieldDefinition.path);
-            if (!fieldDefinition.validation.multivalued && counter != null && counter.count > 1) {
-                problems.add(String.format("Single-valued field [%s] has more than one value", fieldDefinition.path));
-            }
+            return valueToString(nodeA.value()).compareTo(valueToString(nodeB.value()));
         }
-        for (Map.Entry<Path, Counter> entry : counters.entrySet()) {
-            FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(entry.getKey());
-            if (fieldDefinition.validation != null) {
-                if (fieldDefinition.validation.requiredGroup != null) {
-                    requiredGroupMap.put(fieldDefinition.validation.requiredGroup, true);
-                }
-            }
-        }
-        for (Map.Entry<String, Boolean> entry : requiredGroupMap.entrySet()) {
-            if (!entry.getValue()) {
-                problems.add(String.format("Required field violation for [%s]", entry.getKey()));
-            }
-        }
-    }
+    };
 
-    private void validateDocument(Document document, List<String> problems, Set<String> entries, Map<Path, Counter> counters) {
-        Element rootElement = document.getRootElement();
-        if (!rootElement.getQName().getName().equals("validate")) {
-            throw new RuntimeException("Root element should be 'validate'");
+    private static String valueToString(Object object) {
+        if (object instanceof String) {
+            return (String)object;
         }
-        Element recordElement = rootElement.element("record");
-        validateElement(recordElement, new Path(), problems, entries, counters);
-    }
-
-    private boolean validateElement(Element element, Path path, List<String> problems, Set<String> entries, Map<Path, Counter> counters) {
-        path.push(Tag.create(element.getNamespacePrefix(), element.getName()));
-        boolean hasElements = false;
-        Iterator walk = element.elementIterator();
-        while (walk.hasNext()) {
-            Element subelement = (Element) walk.next();
-            boolean remove = validateElement(subelement, path, problems, entries, counters);
-            if (remove) {
-                walk.remove();
-            }
-            hasElements = true;
+        else if (object instanceof GString) {
+            return object.toString();
         }
-        if (!hasElements) {
-            boolean fieldRemove = validatePath(element.getTextTrim(), path, problems, entries, counters);
-            path.pop();
-            return fieldRemove;
+        else if (object instanceof GroovyNode) {
+            return valueToString(((GroovyNode) object).value());
         }
-        path.pop();
-        return false;
-    }
-
-    private boolean validatePath(String text, Path path, List<String> problems, Set<String> entries, Map<Path, Counter> counters) {
-        FieldDefinition field = recordDefinition.getFieldDefinition(path);
-        if (field == null) {
-            problems.add(String.format("No field definition found for path [%s]", path));
-            return true;
-        }
-        String entryString = field + "=" + text;
-        if (text.isEmpty() || entries.contains(entryString)) {
-            return true;
+        else if (object instanceof Node) {
+            return valueToString(((Node) object).value());
         }
         else {
-            entries.add(entryString);
-            Counter counter = counters.get(field.path);
-            if (counter == null) {
-                counters.put(field.path, counter = new Counter());
-            }
-            counter.count++;
-            validateField(text, field, problems);
-            return false;
+            throw new IllegalStateException("Could not deal with class "+object.getClass());
         }
     }
 
+    /*
+    todo: think of something for options, which are now in FieldDefinition
+    todo: add a method for checking URL
+    todo: uniqueness
     private void validateField(String text, FieldDefinition fieldDefinition, List<String> problems) {
         FieldDefinition.Validation validation = fieldDefinition.validation;
         if (validation != null) {
