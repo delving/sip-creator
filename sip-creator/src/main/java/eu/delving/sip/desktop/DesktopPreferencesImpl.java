@@ -53,6 +53,7 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         loadWindowState();
     }
 
+    @SuppressWarnings("unchecked")
     private void loadWindowState() {
         byte[] preferences = this.preferences.getByteArray(WINDOW_STATE, null);
         if (null == preferences) {

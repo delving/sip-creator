@@ -52,7 +52,7 @@ public class NavigationMenu extends JMenuBar {
 
     private JMenu createSipMenu() {
         JMenu menu = new JMenu("SIP");
-        for(AbstractAction action : actions.getNavigationActions().values()) {
+        for (AbstractAction action : actions.getNavigationActions().values()) {
             menu.add(action);
         }
         return menu;
@@ -89,7 +89,7 @@ public class NavigationMenu extends JMenuBar {
                 new AbstractAction(WindowId.DATA_SET.getTitle()) {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        // todo: add data set window
+                        desktopManager.add(WindowId.DATA_SET);
                     }
                 }
         );

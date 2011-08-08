@@ -22,7 +22,7 @@
 package eu.delving.sip.desktop;
 
 import eu.delving.sip.desktop.navigation.Actions;
-import eu.delving.sip.desktop.navigation.Navigation;
+import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
@@ -58,7 +58,7 @@ public class DesktopLauncher {
     private final DesktopManager desktopManager = DesktopManager.getInstance();
     private DesktopPreferences desktopPreferences;
     private DesktopPreferences.DesktopState desktopState;
-    private Navigation navigation;
+    private NavigationBar navigationBar;
     // todo: create user object
     private Object user;
     private AuthenticationWindow authenticationWindow;
@@ -133,9 +133,9 @@ public class DesktopLauncher {
     }
 
     private JComponent buildNavigation() {
-        navigation = new Navigation(actions);
+        navigationBar = new NavigationBar(actions);
         actions.setEnabled(false);
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigation, desktopManager.getDesktop());
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigationBar, desktopManager.getDesktop());
         splitPane.setBorder(null);
         splitPane.setSize(new Dimension(400, 400));
         splitPane.setDividerLocation(200);

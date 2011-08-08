@@ -44,12 +44,14 @@ public class DesktopManager {
     private JDesktopPane desktop;
 
     {
+        // todo: keep this in sync with Actions
         windows.put(WindowId.ANALYZE, new AnalyzeWindow(WindowId.ANALYZE));
         windows.put(WindowId.MAPPING, new MappingWindow(WindowId.MAPPING));
         windows.put(WindowId.PREVIEW, new PreviewWindow(WindowId.PREVIEW));
         windows.put(WindowId.WELCOME, new WelcomeWindow(WindowId.WELCOME));
         windows.put(WindowId.UPLOAD, new UploadWindow(WindowId.UPLOAD));
         windows.put(WindowId.NORMALIZE, new NormalizeWindow(WindowId.NORMALIZE));
+        windows.put(WindowId.DATA_SET, new DataSetWindow());
     }
 
     private DesktopManager() {

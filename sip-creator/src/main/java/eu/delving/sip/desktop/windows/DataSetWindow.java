@@ -53,19 +53,23 @@ public class DataSetWindow extends DesktopWindow {
     }
 
     private void buildLayout() {
-        GridBagHelper gba = new GridBagHelper();
-        gba.reset();
-        add(title, gba);
-        dataSets = new JList(fetchListModel());
-        gba.line();
-        add(dataSets, gba);
-        gba.line();
-        add(cancel, gba);
-        gba.right();
-        add(select, gba);
+        GridBagHelper g = new GridBagHelper();
+        g.reset();
+        add(title, g);
+        dataSets = new JList(createDataListModel());
+        g.line();
+        add(new JScrollPane(dataSets), g);
+        g.line();
+        add(cancel, g);
+        g.right();
+        add(select, g);
     }
 
-    private Object[] fetchListModel() {
-        return new String[]{"Fries Museum", "Princessehof"};
+    private ListModel createDataListModel() {
+        DefaultListModel model = new DefaultListModel();
+        // todo: replcae mock data by actual data sets from file store
+        model.addElement("Fries Museum");
+        model.addElement("Princessehof");
+        return model;
     }
 }

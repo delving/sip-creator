@@ -33,18 +33,18 @@ import java.util.Map;
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class Navigation extends JPanel {
+public class NavigationBar extends JPanel {
 
     private static final Dimension DEFAULT_BUTTON_SIZE = new Dimension(200, 80);
     private static final Logger LOG = Logger.getRootLogger();
-    private Actions actions;
 
-    public Navigation(Actions actions) {
-        this.actions = actions;
+    public NavigationBar(Actions actions) {
         JPanel vertical = new JPanel();
         vertical.setLayout(new GridLayout(8, 0));
         for (Map.Entry<WindowId, AbstractAction> entry : actions.getBarActions().entrySet()) {
-            vertical.add(new JButton(entry.getValue()));
+            JButton button = new JButton(entry.getValue());
+            button.setPreferredSize(DEFAULT_BUTTON_SIZE);
+            vertical.add(button);
         }
         add(vertical);
     }
