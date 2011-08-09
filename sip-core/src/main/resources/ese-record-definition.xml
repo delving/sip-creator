@@ -67,6 +67,28 @@
             <converter multipleOutput="true" call=".extractYear()"/>
         </field>
     </root>
+    <views>
+        <view name="brief">
+            <view-field name="creator" prefix="dc" localName="creator"/>
+            <view-field name="description">
+                <field-ref localName="description"/>
+            </view-field>
+            <view-field name="language">
+                <field-ref prefix="europeana" localName="language"/>
+                <field-ref prefix="dc" localName="language"/>
+            </view-field>
+        </view>
+        <view name="full">
+            <view-field name="creator" prefix="dc" localName="creator"/>
+            <view-field name="description">
+                <field-ref localName="description"/>
+            </view-field>
+            <view-field name="language">
+                <field-ref prefix="europeana" localName="language"/>
+                <field-ref prefix="dc" localName="language"/>
+            </view-field>
+        </view>
+    </views>
     <validation>
         assert record.'europeana:collectionTitle'
         assert record.'europeana:country'

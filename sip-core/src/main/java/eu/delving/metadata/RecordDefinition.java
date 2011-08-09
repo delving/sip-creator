@@ -51,6 +51,8 @@ public class RecordDefinition {
 
     public ElementDefinition root;
 
+    public ViewDefinition views;
+
     public String validation;
 
     void initialize() throws MetadataException {
