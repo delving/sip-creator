@@ -21,9 +21,10 @@
 
 package eu.delving.sip.desktop.windows;
 
-import eu.delving.sip.desktop.navigation.Actions;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 /**
@@ -33,40 +34,79 @@ import java.awt.event.KeyEvent;
  */
 public enum WindowId {
 
-    ANALYZE("Analyze", true, KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR),
-    DATA_SET("Open data set", true, KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_MENU),
-    WELCOME("Welcome", true, KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_MENU),
-    AUTHENTICATION("Authentication", false, KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_MENU),
-    MAPPING("Mapping", true, KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR),
-    PREVIEW("Preview", true, KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR),
-    UPLOAD("Upload", true, KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR),
-    NORMALIZE("Normalize", true, KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.ALT_MASK), Actions.Type.NAVIGATION_BAR);
+    ANALYZE("Analyze", KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_MASK), AnalyzeWindow.class),
+    DATA_SET("Open data set", KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.ALT_MASK), DataSetWindow.class, MenuGroup.FILE),
+    WELCOME("Welcome", KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.ALT_MASK), WelcomeWindow.class, MenuGroup.ACCOUNT),
+    AUTHENTICATION("Authentication", KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), null, MenuGroup.ACCOUNT),
+    SIGN_IN("Sign In", KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), null, MenuGroup.ACCOUNT),
+    SIGN_OUT("Sign Out", KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), null, MenuGroup.ACCOUNT),
+    MAPPING("Mapping", KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.ALT_MASK), MappingWindow.class, MenuGroup.SIP),
+    PREVIEW("Preview", KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_MASK), PreviewWindow.class),
+    UPLOAD("Upload", KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.ALT_MASK), UploadWindow.class),
+    SAVE_STATE("Save desktop state", KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_MASK), MenuGroup.FILE,
+            new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    // todo: save state to preferences
+                    LOG.info("Save dekstop state to preferences");
+                }
+            }
+    ),
+    EXIT("Exit", KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.ALT_MASK), MenuGroup.FILE,
+            new AbstractAction() {
 
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    System.exit(0);
+                }
+            }
+    ),
+    NORMALIZE("Normalize", KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.ALT_MASK), NormalizeWindow.class);
+
+    private static final Logger LOG = Logger.getRootLogger();
     private String title;
-    private boolean draggable;
     private KeyStroke accelerator;
-    private Actions.Type type;
+    private MenuGroup menuGroup;
+    private Action action;
+    private Class<? extends DesktopWindow> desktopWindow;
 
-    private WindowId(String title, @Deprecated boolean draggable, KeyStroke accelerator, Actions.Type type) {
+    WindowId(String title, KeyStroke accelerator, Class<? extends DesktopWindow> desktopWindow) {
         this.title = title;
-        this.draggable = draggable;
         this.accelerator = accelerator;
-        this.type = type;
+        this.desktopWindow = desktopWindow;
+    }
+
+    WindowId(String title, KeyStroke accelerator, Class<? extends DesktopWindow> desktopWindow, MenuGroup menuGroup) {
+        this.title = title;
+        this.accelerator = accelerator;
+        this.desktopWindow = desktopWindow;
+        this.menuGroup = menuGroup;
+    }
+
+    WindowId(String title, KeyStroke accelerator, MenuGroup menuGroup, Action action) {
+        this.title = title;
+        this.accelerator = accelerator;
+        this.menuGroup = menuGroup;
+        this.action = action;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public boolean isDraggable() {
-        return draggable;
-    }
-
     public KeyStroke getAccelerator() {
         return accelerator;
     }
 
-    public Actions.Type getType() {
-        return type;
+    public MenuGroup getMenuGroup() {
+        return menuGroup;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public Class<? extends DesktopWindow> getDesktopWindow() {
+        return desktopWindow;
     }
 }

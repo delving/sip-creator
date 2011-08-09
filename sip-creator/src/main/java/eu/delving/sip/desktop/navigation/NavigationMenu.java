@@ -21,81 +21,41 @@
 
 package eu.delving.sip.desktop.navigation;
 
-import eu.delving.sip.desktop.windows.DesktopManager;
+import eu.delving.sip.desktop.windows.MenuGroup;
 import eu.delving.sip.desktop.windows.WindowId;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 /**
- * todo: add description
+ * Populate the navigation menu by collecting actions with the WindowId.MenuGroup property.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
+ * @see WindowId
+ * @see Actions
+ * @see MenuGroup
  */
 public class NavigationMenu extends JMenuBar {
 
-    private DesktopManager desktopManager;
     private Actions actions;
 
-    public NavigationMenu(DesktopManager desktopManager, Actions actions) {
-        this.desktopManager = desktopManager;
+    public NavigationMenu(Actions actions) {
         this.actions = actions;
         createMenus();
     }
 
     private void createMenus() {
-        add(createFileMenu());
-        add(createAccountMenu());
-        add(createSipMenu());
-    }
-
-    private JMenu createSipMenu() {
-        JMenu menu = new JMenu("SIP");
-        for (AbstractAction action : actions.getNavigationActions().values()) {
-            menu.add(action);
+        for (MenuGroup group : MenuGroup.values()) {
+            add(createMenu(group));
         }
-        return menu;
     }
 
-    private JMenu createAccountMenu() {
-        JMenu menu = new JMenu("Account");
-        JMenuItem signIn = new JMenuItem(
-                new AbstractAction("Sign in") {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        desktopManager.add(WindowId.AUTHENTICATION);
-                    }
-                }
-        );
-        signIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK));
-        menu.add(signIn);
-        return menu;
-    }
-
-    private JMenu createFileMenu() {
-        JMenu menu = new JMenu("File");
-        JMenuItem exit = new JMenuItem(
-                new AbstractAction("Exit") {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        // todo: show alert and ask to save state
-                        System.exit(0);
-                    }
-                }
-        );
-        exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.ALT_MASK));
-        JMenuItem loadDataSet = new JMenuItem(
-                new AbstractAction(WindowId.DATA_SET.getTitle()) {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        desktopManager.add(WindowId.DATA_SET);
-                    }
-                }
-        );
-        loadDataSet.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK));
-        menu.add(loadDataSet);
-        menu.add(exit);
+    private JMenu createMenu(MenuGroup group) {
+        JMenu menu = new JMenu(group.getTitle());
+        for (WindowId windowId : WindowId.values()) {
+            if (group == windowId.getMenuGroup()) {
+                menu.add(actions.getAction(windowId));
+            }
+        }
         return menu;
     }
 }

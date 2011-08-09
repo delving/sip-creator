@@ -60,8 +60,7 @@ public class AuthenticationWindow extends DesktopWindow {
         void failed(Exception exception);
     }
 
-    public AuthenticationWindow(WindowId windowId, Listener listener, DesktopPreferences desktopPreferences) {
-        super(windowId);
+    public AuthenticationWindow(Listener listener, DesktopPreferences desktopPreferences) {
         this.listener = listener;
         this.desktopPreferences = desktopPreferences;
         setLayout(new GridBagLayout());

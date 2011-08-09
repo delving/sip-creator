@@ -26,6 +26,13 @@ package eu.delving.sip.desktop.windows;
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class PreviewWindow extends DesktopWindow {
+public interface DataSet {
 
+    String getName();
+
+    String getSpec();
+
+    String getState();
+
+    int getRecordCount();
 }

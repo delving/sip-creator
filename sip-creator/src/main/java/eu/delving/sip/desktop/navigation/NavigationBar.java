@@ -41,7 +41,7 @@ public class NavigationBar extends JPanel {
     public NavigationBar(Actions actions) {
         JPanel vertical = new JPanel();
         vertical.setLayout(new GridLayout(8, 0));
-        for (Map.Entry<WindowId, AbstractAction> entry : actions.getBarActions().entrySet()) {
+        for (Map.Entry<WindowId, Action> entry : actions.getBarActions().entrySet()) {
             JButton button = new JButton(entry.getValue());
             button.setPreferredSize(DEFAULT_BUTTON_SIZE);
             vertical.add(button);

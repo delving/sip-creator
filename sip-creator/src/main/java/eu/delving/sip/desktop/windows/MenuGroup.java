@@ -22,10 +22,23 @@
 package eu.delving.sip.desktop.windows;
 
 /**
- * todo: add description
+ * Grouping menus for the menu bar.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class PreviewWindow extends DesktopWindow {
+public enum MenuGroup {
 
+    FILE("File"),
+    ACCOUNT("Account"),
+    SIP("SIP");
+
+    private String title;
+
+    MenuGroup(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
 }

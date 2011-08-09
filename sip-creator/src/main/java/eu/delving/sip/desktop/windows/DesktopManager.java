@@ -21,14 +21,12 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.beans.PropertyVetoException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -39,38 +37,42 @@ import java.util.Map;
 public class DesktopManager {
 
     private static final Logger LOG = Logger.getRootLogger();
-    private static DesktopManager instance;
+    private DataSetChangeListener dataSetChangeListener;
     private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
 
-    {
-        // todo: keep this in sync with Actions
-        windows.put(WindowId.ANALYZE, new AnalyzeWindow(WindowId.ANALYZE));
-        windows.put(WindowId.MAPPING, new MappingWindow(WindowId.MAPPING));
-        windows.put(WindowId.PREVIEW, new PreviewWindow(WindowId.PREVIEW));
-        windows.put(WindowId.WELCOME, new WelcomeWindow(WindowId.WELCOME));
-        windows.put(WindowId.UPLOAD, new UploadWindow(WindowId.UPLOAD));
-        windows.put(WindowId.NORMALIZE, new NormalizeWindow(WindowId.NORMALIZE));
-        windows.put(WindowId.DATA_SET, new DataSetWindow());
-    }
-
-    private DesktopManager() {
+    public DesktopManager(DataSetChangeListener dataSetChangeListener) {
+        this.dataSetChangeListener = dataSetChangeListener;
         desktop = new JDesktopPane();
+        initialize();
     }
 
-    public static DesktopManager getInstance() {
-        if (null == instance) {
-            instance = new DesktopManager();
+    private void initialize() {
+        for (WindowId windowId : WindowId.values()) {
+            if (null != windowId.getDesktopWindow()) {
+                try {
+                    DesktopWindow desktopWindow = windowId.getDesktopWindow().newInstance();
+                    desktopWindow.setId(windowId);
+                    desktopWindow.setDataSetChangeListener(dataSetChangeListener);
+                    windows.put(windowId, desktopWindow);
+                    LOG.info("Done creating " + windowId);
+                }
+                catch (InstantiationException e) {
+                    LOG.error("Can't instantiate window " + windowId, e);
+                }
+                catch (IllegalAccessException e) {
+                    LOG.error("Illegal access " + windowId.getTitle(), e);
+                }
+            }
         }
-        return instance;
     }
 
     public JDesktopPane getDesktop() {
-        return getInstance().desktop;
+        return desktop;
     }
 
-    public static DesktopWindow getWindow(WindowId windowId) {
-        return getInstance().windows.get(windowId);
+    public DesktopWindow getWindow(WindowId windowId) {
+        return windows.get(windowId);
     }
 
     public void add(DesktopWindow desktopWindow) {
@@ -84,6 +86,7 @@ public class DesktopManager {
         DesktopWindow window = getWindow(windowId);
         if (getAllWindows().contains(window)) {
             window.moveToFront();
+            window.setVisible(true);
             try {
                 window.setSelected(true);
             }
@@ -91,6 +94,9 @@ public class DesktopManager {
                 LOG.error("Error selecting window", e);
             }
             return;
+        }
+        if (null == window) {
+            throw new NoSuchElementException("Window doesn't exist");
         }
         desktop.add(window);
         window.setVisible(true);

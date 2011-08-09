@@ -36,8 +36,7 @@ public class MappingWindow extends DesktopWindow {
 
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    public MappingWindow(WindowId windowId) {
-        super(windowId);
+    public MappingWindow() {
         tabbedPane.addTab("Dynamic fields", new MappingPanel());
         tabbedPane.addTab("Constant fields", new ConstantsPanel());
         tabbedPane.setPreferredSize(getPreferredSize());

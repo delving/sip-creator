@@ -19,13 +19,21 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.desktop.windows;
+package eu.delving.sip.desktop.listeners;
+
+
+import eu.delving.sip.desktop.windows.DataSet;
 
 /**
  * todo: add description
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class PreviewWindow extends DesktopWindow {
+public interface DataSetChangeListener {
 
+    void dataSetIsChanging(DataSet dataSet);
+
+    void dataSetHasChanged(DataSet dataSet);
+
+    void dataSetChangeCancelled(DataSet dataSet);
 }

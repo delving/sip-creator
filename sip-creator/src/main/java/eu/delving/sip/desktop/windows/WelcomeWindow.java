@@ -31,8 +31,7 @@ import javax.swing.*;
  */
 public class WelcomeWindow extends DesktopWindow {
 
-    public WelcomeWindow(WindowId windowId) {
-        super(windowId);
+    public WelcomeWindow() {
         add(new JLabel("Welcome!"));
     }
 }

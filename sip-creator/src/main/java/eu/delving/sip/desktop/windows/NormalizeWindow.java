@@ -27,7 +27,5 @@ package eu.delving.sip.desktop.windows;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 public class NormalizeWindow extends DesktopWindow {
-    public NormalizeWindow(WindowId id) {
-        super(id);
-    }
+
 }

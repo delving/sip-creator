@@ -21,13 +21,14 @@
 
 package eu.delving.sip.desktop;
 
+import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import eu.delving.sip.desktop.navigation.Actions;
 import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
+import eu.delving.sip.desktop.windows.DataSet;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
-import eu.delving.sip.desktop.windows.WindowId;
 import eu.europeana.sip.localization.Constants;
 import org.apache.log4j.Logger;
 
@@ -55,7 +56,7 @@ import java.util.List;
 public class DesktopLauncher {
 
     private static final Logger LOG = Logger.getRootLogger();
-    private final DesktopManager desktopManager = DesktopManager.getInstance();
+    private DesktopManager desktopManager;
     private DesktopPreferences desktopPreferences;
     private DesktopPreferences.DesktopState desktopState;
     private NavigationBar navigationBar;
@@ -63,9 +64,34 @@ public class DesktopLauncher {
     private Object user;
     private AuthenticationWindow authenticationWindow;
     private DesktopPreferences.Credentials credentials;
+    private DataSet dataSet;
     private Actions actions;
+    private static JFrame main;
+
+    private DataSetChangeListener dataSetChangeListener = new DataSetChangeListener() {
+
+        @Override
+        public void dataSetIsChanging(DataSet dataSet) {
+            LOG.info("Changing to " + dataSet.getName());
+            actions.setEnabled(false);
+        }
+
+        @Override
+        public void dataSetHasChanged(DataSet dataSet) {
+            DesktopLauncher.this.dataSet = dataSet;
+            LOG.info("Changed to " + dataSet.getName());
+            actions.setEnabled(true);
+            main.setTitle(String.format("%s - Data set %s", Constants.SIP_CREATOR_TITLE, dataSet.getName()));
+        }
+
+        @Override
+        public void dataSetChangeCancelled(DataSet dataSet) {
+            actions.setEnabled(true);
+        }
+    };
 
     {
+        desktopManager = new DesktopManager(dataSetChangeListener);
         actions = new Actions(desktopManager);
         desktopPreferences = new DesktopPreferencesImpl(
                 new DesktopPreferences.Listener() {
@@ -77,16 +103,21 @@ public class DesktopLauncher {
 
                     @Override
                     public void credentialsFound(DesktopPreferences.Credentials credentials) {
-                        LOG.info("Received credentials : " + credentials);
                         DesktopLauncher.this.credentials = credentials;
                     }
-                }
+
+                    @Override
+                    public void dataSetFound(DataSet dataSet) {
+                        DesktopLauncher.this.dataSet = dataSet;
+                    }
+                },
+                desktopManager
         );
         buildLayout();
     }
 
     private void buildLayout() {
-        authenticationWindow = new AuthenticationWindow(WindowId.AUTHENTICATION,
+        authenticationWindow = new AuthenticationWindow(
                 new AuthenticationWindow.Listener() {
 
                     @Override
@@ -95,6 +126,9 @@ public class DesktopLauncher {
                         actions.setEnabled(true);
                         if (null != desktopState) {
                             restoreWindows(desktopState);
+                        }
+                        if (null != dataSet) {
+                            dataSetChangeListener.dataSetHasChanged(dataSet);
                         }
                     }
 
@@ -148,18 +182,17 @@ public class DesktopLauncher {
     }
 
     public static void main(String... args) {
+        main = new JFrame(Constants.SIP_CREATOR_TITLE);
         final DesktopLauncher desktopLauncher = new DesktopLauncher();
-        final JFrame main = new JFrame(Constants.SIP_CREATOR_TITLE);
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
         main.setExtendedState(Frame.MAXIMIZED_BOTH);
         main.setLocationRelativeTo(null);
-        main.setJMenuBar(new NavigationMenu(desktopLauncher.desktopManager, desktopLauncher.actions));
+        main.setJMenuBar(new NavigationMenu(desktopLauncher.actions));
         main.setVisible(true);
         main.addWindowListener(
                 new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent windowEvent) {
-                        // todo: do you want to close? and remember the state? or maybe silently remember.
                         switch (JOptionPane.showConfirmDialog(main, Constants.CLOSE, Constants.CLOSE, JOptionPane.YES_NO_OPTION)) {
                             case JOptionPane.NO_OPTION:
                                 return;
@@ -167,6 +200,7 @@ public class DesktopLauncher {
                                 if (null == desktopLauncher.user) {
                                     System.exit(0);
                                 }
+                                desktopLauncher.getDesktopPreferences().saveDataSet(desktopLauncher.dataSet);
                                 desktopLauncher.getDesktopPreferences().saveDesktopState(
                                         new DesktopPreferences.DesktopState() {
 
