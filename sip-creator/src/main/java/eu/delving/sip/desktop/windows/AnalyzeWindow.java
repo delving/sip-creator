@@ -42,13 +42,21 @@ public class AnalyzeWindow extends DesktopWindow {
     }
 
     private void buildLayout() {
-        tabbedPane.addTab("Statistics", new StatisticsPanel());
+        tabbedPane.setPreferredSize(getPreferredSize());
         tabbedPane.addTab("Document stucture", new DocumentStructurePanel());
+        tabbedPane.addTab("Statistics", new StatisticsPanel());
         add(tabbedPane);
     }
 
     private class StatisticsPanel extends JPanel {
 
+
+        private StatisticsPanel() {
+            buildLayout();
+        }
+
+        private void buildLayout() {
+        }
     }
 
     private class DocumentStructurePanel extends JPanel {

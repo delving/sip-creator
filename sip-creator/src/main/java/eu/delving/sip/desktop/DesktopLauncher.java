@@ -64,6 +64,7 @@ public class DesktopLauncher {
     private Object user;
     private AuthenticationWindow authenticationWindow;
     private DesktopPreferences.Credentials credentials;
+    private DataSet dataSet;
     private Actions actions;
     private static JFrame main;
 
@@ -77,6 +78,7 @@ public class DesktopLauncher {
 
         @Override
         public void dataSetHasChanged(DataSet dataSet) {
+            DesktopLauncher.this.dataSet = dataSet;
             LOG.info("Changed to " + dataSet.getName());
             actions.setEnabled(true);
             main.setTitle(String.format("%s - Data set %s", Constants.SIP_CREATOR_TITLE, dataSet.getName()));
@@ -101,8 +103,12 @@ public class DesktopLauncher {
 
                     @Override
                     public void credentialsFound(DesktopPreferences.Credentials credentials) {
-                        LOG.info("Received credentials : " + credentials);
                         DesktopLauncher.this.credentials = credentials;
+                    }
+
+                    @Override
+                    public void dataSetFound(DataSet dataSet) {
+                        DesktopLauncher.this.dataSet = dataSet;
                     }
                 },
                 desktopManager
@@ -120,6 +126,9 @@ public class DesktopLauncher {
                         actions.setEnabled(true);
                         if (null != desktopState) {
                             restoreWindows(desktopState);
+                        }
+                        if (null != dataSet) {
+                            dataSetChangeListener.dataSetHasChanged(dataSet);
                         }
                     }
 
@@ -173,8 +182,8 @@ public class DesktopLauncher {
     }
 
     public static void main(String... args) {
-        final DesktopLauncher desktopLauncher = new DesktopLauncher();
         main = new JFrame(Constants.SIP_CREATOR_TITLE);
+        final DesktopLauncher desktopLauncher = new DesktopLauncher();
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
         main.setExtendedState(Frame.MAXIMIZED_BOTH);
         main.setLocationRelativeTo(null);
@@ -192,6 +201,7 @@ public class DesktopLauncher {
                                 if (null == desktopLauncher.user) {
                                     System.exit(0);
                                 }
+                                desktopLauncher.getDesktopPreferences().saveDataSet(desktopLauncher.dataSet);
                                 desktopLauncher.getDesktopPreferences().saveDesktopState(
                                         new DesktopPreferences.DesktopState() {
 

@@ -21,6 +21,7 @@
 
 package eu.delving.sip.desktop;
 
+import eu.delving.sip.desktop.windows.DataSet;
 import eu.delving.sip.desktop.windows.DesktopWindow;
 
 import java.util.List;
@@ -45,6 +46,8 @@ public interface DesktopPreferences {
         void desktopStateFound(DesktopState desktopState);
 
         void credentialsFound(Credentials credentials);
+
+        void dataSetFound(DataSet dataSet);
     }
 
     interface Credentials {
@@ -72,4 +75,6 @@ public interface DesktopPreferences {
      * @param desktopState The last window state.
      */
     void saveDesktopState(DesktopState desktopState);
+
+    void saveDataSet(DataSet dataSet);
 }

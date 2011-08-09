@@ -202,32 +202,4 @@ public class DataSetWindow extends DesktopWindow {
         return dataSetInfo;
     }
 
-    class DataSetImpl implements DataSet {
-
-        private DataSetInfo dataSetInfo;
-
-        DataSetImpl(DataSetInfo dataSetInfo) {
-            this.dataSetInfo = dataSetInfo;
-        }
-
-        @Override
-        public String getName() {
-            return dataSetInfo.name;
-        }
-
-        @Override
-        public String getSpec() {
-            return dataSetInfo.spec;
-        }
-
-        @Override
-        public String getState() {
-            return dataSetInfo.state;
-        }
-
-        @Override
-        public int getRecordCount() {
-            return dataSetInfo.recordCount;
-        }
-    }
 }

@@ -22,6 +22,7 @@
 package eu.delving.sip.desktop;
 
 
+import eu.delving.sip.desktop.windows.DataSet;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +45,7 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String WINDOW_STATE = "windowState";
+    private static final String DATA_SET = "dataSet";
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private Listener listener;
     private DesktopManager desktopManager;
@@ -53,6 +55,7 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         this.desktopManager = desktopManager;
         loadCredentials();
         loadWindowState();
+        loadDataSet();
     }
 
     @SuppressWarnings("unchecked")
@@ -116,6 +119,26 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         LOG.info("No credentials found.");
     }
 
+    private void loadDataSet() {
+        byte[] preferences = this.preferences.getByteArray(DATA_SET, null);
+        if (null == preferences) {
+            LOG.info("No data set found");
+            return;
+        }
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(preferences);
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+            DataSet dataSet = (DataSet) objectInputStream.readObject();
+            listener.dataSetFound(dataSet);
+        }
+        catch (IOException e) {
+            LOG.error("Error reading data set", e);
+        }
+        catch (ClassNotFoundException e) {
+            LOG.error("Class not found", e);
+        }
+    }
+
     @Override
     public void saveCredentials(Credentials credentials) {
         preferences.put(USERNAME, credentials.getUsername());
@@ -142,6 +165,20 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         }
         catch (IOException e) {
             LOG.error("Error storing desktop state", e);
+        }
+    }
+
+    @Override
+    public void saveDataSet(DataSet dataSet) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(dataSet);
+            LOG.info("Storing data set : " + dataSet.getName());
+            preferences.putByteArray(DATA_SET, byteArrayOutputStream.toByteArray());
+        }
+        catch (IOException e) {
+            LOG.error("Error storing data set", e);
         }
     }
 }
