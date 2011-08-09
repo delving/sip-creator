@@ -58,10 +58,11 @@ class TestMappingEngine {
                 """
             )
             println XmlNodePrinter.serialize(node)
+            println "VALID!"
         }
         catch (ValidationException e) {
-            println "The failed assertion:\n${e.message}"
             println XmlNodePrinter.serialize(e.getRecord())
+            println "The failed assertion:\n${e.message}"
         }
 
     }

@@ -157,5 +157,6 @@
         assert record.'europeana:type'
         assert record.'europeana:uri'
         assert record.'europeana:isShownAt' || record.'europeana:isShownBy'
+        assert isUrl(record.'europeana:isShownAt')
     </validation>
 </record-definition>

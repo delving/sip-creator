@@ -48,8 +48,7 @@ public class RecordValidator {
     private Script script;
 
     public RecordValidator(GroovyCodeResource groovyCodeResource, RecordDefinition recordDefinition) {
-        String wrappedValidationCode = String.format("use (ValidationCategory) {\n%s\n}", recordDefinition.validation);
-        this.script = groovyCodeResource.createShell().parse(wrappedValidationCode);
+        this.script = groovyCodeResource.createValidationScript(recordDefinition.validation);
     }
 
     public void guardUniqueness(Uniqueness uniqueness) {
@@ -143,7 +142,6 @@ public class RecordValidator {
 
     /*
     todo: think of something for options, which are now in FieldDefinition
-    todo: add a method for checking URL
     todo: uniqueness
     private void validateField(String text, FieldDefinition fieldDefinition, List<String> problems) {
         FieldDefinition.Validation validation = fieldDefinition.validation;

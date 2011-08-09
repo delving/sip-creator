@@ -23,6 +23,7 @@ package eu.delving.groovy;
 
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
+import groovy.lang.Script;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,26 +39,29 @@ import java.net.URL;
  */
 
 public class GroovyCodeResource {
-    private static final URL[] CATEGORY_RESOURCES = {
-            GroovyCodeResource.class.getResource("/MappingCategory.groovy"),
-            GroovyCodeResource.class.getResource("/ValidationCategory.groovy")
-    };
-    private GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
+    private static final URL MAPPING_CATEGORY = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
+    private static final URL VALIDATION_HELPERS = GroovyCodeResource.class.getResource("/ValidationHelpers.groovy");
 
-    public GroovyCodeResource() {
+    public Script createMappingScript(String code) {
         try {
-            for (URL resourceUrl : CATEGORY_RESOURCES) {
-                String code = readResourceCode(resourceUrl);
-                classLoader.parseClass(code);
-            }
+            GroovyClassLoader mappingClassLoader = new GroovyClassLoader(getClass().getClassLoader());
+            String categoryCode = readResourceCode(MAPPING_CATEGORY);
+            mappingClassLoader.parseClass(categoryCode);
+            return new GroovyShell(mappingClassLoader).parse(code);
         }
         catch (Exception e) {
             throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
         }
     }
 
-    public GroovyShell createShell() {
-        return new GroovyShell(classLoader);
+    public Script createValidationScript(String code) {
+        try {
+            String validationHelperCode = readResourceCode(VALIDATION_HELPERS);
+            return new GroovyShell(getClass().getClassLoader()).parse(validationHelperCode + "\n//=========\n" + code);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
+        }
     }
 
     private String readResourceCode(URL resource) throws IOException {

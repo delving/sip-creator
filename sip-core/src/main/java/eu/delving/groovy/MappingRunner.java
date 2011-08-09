@@ -68,7 +68,7 @@ public class MappingRunner {
             }
             binding.setVariable("input", metadataRecord.getRootNode());
             if (script == null) {
-                script = groovyCodeResource.createShell().parse(code);
+                script = groovyCodeResource.createMappingScript(code);
             }
             script.setBinding(binding);
             return (Node) script.run();
