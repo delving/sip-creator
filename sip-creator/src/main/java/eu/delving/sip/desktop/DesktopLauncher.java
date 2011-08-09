@@ -21,10 +21,12 @@
 
 package eu.delving.sip.desktop;
 
+import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import eu.delving.sip.desktop.navigation.Actions;
 import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
+import eu.delving.sip.desktop.windows.DataSet;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
 import eu.europeana.sip.localization.Constants;
@@ -54,7 +56,7 @@ import java.util.List;
 public class DesktopLauncher {
 
     private static final Logger LOG = Logger.getRootLogger();
-    private final DesktopManager desktopManager = DesktopManager.getInstance();
+    private DesktopManager desktopManager;
     private DesktopPreferences desktopPreferences;
     private DesktopPreferences.DesktopState desktopState;
     private NavigationBar navigationBar;
@@ -63,8 +65,31 @@ public class DesktopLauncher {
     private AuthenticationWindow authenticationWindow;
     private DesktopPreferences.Credentials credentials;
     private Actions actions;
+    private static JFrame main;
+
+    private DataSetChangeListener dataSetChangeListener = new DataSetChangeListener() {
+
+        @Override
+        public void dataSetIsChanging(DataSet dataSet) {
+            LOG.info("Changing to " + dataSet.getName());
+            actions.setEnabled(false);
+        }
+
+        @Override
+        public void dataSetHasChanged(DataSet dataSet) {
+            LOG.info("Changed to " + dataSet.getName());
+            actions.setEnabled(true);
+            main.setTitle(String.format("%s - Data set %s", Constants.SIP_CREATOR_TITLE, dataSet.getName()));
+        }
+
+        @Override
+        public void dataSetChangeCancelled(DataSet dataSet) {
+            actions.setEnabled(true);
+        }
+    };
 
     {
+        desktopManager = new DesktopManager(dataSetChangeListener);
         actions = new Actions(desktopManager);
         desktopPreferences = new DesktopPreferencesImpl(
                 new DesktopPreferences.Listener() {
@@ -79,7 +104,8 @@ public class DesktopLauncher {
                         LOG.info("Received credentials : " + credentials);
                         DesktopLauncher.this.credentials = credentials;
                     }
-                }
+                },
+                desktopManager
         );
         buildLayout();
     }
@@ -148,7 +174,7 @@ public class DesktopLauncher {
 
     public static void main(String... args) {
         final DesktopLauncher desktopLauncher = new DesktopLauncher();
-        final JFrame main = new JFrame(Constants.SIP_CREATOR_TITLE);
+        main = new JFrame(Constants.SIP_CREATOR_TITLE);
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
         main.setExtendedState(Frame.MAXIMIZED_BOTH);
         main.setLocationRelativeTo(null);

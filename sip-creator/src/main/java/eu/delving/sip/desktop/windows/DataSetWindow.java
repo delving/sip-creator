@@ -69,7 +69,23 @@ public class DataSetWindow extends DesktopWindow {
                     public void actionPerformed(ActionEvent actionEvent) {
                         DataSetModel<DataSet> model = dataSetModel;
                         DataSet selectedItem = model.getSelectedItem(dataSets.getSelectedRow());
-                        LOG.info("Selected item " + selectedItem.getName());
+                        dataSetChangeListener.dataSetIsChanging(selectedItem);
+                        int result = JOptionPane.showConfirmDialog(
+                                DataSetWindow.this,
+                                String.format("<html>You are switching to <b>%s</b>. Are you sure?<br/>Your current workspace will be saved.</html>",
+                                        selectedItem.getName()),
+                                "Change data set",
+                                JOptionPane.YES_NO_OPTION
+                        );
+                        switch (result) {
+                            case JOptionPane.YES_OPTION:
+                                dataSetChangeListener.dataSetHasChanged(selectedItem);
+                                setVisible(false);
+                                break;
+                            default:
+                                dataSetChangeListener.dataSetChangeCancelled(selectedItem);
+                                break;
+                        }
                     }
                 }
         );
@@ -184,16 +200,6 @@ public class DataSetWindow extends DesktopWindow {
         dataSetInfo.state = state;
         dataSetInfo.recordCount = recordCount;
         return dataSetInfo;
-    }
-
-    interface DataSet {
-        String getName();
-
-        String getSpec();
-
-        String getState();
-
-        int getRecordCount();
     }
 
     class DataSetImpl implements DataSet {

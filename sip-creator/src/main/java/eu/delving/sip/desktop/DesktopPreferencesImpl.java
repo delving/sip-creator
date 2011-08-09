@@ -46,9 +46,11 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     private static final String WINDOW_STATE = "windowState";
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private Listener listener;
+    private DesktopManager desktopManager;
 
-    public DesktopPreferencesImpl(Listener listener) {
+    public DesktopPreferencesImpl(Listener listener, DesktopManager desktopManager) {
         this.listener = listener;
+        this.desktopManager = desktopManager;
         loadCredentials();
         loadWindowState();
     }
@@ -66,7 +68,7 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
             List<WindowState> windowStates = (List<WindowState>) objectInputStream.readObject();
             for (WindowState windowState : windowStates) {
-                DesktopWindow window = DesktopManager.getWindow(windowState.getWindowId());
+                DesktopWindow window = desktopManager.getWindow(windowState.getWindowId());
                 window.setWindowState(windowState);
                 windows.add(window);
             }

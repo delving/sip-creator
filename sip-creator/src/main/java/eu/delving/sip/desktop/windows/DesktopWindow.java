@@ -22,6 +22,7 @@
 package eu.delving.sip.desktop.windows;
 
 import eu.delving.sip.desktop.WindowState;
+import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,6 +38,17 @@ public abstract class DesktopWindow extends JInternalFrame {
     private WindowState windowState;
     private WindowId id;
     private boolean preferencesTransient;
+    protected DataSetChangeListener dataSetChangeListener;
+
+    public DesktopWindow() {
+        super("", true, true, true, true);
+        setPreferredSize(DEFAULT_SIZE);
+        setLayout(new FlowLayout());
+    }
+
+    public void setDataSetChangeListener(DataSetChangeListener dataSetChangeListener) {
+        this.dataSetChangeListener = dataSetChangeListener;
+    }
 
     public void setWindowState(WindowState windowState) {
         this.windowState = windowState;
@@ -44,12 +56,6 @@ public abstract class DesktopWindow extends JInternalFrame {
 
     public WindowState getWindowState() {
         return windowState;
-    }
-
-    public DesktopWindow() {
-        super("", true, true, true, true);
-        setPreferredSize(DEFAULT_SIZE);
-        setLayout(new FlowLayout());
     }
 
     public void setId(WindowId id) {
