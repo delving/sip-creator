@@ -22,6 +22,10 @@
 package eu.delving.sip.desktop.windows;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import java.awt.*;
 
 /**
  * The analyze window will present the following data:
@@ -50,7 +54,6 @@ public class AnalyzeWindow extends DesktopWindow {
 
     private class StatisticsPanel extends JPanel {
 
-
         private StatisticsPanel() {
             buildLayout();
         }
@@ -59,7 +62,40 @@ public class AnalyzeWindow extends DesktopWindow {
         }
     }
 
+    /**
+     * todo: document structure will be presented as a TreeTable.
+     */
     private class DocumentStructurePanel extends JPanel {
 
+        private JTree tree;
+
+        {
+            buildLayout();
+        }
+
+        private void buildLayout() {
+            setLayout(new BorderLayout());
+            add(new JLabel("Document structure"), BorderLayout.NORTH);
+            tree = new JTree(createTreeModel());
+            JScrollPane scrollPane = new JScrollPane(tree);
+            scrollPane.setPreferredSize(new Dimension(300, 300));
+            add(scrollPane, BorderLayout.CENTER);
+        }
+
+        // todo: this is mock data, replace with actual data from SIPModel
+        private TreeModel createTreeModel() {
+            DefaultMutableTreeNode root = new DefaultMutableTreeNode("adlibXML");
+            DefaultMutableTreeNode diagnostic = new DefaultMutableTreeNode("diagnostic");
+            diagnostic.add(new DefaultMutableTreeNode("abc"));
+            diagnostic.add(new DefaultMutableTreeNode("def"));
+            diagnostic.add(new DefaultMutableTreeNode("ghi"));
+            root.add(diagnostic);
+            DefaultMutableTreeNode unknown = new DefaultMutableTreeNode("unknown");
+            unknown.add(new DefaultMutableTreeNode("123"));
+            unknown.add(new DefaultMutableTreeNode("456"));
+            unknown.add(new DefaultMutableTreeNode("789"));
+            root.add(unknown);
+            return new DefaultTreeModel(root);
+        }
     }
 }

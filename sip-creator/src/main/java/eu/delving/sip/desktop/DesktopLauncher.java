@@ -193,7 +193,6 @@ public class DesktopLauncher {
                 new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent windowEvent) {
-                        // todo: do you want to close? and remember the state? or maybe silently remember.
                         switch (JOptionPane.showConfirmDialog(main, Constants.CLOSE, Constants.CLOSE, JOptionPane.YES_NO_OPTION)) {
                             case JOptionPane.NO_OPTION:
                                 return;
