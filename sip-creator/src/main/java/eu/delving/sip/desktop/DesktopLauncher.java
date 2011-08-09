@@ -27,7 +27,6 @@ import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
-import eu.delving.sip.desktop.windows.WindowId;
 import eu.europeana.sip.localization.Constants;
 import org.apache.log4j.Logger;
 
@@ -86,7 +85,7 @@ public class DesktopLauncher {
     }
 
     private void buildLayout() {
-        authenticationWindow = new AuthenticationWindow(WindowId.AUTHENTICATION,
+        authenticationWindow = new AuthenticationWindow(
                 new AuthenticationWindow.Listener() {
 
                     @Override
@@ -153,7 +152,7 @@ public class DesktopLauncher {
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
         main.setExtendedState(Frame.MAXIMIZED_BOTH);
         main.setLocationRelativeTo(null);
-        main.setJMenuBar(new NavigationMenu(desktopLauncher.desktopManager, desktopLauncher.actions));
+        main.setJMenuBar(new NavigationMenu(desktopLauncher.actions));
         main.setVisible(true);
         main.addWindowListener(
                 new WindowAdapter() {

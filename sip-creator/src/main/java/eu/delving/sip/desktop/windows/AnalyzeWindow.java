@@ -37,8 +37,7 @@ public class AnalyzeWindow extends DesktopWindow {
 
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    public AnalyzeWindow(WindowId id) {
-        super(id);
+    public AnalyzeWindow() {
         buildLayout();
     }
 

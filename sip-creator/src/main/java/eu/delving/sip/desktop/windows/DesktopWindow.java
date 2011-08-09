@@ -46,11 +46,15 @@ public abstract class DesktopWindow extends JInternalFrame {
         return windowState;
     }
 
-    public DesktopWindow(WindowId id) {
-        super(id.getTitle(), id.isDraggable(), true, true, true);
-        this.id = id;
+    public DesktopWindow() {
+        super("", true, true, true, true);
         setPreferredSize(DEFAULT_SIZE);
         setLayout(new FlowLayout());
+    }
+
+    public void setId(WindowId id) {
+        this.id = id;
+        setTitle(id.getTitle());
     }
 
     public WindowId getId() {

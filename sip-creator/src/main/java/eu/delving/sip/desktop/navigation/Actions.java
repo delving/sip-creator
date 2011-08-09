@@ -38,12 +38,19 @@ import java.util.Map;
 public class Actions {
 
     private DesktopManager desktopManager;
-    private Map<WindowId, AbstractAction> navigationActions = new HashMap<WindowId, AbstractAction>();
+    private Map<WindowId, Action> navigationActions = new HashMap<WindowId, Action>();
     private static final Logger LOG = Logger.getRootLogger();
 
     {
         for (WindowId windowId : WindowId.values()) {
-            navigationActions.put(windowId, new GenericAction(windowId));
+            Action action = windowId.getAction();
+            if (null == action) {
+                action = new GenericAction(windowId);
+            }
+            else {
+                action = new ActionWrapper(windowId);
+            }
+            navigationActions.put(windowId, action);
         }
     }
 
@@ -51,37 +58,46 @@ public class Actions {
         this.desktopManager = desktopManager;
     }
 
-    public Map<WindowId, AbstractAction> getMenuActions() {
-        return filterActions(Type.NAVIGATION_MENU);
-    }
-
-    public Map<WindowId, AbstractAction> getBarActions() {
-        return filterActions(Type.NAVIGATION_BAR);
-    }
-
-    private Map<WindowId, AbstractAction> filterActions(Type type) {
-        Map<WindowId, AbstractAction> menuActions = new HashMap<WindowId, AbstractAction>();
-        for (Map.Entry<WindowId, AbstractAction> entry : navigationActions.entrySet()) {
-            if (type == entry.getKey().getType()) {
-                menuActions.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return menuActions;
-    }
-
-    public Map<WindowId, AbstractAction> getNavigationActions() {
-        return navigationActions;
-    }
-
     public void setEnabled(boolean enabled) {
         LOG.info(String.format("Setting state to %s for %s%n", enabled, navigationActions.entrySet()));
-        for (Map.Entry<WindowId, AbstractAction> entry : navigationActions.entrySet()) {
+        for (Map.Entry<WindowId, Action> entry : navigationActions.entrySet()) {
             entry.getValue().setEnabled(enabled);
         }
     }
 
-    public AbstractAction getAction(WindowId windowId) {
+    public Action getAction(WindowId windowId) {
         return navigationActions.get(windowId);
+    }
+
+    /**
+     * These actions are not bound to a menu item, and thus will be shown in the left navigation bar.
+     *
+     * @return The actions for the navigation bar.
+     */
+    public Map<WindowId, Action> getBarActions() {
+        Map<WindowId, Action> map = new HashMap<WindowId, Action>();
+        for (Map.Entry<WindowId, Action> entry : navigationActions.entrySet()) {
+            if (null == entry.getKey().getMenuGroup()) {
+                map.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return map;
+    }
+
+    private class ActionWrapper extends AbstractAction {
+
+        private Action action;
+
+        private ActionWrapper(WindowId windowId) {
+            super(windowId.getTitle());
+            this.action = windowId.getAction();
+            putValue(ACCELERATOR_KEY, windowId.getAccelerator());
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            action.actionPerformed(actionEvent);
+        }
     }
 
     private class GenericAction extends AbstractAction {
@@ -98,10 +114,5 @@ public class Actions {
         public void actionPerformed(ActionEvent actionEvent) {
             desktopManager.add(windowId);
         }
-    }
-
-    public enum Type {
-        NAVIGATION_BAR,
-        NAVIGATION_MENU
     }
 }

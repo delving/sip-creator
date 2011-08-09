@@ -28,7 +28,4 @@ package eu.delving.sip.desktop.windows;
  */
 public class UploadWindow extends DesktopWindow {
 
-    public UploadWindow(WindowId id) {
-        super(id);
-    }
 }
