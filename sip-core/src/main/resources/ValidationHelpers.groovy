@@ -13,10 +13,13 @@ def stringify(Object value) {
     return value.toString()
 }
 
+def checkOption(Node node) {
+    return optionSource.allowOption(node)
+}
+
 def isUrl(Object value) {
     try {
         value = stringify(value);
-        println "isUrl(${value}) : ${value.getClass()}"
         new URL(value.toString())
         return true;
     }
@@ -25,7 +28,19 @@ def isUrl(Object value) {
     }
 }
 
-//def isOption(Object value, String prefix, String localName) {
-//    return options.hasOption(stringify(value), prefix, localName)
-//}
-
+def isOption(Object object) {
+    if (object instanceof NodeList) {
+        NodeList list = (NodeList)object
+        boolean option = true;
+        for (nodeObject in list) {
+            if (!checkOption((Node)nodeObject)) option = false;
+        }
+        return option;
+    }
+    else if (object instanceof Node) {
+        return checkOption((Node)object)
+    }
+    else {
+        throw new RuntimeException("Checking option for "+object.getClass())
+    }
+}

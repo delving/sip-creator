@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Parse, filter, validate a record
@@ -46,8 +48,11 @@ public class RecordValidator {
     private Logger log = Logger.getLogger(getClass());
     private Uniqueness idUniqueness; // todo: rebuild uniqueness test
     private Script script;
+    private RecordDefinition recordDefinition;
+    private Map<Path, FieldDefinition> fieldDefinitionCache = new TreeMap<Path, FieldDefinition>();
 
     public RecordValidator(GroovyCodeResource groovyCodeResource, RecordDefinition recordDefinition) {
+        this.recordDefinition = recordDefinition;
         this.script = groovyCodeResource.createValidationScript(recordDefinition.validation);
     }
 
@@ -55,16 +60,53 @@ public class RecordValidator {
         this.idUniqueness = uniqueness;
     }
 
+    public interface OptionSource {
+        boolean allowOption(Node node);
+    }
+
     public void validateRecord(Node record, int recordNumber) throws ValidationException {
         sanitizeRecord(record);
         Binding binding = new Binding();
         binding.setVariable("record", record);
+        binding.setVariable("optionSource", new OptionSource() {
+            @Override
+            public boolean allowOption(Node node) {
+                Path path = nodeToPath(node);
+                FieldDefinition definition = fieldDefinitionCache.get(path);
+                if (definition == null) {
+                    fieldDefinitionCache.put(path, definition = recordDefinition.getFieldDefinition(path));
+                }
+                return definition.allowOption(node.value().toString());
+            }
+        });
         script.setBinding(binding);
         try {
             script.run();
         }
         catch (AssertionError e) {
             throw new ValidationException(e, record, recordNumber);
+        }
+    }
+
+    private Path nodeToPath(Node node) {
+        Path path = new Path();
+        nodeToPath(node, path);
+        return path;
+    }
+
+    private void nodeToPath(Node node, Path path) {
+        if (node.parent() != null) {
+            nodeToPath(node.parent(), path);
+        }
+        if (node.name() instanceof String) {
+            path.push(Tag.create((String)node.name()));
+        }
+        else if (node.name() instanceof QName) {
+            QName q = (QName) node.name();
+            path.push(Tag.create(q.getPrefix(), q.getLocalPart()));
+        }
+        else {
+            throw new IllegalStateException("Node name type is not recognized: "+node.name().getClass());
         }
     }
 
@@ -141,7 +183,6 @@ public class RecordValidator {
     }
 
     /*
-    todo: think of something for options, which are now in FieldDefinition
     todo: uniqueness
     private void validateField(String text, FieldDefinition fieldDefinition, List<String> problems) {
         FieldDefinition.Validation validation = fieldDefinition.validation;

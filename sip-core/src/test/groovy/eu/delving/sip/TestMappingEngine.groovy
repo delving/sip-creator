@@ -50,7 +50,7 @@ class TestMappingEngine {
                 <creator.date_of_birth.start>?</creator.date_of_birth.start>
                 <production.date.start>1780</production.date.start>
                 <production.date.end>1799</production.date.end>
-                <acquisition.method>aankoop</acquisition.method>
+                <acquisition.method>schilder</acquisition.method>
                 <acquisition.date>1947</acquisition.date>
                 <association.subject/>
                 <association.subject>bestuurders (Utrecht)</association.subject>

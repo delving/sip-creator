@@ -32,8 +32,6 @@
     <!--
     sortable            => default false; action index also with sort_ prefix in fieldname
     searchField         => add content of field to each field specified in the list
-    fulldoc             => default true; when set to false the field will no be displayed in the full view
-    briefdoc            => default false; if true store with prefix summ_; if false store with prefix md_* (this means that the fieldContents are not stored)
     housekeeping        => default false; this field can never be mapped and its value is only used in back-end processes
     facetPrefix         => this is the prefix used during Solr Query construction for multivalued search
                            If facetPrefix is non-empty store this field with prefix facet_ to enable its use as facet.
@@ -125,25 +123,25 @@
         <field prefix="dcterms" localName="tableOfContents" searchField="description"/>
         <field prefix="dcterms" localName="temporal" searchField="what,subject"/>
         <field prefix="dcterms" localName="rightsHolder"/>
-        <field prefix="europeana" localName="collectionName" systemField="true" fulldoc="false"/>
-        <field prefix="europeana" localName="collectionTitle" fulldoc="false" facetName="collection" facetPrefix="col" factName="name"/>
-        <field prefix="europeana" localName="country" fulldoc="false" factName="country"/>
-        <field prefix="europeana" localName="dataProvider" facetPrefix="dapr" fulldoc="true" briefdoc="true" factName="dataProvider"/>
-        <field prefix="europeana" localName="isShownAt" fulldoc="true" fieldType="string"/>
-        <field prefix="europeana" localName="isShownBy" fulldoc="true" fieldType="string"/>
+        <field prefix="europeana" localName="collectionName" systemField="true"/>
+        <field prefix="europeana" localName="collectionTitle" facetName="collection" facetPrefix="col" factName="name"/>
+        <field prefix="europeana" localName="country" factName="country"/>
+        <field prefix="europeana" localName="dataProvider" facetPrefix="dapr" factName="dataProvider"/>
+        <field prefix="europeana" localName="isShownAt" fieldType="string"/>
+        <field prefix="europeana" localName="isShownBy" fieldType="string"/>
         <field prefix="europeana" localName="language" fieldType="string" facetName="language" searchField="language" factName="language"/>
-        <field prefix="europeana" localName="object" briefdoc="true"/>
+        <field prefix="europeana" localName="object"/>
         <field prefix="europeana" localName="provider" facetPrefix="prov" facetName="provider" factName="provider"/>
         <field prefix="europeana" localName="rights" factName="rights"/>
         <field prefix="europeana" localName="source"/> <!-- to be deleted is unused -->
         <field prefix="europeana" localName="type" fieldType="string" facetPrefix="tp" facetName="type" factName="type"/>
-        <field prefix="europeana" localName="unstored" fieldType="text" fulldoc="false"/>
-        <field prefix="europeana" localName="uri" briefdoc="true" identifierField="true">
+        <field prefix="europeana" localName="unstored" fieldType="text"/>
+        <field prefix="europeana" localName="uri" identifierField="true">
             <converter call=".toId(spec)"/>
         </field>
         <field prefix="europeana" localName="userTag" searchField="usertags"/>
         <field prefix="europeana" localName="hasDigitalObject" systemField="true" facetPrefix="hdo"/>
-        <field prefix="europeana" localName="year" fulldoc="false" fieldType="string" facetPrefix="year">
+        <field prefix="europeana" localName="year" fieldType="string" facetPrefix="year">
             <converter multipleOutput="true" call=".extractYear()"/>
         </field>
     </root>
@@ -158,5 +156,6 @@
         assert record.'europeana:uri'
         assert record.'europeana:isShownAt' || record.'europeana:isShownBy'
         assert isUrl(record.'europeana:isShownAt')
+        assert isOption(record.'icn:acquisitionMeans')
     </validation>
 </record-definition>

@@ -37,10 +37,6 @@ import java.util.List;
 @XStreamAlias("field")
 public class FieldDefinition implements Comparable<FieldDefinition> {
 
-    public FieldDefinition() {
-        fullDoc = true;
-    }
-
     @XStreamAsAttribute
     public String prefix;
 
@@ -49,12 +45,6 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
 
     @XStreamAsAttribute
     public String factName;
-
-    @XStreamAsAttribute
-    public boolean briefDoc;
-
-    @XStreamAsAttribute
-    public boolean fullDoc;
 
     @XStreamAsAttribute
     public boolean systemField;
@@ -146,22 +136,25 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     }
 
     public boolean allowOption(String value) {
-        for (String option : getOptions()) {
-            if (option.endsWith(":")) {
-                int colon = value.indexOf(':');
-                if (colon > 0) {
-                    if (option.equals(value.substring(0, colon + 1))) {
-                        return true;
+        List<String> options = getOptions();
+        if (options != null) {
+            for (String option : options) {
+                if (option.endsWith(":")) {
+                    int colon = value.indexOf(':');
+                    if (colon > 0) {
+                        if (option.equals(value.substring(0, colon + 1))) {
+                            return true;
+                        }
+                    }
+                    else {
+                        if (option.equals(value) || option.substring(0, option.length() - 1).equals(value)) {
+                            return true;
+                        }
                     }
                 }
-                else {
-                    if (option.equals(value) || option.substring(0, option.length() - 1).equals(value)) {
-                        return true;
-                    }
+                else if (option.equals(value)) {
+                    return true;
                 }
-            }
-            else if (option.equals(value)) {
-                return true;
             }
         }
         return false;
