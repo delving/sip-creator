@@ -14,7 +14,11 @@ def stringify(Object value) {
 }
 
 def checkOption(Node node) {
-    return optionSource.allowOption(node)
+    return validationReference.allowOption(node)
+}
+
+def checkUnique(Node node) {
+    return validationReference.isUnique(node.text())
 }
 
 def isUrl(Object value) {
@@ -42,5 +46,23 @@ def isOption(Object object) {
     }
     else {
         throw new RuntimeException("Checking option for "+object.getClass())
+    }
+}
+
+def isUnique(Object object) {
+    if (object instanceof NodeList) {
+        NodeList list = (NodeList)object
+        if (list.size() == 1) {
+            return checkUnique((Node)list[0])
+        }
+        else {
+            return false
+        }
+    }
+    else if (object instanceof Node) {
+        return checkUnique((Node)object)
+    }
+    else {
+        throw new RuntimeException("Checking unique for "+object.getClass())
     }
 }

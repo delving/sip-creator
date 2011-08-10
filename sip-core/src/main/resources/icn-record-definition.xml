@@ -27,7 +27,6 @@
         <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
         <namespace prefix="ese" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
         <namespace prefix="icn" uri="http://www.icn.nl/" schema="http://www.icn.nl/schemas/ICN-V3.2.xsd"/>
-
     </namespaces>
     <!--
     sortable            => default false; action index also with sort_ prefix in fieldname
@@ -37,12 +36,7 @@
                            If facetPrefix is non-empty store this field with prefix facet_ to enable its use as facet.
     facetName           => this is the name used for the facet
     fieldType           => default text; this value is used to determine the fieldType for the Solr search Engine
-
-    Validation
-
     multivalued         => default = true; check if field name appears multiple times.
-
-
     -->
     <root localName="record">
         <field prefix="icn" localName="creatorYearOfBirth">
@@ -157,5 +151,6 @@
         assert record.'europeana:isShownAt' || record.'europeana:isShownBy'
         assert isUrl(record.'europeana:isShownAt')
         assert isOption(record.'icn:acquisitionMeans')
+        assert isUnique(record.'europeana:uri')
     </validation>
 </record-definition>

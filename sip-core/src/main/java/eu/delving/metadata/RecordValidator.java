@@ -46,7 +46,7 @@ import java.util.TreeMap;
 
 public class RecordValidator {
     private Logger log = Logger.getLogger(getClass());
-    private Uniqueness idUniqueness; // todo: rebuild uniqueness test
+    private Uniqueness idUniqueness;
     private Script script;
     private RecordDefinition recordDefinition;
     private Map<Path, FieldDefinition> fieldDefinitionCache = new TreeMap<Path, FieldDefinition>();
@@ -60,15 +60,16 @@ public class RecordValidator {
         this.idUniqueness = uniqueness;
     }
 
-    public interface OptionSource {
+    public interface ValidationReference {
         boolean allowOption(Node node);
+        boolean isUnique(String string);
     }
 
     public void validateRecord(Node record, int recordNumber) throws ValidationException {
         sanitizeRecord(record);
         Binding binding = new Binding();
         binding.setVariable("record", record);
-        binding.setVariable("optionSource", new OptionSource() {
+        binding.setVariable("validationReference", new ValidationReference() {
             @Override
             public boolean allowOption(Node node) {
                 Path path = nodeToPath(node);
@@ -77,6 +78,11 @@ public class RecordValidator {
                     fieldDefinitionCache.put(path, definition = recordDefinition.getFieldDefinition(path));
                 }
                 return definition.allowOption(node.value().toString());
+            }
+
+            @Override
+            public boolean isUnique(String string) {
+                return idUniqueness == null || !idUniqueness.isRepeated(string);
             }
         });
         script.setBinding(binding);
@@ -181,33 +187,4 @@ public class RecordValidator {
             throw new IllegalStateException("Could not deal with class "+object.getClass());
         }
     }
-
-    /*
-    todo: uniqueness
-    private void validateField(String text, FieldDefinition fieldDefinition, List<String> problems) {
-        FieldDefinition.Validation validation = fieldDefinition.validation;
-        if (validation != null) {
-            if (validation.hasOptions()) {
-                if (!validation.allowOption(text)) {
-                    problems.add(String.format("Value for [%s] was [%s] which does not belong to [%s]", fieldDefinition.path, text, validation.getOptionsString()));
-                }
-            }
-            if (validation.url) {
-                try {
-                    new URL(text);
-                }
-                catch (MalformedURLException e) {
-                    problems.add(String.format("URL value for [%s] was [%s] which is malformed", fieldDefinition.path, text));
-                }
-            }
-            if (validation.id && idUniqueness != null) {
-                if (idUniqueness.isRepeated(text)) {
-                    problems.add(String.format("Identifier [%s] must be unique but the value [%s] appears more than once", fieldDefinition.path, text));
-                }
-            }
-        }
-    }
-    */
-
-
 }
