@@ -21,15 +21,15 @@
 
 package eu.europeana.sip.gui;
 
+import eu.delving.security.OAuth2Client;
+import eu.delving.sip.AppConfig;
+import eu.europeana.sip.model.AppConfigModel;
+import eu.europeana.sip.model.SipModel;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
-import javax.swing.*;
-
-import eu.delving.sip.AppConfig;
-import eu.delving.sip.OAuth2Client;
-import eu.europeana.sip.model.AppConfigModel;
-import eu.europeana.sip.model.SipModel;
 
 /**
  * @author Gerald de Jong, Delving BV <gerald@delving.eu>

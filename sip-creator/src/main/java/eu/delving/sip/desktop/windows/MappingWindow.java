@@ -21,6 +21,7 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.util.GridBagHelper;
 
 import javax.swing.*;
@@ -36,7 +37,8 @@ public class MappingWindow extends DesktopWindow {
 
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    public MappingWindow() {
+    public MappingWindow(SipModel sipModel) {
+        super(sipModel);
         tabbedPane.addTab("Dynamic fields", new MappingPanel());
         tabbedPane.addTab("Constant fields", new ConstantsPanel());
         tabbedPane.setPreferredSize(getPreferredSize());

@@ -21,7 +21,7 @@
 
 package eu.delving.sip.desktop;
 
-import eu.delving.sip.desktop.windows.DataSet;
+import eu.delving.sip.FileStore;
 import eu.delving.sip.desktop.windows.DesktopWindow;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public interface DesktopPreferences {
 
         void credentialsFound(Credentials credentials);
 
-        void dataSetFound(DataSet dataSet);
+        void dataSetFound(FileStore.DataSetStore dataSet);
     }
 
     interface Credentials {
@@ -76,5 +76,5 @@ public interface DesktopPreferences {
      */
     void saveDesktopState(DesktopState desktopState);
 
-    void saveDataSet(DataSet dataSet);
+    void saveDataSet(FileStore.DataSetStore dataSet);
 }

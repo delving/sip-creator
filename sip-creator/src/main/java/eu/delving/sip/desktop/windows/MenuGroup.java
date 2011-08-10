@@ -30,6 +30,7 @@ public enum MenuGroup {
 
     FILE("File"),
     ACCOUNT("Account"),
+    SERVER("Server"),
     SIP("SIP");
 
     private String title;

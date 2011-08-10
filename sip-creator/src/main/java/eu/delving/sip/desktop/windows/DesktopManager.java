@@ -22,6 +22,7 @@
 package eu.delving.sip.desktop.windows;
 
 import eu.delving.sip.desktop.listeners.DataSetChangeListener;
+import eu.europeana.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -40,9 +41,11 @@ public class DesktopManager {
     private DataSetChangeListener dataSetChangeListener;
     private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
+    private SipModel sipModel;
 
-    public DesktopManager(DataSetChangeListener dataSetChangeListener) {
+    public DesktopManager(DataSetChangeListener dataSetChangeListener, SipModel sipModel) {
         this.dataSetChangeListener = dataSetChangeListener;
+        this.sipModel = sipModel;
         desktop = new JDesktopPane();
         initialize();
     }
@@ -51,17 +54,13 @@ public class DesktopManager {
         for (WindowId windowId : WindowId.values()) {
             if (null != windowId.getDesktopWindow()) {
                 try {
-                    DesktopWindow desktopWindow = windowId.getDesktopWindow().newInstance();
+                    DesktopWindow desktopWindow = windowId.getDesktopWindow().getConstructor(SipModel.class).newInstance(sipModel);
                     desktopWindow.setId(windowId);
                     desktopWindow.setDataSetChangeListener(dataSetChangeListener);
                     windows.put(windowId, desktopWindow);
-                    LOG.info("Done creating " + windowId);
                 }
-                catch (InstantiationException e) {
-                    LOG.error("Can't instantiate window " + windowId, e);
-                }
-                catch (IllegalAccessException e) {
-                    LOG.error("Illegal access " + windowId.getTitle(), e);
+                catch (Exception e) {
+                    LOG.error("Can't instantiate window : " + windowId, e);
                 }
             }
         }
@@ -96,7 +95,7 @@ public class DesktopManager {
             return;
         }
         if (null == window) {
-            throw new NoSuchElementException("Window doesn't exist");
+            throw new NoSuchElementException(String.format("Window %s doesn't exist", windowId));
         }
         desktop.add(window);
         window.setVisible(true);

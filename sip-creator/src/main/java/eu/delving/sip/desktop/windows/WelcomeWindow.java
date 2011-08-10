@@ -21,7 +21,7 @@
 
 package eu.delving.sip.desktop.windows;
 
-import javax.swing.*;
+import eu.europeana.sip.model.SipModel;
 
 /**
  * Display when user opened the SIP-Creator for the first time.
@@ -31,7 +31,7 @@ import javax.swing.*;
  */
 public class WelcomeWindow extends DesktopWindow {
 
-    public WelcomeWindow() {
-        add(new JLabel("Welcome!"));
+    public WelcomeWindow(SipModel sipModel) {
+        super(sipModel);
     }
 }

@@ -22,7 +22,7 @@
 package eu.delving.sip.desktop.listeners;
 
 
-import eu.delving.sip.desktop.windows.DataSet;
+import eu.delving.sip.FileStore;
 
 /**
  * todo: add description
@@ -31,9 +31,9 @@ import eu.delving.sip.desktop.windows.DataSet;
  */
 public interface DataSetChangeListener {
 
-    void dataSetIsChanging(DataSet dataSet);
+    void dataSetIsChanging(FileStore.DataSetStore dataSet);
 
-    void dataSetHasChanged(DataSet dataSet);
+    void dataSetHasChanged(FileStore.DataSetStore dataSet);
 
-    void dataSetChangeCancelled(DataSet dataSet);
+    void dataSetChangeCancelled(FileStore.DataSetStore dataSet);
 }

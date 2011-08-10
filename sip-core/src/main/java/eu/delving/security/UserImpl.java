@@ -19,18 +19,30 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.desktop.windows;
+package eu.delving.security;
 
-import eu.europeana.sip.model.SipModel;
+
+import sun.security.krb5.internal.ccache.Credentials;
+
+import java.security.Permission;
 
 /**
- * todo: add description
+ * Repreesnts the user in the SIP-Creator.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class NormalizeWindow extends DesktopWindow {
+public class UserImpl implements User {
 
-    public NormalizeWindow(SipModel sipModel) {
-        super(sipModel);
+    private String name;
+    private Permission permission;
+
+    private Credentials credentials;
+
+    public Permission getPermission() {
+        return permission;
+    }
+
+    public void setPermission(Permission permission) {
+        this.permission = permission;
     }
 }

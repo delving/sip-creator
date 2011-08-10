@@ -21,6 +21,8 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.europeana.sip.model.SipModel;
+
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -41,7 +43,8 @@ public class AnalyzeWindow extends DesktopWindow {
 
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    public AnalyzeWindow() {
+    public AnalyzeWindow(SipModel sipModel) {
+        super(sipModel);
         buildLayout();
     }
 

@@ -19,18 +19,12 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.desktop.windows;
-
-import eu.europeana.sip.model.SipModel;
+package eu.delving.security;
 
 /**
  * todo: add description
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class NormalizeWindow extends DesktopWindow {
-
-    public NormalizeWindow(SipModel sipModel) {
-        super(sipModel);
-    }
+public interface Permissions {
 }

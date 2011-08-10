@@ -37,9 +37,9 @@ import java.util.Map;
  */
 public class Actions {
 
+    private static final Logger LOG = Logger.getRootLogger();
     private DesktopManager desktopManager;
     private Map<WindowId, Action> navigationActions = new HashMap<WindowId, Action>();
-    private static final Logger LOG = Logger.getRootLogger();
 
     {
         for (WindowId windowId : WindowId.values()) {
@@ -59,7 +59,6 @@ public class Actions {
     }
 
     public void setEnabled(boolean enabled) {
-        LOG.info(String.format("Setting state to %s for %s%n", enabled, navigationActions.entrySet()));
         for (Map.Entry<WindowId, Action> entry : navigationActions.entrySet()) {
             entry.getValue().setEnabled(enabled);
         }

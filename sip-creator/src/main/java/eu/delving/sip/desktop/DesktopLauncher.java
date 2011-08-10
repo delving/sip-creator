@@ -21,15 +21,23 @@
 
 package eu.delving.sip.desktop;
 
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.metadata.MetadataModel;
+import eu.delving.metadata.MetadataModelImpl;
+import eu.delving.sip.FileStore;
+import eu.delving.sip.FileStoreException;
+import eu.delving.sip.FileStoreImpl;
 import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import eu.delving.sip.desktop.navigation.Actions;
 import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
-import eu.delving.sip.desktop.windows.DataSet;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
 import eu.europeana.sip.localization.Constants;
+import eu.europeana.sip.model.SipModel;
+import eu.europeana.sip.model.UserNotifier;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -37,6 +45,9 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -64,34 +75,83 @@ public class DesktopLauncher {
     private Object user;
     private AuthenticationWindow authenticationWindow;
     private DesktopPreferences.Credentials credentials;
-    private DataSet dataSet;
+    private FileStore.DataSetStore dataSet;
     private Actions actions;
     private static JFrame main;
+    private SipModel sipModel;
 
     private DataSetChangeListener dataSetChangeListener = new DataSetChangeListener() {
 
         @Override
-        public void dataSetIsChanging(DataSet dataSet) {
-            LOG.info("Changing to " + dataSet.getName());
+        public void dataSetIsChanging(FileStore.DataSetStore dataSet) {
             actions.setEnabled(false);
         }
 
         @Override
-        public void dataSetHasChanged(DataSet dataSet) {
+        public void dataSetHasChanged(FileStore.DataSetStore dataSet) {
             DesktopLauncher.this.dataSet = dataSet;
-            LOG.info("Changed to " + dataSet.getName());
+            LOG.info("Changed to " + dataSet.getSpec());
             actions.setEnabled(true);
-            main.setTitle(String.format("%s - Data set %s", Constants.SIP_CREATOR_TITLE, dataSet.getName()));
+            main.setTitle(String.format("%s - Data set %s", Constants.SIP_CREATOR_TITLE, dataSet.getSpec()));
         }
 
         @Override
-        public void dataSetChangeCancelled(DataSet dataSet) {
+        public void dataSetChangeCancelled(FileStore.DataSetStore dataSet) {
             actions.setEnabled(true);
         }
     };
 
-    {
-        desktopManager = new DesktopManager(dataSetChangeListener);
+    private GroovyCodeResource groovyCodeResource;
+    private MetadataModel metadataModel;
+    private FileStore fileStore;
+    private UserNotifier userNotifier;
+
+    private File getFileStoreDirectory() throws FileStoreException {
+        File fileStore = new File(System.getProperty("user.home"), "/sip-creator-file-store");
+        if (fileStore.isFile()) {
+            try {
+                List<String> lines = FileUtils.readLines(fileStore);
+                String directory;
+                if (lines.size() == 1) {
+                    directory = lines.get(0);
+                }
+                else {
+                    directory = (String) JOptionPane.showInputDialog(null,
+                            "Please choose file store", "Launch SIP-Creator", JOptionPane.PLAIN_MESSAGE, null,
+                            lines.toArray(), "");
+                }
+                if (directory == null) {
+                    System.exit(0);
+                }
+                fileStore = new File(directory);
+                if (fileStore.exists() && !fileStore.isDirectory()) {
+                    throw new FileStoreException(String.format("%s is not a directory", fileStore.getAbsolutePath()));
+                }
+            }
+            catch (IOException e) {
+                throw new FileStoreException("Unable to read the file " + fileStore.getAbsolutePath());
+            }
+        }
+        return fileStore;
+    }
+
+    public DesktopLauncher() throws FileStoreException {
+        MetadataModel metadataModel = loadMetadataModel();
+        File fileStoreDirectory = getFileStoreDirectory();
+        FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
+        groovyCodeResource = new GroovyCodeResource();
+        sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, new UserNotifier() {
+            @Override
+            public void tellUser(String message) {
+                System.err.println(message);
+            }
+
+            @Override
+            public void tellUser(String message, Exception exception) {
+                System.err.printf("%s : %s%n", message, exception.getMessage());
+            }
+        });
+        desktopManager = new DesktopManager(dataSetChangeListener, sipModel);
         actions = new Actions(desktopManager);
         desktopPreferences = new DesktopPreferencesImpl(
                 new DesktopPreferences.Listener() {
@@ -107,7 +167,7 @@ public class DesktopLauncher {
                     }
 
                     @Override
-                    public void dataSetFound(DataSet dataSet) {
+                    public void dataSetFound(FileStore.DataSetStore dataSet) {
                         DesktopLauncher.this.dataSet = dataSet;
                     }
                 },
@@ -181,7 +241,7 @@ public class DesktopLauncher {
         return desktopPreferences;
     }
 
-    public static void main(String... args) {
+    public static void main(String... args) throws FileStoreException {
         main = new JFrame(Constants.SIP_CREATOR_TITLE);
         final DesktopLauncher desktopLauncher = new DesktopLauncher();
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
@@ -218,4 +278,23 @@ public class DesktopLauncher {
                 }
         );
     }
+
+    private MetadataModel loadMetadataModel() {
+        try {
+            MetadataModelImpl metadataModel = new MetadataModelImpl();
+            metadataModel.setRecordDefinitionResources(Arrays.asList(
+                    "/ese-record-definition.xml",
+                    "/icn-record-definition.xml",
+                    "/abm-record-definition.xml"
+            ));
+            metadataModel.setDefaultPrefix("ese");
+            return metadataModel;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
+
 }

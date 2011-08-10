@@ -21,49 +21,17 @@
 
 package eu.delving.sip;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import com.thoughtworks.xstream.XStream;
+import eu.delving.metadata.*;
+import org.apache.commons.io.IOUtils;
+
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import com.thoughtworks.xstream.XStream;
-import eu.delving.metadata.Facts;
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.Hasher;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.RecordMapping;
-import org.apache.commons.io.IOUtils;
 
 /**
  * This interface describes how files are stored by the sip-creator
@@ -215,7 +183,7 @@ public class FileStoreImpl implements FileStore {
         return new DataSetStoreImpl(directory);
     }
 
-    public class DataSetStoreImpl implements DataSetStore {
+    public class DataSetStoreImpl implements DataSetStore, Serializable {
 
         private File directory;
 

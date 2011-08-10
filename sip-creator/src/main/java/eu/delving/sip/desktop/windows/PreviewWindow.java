@@ -21,6 +21,8 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.europeana.sip.model.SipModel;
+
 /**
  * todo: add description
  *
@@ -28,4 +30,7 @@ package eu.delving.sip.desktop.windows;
  */
 public class PreviewWindow extends DesktopWindow {
 
+    public PreviewWindow(SipModel sipModel) {
+        super(sipModel);
+    }
 }

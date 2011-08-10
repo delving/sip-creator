@@ -21,6 +21,8 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.security.OAuth2Client;
+import eu.delving.security.User;
 import eu.delving.sip.desktop.DesktopPreferences;
 import eu.europeana.sip.util.GridBagHelper;
 import org.apache.log4j.Logger;
@@ -30,6 +32,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * OAuth2 login window.
@@ -61,6 +65,7 @@ public class AuthenticationWindow extends DesktopWindow {
     }
 
     public AuthenticationWindow(Listener listener, DesktopPreferences desktopPreferences) {
+        super(null); // todo: broken
         this.listener = listener;
         this.desktopPreferences = desktopPreferences;
         setLayout(new GridBagLayout());
@@ -101,34 +106,51 @@ public class AuthenticationWindow extends DesktopWindow {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        if (validateAuthentication(username.getText(), password.getPassword())) {
-                            desktopPreferences.saveCredentials(
-                                    new DesktopPreferences.Credentials() {
-
-                                        @Override
-                                        public String getUsername() {
-                                            return username.getText();
-                                        }
-
-                                        @Override
-                                        public String getPassword() {
-                                            return new String(password.getPassword());
-                                        }
-                                    }
-                            );
-                            listener.success(new Object());
-                            AuthenticationWindow.this.setVisible(false);
-                        }
-                        else {
-                            listener.failed(new Exception("Authentication failed"));
-                        }
+                        SwingUtilities.invokeLater(new Authentication(username.getText(), password.getPassword()));
                     }
                 }
         );
         add(login, gbc);
     }
 
-    private boolean validateAuthentication(String username, char[] password) {
-        return username.equals("serkan") && new String(password).equals("abc");
+    private class Authentication implements Runnable {
+
+        private String username;
+        private char[] password;
+
+        private Authentication(String username, char[] password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        @Override
+        public void run() {
+            try {
+                LOG.info(String.format("Logging in with %s@localhost:9000", username));
+                URL serverLocation = new URL("http://localhost:9000");
+                OAuth2Client client = new OAuth2Client();
+                User user = client.requestAccess(serverLocation, username, new String(password).getBytes());
+                LOG.info("User " + user);
+                desktopPreferences.saveCredentials(
+                        new DesktopPreferences.Credentials() {
+
+                            @Override
+                            public String getUsername() {
+                                return username;
+                            }
+
+                            @Override
+                            public String getPassword() {
+                                return new String(password);
+                            }
+                        }
+                );
+                listener.success(user);
+            }
+            catch (MalformedURLException e) {
+                System.err.println(e);
+                listener.failed(e);
+            }
+        }
     }
 }
