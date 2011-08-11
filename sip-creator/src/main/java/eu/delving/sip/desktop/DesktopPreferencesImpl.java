@@ -90,6 +90,7 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(object);
+        LOG.info(String.format("%d bytes written for key %s", byteArrayOutputStream.toByteArray().length, key));
         preferences.putByteArray(key, byteArrayOutputStream.toByteArray());
     }
 
@@ -101,7 +102,7 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         }
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-        LOG.info(String.format("%s bytes read for key %s%n", data.length, key));
+        LOG.info(String.format("%s bytes read for key %s", data.length, key));
         return objectInputStream.readObject();
     }
 

@@ -44,7 +44,7 @@ public class DesktopStateImpl implements DesktopPreferences.DesktopState {
     }
 
     @Override
-    public List<WindowState> getWindows() {
+    public List<WindowState> getWindowStates() {
         return windowStates;
     }
 

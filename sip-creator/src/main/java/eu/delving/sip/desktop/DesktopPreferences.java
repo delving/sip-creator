@@ -54,7 +54,7 @@ public interface DesktopPreferences extends Serializable {
 
         String getSpec();
 
-        List<WindowState> getWindows();
+        List<WindowState> getWindowStates();
     }
 
     /**

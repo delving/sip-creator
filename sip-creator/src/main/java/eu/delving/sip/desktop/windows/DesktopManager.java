@@ -22,6 +22,7 @@
 package eu.delving.sip.desktop.windows;
 
 import eu.delving.security.AuthenticationClient;
+import eu.delving.sip.desktop.WindowState;
 import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import eu.europeana.sip.model.SipModel;
 import org.apache.log4j.Logger;
@@ -29,8 +30,11 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyVetoException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -126,5 +130,18 @@ public class DesktopManager {
             }
         }
         return windows;
+    }
+
+    public List<WindowState> getWindowStates() {
+        List<DesktopWindow> allWindows = getAllWindows();
+        if (null == allWindows) {
+            LOG.info("Nothing to save");
+            return null;
+        }
+        List<WindowState> windowStates = new ArrayList<WindowState>();
+        for (DesktopWindow window : allWindows) {
+            windowStates.add(new WindowState(window));
+        }
+        return windowStates;
     }
 }

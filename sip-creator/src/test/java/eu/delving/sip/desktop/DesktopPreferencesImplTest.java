@@ -67,7 +67,7 @@ public class DesktopPreferencesImplTest implements Serializable {
         desktopPreferences.saveDesktopState(desktopState);
         DesktopPreferences.DesktopState actual = desktopPreferences.loadDesktopState();
         Assert.assertEquals(desktopState.getSpec(), actual.getSpec());
-        Assert.assertEquals(desktopState.getWindows().size(), actual.getWindows().size());
+        Assert.assertEquals(desktopState.getWindowStates().size(), actual.getWindowStates().size());
     }
 
     @After

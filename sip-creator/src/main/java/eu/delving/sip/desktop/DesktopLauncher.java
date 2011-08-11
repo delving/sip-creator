@@ -35,6 +35,7 @@ import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
+import eu.delving.sip.desktop.windows.DesktopWindow;
 import eu.europeana.sip.localization.Constants;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
@@ -45,6 +46,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -190,51 +192,32 @@ public class DesktopLauncher {
         if (null != credentials) {
             authenticationWindow.setCredentials(credentials);
         }
-        if (null != desktopState) {
-            restoreWindows(desktopState);
-        }
         desktopManager.add(authenticationWindow);
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
-        // todo: convert windowStates to windows
-//        for (DesktopWindow window : desktopState.getWindows()) {
-//            LOG.info("Adding window : " + window);
-//            try {
-//                desktopManager.add(window);
-//            }
-//            catch (Exception e) {
-//                LOG.error("Error adding window " + e);
-//            }
-//            window.setVisible(true);
-//            window.setSize(window.getWindowState().getSize());
-//            window.setLocation(window.getWindowState().getPoint());
-//            try {
-//                window.setSelected(window.getWindowState().isSelected());
-//            }
-//            catch (PropertyVetoException e) {
-//                LOG.error("Can't select window", e);
-//            }
-//        }
-// From DesktopPreferencesImpl
-//        try {
-//            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-//            List<WindowState> windowStates = (List<WindowState>) objectInputStream.readObject();
-//            for (WindowState windowState : windowStates) {
-//                DesktopWindow window = desktopManager.getWindow(windowState.getWindowId());
-//                window.setWindowState(windowState);
-//                windows.add(window);
-//            }
-//            listener.desktopStateFound(
-//                    new DesktopState() {
-//
-//                        @Override
-//                        public List<DesktopWindow> getWindows() {
-//                            return windows;
-//                        }
-//                    }
-//            );
-//        }
+        LOG.info("Spec is " + desktopState.getSpec());
+        if (null == desktopState.getWindowStates()) {
+            LOG.info("No windows found");
+            return;
+        }
+        for (WindowState windowState : desktopState.getWindowStates()) {
+            LOG.info("Adding window : " + windowState.getWindowId());
+            try {
+                DesktopWindow window = desktopManager.getWindow(windowState.getWindowId());
+                if (null == window) {
+                    continue;
+                }
+                window.setVisible(true);
+                window.setSize(windowState.getSize());
+                window.setLocation(windowState.getPoint());
+                desktopManager.add(window);
+                window.setSelected(windowState.isSelected());
+            }
+            catch (PropertyVetoException e) {
+                LOG.error("Can't select window", e);
+            }
+        }
     }
 
     private JComponent buildNavigation() {
@@ -271,8 +254,9 @@ public class DesktopLauncher {
                                 if (null == desktopLauncher.user) {
                                     System.exit(0);
                                 }
-                                List<WindowState> allWindowStates = null; // todo: collect window states
-                                desktopLauncher.getDesktopPreferences().saveDesktopState(new DesktopStateImpl("SPEC", allWindowStates));
+
+                                List<WindowState> allWindowStates = desktopLauncher.desktopManager.getWindowStates();
+                                desktopLauncher.getDesktopPreferences().saveDesktopState(new DesktopStateImpl("SPEC", allWindowStates)); // todo: spec name
                                 System.exit(0);
                                 break;
 
