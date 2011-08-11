@@ -38,6 +38,14 @@ import java.net.URISyntaxException;
  */
 public enum WindowId {
 
+    WORKSPACE("Select workspace", KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.ALT_MASK), MenuGroup.FILE,
+            new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    // todo: add body and return void;
+                }
+            }
+    ),
     ANALYZE("Analyze", KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_MASK), AnalyzeWindow.class),
     DATA_SET("Open data set", KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.ALT_MASK), DataSetWindow.class, MenuGroup.FILE),
     WELCOME("Welcome", KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.ALT_MASK), WelcomeWindow.class, MenuGroup.HELP),
@@ -83,11 +91,9 @@ public enum WindowId {
     ),
     EXIT("Exit", KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.ALT_MASK), MenuGroup.FILE,
             new AbstractAction() {
-
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    // todo: confirm, or notify main
-                    System.exit(0);
+                    // todo: add body and return void;
                 }
             }
     ),
@@ -130,6 +136,10 @@ public enum WindowId {
 
     public MenuGroup getMenuGroup() {
         return menuGroup;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
     }
 
     public Action getAction() {

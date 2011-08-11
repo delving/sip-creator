@@ -39,6 +39,14 @@ import java.util.List;
  */
 public interface DesktopPreferences extends Serializable {
 
+    /**
+     * Local files will be stored here.
+     */
+    interface Workspace extends Serializable {
+
+        String getWorkspacePath();
+    }
+
     interface Credentials extends Serializable {
 
         String getUsername();
@@ -74,6 +82,10 @@ public interface DesktopPreferences extends Serializable {
     void saveDesktopState(DesktopState desktopState);
 
     DesktopState loadDesktopState();
+
+    void saveWorkspace(Workspace workspace);
+
+    Workspace loadWorkspace();
 
     void clear();
 }

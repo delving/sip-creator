@@ -26,6 +26,8 @@ import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.security.AuthenticationClient;
 import eu.delving.security.User;
+import eu.delving.sip.DataSetClient;
+import eu.delving.sip.DataSetInfo;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileStoreImpl;
@@ -39,6 +41,7 @@ import eu.europeana.sip.localization.Constants;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -71,23 +74,51 @@ public class DesktopLauncher {
     private DesktopManager desktopManager;
     private DesktopPreferences desktopPreferences;
     private DesktopPreferences.DesktopState desktopState;
-    private NavigationBar navigationBar;
     private User user;
-    private AuthenticationWindow authenticationWindow;
     private DesktopPreferences.Credentials credentials;
-    private FileStore.DataSetStore dataSet;
     private Actions actions;
     private static JFrame main;
     private SipModel sipModel;
     private AuthenticationClient authenticationClient = new AuthenticationClient();
-    private FileStore.DataSetStore currentStore;
-    private GroovyCodeResource groovyCodeResource;
-    private MetadataModel metadataModel;
-    private FileStore fileStore;
-    private UserNotifier userNotifier;
+    private FileStore.DataSetStore currentStore; // todo: gone for some reason ...
 
-    private File getFileStoreDirectory() throws FileStoreException {
-        File fileStore = new File(System.getProperty("user.home"), "/sip-creator-file-store");
+    private DataSetClient dataSetClient = new DataSetClient(new DataSetClient.Context() {
+
+        @Override
+        public String getServerUrl() {
+            return sipModel.getAppConfigModel().getServerUrl();
+        }
+
+        @Override
+        public String getAccessToken() {
+            return authenticationClient.getAccessToken(sipModel.getAppConfigModel().getServerHostPort(), sipModel.getAppConfigModel().getUsername());
+        }
+
+        @Override
+        public void setInfo(DataSetInfo dataSetInfo) {
+            // todo: update datasetwindow
+            LOG.info("Dataset received " + dataSetInfo);
+        }
+
+        @Override
+        public void setList(List<DataSetInfo> list) {
+            // todo: update datasetwindow
+            LOG.info("Datasets received " + list);
+        }
+
+        @Override
+        public void tellUser(String message) {
+            sipModel.getUserNotifier().tellUser(message);
+        }
+
+        @Override
+        public void disconnected() {
+            sipModel.getUserNotifier().tellUser(String.format("Disconnected from Repository at %s", sipModel.getAppConfigModel().getServerHostPort()));
+        }
+    });
+
+    private File getFileStoreDirectory(String path) throws FileStoreException {
+        File fileStore = new File(path);
         if (fileStore.isFile()) {
             try {
                 List<String> lines = FileUtils.readLines(fileStore);
@@ -112,14 +143,20 @@ public class DesktopLauncher {
                 throw new FileStoreException("Unable to read the file " + fileStore.getAbsolutePath());
             }
         }
+        LOG.info("File store is now : " + fileStore.getAbsolutePath());
         return fileStore;
     }
 
     public DesktopLauncher() throws FileStoreException {
+        desktopPreferences = new DesktopPreferencesImpl(getClass());
+        DesktopPreferences.Workspace workspace = desktopPreferences.loadWorkspace();
+        if (null == workspace || StringUtils.isEmpty(workspace.getWorkspacePath())) {
+            new Actions.WorkspaceAction(desktopPreferences).actionPerformed(null); // todo: fix!
+        }
         MetadataModel metadataModel = loadMetadataModel();
-        File fileStoreDirectory = getFileStoreDirectory();
+        File fileStoreDirectory = getFileStoreDirectory(desktopPreferences.loadWorkspace().getWorkspacePath()); // todo: fix!
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
-        groovyCodeResource = new GroovyCodeResource();
+        GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
         sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, new UserNotifier() {
             @Override
             public void tellUser(String message) {
@@ -133,19 +170,19 @@ public class DesktopLauncher {
         });
         desktopManager = new DesktopManager(sipModel);
         actions = new Actions(desktopManager);
-        desktopPreferences = new DesktopPreferencesImpl(getClass());
         DesktopLauncher.this.credentials = desktopPreferences.loadCredentials();
         DesktopLauncher.this.desktopState = desktopPreferences.loadDesktopState();
         buildLayout();
     }
 
     private void buildLayout() {
-        authenticationWindow = new AuthenticationWindow(
+        AuthenticationWindow authenticationWindow = new AuthenticationWindow(
                 new AuthenticationWindow.Listener() {
 
                     @Override
                     public void success(User user) {
                         DesktopLauncher.this.user = user;
+                        dataSetClient.setListFetchingEnabled(true);
                         actions.setEnabled(true);
                         if (null != desktopState) {
                             restoreWindows(desktopState);
@@ -162,7 +199,7 @@ public class DesktopLauncher {
                     public void signedOut() {
                         // todo: display AuthenticationWindow again
                     }
-                }, desktopPreferences
+                }, desktopPreferences, authenticationClient
         );
         if (null != credentials) {
             authenticationWindow.setCredentials(credentials);
@@ -196,7 +233,7 @@ public class DesktopLauncher {
     }
 
     private JComponent buildNavigation() {
-        navigationBar = new NavigationBar(actions);
+        NavigationBar navigationBar = new NavigationBar(actions);
         actions.setEnabled(false);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigationBar, desktopManager.getDesktop());
         splitPane.setBorder(null);
@@ -222,24 +259,19 @@ public class DesktopLauncher {
                 new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent windowEvent) {
-                        switch (JOptionPane.showConfirmDialog(main, Constants.CLOSE, Constants.CLOSE, JOptionPane.YES_NO_OPTION)) {
-                            case JOptionPane.NO_OPTION:
-                                return;
-                            case JOptionPane.YES_OPTION:
-                                if (null == desktopLauncher.user) {
-                                    System.exit(0);
-                                }
-                                List<WindowState> allWindowStates = desktopLauncher.desktopManager.getWindowStates();
-                                desktopLauncher.getDesktopPreferences().saveDesktopState(
-                                        new DesktopStateImpl(null == desktopLauncher.currentStore ? "-" : desktopLauncher.currentStore.getSpec(),
-                                                allWindowStates));
-                                System.exit(0);
-                                break;
-
-                        }
+                        new Actions.ExitAction(desktopLauncher).actionPerformed(null);
                     }
                 }
         );
+    }
+
+
+    public FileStore.DataSetStore getCurrentStore() {
+        return currentStore;
+    }
+
+    public DesktopManager getDesktopManager() {
+        return desktopManager;
     }
 
     private MetadataModel loadMetadataModel() {

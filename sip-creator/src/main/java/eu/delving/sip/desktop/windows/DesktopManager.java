@@ -21,7 +21,6 @@
 
 package eu.delving.sip.desktop.windows;
 
-import eu.delving.security.AuthenticationClient;
 import eu.delving.sip.desktop.WindowState;
 import eu.europeana.sip.model.SipModel;
 import org.apache.log4j.Logger;
@@ -47,11 +46,6 @@ public class DesktopManager {
     private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
     private SipModel sipModel;
-    private static AuthenticationClient authenticationClient = new AuthenticationClient();
-
-    public static AuthenticationClient getAuthenticationClient() {
-        return authenticationClient;
-    }
 
     public DesktopManager(SipModel sipModel) {
         this.sipModel = sipModel;

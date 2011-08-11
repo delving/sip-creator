@@ -44,17 +44,28 @@ public class DesktopPreferencesImplTest implements Serializable {
     private static final String SERVER_ADDRESS = "localhost";
     private static final String SPEC = "FakeCollection";
     private static final int SERVER_PORT = 9000;
-
     private static final Logger LOG = Logger.getRootLogger();
+    private static final String WORKSPACE_PATH = "temp";
 
-    private DesktopPreferences desktopPreferences = new DesktopPreferencesImpl(getClass());
+    private final DesktopPreferences desktopPreferences = new DesktopPreferencesImpl(getClass());
+
+    @Test
+    public void testWorkspace() throws Exception {
+        DesktopPreferences.Workspace workspace = new WorkspaceImpl(WORKSPACE_PATH);
+        desktopPreferences.saveWorkspace(workspace);
+        Assert.assertEquals(workspace, desktopPreferences.loadWorkspace());
+    }
 
     @Test
     public void testCredentials() throws Exception {
         LOG.info("Writing to preferences");
-        DesktopPreferences.Credentials credentials = new CredentialsImpl(USERNAME, PASSWORD, SERVER_ADDRESS, SERVER_PORT);
-        desktopPreferences.saveCredentials(credentials);
-        Assert.assertEquals(credentials, desktopPreferences.loadCredentials());
+        DesktopPreferences.Credentials expected = new CredentialsImpl(USERNAME, PASSWORD, SERVER_ADDRESS, SERVER_PORT);
+        desktopPreferences.saveCredentials(expected);
+        DesktopPreferences.Credentials actual = desktopPreferences.loadCredentials();
+        Assert.assertEquals(expected.getUsername(), actual.getUsername());
+        Assert.assertEquals(expected.getPassword(), actual.getPassword());
+        Assert.assertEquals(expected.getServerAddress(), actual.getServerAddress());
+        Assert.assertEquals(expected.getServerPort(), actual.getServerPort());
     }
 
     @Test

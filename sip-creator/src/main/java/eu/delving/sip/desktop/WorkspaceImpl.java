@@ -26,48 +26,37 @@ package eu.delving.sip.desktop;
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class CredentialsImpl implements DesktopPreferences.Credentials {
+public class WorkspaceImpl implements DesktopPreferences.Workspace {
 
-    private String username;
-    private String password;
-    private String serverAddress;
-    private int serverPort;
+    private String workspacePath;
 
-    public CredentialsImpl(String username, String password, String serverAddress, int serverPort) {
-        this.username = username;
-        this.password = password;
-        this.serverAddress = serverAddress;
-        this.serverPort = serverPort;
+    public WorkspaceImpl(String workspacePath) {
+        this.workspacePath = workspacePath;
     }
 
     @Override
-    public String getUsername() {
-        return username;
+    public String getWorkspacePath() {
+        return workspacePath;
     }
 
     @Override
-    public String getPassword() {
-        return password;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WorkspaceImpl workspace = (WorkspaceImpl) o;
+        return !(workspacePath != null ? !workspacePath.equals(workspace.workspacePath) : workspace.workspacePath != null);
     }
 
     @Override
-    public String getServerAddress() {
-        return serverAddress;
-    }
-
-    @Override
-    public int getServerPort() {
-        return serverPort;
+    public int hashCode() {
+        return workspacePath != null ? workspacePath.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("CredentialsImpl");
-        sb.append("{username='").append(username).append('\'');
-        sb.append(", password='").append(password).append('\'');
-        sb.append(", serverAddress='").append(serverAddress).append('\'');
-        sb.append(", serverPort=").append(serverPort);
+        sb.append("WorkspaceImpl");
+        sb.append("{workspacePath='").append(workspacePath).append('\'');
         sb.append('}');
         return sb.toString();
     }

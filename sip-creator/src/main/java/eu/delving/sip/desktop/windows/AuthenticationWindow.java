@@ -21,6 +21,7 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.security.AuthenticationClient;
 import eu.delving.security.User;
 import eu.delving.sip.desktop.CredentialsImpl;
 import eu.delving.sip.desktop.DesktopPreferences;
@@ -60,6 +61,7 @@ public class AuthenticationWindow extends DesktopWindow {
     private JCheckBox rememberMe = new JCheckBox(REMEMBER_LABEL);
     private Listener listener;
     private DesktopPreferences desktopPreferences;
+    private AuthenticationClient authenticationClient;
 
     public interface Listener {
 
@@ -70,10 +72,11 @@ public class AuthenticationWindow extends DesktopWindow {
         void signedOut();
     }
 
-    public AuthenticationWindow(Listener listener, DesktopPreferences desktopPreferences) {
+    public AuthenticationWindow(Listener listener, DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient) {
         super(null); // todo: not needed, we don't have the SipModel yet at this point.
         this.listener = listener;
         this.desktopPreferences = desktopPreferences;
+        this.authenticationClient = authenticationClient;
         setLayout(new GridBagLayout());
         buildLayout();
         setResizable(false);
@@ -126,7 +129,7 @@ public class AuthenticationWindow extends DesktopWindow {
                             String serverPortText = serverPort.getText();
                             String usernameText = username.getText();
                             char[] passwordText = password.getPassword();
-                            User user = DesktopManager.getAuthenticationClient().requestAccess(String.format("%s:%s", serverAddressText, serverPortText), usernameText, new String(passwordText));
+                            User user = authenticationClient.requestAccess(String.format("%s:%s", serverAddressText, serverPortText), usernameText, new String(passwordText));
                             desktopPreferences.saveCredentials(
                                     new CredentialsImpl(usernameText, new String(passwordText), serverAddressText, Integer.parseInt(serverPortText)));
                             setVisible(false);

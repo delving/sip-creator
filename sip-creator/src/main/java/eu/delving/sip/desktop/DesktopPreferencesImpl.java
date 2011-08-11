@@ -43,11 +43,10 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     private static final Logger LOG = Logger.getRootLogger();
     private static final String DESKTOP_STATE = "desktopState";
     private static final String CREDENTIALS = "credentials";
+    private static final String WORKSPACE = "workspace";
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
-    private Class<?> clazz; // todo: remove, it's only used for showing the path while debugging
 
     public DesktopPreferencesImpl(Class<?> clazz) {
-        this.clazz = clazz;
         preferences = Preferences.userNodeForPackage(clazz);
     }
 
@@ -120,10 +119,34 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     }
 
     @Override
+    public void saveWorkspace(Workspace workspace) {
+        try {
+            writeObject(WORKSPACE, workspace);
+        }
+        catch (IOException e) {
+            LOG.error("Error writing workspace", e);
+        }
+    }
+
+    @Override
+    public Workspace loadWorkspace() {
+        try {
+            return (Workspace) readObject(WORKSPACE);
+        }
+        catch (IOException e) {
+            LOG.error("Error reading workspace", e);
+        }
+        catch (ClassNotFoundException e) {
+            LOG.error("Error reading workspace", e);
+        }
+        return null;
+    }
+
+    @Override
     public void clear() {
         try {
             preferences.clear();
-            LOG.info("Cleared data for node : " + clazz.getName());
+            LOG.info("Cleared data for node : " + preferences.absolutePath());
         }
         catch (BackingStoreException e) {
             LOG.error("Error clearing preferences", e);

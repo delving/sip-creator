@@ -21,13 +21,20 @@
 
 package eu.delving.sip.desktop.navigation;
 
+import eu.delving.sip.desktop.DesktopLauncher;
+import eu.delving.sip.desktop.DesktopPreferences;
+import eu.delving.sip.desktop.DesktopStateImpl;
+import eu.delving.sip.desktop.WindowState;
+import eu.delving.sip.desktop.WorkspaceImpl;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.WindowId;
+import eu.europeana.sip.localization.Constants;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -112,6 +119,49 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             desktopManager.add(windowId);
+        }
+    }
+
+    public static class ExitAction extends AbstractAction {
+
+        private DesktopLauncher desktopLauncher;
+
+        public ExitAction(DesktopLauncher desktopLauncher) {
+            this.desktopLauncher = desktopLauncher;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            switch (JOptionPane.showConfirmDialog(null, Constants.CLOSE, Constants.CLOSE, JOptionPane.YES_NO_OPTION)) {
+                case JOptionPane.NO_OPTION:
+                    return;
+                case JOptionPane.YES_OPTION:
+                    List<WindowState> allWindowStates = desktopLauncher.getDesktopManager().getWindowStates();
+                    desktopLauncher.getDesktopPreferences().saveDesktopState(
+                            new DesktopStateImpl(null == desktopLauncher.getCurrentStore() ? "-" : desktopLauncher.getCurrentStore().getSpec(),
+                                    allWindowStates));
+                    System.exit(0);
+                    break;
+            }
+        }
+    }
+
+    public static class WorkspaceAction extends AbstractAction {
+
+        private DesktopPreferences desktopPreferences;
+
+        public WorkspaceAction(DesktopPreferences desktopPreferences) {
+            this.desktopPreferences = desktopPreferences;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            JFileChooser chooser = new JFileChooser("Select workspace");
+            chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+            if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(null)) {
+                LOG.info("Selected path : " + chooser.getSelectedFile());
+                desktopPreferences.saveWorkspace(new WorkspaceImpl(chooser.getSelectedFile().getAbsolutePath()));
+            }
         }
     }
 }
