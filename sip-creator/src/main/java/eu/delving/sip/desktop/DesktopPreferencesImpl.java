@@ -78,7 +78,6 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     @Override
     public void saveDesktopState(DesktopState desktopState) {
         try {
-            // todo: strip transient windows
             writeObject(DESKTOP_STATE, desktopState);
         }
         catch (IOException e) {

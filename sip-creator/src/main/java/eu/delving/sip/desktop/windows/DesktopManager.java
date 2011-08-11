@@ -140,7 +140,9 @@ public class DesktopManager {
         }
         List<WindowState> windowStates = new ArrayList<WindowState>();
         for (DesktopWindow window : allWindows) {
-            windowStates.add(new WindowState(window));
+            if (!window.isPreferencesTransient()) {
+                windowStates.add(new WindowState(window));
+            }
         }
         return windowStates;
     }
