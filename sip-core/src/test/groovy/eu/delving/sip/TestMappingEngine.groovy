@@ -1,6 +1,5 @@
 package eu.delving.sip
 
-import eu.delving.groovy.XmlNodePrinter
 import eu.delving.metadata.ValidationException
 import org.junit.Test
 
@@ -18,7 +17,7 @@ class TestMappingEngine {
     @Test
     void initialMapping() {
         try {
-            Node node = mappingEngine.executeMapping(
+            IndexDocument doc = mappingEngine.executeMapping(
                 """
                 <priref>6389</priref>
                 <dimension.unit>cm</dimension.unit>
@@ -57,12 +56,10 @@ class TestMappingEngine {
                 <priref>6389</priref>
                 """
             )
-            println XmlNodePrinter.serialize(node)
-            println "VALID!"
+            println "VALID!\n ${doc}"
         }
         catch (ValidationException e) {
-            println XmlNodePrinter.serialize(e.getRecord())
-            println "The failed assertion:\n${e.message}"
+            println "The failed assertion:\n${e.message}\n${doc}"
         }
 
     }

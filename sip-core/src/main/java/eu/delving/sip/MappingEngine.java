@@ -49,7 +49,7 @@ public class MappingEngine {
      * @throws ValidationException the record is invalid by the criteria in the record definition
      */
 
-    public Node executeMapping(String originalRecord) throws MappingException, ValidationException {
+    public IndexDocument executeMapping(String originalRecord) throws MappingException, ValidationException {
         return executeMapping(originalRecord, -1);
     }
 
@@ -63,17 +63,12 @@ public class MappingEngine {
      * @throws ValidationException the record is invalid by the criteria in the record definition
      */
 
-    public Node executeMapping(String originalRecord, int recordNumber) throws MappingException, ValidationException {
+    public IndexDocument executeMapping(String originalRecord, int recordNumber) throws MappingException, ValidationException {
         try {
             MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
             Node record = mappingRunner.runMapping(metadataRecord);
-            try {
-                recordValidator.validateRecord(record, recordNumber);
-            }
-            catch (ValidationException e) {
-                throw e;
-            }
-            return record;
+            recordValidator.validateRecord(record, recordNumber);
+            return IndexDocument.fromNode(record);
         }
         catch (DiscardRecordException e) {
             return null;
