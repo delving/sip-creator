@@ -24,6 +24,8 @@ package eu.delving.sip.desktop;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
+import eu.delving.security.AuthenticationClient;
+import eu.delving.security.User;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileStoreImpl;
@@ -33,7 +35,6 @@ import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
-import eu.delving.sip.desktop.windows.DesktopWindow;
 import eu.europeana.sip.localization.Constants;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
@@ -44,7 +45,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -71,14 +71,14 @@ public class DesktopLauncher {
     private DesktopPreferences desktopPreferences;
     private DesktopPreferences.DesktopState desktopState;
     private NavigationBar navigationBar;
-    // todo: create user object
-    private Object user;
+    private User user;
     private AuthenticationWindow authenticationWindow;
     private DesktopPreferences.Credentials credentials;
     private FileStore.DataSetStore dataSet;
     private Actions actions;
     private static JFrame main;
     private SipModel sipModel;
+    private AuthenticationClient authenticationClient = new AuthenticationClient();
 
     private DataSetChangeListener dataSetChangeListener = new DataSetChangeListener() {
 
@@ -153,26 +153,9 @@ public class DesktopLauncher {
         });
         desktopManager = new DesktopManager(dataSetChangeListener, sipModel);
         actions = new Actions(desktopManager);
-        desktopPreferences = new DesktopPreferencesImpl(
-                new DesktopPreferences.Listener() {
-
-                    @Override
-                    public void desktopStateFound(DesktopPreferences.DesktopState desktopState) {
-                        DesktopLauncher.this.desktopState = desktopState;
-                    }
-
-                    @Override
-                    public void credentialsFound(DesktopPreferences.Credentials credentials) {
-                        DesktopLauncher.this.credentials = credentials;
-                    }
-
-                    @Override
-                    public void dataSetFound(FileStore.DataSetStore dataSet) {
-                        DesktopLauncher.this.dataSet = dataSet;
-                    }
-                },
-                desktopManager
-        );
+        desktopPreferences = new DesktopPreferencesImpl(getClass());
+        DesktopLauncher.this.credentials = desktopPreferences.loadCredentials();
+        DesktopLauncher.this.desktopState = desktopPreferences.loadDesktopState();
         buildLayout();
     }
 
@@ -181,7 +164,7 @@ public class DesktopLauncher {
                 new AuthenticationWindow.Listener() {
 
                     @Override
-                    public void success(Object user) {
+                    public void success(User user) {
                         DesktopLauncher.this.user = user;
                         actions.setEnabled(true);
                         if (null != desktopState) {
@@ -197,33 +180,61 @@ public class DesktopLauncher {
                         // todo: show error window
                         LOG.error("Authentication failed", exception);
                     }
+
+                    @Override
+                    public void signedOut() {
+                        // todo: display AuthenticationWindow again
+                    }
                 }, desktopPreferences
         );
         if (null != credentials) {
             authenticationWindow.setCredentials(credentials);
         }
+        if (null != desktopState) {
+            restoreWindows(desktopState);
+        }
         desktopManager.add(authenticationWindow);
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
-        for (DesktopWindow window : desktopState.getWindows()) {
-            LOG.info("Adding window : " + window);
-            try {
-                desktopManager.add(window);
-            }
-            catch (Exception e) {
-                LOG.error("Error adding window " + e);
-            }
-            window.setVisible(true);
-            window.setSize(window.getWindowState().getSize());
-            window.setLocation(window.getWindowState().getPoint());
-            try {
-                window.setSelected(window.getWindowState().isSelected());
-            }
-            catch (PropertyVetoException e) {
-                LOG.error("Can't select window", e);
-            }
-        }
+        // todo: convert windowStates to windows
+//        for (DesktopWindow window : desktopState.getWindows()) {
+//            LOG.info("Adding window : " + window);
+//            try {
+//                desktopManager.add(window);
+//            }
+//            catch (Exception e) {
+//                LOG.error("Error adding window " + e);
+//            }
+//            window.setVisible(true);
+//            window.setSize(window.getWindowState().getSize());
+//            window.setLocation(window.getWindowState().getPoint());
+//            try {
+//                window.setSelected(window.getWindowState().isSelected());
+//            }
+//            catch (PropertyVetoException e) {
+//                LOG.error("Can't select window", e);
+//            }
+//        }
+// From DesktopPreferencesImpl
+//        try {
+//            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+//            List<WindowState> windowStates = (List<WindowState>) objectInputStream.readObject();
+//            for (WindowState windowState : windowStates) {
+//                DesktopWindow window = desktopManager.getWindow(windowState.getWindowId());
+//                window.setWindowState(windowState);
+//                windows.add(window);
+//            }
+//            listener.desktopStateFound(
+//                    new DesktopState() {
+//
+//                        @Override
+//                        public List<DesktopWindow> getWindows() {
+//                            return windows;
+//                        }
+//                    }
+//            );
+//        }
     }
 
     private JComponent buildNavigation() {
@@ -260,16 +271,8 @@ public class DesktopLauncher {
                                 if (null == desktopLauncher.user) {
                                     System.exit(0);
                                 }
-                                desktopLauncher.getDesktopPreferences().saveDataSet(desktopLauncher.dataSet);
-                                desktopLauncher.getDesktopPreferences().saveDesktopState(
-                                        new DesktopPreferences.DesktopState() {
-
-                                            @Override
-                                            public List<DesktopWindow> getWindows() {
-                                                return desktopLauncher.desktopManager.getAllWindows();
-                                            }
-                                        }
-                                );
+                                List<WindowState> allWindowStates = null; // todo: collect window states
+                                desktopLauncher.getDesktopPreferences().saveDesktopState(new DesktopStateImpl("SPEC", allWindowStates));
                                 System.exit(0);
                                 break;
 

@@ -46,6 +46,13 @@ public class WindowState implements Serializable {
         this.selected = window.isSelected();
     }
 
+    public WindowState(WindowId windowId, Dimension size, Point point, boolean selected) {
+        this.windowId = windowId;
+        this.size = size;
+        this.point = point;
+        this.selected = selected;
+    }
+
     public Point getPoint() {
         return point;
     }

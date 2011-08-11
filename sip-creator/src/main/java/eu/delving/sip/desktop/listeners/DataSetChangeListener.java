@@ -28,7 +28,9 @@ import eu.delving.sip.FileStore;
  * todo: add description
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
+ *     @deprecated Use sipModel's UpdateListener
  */
+@Deprecated
 public interface DataSetChangeListener {
 
     void dataSetIsChanging(FileStore.DataSetStore dataSet);

@@ -21,13 +21,16 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.security.AuthenticationClient;
 import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import eu.europeana.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyVetoException;
 import java.util.*;
+import java.util.List;
 
 
 /**
@@ -42,15 +45,20 @@ public class DesktopManager {
     private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
     private SipModel sipModel;
+    private static AuthenticationClient authenticationClient = new AuthenticationClient();
+
+    public static AuthenticationClient getAuthenticationClient() {
+        return authenticationClient;
+    }
 
     public DesktopManager(DataSetChangeListener dataSetChangeListener, SipModel sipModel) {
         this.dataSetChangeListener = dataSetChangeListener;
         this.sipModel = sipModel;
         desktop = new JDesktopPane();
-        initialize();
+        buildWindows();
     }
 
-    private void initialize() {
+    private void buildWindows() {
         for (WindowId windowId : WindowId.values()) {
             if (null != windowId.getDesktopWindow()) {
                 try {
@@ -86,6 +94,12 @@ public class DesktopManager {
         if (getAllWindows().contains(window)) {
             window.moveToFront();
             window.setVisible(true);
+            if (window.getLocation().x < 0) {
+                window.setLocation(new Point(0, window.getLocation().y));
+            }
+            if (window.getLocation().y < 0) {
+                window.setLocation(new Point(window.getLocation().x, 0));
+            }
             try {
                 window.setSelected(true);
             }

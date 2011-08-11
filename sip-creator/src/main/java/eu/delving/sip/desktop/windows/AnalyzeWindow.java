@@ -21,7 +21,12 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.Path;
+import eu.delving.sip.FileStore;
+import eu.europeana.sip.gui.AnalysisFactsPanel;
 import eu.europeana.sip.model.SipModel;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -41,27 +46,55 @@ import java.awt.*;
  */
 public class AnalyzeWindow extends DesktopWindow {
 
-    private JTabbedPane tabbedPane = new JTabbedPane();
+    private static final Logger LOG = Logger.getRootLogger();
+    private DocumentStructurePanel documentStructurePanel;
 
     public AnalyzeWindow(SipModel sipModel) {
         super(sipModel);
         buildLayout();
+        SipModel.UpdateListener updateListener = new SipModel.UpdateListener() {
+
+            @Override
+            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
+                LOG.info("Updated data set store " + dataSetStore);
+                documentStructurePanel.setTitle(dataSetStore.getSpec());
+            }
+
+            @Override
+            public void updatedStatistics(FieldStatistics fieldStatistics) {
+                LOG.info("Updated field statistics " + fieldStatistics);
+            }
+
+            @Override
+            public void updatedRecordRoot(Path recordRoot, int recordCount) {
+                LOG.info("Updated record root " + recordRoot + " " + recordCount);
+            }
+
+            @Override
+            public void normalizationMessage(boolean complete, String message) {
+                LOG.info("Normalization : " + complete + " " + message);
+            }
+        };
+        sipModel.addUpdateListener(updateListener);
     }
 
     private void buildLayout() {
-        tabbedPane.setPreferredSize(getPreferredSize());
-        tabbedPane.addTab("Document stucture", new DocumentStructurePanel());
-        tabbedPane.addTab("Statistics", new StatisticsPanel());
-        add(tabbedPane);
+        documentStructurePanel = new DocumentStructurePanel("-");
+        StatisticsPanel statisticsPanel = new StatisticsPanel();
+//        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, documentStructurePanel, statisticsPanel);
+//        splitPane.setPreferredSize(getPreferredSize());
+//        splitPane.setPreferredSize(new Dimension(1000, 500));
+        add(statisticsPanel);
+        setSize(new Dimension(1200, 700));
     }
 
     private class StatisticsPanel extends JPanel {
 
-        private StatisticsPanel() {
-            buildLayout();
-        }
+        private AnalysisFactsPanel panel = new AnalysisFactsPanel(sipModel);
 
-        private void buildLayout() {
+        private StatisticsPanel() {
+            panel.setSize(new Dimension(700, 400));
+            add(panel);
         }
     }
 
@@ -70,11 +103,14 @@ public class AnalyzeWindow extends DesktopWindow {
      */
     private class DocumentStructurePanel extends JPanel {
 
+        private JLabel title = new JLabel();
         private JTree tree;
 
-        {
+        public DocumentStructurePanel(String spec) {
             buildLayout();
+            title.setText(spec);
         }
+
 
         private void buildLayout() {
             setLayout(new BorderLayout());
@@ -82,6 +118,7 @@ public class AnalyzeWindow extends DesktopWindow {
             tree = new JTree(createTreeModel());
             JScrollPane scrollPane = new JScrollPane(tree);
             scrollPane.setPreferredSize(new Dimension(300, 300));
+            add(title, BorderLayout.NORTH);
             add(scrollPane, BorderLayout.CENTER);
         }
 
@@ -99,6 +136,10 @@ public class AnalyzeWindow extends DesktopWindow {
             unknown.add(new DefaultMutableTreeNode("789"));
             root.add(unknown);
             return new DefaultTreeModel(root);
+        }
+
+        public void setTitle(String spec) {
+            title.setText(spec);
         }
     }
 }

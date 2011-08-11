@@ -21,11 +21,20 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.metadata.Facts;
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.Path;
+import eu.delving.sip.FileStore;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.util.GridBagHelper;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This window consists of two tabs, a mapping tab and a constants tab.
@@ -36,6 +45,7 @@ import java.awt.*;
 public class MappingWindow extends DesktopWindow {
 
     private JTabbedPane tabbedPane = new JTabbedPane();
+    private JTable table = new JTable();
 
     public MappingWindow(SipModel sipModel) {
         super(sipModel);
@@ -43,6 +53,31 @@ public class MappingWindow extends DesktopWindow {
         tabbedPane.addTab("Constant fields", new ConstantsPanel());
         tabbedPane.setPreferredSize(getPreferredSize());
         add(tabbedPane);
+        table.setDefaultRenderer(Object.class, new DataSetWindow.ColorRenderer());
+        sipModel.addUpdateListener(
+                new SipModel.UpdateListener() {
+
+                    @Override
+                    public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
+                        table.setModel(new MapTableModel(dataSetStore.getFacts()));
+                    }
+
+                    @Override
+                    public void updatedStatistics(FieldStatistics fieldStatistics) {
+                        // todo: add body and return void;
+                    }
+
+                    @Override
+                    public void updatedRecordRoot(Path recordRoot, int recordCount) {
+                        // todo: add body and return void;
+                    }
+
+                    @Override
+                    public void normalizationMessage(boolean complete, String message) {
+                        // todo: add body and return void;
+                    }
+                }
+        );
     }
 
     private class MappingPanel extends JPanel {
@@ -76,10 +111,85 @@ public class MappingWindow extends DesktopWindow {
             sourceScrollPane.setBorder(BorderFactory.createTitledBorder(title));
             return sourceScrollPane;
         }
-
     }
 
     private class ConstantsPanel extends JPanel {
 
+        {
+            setLayout(new BorderLayout());
+            add(new JLabel("Facts"), BorderLayout.NORTH);
+            add(table, BorderLayout.CENTER);
+            add(new JButton("Save"), BorderLayout.SOUTH);
+        }
+    }
+
+    private class MapTableModel extends AbstractTableModel {
+
+        private String[] columnHeaders = {"Key", "Value"};
+        private Map<String, String> data = new HashMap<String, String>();
+        private List<Constant> constants = new ArrayList<Constant>();
+
+        private MapTableModel(Facts facts) {
+            setData(facts);
+        }
+
+        private class Constant {
+            String key;
+            String value;
+
+            private Constant(String key, String value) {
+                this.key = key;
+                this.value = value;
+            }
+        }
+
+        private void setData(Facts facts) {
+            this.data = facts.getMap();
+            for (Map.Entry<String, String> entry : data.entrySet()) {
+                constants.add(new Constant(entry.getKey(), entry.getValue()));
+            }
+            fireTableDataChanged();
+        }
+
+        public String getSelectedItem(String key) {
+            return data.get(key);
+        }
+
+        @Override
+        public boolean isCellEditable(int i, int i1) {
+            return true;
+        }
+
+        @Override
+        public String getColumnName(int i) {
+            return columnHeaders[i];
+        }
+
+        @Override
+        public int getRowCount() {
+            return data.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columnHeaders.length;
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            Object o;
+            switch (col) {
+                case 0:
+                    o = constants.get(row).key;
+                    break;
+                case 1:
+                    o = constants.get(row).value;
+                    break;
+                default:
+                    o = "-";
+                    break;
+            }
+            return o;
+        }
     }
 }

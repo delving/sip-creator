@@ -21,10 +21,46 @@
 
 package eu.delving.security;
 
+
+import java.security.Permission;
+
 /**
- * todo: add description
+ * Represents the user in the SIP-Creator and contains the following:
+ *
+ * <ul>
+ * <ul>DesktopPreferences - last desktop state etc.</ul>
+ * <ul>Permissions - permissions for the user.</ul>
+ * </ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public interface User {
+public class User {
+
+    private String username;
+    private Permission permission;
+    private String name;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Permission getPermission() {
+        return permission;
+    }
+
+    public void setPermission(Permission permission) {
+        this.permission = permission;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

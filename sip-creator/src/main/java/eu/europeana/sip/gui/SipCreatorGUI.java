@@ -25,7 +25,7 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.ValidationException;
-import eu.delving.security.OAuth2Client;
+import eu.delving.security.AuthenticationClient;
 import eu.delving.sip.AppConfig;
 import eu.delving.sip.DataSetClient;
 import eu.delving.sip.DataSetInfo;
@@ -97,7 +97,7 @@ public class SipCreatorGUI extends JFrame {
     private JLabel titleLabel = new JLabel(LOCAL_SETS, JLabel.CENTER);
     private JTextField filter = new JTextField(10);
     private Timer filterTimer;
-    private OAuth2Client oauth2Client;
+    private AuthenticationClient oauth2Client;
     private DataSetClient dataSetClient;
     private JCheckBox connectedBox;
     private DataSetListModel dataSetListModel;
@@ -119,7 +119,7 @@ public class SipCreatorGUI extends JFrame {
         });
         this.dataSetList = new JList(dataSetListModel);
         this.sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, new PopupExceptionHandler());
-        this.oauth2Client = new OAuth2Client();
+        this.oauth2Client = new AuthenticationClient();
         this.dataSetClient = new DataSetClient(new DataSetClient.Context() {
 
             @Override

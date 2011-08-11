@@ -22,15 +22,14 @@
 package eu.delving.sip.desktop;
 
 
-import eu.delving.sip.FileStore;
-import eu.delving.sip.desktop.windows.DesktopManager;
-import eu.delving.sip.desktop.windows.DesktopWindow;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -42,146 +41,92 @@ import java.util.prefs.Preferences;
 public class DesktopPreferencesImpl implements DesktopPreferences {
 
     private static final Logger LOG = Logger.getRootLogger();
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
-    private static final String WINDOW_STATE = "windowState";
-    private static final String DATA_SET = "dataSet";
+    private static final String DESKTOP_STATE = "desktopState";
+    private static final String CREDENTIALS = "credentials";
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
-    private Listener listener;
-    private DesktopManager desktopManager;
+    private Class<?> clazz; // todo: remove, it's only used for showing the path while debugging
 
-    public DesktopPreferencesImpl(Listener listener, DesktopManager desktopManager) {
-        this.listener = listener;
-        this.desktopManager = desktopManager;
-        loadCredentials();
-        loadWindowState();
-        loadDataSet();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void loadWindowState() {
-        byte[] preferences = this.preferences.getByteArray(WINDOW_STATE, null);
-        if (null == preferences) {
-            return;
-        }
-        LOG.info("Desktop state found");
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(preferences);
-        final List<DesktopWindow> windows = new ArrayList<DesktopWindow>();
-        try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-            List<WindowState> windowStates = (List<WindowState>) objectInputStream.readObject();
-            for (WindowState windowState : windowStates) {
-                DesktopWindow window = desktopManager.getWindow(windowState.getWindowId());
-                window.setWindowState(windowState);
-                windows.add(window);
-            }
-            listener.desktopStateFound(
-                    new DesktopState() {
-
-                        @Override
-                        public List<DesktopWindow> getWindows() {
-                            return windows;
-                        }
-                    }
-            );
-        }
-        catch (IOException e) {
-            LOG.error("Error reading desktop state");
-        }
-        catch (ClassNotFoundException e) {
-            LOG.error("Error reading class", e);
-        }
-
-    }
-
-    private void loadCredentials() {
-        LOG.info("Looking for stored credentials.");
-        final String username = preferences.get(USERNAME, null);
-        final String password = preferences.get(PASSWORD, null);
-        if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
-            LOG.info("Found credentials, will notify the listener.");
-            listener.credentialsFound(
-                    new Credentials() {
-
-                        @Override
-                        public String getUsername() {
-                            return username;
-                        }
-
-                        @Override
-                        public String getPassword() {
-                            return password;
-                        }
-                    }
-            );
-            return;
-        }
-        LOG.info("No credentials found.");
-    }
-
-    private void loadDataSet() {
-        byte[] preferences = this.preferences.getByteArray(DATA_SET, null);
-        if (null == preferences) {
-            LOG.info("No data set found");
-            return;
-        }
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(preferences);
-        try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            FileStore.DataSetStore dataSet = (FileStore.DataSetStore) objectInputStream.readObject();
-            listener.dataSetFound(dataSet);
-        }
-        catch (IOException e) {
-            LOG.error("Error reading data set", e);
-        }
-        catch (ClassNotFoundException e) {
-            LOG.error("Class not found", e);
-        }
-        catch (ClassCastException e) {
-            LOG.error("Error casting class", e);
-        }
+    public DesktopPreferencesImpl(Class<?> clazz) {
+        this.clazz = clazz;
+        preferences = Preferences.userNodeForPackage(clazz);
     }
 
     @Override
     public void saveCredentials(Credentials credentials) {
-        preferences.put(USERNAME, credentials.getUsername());
-        preferences.put(PASSWORD, credentials.getPassword());
+        try {
+            writeObject(CREDENTIALS, credentials);
+        }
+        catch (IOException e) {
+            LOG.error("Error storing credentials", e);
+        }
+    }
+
+    @Override
+    public Credentials loadCredentials() {
+        try {
+            return (Credentials) readObject(CREDENTIALS);
+        }
+        catch (IOException e) {
+            LOG.error("Error loading credentials", e);
+        }
+        catch (ClassNotFoundException e) {
+            LOG.error("Error loading credentials", e);
+        }
+        return null;
     }
 
     @Override
     public void saveDesktopState(DesktopState desktopState) {
-        List<WindowState> windowStates = new ArrayList<WindowState>();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        for (DesktopWindow window : desktopState.getWindows()) {
-            if (window.isPreferencesTransient()) {
-                LOG.info("Skipping transient window : " + window.getId());
-                continue;
-            }
-            WindowState windowState = new WindowState(window);
-            windowStates.add(windowState);
-        }
         try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            objectOutputStream.writeObject(windowStates);
-            LOG.info(String.format("Saving window state for %s", windowStates));
-            preferences.putByteArray(WINDOW_STATE, byteArrayOutputStream.toByteArray());
+            // todo: strip transient windows
+            writeObject(DESKTOP_STATE, desktopState);
         }
         catch (IOException e) {
-            LOG.error("Error storing desktop state", e);
+            LOG.info("Error storing desktop state", e);
         }
     }
 
-    @Override
-    public void saveDataSet(FileStore.DataSetStore dataSet) {
+    private void writeObject(String key, Object object) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(object);
+        preferences.putByteArray(key, byteArrayOutputStream.toByteArray());
+    }
+
+    private Object readObject(String key) throws IOException, ClassNotFoundException {
+        byte[] data = preferences.getByteArray(key, null);
+        if (null == data) {
+            LOG.error("No data found for key " + key);
+            return null;
+        }
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        LOG.info(String.format("%s bytes read for key %s%n", data.length, key));
+        return objectInputStream.readObject();
+    }
+
+    @Override
+    public DesktopState loadDesktopState() {
         try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            objectOutputStream.writeObject(dataSet);
-            LOG.info("Storing data set : " + dataSet);
-            preferences.putByteArray(DATA_SET, byteArrayOutputStream.toByteArray());
+            return (DesktopState) readObject(DESKTOP_STATE);
         }
         catch (IOException e) {
-            LOG.error("Error storing data set", e);
+            LOG.error("Error reading desktop state", e);
+        }
+        catch (ClassNotFoundException e) {
+            LOG.error("Error reading desktop state", e);
+        }
+        return null;
+    }
+
+    @Override
+    public void clear() {
+        try {
+            preferences.clear();
+            LOG.info("Cleared data for node : " + clazz.getName());
+        }
+        catch (BackingStoreException e) {
+            LOG.error("Error clearing preferences", e);
         }
     }
 }

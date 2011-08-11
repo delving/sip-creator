@@ -21,8 +21,8 @@
 
 package eu.delving.sip.desktop.windows;
 
-import eu.delving.security.OAuth2Client;
 import eu.delving.security.User;
+import eu.delving.sip.desktop.CredentialsImpl;
 import eu.delving.sip.desktop.DesktopPreferences;
 import eu.europeana.sip.util.GridBagHelper;
 import org.apache.log4j.Logger;
@@ -32,8 +32,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * OAuth2 login window.
@@ -59,13 +57,15 @@ public class AuthenticationWindow extends DesktopWindow {
 
     public interface Listener {
 
-        void success(Object user);
+        void success(User user);
 
         void failed(Exception exception);
+
+        void signedOut();
     }
 
     public AuthenticationWindow(Listener listener, DesktopPreferences desktopPreferences) {
-        super(null); // todo: broken
+        super(null); // todo: not needed, we don't have the SipModel yet at this point.
         this.listener = listener;
         this.desktopPreferences = desktopPreferences;
         setLayout(new GridBagLayout());
@@ -106,51 +106,19 @@ public class AuthenticationWindow extends DesktopWindow {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        SwingUtilities.invokeLater(new Authentication(username.getText(), password.getPassword()));
+                        try {
+                            User user = DesktopManager.getAuthenticationClient().requestAccess("localhost:9000", username.getText(), new String(password.getPassword()));
+                            desktopPreferences.saveCredentials(
+                                    new CredentialsImpl(username.getText(), new String(password.getPassword()), "localhost", 9000)); // todo: hardcoded stuff, need textfield
+                            setVisible(false);
+                            listener.success(user);
+                        }
+                        catch (Exception e) {
+                            listener.failed(e);
+                        }
                     }
                 }
         );
         add(login, gbc);
-    }
-
-    private class Authentication implements Runnable {
-
-        private String username;
-        private char[] password;
-
-        private Authentication(String username, char[] password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        @Override
-        public void run() {
-            try {
-                LOG.info(String.format("Logging in with %s@localhost:9000", username));
-                URL serverLocation = new URL("http://localhost:9000");
-                OAuth2Client client = new OAuth2Client();
-                User user = client.requestAccess(serverLocation, username, new String(password).getBytes());
-                LOG.info("User " + user);
-                desktopPreferences.saveCredentials(
-                        new DesktopPreferences.Credentials() {
-
-                            @Override
-                            public String getUsername() {
-                                return username;
-                            }
-
-                            @Override
-                            public String getPassword() {
-                                return new String(password);
-                            }
-                        }
-                );
-                listener.success(user);
-            }
-            catch (MalformedURLException e) {
-                System.err.println(e);
-                listener.failed(e);
-            }
-        }
     }
 }

@@ -24,6 +24,7 @@ package eu.delving.sip.desktop.windows;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.sip.FileStore;
+import eu.europeana.sip.gui.DataSetListModel;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.util.GridBagHelper;
 import org.apache.commons.lang.StringUtils;
@@ -49,6 +50,7 @@ import java.util.Map;
  * <ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
+ *         todo: Filter/search is not implemented yet
  */
 public class DataSetWindow extends DesktopWindow {
 
@@ -56,10 +58,17 @@ public class DataSetWindow extends DesktopWindow {
     private static final String TITLE_LABEL = "Data sets";
     private JLabel title = new JLabel(TITLE_LABEL);
     private JTable dataSets;
-    private JTextField filter = new JTextField("Filter");
     private JButton select = new JButton("Select");
     private JButton cancel = new JButton("Cancel");
     private DataSetModel<FileStore.DataSetStore> dataSetModel;
+
+    private DataSetListModel dataSetListModel = new DataSetListModel(new DataSetListModel.ConnectedStatus() {
+        @Override
+        public boolean isConnected() {
+            // todo: show checkbox value.
+            return true;
+        }
+    });
 
     public DataSetWindow(SipModel sipModel) {
         super(sipModel);
@@ -113,7 +122,9 @@ public class DataSetWindow extends DesktopWindow {
                         );
                         switch (result) {
                             case JOptionPane.YES_OPTION:
+                                // todo: remove this
                                 dataSetChangeListener.dataSetHasChanged(selectedItem);
+                                sipModel.setDataSetStore(selectedItem);
                                 setVisible(false);
                                 break;
                             default:
@@ -129,16 +140,19 @@ public class DataSetWindow extends DesktopWindow {
         GridBagHelper g = new GridBagHelper();
         g.fill = GridBagConstraints.HORIZONTAL;
         g.reset();
+        g.gridwidth = 2;
         add(title, g);
         dataSetModel = new DataSetModel<FileStore.DataSetStore>(fetchDataSets());
         dataSets = new JTable(dataSetModel);
-        dataSets.setSize(new Dimension(700, 400));
         dataSets.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         dataSets.setDefaultRenderer(Object.class, new ColorRenderer());
         g.line();
         g.gridwidth = 2;
-        add(new JScrollPane(dataSets), g);
+        JScrollPane pane = new JScrollPane(dataSets);
+        pane.setPreferredSize(new Dimension(700, 400));
+        add(pane, g);
         g.gridwidth = 1;
+        g.fill = GridBagConstraints.BOTH;
         g.line();
         add(cancel, g);
         g.right();
@@ -198,13 +212,13 @@ public class DataSetWindow extends DesktopWindow {
         }
     }
 
-    private class ColorRenderer extends DefaultTableCellRenderer {
+    public static class ColorRenderer extends DefaultTableCellRenderer {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object o, boolean selected, boolean hasFocus, int row, int col) {
             Component component = super.getTableCellRendererComponent(table, o, selected, hasFocus, row, col);
             if (selected) {
-                component.setBackground(Color.MAGENTA);
+                component.setBackground(Color.GRAY);
                 return component;
             }
             if (row % 2 == 0) {

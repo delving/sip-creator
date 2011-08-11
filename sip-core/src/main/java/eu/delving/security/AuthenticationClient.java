@@ -16,7 +16,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +25,7 @@ import java.util.Map;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class OAuth2Client {
+public class AuthenticationClient {
 
     private static final String OAUTH2_ENDPOINT_PATH = "/token";
     private Logger log = Logger.getLogger(getClass());
@@ -47,51 +46,23 @@ public class OAuth2Client {
                 e.printStackTrace();
             }
             return null;
-
         }
     });
 
-    public User requestAccess(URL url, String username, byte[] password) {
-        OAuthClientRequest.TokenRequestBuilder tokenRequestBuilder = OAuthClientRequest.tokenLocation(url.toString());
-        tokenRequestBuilder.setUsername(username);
-        tokenRequestBuilder.setPassword(new String(password));
-        try {
-            OAuthClientRequest request = tokenRequestBuilder.buildBodyMessage();
-            OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(request);
-            log.info("Response : " + tokenResponse);
-        }
-        catch (OAuthSystemException e) {
-            log.error("System error", e);
-        }
-        catch (OAuthProblemException e) {
-            log.error("Auth problem", e);
-        }
-        return new User() {
-        };
-    }
-
-    @Deprecated
-    /** @deprecated use User requestAccess(); */
-    public boolean requestAccess(String location, String username, String password) {
+    public User requestAccess(String location, String username, String password) throws OAuthSystemException, OAuthProblemException {
         String tokenLocation = toTokenLocation(location);
-        try {
-            OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
-                    .setGrantType(GrantType.PASSWORD)
-                    .setUsername(username)
-                    .setPassword(password)
-                    .buildQueryMessage();
-            OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
-            TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
-            connections.put(connectionKey(username, location), connection);
-            return true;
-        }
-        catch (OAuthSystemException e) {
-            log.error("OAuth2 system error", e);
-        }
-        catch (OAuthProblemException e) {
-            log.warn("OAuth2 authentication problem", e);
-        }
-        return false;
+        OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
+                .setGrantType(GrantType.PASSWORD)
+                .setUsername(username)
+                .setPassword(password)
+                .buildQueryMessage();
+        OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
+        TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
+        connections.put(connectionKey(username, location), connection);
+        // todo: user should contain preferences and permission which are sent by the services module
+        User user = new User();
+        user.setUsername(username);
+        return user;
     }
 
     private boolean requestRefresh(String connectionKey, String refreshToken) {
@@ -102,13 +73,10 @@ public class OAuth2Client {
                     .setGrantType(GrantType.REFRESH_TOKEN)
                     .setRefreshToken(refreshToken)
                     .buildQueryMessage();
-
             OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
-
             TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
             connections.put(connectionKey, connection);
             return true;
-
         }
         catch (Throwable t) {
             log.error("Problem while using refresh token", t);
