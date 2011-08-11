@@ -22,7 +22,6 @@
 package eu.delving.sip.desktop.windows;
 
 import eu.delving.sip.desktop.WindowState;
-import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import eu.europeana.sip.model.SipModel;
 
 import javax.swing.*;
@@ -39,7 +38,6 @@ public abstract class DesktopWindow extends JInternalFrame {
     private WindowState windowState;
     private WindowId id;
     private boolean preferencesTransient;
-    protected DataSetChangeListener dataSetChangeListener;
     protected SipModel sipModel;
 
     public DesktopWindow(SipModel sipModel) {
@@ -47,10 +45,6 @@ public abstract class DesktopWindow extends JInternalFrame {
         this.sipModel = sipModel;
         setPreferredSize(DEFAULT_SIZE);
         setLayout(new FlowLayout());
-    }
-
-    public void setDataSetChangeListener(DataSetChangeListener dataSetChangeListener) {
-        this.dataSetChangeListener = dataSetChangeListener;
     }
 
     public void setWindowState(WindowState windowState) {

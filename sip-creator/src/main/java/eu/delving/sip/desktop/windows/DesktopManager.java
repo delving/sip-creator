@@ -23,7 +23,6 @@ package eu.delving.sip.desktop.windows;
 
 import eu.delving.security.AuthenticationClient;
 import eu.delving.sip.desktop.WindowState;
-import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import eu.europeana.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
@@ -45,7 +44,6 @@ import java.util.NoSuchElementException;
 public class DesktopManager {
 
     private static final Logger LOG = Logger.getRootLogger();
-    private DataSetChangeListener dataSetChangeListener;
     private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
     private SipModel sipModel;
@@ -55,8 +53,7 @@ public class DesktopManager {
         return authenticationClient;
     }
 
-    public DesktopManager(DataSetChangeListener dataSetChangeListener, SipModel sipModel) {
-        this.dataSetChangeListener = dataSetChangeListener;
+    public DesktopManager(SipModel sipModel) {
         this.sipModel = sipModel;
         desktop = new JDesktopPane();
         buildWindows();
@@ -68,7 +65,6 @@ public class DesktopManager {
                 try {
                     DesktopWindow desktopWindow = windowId.getDesktopWindow().getConstructor(SipModel.class).newInstance(sipModel);
                     desktopWindow.setId(windowId);
-                    desktopWindow.setDataSetChangeListener(dataSetChangeListener);
                     windows.put(windowId, desktopWindow);
                 }
                 catch (Exception e) {

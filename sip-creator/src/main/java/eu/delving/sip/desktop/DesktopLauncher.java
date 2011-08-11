@@ -29,7 +29,6 @@ import eu.delving.security.User;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileStoreImpl;
-import eu.delving.sip.desktop.listeners.DataSetChangeListener;
 import eu.delving.sip.desktop.navigation.Actions;
 import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
@@ -82,29 +81,6 @@ public class DesktopLauncher {
     private SipModel sipModel;
     private AuthenticationClient authenticationClient = new AuthenticationClient();
     private FileStore.DataSetStore currentStore;
-
-    private DataSetChangeListener dataSetChangeListener = new DataSetChangeListener() {
-
-        @Override
-        public void dataSetIsChanging(FileStore.DataSetStore dataSet) {
-            currentStore = dataSet;
-            actions.setEnabled(false);
-        }
-
-        @Override
-        public void dataSetHasChanged(FileStore.DataSetStore dataSet) {
-            DesktopLauncher.this.dataSet = dataSet;
-            LOG.info("Changed to " + dataSet.getSpec());
-            actions.setEnabled(true);
-            main.setTitle(String.format("%s - Data set %s", Constants.SIP_CREATOR_TITLE, dataSet.getSpec()));
-        }
-
-        @Override
-        public void dataSetChangeCancelled(FileStore.DataSetStore dataSet) {
-            actions.setEnabled(true);
-        }
-    };
-
     private GroovyCodeResource groovyCodeResource;
     private MetadataModel metadataModel;
     private FileStore fileStore;
@@ -155,7 +131,7 @@ public class DesktopLauncher {
                 System.err.printf("%s : %s%n", message, exception.getMessage());
             }
         });
-        desktopManager = new DesktopManager(dataSetChangeListener, sipModel);
+        desktopManager = new DesktopManager(sipModel);
         actions = new Actions(desktopManager);
         desktopPreferences = new DesktopPreferencesImpl(getClass());
         DesktopLauncher.this.credentials = desktopPreferences.loadCredentials();
@@ -173,9 +149,6 @@ public class DesktopLauncher {
                         actions.setEnabled(true);
                         if (null != desktopState) {
                             restoreWindows(desktopState);
-                        }
-                        if (null != dataSet) {
-                            dataSetChangeListener.dataSetHasChanged(dataSet);
                         }
                     }
 

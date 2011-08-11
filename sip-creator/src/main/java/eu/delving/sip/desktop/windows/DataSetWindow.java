@@ -62,14 +62,6 @@ public class DataSetWindow extends DesktopWindow {
     private JButton cancel = new JButton("Cancel");
     private DataSetModel<FileStore.DataSetStore> dataSetModel;
 
-    private DataSetListModel dataSetListModel = new DataSetListModel(new DataSetListModel.ConnectedStatus() {
-        @Override
-        public boolean isConnected() {
-            // todo: show checkbox value.
-            return true;
-        }
-    });
-
     public DataSetWindow(SipModel sipModel) {
         super(sipModel);
         setLayout(new GridBagLayout());
@@ -108,7 +100,6 @@ public class DataSetWindow extends DesktopWindow {
                     public void actionPerformed(ActionEvent actionEvent) {
                         DataSetModel<FileStore.DataSetStore> model = dataSetModel;
                         FileStore.DataSetStore selectedItem = model.getSelectedItem(dataSets.getSelectedRow());
-                        dataSetChangeListener.dataSetIsChanging(selectedItem);
                         LOG.info(selectedItem.getSourceFile() + " exists? " + selectedItem.getSourceFile().exists());
                         if (!selectedItem.hasSource()) {
                             LOG.warn("No source found, download it first");
@@ -122,13 +113,10 @@ public class DataSetWindow extends DesktopWindow {
                         );
                         switch (result) {
                             case JOptionPane.YES_OPTION:
-                                // todo: remove this
-                                dataSetChangeListener.dataSetHasChanged(selectedItem);
                                 sipModel.setDataSetStore(selectedItem);
                                 setVisible(false);
                                 break;
                             default:
-                                dataSetChangeListener.dataSetChangeCancelled(selectedItem);
                                 break;
                         }
                     }
