@@ -45,9 +45,9 @@ public interface DesktopPreferences extends Serializable {
 
         String getPassword();
 
-        String serverAddress();
+        String getServerAddress();
 
-        int serverPort();
+        int getServerPort();
     }
 
     interface DesktopState extends Serializable {

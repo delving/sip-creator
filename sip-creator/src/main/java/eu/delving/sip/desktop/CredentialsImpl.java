@@ -51,12 +51,12 @@ public class CredentialsImpl implements DesktopPreferences.Credentials {
     }
 
     @Override
-    public String serverAddress() {
+    public String getServerAddress() {
         return serverAddress;
     }
 
     @Override
-    public int serverPort() {
+    public int getServerPort() {
         return serverPort;
     }
 

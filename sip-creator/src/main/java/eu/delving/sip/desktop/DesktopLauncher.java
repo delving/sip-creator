@@ -208,10 +208,10 @@ public class DesktopLauncher {
                 if (null == window) {
                     continue;
                 }
+                desktopManager.add(window);
                 window.setVisible(true);
                 window.setSize(windowState.getSize());
                 window.setLocation(windowState.getPoint());
-                desktopManager.add(window);
                 window.setSelected(windowState.isSelected());
             }
             catch (PropertyVetoException e) {
@@ -254,7 +254,6 @@ public class DesktopLauncher {
                                 if (null == desktopLauncher.user) {
                                     System.exit(0);
                                 }
-
                                 List<WindowState> allWindowStates = desktopLauncher.desktopManager.getWindowStates();
                                 desktopLauncher.getDesktopPreferences().saveDesktopState(new DesktopStateImpl("SPEC", allWindowStates)); // todo: spec name
                                 System.exit(0);

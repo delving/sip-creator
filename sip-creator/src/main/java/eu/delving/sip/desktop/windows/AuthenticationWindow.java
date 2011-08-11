@@ -45,10 +45,16 @@ public class AuthenticationWindow extends DesktopWindow {
     private static final String REMEMBER_LABEL = "Remember me";
     private static final String USERNAME_LABEL = "Username";
     private static final String PASSWORD_LABEL = "Password";
+    private static final String SERVER_LABEL = "Server address";
+    private static final String SERVER_PORT = "Port";
 
     private JLabel usernameLabel = new JLabel(USERNAME_LABEL);
     private JLabel passwordLabel = new JLabel(PASSWORD_LABEL);
+    private JLabel serverLabel = new JLabel(SERVER_LABEL);
+    private JLabel serverPortLabel = new JLabel(SERVER_PORT);
     private JTextField username = new JTextField();
+    private JTextField serverAddress = new JTextField();
+    private JTextField serverPort = new JTextField();
     private JPasswordField password = new JPasswordField();
     private JButton login = new JButton(LOGIN_LABEL);
     private JCheckBox rememberMe = new JCheckBox(REMEMBER_LABEL);
@@ -85,6 +91,8 @@ public class AuthenticationWindow extends DesktopWindow {
     public void setCredentials(DesktopPreferences.Credentials credentials) {
         username.setText(credentials.getUsername());
         password.setText(credentials.getPassword());
+        serverAddress.setText(credentials.getServerAddress());
+        serverPort.setText("" + credentials.getServerPort());
         rememberMe.setSelected(true);
     }
 
@@ -100,16 +108,27 @@ public class AuthenticationWindow extends DesktopWindow {
         gbc.right();
         add(password, gbc);
         gbc.line();
-        add(rememberMe, gbc);
+        add(serverLabel, gbc);
+        gbc.right();
+        add(serverAddress, gbc);
+        gbc.line();
+        add(serverPortLabel, gbc);
+        gbc.right();
+        add(serverPort, gbc);
+        gbc.line();
         gbc.right();
         login.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         try {
-                            User user = DesktopManager.getAuthenticationClient().requestAccess("localhost:9000", username.getText(), new String(password.getPassword()));
+                            String serverAddressText = serverAddress.getText();
+                            String serverPortText = serverPort.getText();
+                            String usernameText = username.getText();
+                            char[] passwordText = password.getPassword();
+                            User user = DesktopManager.getAuthenticationClient().requestAccess(String.format("%s:%s", serverAddressText, serverPortText), usernameText, new String(passwordText));
                             desktopPreferences.saveCredentials(
-                                    new CredentialsImpl(username.getText(), new String(password.getPassword()), "localhost", 9000)); // todo: hardcoded stuff, need textfield
+                                    new CredentialsImpl(usernameText, new String(passwordText), serverAddressText, Integer.parseInt(serverPortText)));
                             setVisible(false);
                             listener.success(user);
                         }
@@ -119,6 +138,9 @@ public class AuthenticationWindow extends DesktopWindow {
                     }
                 }
         );
+        add(rememberMe, gbc);
+        gbc.line();
+        gbc.right();
         add(login, gbc);
     }
 }
