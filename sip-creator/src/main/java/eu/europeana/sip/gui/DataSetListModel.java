@@ -52,7 +52,7 @@ public class DataSetListModel extends AbstractListModel {
     private List<Entry> entries = new ArrayList<Entry>();
     private ConnectedStatus connectedStatus;
 
-    interface ConnectedStatus {
+    public interface ConnectedStatus {
         boolean isConnected();
     }
 

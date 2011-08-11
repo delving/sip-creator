@@ -22,15 +22,16 @@
 package eu.delving.sip.desktop.windows;
 
 /**
- * Grouping menus for the menu bar.
+ * The menus in the menu bar are generated from these values. Add a new group and pass it as menuGroup to WindowId.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
+ * @see WindowId
  */
 public enum MenuGroup {
 
     FILE("File"),
     ACCOUNT("Account"),
-    SIP("SIP");
+    HELP("Help");
 
     private String title;
 

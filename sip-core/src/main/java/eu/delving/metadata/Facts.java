@@ -45,6 +45,10 @@ public class Facts {
         return false;
     }
 
+    public Map<String, String> getMap() {
+        return map;
+    }
+
     public String get(String name) {
         if (!FIELD_SET.contains(name)) {
             throw new IllegalArgumentException(String.format("[%s] is not a fact name", name));

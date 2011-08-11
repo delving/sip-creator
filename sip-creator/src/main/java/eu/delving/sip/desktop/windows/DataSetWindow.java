@@ -21,8 +21,13 @@
 
 package eu.delving.sip.desktop.windows;
 
-import eu.delving.sip.DataSetInfo;
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.Path;
+import eu.delving.sip.FileStore;
+import eu.europeana.sip.gui.DataSetListModel;
+import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.util.GridBagHelper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -33,6 +38,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Contains the following elements:
@@ -44,6 +50,7 @@ import java.util.List;
  * <ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
+ *         todo: Filter/search is not implemented yet
  */
 public class DataSetWindow extends DesktopWindow {
 
@@ -51,35 +58,73 @@ public class DataSetWindow extends DesktopWindow {
     private static final String TITLE_LABEL = "Data sets";
     private JLabel title = new JLabel(TITLE_LABEL);
     private JTable dataSets;
-    private JTextField filter = new JTextField("Filter");
     private JButton select = new JButton("Select");
     private JButton cancel = new JButton("Cancel");
-    private DataSetModel<DataSet> dataSetModel;
+    private DataSetModel<FileStore.DataSetStore> dataSetModel;
 
-    public DataSetWindow() {
+    private DataSetListModel dataSetListModel = new DataSetListModel(new DataSetListModel.ConnectedStatus() {
+        @Override
+        public boolean isConnected() {
+            // todo: show checkbox value.
+            return true;
+        }
+    });
+
+    public DataSetWindow(SipModel sipModel) {
+        super(sipModel);
         setLayout(new GridBagLayout());
         buildLayout();
         addActions();
     }
 
+    private SipModel.UpdateListener updateListener = new SipModel.UpdateListener() {
+
+        @Override
+        public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
+            LOG.info("Updated data set store " + dataSetStore);
+        }
+
+        @Override
+        public void updatedStatistics(FieldStatistics fieldStatistics) {
+            LOG.info("Updated field statistics " + fieldStatistics);
+        }
+
+        @Override
+        public void updatedRecordRoot(Path recordRoot, int recordCount) {
+            LOG.info("Updated record root " + recordRoot + " " + recordCount);
+        }
+
+        @Override
+        public void normalizationMessage(boolean complete, String message) {
+            LOG.info("Normalization : " + complete + " " + message);
+        }
+    };
+
     private void addActions() {
+        sipModel.addUpdateListener(updateListener);
         select.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        DataSetModel<DataSet> model = dataSetModel;
-                        DataSet selectedItem = model.getSelectedItem(dataSets.getSelectedRow());
+                        DataSetModel<FileStore.DataSetStore> model = dataSetModel;
+                        FileStore.DataSetStore selectedItem = model.getSelectedItem(dataSets.getSelectedRow());
                         dataSetChangeListener.dataSetIsChanging(selectedItem);
+                        LOG.info(selectedItem.getSourceFile() + " exists? " + selectedItem.getSourceFile().exists());
+                        if (!selectedItem.hasSource()) {
+                            LOG.warn("No source found, download it first");
+                        }
                         int result = JOptionPane.showConfirmDialog(
                                 DataSetWindow.this,
                                 String.format("<html>You are switching to <b>%s</b>. Are you sure?<br/>Your current workspace will be saved.</html>",
-                                        selectedItem.getName()),
+                                        selectedItem.getSpec()),
                                 "Change data set",
                                 JOptionPane.YES_NO_OPTION
                         );
                         switch (result) {
                             case JOptionPane.YES_OPTION:
+                                // todo: remove this
                                 dataSetChangeListener.dataSetHasChanged(selectedItem);
+                                sipModel.setDataSetStore(selectedItem);
                                 setVisible(false);
                                 break;
                             default:
@@ -95,24 +140,28 @@ public class DataSetWindow extends DesktopWindow {
         GridBagHelper g = new GridBagHelper();
         g.fill = GridBagConstraints.HORIZONTAL;
         g.reset();
+        g.gridwidth = 2;
         add(title, g);
-        dataSetModel = new DataSetModel<DataSet>(createMockData());
+        dataSetModel = new DataSetModel<FileStore.DataSetStore>(fetchDataSets());
         dataSets = new JTable(dataSetModel);
         dataSets.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         dataSets.setDefaultRenderer(Object.class, new ColorRenderer());
         g.line();
         g.gridwidth = 2;
-        add(new JScrollPane(dataSets), g);
+        JScrollPane pane = new JScrollPane(dataSets);
+        pane.setPreferredSize(new Dimension(700, 400));
+        add(pane, g);
         g.gridwidth = 1;
+        g.fill = GridBagConstraints.BOTH;
         g.line();
         add(cancel, g);
         g.right();
         add(select, g);
     }
 
-    private class DataSetModel<T extends DataSet> extends AbstractTableModel {
+    private class DataSetModel<T extends FileStore.DataSetStore> extends AbstractTableModel {
 
-        private String[] columnHeaders = {"Collection name", "Records", "Spec", "Status"};
+        private String[] columnHeaders = {"Collection", "Cached", "Count", "Validated"};
         private List<T> data = new ArrayList<T>();
 
         private DataSetModel(List<T> data) {
@@ -144,16 +193,16 @@ public class DataSetWindow extends DesktopWindow {
             Object o;
             switch (col) {
                 case 0:
-                    o = dataSetInfo.getName();
-                    break;
-                case 1:
-                    o = dataSetInfo.getRecordCount();
-                    break;
-                case 2:
                     o = dataSetInfo.getSpec();
                     break;
+                case 1:
+                    o = dataSetInfo.hasSource();
+                    break;
+                case 2:
+                    o = StringUtils.isEmpty(dataSetInfo.getFacts().getRecordCount()) ? "-" : dataSetInfo.getFacts().getRecordCount();
+                    break;
                 case 3:
-                    o = dataSetInfo.getState();
+                    o = dataSetInfo.getFacts().isValid();
                     break;
                 default:
                     o = "-";
@@ -163,13 +212,13 @@ public class DataSetWindow extends DesktopWindow {
         }
     }
 
-    private class ColorRenderer extends DefaultTableCellRenderer {
+    public static class ColorRenderer extends DefaultTableCellRenderer {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object o, boolean selected, boolean hasFocus, int row, int col) {
             Component component = super.getTableCellRendererComponent(table, o, selected, hasFocus, row, col);
             if (selected) {
-                component.setBackground(Color.MAGENTA);
+                component.setBackground(Color.GRAY);
                 return component;
             }
             if (row % 2 == 0) {
@@ -182,24 +231,13 @@ public class DataSetWindow extends DesktopWindow {
         }
     }
 
-    // todo: this is mock data, replace it by the actual data from the data store
-    private List<DataSet> createMockData() {
-        List<DataSet> data = new ArrayList<DataSet>();
-        data.add(new DataSetImpl(createDataSetInfo("Frisian Stories", "Description?", "NEW", 234)));
-        data.add(new DataSetImpl(createDataSetInfo("TEL Treasures", "Description?", "NEW", 2)));
-        data.add(new DataSetImpl(createDataSetInfo("Sample collection", "Description?", "NEW", 4123)));
-        data.add(new DataSetImpl(createDataSetInfo("Princessehof", "Description?", "Changed on server", 5346345)));
-        data.add(new DataSetImpl(createDataSetInfo("ABC", "Test?", "INDEXED", 3124)));
+    private List<FileStore.DataSetStore> fetchDataSets() {
+        List<FileStore.DataSetStore> data = new ArrayList<FileStore.DataSetStore>();
+        Map<String, FileStore.DataSetStore> dataSetStores = sipModel.getFileStore().getDataSetStores();
+        for (Map.Entry<String, FileStore.DataSetStore> entry : dataSetStores.entrySet()) {
+            FileStore.DataSetStore dataSetStore = entry.getValue();
+            data.add(dataSetStore);
+        }
         return data;
     }
-
-    private DataSetInfo createDataSetInfo(String name, String spec, String state, int recordCount) {
-        DataSetInfo dataSetInfo = new DataSetInfo();
-        dataSetInfo.name = name;
-        dataSetInfo.spec = spec;
-        dataSetInfo.state = state;
-        dataSetInfo.recordCount = recordCount;
-        return dataSetInfo;
-    }
-
 }

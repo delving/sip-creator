@@ -24,8 +24,12 @@ package eu.delving.sip.desktop.windows;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * The identifier of a window and additional properties.
@@ -36,19 +40,44 @@ public enum WindowId {
 
     ANALYZE("Analyze", KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_MASK), AnalyzeWindow.class),
     DATA_SET("Open data set", KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.ALT_MASK), DataSetWindow.class, MenuGroup.FILE),
-    WELCOME("Welcome", KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.ALT_MASK), WelcomeWindow.class, MenuGroup.ACCOUNT),
-    AUTHENTICATION("Authentication", KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), null, MenuGroup.ACCOUNT),
-    SIGN_IN("Sign In", KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), null, MenuGroup.ACCOUNT),
-    SIGN_OUT("Sign Out", KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), null, MenuGroup.ACCOUNT),
-    MAPPING("Mapping", KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.ALT_MASK), MappingWindow.class, MenuGroup.SIP),
+    WELCOME("Welcome", KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.ALT_MASK), WelcomeWindow.class, MenuGroup.HELP),
+    MAPPING("Mapping", KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.ALT_MASK), MappingWindow.class),
     PREVIEW("Preview", KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_MASK), PreviewWindow.class),
     UPLOAD("Upload", KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.ALT_MASK), UploadWindow.class),
-    SAVE_STATE("Save desktop state", KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_MASK), MenuGroup.FILE,
+    DOCUMENTATION("Documentation", KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.ALT_MASK), MenuGroup.HELP,
             new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    // todo: save state to preferences
-                    LOG.info("Save dekstop state to preferences");
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop desktop = Desktop.getDesktop();
+                        try {
+                            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                                desktop.browse(new URI("http://www.delving.eu"));
+                            }
+                            else {
+                                // todo: display JOption pane with link
+                            }
+                        }
+                        catch (IOException e) {
+                            LOG.error("Error opening URL", e);
+                        }
+                        catch (URISyntaxException e) {
+                            LOG.error("Error opening URL", e);
+                        }
+                    }
+                    else {
+                        // todo: display JOption pane with link
+                    }
+                }
+            }
+    ),
+    SIGN_OUT("Sign Out", KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK), MenuGroup.ACCOUNT,
+            new AbstractAction() {
+
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    // todo: say bye and sign out using AuthenticationClient (set token to null and stop polling?)
+                    throw new NoSuchMethodError("Method not implemented yet");
                 }
             }
     ),
@@ -57,6 +86,7 @@ public enum WindowId {
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    // todo: confirm, or notify main
                     System.exit(0);
                 }
             }

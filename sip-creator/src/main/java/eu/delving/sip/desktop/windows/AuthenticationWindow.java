@@ -21,6 +21,8 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.security.User;
+import eu.delving.sip.desktop.CredentialsImpl;
 import eu.delving.sip.desktop.DesktopPreferences;
 import eu.europeana.sip.util.GridBagHelper;
 import org.apache.log4j.Logger;
@@ -55,12 +57,15 @@ public class AuthenticationWindow extends DesktopWindow {
 
     public interface Listener {
 
-        void success(Object user);
+        void success(User user);
 
         void failed(Exception exception);
+
+        void signedOut();
     }
 
     public AuthenticationWindow(Listener listener, DesktopPreferences desktopPreferences) {
+        super(null); // todo: not needed, we don't have the SipModel yet at this point.
         this.listener = listener;
         this.desktopPreferences = desktopPreferences;
         setLayout(new GridBagLayout());
@@ -101,34 +106,19 @@ public class AuthenticationWindow extends DesktopWindow {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        if (validateAuthentication(username.getText(), password.getPassword())) {
+                        try {
+                            User user = DesktopManager.getAuthenticationClient().requestAccess("localhost:9000", username.getText(), new String(password.getPassword()));
                             desktopPreferences.saveCredentials(
-                                    new DesktopPreferences.Credentials() {
-
-                                        @Override
-                                        public String getUsername() {
-                                            return username.getText();
-                                        }
-
-                                        @Override
-                                        public String getPassword() {
-                                            return new String(password.getPassword());
-                                        }
-                                    }
-                            );
-                            listener.success(new Object());
-                            AuthenticationWindow.this.setVisible(false);
+                                    new CredentialsImpl(username.getText(), new String(password.getPassword()), "localhost", 9000)); // todo: hardcoded stuff, need textfield
+                            setVisible(false);
+                            listener.success(user);
                         }
-                        else {
-                            listener.failed(new Exception("Authentication failed"));
+                        catch (Exception e) {
+                            listener.failed(e);
                         }
                     }
                 }
         );
         add(login, gbc);
-    }
-
-    private boolean validateAuthentication(String username, char[] password) {
-        return username.equals("serkan") && new String(password).equals("abc");
     }
 }

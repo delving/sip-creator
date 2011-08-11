@@ -21,12 +21,16 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.security.AuthenticationClient;
 import eu.delving.sip.desktop.listeners.DataSetChangeListener;
+import eu.europeana.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyVetoException;
 import java.util.*;
+import java.util.List;
 
 
 /**
@@ -40,28 +44,31 @@ public class DesktopManager {
     private DataSetChangeListener dataSetChangeListener;
     private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
+    private SipModel sipModel;
+    private static AuthenticationClient authenticationClient = new AuthenticationClient();
 
-    public DesktopManager(DataSetChangeListener dataSetChangeListener) {
-        this.dataSetChangeListener = dataSetChangeListener;
-        desktop = new JDesktopPane();
-        initialize();
+    public static AuthenticationClient getAuthenticationClient() {
+        return authenticationClient;
     }
 
-    private void initialize() {
+    public DesktopManager(DataSetChangeListener dataSetChangeListener, SipModel sipModel) {
+        this.dataSetChangeListener = dataSetChangeListener;
+        this.sipModel = sipModel;
+        desktop = new JDesktopPane();
+        buildWindows();
+    }
+
+    private void buildWindows() {
         for (WindowId windowId : WindowId.values()) {
             if (null != windowId.getDesktopWindow()) {
                 try {
-                    DesktopWindow desktopWindow = windowId.getDesktopWindow().newInstance();
+                    DesktopWindow desktopWindow = windowId.getDesktopWindow().getConstructor(SipModel.class).newInstance(sipModel);
                     desktopWindow.setId(windowId);
                     desktopWindow.setDataSetChangeListener(dataSetChangeListener);
                     windows.put(windowId, desktopWindow);
-                    LOG.info("Done creating " + windowId);
                 }
-                catch (InstantiationException e) {
-                    LOG.error("Can't instantiate window " + windowId, e);
-                }
-                catch (IllegalAccessException e) {
-                    LOG.error("Illegal access " + windowId.getTitle(), e);
+                catch (Exception e) {
+                    LOG.error("Can't instantiate window : " + windowId, e);
                 }
             }
         }
@@ -87,6 +94,12 @@ public class DesktopManager {
         if (getAllWindows().contains(window)) {
             window.moveToFront();
             window.setVisible(true);
+            if (window.getLocation().x < 0) {
+                window.setLocation(new Point(0, window.getLocation().y));
+            }
+            if (window.getLocation().y < 0) {
+                window.setLocation(new Point(window.getLocation().x, 0));
+            }
             try {
                 window.setSelected(true);
             }
@@ -96,7 +109,7 @@ public class DesktopManager {
             return;
         }
         if (null == window) {
-            throw new NoSuchElementException("Window doesn't exist");
+            throw new NoSuchElementException(String.format("Window %s doesn't exist", windowId));
         }
         desktop.add(window);
         window.setVisible(true);

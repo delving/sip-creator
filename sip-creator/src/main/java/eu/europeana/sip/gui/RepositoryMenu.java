@@ -21,15 +21,19 @@
 
 package eu.europeana.sip.gui;
 
+import eu.delving.security.AuthenticationClient;
+import eu.delving.security.User;
+import eu.delving.sip.AppConfig;
+import eu.europeana.sip.model.AppConfigModel;
+import eu.europeana.sip.model.SipModel;
+import org.apache.amber.oauth2.common.exception.OAuthProblemException;
+import org.apache.amber.oauth2.common.exception.OAuthSystemException;
+import org.apache.log4j.Logger;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
-import javax.swing.*;
-
-import eu.delving.sip.AppConfig;
-import eu.delving.sip.OAuth2Client;
-import eu.europeana.sip.model.AppConfigModel;
-import eu.europeana.sip.model.SipModel;
 
 /**
  * @author Gerald de Jong, Delving BV <gerald@delving.eu>
@@ -38,9 +42,10 @@ import eu.europeana.sip.model.SipModel;
 public class RepositoryMenu extends JMenu {
     private Component parent;
     private SipModel sipModel;
-    private OAuth2Client oauth2Client;
+    private AuthenticationClient oauth2Client;
+    private static final Logger LOG = Logger.getRootLogger();
 
-    public RepositoryMenu(Component parent, SipModel sipModel, OAuth2Client client) {
+    public RepositoryMenu(Component parent, SipModel sipModel, AuthenticationClient client) {
         super("Repository");
         this.parent = parent;
         this.sipModel = sipModel;
@@ -108,14 +113,19 @@ public class RepositoryMenu extends JMenu {
             loginPanel.add(usernameField);
             loginPanel.add(passwordLabel);
             loginPanel.add(passwordField);
-            Object[] msg = { loginPanel };
+            Object[] msg = {loginPanel};
             int result = JOptionPane.showConfirmDialog(parent, msg, "Permission", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                boolean loginSuccessful = oauth2Client.requestAccess(sipModel.getAppConfigModel().getServerHostPort(), usernameField.getText(), new String(passwordField.getPassword()));
-                if(!loginSuccessful) {
-                    JOptionPane.showMessageDialog(parent, "Error while logging in", "Permission error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    sipModel.getAppConfigModel().setUsername(usernameField.getText());
+                try {
+                    User user = oauth2Client.requestAccess(sipModel.getAppConfigModel().getServerHostPort(), usernameField.getText(), new String(passwordField.getPassword()));
+                    LOG.info("Login successful : " + user);
+                    sipModel.getAppConfigModel().setUsername(user.getUsername());
+                }
+                catch (OAuthSystemException e) {
+                    LOG.error("OAuth system exception", e);
+                }
+                catch (OAuthProblemException e) {
+                    LOG.error("OAuth problem", e);
                 }
             }
         }

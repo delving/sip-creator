@@ -21,9 +21,7 @@
 
 package eu.delving.sip.desktop;
 
-import eu.delving.sip.desktop.windows.DataSet;
-import eu.delving.sip.desktop.windows.DesktopWindow;
-
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -32,34 +30,31 @@ import java.util.List;
  * The following properties will be loaded:
  *
  * <ul>
- * <li>Credentials</li>
- * <li>Window states</li>
- * <li>Data sets</li>
+ * <li>Credentials - Username/password and server</li>
+ * <li>Window states - The last states of the windows</li>
+ * <li>Data sets - The last data set</li>
  * </ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public interface DesktopPreferences {
+public interface DesktopPreferences extends Serializable {
 
-    interface Listener {
-
-        void desktopStateFound(DesktopState desktopState);
-
-        void credentialsFound(Credentials credentials);
-
-        void dataSetFound(DataSet dataSet);
-    }
-
-    interface Credentials {
+    interface Credentials extends Serializable {
 
         String getUsername();
 
         String getPassword();
+
+        String serverAddress();
+
+        int serverPort();
     }
 
-    interface DesktopState {
+    interface DesktopState extends Serializable {
 
-        List<DesktopWindow> getWindows();
+        String getSpec();
+
+        List<WindowState> getWindows();
     }
 
     /**
@@ -69,6 +64,8 @@ public interface DesktopPreferences {
      */
     void saveCredentials(Credentials credentials);
 
+    Credentials loadCredentials();
+
     /**
      * Remember the window state.
      *
@@ -76,5 +73,7 @@ public interface DesktopPreferences {
      */
     void saveDesktopState(DesktopState desktopState);
 
-    void saveDataSet(DataSet dataSet);
+    DesktopState loadDesktopState();
+
+    void clear();
 }
