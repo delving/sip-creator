@@ -81,11 +81,13 @@ public class DesktopLauncher {
     private static JFrame main;
     private SipModel sipModel;
     private AuthenticationClient authenticationClient = new AuthenticationClient();
+    private FileStore.DataSetStore currentStore;
 
     private DataSetChangeListener dataSetChangeListener = new DataSetChangeListener() {
 
         @Override
         public void dataSetIsChanging(FileStore.DataSetStore dataSet) {
+            currentStore = dataSet;
             actions.setEnabled(false);
         }
 
@@ -255,7 +257,9 @@ public class DesktopLauncher {
                                     System.exit(0);
                                 }
                                 List<WindowState> allWindowStates = desktopLauncher.desktopManager.getWindowStates();
-                                desktopLauncher.getDesktopPreferences().saveDesktopState(new DesktopStateImpl("SPEC", allWindowStates)); // todo: spec name
+                                desktopLauncher.getDesktopPreferences().saveDesktopState(
+                                        new DesktopStateImpl(null == desktopLauncher.currentStore ? "-" : desktopLauncher.currentStore.getSpec(),
+                                                allWindowStates));
                                 System.exit(0);
                                 break;
 
