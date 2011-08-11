@@ -179,8 +179,8 @@ public class DesktopLauncher {
 
                     @Override
                     public void failed(Exception exception) {
-                        // todo: show error window
                         LOG.error("Authentication failed", exception);
+                        JOptionPane.showMessageDialog(null, exception.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
                     }
 
                     @Override
