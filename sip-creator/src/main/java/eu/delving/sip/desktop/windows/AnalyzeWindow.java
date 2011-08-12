@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  * Licensed under the EUPL, Version 1.0 or as soon they
  * will be approved by the European Commission - subsequent
@@ -21,125 +21,272 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.delving.metadata.AnalysisTree;
+import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.sip.FileStore;
-import eu.europeana.sip.gui.AnalysisFactsPanel;
+import eu.europeana.sip.gui.FieldStatisticsPanel;
 import eu.europeana.sip.model.SipModel;
-import org.apache.log4j.Logger;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * The analyze window will present the following data:
- *
+ * <p/>
  * <ul>
  * <li>Statistics</li>
  * <li>Document structure</li>
  * </ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
-public class AnalyzeWindow extends DesktopWindow {
 
-    private static final Logger LOG = Logger.getRootLogger();
-    private DocumentStructurePanel documentStructurePanel;
+public class AnalyzeWindow extends DesktopWindow {
+    private static final String RUN_ANALYSIS = "Run the Analysis";
+    private static final String ELEMENTS_PROCESSED = "%d Elements Processed";
+    private JButton selectRecordRootButton = new JButton("Select Record Root ");
+    private JButton selectUniqueElementButton = new JButton("Select Unique Element");
+    private JButton analyzeButton = new JButton(RUN_ANALYSIS);
+    private JTree statisticsJTree;
+    private FieldStatisticsPanel fieldStatisticsPanel = new FieldStatisticsPanel();
 
     public AnalyzeWindow(SipModel sipModel) {
         super(sipModel);
-        buildLayout();
-        SipModel.UpdateListener updateListener = new SipModel.UpdateListener() {
+        setLayout(new GridLayout(1, 2));
+        add(createTreePanel());
+        add(fieldStatisticsPanel);
+        wireUp();
+    }
 
+    private void wireUp() {
+        sipModel.addUpdateListener(new SipModel.UpdateListener() {
             @Override
             public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
-                LOG.info("Updated data set store " + dataSetStore);
-                documentStructurePanel.setTitle(dataSetStore.getSpec());
+                analyzeButton.setText(RUN_ANALYSIS);
+                analyzeButton.setEnabled(true);
             }
 
             @Override
-            public void updatedStatistics(FieldStatistics fieldStatistics) {
-                LOG.info("Updated field statistics " + fieldStatistics);
+            public void updatedStatistics(final FieldStatistics fieldStatistics) {
+                fieldStatisticsPanel.setStatistics(fieldStatistics);
             }
 
             @Override
             public void updatedRecordRoot(Path recordRoot, int recordCount) {
-                LOG.info("Updated record root " + recordRoot + " " + recordCount);
             }
 
             @Override
             public void normalizationMessage(boolean complete, String message) {
-                LOG.info("Normalization : " + complete + " " + message);
             }
-        };
-        sipModel.addUpdateListener(updateListener);
+        });
+        statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent event) {
+                TreePath path = event.getPath();
+                if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
+                    final AnalysisTree.Node node = (AnalysisTree.Node) path.getLastPathComponent();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
+                            selectUniqueElementButton.setEnabled(!node.couldBeRecordRoot());
+                            sipModel.setStatistics(node.getStatistics());
+                        }
+                    });
+                }
+                else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            selectRecordRootButton.setEnabled(false);
+                            selectUniqueElementButton.setEnabled(false);
+                            sipModel.setStatistics(null);
+                        }
+                    });
+                }
+            }
+        });
+        selectRecordRootButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TreePath path = statisticsJTree.getSelectionPath();
+                AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
+                Path recordRoot = node.getPath();
+                if (recordRoot != null) {
+                    sipModel.setRecordRoot(recordRoot, node.getStatistics().getTotal());
+                }
+            }
+        });
+        selectUniqueElementButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TreePath path = statisticsJTree.getSelectionPath();
+                AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
+                sipModel.setUniqueElement(node.getPath());
+            }
+        });
+        analyzeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                analyzeButton.setEnabled(false);
+                performAnalysis();
+            }
+        });
     }
 
-    private void buildLayout() {
-        documentStructurePanel = new DocumentStructurePanel("-");
-        StatisticsPanel statisticsPanel = new StatisticsPanel();
-//        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, documentStructurePanel, statisticsPanel);
-//        splitPane.setPreferredSize(getPreferredSize());
-//        splitPane.setPreferredSize(new Dimension(1000, 500));
-        add(statisticsPanel);
-        setSize(new Dimension(1200, 700));
+    private JPanel createTreePanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
+        statisticsJTree = new JTree(sipModel.getAnalysisTreeModel());
+        statisticsJTree.getModel().addTreeModelListener(new Expander());
+        statisticsJTree.setCellRenderer(new AnalysisTreeCellRenderer());
+        statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        p.add(scroll(statisticsJTree), BorderLayout.CENTER);
+        JPanel south = new JPanel(new GridLayout(0, 1));
+        south.add(analyzeButton);
+        south.add(createSelectButtonPanel());
+        p.add(south, BorderLayout.SOUTH);
+        return p;
     }
 
-    private class StatisticsPanel extends JPanel {
+    private JPanel createSelectButtonPanel() {
+        JPanel bp = new JPanel(new GridLayout(1, 0, 5, 5));
+        selectRecordRootButton.setEnabled(false);
+        bp.add(selectRecordRootButton);
+        selectUniqueElementButton.setEnabled(false);
+        bp.add(selectUniqueElementButton);
+        return bp;
+    }
 
-        private AnalysisFactsPanel panel = new AnalysisFactsPanel(sipModel);
+    private JScrollPane scroll(JComponent content) {
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        return scroll;
+    }
 
-        private StatisticsPanel() {
-            panel.setSize(new Dimension(700, 400));
-            add(panel);
+    private void performAnalysis() {
+        sipModel.analyzeFields(new SipModel.AnalysisListener() {
+
+            @Override
+            public void finished(boolean success) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        setElementsProcessed(sipModel.getElementCount());
+                        analyzeButton.setEnabled(true);
+                    }
+                });
+            }
+
+            @Override
+            public void analysisProgress(final long elementCount) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        setElementsProcessed(elementCount);
+                    }
+                });
+            }
+        });
+    }
+
+    private void setElementsProcessed(long count) {
+        analyzeButton.setText(String.format(ELEMENTS_PROCESSED, count));
+    }
+
+    private class AnalysisTreeCellRenderer extends DefaultTreeCellRenderer {
+        private Font normalFont, thickFont;
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree jTree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            JLabel label = (JLabel) super.getTreeCellRendererComponent(jTree, value, selected, expanded, leaf, row, hasFocus);
+            AnalysisTree.Node node = (AnalysisTree.Node) value;
+            label.setFont(getNormalFont());
+            if (node.isRecordRoot()) {
+                label.setFont(getThickFont());
+                label.setText(String.format("%s : Record Root", node));
+            }
+            if (node.isUniqueElement()) {
+                label.setFont(getThickFont());
+                label.setText(String.format("%s : Unique Element", node));
+            }
+            return label;
+        }
+
+        private Font getNormalFont() {
+            if (normalFont == null) {
+                normalFont = super.getFont();
+            }
+            return normalFont;
+        }
+
+        private Font getThickFont() {
+            if (thickFont == null) {
+                thickFont = new Font(getNormalFont().getFontName(), Font.BOLD, getNormalFont().getSize());
+            }
+            return thickFont;
         }
     }
 
-    /**
-     * todo: document structure will be presented as a TreeTable.
-     */
-    private class DocumentStructurePanel extends JPanel {
+    private class Expander implements TreeModelListener {
 
-        private JLabel title = new JLabel();
-        private JTree tree;
-
-        public DocumentStructurePanel(String spec) {
-            buildLayout();
-            title.setText(spec);
+        @Override
+        public void treeNodesChanged(TreeModelEvent e) {
         }
 
-
-        private void buildLayout() {
-            setLayout(new BorderLayout());
-            add(new JLabel("Document structure"), BorderLayout.NORTH);
-            tree = new JTree(createTreeModel());
-            JScrollPane scrollPane = new JScrollPane(tree);
-            scrollPane.setPreferredSize(new Dimension(300, 300));
-            add(title, BorderLayout.NORTH);
-            add(scrollPane, BorderLayout.CENTER);
+        @Override
+        public void treeNodesInserted(TreeModelEvent e) {
         }
 
-        // todo: this is mock data, replace with actual data from SIPModel
-        private TreeModel createTreeModel() {
-            DefaultMutableTreeNode root = new DefaultMutableTreeNode("adlibXML");
-            DefaultMutableTreeNode diagnostic = new DefaultMutableTreeNode("diagnostic");
-            diagnostic.add(new DefaultMutableTreeNode("abc"));
-            diagnostic.add(new DefaultMutableTreeNode("def"));
-            diagnostic.add(new DefaultMutableTreeNode("ghi"));
-            root.add(diagnostic);
-            DefaultMutableTreeNode unknown = new DefaultMutableTreeNode("unknown");
-            unknown.add(new DefaultMutableTreeNode("123"));
-            unknown.add(new DefaultMutableTreeNode("456"));
-            unknown.add(new DefaultMutableTreeNode("789"));
-            root.add(unknown);
-            return new DefaultTreeModel(root);
+        @Override
+        public void treeNodesRemoved(TreeModelEvent e) {
         }
 
-        public void setTitle(String spec) {
-            title.setText(spec);
+        @Override
+        public void treeStructureChanged(TreeModelEvent e) {
+            Timer timer = new Timer(500, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    expandEmptyNodes((AnalysisTree.Node) statisticsJTree.getModel().getRoot());
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }
+
+        private void expandEmptyNodes(AnalysisTree.Node node) {
+            if (node.couldBeRecordRoot()) {
+                TreePath path = node.getTreePath();
+                statisticsJTree.expandPath(path);
+            }
+            for (AnalysisTree.Node childNode : node.getChildNodes()) {
+                expandEmptyNodes(childNode);
+            }
         }
     }
+
 }
