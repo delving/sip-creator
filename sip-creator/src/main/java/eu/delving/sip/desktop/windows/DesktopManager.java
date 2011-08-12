@@ -25,8 +25,12 @@ import eu.delving.sip.desktop.WindowState;
 import eu.europeana.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +53,14 @@ public class DesktopManager {
 
     public DesktopManager(SipModel sipModel) {
         this.sipModel = sipModel;
-        desktop = new JDesktopPane();
+        final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
+        desktop = new JDesktopPane() {
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(backgroundIcon.getImage(), 0, 0, desktop);
+            }
+        };
+        desktop.setBackground(new Color(190, 190, 200));
         buildWindows();
     }
 

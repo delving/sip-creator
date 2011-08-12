@@ -44,8 +44,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JSplitPane;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
@@ -56,9 +61,9 @@ import java.util.List;
 
 /**
  * This is the main window of the SIP-Creator.
- *
+ * <p/>
  * The SIP-Creator contains the following windows:
- *
+ * <p/>
  * <ul>
  * <li>DataSet window</li>
  * <li>Analysis window</li>
@@ -205,6 +210,7 @@ public class DesktopLauncher {
             authenticationWindow.setCredentials(credentials);
         }
         desktopManager.add(authenticationWindow);
+        authenticationWindow.setLocation(582, 614);
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
