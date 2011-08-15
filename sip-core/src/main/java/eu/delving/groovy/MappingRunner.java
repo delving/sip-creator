@@ -45,13 +45,11 @@ import java.util.regex.Pattern;
  */
 
 public class MappingRunner {
-    private GroovyCodeResource groovyCodeResource;
-    private String code;
     private Script script;
+    private String code;
 
     public MappingRunner(GroovyCodeResource groovyCodeResource, String code) {
-        this.groovyCodeResource = groovyCodeResource;
-        this.code = code;
+        this.script = groovyCodeResource.createMappingScript(this.code = code);
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
@@ -67,9 +65,6 @@ public class MappingRunner {
                 binding.setVariable(ns.getPrefix(), xmlns.namespace(ns.getUri(), ns.getPrefix()));
             }
             binding.setVariable("input", metadataRecord.getRootNode());
-            if (script == null) {
-                script = groovyCodeResource.createMappingScript(code);
-            }
             script.setBinding(binding);
             return (Node) script.run();
         }

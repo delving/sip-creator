@@ -24,8 +24,8 @@ package eu.delving.sip.desktop.windows;
 import eu.delving.sip.desktop.WindowState;
 import eu.europeana.sip.model.SipModel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JInternalFrame;
+import java.awt.Dimension;
 
 /**
  * The base of all windows within the SIP-Creator.
@@ -44,7 +44,6 @@ public abstract class DesktopWindow extends JInternalFrame {
         super("", true, true, true, true);
         this.sipModel = sipModel;
         setPreferredSize(DEFAULT_SIZE);
-        setLayout(new FlowLayout());
     }
 
     public void setWindowState(WindowState windowState) {
