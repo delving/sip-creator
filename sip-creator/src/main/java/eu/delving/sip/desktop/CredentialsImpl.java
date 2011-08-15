@@ -78,12 +78,7 @@ public class CredentialsImpl implements DesktopPreferences.Credentials {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("CredentialsImpl");
-        sb.append("{username='").append(username).append('\'');
-        sb.append(", password='").append(password).append('\'');
-        sb.append(", serverAddress='").append(serverAddress).append('\'');
-        sb.append(", serverPort=").append(serverPort);
-        sb.append('}');
+        sb.append(serverAddress).append(":").append(serverPort);
         return sb.toString();
     }
 }

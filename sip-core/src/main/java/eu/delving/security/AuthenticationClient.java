@@ -80,7 +80,6 @@ public class AuthenticationClient {
     }
 
     public String getAccessToken(String location, String username) throws OAuthSystemException, OAuthProblemException {
-        String tokenLocation = toTokenLocation(location); // todo: store the tokenLocation?
         if (!connections.containsKey(connectionKey(username, location))) {
             throw new OAuthRuntimeException("Key not found");
         }

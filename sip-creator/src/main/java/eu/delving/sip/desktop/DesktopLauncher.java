@@ -84,7 +84,6 @@ public class DesktopLauncher {
     private AuthenticationClient authenticationClient = new AuthenticationClient();
     private AuthenticationWindow authenticationWindow;
     private DataSetWindow dataSetWindow;
-    private DesktopPreferences.Credentials credentials;
     private FileStore.DataSetStore currentStore;
 
     private File getFileStoreDirectory(String path) throws FileStoreException {
@@ -135,7 +134,6 @@ public class DesktopLauncher {
 
                     @Override
                     public void credentialsChanged(DesktopPreferences.Credentials credentials) {
-                        DesktopLauncher.this.credentials = credentials;
                     }
 
                     @Override
@@ -181,18 +179,7 @@ public class DesktopLauncher {
      * @return The matched credentials.
      */
     private Set<DesktopPreferences.Credentials> getCredentials() {
-        Set<DesktopPreferences.Credentials> credentialsSet = desktopPreferences.getCredentials();
-        if (null == credentials) {
-            for (String hostDir : getWorkspace().getHostDirectories()) {
-                for (DesktopPreferences.Credentials credentials : desktopPreferences.getCredentials()) {
-                    if (String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()).equals(hostDir)) {
-                        // todo: this is a match
-                        System.out.printf("This is a match : %s%n", credentials);
-                    }
-                }
-            }
-        }
-        return credentialsSet;
+        return desktopPreferences.getCredentials();
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
@@ -283,12 +270,14 @@ public class DesktopLauncher {
 
         @Override
         public String getServerUrl() {
+            DesktopPreferences.Credentials credentials = authenticationWindow.getCredentials();
             return String.format("http://%s:%d/%s/dataset", credentials.getServerAddress(), credentials.getServerPort(), credentials.getUsername());
         }
 
         @Override
         public String getAccessToken() {
             try {
+                DesktopPreferences.Credentials credentials = authenticationWindow.getCredentials();
                 return authenticationClient.getAccessToken(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()), credentials.getUsername());
             }
             catch (OAuthSystemException e) {

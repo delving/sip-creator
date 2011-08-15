@@ -32,6 +32,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -64,6 +65,7 @@ public class AuthenticationWindow extends DesktopWindow {
     private AuthenticationClient authenticationClient;
     private JComboBox servers = new JComboBox();
     private Listener listener;
+    private DesktopPreferences.Credentials credentials;
 
     public interface Listener {
 
@@ -75,18 +77,21 @@ public class AuthenticationWindow extends DesktopWindow {
     }
 
     public AuthenticationWindow(DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient, Listener listener, Set<DesktopPreferences.Credentials> credentials) {
-        super(null); // todo: no sipmodel needed
+        super(null);
         this.desktopPreferences = desktopPreferences;
         this.authenticationClient = authenticationClient;
         this.listener = listener;
         setLayout(new GridBagLayout());
-        buildLayout();
         setResizable(false);
         setSize(new Dimension(600, 400));
+        buildLayout();
         setCredentials(credentials);
     }
 
     private void setCredentials(Set<DesktopPreferences.Credentials> credentialsSet) {
+        if (null == credentialsSet) {
+            return;
+        }
         servers.addActionListener(
                 new ActionListener() {
                     @Override
@@ -95,7 +100,7 @@ public class AuthenticationWindow extends DesktopWindow {
                     }
                 }
         );
-        for (DesktopPreferences.Credentials credentials : credentialsSet) {  // todo: set credentials, not in a loop
+        for (DesktopPreferences.Credentials credentials : credentialsSet) { // todo: set credentials, not in a loop
             servers.addItem(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()));
             username.setText(credentials.getUsername());
             password.setText(credentials.getPassword());
@@ -103,6 +108,41 @@ public class AuthenticationWindow extends DesktopWindow {
             serverPort.setText("" + credentials.getServerPort());
             rememberMe.setSelected(true);
             listener.credentialsChanged(credentials);
+            break;
+        }
+    }
+
+    // todo: not implemented yet
+    private class ServerListModel extends AbstractListModel implements ComboBoxModel {
+
+        List<DesktopPreferences.Credentials> credentialsList;
+
+        private ServerListModel(List<DesktopPreferences.Credentials> credentialsList) {
+            this.credentialsList = credentialsList;
+            setSelectedItem(credentialsList.get(0));
+        }
+
+        private String selection;
+
+        @Override
+        public void setSelectedItem(Object o) {
+            DesktopPreferences.Credentials credentials = (DesktopPreferences.Credentials) o;
+            selection = String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort());
+        }
+
+        @Override
+        public Object getSelectedItem() {
+            return selection;
+        }
+
+        @Override
+        public int getSize() {
+            return credentialsList.size();
+        }
+
+        @Override
+        public Object getElementAt(int i) {
+            return credentialsList.get(i);
         }
     }
 
@@ -118,17 +158,15 @@ public class AuthenticationWindow extends DesktopWindow {
         gbc.right();
         add(password, gbc);
         gbc.line();
-        if (desktopPreferences.getWorkspace().getHostDirectories().size() > 1) {
-            add(serverLabel, gbc);
-            gbc.right();
-            add(serverAddress, gbc);
-            gbc.line();
-            add(serverPortLabel, gbc);
-            gbc.right();
-            add(serverPort, gbc);
-            gbc.line();
-            gbc.right();
-        }
+        add(serverLabel, gbc);
+        gbc.right();
+        add(serverAddress, gbc);
+        gbc.line();
+        add(serverPortLabel, gbc);
+        gbc.right();
+        add(serverPort, gbc);
+        gbc.line();
+        gbc.right();
         add(rememberMe, gbc);
         gbc.line();
         gbc.right();
@@ -148,9 +186,9 @@ public class AuthenticationWindow extends DesktopWindow {
                             String usernameText = username.getText();
                             char[] passwordText = password.getPassword();
                             User user = authenticationClient.requestAccess(String.format("%s:%s", serverAddressText, serverPortText), usernameText, new String(passwordText));
+                            AuthenticationWindow.this.credentials = new CredentialsImpl(usernameText, new String(passwordText), serverAddressText, Integer.parseInt(serverPortText));
                             listener.success(user);
-                            desktopPreferences.saveCredentials(
-                                    new CredentialsImpl(usernameText, new String(passwordText), serverAddressText, Integer.parseInt(serverPortText)));
+                            desktopPreferences.saveCredentials(credentials);
                             setVisible(false);
                         }
                         catch (Exception e) {
@@ -159,5 +197,9 @@ public class AuthenticationWindow extends DesktopWindow {
                     }
                 }
         );
+    }
+
+    public DesktopPreferences.Credentials getCredentials() {
+        return credentials;
     }
 }
