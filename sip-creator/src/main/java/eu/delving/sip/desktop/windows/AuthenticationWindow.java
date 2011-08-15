@@ -66,7 +66,12 @@ public class AuthenticationWindow extends JDialog {
     private Listener listener;
 
     public interface Listener {
+
         void credentialsChanged(DesktopPreferences.Credentials credentials);
+
+        void success(User user);
+
+        void failed(Exception e);
     }
 
     public AuthenticationWindow(Frame parent, DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient, Listener listener) {
@@ -77,7 +82,7 @@ public class AuthenticationWindow extends JDialog {
         setLayout(new GridBagLayout());
         buildLayout();
         setResizable(false);
-        setSize(new Dimension(500, 300));
+        setSize(new Dimension(600, 400));
     }
 
     public void setCredentials(Set<DesktopPreferences.Credentials> credentialsSet) {
@@ -85,11 +90,11 @@ public class AuthenticationWindow extends JDialog {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        // todo: add body and return void;
+                        // todo: update fields when another server is selected
                     }
                 }
         );
-        for (DesktopPreferences.Credentials credentials : credentialsSet) {  // todo: set credentials
+        for (DesktopPreferences.Credentials credentials : credentialsSet) {  // todo: set credentials, not in a loop
             servers.addItem(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()));
             username.setText(credentials.getUsername());
             password.setText(credentials.getPassword());
@@ -142,13 +147,13 @@ public class AuthenticationWindow extends JDialog {
                             String usernameText = username.getText();
                             char[] passwordText = password.getPassword();
                             User user = authenticationClient.requestAccess(String.format("%s:%s", serverAddressText, serverPortText), usernameText, new String(passwordText));
+                            listener.success(user);
                             desktopPreferences.saveCredentials(
                                     new CredentialsImpl(usernameText, new String(passwordText), serverAddressText, Integer.parseInt(serverPortText)));
                             setVisible(false);
-                            // todo: update via auth client
                         }
                         catch (Exception e) {
-                            // todo: update via auth client
+                           listener.failed(e);
                         }
                     }
                 }

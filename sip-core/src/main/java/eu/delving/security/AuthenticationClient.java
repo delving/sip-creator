@@ -6,6 +6,7 @@ import org.apache.amber.oauth2.client.response.OAuthClientResponse;
 import org.apache.amber.oauth2.client.response.OAuthClientResponseFactory;
 import org.apache.amber.oauth2.client.response.OAuthJSONAccessTokenResponse;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
+import org.apache.amber.oauth2.common.exception.OAuthRuntimeException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.amber.oauth2.common.message.types.GrantType;
 import org.apache.amber.oauth2.common.utils.OAuthUtils;
@@ -30,18 +31,6 @@ public class AuthenticationClient {
     private static final String OAUTH2_ENDPOINT_PATH = "/token";
     private Logger log = Logger.getLogger(getClass());
     private Map<String, TokenConnection> connections = new HashMap<String, TokenConnection>();
-    private Listener listener;
-
-    public interface Listener {
-
-        void success(User user);
-
-        void failed(Exception exception);
-    }
-
-    public AuthenticationClient(Listener listener) {
-        this.listener = listener;
-    }
 
     private final OAuthClient client = new OAuthClient(new org.apache.amber.oauth2.client.HttpClient() {
         @Override
@@ -74,7 +63,6 @@ public class AuthenticationClient {
         // todo: user should contain preferences and permission which are sent by the services module
         User user = new User();
         user.setUsername(username);
-        listener.success(user);
         return user;
     }
 
@@ -91,26 +79,16 @@ public class AuthenticationClient {
         return connection.getAccessToken();
     }
 
-    public String getAccessToken(String location, String username) {
+    public String getAccessToken(String location, String username) throws OAuthSystemException, OAuthProblemException {
         String tokenLocation = toTokenLocation(location); // todo: store the tokenLocation?
         if (!connections.containsKey(connectionKey(username, location))) {
-            listener.failed(new Exception("Key not found"));
-            return null;
+            throw new OAuthRuntimeException("Key not found");
         }
         TokenConnection connection = connections.get(connectionKey(username, location));
         if (!connection.isTokenExpired()) {
             return connection.getAccessToken();
         }
-        try {
-            return requestRefresh(connectionKey(username, location), connection.getRefreshToken());
-        }
-        catch (OAuthSystemException e) {
-            listener.failed(e);
-        }
-        catch (OAuthProblemException e) {
-            listener.failed(e);
-        }
-        return null;
+        return requestRefresh(connectionKey(username, location), connection.getRefreshToken());
     }
 
 

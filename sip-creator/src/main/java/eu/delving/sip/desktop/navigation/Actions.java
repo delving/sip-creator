@@ -165,4 +165,15 @@ public class Actions {
             }
         }
     }
+
+    public Action getDataSetAction() {
+        return new AbstractAction() {
+
+            @Override
+            public void actionPerformed
+                    (ActionEvent actionEvent) {
+                Actions.this.desktopManager.getDataSetWindow().setVisible(true);
+            }
+        };
+    }
 }

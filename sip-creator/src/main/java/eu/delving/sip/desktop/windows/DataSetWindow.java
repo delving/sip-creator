@@ -23,6 +23,7 @@ package eu.delving.sip.desktop.windows;
 
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
+import eu.delving.sip.DataSetInfo;
 import eu.delving.sip.FileStore;
 import eu.europeana.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
@@ -50,19 +51,27 @@ import java.util.Map;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  *         todo: Filter/search is not implemented yet
  */
-public class DataSetWindow extends DesktopWindow {
+public class DataSetWindow extends JDialog {
 
     private static final Logger LOG = Logger.getRootLogger();
     private JTable dataSets;
     private JButton select = new JButton("Select");
     private JButton cancel = new JButton("Cancel");
     private DataSetModel<FileStore.DataSetStore> dataSetModel;
+    private SipModel sipModel;
 
-    public DataSetWindow(SipModel sipModel) {
-        super(sipModel);
+    public DataSetWindow(Frame parent, SipModel sipModel) {
+        super(parent, true);
+        this.sipModel = sipModel;
+        setSize(new Dimension(600, 400));
         setLayout(new BorderLayout());
+        setLocationRelativeTo(parent);
         buildLayout();
         addActions();
+    }
+
+    public void setData(List<DataSetInfo> dataSetInfoList) {
+        LOG.info("todo: update dataModel " + dataSetInfoList.size());
     }
 
     private SipModel.UpdateListener updateListener = new SipModel.UpdateListener() {
@@ -136,7 +145,11 @@ public class DataSetWindow extends DesktopWindow {
         private String[] columnHeaders = {"Collection", "Cached", "Count", "Validated"};
         private List<T> data = new ArrayList<T>();
 
-        private DataSetModel(List<T> data) {
+        public DataSetModel(List<T> data) {
+            this.data = data;
+        }
+
+        public void setData(List<T> data) {
             this.data = data;
         }
 

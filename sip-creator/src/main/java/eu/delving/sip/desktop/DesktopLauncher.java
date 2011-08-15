@@ -35,11 +35,14 @@ import eu.delving.sip.desktop.navigation.Actions;
 import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
+import eu.delving.sip.desktop.windows.DataSetWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
 import eu.europeana.sip.localization.Constants;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
+import org.apache.amber.oauth2.common.exception.OAuthProblemException;
+import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -76,25 +79,11 @@ public class DesktopLauncher {
     private DesktopManager desktopManager;
     private DesktopPreferences desktopPreferences;
     private DesktopPreferences.DesktopState desktopState;
-    private User user;
     private Actions actions;
     private static JFrame main;
     private SipModel sipModel;
-    private AuthenticationClient authenticationClient = new AuthenticationClient(
-            new AuthenticationClient.Listener() {
-
-                @Override
-                public void success(User user) {
-                    LOG.info("Authenticated with user " + user);
-                    dataSetClient.setListFetchingEnabled(true);
-                }
-
-                @Override
-                public void failed(Exception exception) {
-                    // todo: set auth window to visible
-                }
-            }
-    );
+    private AuthenticationClient authenticationClient = new AuthenticationClient();
+    private DataSetWindow dataSetWindow;
 
     private DesktopPreferences.Credentials credentials;
     private FileStore.DataSetStore currentStore;
@@ -138,7 +127,9 @@ public class DesktopLauncher {
         MetadataModel metadataModel = loadMetadataModel();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
         sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(), userNotifier);
+        dataSetWindow = new DataSetWindow(main, sipModel);
         desktopManager = new DesktopManager(sipModel);
+        desktopManager.setDataSetWindow(dataSetWindow);
         actions = new Actions(desktopManager);
         buildLayout();
     }
@@ -189,36 +180,24 @@ public class DesktopLauncher {
                     public void credentialsChanged(DesktopPreferences.Credentials credentials) {
                         DesktopLauncher.this.credentials = credentials;
                     }
+
+                    @Override
+                    public void success(User user) {
+                        dataSetClient.setListFetchingEnabled(true);
+                        if (null != desktopState) {
+                            restoreWindows(desktopState);
+                        }
+                    }
+
+                    @Override
+                    public void failed(Exception exception) {
+                        LOG.error("Authentication failed", exception);
+                        JOptionPane.showMessageDialog(null, exception.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
         );
         authenticationWindow.setCredentials(getCredentials());
-        authenticationWindow.setVisible(true); // todo: trigger after building layout
-//        AuthenticationWindow authenticationWindow = new AuthenticationWindow(
-//                new AuthenticationWindow.Listener() {
-//
-//                    @Override
-//                    public void success(User user) {
-//                        DesktopLauncher.this.user = user;
-//                        dataSetClient.setListFetchingEnabled(true);
-//                        actions.setEnabled(true);
-//                        if (null != desktopState) {
-//                            restoreWindows(desktopState);
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void failed(Exception exception) {
-//                        LOG.error("Authentication failed", exception);
-//                        JOptionPane.showMessageDialog(null, exception.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
-//                    }
-//
-//                    @Override
-//                    public void signedOut() {
-//                        // todo: display AuthenticationWindow again
-//                    }
-//                }, desktopPreferences, authenticationClient
-//        );
-
+        authenticationWindow.setVisible(true); // todo: trigger _after_ building layout
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
@@ -305,7 +284,6 @@ public class DesktopLauncher {
         }
     }
 
-
     private DataSetClient dataSetClient = new DataSetClient(new DataSetClient.Context() {
 
         @Override
@@ -315,7 +293,16 @@ public class DesktopLauncher {
 
         @Override
         public String getAccessToken() {
-            return authenticationClient.getAccessToken(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()), credentials.getUsername());
+            try {
+                return authenticationClient.getAccessToken(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()), credentials.getUsername());
+            }
+            catch (OAuthSystemException e) {
+                // todo: show auth window
+            }
+            catch (OAuthProblemException e) {
+                // todo: show auth window
+            }
+            return null;
         }
 
         @Override
@@ -326,10 +313,7 @@ public class DesktopLauncher {
 
         @Override
         public void setList(List<DataSetInfo> list) {
-            // todo: update datasetwindow
-            for (DataSetInfo dataSetInfo : list) {
-                LOG.info("Data set : " + dataSetInfo.spec);
-            }
+            dataSetWindow.setData(list);
         }
 
         @Override
