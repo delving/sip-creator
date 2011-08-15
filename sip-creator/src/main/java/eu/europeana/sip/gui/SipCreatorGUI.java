@@ -35,40 +35,17 @@ import eu.delving.sip.FileStoreImpl;
 import eu.europeana.sip.model.AppConfigModel;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
+import org.apache.amber.oauth2.common.exception.OAuthProblemException;
+import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -111,7 +88,7 @@ public class SipCreatorGUI extends JFrame {
         File fileStoreDirectory = getFileStoreDirectory();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
-        this.dataSetListModel  = new DataSetListModel(new DataSetListModel.ConnectedStatus() {
+        this.dataSetListModel = new DataSetListModel(new DataSetListModel.ConnectedStatus() {
             @Override
             public boolean isConnected() {
                 return connectedBox.isSelected();
@@ -129,7 +106,16 @@ public class SipCreatorGUI extends JFrame {
 
             @Override
             public String getAccessToken() {
-                return oauth2Client.getAccessToken(sipModel.getAppConfigModel().getServerHostPort(), sipModel.getAppConfigModel().getUsername());
+                try {
+                    return oauth2Client.getAccessToken(sipModel.getAppConfigModel().getServerHostPort(), sipModel.getAppConfigModel().getUsername());
+                }
+                catch (OAuthSystemException e) {
+                    // todo: show auth window
+                }
+                catch (OAuthProblemException e) {
+                    // todo: show auth window
+                }
+                return null;
             }
 
             @Override

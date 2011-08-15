@@ -32,6 +32,7 @@ public class DesktopStateImpl implements DesktopPreferences.DesktopState {
 
     private String spec;
     private List<WindowState> windowStates;
+    private String recentDirectory;
 
     public DesktopStateImpl(String spec, List<WindowState> windowStates) {
         this.spec = spec;
@@ -46,6 +47,15 @@ public class DesktopStateImpl implements DesktopPreferences.DesktopState {
     @Override
     public List<WindowState> getWindowStates() {
         return windowStates;
+    }
+
+    public void setRecentDirectory(String recentDirectory) {
+        this.recentDirectory = recentDirectory;
+    }
+
+    @Override
+    public String getRecentDirectory() {
+        return recentDirectory;
     }
 
     @Override

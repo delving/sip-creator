@@ -21,11 +21,11 @@
 
 package eu.delving.sip;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * This class
@@ -35,6 +35,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("sip-creator-configuration")
+@Deprecated
+/** @deprecated will bre replaced by DesktopPreferences */
 public class AppConfig {
     private String serverHostPort;
     private String accessKey;
@@ -71,7 +73,7 @@ public class AppConfig {
     }
 
     public String getUsername() {
-        if(username == null) {
+        if (username == null) {
             username = "";
         }
         return username;
@@ -80,7 +82,7 @@ public class AppConfig {
     public void setUsername(String username) {
         this.username = username;
         saveConnection();
-     }
+    }
 
     public void saveConnection() {
         for (RepositoryConnection connection : getRepositoryConnections()) {
@@ -153,6 +155,8 @@ public class AppConfig {
     }
 
     @XStreamAlias("repository-connection")
+    @Deprecated
+    /** @deprecated Will be replaced by DesktopPreferences */
     public static class RepositoryConnection {
         public String accessKey; // TODO remove once we all switch to new config
         public String serverHostPort;

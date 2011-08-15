@@ -29,6 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -45,15 +47,36 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     private static final String CREDENTIALS = "credentials";
     private static final String WORKSPACE = "workspace";
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
+    private Set<Credentials> credentials;
+    private Workspace workspace;
+    private DesktopState desktopState;
 
     public DesktopPreferencesImpl(Class<?> clazz) {
         preferences = Preferences.userNodeForPackage(clazz);
+        // cache the preferences
+        refresh();
+    }
+
+    private void refresh() {
+        credentials = loadCredentials();
+        workspace = loadWorkspace();
+        desktopState = loadDesktopState();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void saveCredentials(Credentials credentials) {
+        LOG.info("Looking for existing credentials");
+        Set<Credentials> credentialsList = loadCredentials();
+        if (null == credentialsList) {
+            LOG.info("There are no credentials found, will create an empty list");
+            credentialsList = new HashSet<Credentials>();
+        }
+        credentialsList.add(credentials);
         try {
-            writeObject(CREDENTIALS, credentials);
+            LOG.info("Writing list " + credentialsList);
+            writeObject(CREDENTIALS, credentialsList);
+            LOG.info("Done.");
         }
         catch (IOException e) {
             LOG.error("Error storing credentials", e);
@@ -61,17 +84,16 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     }
 
     @Override
-    public Credentials loadCredentials() {
-        try {
-            return (Credentials) readObject(CREDENTIALS);
+    public Set<Credentials> getCredentials() {
+        if (null == credentials) {
+            refresh();
         }
-        catch (IOException e) {
-            LOG.error("Error loading credentials", e);
-        }
-        catch (ClassNotFoundException e) {
-            LOG.error("Error loading credentials", e);
-        }
-        return null;
+        return credentials;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<Credentials> loadCredentials() {
+        return (Set<Credentials>) readObject(CREDENTIALS);
     }
 
     @Override
@@ -84,6 +106,14 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         }
     }
 
+    @Override
+    public DesktopState getDesktopState() {
+        if (null == desktopState) {
+            refresh();
+        }
+        return desktopState;
+    }
+
     private void writeObject(String key, Object object) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -92,30 +122,29 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
         preferences.putByteArray(key, byteArrayOutputStream.toByteArray());
     }
 
-    private Object readObject(String key) throws IOException, ClassNotFoundException {
+    private Object readObject(String key) {
         byte[] data = preferences.getByteArray(key, null);
         if (null == data) {
-            LOG.error("No data found for key " + key);
+            LOG.error("No data found for key : " + key);
             return null;
         }
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
-        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-        LOG.info(String.format("%s bytes read for key %s", data.length, key));
-        return objectInputStream.readObject();
-    }
-
-    @Override
-    public DesktopState loadDesktopState() {
         try {
-            return (DesktopState) readObject(DESKTOP_STATE);
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+            LOG.info(String.format("%s bytes read for key %s", data.length, key));
+            return objectInputStream.readObject();
         }
         catch (IOException e) {
-            LOG.error("Error reading desktop state", e);
+            LOG.error(String.format("Error reading data for key '%s'", key), e);
         }
         catch (ClassNotFoundException e) {
-            LOG.error("Error reading desktop state", e);
+            LOG.error(String.format("Error reading data for key '%s'", key), e);
         }
         return null;
+    }
+
+    private DesktopState loadDesktopState() {
+        return (DesktopState) readObject(DESKTOP_STATE);
     }
 
     @Override
@@ -129,17 +158,15 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     }
 
     @Override
-    public Workspace loadWorkspace() {
-        try {
-            return (Workspace) readObject(WORKSPACE);
+    public Workspace getWorkspace() {
+        if (null == workspace) {
+            refresh();
         }
-        catch (IOException e) {
-            LOG.error("Error reading workspace", e);
-        }
-        catch (ClassNotFoundException e) {
-            LOG.error("Error reading workspace", e);
-        }
-        return null;
+        return workspace;
+    }
+
+    private Workspace loadWorkspace() {
+        return (Workspace) readObject(WORKSPACE);
     }
 
     @Override

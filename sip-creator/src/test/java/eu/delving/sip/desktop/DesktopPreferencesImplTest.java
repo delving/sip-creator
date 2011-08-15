@@ -31,6 +31,7 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Store and retrieve preferences.
@@ -45,7 +46,7 @@ public class DesktopPreferencesImplTest implements Serializable {
     private static final String SPEC = "FakeCollection";
     private static final int SERVER_PORT = 9000;
     private static final Logger LOG = Logger.getRootLogger();
-    private static final String WORKSPACE_PATH = "temp";
+    private static final String WORKSPACE_PATH = "/Users/serkan.delving/Metadata/file-store/";
 
     private final DesktopPreferences desktopPreferences = new DesktopPreferencesImpl(getClass());
 
@@ -53,7 +54,7 @@ public class DesktopPreferencesImplTest implements Serializable {
     public void testWorkspace() throws Exception {
         DesktopPreferences.Workspace workspace = new WorkspaceImpl(WORKSPACE_PATH);
         desktopPreferences.saveWorkspace(workspace);
-        Assert.assertEquals(workspace, desktopPreferences.loadWorkspace());
+        Assert.assertEquals(workspace, desktopPreferences.getWorkspace());
     }
 
     @Test
@@ -61,11 +62,27 @@ public class DesktopPreferencesImplTest implements Serializable {
         LOG.info("Writing to preferences");
         DesktopPreferences.Credentials expected = new CredentialsImpl(USERNAME, PASSWORD, SERVER_ADDRESS, SERVER_PORT);
         desktopPreferences.saveCredentials(expected);
-        DesktopPreferences.Credentials actual = desktopPreferences.loadCredentials();
+        DesktopPreferences.Credentials actual = desktopPreferences.getCredentials().iterator().next(); // todo: fix
         Assert.assertEquals(expected.getUsername(), actual.getUsername());
         Assert.assertEquals(expected.getPassword(), actual.getPassword());
         Assert.assertEquals(expected.getServerAddress(), actual.getServerAddress());
         Assert.assertEquals(expected.getServerPort(), actual.getServerPort());
+    }
+
+    @Test
+    public void testCredentialsList() throws Exception {
+        DesktopPreferences.Credentials test1 = new CredentialsImpl(USERNAME, PASSWORD, SERVER_ADDRESS, SERVER_PORT);
+        DesktopPreferences.Credentials test2 = new CredentialsImpl("serkan", "password", "test.blackbuilt.nl", 9000);
+        // This is a duplicate and should replace the previous one.
+        DesktopPreferences.Credentials test3 = new CredentialsImpl("serkan", "password", "test.blackbuilt.nl", 9000);
+        DesktopPreferences.Credentials test4 = new CredentialsImpl("serkan", "password", "some_host", 9000);
+        desktopPreferences.saveCredentials(test1);
+        desktopPreferences.saveCredentials(test2);
+        desktopPreferences.saveCredentials(test3);
+        desktopPreferences.saveCredentials(test4);
+        Set<DesktopPreferences.Credentials> credentialsList = desktopPreferences.getCredentials();
+        LOG.info("Reading credentials : " + credentialsList);
+        Assert.assertTrue("Expecting 3 credentials, found " + credentialsList.size(), 3 == credentialsList.size());
     }
 
     @Test
@@ -76,7 +93,7 @@ public class DesktopPreferencesImplTest implements Serializable {
         windows.add(new WindowState(WindowId.MAPPING, new Dimension(555, 123), new Point(233, 51), false));
         DesktopPreferences.DesktopState desktopState = new DesktopStateImpl(SPEC, windows);
         desktopPreferences.saveDesktopState(desktopState);
-        DesktopPreferences.DesktopState actual = desktopPreferences.loadDesktopState();
+        DesktopPreferences.DesktopState actual = desktopPreferences.getDesktopState();
         Assert.assertEquals(desktopState.getSpec(), actual.getSpec());
         Assert.assertEquals(desktopState.getWindowStates().size(), actual.getWindowStates().size());
     }

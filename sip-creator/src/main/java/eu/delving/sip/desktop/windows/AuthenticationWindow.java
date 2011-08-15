@@ -32,12 +32,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
+import java.util.List;
+import java.util.Set;
 
 /**
- * OAuth2 login window.
+ * OAuth2 login window. The
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
+ *         todo: make it a modal popup
  */
 public class AuthenticationWindow extends DesktopWindow {
 
@@ -59,44 +61,89 @@ public class AuthenticationWindow extends DesktopWindow {
     private JPasswordField password = new JPasswordField();
     private JButton login = new JButton(LOGIN_LABEL);
     private JCheckBox rememberMe = new JCheckBox(REMEMBER_LABEL);
-    private Listener listener;
     private DesktopPreferences desktopPreferences;
     private AuthenticationClient authenticationClient;
+    private JComboBox servers = new JComboBox();
+    private Listener listener;
+    private DesktopPreferences.Credentials credentials;
 
     public interface Listener {
 
+        void credentialsChanged(DesktopPreferences.Credentials credentials);
+
         void success(User user);
 
-        void failed(Exception exception);
-
-        void signedOut();
+        void failed(Exception e);
     }
 
-    public AuthenticationWindow(Listener listener, DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient) {
-        super(null); // todo: not needed, we don't have the SipModel yet at this point.
-        this.listener = listener;
+    public AuthenticationWindow(DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient, Listener listener, Set<DesktopPreferences.Credentials> credentials) {
+        super(null);
         this.desktopPreferences = desktopPreferences;
         this.authenticationClient = authenticationClient;
+        this.listener = listener;
         setLayout(new GridBagLayout());
-        buildLayout();
         setResizable(false);
-        setClosable(false);
-        try {
-            setIcon(false);
-        }
-        catch (PropertyVetoException e) {
-            LOG.error("Can't change property", e);
-        }
-        setSize(new Dimension());
-        setPreferencesTransient(true);
+        setSize(new Dimension(600, 400));
+        buildLayout();
+        setCredentials(credentials);
     }
 
-    public void setCredentials(DesktopPreferences.Credentials credentials) {
-        username.setText(credentials.getUsername());
-        password.setText(credentials.getPassword());
-        serverAddress.setText(credentials.getServerAddress());
-        serverPort.setText("" + credentials.getServerPort());
-        rememberMe.setSelected(true);
+    private void setCredentials(Set<DesktopPreferences.Credentials> credentialsSet) {
+        if (null == credentialsSet) {
+            return;
+        }
+        servers.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        // todo: update fields when another server is selected
+                    }
+                }
+        );
+        for (DesktopPreferences.Credentials credentials : credentialsSet) { // todo: set credentials, not in a loop
+            servers.addItem(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()));
+            username.setText(credentials.getUsername());
+            password.setText(credentials.getPassword());
+            serverAddress.setText(credentials.getServerAddress());
+            serverPort.setText("" + credentials.getServerPort());
+            rememberMe.setSelected(true);
+            listener.credentialsChanged(credentials);
+            break;
+        }
+    }
+
+    // todo: not implemented yet
+    private class ServerListModel extends AbstractListModel implements ComboBoxModel {
+
+        List<DesktopPreferences.Credentials> credentialsList;
+
+        private ServerListModel(List<DesktopPreferences.Credentials> credentialsList) {
+            this.credentialsList = credentialsList;
+            setSelectedItem(credentialsList.get(0));
+        }
+
+        private String selection;
+
+        @Override
+        public void setSelectedItem(Object o) {
+            DesktopPreferences.Credentials credentials = (DesktopPreferences.Credentials) o;
+            selection = String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort());
+        }
+
+        @Override
+        public Object getSelectedItem() {
+            return selection;
+        }
+
+        @Override
+        public int getSize() {
+            return credentialsList.size();
+        }
+
+        @Override
+        public Object getElementAt(int i) {
+            return credentialsList.get(i);
+        }
     }
 
     private void buildLayout() {
@@ -120,6 +167,15 @@ public class AuthenticationWindow extends DesktopWindow {
         add(serverPort, gbc);
         gbc.line();
         gbc.right();
+        add(rememberMe, gbc);
+        gbc.line();
+        gbc.right();
+        add(login, gbc);
+        gbc.line();
+        if (desktopPreferences.getWorkspace().getHostDirectories().size() > 1) {
+            gbc.gridwidth = 2;
+            add(servers, gbc);
+        }
         login.addActionListener(
                 new ActionListener() {
                     @Override
@@ -130,10 +186,10 @@ public class AuthenticationWindow extends DesktopWindow {
                             String usernameText = username.getText();
                             char[] passwordText = password.getPassword();
                             User user = authenticationClient.requestAccess(String.format("%s:%s", serverAddressText, serverPortText), usernameText, new String(passwordText));
-                            desktopPreferences.saveCredentials(
-                                    new CredentialsImpl(usernameText, new String(passwordText), serverAddressText, Integer.parseInt(serverPortText)));
-                            setVisible(false);
+                            AuthenticationWindow.this.credentials = new CredentialsImpl(usernameText, new String(passwordText), serverAddressText, Integer.parseInt(serverPortText));
                             listener.success(user);
+                            desktopPreferences.saveCredentials(credentials);
+                            setVisible(false);
                         }
                         catch (Exception e) {
                             listener.failed(e);
@@ -141,9 +197,9 @@ public class AuthenticationWindow extends DesktopWindow {
                     }
                 }
         );
-        add(rememberMe, gbc);
-        gbc.line();
-        gbc.right();
-        add(login, gbc);
+    }
+
+    public DesktopPreferences.Credentials getCredentials() {
+        return credentials;
     }
 }

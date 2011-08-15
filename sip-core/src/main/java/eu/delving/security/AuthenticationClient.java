@@ -6,6 +6,7 @@ import org.apache.amber.oauth2.client.response.OAuthClientResponse;
 import org.apache.amber.oauth2.client.response.OAuthClientResponseFactory;
 import org.apache.amber.oauth2.client.response.OAuthJSONAccessTokenResponse;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
+import org.apache.amber.oauth2.common.exception.OAuthRuntimeException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.amber.oauth2.common.message.types.GrantType;
 import org.apache.amber.oauth2.common.utils.OAuthUtils;
@@ -65,46 +66,30 @@ public class AuthenticationClient {
         return user;
     }
 
-    private boolean requestRefresh(String connectionKey, String refreshToken) {
+    private String requestRefresh(String connectionKey, String refreshToken) throws OAuthSystemException, OAuthProblemException {
         String location = connectionKey.split("#")[1];
         String tokenLocation = toTokenLocation(location);
-        try {
-            OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
-                    .setGrantType(GrantType.REFRESH_TOKEN)
-                    .setRefreshToken(refreshToken)
-                    .buildQueryMessage();
-            OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
-            TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
-            connections.put(connectionKey, connection);
-            return true;
-        }
-        catch (Throwable t) {
-            log.error("Problem while using refresh token", t);
-            connections.remove(connectionKey);
-        }
-        return false;
+        OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
+                .setGrantType(GrantType.REFRESH_TOKEN)
+                .setRefreshToken(refreshToken)
+                .buildQueryMessage();
+        OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
+        TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
+        connections.put(connectionKey, connection);
+        return connection.getAccessToken();
     }
 
-    public String getAccessToken(String location, String username) {
-
-        // TODO (Serkan?): we return null here when there is a problem with fetching an access token, in other words when the client needs to login again (with user & password)
-        // in case this happens, the login should be triggered ( probably somewhere near SIPCreatorGui#getAccessToken() )
-
-        String tokenLocation = toTokenLocation(location);
-
+    public String getAccessToken(String location, String username) throws OAuthSystemException, OAuthProblemException {
         if (!connections.containsKey(connectionKey(username, location))) {
-            return null;
+            throw new OAuthRuntimeException("Key not found");
         }
-
         TokenConnection connection = connections.get(connectionKey(username, location));
-        if (connection.isTokenExpired()) {
-            boolean refreshSuccessful = requestRefresh(connectionKey(username, location), connection.getRefreshToken());
-            return refreshSuccessful ? connection.getAccessToken() : null;
-        }
-        else {
+        if (!connection.isTokenExpired()) {
             return connection.getAccessToken();
         }
+        return requestRefresh(connectionKey(username, location), connection.getRefreshToken());
     }
+
 
     private String toTokenLocation(String location) {
         return "http://" + location + OAUTH2_ENDPOINT_PATH;

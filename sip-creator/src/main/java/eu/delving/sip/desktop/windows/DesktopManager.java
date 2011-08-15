@@ -50,6 +50,7 @@ public class DesktopManager {
     private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
     private SipModel sipModel;
+    private DataSetWindow dataSetWindow;
 
     public DesktopManager(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -77,6 +78,14 @@ public class DesktopManager {
                 }
             }
         }
+    }
+
+    public DataSetWindow getDataSetWindow() {
+        return dataSetWindow;
+    }
+
+    public void setDataSetWindow(DataSetWindow dataSetWindow) {
+        this.dataSetWindow = dataSetWindow;
     }
 
     public JDesktopPane getDesktop() {

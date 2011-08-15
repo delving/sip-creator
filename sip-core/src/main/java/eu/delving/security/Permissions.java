@@ -22,7 +22,7 @@
 package eu.delving.security;
 
 /**
- * todo: add description
+ * This defines the permissions like upload/delete per data set for the user.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
