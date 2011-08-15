@@ -51,21 +51,18 @@ import java.util.Map;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  *         todo: Filter/search is not implemented yet
  */
-public class DataSetWindow extends JDialog {
+public class DataSetWindow extends DesktopWindow {
 
     private static final Logger LOG = Logger.getRootLogger();
     private JTable dataSets;
     private JButton select = new JButton("Select");
     private JButton cancel = new JButton("Cancel");
     private DataSetModel<FileStore.DataSetStore> dataSetModel;
-    private SipModel sipModel;
 
-    public DataSetWindow(Frame parent, SipModel sipModel) {
-        super(parent, true);
-        this.sipModel = sipModel;
+    public DataSetWindow(SipModel sipModel) {
+        super(sipModel);
         setSize(new Dimension(600, 400));
         setLayout(new BorderLayout());
-        setLocationRelativeTo(parent);
         buildLayout();
         addActions();
     }

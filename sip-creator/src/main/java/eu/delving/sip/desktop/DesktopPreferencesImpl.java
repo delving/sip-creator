@@ -54,10 +54,10 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
     public DesktopPreferencesImpl(Class<?> clazz) {
         preferences = Preferences.userNodeForPackage(clazz);
         // cache the preferences
-        loadPreferences();
+        refresh();
     }
 
-    private void loadPreferences() {
+    private void refresh() {
         credentials = loadCredentials();
         workspace = loadWorkspace();
         desktopState = loadDesktopState();
@@ -85,6 +85,9 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
 
     @Override
     public Set<Credentials> getCredentials() {
+        if (null == credentials) {
+            refresh();
+        }
         return credentials;
     }
 
@@ -105,6 +108,9 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
 
     @Override
     public DesktopState getDesktopState() {
+        if (null == desktopState) {
+            refresh();
+        }
         return desktopState;
     }
 
@@ -153,6 +159,9 @@ public class DesktopPreferencesImpl implements DesktopPreferences {
 
     @Override
     public Workspace getWorkspace() {
+        if (null == workspace) {
+            refresh();
+        }
         return workspace;
     }
 

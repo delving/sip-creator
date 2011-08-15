@@ -40,7 +40,7 @@ import java.util.Set;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  *         todo: make it a modal popup
  */
-public class AuthenticationWindow extends JDialog {
+public class AuthenticationWindow extends DesktopWindow {
 
     private static final Logger LOG = Logger.getRootLogger();
     private static final String LOGIN_LABEL = "Login";
@@ -74,8 +74,8 @@ public class AuthenticationWindow extends JDialog {
         void failed(Exception e);
     }
 
-    public AuthenticationWindow(Frame parent, DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient, Listener listener) {
-        super(parent, "Authentication", true);
+    public AuthenticationWindow(DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient, Listener listener, Set<DesktopPreferences.Credentials> credentials) {
+        super(null); // todo: no sipmodel needed
         this.desktopPreferences = desktopPreferences;
         this.authenticationClient = authenticationClient;
         this.listener = listener;
@@ -83,9 +83,10 @@ public class AuthenticationWindow extends JDialog {
         buildLayout();
         setResizable(false);
         setSize(new Dimension(600, 400));
+        setCredentials(credentials);
     }
 
-    public void setCredentials(Set<DesktopPreferences.Credentials> credentialsSet) {
+    private void setCredentials(Set<DesktopPreferences.Credentials> credentialsSet) {
         servers.addActionListener(
                 new ActionListener() {
                     @Override
@@ -153,7 +154,7 @@ public class AuthenticationWindow extends JDialog {
                             setVisible(false);
                         }
                         catch (Exception e) {
-                           listener.failed(e);
+                            listener.failed(e);
                         }
                     }
                 }

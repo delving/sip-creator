@@ -137,7 +137,6 @@ public class Actions {
                     return;
                 case JOptionPane.YES_OPTION:
                     List<WindowState> allWindowStates = desktopLauncher.getDesktopManager().getWindowStates();
-                    // todo: should come from preferences
                     desktopLauncher.getDesktopPreferences().saveDesktopState(
                             new DesktopStateImpl(null == desktopLauncher.getCurrentStore() ? "-" : desktopLauncher.getCurrentStore().getSpec(),
                                     allWindowStates));
@@ -164,16 +163,5 @@ public class Actions {
                 desktopPreferences.saveWorkspace(new WorkspaceImpl(chooser.getSelectedFile().getAbsolutePath()));
             }
         }
-    }
-
-    public Action getDataSetAction() {
-        return new AbstractAction() {
-
-            @Override
-            public void actionPerformed
-                    (ActionEvent actionEvent) {
-                Actions.this.desktopManager.getDataSetWindow().setVisible(true);
-            }
-        };
     }
 }

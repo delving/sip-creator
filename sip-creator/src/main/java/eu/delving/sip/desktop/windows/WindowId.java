@@ -47,6 +47,7 @@ public enum WindowId {
             }
     ),
     ANALYZE("Analyze", KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_MASK), AnalyzeWindow.class),
+    DATA_SET("Open data set", KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.ALT_MASK), DataSetWindow.class, MenuGroup.FILE),
     WELCOME("Welcome", KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.ALT_MASK), WelcomeWindow.class, MenuGroup.HELP),
     MAPPING("Mapping", KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.ALT_MASK), MappingWindow.class),
     PREVIEW("Preview", KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_MASK), PreviewWindow.class),

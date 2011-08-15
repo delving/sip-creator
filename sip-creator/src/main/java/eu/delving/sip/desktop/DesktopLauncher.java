@@ -80,11 +80,10 @@ public class DesktopLauncher {
     private DesktopPreferences desktopPreferences;
     private DesktopPreferences.DesktopState desktopState;
     private Actions actions;
-    private static JFrame main;
     private SipModel sipModel;
     private AuthenticationClient authenticationClient = new AuthenticationClient();
+    private AuthenticationWindow authenticationWindow;
     private DataSetWindow dataSetWindow;
-
     private DesktopPreferences.Credentials credentials;
     private FileStore.DataSetStore currentStore;
 
@@ -127,11 +126,35 @@ public class DesktopLauncher {
         MetadataModel metadataModel = loadMetadataModel();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
         sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(), userNotifier);
-        dataSetWindow = new DataSetWindow(main, sipModel);
+        dataSetWindow = new DataSetWindow(sipModel);
         desktopManager = new DesktopManager(sipModel);
         desktopManager.setDataSetWindow(dataSetWindow);
         actions = new Actions(desktopManager);
-        buildLayout();
+        authenticationWindow = new AuthenticationWindow(desktopPreferences, authenticationClient,
+                new AuthenticationWindow.Listener() {
+
+                    @Override
+                    public void credentialsChanged(DesktopPreferences.Credentials credentials) {
+                        DesktopLauncher.this.credentials = credentials;
+                    }
+
+                    @Override
+                    public void success(User user) {
+                        dataSetClient.setListFetchingEnabled(true);
+                        if (null != desktopState) {
+                            restoreWindows(desktopState);
+                        }
+                    }
+
+                    @Override
+                    public void failed(Exception exception) {
+                        LOG.error("Authentication failed", exception);
+                        JOptionPane.showMessageDialog(null, exception.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
+                    }
+                },
+                getCredentials()
+        );
+        desktopManager.add(authenticationWindow);
     }
 
     /**
@@ -170,34 +193,6 @@ public class DesktopLauncher {
             }
         }
         return credentialsSet;
-    }
-
-    private void buildLayout() {
-        AuthenticationWindow authenticationWindow = new AuthenticationWindow(main, desktopPreferences, authenticationClient,
-                new AuthenticationWindow.Listener() {
-
-                    @Override
-                    public void credentialsChanged(DesktopPreferences.Credentials credentials) {
-                        DesktopLauncher.this.credentials = credentials;
-                    }
-
-                    @Override
-                    public void success(User user) {
-                        dataSetClient.setListFetchingEnabled(true);
-                        if (null != desktopState) {
-                            restoreWindows(desktopState);
-                        }
-                    }
-
-                    @Override
-                    public void failed(Exception exception) {
-                        LOG.error("Authentication failed", exception);
-                        JOptionPane.showMessageDialog(null, exception.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-        );
-        authenticationWindow.setCredentials(getCredentials());
-        authenticationWindow.setVisible(true); // todo: trigger _after_ building layout
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
@@ -240,7 +235,7 @@ public class DesktopLauncher {
     }
 
     public static void main(String... args) throws FileStoreException {
-        main = new JFrame(Constants.SIP_CREATOR_TITLE);
+        JFrame main = new JFrame(Constants.SIP_CREATOR_TITLE);
         final DesktopLauncher desktopLauncher = new DesktopLauncher();
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
         main.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -297,10 +292,10 @@ public class DesktopLauncher {
                 return authenticationClient.getAccessToken(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()), credentials.getUsername());
             }
             catch (OAuthSystemException e) {
-                // todo: show auth window
+                authenticationWindow.setVisible(true);
             }
             catch (OAuthProblemException e) {
-                // todo: show auth window
+                authenticationWindow.setVisible(true);
             }
             return null;
         }
