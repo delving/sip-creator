@@ -30,6 +30,18 @@ public class AuthenticationClient {
     private static final String OAUTH2_ENDPOINT_PATH = "/token";
     private Logger log = Logger.getLogger(getClass());
     private Map<String, TokenConnection> connections = new HashMap<String, TokenConnection>();
+    private Listener listener;
+
+    public interface Listener {
+
+        void success(User user);
+
+        void failed(Exception exception);
+    }
+
+    public AuthenticationClient(Listener listener) {
+        this.listener = listener;
+    }
 
     private final OAuthClient client = new OAuthClient(new org.apache.amber.oauth2.client.HttpClient() {
         @Override
@@ -62,49 +74,45 @@ public class AuthenticationClient {
         // todo: user should contain preferences and permission which are sent by the services module
         User user = new User();
         user.setUsername(username);
+        listener.success(user);
         return user;
     }
 
-    private boolean requestRefresh(String connectionKey, String refreshToken) {
+    private String requestRefresh(String connectionKey, String refreshToken) throws OAuthSystemException, OAuthProblemException {
         String location = connectionKey.split("#")[1];
         String tokenLocation = toTokenLocation(location);
-        try {
-            OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
-                    .setGrantType(GrantType.REFRESH_TOKEN)
-                    .setRefreshToken(refreshToken)
-                    .buildQueryMessage();
-            OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
-            TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
-            connections.put(connectionKey, connection);
-            return true;
-        }
-        catch (Throwable t) {
-            log.error("Problem while using refresh token", t);
-            connections.remove(connectionKey);
-        }
-        return false;
+        OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
+                .setGrantType(GrantType.REFRESH_TOKEN)
+                .setRefreshToken(refreshToken)
+                .buildQueryMessage();
+        OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
+        TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
+        connections.put(connectionKey, connection);
+        return connection.getAccessToken();
     }
 
     public String getAccessToken(String location, String username) {
-
-        // TODO (Serkan?): we return null here when there is a problem with fetching an access token, in other words when the client needs to login again (with user & password)
-        // in case this happens, the login should be triggered ( probably somewhere near SIPCreatorGui#getAccessToken() )
-
-        String tokenLocation = toTokenLocation(location);
-
+        String tokenLocation = toTokenLocation(location); // todo: store the tokenLocation?
         if (!connections.containsKey(connectionKey(username, location))) {
+            listener.failed(new Exception("Key not found"));
             return null;
         }
-
         TokenConnection connection = connections.get(connectionKey(username, location));
-        if (connection.isTokenExpired()) {
-            boolean refreshSuccessful = requestRefresh(connectionKey(username, location), connection.getRefreshToken());
-            return refreshSuccessful ? connection.getAccessToken() : null;
-        }
-        else {
+        if (!connection.isTokenExpired()) {
             return connection.getAccessToken();
         }
+        try {
+            return requestRefresh(connectionKey(username, location), connection.getRefreshToken());
+        }
+        catch (OAuthSystemException e) {
+            listener.failed(e);
+        }
+        catch (OAuthProblemException e) {
+            listener.failed(e);
+        }
+        return null;
     }
+
 
     private String toTokenLocation(String location) {
         return "http://" + location + OAUTH2_ENDPOINT_PATH;

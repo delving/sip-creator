@@ -26,6 +26,7 @@ import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.ValidationException;
 import eu.delving.security.AuthenticationClient;
+import eu.delving.security.User;
 import eu.delving.sip.AppConfig;
 import eu.delving.sip.DataSetClient;
 import eu.delving.sip.DataSetInfo;
@@ -111,7 +112,7 @@ public class SipCreatorGUI extends JFrame {
         File fileStoreDirectory = getFileStoreDirectory();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
-        this.dataSetListModel  = new DataSetListModel(new DataSetListModel.ConnectedStatus() {
+        this.dataSetListModel = new DataSetListModel(new DataSetListModel.ConnectedStatus() {
             @Override
             public boolean isConnected() {
                 return connectedBox.isSelected();
@@ -119,7 +120,20 @@ public class SipCreatorGUI extends JFrame {
         });
         this.dataSetList = new JList(dataSetListModel);
         this.sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, new PopupExceptionHandler());
-        this.oauth2Client = new AuthenticationClient();
+        this.oauth2Client = new AuthenticationClient(
+                new AuthenticationClient.Listener() {
+
+                    @Override
+                    public void success(User user) {
+                        // todo: add body and return void;
+                    }
+
+                    @Override
+                    public void failed(Exception exception) {
+                        // todo: display authentication window again
+                    }
+                }
+        );
         this.dataSetClient = new DataSetClient(new DataSetClient.Context() {
 
             @Override

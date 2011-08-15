@@ -32,14 +32,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
+import java.util.Set;
 
 /**
- * OAuth2 login window.
+ * OAuth2 login window. The
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
+ *         todo: make it a modal popup
  */
-public class AuthenticationWindow extends DesktopWindow {
+public class AuthenticationWindow extends JDialog {
 
     private static final Logger LOG = Logger.getRootLogger();
     private static final String LOGIN_LABEL = "Login";
@@ -59,44 +60,44 @@ public class AuthenticationWindow extends DesktopWindow {
     private JPasswordField password = new JPasswordField();
     private JButton login = new JButton(LOGIN_LABEL);
     private JCheckBox rememberMe = new JCheckBox(REMEMBER_LABEL);
-    private Listener listener;
     private DesktopPreferences desktopPreferences;
     private AuthenticationClient authenticationClient;
+    private JComboBox servers = new JComboBox();
+    private Listener listener;
 
     public interface Listener {
-
-        void success(User user);
-
-        void failed(Exception exception);
-
-        void signedOut();
+        void credentialsChanged(DesktopPreferences.Credentials credentials);
     }
 
-    public AuthenticationWindow(Listener listener, DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient) {
-        super(null); // todo: not needed, we don't have the SipModel yet at this point.
-        this.listener = listener;
+    public AuthenticationWindow(Frame parent, DesktopPreferences desktopPreferences, AuthenticationClient authenticationClient, Listener listener) {
+        super(parent, "Authentication", true);
         this.desktopPreferences = desktopPreferences;
         this.authenticationClient = authenticationClient;
+        this.listener = listener;
         setLayout(new GridBagLayout());
         buildLayout();
         setResizable(false);
-        setClosable(false);
-        try {
-            setIcon(false);
-        }
-        catch (PropertyVetoException e) {
-            LOG.error("Can't change property", e);
-        }
-        setSize(new Dimension());
-        setPreferencesTransient(true);
+        setSize(new Dimension(500, 300));
     }
 
-    public void setCredentials(DesktopPreferences.Credentials credentials) {
-        username.setText(credentials.getUsername());
-        password.setText(credentials.getPassword());
-        serverAddress.setText(credentials.getServerAddress());
-        serverPort.setText("" + credentials.getServerPort());
-        rememberMe.setSelected(true);
+    public void setCredentials(Set<DesktopPreferences.Credentials> credentialsSet) {
+        servers.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        // todo: add body and return void;
+                    }
+                }
+        );
+        for (DesktopPreferences.Credentials credentials : credentialsSet) {  // todo: set credentials
+            servers.addItem(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()));
+            username.setText(credentials.getUsername());
+            password.setText(credentials.getPassword());
+            serverAddress.setText(credentials.getServerAddress());
+            serverPort.setText("" + credentials.getServerPort());
+            rememberMe.setSelected(true);
+            listener.credentialsChanged(credentials);
+        }
     }
 
     private void buildLayout() {
@@ -111,15 +112,26 @@ public class AuthenticationWindow extends DesktopWindow {
         gbc.right();
         add(password, gbc);
         gbc.line();
-        add(serverLabel, gbc);
-        gbc.right();
-        add(serverAddress, gbc);
+        if (desktopPreferences.getWorkspace().getHostDirectories().size() > 1) {
+            add(serverLabel, gbc);
+            gbc.right();
+            add(serverAddress, gbc);
+            gbc.line();
+            add(serverPortLabel, gbc);
+            gbc.right();
+            add(serverPort, gbc);
+            gbc.line();
+            gbc.right();
+        }
+        add(rememberMe, gbc);
         gbc.line();
-        add(serverPortLabel, gbc);
         gbc.right();
-        add(serverPort, gbc);
+        add(login, gbc);
         gbc.line();
-        gbc.right();
+        if (desktopPreferences.getWorkspace().getHostDirectories().size() > 1) {
+            gbc.gridwidth = 2;
+            add(servers, gbc);
+        }
         login.addActionListener(
                 new ActionListener() {
                     @Override
@@ -133,17 +145,13 @@ public class AuthenticationWindow extends DesktopWindow {
                             desktopPreferences.saveCredentials(
                                     new CredentialsImpl(usernameText, new String(passwordText), serverAddressText, Integer.parseInt(serverPortText)));
                             setVisible(false);
-                            listener.success(user);
+                            // todo: update via auth client
                         }
                         catch (Exception e) {
-                            listener.failed(e);
+                            // todo: update via auth client
                         }
                     }
                 }
         );
-        add(rememberMe, gbc);
-        gbc.line();
-        gbc.right();
-        add(login, gbc);
     }
 }

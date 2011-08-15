@@ -137,6 +137,7 @@ public class Actions {
                     return;
                 case JOptionPane.YES_OPTION:
                     List<WindowState> allWindowStates = desktopLauncher.getDesktopManager().getWindowStates();
+                    // todo: should come from preferences
                     desktopLauncher.getDesktopPreferences().saveDesktopState(
                             new DesktopStateImpl(null == desktopLauncher.getCurrentStore() ? "-" : desktopLauncher.getCurrentStore().getSpec(),
                                     allWindowStates));

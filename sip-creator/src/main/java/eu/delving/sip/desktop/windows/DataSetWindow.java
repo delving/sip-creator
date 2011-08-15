@@ -24,9 +24,7 @@ package eu.delving.sip.desktop.windows;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.sip.FileStore;
-import eu.europeana.sip.gui.DataSetListModel;
 import eu.europeana.sip.model.SipModel;
-import eu.europeana.sip.util.GridBagHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -55,8 +53,6 @@ import java.util.Map;
 public class DataSetWindow extends DesktopWindow {
 
     private static final Logger LOG = Logger.getRootLogger();
-    private static final String TITLE_LABEL = "Data sets";
-    private JLabel title = new JLabel(TITLE_LABEL);
     private JTable dataSets;
     private JButton select = new JButton("Select");
     private JButton cancel = new JButton("Cancel");
@@ -64,7 +60,7 @@ public class DataSetWindow extends DesktopWindow {
 
     public DataSetWindow(SipModel sipModel) {
         super(sipModel);
-        setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
         buildLayout();
         addActions();
     }
@@ -125,26 +121,14 @@ public class DataSetWindow extends DesktopWindow {
     }
 
     private void buildLayout() {
-        GridBagHelper g = new GridBagHelper();
-        g.fill = GridBagConstraints.HORIZONTAL;
-        g.reset();
-        g.gridwidth = 2;
-        add(title, g);
         dataSetModel = new DataSetModel<FileStore.DataSetStore>(fetchDataSets());
         dataSets = new JTable(dataSetModel);
         dataSets.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         dataSets.setDefaultRenderer(Object.class, new ColorRenderer());
-        g.line();
-        g.gridwidth = 2;
         JScrollPane pane = new JScrollPane(dataSets);
         pane.setPreferredSize(new Dimension(700, 400));
-        add(pane, g);
-        g.gridwidth = 1;
-        g.fill = GridBagConstraints.BOTH;
-        g.line();
-        add(cancel, g);
-        g.right();
-        add(select, g);
+        add(pane, BorderLayout.CENTER);
+        add(select, BorderLayout.SOUTH);
     }
 
     private class DataSetModel<T extends FileStore.DataSetStore> extends AbstractTableModel {
@@ -219,6 +203,7 @@ public class DataSetWindow extends DesktopWindow {
         }
     }
 
+    // todo: fetch them from the server, compare with local, set "cached" status
     private List<FileStore.DataSetStore> fetchDataSets() {
         List<FileStore.DataSetStore> data = new ArrayList<FileStore.DataSetStore>();
         Map<String, FileStore.DataSetStore> dataSetStores = sipModel.getFileStore().getDataSetStores();

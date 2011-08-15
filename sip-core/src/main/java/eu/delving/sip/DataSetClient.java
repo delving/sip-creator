@@ -1,5 +1,20 @@
 package eu.delving.sip;
 
+import com.thoughtworks.xstream.XStream;
+import eu.delving.metadata.Hasher;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Logger;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -14,21 +29,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipInputStream;
-import javax.swing.*;
-
-import com.thoughtworks.xstream.XStream;
-import eu.delving.metadata.Hasher;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
 
 /**
  * The tab related to interacting with the metadata repository
@@ -94,7 +94,6 @@ public class DataSetClient {
     public void uploadXMLStream(InputStream stream, String spec, String uploadType, String contentType, String contentName, ProgressListener progressListener, UploadCallback callback) {
         executor.execute(new XMLStreamUploader(stream, spec, uploadType, contentType, contentName, progressListener, callback));
     }
-
 
     public void downloadDataSet(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
         executor.execute(new DataSetDownloader(dataSetStore, progressListener));

@@ -44,13 +44,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JSplitPane;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
@@ -58,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This is the main window of the SIP-Creator.
@@ -80,47 +77,27 @@ public class DesktopLauncher {
     private DesktopPreferences desktopPreferences;
     private DesktopPreferences.DesktopState desktopState;
     private User user;
-    private DesktopPreferences.Credentials credentials;
     private Actions actions;
     private static JFrame main;
     private SipModel sipModel;
-    private AuthenticationClient authenticationClient = new AuthenticationClient();
-    private FileStore.DataSetStore currentStore; // todo: gone for some reason ...
+    private AuthenticationClient authenticationClient = new AuthenticationClient(
+            new AuthenticationClient.Listener() {
 
-    private DataSetClient dataSetClient = new DataSetClient(new DataSetClient.Context() {
+                @Override
+                public void success(User user) {
+                    LOG.info("Authenticated with user " + user);
+                    dataSetClient.setListFetchingEnabled(true);
+                }
 
-        @Override
-        public String getServerUrl() {
-            return sipModel.getAppConfigModel().getServerUrl();
-        }
+                @Override
+                public void failed(Exception exception) {
+                    // todo: set auth window to visible
+                }
+            }
+    );
 
-        @Override
-        public String getAccessToken() {
-            return authenticationClient.getAccessToken(sipModel.getAppConfigModel().getServerHostPort(), sipModel.getAppConfigModel().getUsername());
-        }
-
-        @Override
-        public void setInfo(DataSetInfo dataSetInfo) {
-            // todo: update datasetwindow
-            LOG.info("Dataset received " + dataSetInfo);
-        }
-
-        @Override
-        public void setList(List<DataSetInfo> list) {
-            // todo: update datasetwindow
-            LOG.info("Datasets received " + list);
-        }
-
-        @Override
-        public void tellUser(String message) {
-            sipModel.getUserNotifier().tellUser(message);
-        }
-
-        @Override
-        public void disconnected() {
-            sipModel.getUserNotifier().tellUser(String.format("Disconnected from Repository at %s", sipModel.getAppConfigModel().getServerHostPort()));
-        }
-    });
+    private DesktopPreferences.Credentials credentials;
+    private FileStore.DataSetStore currentStore;
 
     private File getFileStoreDirectory(String path) throws FileStoreException {
         File fileStore = new File(path);
@@ -154,63 +131,94 @@ public class DesktopLauncher {
 
     public DesktopLauncher() throws FileStoreException {
         desktopPreferences = new DesktopPreferencesImpl(getClass());
-        DesktopPreferences.Workspace workspace = desktopPreferences.loadWorkspace();
-        if (null == workspace || StringUtils.isEmpty(workspace.getWorkspacePath())) {
-            new Actions.WorkspaceAction(desktopPreferences).actionPerformed(null); // todo: fix!
-        }
+        DesktopPreferences.Workspace workspace = getWorkspace();
+//        Set<DesktopPreferences.Credentials> credentials = getCredentials();
+        desktopState = desktopPreferences.getDesktopState();
+        File fileStoreDirectory = getFileStoreDirectory(desktopPreferences.getWorkspace().getWorkspacePath());
         MetadataModel metadataModel = loadMetadataModel();
-        File fileStoreDirectory = getFileStoreDirectory(desktopPreferences.loadWorkspace().getWorkspacePath()); // todo: fix!
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
-        GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
-        sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, new UserNotifier() {
-            @Override
-            public void tellUser(String message) {
-                System.err.println(message);
-            }
-
-            @Override
-            public void tellUser(String message, Exception exception) {
-                System.err.printf("%s : %s%n", message, exception.getMessage());
-            }
-        });
+        sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(), userNotifier);
         desktopManager = new DesktopManager(sipModel);
         actions = new Actions(desktopManager);
-        DesktopLauncher.this.credentials = desktopPreferences.loadCredentials();
-        DesktopLauncher.this.desktopState = desktopPreferences.loadDesktopState();
         buildLayout();
     }
 
+    /**
+     * A workspace is mandatory. If no workspace is specified, the user will be asked to specify one.
+     *
+     * @return The workspace.
+     */
+    private DesktopPreferences.Workspace getWorkspace() {
+        DesktopPreferences.Workspace workspace = desktopPreferences.getWorkspace();
+        if (null == workspace || StringUtils.isEmpty(workspace.getWorkspacePath())) {
+            new Actions.WorkspaceAction(desktopPreferences).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "selectWorkspace"));
+            workspace = desktopPreferences.getWorkspace();
+            if (null == workspace) {
+                throw new NullPointerException("No workspace path defined");
+            }
+        }
+        return workspace;
+    }
+
+    /**
+     * Scans the directories in the workspace. Directories are formatted with host_port pattern. If a directory
+     * is found, the stored credentials for a specific host will be used. Unmatched credentials will be ignored.
+     *
+     * @return The matched credentials.
+     */
+    private Set<DesktopPreferences.Credentials> getCredentials() {
+        Set<DesktopPreferences.Credentials> credentialsSet = desktopPreferences.getCredentials();
+        if (null == credentials) {
+            for (String hostDir : getWorkspace().getHostDirectories()) {
+                for (DesktopPreferences.Credentials credentials : desktopPreferences.getCredentials()) {
+                    if (String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()).equals(hostDir)) {
+                        // todo: this is a match
+                        System.out.printf("This is a match : %s%n", credentials);
+                    }
+                }
+            }
+        }
+        return credentialsSet;
+    }
+
     private void buildLayout() {
-        AuthenticationWindow authenticationWindow = new AuthenticationWindow(
+        AuthenticationWindow authenticationWindow = new AuthenticationWindow(main, desktopPreferences, authenticationClient,
                 new AuthenticationWindow.Listener() {
 
                     @Override
-                    public void success(User user) {
-                        DesktopLauncher.this.user = user;
-                        dataSetClient.setListFetchingEnabled(true);
-                        actions.setEnabled(true);
-                        if (null != desktopState) {
-                            restoreWindows(desktopState);
-                        }
+                    public void credentialsChanged(DesktopPreferences.Credentials credentials) {
+                        DesktopLauncher.this.credentials = credentials;
                     }
-
-                    @Override
-                    public void failed(Exception exception) {
-                        LOG.error("Authentication failed", exception);
-                        JOptionPane.showMessageDialog(null, exception.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
-                    }
-
-                    @Override
-                    public void signedOut() {
-                        // todo: display AuthenticationWindow again
-                    }
-                }, desktopPreferences, authenticationClient
+                }
         );
-        if (null != credentials) {
-            authenticationWindow.setCredentials(credentials);
-        }
-        desktopManager.add(authenticationWindow);
-        authenticationWindow.setLocation(582, 614);
+        authenticationWindow.setCredentials(getCredentials());
+        authenticationWindow.setVisible(true); // todo: trigger after building layout
+//        AuthenticationWindow authenticationWindow = new AuthenticationWindow(
+//                new AuthenticationWindow.Listener() {
+//
+//                    @Override
+//                    public void success(User user) {
+//                        DesktopLauncher.this.user = user;
+//                        dataSetClient.setListFetchingEnabled(true);
+//                        actions.setEnabled(true);
+//                        if (null != desktopState) {
+//                            restoreWindows(desktopState);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void failed(Exception exception) {
+//                        LOG.error("Authentication failed", exception);
+//                        JOptionPane.showMessageDialog(null, exception.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
+//                    }
+//
+//                    @Override
+//                    public void signedOut() {
+//                        // todo: display AuthenticationWindow again
+//                    }
+//                }, desktopPreferences, authenticationClient
+//        );
+
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
@@ -240,7 +248,6 @@ public class DesktopLauncher {
 
     private JComponent buildNavigation() {
         NavigationBar navigationBar = new NavigationBar(actions);
-        actions.setEnabled(false);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, navigationBar, desktopManager.getDesktop());
         splitPane.setBorder(null);
         splitPane.setSize(new Dimension(400, 400));
@@ -265,7 +272,7 @@ public class DesktopLauncher {
                 new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent windowEvent) {
-                        new Actions.ExitAction(desktopLauncher).actionPerformed(null);
+                        new Actions.ExitAction(desktopLauncher).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "exitAction"));
                     }
                 }
         );
@@ -298,4 +305,53 @@ public class DesktopLauncher {
         }
     }
 
+
+    private DataSetClient dataSetClient = new DataSetClient(new DataSetClient.Context() {
+
+        @Override
+        public String getServerUrl() {
+            return String.format("http://%s:%d/%s/dataset", credentials.getServerAddress(), credentials.getServerPort(), credentials.getUsername());
+        }
+
+        @Override
+        public String getAccessToken() {
+            return authenticationClient.getAccessToken(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()), credentials.getUsername());
+        }
+
+        @Override
+        public void setInfo(DataSetInfo dataSetInfo) {
+            // todo: update datasetwindow
+            LOG.info("Dataset received " + dataSetInfo.spec);
+        }
+
+        @Override
+        public void setList(List<DataSetInfo> list) {
+            // todo: update datasetwindow
+            for (DataSetInfo dataSetInfo : list) {
+                LOG.info("Data set : " + dataSetInfo.spec);
+            }
+        }
+
+        @Override
+        public void tellUser(String message) {
+            sipModel.getUserNotifier().tellUser(message);
+        }
+
+        @Override
+        public void disconnected() {
+            sipModel.getUserNotifier().tellUser(String.format("Disconnected from Repository at %s", getServerUrl()));
+        }
+    });
+
+    private UserNotifier userNotifier = new UserNotifier() {
+        @Override
+        public void tellUser(String message) {
+            // todo: show popup?
+        }
+
+        @Override
+        public void tellUser(String message, Exception exception) {
+            // todo: show popup?
+        }
+    };
 }

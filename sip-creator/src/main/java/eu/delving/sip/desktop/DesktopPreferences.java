@@ -23,6 +23,7 @@ package eu.delving.sip.desktop;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Load the preferences for the desktop.
@@ -45,6 +46,8 @@ public interface DesktopPreferences extends Serializable {
     interface Workspace extends Serializable {
 
         String getWorkspacePath();
+
+        Set<String> getHostDirectories();
     }
 
     interface Credentials extends Serializable {
@@ -63,6 +66,8 @@ public interface DesktopPreferences extends Serializable {
         String getSpec();
 
         List<WindowState> getWindowStates();
+
+        String getRecentDirectory();
     }
 
     /**
@@ -72,7 +77,7 @@ public interface DesktopPreferences extends Serializable {
      */
     void saveCredentials(Credentials credentials);
 
-    Credentials loadCredentials();
+    Set<Credentials> getCredentials();
 
     /**
      * Remember the window state.
@@ -81,11 +86,11 @@ public interface DesktopPreferences extends Serializable {
      */
     void saveDesktopState(DesktopState desktopState);
 
-    DesktopState loadDesktopState();
+    DesktopState getDesktopState();
 
     void saveWorkspace(Workspace workspace);
 
-    Workspace loadWorkspace();
+    Workspace getWorkspace();
 
     void clear();
 }

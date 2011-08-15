@@ -21,12 +21,33 @@
 
 package eu.delving.sip.desktop;
 
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * todo: add description
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 public class WorkspaceImpl implements DesktopPreferences.Workspace {
+
+    transient private static final String DIRECTORY_HOST_FORMAT = "([A-Za-z0-9_]+)_([0-9]+)";
+    transient private static final Logger LOG = Logger.getRootLogger();
+
+    transient private Pattern pattern = Pattern.compile(DIRECTORY_HOST_FORMAT);
+    transient private FilenameFilter filenameFilter = new FilenameFilter() {
+        @Override
+        public boolean accept(File file, String s) {
+            Matcher matcher = pattern.matcher(s);
+            return matcher.matches() && new File(file, s).isDirectory();
+        }
+    };
 
     private String workspacePath;
 
@@ -37,6 +58,20 @@ public class WorkspaceImpl implements DesktopPreferences.Workspace {
     @Override
     public String getWorkspacePath() {
         return workspacePath;
+    }
+
+    @Override
+    public Set<String> getHostDirectories() {
+        Set<String> fileNames = new HashSet<String>();
+        for (File file : new File(workspacePath).listFiles(filenameFilter)) {
+            String name = file.getName();
+            Pattern pattern = Pattern.compile(DIRECTORY_HOST_FORMAT);
+            Matcher matcher = pattern.matcher(name);
+            if (matcher.matches()) {
+                fileNames.add(String.format("%s:%s", matcher.group(1).replace("_", "."), matcher.group(2)));
+            }
+        }
+        return fileNames;
     }
 
     @Override

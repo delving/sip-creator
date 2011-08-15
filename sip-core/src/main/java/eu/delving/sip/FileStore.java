@@ -21,6 +21,10 @@
 
 package eu.delving.sip;
 
+import eu.delving.metadata.Facts;
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.RecordMapping;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,10 +34,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipInputStream;
 
-import eu.delving.metadata.Facts;
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.RecordMapping;
-
 /**
  * This interface describes how files are stored by the sip-creator
  *
@@ -42,6 +42,7 @@ import eu.delving.metadata.RecordMapping;
 
 public interface FileStore {
 
+    @Deprecated /** @deprecated Will be replaced by DesktopPreferences */
     AppConfig getAppConfig() throws FileStoreException;
 
     void setAppConfig(AppConfig appConfig) throws FileStoreException;
