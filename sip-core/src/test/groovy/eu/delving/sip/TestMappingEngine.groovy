@@ -17,8 +17,8 @@ class TestMappingEngine {
     @Test
     void initialMapping() {
         try {
-            IndexDocument doc = mappingEngine.executeMapping(
-                """
+            String record =
+            """
                 <priref>6389</priref>
                 <dimension.unit>cm</dimension.unit>
                 <dimension.unit>cm</dimension.unit>
@@ -55,8 +55,12 @@ class TestMappingEngine {
                 <association.subject>bestuurders (Utrecht)</association.subject>
                 <priref>6389</priref>
                 """
-            )
+            IndexDocument doc;
+            for (int x: 1..1000) {
+                doc = mappingEngine.executeMapping(record)
+            }
             println "VALID!\n ${doc}"
+            println 'After 1000 runs:\n' + mappingEngine
         }
         catch (ValidationException e) {
             println "The failed assertion:\n${e.message}\n${doc}"
