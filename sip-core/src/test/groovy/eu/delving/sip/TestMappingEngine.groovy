@@ -64,8 +64,12 @@ class TestMappingEngine {
                 <priref>6389</priref>
                 """
             IndexDocument doc;
-            for (int x: 1..1000) {
-                doc = mappingEngine.executeMapping(record)
+            for (int x: 1..10) {
+              Long now = System.currentTimeMillis();
+              doc = mappingEngine.executeMapping(record)
+              Long total = System.currentTimeMillis() - now;
+              println "mapping time: " + total
+//              println mappingEngine
             }
             println "VALID!\n ${doc}"
             println 'After 1000 runs:\n' + mappingEngine
