@@ -8,6 +8,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,15 +32,15 @@ public class XmlNodePrinter {
     private boolean preserveWhitespace = false;
     private boolean showNamespaceUri = false;
 
-    public XmlNodePrinter(PrintWriter out) {
+    public XmlNodePrinter(Writer out) {
         this(out, "  ");
     }
 
-    public XmlNodePrinter(PrintWriter out, String indent) {
+    public XmlNodePrinter(Writer out, String indent) {
         this(out, indent, "\"");
     }
 
-    public XmlNodePrinter(PrintWriter out, String indent, String quote) {
+    public XmlNodePrinter(Writer out, String indent, String quote) {
         this(new IndentPrinter(out, indent), quote);
     }
 
