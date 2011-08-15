@@ -30,6 +30,7 @@ public class MappingEngine {
     private MetadataRecordFactory metadataRecordFactory;
     private MappingRunner mappingRunner;
     private RecordValidator recordValidator;
+    private long parseTime, mapTime, validateTime, outputTime;
 
     public MappingEngine(InputStream mappingFile, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
         MetadataModel metadataModel = loadMetadataModel();
@@ -65,10 +66,19 @@ public class MappingEngine {
 
     public IndexDocument executeMapping(String originalRecord, int recordNumber) throws MappingException, ValidationException {
         try {
+            long now = System.currentTimeMillis();
             MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
+            parseTime += System.currentTimeMillis() - now;
+            now = System.currentTimeMillis();
             Node record = mappingRunner.runMapping(metadataRecord);
+            mapTime += System.currentTimeMillis() - now;
+            now = System.currentTimeMillis();
             recordValidator.validateRecord(record, recordNumber);
-            return IndexDocument.fromNode(record);
+            validateTime += System.currentTimeMillis() - now;
+            now = System.currentTimeMillis();
+            IndexDocument indexDocument = IndexDocument.fromNode(record);
+            outputTime += System.currentTimeMillis() - now;
+            return indexDocument;
         }
         catch (DiscardRecordException e) {
             return null;
@@ -94,6 +104,15 @@ public class MappingEngine {
             System.exit(1);
             return null;
         }
+    }
+
+    public String toString() {
+        return "MappingEngine {\n" +
+                "\tParse Time    : " + parseTime + "\n" +
+                "\tMap Time      : " + mapTime + "\n" +
+                "\tValidate Time : " + validateTime + "\n" +
+                "\tOutput Time   : " + outputTime + "\n" +
+                "}\n";
     }
 
 }

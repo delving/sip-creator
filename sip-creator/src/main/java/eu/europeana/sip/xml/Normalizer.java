@@ -62,7 +62,6 @@ public class Normalizer implements Runnable {
     private ProgressAdapter progressAdapter;
     private Listener listener;
     private volatile boolean running = true;
-    private long totalMappingTime, totalValidationTime;
 
     public interface Listener {
         void invalidInput(MappingException exception);
@@ -122,17 +121,13 @@ public class Normalizer implements Runnable {
             MetadataRecord record;
             while ((record = parser.nextRecord()) != null && running) {
                 try {
-                    long before = System.currentTimeMillis();
                     Node outputNode = mappingRunner.runMapping(record);
                     StringWriter writer = new StringWriter();
                     XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
                     xmlNodePrinter.print(outputNode);
-                    totalMappingTime += System.currentTimeMillis() - before;
-                    before = System.currentTimeMillis();
                     recordValidator.validateRecord(outputNode, record.getRecordNumber());
-                    String validated = XmlNodePrinter.serialize(outputNode);
-                    totalValidationTime += System.currentTimeMillis() - before;
                     if (store) {
+                        String validated = XmlNodePrinter.serialize(outputNode);
                         fileSetOutput.getOutputWriter().write(validated);
                     }
                     fileSetOutput.recordNormalized();
@@ -230,8 +225,6 @@ public class Normalizer implements Runnable {
             }
         }
         finally {
-            log.info(String.format("Mapping Time %d", totalMappingTime));
-            log.info(String.format("Validating Time %d", totalValidationTime));
             listener.finished(running);
             uniqueness.destroy();
             if (!running) { // aborted, so metadataparser will not call finished()
