@@ -43,6 +43,17 @@ public class MappingEngine {
         recordValidator = new RecordValidator(groovyCodeResource, metadataModel.getRecordDefinition(recordMapping.getPrefix()));
     }
 
+    public MappingEngine(String mappingFile, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
+        MetadataModel metadataModel = loadMetadataModel();
+        RecordMapping recordMapping = RecordMapping.read(mappingFile, metadataModel);
+        GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
+        long now = System.currentTimeMillis();
+        mappingRunner = new MappingRunner(groovyCodeResource, recordMapping.toCompileCode(metadataModel));
+        compileTime += System.currentTimeMillis() - now;
+        metadataRecordFactory = new MetadataRecordFactory(namespaces);
+        recordValidator = new RecordValidator(groovyCodeResource, metadataModel.getRecordDefinition(recordMapping.getPrefix()));
+    }
+
     /**
      * Execute the mapping on the string format of the original record to turn it into the mapped record
      *
