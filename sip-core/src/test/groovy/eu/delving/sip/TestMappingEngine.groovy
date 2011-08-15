@@ -1,6 +1,8 @@
 package eu.delving.sip
 
 import eu.delving.metadata.ValidationException
+import org.apache.commons.io.IOUtils
+import org.junit.Before
 import org.junit.Test
 
 /**
@@ -11,14 +13,20 @@ import org.junit.Test
 
 class TestMappingEngine {
 
-    Map<String, String> namespaces = new HashMap<String, String>()
-    MappingEngine mappingEngine = new MappingEngine(getClass().getResourceAsStream("/sample_mapping_icn.xml"), namespaces)
+    MappingEngine mappingEngine;
+
+    @Before
+    void createMappingEngine() {
+        Map<String, String> namespaces = new HashMap<String, String>()
+        String mapping = IOUtils.toString(getClass().getResourceAsStream("/sample_mapping_icn.xml"), "UTF-8")
+        mappingEngine = new MappingEngine(mapping, namespaces)
+    }
 
     @Test
     void initialMapping() {
         try {
-            IndexDocument doc = mappingEngine.executeMapping(
-                """
+            String record =
+            """
                 <priref>6389</priref>
                 <dimension.unit>cm</dimension.unit>
                 <dimension.unit>cm</dimension.unit>
@@ -55,8 +63,12 @@ class TestMappingEngine {
                 <association.subject>bestuurders (Utrecht)</association.subject>
                 <priref>6389</priref>
                 """
-            )
+            IndexDocument doc;
+            for (int x: 1..1000) {
+                doc = mappingEngine.executeMapping(record)
+            }
             println "VALID!\n ${doc}"
+            println 'After 1000 runs:\n' + mappingEngine
         }
         catch (ValidationException e) {
             println "The failed assertion:\n${e.message}\n${doc}"

@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
@@ -62,7 +61,7 @@ public class XmlNodePrinterTest {
         rootNode.append(createChildNode("uri", "http://doesntexist"));
         rootNode.append(createChildNode("type", "IMAGE"));
         StringWriter writer = new StringWriter();
-        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(writer);
         xmlNodePrinter.print(rootNode);
         LOG.info("Result :\n" + writer.toString());
         Assert.assertEquals(SINGLE_EXPECTED, writer.toString());
@@ -71,7 +70,7 @@ public class XmlNodePrinterTest {
     @Test
     public void testMultiNodePrint() throws Exception {
         StringWriter writer = new StringWriter();
-        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(writer);
         Node rootNode;
         rootNode = new Node(null, "record");
         rootNode.append(createChildNode("uri", "http://doesntexist"));
