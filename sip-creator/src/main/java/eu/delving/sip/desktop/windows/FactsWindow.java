@@ -21,9 +21,9 @@
 
 package eu.delving.sip.desktop.windows;
 
+import eu.europeana.sip.gui.FactPanel;
 import eu.europeana.sip.model.SipModel;
 
-import javax.swing.JLabel;
 import java.awt.BorderLayout;
 
 /**
@@ -36,7 +36,6 @@ public class FactsWindow extends DesktopWindow {
 
     public FactsWindow(SipModel sipModel) {
         super(sipModel);
-        add(new JLabel("FACTS"), BorderLayout.CENTER);
-        // todo: snatch the facts input fields from the previous version
+        add(new FactPanel(sipModel.getFactModel()), BorderLayout.CENTER);
     }
 }
