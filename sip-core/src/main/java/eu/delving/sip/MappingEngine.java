@@ -16,7 +16,6 @@ import groovy.util.Node;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -32,20 +31,9 @@ public class MappingEngine {
     private RecordValidator recordValidator;
     private long compileTime, parseTime, mapTime, validateTime, outputTime;
 
-    public MappingEngine(InputStream mappingFile, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
+    public MappingEngine(String mapping, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
         MetadataModel metadataModel = loadMetadataModel();
-        RecordMapping recordMapping = RecordMapping.read(mappingFile, metadataModel);
-        GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
-        long now = System.currentTimeMillis();
-        mappingRunner = new MappingRunner(groovyCodeResource, recordMapping.toCompileCode(metadataModel));
-        compileTime += System.currentTimeMillis() - now;
-        metadataRecordFactory = new MetadataRecordFactory(namespaces);
-        recordValidator = new RecordValidator(groovyCodeResource, metadataModel.getRecordDefinition(recordMapping.getPrefix()));
-    }
-
-    public MappingEngine(String mappingFile, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
-        MetadataModel metadataModel = loadMetadataModel();
-        RecordMapping recordMapping = RecordMapping.read(mappingFile, metadataModel);
+        RecordMapping recordMapping = RecordMapping.read(mapping, metadataModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
         long now = System.currentTimeMillis();
         mappingRunner = new MappingRunner(groovyCodeResource, recordMapping.toCompileCode(metadataModel));
