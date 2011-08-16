@@ -32,7 +32,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -96,53 +95,18 @@ public class AuthenticationWindow extends DesktopWindow {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        // todo: update fields when another server is selected
+                        DesktopPreferences.Credentials credentials = (DesktopPreferences.Credentials) servers.getSelectedItem();
+                        LOG.info(credentials);
+                        username.setText(credentials.getUsername());
+                        password.setText(credentials.getPassword());
+                        serverAddress.setText(credentials.getServerAddress());
+                        serverPort.setText("" + credentials.getServerPort());
+                        rememberMe.setSelected(true);
                     }
                 }
         );
-        for (DesktopPreferences.Credentials credentials : credentialsSet) { // todo: set credentials, not in a loop
-            servers.addItem(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()));
-            username.setText(credentials.getUsername());
-            password.setText(credentials.getPassword());
-            serverAddress.setText(credentials.getServerAddress());
-            serverPort.setText("" + credentials.getServerPort());
-            rememberMe.setSelected(true);
-            listener.credentialsChanged(credentials);
-            break;
-        }
-    }
-
-    // todo: not implemented yet
-    private class ServerListModel extends AbstractListModel implements ComboBoxModel {
-
-        List<DesktopPreferences.Credentials> credentialsList;
-
-        private ServerListModel(List<DesktopPreferences.Credentials> credentialsList) {
-            this.credentialsList = credentialsList;
-            setSelectedItem(credentialsList.get(0));
-        }
-
-        private String selection;
-
-        @Override
-        public void setSelectedItem(Object o) {
-            DesktopPreferences.Credentials credentials = (DesktopPreferences.Credentials) o;
-            selection = String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort());
-        }
-
-        @Override
-        public Object getSelectedItem() {
-            return selection;
-        }
-
-        @Override
-        public int getSize() {
-            return credentialsList.size();
-        }
-
-        @Override
-        public Object getElementAt(int i) {
-            return credentialsList.get(i);
+        for (DesktopPreferences.Credentials credentials : credentialsSet) {
+            servers.addItem(credentials);
         }
     }
 

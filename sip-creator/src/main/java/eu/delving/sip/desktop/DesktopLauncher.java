@@ -21,19 +21,6 @@
 
 package eu.delving.sip.desktop;
 
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.beans.PropertyVetoException;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import javax.swing.*;
-
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
@@ -59,6 +46,19 @@ import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This is the main window of the SIP-Creator.
@@ -120,12 +120,22 @@ public class DesktopLauncher {
     public DesktopLauncher() throws FileStoreException {
         desktopPreferences = new DesktopPreferencesImpl(getClass());
         DesktopPreferences.Workspace workspace = getWorkspace();
-//        Set<DesktopPreferences.Credentials> credentials = getCredentials();
         desktopState = desktopPreferences.getDesktopState();
         File fileStoreDirectory = getFileStoreDirectory(desktopPreferences.getWorkspace().getWorkspacePath());
         MetadataModel metadataModel = loadMetadataModel();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
-        sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(getClass().getClassLoader()), userNotifier);
+        UserNotifier userNotifier = new UserNotifier() {
+            @Override
+            public void tellUser(String message) {
+                JOptionPane.showMessageDialog(null, "Message from SipModel", message, JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            @Override
+            public void tellUser(String message, Exception exception) {
+                JOptionPane.showMessageDialog(null, "Error from SipModel", String.format("%s%n%s", message, exception.getMessage()), JOptionPane.ERROR_MESSAGE);
+            }
+        };
+        sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(), userNotifier);
         dataSetWindow = new DataSetWindow(sipModel);
         desktopManager = new DesktopManager(sipModel);
         desktopManager.setDataSetWindow(dataSetWindow);
@@ -180,7 +190,22 @@ public class DesktopLauncher {
      * @return The matched credentials.
      */
     private Set<DesktopPreferences.Credentials> getCredentials() {
-        return desktopPreferences.getCredentials();
+        Set<DesktopPreferences.Credentials> credentialsSet = new HashSet<DesktopPreferences.Credentials>();
+        Set<String> hostDirectories = desktopPreferences.getWorkspace().getHostDirectories();
+        for (String directory : hostDirectories) {
+            CredentialsImpl empty = new CredentialsImpl("", "", directory.split(":")[0], Integer.parseInt(directory.split(":")[1]));
+            if (null == desktopPreferences.getCredentials()) {
+                credentialsSet.add(empty);
+                continue;
+            }
+            for (DesktopPreferences.Credentials credentials : desktopPreferences.getCredentials()) {
+                if (empty.equals(credentials)) {
+                    empty = new CredentialsImpl(credentials.getUsername(), credentials.getPassword(), credentials.getServerAddress(), credentials.getServerPort());
+                }
+            }
+            credentialsSet.add(empty);
+        }
+        return credentialsSet;
     }
 
     private void restoreWindows(DesktopPreferences.DesktopState desktopState) {
@@ -312,15 +337,4 @@ public class DesktopLauncher {
         }
     });
 
-    private UserNotifier userNotifier = new UserNotifier() {
-        @Override
-        public void tellUser(String message) {
-            // todo: show popup?
-        }
-
-        @Override
-        public void tellUser(String message, Exception exception) {
-            // todo: show popup?
-        }
-    };
 }
