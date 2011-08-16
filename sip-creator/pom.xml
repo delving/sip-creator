@@ -31,7 +31,7 @@
     <artifactId>sip-creator</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Creator</name>
-    <version>0.3.2</version>
+    <version>0.3.2-SNAPSHOT</version>
     <inceptionYear>2008</inceptionYear>
 
     <organization>
