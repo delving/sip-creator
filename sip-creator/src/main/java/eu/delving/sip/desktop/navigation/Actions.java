@@ -46,7 +46,6 @@ import java.util.Map;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 public class Actions {
-
     private static final Logger LOG = Logger.getRootLogger();
     private DesktopManager desktopManager;
     private Map<WindowId, Action> navigationActions = new HashMap<WindowId, Action>();

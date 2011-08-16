@@ -54,6 +54,7 @@ public class DesktopManager {
 
     public DesktopManager(SipModel sipModel) {
         this.sipModel = sipModel;
+        this.dataSetWindow = new DataSetWindow(sipModel);
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
             public void paintComponent(Graphics g) {
@@ -78,14 +79,6 @@ public class DesktopManager {
                 }
             }
         }
-    }
-
-    public DataSetWindow getDataSetWindow() {
-        return dataSetWindow;
-    }
-
-    public void setDataSetWindow(DataSetWindow dataSetWindow) {
-        this.dataSetWindow = dataSetWindow;
     }
 
     public JDesktopPane getDesktop() {

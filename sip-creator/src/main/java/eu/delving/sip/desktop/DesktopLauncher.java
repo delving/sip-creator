@@ -35,7 +35,6 @@ import eu.delving.sip.desktop.navigation.Actions;
 import eu.delving.sip.desktop.navigation.NavigationBar;
 import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
-import eu.delving.sip.desktop.windows.DataSetWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
 import eu.europeana.sip.localization.Constants;
@@ -43,7 +42,6 @@ import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.swing.JComponent;
@@ -85,15 +83,12 @@ public class DesktopLauncher {
     private SipModel sipModel;
     private AuthenticationClient authenticationClient = new AuthenticationClient();
     private AuthenticationWindow authenticationWindow;
-    private DataSetWindow dataSetWindow;
 
     public DesktopLauncher(File fileStoreDirectory) throws FileStoreException {
         MetadataModel metadataModel = loadMetadataModel();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
         sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(), USER_NOTIFIER);
-        dataSetWindow = new DataSetWindow(sipModel);
         desktopManager = new DesktopManager(sipModel);
-        desktopManager.setDataSetWindow(dataSetWindow);
         actions = new Actions(desktopManager);
         authenticationWindow = new AuthenticationWindow(desktopPreferences, authenticationClient,
                 new AuthenticationWindow.Listener() {
@@ -117,23 +112,6 @@ public class DesktopLauncher {
                 getCredentials()
         );
         desktopManager.add(authenticationWindow);
-    }
-
-    /**
-     * A workspace is mandatory. If no workspace is specified, the user will be asked to specify one.
-     *
-     * @return The workspace.
-     */
-    private DesktopPreferences.Workspace getWorkspace() {
-        DesktopPreferences.Workspace workspace = desktopPreferences.getWorkspace();
-        if (null == workspace || StringUtils.isEmpty(workspace.getWorkspacePath())) {
-            new Actions.WorkspaceAction(desktopPreferences).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "selectWorkspace"));
-            workspace = desktopPreferences.getWorkspace();
-            if (null == workspace) {
-                throw new NullPointerException("No workspace path defined");
-            }
-        }
-        return workspace;
     }
 
     /**
@@ -252,7 +230,7 @@ public class DesktopLauncher {
 
         @Override
         public void setList(List<DataSetInfo> list) {
-            dataSetWindow.setData(list);
+//            dataSetWindow.setData(list);
         }
 
         @Override

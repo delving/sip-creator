@@ -24,6 +24,7 @@ package eu.delving.sip.desktop;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import java.io.File;
+import java.io.FileFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,12 @@ public class FileStoreFinder {
         else if (!WORKSPACE_DIR.isDirectory()) {
             throw new RuntimeException(String.format("Expected directory but %s is a file", WORKSPACE_DIR.getAbsolutePath()));
         }
-        File[] files = WORKSPACE_DIR.listFiles();
+        File[] files = WORKSPACE_DIR.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isDirectory() && DIRECTORY_PATTERN.matcher(file.getName()).matches();
+            }
+        });
         switch (files.length) {
             case 0:
                 return createHostPortDirectory();
