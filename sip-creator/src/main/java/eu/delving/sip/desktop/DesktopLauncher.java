@@ -21,6 +21,19 @@
 
 package eu.delving.sip.desktop;
 
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import javax.swing.*;
+
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
@@ -46,18 +59,6 @@ import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.beans.PropertyVetoException;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This is the main window of the SIP-Creator.
@@ -124,7 +125,7 @@ public class DesktopLauncher {
         File fileStoreDirectory = getFileStoreDirectory(desktopPreferences.getWorkspace().getWorkspacePath());
         MetadataModel metadataModel = loadMetadataModel();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
-        sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(), userNotifier);
+        sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(getClass().getClassLoader()), userNotifier);
         dataSetWindow = new DataSetWindow(sipModel);
         desktopManager = new DesktopManager(sipModel);
         desktopManager.setDataSetWindow(dataSetWindow);

@@ -21,16 +21,16 @@
 
 package eu.delving.groovy;
 
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
 
 /**
  * The groovy helper code that precedes the mapping snippet.
@@ -41,15 +41,24 @@ import java.net.URL;
 public class GroovyCodeResource {
     private static final URL MAPPING_CATEGORY = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
     private static final URL VALIDATION_HELPERS = GroovyCodeResource.class.getResource("/ValidationHelpers.groovy");
+    private final ClassLoader classLoader;
+
+    public GroovyCodeResource(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
 
     public Script createMappingScript(String code) {
+        return getCategoryShell().parse(code);
+    }
+
+    public GroovyShell getCategoryShell() {
         try {
-            GroovyClassLoader mappingClassLoader = new GroovyClassLoader(getClass().getClassLoader());
+            ClassLoader classLoader = this.classLoader;
+            GroovyClassLoader mappingClassLoader = new GroovyClassLoader(classLoader);
             String categoryCode = readResourceCode(MAPPING_CATEGORY);
             mappingClassLoader.parseClass(categoryCode);
-            return new GroovyShell(mappingClassLoader).parse(code);
-        }
-        catch (Exception e) {
+            return new GroovyShell(mappingClassLoader);
+        } catch (Exception e) {
             throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
         }
     }

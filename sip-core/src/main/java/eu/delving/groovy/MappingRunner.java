@@ -21,8 +21,16 @@
 
 package eu.delving.groovy;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import eu.delving.metadata.MetadataNamespace;
 import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+import groovy.lang.GroovySystem;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import groovy.util.Node;
@@ -31,11 +39,6 @@ import groovy.xml.NamespaceBuilder;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
 import org.codehaus.groovy.syntax.SyntaxException;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class takes code, a record, and produces a record, using the code
@@ -46,16 +49,47 @@ import java.util.regex.Pattern;
 
 public class MappingRunner {
     private Script script;
+    private GroovyShell groovyShell;
     private String code;
+    private GroovyCodeResource groovyCodeResource;
+    private int counter = 0;
 
     public MappingRunner(GroovyCodeResource groovyCodeResource, String code) {
-        this.script = groovyCodeResource.createMappingScript(this.code = code);
+        this.groovyCodeResource = groovyCodeResource;
+        this.groovyShell = groovyCodeResource.getCategoryShell();
+        this.code = code;
+        script = groovyCodeResource.createMappingScript(code);
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
+
+        // Groovy generates classes for each script evaluation
+        // this ends up eating up all permGen space
+        // thus we clear the caches referencing those classes so that GC can remove them
+
+        // additionally Groovy also at each script evaluation generates instances of MetaMethodIndex$Elem
+        // those are SoftReferences so they only disappear when the used memory reaches its max allowed heap
+        // but they also pretty much impact on the execution time, probably because method cache lookup time increases
+        // (maybe because of a poorly implemented equals() & hashcode() implementation)
+        // thus in order to get rid of this performance impact we need a reasonabily low -XX:MaxPermSize
+        // yet it can't be too low because otherwise Groovy won't be able to generate its classes anymore
+        // this is why we now clear those every 50 iterations.
+
+        GroovySystem.setKeepJavaMetaClasses(false);
+        if((counter % 50) == 0) {
+
+            for(Iterator it = GroovySystem.getMetaClassRegistry().iterator(); it.hasNext();) {
+                it.remove();
+            }
+
+            this.groovyShell.resetLoadedClasses();
+            this.groovyShell.getClassLoader().clearCache();
+        }
         if (metadataRecord == null) {
             throw new RuntimeException("Null input metadata record");
         }
+        counter += 1;
+//        long now = System.currentTimeMillis();
         try {
             Binding binding = new Binding();
             NodeBuilder builder = NodeBuilder.newInstance();
@@ -93,6 +127,9 @@ public class MappingRunner {
                 throw new MappingException(metadataRecord, "Unexpected: " + e.toString(), e);
             }
         }
+//        finally {
+//            System.out.println("Mapping time: "+ (System.currentTimeMillis() - now));
+//        }
     }
 
     // a dirty hack which parses the exception's stack trace.  any better strategy welcome, but it works.
