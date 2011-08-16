@@ -43,6 +43,7 @@ public enum WindowId {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     // todo: add body and return void;
+                    throw new NoSuchMethodError("Method not implemented yet");
                 }
             }
     ),
@@ -62,9 +63,6 @@ public enum WindowId {
                             if (desktop.isSupported(Desktop.Action.BROWSE)) {
                                 desktop.browse(new URI("http://www.delving.eu"));
                             }
-                            else {
-                                // todo: display JOption pane with link
-                            }
                         }
                         catch (IOException e) {
                             LOG.error("Error opening URL", e);
@@ -72,9 +70,6 @@ public enum WindowId {
                         catch (URISyntaxException e) {
                             LOG.error("Error opening URL", e);
                         }
-                    }
-                    else {
-                        // todo: display JOption pane with link
                     }
                 }
             }
@@ -93,7 +88,8 @@ public enum WindowId {
             new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    // todo: add body and return void;
+                    // todo: say bye and save the desktop state.
+                    throw new NoSuchMethodError("Method not implemented yet");
                 }
             }
     ),

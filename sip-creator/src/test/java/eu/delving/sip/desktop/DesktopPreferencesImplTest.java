@@ -25,6 +25,7 @@ import eu.delving.sip.desktop.windows.WindowId;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
@@ -49,6 +50,11 @@ public class DesktopPreferencesImplTest implements Serializable {
     private static final String WORKSPACE_PATH = "/Users/serkan.delving/Metadata/file-store/";
 
     private final DesktopPreferences desktopPreferences = new DesktopPreferencesImpl(getClass());
+
+    @Before
+    public void setUp() throws Exception {
+        desktopPreferences.clear();
+    }
 
     @Test
     public void testWorkspace() throws Exception {

@@ -24,8 +24,8 @@ package eu.delving.sip.desktop.windows;
 import eu.delving.sip.desktop.WindowState;
 import eu.europeana.sip.model.SipModel;
 
-import javax.swing.JInternalFrame;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * The base of all windows within the SIP-Creator.
@@ -39,6 +39,7 @@ public abstract class DesktopWindow extends JInternalFrame {
     private WindowId id;
     private boolean preferencesTransient;
     protected SipModel sipModel;
+    protected Action popupAction;
 
     public DesktopWindow(SipModel sipModel) {
         super("", true, true, true, true);
@@ -69,6 +70,14 @@ public abstract class DesktopWindow extends JInternalFrame {
 
     public boolean isPreferencesTransient() {
         return preferencesTransient;
+    }
+
+    public Action getPopupAction() {
+        return popupAction;
+    }
+
+    public void setPopupAction(Action popupAction) {
+        this.popupAction = popupAction;
     }
 
     @Override
