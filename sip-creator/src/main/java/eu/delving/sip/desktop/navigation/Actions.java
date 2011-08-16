@@ -31,7 +31,10 @@ import eu.delving.sip.desktop.windows.WindowId;
 import eu.europeana.sip.localization.Constants;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.List;
@@ -138,8 +141,7 @@ public class Actions {
                 case JOptionPane.YES_OPTION:
                     List<WindowState> allWindowStates = desktopLauncher.getDesktopManager().getWindowStates();
                     desktopLauncher.getDesktopPreferences().saveDesktopState(
-                            new DesktopStateImpl(null == desktopLauncher.getCurrentStore() ? "-" : desktopLauncher.getCurrentStore().getSpec(),
-                                    allWindowStates));
+                            new DesktopStateImpl("the current dataset spec?", allWindowStates));
                     System.exit(0);
                     break;
             }
