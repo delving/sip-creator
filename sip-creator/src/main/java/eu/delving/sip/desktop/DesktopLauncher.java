@@ -21,6 +21,19 @@
 
 package eu.delving.sip.desktop;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.swing.*;
+
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
@@ -87,7 +100,19 @@ public class DesktopLauncher {
     public DesktopLauncher(File fileStoreDirectory) throws FileStoreException {
         MetadataModel metadataModel = loadMetadataModel();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
-        sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(), USER_NOTIFIER);
+        UserNotifier userNotifier = new UserNotifier() {
+            @Override
+            public void tellUser(String message) {
+                JOptionPane.showMessageDialog(null, "Message from SipModel", message, JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            @Override
+            public void tellUser(String message, Exception exception) {
+                JOptionPane.showMessageDialog(null, "Error from SipModel", String.format("%s%n%s", message, exception.getMessage()), JOptionPane.ERROR_MESSAGE);
+            }
+        };
+        sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(), userNotifier);
+        dataSetWindow = new DataSetWindow(sipModel);
         desktopManager = new DesktopManager(sipModel);
         actions = new Actions(desktopManager);
         authenticationWindow = new AuthenticationWindow(desktopPreferences, authenticationClient,

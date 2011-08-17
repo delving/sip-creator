@@ -19,7 +19,7 @@ class TestMappingEngine {
     void createMappingEngine() {
         Map<String, String> namespaces = new HashMap<String, String>()
         String mapping = IOUtils.toString(getClass().getResourceAsStream("/sample_mapping_icn.xml"), "UTF-8")
-        mappingEngine = new MappingEngine(mapping, namespaces)
+        mappingEngine = new MappingEngine(mapping, namespaces, getClass().getClassLoader())
     }
 
     @Test
@@ -64,9 +64,14 @@ class TestMappingEngine {
                 <priref>6389</priref>
                 """
             IndexDocument doc;
-            for (int x: 1..10) {
+            for (int x: 1..10000) {
               Long now = System.currentTimeMillis();
+//              record.replace("6389", new Random().toString())
+              IndexDocument oldDoc = doc;
               doc = mappingEngine.executeMapping(record)
+              if(doc != null && oldDoc != null && !doc.toString().equals(oldDoc.toString())) {
+                throw new Exception("WRONG");
+              }
               Long total = System.currentTimeMillis() - now;
               println "mapping time: " + total
 //              println mappingEngine

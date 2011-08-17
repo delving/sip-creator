@@ -1,5 +1,10 @@
 package eu.delving.sip;
 
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Map;
+import javax.xml.stream.XMLStreamException;
+
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
@@ -14,11 +19,6 @@ import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.ValidationException;
 import groovy.util.Node;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Map;
-
 /**
  * Wrapping the mapping mechanism for easy access from Scala
  *
@@ -31,10 +31,10 @@ public class MappingEngine {
     private RecordValidator recordValidator;
     private long compileTime, parseTime, mapTime, validateTime, outputTime;
 
-    public MappingEngine(String mapping, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
+    public MappingEngine(String mapping, Map<String, String> namespaces, ClassLoader classLoader) throws FileNotFoundException, MetadataException {
         MetadataModel metadataModel = loadMetadataModel();
         RecordMapping recordMapping = RecordMapping.read(mapping, metadataModel);
-        GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
+        GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
         long now = System.currentTimeMillis();
         mappingRunner = new MappingRunner(groovyCodeResource, recordMapping.toCompileCode(metadataModel));
         compileTime += System.currentTimeMillis() - now;
