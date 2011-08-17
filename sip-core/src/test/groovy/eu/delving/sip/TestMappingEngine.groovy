@@ -19,7 +19,7 @@ class TestMappingEngine {
     void createMappingEngine() {
         Map<String, String> namespaces = new HashMap<String, String>()
         String mapping = IOUtils.toString(getClass().getResourceAsStream("/sample_mapping_icn.xml"), "UTF-8")
-        mappingEngine = new MappingEngine(mapping, namespaces)
+        mappingEngine = new MappingEngine(mapping, namespaces, getClass().getClassLoader())
     }
 
     @Test
