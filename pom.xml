@@ -29,9 +29,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
     <artifactId>sip-parent</artifactId>
-    <version>0.3.2-SNAPSHOT</version>
+    <version>0.3.3-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Delving Sip-Creator Parent</name>
+    <name>SIP-Creator Parent</name>
     <description>
         This parent project defines the version management, repositories, etc for all the other modules.
     </description>

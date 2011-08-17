@@ -31,7 +31,7 @@
     <artifactId>sip-creator</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Creator</name>
-    <version>0.3.2-SNAPSHOT</version>
+    <version>0.3.3-SNAPSHOT</version>
     <inceptionYear>2008</inceptionYear>
 
     <organization>
@@ -66,7 +66,7 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-parent</artifactId>
-        <version>0.3.2-SNAPSHOT</version>
+        <version>0.3.3-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -108,9 +108,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.amber</groupId>
+            <artifactId>oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ostermiller</groupId>
+            <artifactId>utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>sip-core</artifactId>
-            <version>0.3.2-SNAPSHOT</version>
+            <version>0.3.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.jnlp</groupId>

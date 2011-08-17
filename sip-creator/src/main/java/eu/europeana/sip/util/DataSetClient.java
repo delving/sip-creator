@@ -1,7 +1,14 @@
-package eu.delving.sip;
+package eu.europeana.sip.util;
 
 import com.thoughtworks.xstream.XStream;
 import eu.delving.metadata.Hasher;
+import eu.delving.sip.DataSetCommand;
+import eu.delving.sip.DataSetInfo;
+import eu.delving.sip.DataSetResponse;
+import eu.delving.sip.DataSetResponseCode;
+import eu.delving.sip.FileStore;
+import eu.delving.sip.FileType;
+import eu.delving.sip.ProgressListener;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -14,7 +21,8 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;

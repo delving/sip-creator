@@ -1,5 +1,6 @@
-package eu.delving.security;
+package eu.delving.sip.gui;
 
+import eu.delving.security.User;
 import org.apache.amber.oauth2.client.OAuthClient;
 import org.apache.amber.oauth2.client.request.OAuthClientRequest;
 import org.apache.amber.oauth2.client.response.OAuthClientResponse;

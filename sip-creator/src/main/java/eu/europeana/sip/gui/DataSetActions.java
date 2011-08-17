@@ -21,20 +21,8 @@
 
 package eu.europeana.sip.gui;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javax.swing.*;
-
 import com.Ostermiller.util.CircularByteBuffer;
 import eu.delving.metadata.Hasher;
-import eu.delving.sip.DataSetClient;
 import eu.delving.sip.DataSetCommand;
 import eu.delving.sip.DataSetInfo;
 import eu.delving.sip.DataSetResponse;
@@ -44,9 +32,42 @@ import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileType;
 import eu.delving.sip.ProgressListener;
 import eu.europeana.sip.model.SipModel;
+import eu.europeana.sip.util.DataSetClient;
 import eu.europeana.sip.xml.AbstractRecordParser;
 import eu.europeana.sip.xml.HashParser;
 import eu.europeana.sip.xml.RecordFilterParser;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
+import javax.swing.ProgressMonitor;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * All the actions that can be launched when a data set is selected

@@ -21,15 +21,22 @@
 
 package eu.delving.sip.desktop.windows;
 
-import eu.delving.security.AuthenticationClient;
 import eu.delving.security.User;
 import eu.delving.sip.desktop.CredentialsImpl;
 import eu.delving.sip.desktop.DesktopPreferences;
+import eu.delving.sip.gui.AuthenticationClient;
 import eu.europeana.sip.util.GridBagHelper;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;

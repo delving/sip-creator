@@ -21,17 +21,25 @@
 
 package eu.europeana.sip.gui;
 
-import eu.delving.security.AuthenticationClient;
 import eu.delving.security.User;
 import eu.delving.sip.AppConfig;
+import eu.delving.sip.gui.AuthenticationClient;
 import eu.europeana.sip.model.AppConfigModel;
 import eu.europeana.sip.model.SipModel;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
 

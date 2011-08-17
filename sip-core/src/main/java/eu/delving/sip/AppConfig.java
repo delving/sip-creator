@@ -35,8 +35,6 @@ import java.util.List;
 
 
 @XStreamAlias("sip-creator-configuration")
-@Deprecated
-/** @deprecated will bre replaced by DesktopPreferences */
 public class AppConfig {
     private String serverHostPort;
     private String accessKey;

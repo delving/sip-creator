@@ -21,8 +21,8 @@
 
 package eu.delving.sip.gui;
 
-import eu.delving.sip.DataSetClient;
 import eu.europeana.sip.model.SipModel;
+import eu.europeana.sip.util.DataSetClient;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
