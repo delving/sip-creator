@@ -58,18 +58,13 @@ public class Application {
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
     private MappingMenu mappingMenu;
+    private CultureHubMenu cultureHubMenu;
 
     private Application(File fileStoreDirectory) throws FileStoreException {
         MetadataModel metadataModel = loadMetadataModel();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
-        GroovyCodeResource groovyCodeResource = new GroovyCodeResource();
+        GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         this.sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, new PopupExceptionHandler());
-        this.dataSetMenu = new DataSetMenu(sipModel);
-        this.mappingMenu = new MappingMenu(sipModel);
-        buildFrame();
-    }
-
-    private void buildFrame() {
         frame = new JFrame("Delving SIP Creator");
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -80,9 +75,12 @@ public class Application {
         };
         desktop.setBackground(new Color(190, 190, 200));
         frame.getContentPane().add(desktop);
-        frame.setJMenuBar(createMenuBar());
         frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.dataSetMenu = new DataSetMenu(sipModel);
+        this.mappingMenu = new MappingMenu(sipModel);
+        this.cultureHubMenu = new CultureHubMenu(desktop, sipModel, null); // todo: datasetclient
+        frame.setJMenuBar(createMenuBar());
     }
 
     private JMenuBar createMenuBar() {
@@ -95,6 +93,7 @@ public class Application {
         }));
         bar.add(dataSetMenu);
         bar.add(mappingMenu);
+        bar.add(cultureHubMenu);
         return bar;
     }
 
