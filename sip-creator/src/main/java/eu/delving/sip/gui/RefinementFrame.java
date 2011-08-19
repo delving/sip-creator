@@ -23,12 +23,16 @@ package eu.delving.sip.gui;
 
 import eu.europeana.sip.model.SipModel;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 
 /**
  * Refining the mapping interactively
@@ -45,7 +49,32 @@ public class RefinementFrame extends FrameBase {
     }
 
     private JComponent createWest() {
-        return new JLabel("Mapping List");
+        JButton b = new JButton("Mapping List");
+        b.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                final PopupFrame popupFrame = new PopupFrame(RefinementFrame.this, "Pop!");
+                desktop.add(popupFrame);
+                popupFrame.getContentPane().setLayout(new BorderLayout());
+                popupFrame.getContentPane().add(new JLabel("Crackle to the max!"), BorderLayout.CENTER);
+                JButton close = new JButton("close");
+                close.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        try {
+                            popupFrame.setClosed(true);
+                        }
+                        catch (PropertyVetoException e) {
+                            e.printStackTrace();  // todo: something
+                        }
+                    }
+                });
+                popupFrame.getContentPane().add(close, BorderLayout.EAST);
+                popupFrame.show();
+                popupFrame.setSize(800, 600);
+             }
+        });
+        return b;
     }
 
     private JComponent createCenter() {

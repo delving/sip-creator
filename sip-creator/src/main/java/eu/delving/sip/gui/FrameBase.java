@@ -43,7 +43,7 @@ import java.awt.event.KeyEvent;
 public abstract class FrameBase extends JInternalFrame {
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     protected SipModel sipModel;
-    private JDesktopPane desktop;
+    protected JDesktopPane desktop;
     protected Action action;
 
     public FrameBase(JDesktopPane desktop, SipModel sipModel, String title) {

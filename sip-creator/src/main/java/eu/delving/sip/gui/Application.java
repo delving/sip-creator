@@ -36,11 +36,14 @@ import eu.europeana.sip.model.UserNotifier;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
@@ -55,6 +58,7 @@ import java.util.Arrays;
  */
 
 public class Application {
+    private ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
     private PopupExceptionHandler exceptionHandler;
     private SipModel sipModel;
     private JFrame frame;
@@ -82,24 +86,13 @@ public class Application {
         frame.getContentPane().add(desktop);
         frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setIconImage(logo.getImage());
         this.dataSetMenu = new DataSetMenu(sipModel);
         this.mappingMenu = new MappingMenu(sipModel);
         this.oauthClient = new OAuthClient(
                 FileStoreFinder.getHostPort(fileStoreDirectory),
                 FileStoreFinder.getUser(fileStoreDirectory),
-                new OAuthClient.PasswordRequest() {
-                    @Override
-                    public String getPassword() {
-                        JPasswordField passwordField = new JPasswordField();
-                        int answer = JOptionPane.showInternalConfirmDialog(
-                                frame,
-                                passwordField,
-                                String.format("Password for %s", FileStoreFinder.getHostPortUser(fileStoreDirectory)),
-                                JOptionPane.OK_CANCEL_OPTION
-                        );
-                        return answer == JOptionPane.OK_OPTION ? new String(passwordField.getPassword()) : null;
-                    }
-                }
+                new PasswordFetcher(fileStoreDirectory)
         );
         this.cultureHubMenu = new CultureHubMenu(desktop, sipModel, new CultureHubClient(new CultureHubClient.Context() {
 
@@ -160,6 +153,35 @@ public class Application {
             e.printStackTrace();
             System.exit(1);
             return null;
+        }
+    }
+
+    private class PasswordFetcher implements OAuthClient.PasswordRequest {
+        private File fileStoreDirectory;
+
+        private PasswordFetcher(File fileStoreDirectory) {
+            this.fileStoreDirectory = fileStoreDirectory;
+        }
+
+        @Override
+        public String getPassword() {
+            JPasswordField passwordField = new JPasswordField(15);
+            JLabel labelA = new JLabel("Password");
+            labelA.setLabelFor(passwordField);
+            JPanel p = new JPanel(new BorderLayout(10, 10));
+            p.add(labelA, BorderLayout.WEST);
+            p.add(passwordField, BorderLayout.CENTER);
+            JPanel wrap = new JPanel();
+            wrap.add(p);
+            int answer = JOptionPane.showInternalConfirmDialog(
+                    desktop,
+                    wrap,
+                    String.format("Authenticate for %s", FileStoreFinder.getHostPortUser(fileStoreDirectory)),
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    logo
+            );
+            return answer == JOptionPane.OK_OPTION ? new String(passwordField.getPassword()) : null;
         }
     }
 
