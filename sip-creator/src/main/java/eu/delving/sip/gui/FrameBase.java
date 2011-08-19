@@ -27,8 +27,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.KeyStroke;
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * The base of all windows within the SIP-Creator.
@@ -39,6 +43,7 @@ import java.awt.event.ActionEvent;
 public abstract class FrameBase extends JInternalFrame {
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     protected SipModel sipModel;
+    private JDesktopPane desktop;
     protected Action action;
 
     public FrameBase(JDesktopPane desktop, SipModel sipModel, String title) {
@@ -50,18 +55,75 @@ public abstract class FrameBase extends JInternalFrame {
                 false // iconifiable
         );
         this.sipModel = sipModel;
-        action = new AbstractAction(title) {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                setVisible(true);
-                // maybe relocate if it's off screen or something
-            }
-        };
+        this.desktop = desktop;
+        action = new PopupAction(title);
         setSize(DEFAULT_SIZE);
-        desktop.add(this);
     }
 
     public Action getAction() {
         return action;
+    }
+
+    private class PopupAction extends AbstractAction {
+
+        public PopupAction(String title) {
+            super(title);
+            this.putValue(
+                    Action.ACCELERATOR_KEY,
+                    KeyStroke.getKeyStroke(
+                            KeyEvent.VK_A + (title.charAt(0) - 'A'),
+                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+                    )
+            );
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            addIfAbsent();
+            show();
+            toFront();
+            ensureOnScreen();
+        }
+
+    }
+
+    private void addIfAbsent() {
+        boolean add = true;
+        JInternalFrame[] frames = desktop.getAllFrames();
+        for (JInternalFrame frame : frames) {
+            if (frame == this) {
+                add = false;
+            }
+        }
+        if (add) {
+            desktop.add(this);
+        }
+    }
+
+    private void ensureOnScreen() {
+        boolean move = false;
+        Point loc = getLocation();
+        Dimension desk = desktop.getSize();
+        Dimension size = getSize();
+        Point far = new Point(loc.x + size.width, loc.y + size.height);
+        if (loc.x < 0) {
+            loc.x = 0;
+            move = true;
+        }
+        else if (far.x > desk.width) {
+            loc.x -= far.x - desk.width;
+            move = true;
+        }
+        if (loc.y < 0) {
+            loc.y = 0;
+            move = true;
+        }
+        else if (far.y > desk.height) {
+            loc.y -= far.y - desk.height;
+            move = true;
+        }
+        if (move) {
+            setLocation(loc);
+        }
     }
 }
