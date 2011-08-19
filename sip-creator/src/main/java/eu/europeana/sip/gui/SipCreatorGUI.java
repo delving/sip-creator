@@ -30,7 +30,7 @@ import eu.delving.sip.DataSetInfo;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileStoreImpl;
-import eu.delving.sip.gui.AuthenticationClient;
+import eu.delving.sip.desktop.AuthenticationClient;
 import eu.europeana.sip.model.AppConfigModel;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;

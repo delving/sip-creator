@@ -111,6 +111,7 @@
             <groupId>org.apache.amber</groupId>
             <artifactId>oauth2-client</artifactId>
         </dependency>
+        <!-- todo: remove the following when DataSetClient is removed -->
         <dependency>
             <groupId>org.ostermiller</groupId>
             <artifactId>utils</artifactId>

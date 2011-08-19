@@ -22,7 +22,6 @@
 package eu.delving.sip.gui;
 
 import eu.europeana.sip.model.SipModel;
-import eu.europeana.sip.util.DataSetClient;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
@@ -40,15 +39,15 @@ import java.awt.event.ActionListener;
 public class CultureHubMenu extends JMenu {
     private JDesktopPane parent;
     private SipModel sipModel;
-    private DataSetClient dataSetClient;
+    private CultureHubClient cultureHubClient;
     private JMenuItem download = new JMenuItem("Download");
     private JMenuItem upload = new JMenuItem("Upload");
 
-    public CultureHubMenu(JDesktopPane parent, SipModel sipModel, DataSetClient dataSetClient) {
+    public CultureHubMenu(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Culture Hub");
         this.parent = parent;
         this.sipModel = sipModel;
-        this.dataSetClient = dataSetClient;
+        this.cultureHubClient = cultureHubClient;
         add(download);
         add(upload);
         wireUp();

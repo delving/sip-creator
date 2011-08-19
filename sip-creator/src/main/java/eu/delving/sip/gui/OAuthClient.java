@@ -1,7 +1,6 @@
 package eu.delving.sip.gui;
 
 import eu.delving.security.User;
-import org.apache.amber.oauth2.client.OAuthClient;
 import org.apache.amber.oauth2.client.request.OAuthClientRequest;
 import org.apache.amber.oauth2.client.response.OAuthClientResponse;
 import org.apache.amber.oauth2.client.response.OAuthClientResponseFactory;
@@ -27,39 +26,25 @@ import java.util.Map;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class AuthenticationClient {
+public class OAuthClient {
 
     private static final String OAUTH2_ENDPOINT_PATH = "/token";
     private Logger log = Logger.getLogger(getClass());
     private Map<String, TokenConnection> connections = new HashMap<String, TokenConnection>();
 
-    private final OAuthClient client = new OAuthClient(new org.apache.amber.oauth2.client.HttpClient() {
-        @Override
-        public <T extends OAuthClientResponse> T execute(OAuthClientRequest request, Map<String, String> headers, String requestMethod, Class<T> responseClass) throws OAuthSystemException, OAuthProblemException {
-            try {
-                HttpClient httpClient = new DefaultHttpClient();
-                HttpGet get = new HttpGet(request.getLocationUri());
-                HttpResponse httpResponse = httpClient.execute(get);
-                String responseBody = OAuthUtils.saveStreamAsString(httpResponse.getEntity().getContent());
-                return OAuthClientResponseFactory
-                        .createCustomResponse(responseBody, httpResponse.getEntity().getContentType().getValue(), httpResponse.getStatusLine().getStatusCode(), responseClass);
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    });
-
     public User requestAccess(String location, String username, String password) throws OAuthSystemException, OAuthProblemException {
         String tokenLocation = toTokenLocation(location);
-        OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
+        OAuthClientRequest request = OAuthClientRequest.tokenLocation(tokenLocation)
                 .setGrantType(GrantType.PASSWORD)
                 .setUsername(username)
                 .setPassword(password)
                 .buildQueryMessage();
-        OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
-        TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
+        OAuthJSONAccessTokenResponse tokenResponse = OAUTH_CLIENT.accessToken(request);
+        TokenConnection connection = new TokenConnection(
+                tokenResponse.getAccessToken(),
+                tokenResponse.getRefreshToken(),
+                Integer.parseInt(tokenResponse.getExpiresIn())
+        );
         connections.put(connectionKey(username, location), connection);
         // todo: user should contain preferences and permission which are sent by the services module
         User user = new User();
@@ -70,12 +55,16 @@ public class AuthenticationClient {
     private String requestRefresh(String connectionKey, String refreshToken) throws OAuthSystemException, OAuthProblemException {
         String location = connectionKey.split("#")[1];
         String tokenLocation = toTokenLocation(location);
-        OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenLocation(tokenLocation)
+        OAuthClientRequest request = OAuthClientRequest.tokenLocation(tokenLocation)
                 .setGrantType(GrantType.REFRESH_TOKEN)
                 .setRefreshToken(refreshToken)
                 .buildQueryMessage();
-        OAuthJSONAccessTokenResponse tokenResponse = client.accessToken(oAuthClientRequest);
-        TokenConnection connection = new TokenConnection(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), Integer.parseInt(tokenResponse.getExpiresIn()));
+        OAuthJSONAccessTokenResponse response = OAUTH_CLIENT.accessToken(request);
+        TokenConnection connection = new TokenConnection(
+                response.getAccessToken(),
+                response.getRefreshToken(),
+                Integer.parseInt(response.getExpiresIn())
+        );
         connections.put(connectionKey, connection);
         return connection.getAccessToken();
     }
@@ -99,6 +88,28 @@ public class AuthenticationClient {
     private String connectionKey(String username, String location) {
         return String.format("%s.#.%s", username, location);
     }
+
+    private final org.apache.amber.oauth2.client.OAuthClient OAUTH_CLIENT = new org.apache.amber.oauth2.client.OAuthClient(new org.apache.amber.oauth2.client.HttpClient() {
+        @Override
+        public <T extends OAuthClientResponse> T execute(OAuthClientRequest request, Map<String, String> headers, String requestMethod, Class<T> responseClass) throws OAuthSystemException, OAuthProblemException {
+            try {
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpGet get = new HttpGet(request.getLocationUri());
+                HttpResponse httpResponse = httpClient.execute(get);
+                String responseBody = OAuthUtils.saveStreamAsString(httpResponse.getEntity().getContent());
+                return OAuthClientResponseFactory.createCustomResponse(
+                        responseBody,
+                        httpResponse.getEntity().getContentType().getValue(),
+                        httpResponse.getStatusLine().getStatusCode(),
+                        responseClass
+                );
+            }
+            catch (IOException e) {
+                log.error("OAuth Client problem", e); // todo: something sensible
+            }
+            return null;
+        }
+    });
 
     private static class TokenConnection {
         private String accessToken = null;

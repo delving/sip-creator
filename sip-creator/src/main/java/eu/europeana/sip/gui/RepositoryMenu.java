@@ -23,7 +23,7 @@ package eu.europeana.sip.gui;
 
 import eu.delving.security.User;
 import eu.delving.sip.AppConfig;
-import eu.delving.sip.gui.AuthenticationClient;
+import eu.delving.sip.desktop.AuthenticationClient;
 import eu.europeana.sip.model.AppConfigModel;
 import eu.europeana.sip.model.SipModel;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;

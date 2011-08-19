@@ -22,9 +22,9 @@
 package eu.delving.sip.desktop.windows;
 
 import eu.delving.security.User;
+import eu.delving.sip.desktop.AuthenticationClient;
 import eu.delving.sip.desktop.CredentialsImpl;
 import eu.delving.sip.desktop.DesktopPreferences;
-import eu.delving.sip.gui.AuthenticationClient;
 import eu.europeana.sip.util.GridBagHelper;
 import org.apache.log4j.Logger;
 

@@ -191,6 +191,7 @@
                 <version>0.2-SNAPSHOT</version>
             </dependency>
 
+            <!-- todo: remove the following when DataSetClient is removed -->
             <dependency>
                 <groupId>org.ostermiller</groupId>
                 <artifactId>utils</artifactId>

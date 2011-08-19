@@ -36,8 +36,8 @@ import java.util.regex.Pattern;
 
 public class FileStoreFinder {
     private static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "SIPCreatorWorkspace");
-    private static final Pattern HOST_PORT_PATTERN = Pattern.compile("([A-Za-z0-9.]+):([0-9]+)");
-    private static final Pattern DIRECTORY_PATTERN = Pattern.compile("([A-Za-z0-9_]+)__([0-9]+)");
+    private static final Pattern HPU_HUMAN = Pattern.compile("([A-Za-z0-9.]+):([0-9]+)/([A-Za-z0-9]+)");
+    private static final Pattern HPU_DIRECTORY = Pattern.compile("([A-Za-z0-9_]+)__([0-9]+)___([A-Za-z0-9]+)");
 
     public static File getFileStoreDirectory() {
         if (!WORKSPACE_DIR.exists()) {
@@ -51,7 +51,7 @@ public class FileStoreFinder {
         File[] files = WORKSPACE_DIR.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return file.isDirectory() && DIRECTORY_PATTERN.matcher(file.getName()).matches();
+                return file.isDirectory() && HPU_DIRECTORY.matcher(file.getName()).matches();
             }
         });
         switch (files.length) {
@@ -64,17 +64,36 @@ public class FileStoreFinder {
         }
     }
 
-    private static String getHostPort(File file) {
-        Matcher matcher = DIRECTORY_PATTERN.matcher(file.getName());
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException("Host and port could not be extracted from file name " + file.getName());
-        }
-        return String.format("%s:%s", matcher.group(1).replace("_", "."), matcher.group(2));
+    public static String getHostPort(File file) {
+        Matcher matcher = getDirectoryMatcher(file);
+        return String.format("%s:%s", getHostName(matcher), matcher.group(2));
     }
 
-    private static File createDirectory(String host, String port) {
+    public static String getUser(File file) {
+        Matcher matcher = getDirectoryMatcher(file);
+        return matcher.group(3);
+    }
+
+    public static String getHostPortUser(File file) {
+        Matcher matcher = getDirectoryMatcher(file);
+        return String.format("%s:%s/%s", getHostName(matcher), matcher.group(2), matcher.group(3));
+    }
+
+    private static String getHostName(Matcher matcher) {
+        return matcher.group(1).replace("_", ".");
+    }
+
+    private static Matcher getDirectoryMatcher(File file) {
+        Matcher matcher = HPU_DIRECTORY.matcher(file.getName());
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Directory name is incorrect " + file.getName());
+        }
+        return matcher;
+    }
+
+    private static File createDirectory(String host, String port, String user) {
         String mungedHost = host.replaceAll("\\.", "_");
-        String directoryName = String.format("%s__%s", mungedHost, port);
+        String directoryName = String.format("%s__%s___%s", mungedHost, port, user);
         File directory = new File(WORKSPACE_DIR, directoryName);
         if (!directory.exists() && !directory.mkdirs()) {
             throw new RuntimeException("Unable to create "+directory.getAbsolutePath());
@@ -82,24 +101,24 @@ public class FileStoreFinder {
         return directory;
     }
 
-    private static File createDirectory(String hostPort) {
-        Matcher matcher = HOST_PORT_PATTERN.matcher(hostPort);
+    private static File createDirectory(String hostPortUser) {
+        Matcher matcher = HPU_HUMAN.matcher(hostPortUser);
         if (matcher.matches()) {
-            return createDirectory(matcher.group(1), matcher.group(2));
+            return createDirectory(matcher.group(1), matcher.group(2), matcher.group(3));
         }
         else {
-            throw new RuntimeException("Expected host:port but got "+hostPort);
+            throw new RuntimeException("Expected host:port/user but got "+hostPortUser);
         }
     }
 
     private static File createHostPortDirectory() {
         while (true) {
-            String answer = JOptionPane.showInputDialog(null, "<html>Please enter host:port for the sever");
-            Matcher matcher = HOST_PORT_PATTERN.matcher(answer);
+            String answer = JOptionPane.showInputDialog(null, "<html>Please enter host:port/user for your Culture Hub connection");
+            Matcher matcher = HPU_HUMAN.matcher(answer);
             if (matcher.matches()) {
-                return createDirectory(matcher.group(1), matcher.group(2));
+                return createDirectory(matcher.group(1), matcher.group(2), matcher.group(3));
             }
-            int okCancel = JOptionPane.showConfirmDialog(null, "<html>Value does not match host:port pattern. Try again.", "Sorry", JOptionPane.OK_CANCEL_OPTION);
+            int okCancel = JOptionPane.showConfirmDialog(null, "<html>Value does not match \"host:port/user\" pattern. Try again.", "Sorry", JOptionPane.OK_CANCEL_OPTION);
             if (okCancel == JOptionPane.CANCEL_OPTION) {
                 throw new RuntimeException("No directory created");
             }
@@ -109,7 +128,7 @@ public class FileStoreFinder {
     private static File chooseDirectory(File[] directories) {
         String [] hostPorts = new String[directories.length];
         for (int walk=0; walk<directories.length; walk++) {
-            hostPorts[walk] = getHostPort(directories[walk]);
+            hostPorts[walk] = getHostPortUser(directories[walk]);
         }
         JComboBox box = new JComboBox(hostPorts);
         int okCancel = JOptionPane.showConfirmDialog(null, box, "Choose server", JOptionPane.OK_CANCEL_OPTION);

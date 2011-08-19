@@ -35,7 +35,6 @@ import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
-import eu.delving.sip.gui.AuthenticationClient;
 import eu.europeana.sip.localization.Constants;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
