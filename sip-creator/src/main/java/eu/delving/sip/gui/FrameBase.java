@@ -90,13 +90,24 @@ public abstract class FrameBase extends JInternalFrame {
     private void addIfAbsent() {
         boolean add = true;
         JInternalFrame[] frames = desktop.getAllFrames();
+        Point max = new Point();
         for (JInternalFrame frame : frames) {
             if (frame == this) {
                 add = false;
             }
+            Point loc = frame.getLocation();
+            if (max.x < loc.x) {
+                max.x = loc.x;
+            }
+            if (max.y < loc.y) {
+                max.y = loc.y;
+            }
         }
         if (add) {
             desktop.add(this);
+            max.x += 25;
+            max.y += 25;
+            setLocation(max);
         }
     }
 
