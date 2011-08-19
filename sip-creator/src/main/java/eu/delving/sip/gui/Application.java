@@ -32,14 +32,13 @@ import eu.delving.sip.desktop.FileStoreFinder;
 import eu.europeana.sip.gui.ImportMenu;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
-import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -84,7 +83,24 @@ public class Application {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.dataSetMenu = new DataSetMenu(sipModel);
         this.mappingMenu = new MappingMenu(sipModel);
-        this.oauthClient = new OAuthClient();
+        this.oauthClient = new OAuthClient(
+                FileStoreFinder.getHostPort(fileStoreDirectory),
+                FileStoreFinder.getUser(fileStoreDirectory),
+                new OAuthClient.PasswordRequest() {
+
+                    @Override
+                    public String getPassword() {
+                        JPasswordField passwordField = new JPasswordField();
+                        int answer = JOptionPane.showInternalConfirmDialog(
+                                frame,
+                                passwordField,
+                                String.format("Password for %s", FileStoreFinder.getHostPortUser(fileStoreDirectory)),
+                                JOptionPane.OK_CANCEL_OPTION
+                        );
+                        return new String(passwordField.getPassword());
+                    }
+                }
+        );
         this.cultureHubMenu = new CultureHubMenu(desktop, sipModel, new CultureHubClient(new CultureHubClient.Context() {
 
             @Override
@@ -94,17 +110,7 @@ public class Application {
 
             @Override
             public String getAccessToken() {
-                try {
-                    return oauthClient.getAccessToken(FileStoreFinder.getHostPort(fileStoreDirectory), FileStoreFinder.getUser(fileStoreDirectory));
-                }
-                catch (OAuthSystemException e) {
-                    tellUser(e.getMessage()); // todo: improve
-                    return "";
-                }
-                catch (OAuthProblemException e) {
-                    tellUser(e.getMessage()); // todo: improve
-                    return ""; // todo:
-                }
+                return oauthClient.getToken();
             }
 
             @Override

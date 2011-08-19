@@ -1,12 +1,10 @@
 package eu.delving.sip.gui;
 
-import eu.delving.security.User;
 import org.apache.amber.oauth2.client.request.OAuthClientRequest;
 import org.apache.amber.oauth2.client.response.OAuthClientResponse;
 import org.apache.amber.oauth2.client.response.OAuthClientResponseFactory;
 import org.apache.amber.oauth2.client.response.OAuthJSONAccessTokenResponse;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthRuntimeException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.amber.oauth2.common.message.types.GrantType;
 import org.apache.amber.oauth2.common.utils.OAuthUtils;
@@ -17,7 +15,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,68 +22,84 @@ import java.util.Map;
  * in order to get access to resources on the CultureHub server.
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
+
 public class OAuthClient {
-
-    private static final String OAUTH2_ENDPOINT_PATH = "/token";
     private Logger log = Logger.getLogger(getClass());
-    private Map<String, TokenConnection> connections = new HashMap<String, TokenConnection>();
+    private String hostPort;
+    private String username;
+    private PasswordRequest passwordRequest;
+    private String password;
+    private String accessToken;
+    private String refreshToken;
+    private long requestTimeStamp;
+    private int expirationSeconds;
 
-    public User requestAccess(String location, String username, String password) throws OAuthSystemException, OAuthProblemException {
-        String tokenLocation = toTokenLocation(location);
-        OAuthClientRequest request = OAuthClientRequest.tokenLocation(tokenLocation)
-                .setGrantType(GrantType.PASSWORD)
-                .setUsername(username)
-                .setPassword(password)
-                .buildQueryMessage();
-        OAuthJSONAccessTokenResponse tokenResponse = OAUTH_CLIENT.accessToken(request);
-        TokenConnection connection = new TokenConnection(
-                tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(),
-                Integer.parseInt(tokenResponse.getExpiresIn())
-        );
-        connections.put(connectionKey(username, location), connection);
-        // todo: user should contain preferences and permission which are sent by the services module
-        User user = new User();
-        user.setUsername(username);
-        return user;
+    public interface PasswordRequest {
+        String getPassword();
     }
 
-    private String requestRefresh(String connectionKey, String refreshToken) throws OAuthSystemException, OAuthProblemException {
-        String location = connectionKey.split("#")[1];
-        String tokenLocation = toTokenLocation(location);
-        OAuthClientRequest request = OAuthClientRequest.tokenLocation(tokenLocation)
-                .setGrantType(GrantType.REFRESH_TOKEN)
-                .setRefreshToken(refreshToken)
-                .buildQueryMessage();
-        OAuthJSONAccessTokenResponse response = OAUTH_CLIENT.accessToken(request);
-        TokenConnection connection = new TokenConnection(
-                response.getAccessToken(),
-                response.getRefreshToken(),
-                Integer.parseInt(response.getExpiresIn())
-        );
-        connections.put(connectionKey, connection);
-        return connection.getAccessToken();
+    public OAuthClient(String hostPort, String username, PasswordRequest passwordRequest) {
+        this.hostPort = hostPort;
+        this.username = username;
+        this.passwordRequest = passwordRequest;
     }
 
-    public String getAccessToken(String location, String username) throws OAuthSystemException, OAuthProblemException {
-        if (!connections.containsKey(connectionKey(username, location))) {
-            throw new OAuthRuntimeException("Key not found");
+    public String getToken() {
+        try {
+            if (System.currentTimeMillis() - requestTimeStamp > expirationSeconds * 1000) {
+                accessToken = null;
+            }
+            if (accessToken == null) {
+                if (refreshToken != null) {
+                    requestWithRefreshToken();
+                }
+                if (accessToken == null) {
+                    if (password == null) {
+                        password = passwordRequest.getPassword();
+                        if (password != null) {
+                            requestWithPassword();
+                        }
+                    }
+                }
+            }
+            return accessToken;
         }
-        TokenConnection connection = connections.get(connectionKey(username, location));
-        if (!connection.isTokenExpired()) {
-            return connection.getAccessToken();
+        catch (OAuthProblemException e) {
+            log.warn("OAuth Problem", e);
+            return null;
         }
-        return requestRefresh(connectionKey(username, location), connection.getRefreshToken());
+        catch (OAuthSystemException e) {
+            log.warn("OAuth System Problem", e);
+            return null;
+        }
+
     }
 
-
-    private String toTokenLocation(String location) {
-        return "http://" + location + OAUTH2_ENDPOINT_PATH;
+    private void requestWithPassword() throws OAuthSystemException, OAuthProblemException {
+        OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
+                .setGrantType(GrantType.PASSWORD).setUsername(username).setPassword(password)
+                .buildQueryMessage();
+        acceptResponse(OAUTH_CLIENT.accessToken(request));
     }
 
-    private String connectionKey(String username, String location) {
-        return String.format("%s.#.%s", username, location);
+    private void requestWithRefreshToken() throws OAuthSystemException, OAuthProblemException {
+        OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
+                .setGrantType(GrantType.REFRESH_TOKEN).setRefreshToken(refreshToken)
+                .buildQueryMessage();
+        acceptResponse(OAUTH_CLIENT.accessToken(request));
+    }
+
+    private void acceptResponse(OAuthJSONAccessTokenResponse response) {
+        requestTimeStamp = System.currentTimeMillis();
+        accessToken = response.getAccessToken();
+        refreshToken = response.getRefreshToken();
+        expirationSeconds = Integer.parseInt(response.getExpiresIn());
+    }
+
+    private String getTokenUrl() {
+        return String.format("http://%s/token", hostPort);
     }
 
     private final org.apache.amber.oauth2.client.OAuthClient OAUTH_CLIENT = new org.apache.amber.oauth2.client.OAuthClient(new org.apache.amber.oauth2.client.HttpClient() {
@@ -110,30 +123,4 @@ public class OAuthClient {
             return null;
         }
     });
-
-    private static class TokenConnection {
-        private String accessToken = null;
-        private String refreshToken = null;
-        private Long requestTimeStamp = null;
-        private Integer expiresIn = null;
-
-        private TokenConnection(String accessToken, String refreshToken, Integer expiresIn) {
-            this.accessToken = accessToken;
-            this.refreshToken = refreshToken;
-            this.requestTimeStamp = System.currentTimeMillis();
-            this.expiresIn = expiresIn;
-        }
-
-        public String getAccessToken() {
-            return accessToken;
-        }
-
-        public String getRefreshToken() {
-            return refreshToken;
-        }
-
-        public boolean isTokenExpired() {
-            return System.currentTimeMillis() - requestTimeStamp > expiresIn * 1000;
-        }
-    }
 }
