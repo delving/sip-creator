@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.desktop.windows;
+package eu.delving.sip.gui;
 
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.CodeGenerator;
@@ -35,6 +35,7 @@ import eu.europeana.sip.model.SipModel;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -69,7 +70,7 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class StructureWindow extends DesktopWindow {
+public class MappingFrame extends FrameBase {
     private static final String RUN_ANALYSIS = "Run the Analysis";
     private static final String ELEMENTS_PROCESSED = "%d Elements Processed";
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
@@ -82,11 +83,11 @@ public class StructureWindow extends DesktopWindow {
     private JTree statisticsJTree;
     private JList variablesList;
 
-    public StructureWindow(SipModel sipModel) {
-        super(sipModel);
-        setLayout(new GridLayout(1, 0, 5, 5));
-        add(createLeft());
-        add(createRight());
+    public MappingFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Mapping");
+        getContentPane().setLayout(new GridLayout(1, 0, 5, 5));
+        getContentPane().add(createLeft());
+        getContentPane().add(createRight());
         wireUp();
     }
 

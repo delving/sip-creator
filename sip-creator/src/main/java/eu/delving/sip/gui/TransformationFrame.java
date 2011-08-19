@@ -19,11 +19,12 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.desktop.windows;
+package eu.delving.sip.gui;
 
 import eu.europeana.sip.model.SipModel;
 
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -35,12 +36,12 @@ import java.awt.GridLayout;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class TransformationWindow extends DesktopWindow {
+public class TransformationFrame extends FrameBase {
 
-    public TransformationWindow(SipModel sipModel) {
-        super(sipModel);
-        add(createCenter(), BorderLayout.CENTER);
-        add(createSouth(), BorderLayout.SOUTH);
+    public TransformationFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Transformation");
+        getContentPane().add(createCenter(), BorderLayout.CENTER);
+        getContentPane().add(createSouth(), BorderLayout.SOUTH);
     }
 
     private JComponent createCenter() {
@@ -63,7 +64,6 @@ public class TransformationWindow extends DesktopWindow {
         // todo: south has: validate, discard-invalid checkbox, view invalid file, and UPLOAD
         return new JLabel("Buttons");
     }
-
 
     // todo: search popup
     // todo: view invalid popup

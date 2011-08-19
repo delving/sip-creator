@@ -19,11 +19,12 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.desktop.windows;
+package eu.delving.sip.gui;
 
 import eu.europeana.sip.model.SipModel;
 
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -35,12 +36,12 @@ import java.awt.GridLayout;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class RefinementWindow extends DesktopWindow {
+public class RefinementFrame extends FrameBase {
 
-    public RefinementWindow(SipModel sipModel) {
-        super(sipModel);
-        add(createWest(), BorderLayout.WEST);
-        add(createCenter(), BorderLayout.CENTER);
+    public RefinementFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Refinement");
+        getContentPane().add(createWest(), BorderLayout.WEST);
+        getContentPane().add(createCenter(), BorderLayout.CENTER);
     }
 
     private JComponent createWest() {

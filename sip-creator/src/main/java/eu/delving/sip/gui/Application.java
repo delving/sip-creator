@@ -36,6 +36,7 @@ import eu.europeana.sip.model.UserNotifier;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -87,7 +88,6 @@ public class Application {
                 FileStoreFinder.getHostPort(fileStoreDirectory),
                 FileStoreFinder.getUser(fileStoreDirectory),
                 new OAuthClient.PasswordRequest() {
-
                     @Override
                     public String getPassword() {
                         JPasswordField passwordField = new JPasswordField();
@@ -97,7 +97,7 @@ public class Application {
                                 String.format("Password for %s", FileStoreFinder.getHostPortUser(fileStoreDirectory)),
                                 JOptionPane.OK_CANCEL_OPTION
                         );
-                        return new String(passwordField.getPassword());
+                        return answer == JOptionPane.OK_OPTION ? new String(passwordField.getPassword()) : null;
                     }
                 }
         );
@@ -132,7 +132,16 @@ public class Application {
         bar.add(dataSetMenu);
         bar.add(mappingMenu);
         bar.add(cultureHubMenu);
+        bar.add(createFrameMenu());
         return bar;
+    }
+
+    private JMenu createFrameMenu() {
+        JMenu menu = new JMenu("Frames");
+        menu.add(new MappingFrame(desktop, sipModel).getAction());
+        menu.add(new RefinementFrame(desktop, sipModel).getAction());
+        menu.add(new TransformationFrame(desktop, sipModel).getAction());
+        return menu;
     }
 
 
