@@ -4,14 +4,11 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -148,6 +145,7 @@ public abstract class PopupFrame extends JInternalFrame {
         }
         getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         setChildFrame(null);
+        setClosable(true);
     }
 
     /*
@@ -169,34 +167,7 @@ public abstract class PopupFrame extends JInternalFrame {
             // to child opening
             ((PopupFrame) parent).childOpening();
         }
-        calculateBounds();
         super.show();
-    }
-
-    public void calculateBounds() {
-        Dimension frameSize = getPreferredSize();
-        Dimension parentSize = new Dimension();
-        Dimension rootSize = new Dimension(); // size of desktop
-        Point frameCoord = new Point();
-
-        if (desktopPane != null) {
-            rootSize = desktopPane.getSize(); // size of desktop
-            frameCoord = SwingUtilities.convertPoint(parent, 0, 0, desktopPane);
-            parentSize = parent.getSize();
-        }
-
-        //setBounds((rootSize.width - frameSize.width) / 2, (rootSize.height - frameSize.height) / 2, frameSize.width, frameSize.height);
-
-        // We want dialog centered relative to its parent component
-        int x = (parentSize.width - frameSize.width) / 2 + frameCoord.x;
-        int y = (parentSize.height - frameSize.height) / 2 + frameCoord.y;
-
-        // If possible, dialog should be fully visible
-        int ovrx = x + frameSize.width - rootSize.width;
-        int ovry = y + frameSize.height - rootSize.height;
-        x = Math.max((ovrx > 0 ? x - ovrx : x), 0);
-        y = Math.max((ovry > 0 ? y - ovry : y), 0);
-        setBounds(x, y, frameSize.width, frameSize.height);
     }
 
     /**
