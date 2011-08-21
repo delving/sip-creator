@@ -30,10 +30,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
 
 /**
  * Refining the mapping interactively
@@ -45,8 +45,12 @@ public class RefinementFrame extends FrameBase {
 
     public RefinementFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Refinement", false);
-        getContentPane().add(createWest(), BorderLayout.WEST);
-        getContentPane().add(createCenter(), BorderLayout.CENTER);
+    }
+
+    @Override
+    protected void initContent(Container content) {
+        content.add(createWest(), BorderLayout.WEST);
+        content.add(createCenter(), BorderLayout.CENTER);
     }
 
     private JComponent createWest() {
@@ -61,22 +65,22 @@ public class RefinementFrame extends FrameBase {
     }
 
     private void showPopupFrame() {
-        final FrameBase pop = createPopup("Pop!");
-        pop.getContentPane().setLayout(new BorderLayout());
-        pop.getContentPane().add(new JLabel("Crackle to the max!"), BorderLayout.CENTER);
-        JButton close = new JButton("close");
-        close.addActionListener(new ActionListener() {
+        final FrameBase pop = new FrameBase(this, sipModel, "Pop!", true) {
+
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    pop.setClosed(true);
-                }
-                catch (PropertyVetoException e) {
-                    e.printStackTrace();  // todo: something
-                }
+            protected void initContent(Container content) {
+                JButton close = new JButton("close");
+                close.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        closeFrame();
+                    }
+                });
+                content.setLayout(new BorderLayout());
+                content.add(new JLabel("Crackle to the max!"), BorderLayout.CENTER);
+                content.add(close, BorderLayout.EAST);
             }
-        });
-        pop.getContentPane().add(close, BorderLayout.EAST);
+        };
         pop.show();
     }
 
@@ -97,4 +101,5 @@ public class RefinementFrame extends FrameBase {
     }
 
     // todo: dictionary mapping popup
+
 }

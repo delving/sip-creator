@@ -28,11 +28,13 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.KeyStroke;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
 
 /**
  * The base of all windows within the SIP-Creator.
@@ -40,10 +42,11 @@ import java.awt.event.KeyEvent;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class FrameBase extends PopupFrame {
+public abstract class FrameBase extends PopupFrame {
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     protected SipModel sipModel;
     protected Action action;
+    private boolean initialized;
 
     public FrameBase(JComponent parent, SipModel sipModel, String title, boolean modal) {
         super(parent, title, modal);
@@ -51,24 +54,43 @@ public class FrameBase extends PopupFrame {
         this.action = new PopupAction(title);
     }
 
+    protected abstract void initContent(Container content);
+
     @Override
     public void show() {
+        if (!initialized) {
+            initContent(getContentPane());
+            initialized = true;
+        }
         Point added = addIfAbsent();
         super.show();
         if (added != null) {
             setLocation(added);
             setSize(DEFAULT_SIZE); // after show
         }
-        toFront();
-        ensureOnScreen();
+        if (hasChildFrame()) {
+            childFrame.moveToFront();
+            try {
+                childFrame.setSelected(true);
+            }
+            catch (PropertyVetoException e) {
+                e.printStackTrace();  // child should not veto
+            }
+        }
+        else {
+            moveToFront();
+            ensureOnScreen();
+            try {
+                setSelected(true);
+            }
+            catch (PropertyVetoException e) {
+                e.printStackTrace();  // we should not veto
+            }
+        }
     }
 
     public Action getAction() {
         return action;
-    }
-
-    protected FrameBase createPopup(String title) {
-        return new FrameBase(this, sipModel, title, true);
     }
 
     private class PopupAction extends AbstractAction {

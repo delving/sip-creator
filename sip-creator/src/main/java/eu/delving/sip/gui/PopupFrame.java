@@ -60,6 +60,15 @@ public abstract class PopupFrame extends JInternalFrame {
         return (childFrame != null);
     }
 
+    protected void closeFrame() {
+        try {
+            setClosed(true);
+        }
+        catch (PropertyVetoException e) {
+            e.printStackTrace();  // nobody should be vetoing this
+        }
+    }
+
     protected void addFrameVetoListener() {
         addVetoableChangeListener(new VetoableChangeListener() {
 

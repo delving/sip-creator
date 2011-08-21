@@ -54,6 +54,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -85,9 +86,13 @@ public class MappingFrame extends FrameBase {
 
     public MappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Mapping", false);
-        getContentPane().setLayout(new GridLayout(1, 0, 5, 5));
-        getContentPane().add(createLeft());
-        getContentPane().add(createRight());
+    }
+
+    @Override
+    protected void initContent(Container content) {
+        content.setLayout(new GridLayout(1, 0, 5, 5));
+        content.add(createLeft());
+        content.add(createRight());
         wireUp();
     }
 

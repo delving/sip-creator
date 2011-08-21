@@ -28,6 +28,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.GridLayout;
 
 /**
@@ -40,8 +41,12 @@ public class TransformationFrame extends FrameBase {
 
     public TransformationFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Transformation", false);
-        getContentPane().add(createCenter(), BorderLayout.CENTER);
-        getContentPane().add(createSouth(), BorderLayout.SOUTH);
+    }
+
+    @Override
+    protected void initContent(Container content) {
+        content.add(createCenter(), BorderLayout.CENTER);
+        content.add(createSouth(), BorderLayout.SOUTH);
     }
 
     private JComponent createCenter() {
@@ -67,4 +72,5 @@ public class TransformationFrame extends FrameBase {
 
     // todo: search popup
     // todo: view invalid popup
+
 }
