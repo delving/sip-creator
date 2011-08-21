@@ -24,29 +24,30 @@ import java.beans.VetoableChangeListener;
  *
  * @author webbyit
  */
-public class PopupFrame extends JInternalFrame {
+public abstract class PopupFrame extends JInternalFrame {
     protected JDesktopPane desktopPane;
     protected JComponent parent;
     protected PopupFrame childFrame;
     protected JComponent focusOwner;
 
-    public PopupFrame(JComponent parent, String title) {
+    public PopupFrame(JComponent parent, String title, boolean modal) {
         super(
                 title,
                 true, // resizable
-                false, // closeable
+                !modal, // closeable
                 true, // maximizable
                 false // iconifiable
         );
         setParentFrame(parent);
-        setFocusTraversalKeysEnabled(false);
-        if (parent != null && parent instanceof PopupFrame) {
-            ((PopupFrame) parent).setChildFrame(PopupFrame.this);
-        }
-        ModalityInternalGlassPane glassPane = new ModalityInternalGlassPane(this);
-        setGlassPane(glassPane);
+        setGlassPane(new ModalityInternalGlassPane(this));
         addFrameListener();
         addFrameVetoListener();
+        if (modal) {
+            if (parent != null && parent instanceof PopupFrame) {
+                ((PopupFrame) parent).setChildFrame(PopupFrame.this);
+            }
+            setFocusTraversalKeysEnabled(false);
+        }
     }
 
     private void setParentFrame(JComponent parent) {
@@ -128,7 +129,6 @@ public class PopupFrame extends JInternalFrame {
      * available for user input again with no glasspane visible
      */
     protected void childClosing() {
-        setClosable(false);
         getGlassPane().setVisible(false);
         if (focusOwner != null) {
             java.awt.EventQueue.invokeLater(new Runnable() {
@@ -138,7 +138,8 @@ public class PopupFrame extends JInternalFrame {
                         moveToFront();
                         setSelected(true);
                         focusOwner.grabFocus();
-                    } catch (PropertyVetoException ex) {
+                    }
+                    catch (PropertyVetoException ex) {
                         ex.printStackTrace();
                     }
                 }
@@ -219,7 +220,8 @@ public class PopupFrame extends JInternalFrame {
                             if (!modalFrame.hasChildFrame()) {
                                 setVisible(false);
                             }
-                        } catch (PropertyVetoException e1) {
+                        }
+                        catch (PropertyVetoException e1) {
                             //e1.printStackTrace();
                         }
                     }

@@ -25,7 +25,7 @@ import eu.europeana.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDesktopPane;
+import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.KeyStroke;
 import java.awt.Dimension;
@@ -40,28 +40,35 @@ import java.awt.event.KeyEvent;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public abstract class FrameBase extends JInternalFrame {
+public class FrameBase extends PopupFrame {
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     protected SipModel sipModel;
-    protected JDesktopPane desktop;
     protected Action action;
 
-    public FrameBase(JDesktopPane desktop, SipModel sipModel, String title) {
-        super(
-                title,
-                true, // resizable
-                true, // closable
-                true, // maximizable
-                false // iconifiable
-        );
+    public FrameBase(JComponent parent, SipModel sipModel, String title, boolean modal) {
+        super(parent, title, modal);
         this.sipModel = sipModel;
-        this.desktop = desktop;
-        action = new PopupAction(title);
-        setSize(DEFAULT_SIZE);
+        this.action = new PopupAction(title);
+    }
+
+    @Override
+    public void show() {
+        Point added = addIfAbsent();
+        super.show();
+        if (added != null) {
+            setLocation(added);
+            setSize(DEFAULT_SIZE); // after show
+        }
+        toFront();
+        ensureOnScreen();
     }
 
     public Action getAction() {
         return action;
+    }
+
+    protected FrameBase createPopup(String title) {
+        return new FrameBase(this, sipModel, title, true);
     }
 
     private class PopupAction extends AbstractAction {
@@ -79,17 +86,14 @@ public abstract class FrameBase extends JInternalFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            addIfAbsent();
             show();
-            toFront();
-            ensureOnScreen();
         }
 
     }
 
-    private void addIfAbsent() {
+    private Point addIfAbsent() {
         boolean add = true;
-        JInternalFrame[] frames = desktop.getAllFrames();
+        JInternalFrame[] frames = desktopPane.getAllFrames();
         Point max = new Point();
         for (JInternalFrame frame : frames) {
             if (frame == this) {
@@ -104,17 +108,20 @@ public abstract class FrameBase extends JInternalFrame {
             }
         }
         if (add) {
-            desktop.add(this);
+            desktopPane.add(this);
             max.x += 25;
             max.y += 25;
-            setLocation(max);
+            return max;
+        }
+        else {
+            return null;
         }
     }
 
     private void ensureOnScreen() {
         boolean move = false;
         Point loc = getLocation();
-        Dimension desk = desktop.getSize();
+        Dimension desk = desktopPane.getSize();
         Dimension size = getSize();
         Point far = new Point(loc.x + size.width, loc.y + size.height);
         if (loc.x < 0) {

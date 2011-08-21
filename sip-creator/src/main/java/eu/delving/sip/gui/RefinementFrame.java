@@ -28,6 +28,7 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -43,7 +44,7 @@ import java.beans.PropertyVetoException;
 public class RefinementFrame extends FrameBase {
 
     public RefinementFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Refinement");
+        super(desktop, sipModel, "Refinement", false);
         getContentPane().add(createWest(), BorderLayout.WEST);
         getContentPane().add(createCenter(), BorderLayout.CENTER);
     }
@@ -53,28 +54,30 @@ public class RefinementFrame extends FrameBase {
         b.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                final PopupFrame popupFrame = new PopupFrame(RefinementFrame.this, "Pop!");
-                desktop.add(popupFrame);
-                popupFrame.getContentPane().setLayout(new BorderLayout());
-                popupFrame.getContentPane().add(new JLabel("Crackle to the max!"), BorderLayout.CENTER);
-                JButton close = new JButton("close");
-                close.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        try {
-                            popupFrame.setClosed(true);
-                        }
-                        catch (PropertyVetoException e) {
-                            e.printStackTrace();  // todo: something
-                        }
-                    }
-                });
-                popupFrame.getContentPane().add(close, BorderLayout.EAST);
-                popupFrame.show();
-                popupFrame.setSize(800, 600);
+                showPopupFrame();
              }
         });
         return b;
+    }
+
+    private void showPopupFrame() {
+        final FrameBase pop = createPopup("Pop!");
+        pop.getContentPane().setLayout(new BorderLayout());
+        pop.getContentPane().add(new JLabel("Crackle to the max!"), BorderLayout.CENTER);
+        JButton close = new JButton("close");
+        close.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    pop.setClosed(true);
+                }
+                catch (PropertyVetoException e) {
+                    e.printStackTrace();  // todo: something
+                }
+            }
+        });
+        pop.getContentPane().add(close, BorderLayout.EAST);
+        pop.show();
     }
 
     private JComponent createCenter() {
@@ -90,7 +93,7 @@ public class RefinementFrame extends FrameBase {
     }
 
     private JComponent createOutputPane() {
-        return new JLabel("Output");
+        return new JTextField();
     }
 
     // todo: dictionary mapping popup

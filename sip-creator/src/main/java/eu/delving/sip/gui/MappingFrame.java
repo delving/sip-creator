@@ -84,7 +84,7 @@ public class MappingFrame extends FrameBase {
     private JList variablesList;
 
     public MappingFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Mapping");
+        super(desktop, sipModel, "Mapping", false);
         getContentPane().setLayout(new GridLayout(1, 0, 5, 5));
         getContentPane().add(createLeft());
         getContentPane().add(createRight());

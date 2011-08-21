@@ -39,7 +39,7 @@ import java.awt.GridLayout;
 public class TransformationFrame extends FrameBase {
 
     public TransformationFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Transformation");
+        super(desktop, sipModel, "Transformation", false);
         getContentPane().add(createCenter(), BorderLayout.CENTER);
         getContentPane().add(createSouth(), BorderLayout.SOUTH);
     }
