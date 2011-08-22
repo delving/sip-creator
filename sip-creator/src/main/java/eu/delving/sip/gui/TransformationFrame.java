@@ -25,13 +25,13 @@ import eu.delving.groovy.MetadataRecord;
 import eu.europeana.sip.gui.RecordSearchPanel;
 import eu.europeana.sip.model.SipModel;
 
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -42,6 +42,7 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -60,6 +61,8 @@ public class TransformationFrame extends FrameBase {
     private HTMLDocument inputDocument = (HTMLDocument) new HTMLEditorKit().createDefaultDocument();
     private JButton firstButton = new JButton("First");
     private JButton nextButton = new JButton("Next");
+    private CriterionFrame criterionFrame;
+    private JLabel criterionLabel = new JLabel();
 
     public TransformationFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Transformation", false);
@@ -77,9 +80,14 @@ public class TransformationFrame extends FrameBase {
     }
 
     @Override
-    protected void initContent(Container content) {
+    protected void buildContent(Container content) {
+        this.criterionFrame = new CriterionFrame(sipModel);
         content.add(createCenter(), BorderLayout.CENTER);
         content.add(createSouth(), BorderLayout.SOUTH);
+    }
+
+    @Override
+    protected void refresh() {
     }
 
     private JComponent createCenter() {
@@ -101,7 +109,7 @@ public class TransformationFrame extends FrameBase {
         return p;
     }
 
-    // todo: view invalid popup
+    // todo: view invalid records popup
 
     private JPanel createOutputPanel() {
         JPanel p = new JPanel(new BorderLayout());
@@ -113,7 +121,7 @@ public class TransformationFrame extends FrameBase {
     }
 
     private JPanel createRecordPanel() {
-        JPanel p = new JPanel(new BorderLayout(5,5));
+        JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Input Record"));
         p.add(scroll(createRecordView()), BorderLayout.CENTER);
         p.add(createRecordButtonPanel(), BorderLayout.SOUTH);
@@ -149,46 +157,64 @@ public class TransformationFrame extends FrameBase {
     }
 
     private JPanel createRecordButtonPanel() {
-        JPanel p = new JPanel(new FlowLayout());
+        int margin = 4;
+        criterionLabel.setHorizontalAlignment(JLabel.CENTER);
+        criterionLabel.setBackground(Color.WHITE);
+        criterionLabel.setOpaque(true);
+        criterionLabel.setBorder(BorderFactory.createEtchedBorder());
+        JPanel p = new JPanel(new GridLayout(2, 2, margin, margin));
+        p.setBorder(BorderFactory.createEmptyBorder(margin, margin, margin, margin));
         p.add(firstButton);
         p.add(nextButton);
-        p.add(new JButton(createSearchAction()));
+        p.add(new JButton(criterionFrame.getAction()));
+        criterionFrame.init();
+        criterionLabel.setText(criterionFrame.recordSearchPanel.getPredicateDescription());
+        p.add(criterionLabel);
         return p;
     }
 
-    private Action createSearchAction() {
-        final RecordSearchPanel rsp = new RecordSearchPanel(sipModel, new RecordSearchPanel.Listener() {
-            @Override
-            public void searchStarted(String description) {
-                firstButton.setText(String.format("First: %s", description));
-                nextButton.setText(String.format("Next: %s", description));
-            }
+    private class CriterionFrame extends FrameBase {
 
-            @Override
-            public void searchFinished() {
-                // todo: anything interesting?
-            }
-        });
-        firstButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                rsp.scan(false);
-            }
-        });
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                rsp.scan(true);
-            }
-        });
-        final FrameBase search = new FrameBase(this, sipModel, "Search", true) {
-            @Override
-            protected void initContent(Container content) {
-                content.add(rsp);
-            }
-        };
-        search.setDefaultSize(400, 200);
-        return search.getAction();
+        private RecordSearchPanel recordSearchPanel;
+
+        public CriterionFrame(SipModel sipModel) {
+            super(TransformationFrame.this, sipModel, "Criteria", true);
+            setDefaultSize(500, 200);
+        }
+
+        @Override
+        protected void buildContent(Container content) {
+            recordSearchPanel = new RecordSearchPanel(sipModel, new RecordSearchPanel.Listener() {
+                @Override
+                public void searchStarted(String description) {
+                    closeFrame();
+                    criterionLabel.setText(description);
+                }
+
+                @Override
+                public void searchFinished() {
+                    // todo: remove this function eventually
+                }
+            });
+            firstButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    recordSearchPanel.scan(false);
+                }
+            });
+            nextButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    recordSearchPanel.scan(true);
+                }
+            });
+            content.add(recordSearchPanel);
+        }
+
+        @Override
+        protected void refresh() {
+            recordSearchPanel.clear();
+        }
     }
 
     private class DocumentSetter implements Runnable {

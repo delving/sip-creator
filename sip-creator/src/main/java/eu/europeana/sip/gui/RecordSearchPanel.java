@@ -25,6 +25,7 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.ProgressListener;
 import eu.europeana.sip.model.SipModel;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -45,12 +46,12 @@ public class RecordSearchPanel extends JPanel {
     private SipModel sipModel;
     private List<JTextField> fields = new ArrayList<JTextField>();
     private Listener listener;
-    private FieldScanPredicate currentPredicate;
+    private FieldScanPredicate currentPredicate = DEFAULT_PREDICATE;
 
     public interface Listener {
         void searchStarted(String description);
 
-        void searchFinished();
+        void searchFinished(); // todo: remove eventually
     }
 
     public RecordSearchPanel(SipModel sipModel, Listener listener) {
@@ -120,7 +121,17 @@ public class RecordSearchPanel extends JPanel {
                 return record.contains(Pattern.compile(regex));
             }
         }));
-        Utility.makeCompactGrid(this, getComponentCount() / 2, 2, 5, 5, 5, 5);
+        Utility.makeCompactGrid(this, getComponentCount() / 3, 3, 5, 5, 5, 5);
+    }
+
+    public String getPredicateDescription() {
+        return currentPredicate.render();
+    }
+
+    public void clear() {
+        for (JTextField field : fields) {
+            field.setText(null);
+        }
     }
 
     public void scan(boolean next) {
@@ -147,12 +158,13 @@ public class RecordSearchPanel extends JPanel {
 
     private JTextField createField(String prompt, final FieldScanPredicate fieldScanPredicate) {
         JLabel label = new JLabel(prompt, JLabel.RIGHT);
-        JTextField field = new JTextField();
+        final JTextField field = new JTextField();
         label.setLabelFor(field);
-        field.addActionListener(new ActionListener() {
+        JButton setButton = new JButton("Set");
+        setButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                fieldScanPredicate.setFieldValue(actionEvent.getActionCommand());
+                fieldScanPredicate.setFieldValue(field.getText().trim());
                 currentPredicate = fieldScanPredicate;
                 listener.searchStarted(fieldScanPredicate.render());
                 scan(true);
@@ -160,6 +172,7 @@ public class RecordSearchPanel extends JPanel {
         });
         add(label);
         add(field);
+        add(setButton);
         return field;
     }
 
@@ -169,4 +182,20 @@ public class RecordSearchPanel extends JPanel {
 
         String render();
     }
+
+    private static final FieldScanPredicate DEFAULT_PREDICATE = new FieldScanPredicate() {
+        @Override
+        public void setFieldValue(String value) {
+        }
+
+        @Override
+        public String render() {
+            return "All records";
+        }
+
+        @Override
+        public boolean accept(MetadataRecord record) {
+            return true;
+        }
+    };
 }

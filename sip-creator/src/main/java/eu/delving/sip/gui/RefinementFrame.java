@@ -23,7 +23,6 @@ package eu.delving.sip.gui;
 
 import eu.europeana.sip.model.SipModel;
 
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
@@ -32,8 +31,6 @@ import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Refining the mapping interactively
@@ -48,40 +45,17 @@ public class RefinementFrame extends FrameBase {
     }
 
     @Override
-    protected void initContent(Container content) {
+    protected void buildContent(Container content) {
         content.add(createWest(), BorderLayout.WEST);
         content.add(createCenter(), BorderLayout.CENTER);
     }
 
-    private JComponent createWest() {
-        JButton b = new JButton("Mapping List");
-        b.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                showPopupFrame();
-             }
-        });
-        return b;
+    @Override
+    protected void refresh() {
     }
 
-    private void showPopupFrame() {
-        final FrameBase pop = new FrameBase(this, sipModel, "Pop!", true) {
-
-            @Override
-            protected void initContent(Container content) {
-                JButton close = new JButton("close");
-                close.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        closeFrame();
-                    }
-                });
-                content.setLayout(new BorderLayout());
-                content.add(new JLabel("Crackle to the max!"), BorderLayout.CENTER);
-                content.add(close, BorderLayout.EAST);
-            }
-        };
-        pop.show();
+    private JComponent createWest() {
+        return new JLabel("LIST");
     }
 
     private JComponent createCenter() {

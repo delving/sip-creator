@@ -88,11 +88,15 @@ public class MappingFrame extends FrameBase {
     }
 
     @Override
-    protected void initContent(Container content) {
+    protected void buildContent(Container content) {
         content.setLayout(new GridLayout(1, 0, 5, 5));
         content.add(createLeft());
         content.add(createRight());
         wireUp();
+    }
+
+    @Override
+    protected void refresh() {
     }
 
     private void wireUp() {

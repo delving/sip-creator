@@ -27,17 +27,28 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 
 /**
  * The base of all windows within the SIP-Creator.
@@ -45,35 +56,59 @@ import java.beans.PropertyVetoException;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public abstract class FrameBase extends PopupFrame {
+public abstract class FrameBase extends JInternalFrame {
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     private static final int MARGIN = 12;
     private Dimension defaultSize = DEFAULT_SIZE;
+    protected JDesktopPane desktopPane;
+    protected JComponent parent;
+    protected FrameBase childFrame;
+    protected JComponent focusOwner;
     protected SipModel sipModel;
     protected Action action;
     private boolean initialized;
 
     public FrameBase(JComponent parent, SipModel sipModel, String title, boolean modal) {
-        super(parent, title, modal);
+        super(
+                title,
+                true, // resizable
+                !modal, // closeable
+                true, // maximizable
+                false // iconifiable
+        );
+        this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title, !modal);
+        this.desktopPane = parent instanceof FrameBase ? ((FrameBase) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
+        setGlassPane(new ModalityInternalGlassPane(this));
+        addFrameListener();
+        addFrameVetoListener();
+        if (modal) {
+//            if (parent instanceof FrameBase) {
+//                ((FrameBase) parent).setChildFrame(FrameBase.this);
+//            }
+            setFocusTraversalKeysEnabled(false);
+        }
     }
 
     public void setDefaultSize(int width, int height) {
         defaultSize = new Dimension(width, height);
     }
 
-    protected abstract void initContent(Container content);
+    protected abstract void buildContent(Container content);
+    protected abstract void refresh();
 
     @Override
     public void show() {
-        if (!initialized) {
-            JPanel content = (JPanel) getContentPane();
-            content.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
-            initContent(content);
-            initialized = true;
-        }
+        init();
+        refresh();
         Point added = addIfAbsent();
+        if (parent instanceof FrameBase) {
+            ((FrameBase) parent).setChildFrame(FrameBase.this);
+            // Need to inform parent its about to lose its focus due
+            // to child opening
+            ((FrameBase) parent).childOpening();
+        }
         super.show();
         if (added != null) {
             setLocation(added);
@@ -98,6 +133,21 @@ public abstract class FrameBase extends PopupFrame {
                 e.printStackTrace();  // we should not veto
             }
         }
+        try {
+            setClosed(false);
+        }
+        catch (PropertyVetoException e) {
+            e.printStackTrace();  // nobody should be vetoing this
+        }
+    }
+
+    public void init() {
+        if (!initialized) {
+            JPanel content = (JPanel) getContentPane();
+            content.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+            buildContent(content);
+            initialized = true;
+        }
     }
 
     public Action getAction() {
@@ -121,7 +171,12 @@ public abstract class FrameBase extends PopupFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            show();
+            if (sipModel.getDataSetStore() == null) {
+                JOptionPane.showInternalMessageDialog(desktopPane, "A Dataset must be selected from the menu", FrameBase.this.getTitle(), JOptionPane.PLAIN_MESSAGE);
+            }
+            else {
+                show();
+            }
         }
 
     }
@@ -177,6 +232,161 @@ public abstract class FrameBase extends PopupFrame {
         }
         if (move) {
             setLocation(loc);
+        }
+    }
+
+    public void setChildFrame(FrameBase childFrame) {
+        this.childFrame = childFrame;
+    }
+
+    public boolean hasChildFrame() {
+        return childFrame != null;
+    }
+
+    protected void closeFrame() {
+        try {
+            setClosed(true);
+        }
+        catch (PropertyVetoException e) {
+            e.printStackTrace();  // nobody should be vetoing this
+        }
+    }
+
+    protected void addFrameVetoListener() {
+        addVetoableChangeListener(new VetoableChangeListener() {
+
+            public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+                if (evt.getPropertyName().equals(JInternalFrame.IS_SELECTED_PROPERTY)
+                        && evt.getNewValue().equals(Boolean.TRUE)) {
+                    if (hasChildFrame()) {
+                        childFrame.setSelected(true);
+                        if (childFrame.isIcon()) {
+                            childFrame.setIcon(false);
+                        }
+                        throw new PropertyVetoException("no!", evt);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Method to control the display of the glasspane, dependant
+     * on the frame being active or not
+     */
+    protected void addFrameListener() {
+        addInternalFrameListener(new InternalFrameAdapter() {
+
+            @Override
+            public void internalFrameActivated(InternalFrameEvent e) {
+                if (hasChildFrame()) {
+                    getGlassPane().setVisible(true);
+                    grabFocus();
+                }
+                else {
+                    getGlassPane().setVisible(false);
+                }
+            }
+
+            @Override
+            public void internalFrameDeactivated(InternalFrameEvent e) {
+                if (hasChildFrame()) {
+                    getGlassPane().setVisible(true);
+                    grabFocus();
+                }
+                else {
+                    getGlassPane().setVisible(false);
+                }
+            }
+
+            @Override
+            public void internalFrameOpened(InternalFrameEvent e) {
+                getGlassPane().setVisible(false);
+            }
+
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                if (parent != null && parent instanceof FrameBase) {
+                    ((FrameBase) parent).childClosing();
+                }
+            }
+        });
+    }
+
+    /**
+     * Method to handle child frame closing and make this frame
+     * available for user input again with no glasspane visible
+     */
+    protected void childClosing() {
+        getGlassPane().setVisible(false);
+        if (focusOwner != null) {
+            java.awt.EventQueue.invokeLater(new Runnable() {
+
+                public void run() {
+                    try {
+                        moveToFront();
+                        setSelected(true);
+                        focusOwner.grabFocus();
+                    }
+                    catch (PropertyVetoException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+            focusOwner.grabFocus();
+        }
+        getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        setChildFrame(null);
+        setClosable(true);
+    }
+
+    /*
+     * Method to handle child opening and becoming visible.
+     */
+    protected void childOpening() {
+        // record the present focused component
+        setClosable(false);
+        focusOwner = (JComponent) getFocusOwner();
+        grabFocus();
+        getGlassPane().setVisible(true);
+        getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    }
+
+    /**
+     * Glass pane to overlay. Listens for mouse clicks and sets selected
+     * on associated modal frame. Also if modal frame has no children make
+     * class pane invisible
+     */
+    class ModalityInternalGlassPane extends JComponent {
+
+        private FrameBase modalFrame;
+
+        public ModalityInternalGlassPane(FrameBase frame) {
+            modalFrame = frame;
+            addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (!modalFrame.isSelected()) {
+                        try {
+                            modalFrame.setSelected(true);
+                            if (!modalFrame.hasChildFrame()) {
+                                setVisible(false);
+                            }
+                        }
+                        catch (PropertyVetoException e1) {
+                            //e1.printStackTrace();
+                        }
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g);
+            g.setColor(new Color(255, 255, 255, 100));
+            g.fillRect(0, 0, getWidth(), getHeight());
         }
     }
 
