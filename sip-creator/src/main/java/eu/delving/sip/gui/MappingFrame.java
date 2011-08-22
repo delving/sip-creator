@@ -89,8 +89,8 @@ public class MappingFrame extends FrameBase {
             @Override
             public List<SourceVariable> createSelectedVariableList() {
                 List<SourceVariable> list = new ArrayList<SourceVariable>();
-                for (Object variableHolderObject : variablesList.getSelectedValues()) {
-                    list.add((SourceVariable) variableHolderObject);
+                for (Object sourceVariable : variablesList.getSelectedValues()) {
+                    list.add((SourceVariable) sourceVariable);
                 }
                 return list;
             }
@@ -197,6 +197,13 @@ public class MappingFrame extends FrameBase {
                     sipModel.setStatistics(sourceVariable.getStatistics());
                     constantField.setText("?");
                 }
+            }
+        });
+        analyzeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                analyzeButton.setEnabled(false);
+                performAnalysis();
             }
         });
     }
