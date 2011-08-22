@@ -25,8 +25,11 @@ import eu.europeana.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -44,6 +47,8 @@ import java.beans.PropertyVetoException;
 
 public abstract class FrameBase extends PopupFrame {
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
+    private static final int MARGIN = 12;
+    private Dimension defaultSize = DEFAULT_SIZE;
     protected SipModel sipModel;
     protected Action action;
     private boolean initialized;
@@ -51,7 +56,11 @@ public abstract class FrameBase extends PopupFrame {
     public FrameBase(JComponent parent, SipModel sipModel, String title, boolean modal) {
         super(parent, title, modal);
         this.sipModel = sipModel;
-        this.action = new PopupAction(title);
+        this.action = new PopupAction(title, !modal);
+    }
+
+    public void setDefaultSize(int width, int height) {
+        defaultSize = new Dimension(width, height);
     }
 
     protected abstract void initContent(Container content);
@@ -59,14 +68,16 @@ public abstract class FrameBase extends PopupFrame {
     @Override
     public void show() {
         if (!initialized) {
-            initContent(getContentPane());
+            JPanel content = (JPanel) getContentPane();
+            content.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+            initContent(content);
             initialized = true;
         }
         Point added = addIfAbsent();
         super.show();
         if (added != null) {
             setLocation(added);
-            setSize(DEFAULT_SIZE); // after show
+            setSize(defaultSize); // after show
         }
         if (hasChildFrame()) {
             childFrame.moveToFront();
@@ -95,15 +106,17 @@ public abstract class FrameBase extends PopupFrame {
 
     private class PopupAction extends AbstractAction {
 
-        public PopupAction(String title) {
+        public PopupAction(String title, boolean withAccelerator) {
             super(title);
-            this.putValue(
-                    Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(
-                            KeyEvent.VK_A + (title.charAt(0) - 'A'),
-                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
-                    )
-            );
+            if (withAccelerator) {
+                this.putValue(
+                        Action.ACCELERATOR_KEY,
+                        KeyStroke.getKeyStroke(
+                                KeyEvent.VK_A + (title.charAt(0) - 'A'),
+                                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+                        )
+                );
+            }
         }
 
         @Override
@@ -166,4 +179,13 @@ public abstract class FrameBase extends PopupFrame {
             setLocation(loc);
         }
     }
+
+    protected static JScrollPane scroll(JComponent content) {
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+//        scroll.setPreferredSize(new Dimension(300, 800));
+        return scroll;
+    }
+
 }

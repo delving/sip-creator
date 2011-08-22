@@ -35,7 +35,8 @@ public abstract class PopupFrame extends JInternalFrame {
                 true, // maximizable
                 false // iconifiable
         );
-        setParentFrame(parent);
+        this.parent = parent;
+        desktopPane = parent instanceof PopupFrame ? ((PopupFrame) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
         setGlassPane(new ModalityInternalGlassPane(this));
         addFrameListener();
         addFrameVetoListener();
@@ -45,11 +46,6 @@ public abstract class PopupFrame extends JInternalFrame {
             }
             setFocusTraversalKeysEnabled(false);
         }
-    }
-
-    private void setParentFrame(JComponent parent) {
-        desktopPane = JOptionPane.getDesktopPaneForComponent(parent);
-        this.parent = parent == null ? JOptionPane.getDesktopPaneForComponent(parent) : parent; // default to desktop if no parent given
     }
 
     public void setChildFrame(PopupFrame childFrame) {

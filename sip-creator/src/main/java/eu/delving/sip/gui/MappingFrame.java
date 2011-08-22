@@ -39,7 +39,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -323,14 +322,6 @@ public class MappingFrame extends FrameBase {
                 expandEmptyNodes(childNode);
             }
         }
-    }
-
-
-    private JScrollPane scroll(JComponent content) {
-        JScrollPane scroll = new JScrollPane(content);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        return scroll;
     }
 
     // todo: popup for obvious mappings
