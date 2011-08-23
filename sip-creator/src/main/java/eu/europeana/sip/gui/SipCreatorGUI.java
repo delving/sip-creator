@@ -25,13 +25,11 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.ValidationException;
-import eu.delving.sip.AppConfig;
 import eu.delving.sip.DataSetInfo;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileStoreImpl;
 import eu.delving.sip.desktop.AuthenticationClient;
-import eu.europeana.sip.model.AppConfigModel;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
 import eu.europeana.sip.util.DataSetClient;
@@ -94,6 +92,7 @@ public class SipCreatorGUI extends JFrame {
     private static final String CONNECT_TO = "Connect to repository at %s";
     private static final Dimension SIZE = new Dimension(1024, 768);
     private static final int MARGIN = 15;
+    private static final String HOSTPORT = "localhost:9000";
     private Logger log = Logger.getLogger(getClass());
     private SipModel sipModel;
     private JLabel titleLabel = new JLabel(LOCAL_SETS, JLabel.CENTER);
@@ -126,13 +125,13 @@ public class SipCreatorGUI extends JFrame {
 
             @Override
             public String getServerUrl() {
-                return sipModel.getAppConfigModel().getServerUrl();
+                return "http://server.url";
             }
 
             @Override
             public String getAccessToken() {
                 try {
-                    return oauth2Client.getAccessToken(sipModel.getAppConfigModel().getServerHostPort(), sipModel.getAppConfigModel().getUsername());
+                    return oauth2Client.getAccessToken(HOSTPORT, "bob");
                 }
                 catch (OAuthSystemException e) {
                     // todo: show auth window
@@ -173,7 +172,7 @@ public class SipCreatorGUI extends JFrame {
             @Override
             public void disconnected() {
                 connectedBox.setSelected(false);
-                sipModel.getUserNotifier().tellUser(String.format("Disconnected from Repository at %s", sipModel.getAppConfigModel().getServerHostPort()));
+                sipModel.getUserNotifier().tellUser(String.format("Disconnected from Repository at %s", HOSTPORT));
             }
         });
         dataSetActions = new DataSetActions(this, sipModel, dataSetClient, new Runnable() {
@@ -283,13 +282,7 @@ public class SipCreatorGUI extends JFrame {
     }
 
     private JPanel createConnectPanel() {
-        connectedBox = new JCheckBox(String.format(CONNECT_TO, sipModel.getAppConfigModel().getServerHostPort()));
-        sipModel.getAppConfigModel().addListener(new AppConfigModel.Listener() {
-            @Override
-            public void appConfigUpdated(AppConfig appConfig) {
-                connectedBox.setText(String.format(CONNECT_TO, sipModel.getAppConfigModel().getServerHostPort()));
-            }
-        });
+        connectedBox = new JCheckBox(String.format(CONNECT_TO, HOSTPORT));
         connectedBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -364,7 +357,7 @@ public class SipCreatorGUI extends JFrame {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        bar.add(new ImportMenu(this, sipModel, new Runnable() {
+        bar.add(new FileMenu(this, sipModel, new Runnable() {
             @Override
             public void run() {
                 for (FileStore.DataSetStore dataSetStore : sipModel.getFileStore().getDataSetStores().values()) {
@@ -372,8 +365,8 @@ public class SipCreatorGUI extends JFrame {
                 }
             }
         }));
-        bar.add(new RepositoryMenu(this, sipModel, oauth2Client));
-        bar.add(dataSetActions.createPrefixActivationMenu());
+//        bar.add(new RepositoryMenu(this, sipModel, oauth2Client));
+//        bar.add(dataSetActions.createPrefixActivationMenu());
         return bar;
     }
 

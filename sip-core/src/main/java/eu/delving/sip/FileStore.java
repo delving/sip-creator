@@ -42,11 +42,6 @@ import java.util.zip.ZipInputStream;
 
 public interface FileStore {
 
-    @Deprecated /** @deprecated Will be replaced by DesktopPreferences */
-    AppConfig getAppConfig() throws FileStoreException;
-
-    void setAppConfig(AppConfig appConfig) throws FileStoreException;
-
     String getCode(String fileName) throws FileStoreException;
 
     void setCode(String fileName, String code) throws FileStoreException;

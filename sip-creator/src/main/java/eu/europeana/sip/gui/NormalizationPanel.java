@@ -127,11 +127,12 @@ public class NormalizationPanel extends JPanel {
     }
 
     private Action normalizeAction = new AbstractAction("Normalize") {
+        private final String NORM_DIR = "normalizeDirectory";
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             if (storeNormalizedBox.isSelected()) {
-                File normalizeDirectory = new File(sipModel.getAppConfigModel().getNormalizeDirectory());
+                File normalizeDirectory = new File(sipModel.getPreferences().get(NORM_DIR, System.getProperty("user.home")));
                 chooser.setSelectedFile(normalizeDirectory); // todo: this doesn't work for some reason
                 chooser.setCurrentDirectory(normalizeDirectory.getParentFile());
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -150,7 +151,7 @@ public class NormalizationPanel extends JPanel {
                 int choiceMade = chooser.showOpenDialog(NormalizationPanel.this);
                 if (choiceMade == JFileChooser.APPROVE_OPTION) {
                     normalizeDirectory = chooser.getSelectedFile();
-                    sipModel.getAppConfigModel().setNormalizeDirectory(normalizeDirectory);
+                    sipModel.getPreferences().put(NORM_DIR, normalizeDirectory.getAbsolutePath());
                     normalizeTo(normalizeDirectory);
                 }
             }
@@ -181,9 +182,9 @@ public class NormalizationPanel extends JPanel {
                     SwingUtilities.getRoot(NormalizationPanel.this),
                     "<html><h2>Normalizing</h2>",
                     message,
-                    0,100
+                    0, 100
             );
-            sipModel.normalize(normalizeDirectory, discardInvalidBox.isSelected(), new ProgressListener.Adapter(progressMonitor){
+            sipModel.normalize(normalizeDirectory, discardInvalidBox.isSelected(), new ProgressListener.Adapter(progressMonitor) {
                 @Override
                 public void swingFinished(boolean success) {
                     setEnabled(true);

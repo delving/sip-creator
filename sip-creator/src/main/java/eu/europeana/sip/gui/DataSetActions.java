@@ -43,11 +43,9 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -61,7 +59,6 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,30 +104,6 @@ public class DataSetActions {
             buildPanel();
         }
         return panel;
-    }
-
-    public JMenu createPrefixActivationMenu() {
-        JMenu menu = new JMenu("Mappings");
-        List<String> activePrefixes = sipModel.getAppConfigModel().getActiveMetadataPrefixes();
-        for (final String prefix : sipModel.getMetadataModel().getPrefixes()) {
-            final JCheckBoxMenuItem box = new JCheckBoxMenuItem(String.format("Mapping '%s'", prefix));
-            if (activePrefixes.contains(prefix)) {
-                box.setState(true);
-            }
-            box.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    sipModel.getAppConfigModel().setMetadataPrefixActive(prefix, box.getState());
-                    panel.removeAll();
-                    buildPanel();
-                    panel.invalidate();
-                    frame.getContentPane().validate();
-                    setEntry(null);
-                }
-            });
-            menu.add(box);
-        }
-        return menu;
     }
 
     public void setEntry(DataSetListModel.Entry entry) {
@@ -195,7 +168,7 @@ public class DataSetActions {
         localActions.clear();
         localActions.add(createDownloadDataSetAction());
         localActions.add(createAnalyzeFactsAction());
-        for (String metadataPrefix : sipModel.getAppConfigModel().getActiveMetadataPrefixes()) {
+        for (String metadataPrefix : sipModel.getMetadataModel().getPrefixes()) {
             localActions.add(createEditMappingAction(metadataPrefix));
         }
         localActions.add(createRecordStatisticsAction());
@@ -206,7 +179,7 @@ public class DataSetActions {
         remoteActions.clear();
         remoteActions.add(createUploadFactsAction());
         remoteActions.add(createUploadSourceAction());
-        for (String prefix : sipModel.getAppConfigModel().getActiveMetadataPrefixes()) {
+        for (String prefix : sipModel.getMetadataModel().getPrefixes()) {
             remoteActions.add(createUploadMappingAction(prefix));
         }
         for (DataSetCommand command : DataSetCommand.values()) {

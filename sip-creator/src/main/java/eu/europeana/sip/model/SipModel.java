@@ -37,7 +37,6 @@ import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.SourceVariable;
 import eu.delving.metadata.ValidationException;
-import eu.delving.sip.AppConfig;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.ProgressListener;
@@ -61,6 +60,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.prefs.Preferences;
 
 /**
  * This model is behind the whole sip creator, as a facade for all the models related to a data set
@@ -74,7 +74,7 @@ public class SipModel {
     private FileStore fileStore;
     private MetadataModel metadataModel;
     private GroovyCodeResource groovyCodeResource;
-    private AppConfigModel appConfigModel;
+    private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private FileStore.DataSetStore dataSetStore;
     private Facts facts;
     private UserNotifier userNotifier;
@@ -121,13 +121,6 @@ public class SipModel {
 
     public SipModel(FileStore fileStore, MetadataModel metadataModel, GroovyCodeResource groovyCodeResource, UserNotifier userNotifier) throws FileStoreException {
         this.fileStore = fileStore;
-        this.appConfigModel = new AppConfigModel(fileStore.getAppConfig());
-        this.appConfigModel.addListener(new AppConfigModel.Listener() {
-            @Override
-            public void appConfigUpdated(AppConfig appConfig) {
-                executor.execute(new AppConfigSetter(appConfig));
-            }
-        });
         this.metadataModel = metadataModel;
         this.groovyCodeResource = groovyCodeResource;
         this.userNotifier = userNotifier;
@@ -164,6 +157,10 @@ public class SipModel {
         parseListeners.add(parseListener);
     }
 
+    public Preferences getPreferences() {
+        return preferences;
+    }
+
     public FileStore getFileStore() {
         return fileStore;
     }
@@ -188,10 +185,6 @@ public class SipModel {
 
     public FileStore.DataSetStore getDataSetStore() {
         return dataSetStore;
-    }
-
-    public AppConfigModel getAppConfigModel() {
-        return appConfigModel;
     }
 
     public MetadataModel getMetadataModel() {
@@ -679,24 +672,6 @@ public class SipModel {
         public void mappingChanged(RecordMapping recordMapping) {
             log.info("Mapping changed");
             timer.restart();
-        }
-    }
-
-    private class AppConfigSetter implements Runnable {
-        private AppConfig appConfig;
-
-        private AppConfigSetter(AppConfig appConfig) {
-            this.appConfig = appConfig;
-        }
-
-        @Override
-        public void run() {
-            try {
-                fileStore.setAppConfig(appConfig);
-            }
-            catch (FileStoreException e) {
-                userNotifier.tellUser("Unable to save application configuration", e);
-            }
         }
     }
 

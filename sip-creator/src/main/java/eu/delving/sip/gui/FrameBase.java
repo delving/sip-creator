@@ -33,6 +33,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import java.awt.Color;
@@ -84,10 +85,15 @@ public abstract class FrameBase extends JInternalFrame {
         addFrameListener();
         addFrameVetoListener();
         if (modal) {
-//            if (parent instanceof FrameBase) {
-//                ((FrameBase) parent).setChildFrame(FrameBase.this);
-//            }
             setFocusTraversalKeysEnabled(false);
+        }
+        if (getStoredSize() != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    show();
+                }
+            });
         }
     }
 
@@ -96,6 +102,7 @@ public abstract class FrameBase extends JInternalFrame {
     }
 
     protected abstract void buildContent(Container content);
+
     protected abstract void refresh();
 
     @Override
@@ -112,7 +119,13 @@ public abstract class FrameBase extends JInternalFrame {
         super.show();
         if (added != null) {
             setLocation(added);
-            setSize(defaultSize); // after show
+            Dimension storedSize = getStoredSize();
+            if (storedSize != null) {
+                setSize(storedSize);
+            }
+            else {
+                setSize(defaultSize); // after show
+            }
         }
         if (hasChildFrame()) {
             childFrame.moveToFront();
@@ -171,8 +184,8 @@ public abstract class FrameBase extends JInternalFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (sipModel.getDataSetStore() == null) {
-                JOptionPane.showInternalMessageDialog(desktopPane, "A Dataset must be selected from the menu", FrameBase.this.getTitle(), JOptionPane.PLAIN_MESSAGE);
+            if (sipModel.getDataSetStore() == null || sipModel.getMappingModel().getRecordMapping() == null) {
+                JOptionPane.showInternalMessageDialog(desktopPane, "A Dataset and Mapping must be selected from the menus", FrameBase.this.getTitle(), JOptionPane.PLAIN_MESSAGE);
             }
             else {
                 show();
@@ -199,9 +212,15 @@ public abstract class FrameBase extends JInternalFrame {
         }
         if (add) {
             desktopPane.add(this);
-            max.x += 25;
-            max.y += 25;
-            return max;
+            Point storedLocation = getStoredLocation();
+            if (storedLocation != null) {
+                return storedLocation;
+            }
+            else {
+                max.x += 25;
+                max.y += 25;
+                return max;
+            }
         }
         else {
             return null;
@@ -390,11 +409,43 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
+    private Dimension getStoredSize() {
+        Dimension size = new Dimension(getStoredInt("width"), getStoredInt("height"));
+        return size.width > 100 && size.height > 100 ? size : null;
+    }
+
+    private Point getStoredLocation() {
+        Point location = new Point(getStoredInt("x"), getStoredInt("y"));
+        return location.x >= 0 && location.y >= 0 ? location : null;
+    }
+
+    private int getStoredInt(String name) {
+        return sipModel.getPreferences().getInt(String.format("%s:%s", title, name), -1);
+    }
+
+    public void putState() {
+        if (isVisible()) {
+            putStoredInt("x", getLocation().x);
+            putStoredInt("y", getLocation().y);
+            putStoredInt("width", getSize().width);
+            putStoredInt("height", getSize().height);
+        }
+        else {
+            putStoredInt("x", -1);
+            putStoredInt("y", -1);
+            putStoredInt("width", -1);
+            putStoredInt("height", -1);
+        }
+    }
+
+    private void putStoredInt(String name, int value) {
+        sipModel.getPreferences().putInt(String.format("%s:%s", title, name), value);
+    }
+
     protected static JScrollPane scroll(JComponent content) {
         JScrollPane scroll = new JScrollPane(content);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-//        scroll.setPreferredSize(new Dimension(300, 800));
         return scroll;
     }
 

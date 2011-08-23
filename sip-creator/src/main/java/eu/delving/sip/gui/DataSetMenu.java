@@ -37,6 +37,7 @@ import java.awt.event.ActionListener;
  */
 
 public class DataSetMenu extends JMenu {
+    private final String SELECTED = "datasetSelected";
     private SipModel sipModel;
 
     public DataSetMenu(SipModel sipModel) {
@@ -48,7 +49,7 @@ public class DataSetMenu extends JMenu {
     public void refresh() {
         removeAll();
         ButtonGroup bg = new ButtonGroup();
-        FileStore.DataSetStore current = sipModel.getDataSetStore();
+        String selectedSpec = sipModel.getPreferences().get(SELECTED, "");
         for (FileStore.DataSetStore store : sipModel.getFileStore().getDataSetStores().values()) {
             final DataSetItem item = new DataSetItem(store);
             bg.add(item);
@@ -57,9 +58,13 @@ public class DataSetMenu extends JMenu {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     sipModel.setDataSetStore(item.getStore());
+                    sipModel.getPreferences().put(SELECTED, item.getStore().getSpec());
                 }
             });
-            if (store == current) {
+            if (sipModel.getDataSetStore() == null && selectedSpec.equals(store.getSpec())) {
+                sipModel.setDataSetStore(store);
+            }
+            if (store == sipModel.getDataSetStore()) {
                 item.setSelected(true);
             }
         }

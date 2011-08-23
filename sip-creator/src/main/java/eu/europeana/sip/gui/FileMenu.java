@@ -44,13 +44,14 @@ import java.util.Map;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 
-public class ImportMenu extends JMenu {
+public class FileMenu extends JMenu {
+    private final String RECENT_DIR = "recentImportDirectory";
     private Component parent;
     private SipModel sipModel;
     private Runnable dataStoreCreated;
 
-    public ImportMenu(Component parent, SipModel sipModel, Runnable dataStoreCreated) {
-        super("Import");
+    public FileMenu(Component parent, SipModel sipModel, Runnable dataStoreCreated) {
+        super("File");
         this.parent = parent;
         this.sipModel = sipModel;
         this.dataStoreCreated = dataStoreCreated;
@@ -61,7 +62,7 @@ public class ImportMenu extends JMenu {
         private JFileChooser chooser = new JFileChooser("XML File");
 
         private LoadNewFileAction(File directory) {
-            super("From " + directory.getAbsolutePath());
+            super("Import From " + directory.getAbsolutePath());
             chooser.setCurrentDirectory(directory);
             chooser.setFileFilter(new FileFilter() {
                 @Override
@@ -82,7 +83,7 @@ public class ImportMenu extends JMenu {
             int choiceMade = chooser.showOpenDialog(parent);
             if (choiceMade == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
-                sipModel.getAppConfigModel().setRecentDirectory(file);
+                sipModel.getPreferences().put(RECENT_DIR, file.getAbsolutePath());
                 selectInputFile(file);
                 refresh();
             }
@@ -174,7 +175,7 @@ public class ImportMenu extends JMenu {
 
     private void refresh() {
         removeAll();
-        File directory = new File(sipModel.getAppConfigModel().getRecentDirectory());
+        File directory = new File(sipModel.getPreferences().get(RECENT_DIR, System.getProperty("user.home")));
         while (directory != null) {
             add(new LoadNewFileAction(directory));
             directory = directory.getParentFile();

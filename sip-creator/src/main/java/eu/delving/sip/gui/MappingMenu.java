@@ -37,15 +37,29 @@ import java.awt.event.ActionListener;
  */
 
 public class MappingMenu extends JMenu {
+    private final String SELECTED = "selectedMapping";
     private SipModel sipModel;
 
     public MappingMenu(SipModel sipModel) {
         super("Mappings");
         this.sipModel = sipModel;
+        build();
+    }
+
+    private void build() {
         String currentPrefix = null;
         RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
         if (recordMapping != null) {
             currentPrefix = recordMapping.getPrefix();
+        }
+        if (currentPrefix == null) {
+            currentPrefix = sipModel.getPreferences().get(SELECTED, "");
+            if (currentPrefix.isEmpty()) {
+                currentPrefix = null;
+            }
+            else {
+                sipModel.setMetadataPrefix(currentPrefix);
+            }
         }
         ButtonGroup bg = new ButtonGroup();
         for (String prefix : sipModel.getMetadataModel().getPrefixes()) {
@@ -55,7 +69,8 @@ public class MappingMenu extends JMenu {
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    MappingMenu.this.sipModel.setMetadataPrefix(actionEvent.getActionCommand());
+                    sipModel.setMetadataPrefix(actionEvent.getActionCommand());
+                    sipModel.getPreferences().put(SELECTED, actionEvent.getActionCommand());
                 }
             });
         }

@@ -29,7 +29,7 @@ import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileStoreImpl;
 import eu.delving.sip.desktop.FileStoreFinder;
-import eu.europeana.sip.gui.ImportMenu;
+import eu.europeana.sip.gui.FileMenu;
 import eu.europeana.sip.model.SipModel;
 import eu.europeana.sip.model.UserNotifier;
 
@@ -48,7 +48,12 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Toolkit;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 
 /**
@@ -67,6 +72,9 @@ public class Application {
     private MappingMenu mappingMenu;
     private CultureHubMenu cultureHubMenu;
     private OAuthClient oauthClient;
+    private MappingFrame mappingFrame;
+    private RefinementFrame refinementFrame;
+    private TransformationFrame transformationFrame;
 
     private Application(final File fileStoreDirectory) throws FileStoreException {
         MetadataModel metadataModel = loadMetadataModel();
@@ -83,9 +91,12 @@ public class Application {
             }
         };
         desktop.setBackground(new Color(190, 190, 200));
+        mappingFrame = new MappingFrame(desktop, sipModel);
+        refinementFrame = new RefinementFrame(desktop, sipModel);
+        transformationFrame = new TransformationFrame(desktop, sipModel);
         frame.getContentPane().add(desktop);
         frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setIconImage(logo.getImage());
         this.dataSetMenu = new DataSetMenu(sipModel);
         this.mappingMenu = new MappingMenu(sipModel);
@@ -112,11 +123,49 @@ public class Application {
             }
         }));
         frame.setJMenuBar(createMenuBar());
+        frame.addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent windowEvent) {
+            }
+
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                putFrameStates();
+                System.exit(0);
+            }
+
+            @Override
+            public void windowClosed(WindowEvent windowEvent) {
+            }
+
+            @Override
+            public void windowIconified(WindowEvent windowEvent) {
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent windowEvent) {
+            }
+
+            @Override
+            public void windowActivated(WindowEvent windowEvent) {
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent windowEvent) {
+            }
+        });
+        osxExtra();
+    }
+
+    private void putFrameStates() {
+        mappingFrame.putState();
+        refinementFrame.putState();
+        transformationFrame.putState();
     }
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        bar.add(new ImportMenu(frame, sipModel, new Runnable() {
+        bar.add(new FileMenu(frame, sipModel, new Runnable() {
             @Override
             public void run() {
                 // todo: when a new data set is imported...
@@ -131,9 +180,9 @@ public class Application {
 
     private JMenu createFrameMenu() {
         JMenu menu = new JMenu("Frames");
-        menu.add(new MappingFrame(desktop, sipModel).getAction());
-        menu.add(new RefinementFrame(desktop, sipModel).getAction());
-        menu.add(new TransformationFrame(desktop, sipModel).getAction());
+        menu.add(mappingFrame.getAction());
+        menu.add(refinementFrame.getAction());
+        menu.add(transformationFrame.getAction());
         return menu;
     }
 
@@ -212,6 +261,38 @@ public class Application {
         }
     }
 
+    private void osxExtra() {
+        boolean osx = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
+        if (osx) {
+            try {
+                InvocationHandler handler = new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
+                        if (method.getName().equals("handleQuitRequestWith")) {
+                            putFrameStates();
+                            Method performQuitMethod = objects[1].getClass().getDeclaredMethod("performQuit");
+                            performQuitMethod.invoke(objects[1]);
+                        }
+                        return null;
+                    }
+                };
+                Class quitHandlerInterface = Class.forName("com.apple.eawt.QuitHandler");
+                Object quitHandlerProxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {quitHandlerInterface}, handler);
+                Class applicationClass = Class.forName("com.apple.eawt.Application");
+                Method getApplication = applicationClass.getDeclaredMethod("getApplication");
+                Object applicationInstance = getApplication.invoke(null);
+                Method setQuitHandlerMethod = applicationClass.getDeclaredMethod("setQuitHandler", quitHandlerInterface);
+                setQuitHandlerMethod.invoke(applicationInstance, quitHandlerProxy);
+            }
+            catch (ClassNotFoundException cnfe) {
+                System.err.println("This version of Mac OS X does not support the Apple EAWT.  ApplicationEvent handling has been disabled (" + cnfe + ")");
+            }
+            catch (Exception ex) {  // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
+                System.err.println("Mac OS X Adapter could not talk to EAWT:");
+                ex.printStackTrace();
+            }
+        }
+    }
 
     public static void main(String[] args) throws FileStoreException {
         final File fileStoreDirectory = FileStoreFinder.getFileStoreDirectory();

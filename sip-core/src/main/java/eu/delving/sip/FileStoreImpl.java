@@ -21,13 +21,25 @@
 
 package eu.delving.sip;
 
-import com.thoughtworks.xstream.XStream;
-import eu.delving.metadata.*;
+import eu.delving.metadata.Facts;
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.Hasher;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.MetadataModel;
+import eu.delving.metadata.RecordDefinition;
+import eu.delving.metadata.RecordMapping;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -53,39 +65,6 @@ public class FileStoreImpl implements FileStore {
             if (!home.mkdirs()) {
                 throw new FileStoreException(String.format("Unable to create file store in %s", home.getAbsolutePath()));
             }
-        }
-    }
-
-    @Override
-    public AppConfig getAppConfig() throws FileStoreException {
-        File appConfigFile = new File(home, APP_CONFIG_FILE_NAME);
-        AppConfig config = null;
-        if (appConfigFile.exists()) {
-            try {
-                Reader reader = new InputStreamReader(new FileInputStream(appConfigFile));
-                config = (AppConfig) getAppConfigStream().fromXML(reader);
-                reader.close();
-            }
-            catch (Exception e) {
-                throw new FileStoreException(String.format("Unable to read application configuration from %s", appConfigFile.getAbsolutePath()));
-            }
-        }
-        if (config == null) {
-            config = new AppConfig();
-        }
-        return config;
-    }
-
-    @Override
-    public void setAppConfig(AppConfig appConfig) throws FileStoreException {
-        File appConfigFile = new File(home, APP_CONFIG_FILE_NAME);
-        try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream(appConfigFile), "UTF-8");
-            getAppConfigStream().toXML(appConfig, writer);
-            writer.close();
-        }
-        catch (IOException e) {
-            throw new FileStoreException(String.format("Unable to save application config to %s", appConfigFile.getAbsolutePath()), e);
         }
     }
 
@@ -586,12 +565,6 @@ public class FileStoreImpl implements FileStore {
                 throw new FileStoreException("Unable to close output", e);
             }
         }
-    }
-
-    private XStream getAppConfigStream() {
-        XStream stream = new XStream();
-        stream.processAnnotations(AppConfig.class);
-        return stream;
     }
 
     private File findFactsFile(File dir) {
