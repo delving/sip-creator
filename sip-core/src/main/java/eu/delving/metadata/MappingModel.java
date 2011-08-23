@@ -37,7 +37,7 @@ public class MappingModel {
 
     public void setRecordMapping(RecordMapping recordMapping) {
         this.recordMapping = recordMapping;
-        fireChangeEvent();
+        fireChangeEvent(null);
     }
 
     public RecordMapping getRecordMapping() {
@@ -46,7 +46,7 @@ public class MappingModel {
 
     public void setFact(String path, String value) {
         if (recordMapping != null) {
-            boolean changed = false;
+            boolean changed;
             if (value == null) {
                 changed = recordMapping.facts.containsKey(path);
                 recordMapping.facts.remove(path);
@@ -56,7 +56,7 @@ public class MappingModel {
                 recordMapping.facts.put(path, value);
             }
             if (changed) {
-                fireChangeEvent();
+                fireChangeEvent(null);
             }
         }
     }
@@ -69,20 +69,24 @@ public class MappingModel {
         else {
             recordMapping.fieldMappings.put(path, fieldMapping);
         }
-        fireChangeEvent();
+        fireChangeEvent(fieldMapping);
     }
 
     public void applyTemplate(RecordMapping template) {
         if (recordMapping.fieldMappings.isEmpty()) {
             recordMapping.applyTemplate(template);
-            fireChangeEvent();
+            fireChangeEvent(null);
         }
+    }
+
+    public void changed(FieldMapping fieldMapping) {
+        fireChangeEvent(fieldMapping);
     }
 
     // observable
 
     public interface Listener {
-        void mappingChanged(RecordMapping recordMapping);
+        void mappingChanged(RecordMapping recordMapping, FieldMapping fieldMapping);
     }
 
     public void addListener(Listener listener) {
@@ -91,9 +95,9 @@ public class MappingModel {
 
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
-    private void fireChangeEvent() {
+    private void fireChangeEvent(FieldMapping fieldMapping) {
         for (Listener listener : listeners) {
-            listener.mappingChanged(recordMapping);
+            listener.mappingChanged(recordMapping, fieldMapping);
         }
     }
 

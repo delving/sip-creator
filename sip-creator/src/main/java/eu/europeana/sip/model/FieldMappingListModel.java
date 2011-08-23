@@ -52,13 +52,15 @@ public class FieldMappingListModel extends AbstractListModel implements MappingM
     }
 
     @Override
-    public void mappingChanged(RecordMapping recordMapping) {
-        clear();
-        if (recordMapping != null) {
-            for (FieldMapping fieldMapping : recordMapping.getFieldMappings()) {
-                list.add(fieldMapping);
+    public void mappingChanged(RecordMapping recordMapping, FieldMapping fieldChanged) {
+        if (fieldChanged == null) {
+            clear();
+            if (recordMapping != null) {
+                for (FieldMapping fieldMapping : recordMapping.getFieldMappings()) {
+                    list.add(fieldMapping);
+                }
+                fireIntervalAdded(this, 0, getSize());
             }
-            fireIntervalAdded(this, 0, getSize());
         }
     }
 

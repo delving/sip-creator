@@ -95,7 +95,7 @@ public class RecordPanel extends JPanel {
     private JEditorPane createRecordView(CompileModel compileModel) {
         final JEditorPane recordView = new JEditorPane();
         recordView.setContentType("text/html");
-        recordView.setDocument(compileModel.getInputDocument());
+//        recordView.setDocument(compileModel.getInputDocument());
         recordView.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {

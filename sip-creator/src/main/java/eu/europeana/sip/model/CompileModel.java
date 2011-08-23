@@ -64,8 +64,6 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private RecordMapping recordMapping;
     private MetadataRecord metadataRecord;
-    private HTMLEditorKit editorKit = new HTMLEditorKit();
-    private HTMLDocument inputDocument = (HTMLDocument) editorKit.createDefaultDocument();
     private Document codeDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
     private CompileTimer compileTimer = new CompileTimer();
@@ -97,14 +95,16 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     @Override
-    public void mappingChanged(RecordMapping recordMapping) {
+    public void mappingChanged(RecordMapping recordMapping, FieldMapping fieldMapping) {
         if (this.recordMapping != recordMapping) {
             log.info("New record mapping, selected path eliminated");
             this.selectedPath = null;
         }
         this.recordMapping = recordMapping;
         this.editedCode = null;
-        SwingUtilities.invokeLater(new DocumentSetter(codeDocument, getDisplayCode()));
+        if (fieldMapping == null) {
+            SwingUtilities.invokeLater(new DocumentSetter(codeDocument, getDisplayCode()));
+        }
         notifyStateChange(State.PRISTINE);
         compileSoon();
     }
@@ -171,18 +171,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     @Override
     public void updatedRecord(MetadataRecord metadataRecord) {
         this.metadataRecord = metadataRecord;
-        if (metadataRecord == null) {
-            SwingUtilities.invokeLater(new DocumentSetter(inputDocument, "<html><h1>No input</h1>"));
-            SwingUtilities.invokeLater(new DocumentSetter(outputDocument, ""));
-        }
-        else {
-            updateInputDocument(metadataRecord);
+        if (metadataRecord != null) {
             compileSoon();
         }
-    }
-
-    public Document getInputDocument() {
-        return inputDocument;
     }
 
     public Document getCodeDocument() {
@@ -240,15 +231,6 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         }
         else {
             return recordMapping.toCompileCode(metadataModel, selectedPath, editedCode);
-        }
-    }
-
-    private void updateInputDocument(MetadataRecord metadataRecord) {
-        if (metadataRecord != null) {
-            SwingUtilities.invokeLater(new DocumentSetter(inputDocument, metadataRecord.toHtml()));
-        }
-        else {
-            SwingUtilities.invokeLater(new DocumentSetter(inputDocument, "<html><h1>No Input</h1>"));
         }
     }
 

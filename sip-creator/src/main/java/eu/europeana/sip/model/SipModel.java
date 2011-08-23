@@ -143,7 +143,7 @@ public class SipModel {
                 switch (state) {
                     case COMMITTED:
                     case REGENERATED:
-                        mappingSaveTimer.mappingChanged(null);
+                        mappingModel.changed(fieldCompileModel.getSelectedFieldMapping());
                 }
             }
         });
@@ -669,8 +669,7 @@ public class SipModel {
         }
 
         @Override
-        public void mappingChanged(RecordMapping recordMapping) {
-            log.info("Mapping changed");
+        public void mappingChanged(RecordMapping recordMapping, FieldMapping fieldMapping) {
             timer.restart();
         }
     }
@@ -681,7 +680,7 @@ public class SipModel {
             if (interactive) {
                 RecordMapping recordMapping = getMappingModel().getRecordMapping();
                 if (recordMapping != null && factModel.fillRecordMapping(recordMapping)) {
-                    mappingSaveTimer.mappingChanged(recordMapping);
+                    mappingSaveTimer.mappingChanged(recordMapping, null);
                 }
                 if (factModel.fillFacts(facts)) {
                     executor.execute(new FactsSetter(facts));

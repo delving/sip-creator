@@ -135,7 +135,7 @@ public class VariableListModel extends AbstractListModel {
         }
 
         @Override
-        public void mappingChanged(RecordMapping recordMapping) {
+        public void mappingChanged(RecordMapping recordMapping, FieldMapping fieldMapping) {
             refresh();
         }
     }
