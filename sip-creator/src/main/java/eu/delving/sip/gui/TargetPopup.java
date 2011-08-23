@@ -59,7 +59,7 @@ public class TargetPopup extends FrameBase {
     }
 
     public TargetPopup(FrameBase parent, Context context) {
-        super(parent, parent.sipModel, "Target", true);
+        super(parent, parent.sipModel, "Create Mapping", true);
         this.context = context;
         targetFieldList = new JList(sipModel.getUnmappedFieldListModel());
         targetFieldList.setCellRenderer(new FieldListModel.CellRenderer());

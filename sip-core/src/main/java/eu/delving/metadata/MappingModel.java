@@ -69,7 +69,7 @@ public class MappingModel {
         else {
             recordMapping.fieldMappings.put(path, fieldMapping);
         }
-        fireChangeEvent(fieldMapping);
+        fireChangeEvent(null);
     }
 
     public void applyTemplate(RecordMapping template) {

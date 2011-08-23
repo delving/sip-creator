@@ -22,6 +22,8 @@
 package eu.delving.sip.gui;
 
 import eu.delving.metadata.AnalysisTree;
+import eu.delving.metadata.CodeGenerator;
+import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.SourceVariable;
@@ -81,6 +83,7 @@ public class MappingFrame extends FrameBase {
     private JTree statisticsJTree;
     private JList variablesList;
     private TargetPopup targetPopup;
+    private ObviousMappingsPopup obviousMappingsPopup;
 
     public MappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Mapping", false);
@@ -106,6 +109,7 @@ public class MappingFrame extends FrameBase {
                 constantField.setText("");
             }
         });
+        obviousMappingsPopup = new ObviousMappingsPopup(this);
         variablesList = new JList(sipModel.getVariablesListWithCountsModel());
         statisticsJTree = new JTree(sipModel.getAnalysisTreeModel());
         statisticsJTree.getModel().addTreeModelListener(new Expander());
@@ -216,9 +220,12 @@ public class MappingFrame extends FrameBase {
     }
 
     private JPanel createVariableMappingPanel() {
+        JPanel pp = new JPanel(new GridLayout(0, 1, 5, 5));
+        pp.add(new JButton(obviousMappingsPopup.getAction()));
+        pp.add(new JButton(targetPopup.getAction()));
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.add(createVariableMappingTop(), BorderLayout.CENTER);
-        p.add(new JButton(targetPopup.getAction()), BorderLayout.SOUTH); // todo: also create-obvious
+        p.add(pp, BorderLayout.SOUTH);
         return p;
     }
 
@@ -266,6 +273,25 @@ public class MappingFrame extends FrameBase {
 
     private JComponent createRight() {
         return fieldStatisticsPanel;
+    }
+
+    private void prepareCreateMappingButtons() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                CodeGenerator codeGenerator = new CodeGenerator();
+                List<FieldMapping> obvious = codeGenerator.createObviousMappings(sipModel.getUnmappedFields(), sipModel.getVariables());
+                if (obvious.isEmpty()) {
+                    if (obviousMappingsPopup.isVisible()) {
+                        obviousMappingsPopup.closeFrame();
+                    }
+                    createObviousMappingButton.setEnabled(false);
+                }
+                else {
+                    createObviousMappingButton.setEnabled(true);
+                }
+            }
+        });
     }
 
     private void performAnalysis() {
