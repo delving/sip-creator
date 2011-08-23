@@ -26,7 +26,6 @@ import eu.delving.metadata.FieldDefinition;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.SourceVariable;
 import eu.europeana.sip.model.FieldListModel;
-import eu.europeana.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -59,8 +58,8 @@ public class TargetPopup extends FrameBase {
         void clear();
     }
 
-    public TargetPopup(JComponent parent, SipModel sipModel, Context context) {
-        super(parent, sipModel, "Target", true);
+    public TargetPopup(FrameBase parent, Context context) {
+        super(parent, parent.sipModel, "Target", true);
         this.context = context;
         targetFieldList = new JList(sipModel.getUnmappedFieldListModel());
         targetFieldList.setCellRenderer(new FieldListModel.CellRenderer());

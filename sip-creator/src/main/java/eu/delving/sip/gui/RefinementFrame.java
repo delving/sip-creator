@@ -74,6 +74,7 @@ public class RefinementFrame extends FrameBase {
     private JButton dictionaryCreate = new JButton("Create");
     private JButton dictionaryEdit = new JButton("Edit");
     private JButton dictionaryDelete = new JButton("Delete");
+    private DictionaryPopup dictionaryPopup;
     private JList mappingList;
 
     public RefinementFrame(JDesktopPane desktop, SipModel sipModel) {
@@ -84,6 +85,7 @@ public class RefinementFrame extends FrameBase {
         dictionaryCreate.setEnabled(false);
         dictionaryEdit.setEnabled(false);
         dictionaryDelete.setEnabled(false);
+        dictionaryPopup = new DictionaryPopup(this);
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         groovyCodeArea.setTabSize(3);
         groovyCodeArea.setToolTipText(Utility.GROOVY_TOOL_TIP);
@@ -225,13 +227,12 @@ public class RefinementFrame extends FrameBase {
             public void actionPerformed(ActionEvent e) {
                 final FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
                 if (fieldMapping != null) {
-//                    DictionaryDialog dialog = new DictionaryDialog(parent, fieldMapping, new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            setFieldMapping(fieldMapping);
-//                        }
-//                    });
-//                    dialog.setVisible(true);
+                    dictionaryPopup.editDictionary(fieldMapping, new Runnable() {
+                        @Override
+                        public void run() {
+                            setFieldMapping(fieldMapping);
+                        }
+                    });
                 }
             }
         });

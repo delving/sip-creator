@@ -84,7 +84,7 @@ public class MappingFrame extends FrameBase {
 
     public MappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Mapping", false);
-        this.targetPopup = new TargetPopup(this, sipModel, new TargetPopup.Context() {
+        this.targetPopup = new TargetPopup(this, new TargetPopup.Context() {
 
             @Override
             public List<SourceVariable> createSelectedVariableList() {
