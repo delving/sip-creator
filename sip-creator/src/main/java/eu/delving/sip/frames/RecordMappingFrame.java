@@ -22,6 +22,8 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.FieldMapping;
+import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.FieldMappingListModel;
 import eu.delving.sip.model.SipModel;
@@ -31,6 +33,8 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -49,6 +53,7 @@ import java.awt.event.ActionListener;
 public class RecordMappingFrame extends FrameBase {
     private JButton removeMappingButton = new JButton("Remove Selected Mapping");
     private JList mappingList;
+    private JTextArea codeArea = new JTextArea();
 
     public RecordMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Record Mapping", false);
@@ -61,11 +66,20 @@ public class RecordMappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        add(createListPanel(), BorderLayout.CENTER);
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.add("Field List", createListPanel());
+        tabs.add("Mapping Code", createCodePanel());
+        add(tabs, BorderLayout.CENTER);
     }
 
     @Override
     protected void refresh() {
+    }
+
+    private JPanel createCodePanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(scroll(codeArea), BorderLayout.CENTER);
+        return p;
     }
 
     private JPanel createListPanel() {
@@ -84,6 +98,25 @@ public class RecordMappingFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+            @Override
+            public void factChanged() {
+            }
+
+            @Override
+            public void select(FieldMapping fieldMapping) {
+            }
+
+            @Override
+            public void selectedChanged() {
+            }
+
+            @Override
+            public void mappingChanged(RecordMapping recordMapping) {
+                String code = recordMapping.toDisplayCode(sipModel.getMetadataModel());
+                codeArea.setText(code);
+            }
+        });
         removeMappingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
