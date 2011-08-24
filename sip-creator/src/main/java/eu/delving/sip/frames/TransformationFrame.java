@@ -68,7 +68,7 @@ public class TransformationFrame extends FrameBase {
     private HTMLDocument inputDocument = (HTMLDocument) new HTMLEditorKit().createDefaultDocument();
     private JButton firstButton = new JButton("First");
     private JButton nextButton = new JButton("Next");
-    private CriterionFrame criterionFrame;
+    private RecordScanPopup recordScanPopup;
     private JLabel criterionLabel = new JLabel();
 
     public TransformationFrame(JDesktopPane desktop, SipModel sipModel) {
@@ -84,11 +84,29 @@ public class TransformationFrame extends FrameBase {
                 }
             }
         });
+        this.recordScanPopup = new RecordScanPopup(this, sipModel, new RecordScanPopup.Listener() {
+            @Override
+            public void searchStarted(String description) {
+                closeFrame();
+                criterionLabel.setText(description);
+            }
+        });
+        firstButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                recordScanPopup.scan(false);
+            }
+        });
+        nextButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                recordScanPopup.scan(true);
+            }
+        });
     }
 
     @Override
     protected void buildContent(Container content) {
-        this.criterionFrame = new CriterionFrame(sipModel);
         content.add(createCenter(), BorderLayout.CENTER);
         content.add(createSouth(), BorderLayout.SOUTH);
     }
@@ -173,55 +191,11 @@ public class TransformationFrame extends FrameBase {
         p.setBorder(BorderFactory.createEmptyBorder(margin, margin, margin, margin));
         p.add(firstButton);
         p.add(nextButton);
-        p.add(new JButton(criterionFrame.getAction()));
-        criterionFrame.init();
-        criterionLabel.setText(criterionFrame.recordSearchPanel.getPredicateDescription());
+        p.add(new JButton(recordScanPopup.getAction()));
+        recordScanPopup.init();
+        criterionLabel.setText(recordScanPopup.getPredicateDescription());
         p.add(criterionLabel);
         return p;
-    }
-
-    private class CriterionFrame extends FrameBase {
-
-        private RecordSearchPanel recordSearchPanel;
-
-        public CriterionFrame(SipModel sipModel) {
-            super(TransformationFrame.this, sipModel, "Criteria", true);
-            setDefaultSize(500, 200);
-        }
-
-        @Override
-        protected void buildContent(Container content) {
-            recordSearchPanel = new RecordSearchPanel(sipModel, new RecordSearchPanel.Listener() {
-                @Override
-                public void searchStarted(String description) {
-                    closeFrame();
-                    criterionLabel.setText(description);
-                }
-
-                @Override
-                public void searchFinished() {
-                    // todo: remove this function eventually
-                }
-            });
-            firstButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    recordSearchPanel.scan(false);
-                }
-            });
-            nextButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    recordSearchPanel.scan(true);
-                }
-            });
-            content.add(recordSearchPanel);
-        }
-
-        @Override
-        protected void refresh() {
-            recordSearchPanel.clear();
-        }
     }
 
     private class DocumentSetter implements Runnable {
@@ -267,7 +241,7 @@ public class TransformationFrame extends FrameBase {
 
     private JCheckBox discardInvalidBox = new JCheckBox("Discard Invalid Records");
     private JCheckBox storeNormalizedBox = new JCheckBox("Store Normalized XML");
-//    private JLabel normalizeMessageLabel = new JLabel("?", JLabel.CENTER);
+    //    private JLabel normalizeMessageLabel = new JLabel("?", JLabel.CENTER);
     private JFileChooser chooser = new JFileChooser("Normalized Data Output Directory");
 
     private Action normalizeAction = new AbstractAction("Normalize") {

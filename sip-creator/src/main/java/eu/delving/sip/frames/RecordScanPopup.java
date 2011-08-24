@@ -23,16 +23,18 @@ package eu.delving.sip.frames;
 
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -43,22 +45,23 @@ import java.util.regex.Pattern;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class RecordSearchPanel extends JPanel {
-    private SipModel sipModel;
+public class RecordScanPopup extends FrameBase {
     private List<JTextField> fields = new ArrayList<JTextField>();
     private Listener listener;
     private FieldScanPredicate currentPredicate = DEFAULT_PREDICATE;
 
     public interface Listener {
         void searchStarted(String description);
-
-        void searchFinished(); // todo: remove eventually
     }
 
-    public RecordSearchPanel(SipModel sipModel, Listener listener) {
-        super(new SpringLayout());
-        this.sipModel = sipModel;
+    public RecordScanPopup(JComponent parent, SipModel sipModel, Listener listener) {
+        super(parent, sipModel, "Scan Criteria", true);
         this.listener = listener;
+    }
+
+    @Override
+    protected void buildContent(Container content) {
+        content.setLayout(new SpringLayout());
         fields.add(createField("Record Number (modulo):", new FieldScanPredicate() {
 
             private int modulo;
@@ -125,14 +128,15 @@ public class RecordSearchPanel extends JPanel {
         Utility.makeCompactGrid(this, getComponentCount() / 3, 3, 5, 5, 5, 5);
     }
 
-    public String getPredicateDescription() {
-        return currentPredicate.render();
-    }
-
-    public void clear() {
+    @Override
+    protected void refresh() {
         for (JTextField field : fields) {
             field.setText(null);
         }
+    }
+
+    public String getPredicateDescription() {
+        return currentPredicate.render();
     }
 
     public void scan(boolean next) {
@@ -141,7 +145,7 @@ public class RecordSearchPanel extends JPanel {
         if (currentPredicate != null) {
             for (JTextField field : fields) field.setEnabled(false);
             final ProgressMonitor progressMonitor = new ProgressMonitor(
-                    SwingUtilities.getRoot(RecordSearchPanel.this),
+                    SwingUtilities.getRoot(RecordScanPopup.this),
                     "<html><h2>Scanning</h2>",
                     currentPredicate.render(),
                     0, 100
@@ -150,7 +154,6 @@ public class RecordSearchPanel extends JPanel {
                 @Override
                 public void swingFinished(boolean success) {
                     for (JTextField field : fields) field.setEnabled(true);
-                    listener.searchFinished();
                 }
             };
         }
