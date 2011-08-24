@@ -61,6 +61,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     public final static int COMPILE_DELAY = 500;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private RecordMapping recordMapping;
+    private FieldMapping selectedFieldMapping;
     private MetadataRecord metadataRecord;
     private Document codeDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
@@ -68,7 +69,6 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private MetadataModel metadataModel;
     private Type type;
     private RecordValidator recordValidator;
-    private String selectedPath;
     private String editedCode;
     private GroovyCodeResource groovyCodeResource;
 
@@ -93,36 +93,35 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     @Override
-    public void mappingChanged(RecordMapping recordMapping, FieldMapping fieldMapping) {
-        if (this.recordMapping != recordMapping) {
-            this.selectedPath = null;
-        }
-        this.recordMapping = recordMapping;
-        this.editedCode = null;
-        if (fieldMapping == null) {
-            SwingUtilities.invokeLater(new DocumentSetter(codeDocument, getDisplayCode()));
-        }
-        notifyStateChange(State.PRISTINE);
+    public void factChanged() {
         compileSoon();
     }
 
-    public void setSelectedPath(String selectedPath) {
-        if (this.selectedPath != null && this.selectedPath.equals(selectedPath)) {
+    @Override
+    public void select(FieldMapping fieldMapping) {
+        if (fieldMapping == selectedFieldMapping) {
             notifyStateChange(State.REGENERATED);
         }
         else {
-            this.selectedPath = selectedPath;
+            selectedFieldMapping = fieldMapping;
             notifyStateChange(State.PRISTINE);
         }
         SwingUtilities.invokeLater(new DocumentSetter(codeDocument, getDisplayCode()));
         compileSoon();
     }
 
-    public FieldMapping getSelectedFieldMapping() {
-        if (selectedPath == null) {
-            return null;
-        }
-        return recordMapping.getFieldMapping(selectedPath);
+    @Override
+    public void selectedChanged() {
+        compileSoon();
+    }
+
+    @Override
+    public void mappingChanged(RecordMapping recordMapping) {
+        this.recordMapping = recordMapping;
+        this.editedCode = null;
+        SwingUtilities.invokeLater(new DocumentSetter(codeDocument, getDisplayCode()));
+        notifyStateChange(State.PRISTINE);
+        compileSoon();
     }
 
     public void setRecordValidator(RecordValidator recordValidator) {
@@ -139,23 +138,17 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     public void setCode(String code) {
-        if (selectedPath != null) {
-            FieldMapping fieldMapping = recordMapping.getFieldMapping(selectedPath);
-            if (fieldMapping != null) {
-                if (!fieldMapping.codeLooksLike(code)) {
-                    editedCode = code;
-                    notifyStateChange(State.EDITED);
-                }
-                else {
-                    editedCode = null;
-                    notifyStateChange(State.PRISTINE);
-                }
+        if (selectedFieldMapping != null) {
+            if (!selectedFieldMapping.codeLooksLike(code)) {
+                editedCode = code;
+                notifyStateChange(State.EDITED);
             }
             else {
-                // todo: kill the selected path
+                editedCode = null;
+                notifyStateChange(State.PRISTINE);
             }
-            compileSoon();
         }
+        compileSoon();
     }
 
     @Override
@@ -180,6 +173,10 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
 
     // === privates
 
+    private String getSelectedPath() {
+        return selectedFieldMapping == null ? null : selectedFieldMapping.getDefinition().path.toString();
+    }
+
     private String getDisplayCode() {
         switch (type) {
             case RECORD:
@@ -190,11 +187,11 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                     return "// no mapping";
                 }
             case FIELD:
-                if (selectedPath == null) {
+                if (selectedFieldMapping == null) {
                     return "// no code";
                 }
                 else {
-                    return recordMapping.toDisplayCode(metadataModel, selectedPath);
+                    return recordMapping.toDisplayCode(metadataModel, getSelectedPath());
                 }
             default:
                 throw new RuntimeException();
@@ -206,7 +203,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             case RECORD:
                 return recordMapping != null ? recordMapping.toCompileCode(metadataModel) : "";
             case FIELD:
-                return selectedPath != null ? recordMapping.toCompileCode(metadataModel, selectedPath) : "";
+                return selectedFieldMapping != null ? recordMapping.toCompileCode(metadataModel, getSelectedPath()) : "";
             default:
                 throw new RuntimeException();
         }
@@ -216,11 +213,11 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         if (type == Type.RECORD) {
             throw new RuntimeException();
         }
-        if (selectedPath == null) {
+        if (selectedFieldMapping == null) {
             return "print 'nothing selected'";
         }
         else {
-            return recordMapping.toCompileCode(metadataModel, selectedPath, editedCode);
+            return recordMapping.toCompileCode(metadataModel, getSelectedPath(), editedCode);
         }
     }
 
@@ -251,9 +248,8 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                             notifyStateChange(State.PRISTINE);
                         }
                         else {
-                            FieldMapping fieldMapping = recordMapping.getFieldMapping(selectedPath);
-                            if (fieldMapping != null) {
-                                fieldMapping.setCode(editedCode);
+                            if (selectedFieldMapping != null) {
+                                selectedFieldMapping.setCode(editedCode);
                                 notifyStateChange(State.COMMITTED);
                                 editedCode = null;
                                 notifyStateChange(State.PRISTINE);
@@ -266,10 +262,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                 }
                 catch (DiscardRecordException e) {
                     compilationComplete(e.getMessage());
-                    FieldMapping fieldMapping = recordMapping.getFieldMapping(selectedPath);
-                    if (fieldMapping != null) {
+                    if (selectedFieldMapping != null) {
                         if (editedCode != null) {
-                            fieldMapping.setCode(editedCode);
+                            selectedFieldMapping.setCode(editedCode);
                             notifyStateChange(State.COMMITTED);
                             editedCode = null;
                         }

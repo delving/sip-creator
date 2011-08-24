@@ -24,14 +24,12 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.Path;
+import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.SourceVariable;
-import eu.delving.sip.FileStore;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CompileModel;
-import eu.delving.sip.model.FieldMappingListModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -40,21 +38,15 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,21 +60,16 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class RefinementFrame extends FrameBase {
+public class FieldMappingFrame extends FrameBase {
     private JTextArea groovyCodeArea;
     private JTextArea outputArea;
-    private JButton removeMappingButton = new JButton("Remove Selected Mapping");
     private JButton dictionaryCreate = new JButton("Create");
     private JButton dictionaryEdit = new JButton("Edit");
     private JButton dictionaryDelete = new JButton("Delete");
     private DictionaryPopup dictionaryPopup;
-    private JList mappingList;
 
-    public RefinementFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Refinement", false);
-        mappingList = new JList(sipModel.getFieldMappingListModel());
-        mappingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        mappingList.setCellRenderer(new FieldMappingListModel.CellRenderer());
+    public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Field Mapping", false);
         dictionaryCreate.setEnabled(false);
         dictionaryEdit.setEnabled(false);
         dictionaryDelete.setEnabled(false);
@@ -98,36 +85,17 @@ public class RefinementFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        split.setLeftComponent(createLeftSide());
-        split.setRightComponent(createRightSide());
-        split.setDividerLocation(0.5);
-        add(split, BorderLayout.CENTER);
+        add(createPanel(), BorderLayout.CENTER);
     }
 
     @Override
     protected void refresh() {
     }
 
-    private JPanel createLeftSide() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(createFieldMappingListPanel(), BorderLayout.CENTER);
-        p.add(removeMappingButton, BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel createRightSide() {
+    private JPanel createPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
         p.add(createGroovyPanel());
         p.add(createOutputPanel());
-        return p;
-    }
-
-    private JPanel createFieldMappingListPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Field Mappings"));
-        p.add(scroll(mappingList));
-        p.setMaximumSize(new Dimension(200, 2000));
         return p;
     }
 
@@ -160,7 +128,6 @@ public class RefinementFrame extends FrameBase {
 
     private void setFieldMapping(FieldMapping fieldMapping) {
         if (fieldMapping != null) {
-            sipModel.getFieldCompileModel().setSelectedPath(fieldMapping.getDefinition().path.toString());
             AnalysisTree.Node node = getNode(fieldMapping);
             if (node != null) {
                 dictionaryCreate.setEnabled(fieldMapping.dictionary == null && CodeGenerator.isDictionaryPossible(fieldMapping.getDefinition(), node));
@@ -170,11 +137,8 @@ public class RefinementFrame extends FrameBase {
             }
             dictionaryEdit.setEnabled(fieldMapping.dictionary != null);
             dictionaryDelete.setEnabled(fieldMapping.dictionary != null);
-            removeMappingButton.setEnabled(true);
         }
         else {
-            sipModel.getFieldCompileModel().setSelectedPath(null);
-            removeMappingButton.setEnabled(false);
             dictionaryCreate.setEnabled(false);
             dictionaryEdit.setEnabled(false);
             dictionaryDelete.setEnabled(false);
@@ -201,19 +165,28 @@ public class RefinementFrame extends FrameBase {
     }
 
     private void wireUp() {
-        removeMappingButton.addActionListener(new ActionListener() {
+        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
-                if (fieldMapping != null) {
-                    sipModel.removeFieldMapping(fieldMapping);
-                }
+            public void factChanged() {
+            }
+
+            @Override
+            public void select(FieldMapping fieldMapping) {
+                setFieldMapping(fieldMapping);
+            }
+
+            @Override
+            public void selectedChanged() {
+            }
+
+            @Override
+            public void mappingChanged(RecordMapping recordMapping) {
             }
         });
         dictionaryCreate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
+                FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedFieldMapping();
                 if (fieldMapping != null) {
                     CodeGenerator codeGenerator = new CodeGenerator();
                     SourceVariable sourceVariable = getSourceVariable(fieldMapping);
@@ -226,7 +199,7 @@ public class RefinementFrame extends FrameBase {
         dictionaryEdit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
+                final FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedFieldMapping();
                 if (fieldMapping != null) {
                     dictionaryPopup.editDictionary(fieldMapping, new Runnable() {
                         @Override
@@ -240,7 +213,7 @@ public class RefinementFrame extends FrameBase {
         dictionaryDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
+                FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedFieldMapping();
                 if (fieldMapping != null) {
                     if (fieldMapping.dictionary == null) {
                         throw new RuntimeException("No dictionary to delete!");
@@ -273,32 +246,6 @@ public class RefinementFrame extends FrameBase {
                     }
                     setFieldMapping(fieldMapping);
                 }
-            }
-        });
-        mappingList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) return;
-                FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
-                setFieldMapping(fieldMapping);
-            }
-        });
-        sipModel.addUpdateListener(new SipModel.UpdateListener() {
-            @Override
-            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
-            }
-
-            @Override
-            public void updatedStatistics(FieldStatistics fieldStatistics) {
-
-            }
-
-            @Override
-            public void updatedRecordRoot(Path recordRoot, int recordCount) {
-            }
-
-            @Override
-            public void normalizationMessage(boolean complete, String message) {
             }
         });
         sipModel.getFieldCompileModel().getCodeDocument().addDocumentListener(new DocumentListener() {
@@ -377,8 +324,4 @@ public class RefinementFrame extends FrameBase {
             });
         }
     }
-
-
-    // todo: dictionary mapping popup
-
 }

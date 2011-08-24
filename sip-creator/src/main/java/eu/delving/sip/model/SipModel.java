@@ -87,7 +87,6 @@ public class SipModel {
     private FactModel factModel = new FactModel();
     private FieldMappingListModel fieldMappingListModel;
     private MappingModel mappingModel = new MappingModel();
-    private MappingSaveTimer mappingSaveTimer = new MappingSaveTimer();
     private VariableListModel variableListModel = new VariableListModel();
     private List<UpdateListener> updateListeners = new CopyOnWriteArrayList<UpdateListener>();
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
@@ -130,18 +129,17 @@ public class SipModel {
         parseListeners.add(recordCompileModel);
         parseListeners.add(fieldCompileModel);
         fieldMappingListModel = new FieldMappingListModel();
-        factModel.addListener(new FactModelAdapter());
         mappingModel.addListener(fieldMappingListModel);
         mappingModel.addListener(recordCompileModel);
         mappingModel.addListener(fieldCompileModel);
-        mappingModel.addListener(mappingSaveTimer);
+        mappingModel.addListener(new MappingSaveTimer());
         fieldCompileModel.addListener(new CompileModel.Listener() {
             @Override
             public void stateChanged(CompileModel.State state) {
                 switch (state) {
                     case COMMITTED:
                     case REGENERATED:
-                        mappingModel.changed(fieldCompileModel.getSelectedFieldMapping());
+                        mappingModel.changeSelected();
                 }
             }
         });
@@ -212,8 +210,11 @@ public class SipModel {
                             SipModel.this.facts = facts;
                             factModel.clear();
                             factModel.setFacts(facts, dataSetStore.getSpec());
-                            mappingModel.setRecordMapping(null);
                             setStatisticsList(statistics);
+                            seekFirstRecord();
+                            if (mappingModel.getRecordMapping() != null) {
+                                setMetadataPrefix(mappingModel.getRecordMapping().getPrefix());
+                            }
                             variableListModel.clear();
                             AnalysisTree.setUniqueElement(analysisTreeModel, getUniqueElement());
                             for (UpdateListener updateListener : updateListeners) {
@@ -243,7 +244,6 @@ public class SipModel {
                         public void run() {
                             mappingModel.setRecordMapping(recordMapping);
                             recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
-                            seekFirstRecord();
                             if (recordMapping != null) {
                                 if (getRecordRoot() != null) {
                                     setRecordRootInternal(new Path(facts.getRecordRootPath()), Integer.parseInt(facts.getRecordCount()));
@@ -661,20 +661,23 @@ public class SipModel {
         }
 
         @Override
-        public void mappingChanged(RecordMapping recordMapping, FieldMapping fieldMapping) {
+        public void factChanged() {
             timer.restart();
         }
-    }
 
-    private class FactModelAdapter implements FactModel.Listener {
         @Override
-        public void updatedFact(FactModel factModel, boolean interactive) {
-            if (interactive) {
-                RecordMapping recordMapping = getMappingModel().getRecordMapping();
-                if (recordMapping != null && factModel.fillRecordMapping(recordMapping)) {
-                    mappingSaveTimer.mappingChanged(recordMapping, null);
-                }
-            }
+        public void select(FieldMapping fieldMapping) {
+            timer.restart();
+        }
+
+        @Override
+        public void selectedChanged() {
+            timer.restart();
+        }
+
+        @Override
+        public void mappingChanged(RecordMapping recordMapping) {
+            timer.restart();
         }
     }
 

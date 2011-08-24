@@ -62,10 +62,20 @@ public class ObviousMappingsPopup extends FrameBase {
         obviousMappingsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
-            public void mappingChanged(RecordMapping recordMapping, FieldMapping fieldMapping) {
-                if (fieldMapping == null) {
-                    obviousListModel.refresh();
-                }
+            public void factChanged() {
+            }
+
+            @Override
+            public void select(FieldMapping fieldMapping) {
+            }
+
+            @Override
+            public void selectedChanged() {
+            }
+
+            @Override
+            public void mappingChanged(RecordMapping recordMapping) {
+                obviousListModel.refresh();
             }
         });
         setDefaultSize(400, 400);

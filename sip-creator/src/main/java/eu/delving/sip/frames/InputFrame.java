@@ -22,27 +22,19 @@
 package eu.delving.sip.frames;
 
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
@@ -50,11 +42,9 @@ import javax.swing.text.html.HTMLEditorKit;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -64,15 +54,15 @@ import java.io.StringReader;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class TransformationFrame extends FrameBase {
+public class InputFrame extends FrameBase {
     private HTMLDocument inputDocument = (HTMLDocument) new HTMLEditorKit().createDefaultDocument();
     private JButton firstButton = new JButton("First");
     private JButton nextButton = new JButton("Next");
     private RecordScanPopup recordScanPopup;
     private JLabel criterionLabel = new JLabel();
 
-    public TransformationFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Transformation", false);
+    public InputFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Input", false);
         sipModel.addParseListener(new SipModel.ParseListener() {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {
@@ -107,50 +97,12 @@ public class TransformationFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(createCenter(), BorderLayout.CENTER);
-        content.add(createSouth(), BorderLayout.SOUTH);
+        content.add(scroll(createRecordView()), BorderLayout.CENTER);
+        content.add(createRecordButtonPanel(), BorderLayout.SOUTH);
     }
 
     @Override
     protected void refresh() {
-    }
-
-    private JComponent createCenter() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
-        p.add(createRecordPanel());
-        p.add(createOutputPanel());
-        return p;
-    }
-
-    private JComponent createSouth() {
-        JButton validate = new JButton("Validate all records");
-        JCheckBox discardInvalid = new JCheckBox("Discard invalid records");
-        JButton upload = new JButton("Upload Dataset and mapping");
-        upload.setEnabled(false);
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        p.add(validate);
-        p.add(discardInvalid);
-        p.add(upload);
-        return p;
-    }
-
-    // todo: view invalid records popup
-
-    private JPanel createOutputPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Output Record"));
-        JTextArea area = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
-        area.setEditable(false);
-        p.add(scroll(area));
-        return p;
-    }
-
-    private JPanel createRecordPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Input Record"));
-        p.add(scroll(createRecordView()), BorderLayout.CENTER);
-        p.add(createRecordButtonPanel(), BorderLayout.SOUTH);
-        return p;
     }
 
     private JComponent createRecordView() {
@@ -238,77 +190,4 @@ public class TransformationFrame extends FrameBase {
             }
         }
     }
-
-    private JCheckBox discardInvalidBox = new JCheckBox("Discard Invalid Records");
-    private JCheckBox storeNormalizedBox = new JCheckBox("Store Normalized XML");
-    //    private JLabel normalizeMessageLabel = new JLabel("?", JLabel.CENTER);
-    private JFileChooser chooser = new JFileChooser("Normalized Data Output Directory");
-
-    private Action normalizeAction = new AbstractAction("Normalize") {
-        private final String NORM_DIR = "normalizeDirectory";
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            if (storeNormalizedBox.isSelected()) {
-                File normalizeDirectory = new File(sipModel.getPreferences().get(NORM_DIR, System.getProperty("user.home")));
-                chooser.setSelectedFile(normalizeDirectory); // todo: this doesn't work for some reason
-                chooser.setCurrentDirectory(normalizeDirectory.getParentFile());
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                chooser.setFileFilter(new FileFilter() {
-                    @Override
-                    public boolean accept(File file) {
-                        return file.isDirectory();
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "Directories";
-                    }
-                });
-                chooser.setMultiSelectionEnabled(false);
-                int choiceMade = chooser.showOpenDialog(TransformationFrame.this);
-                if (choiceMade == JFileChooser.APPROVE_OPTION) {
-                    normalizeDirectory = chooser.getSelectedFile();
-                    sipModel.getPreferences().put(NORM_DIR, normalizeDirectory.getAbsolutePath());
-                    normalizeTo(normalizeDirectory);
-                }
-            }
-            else {
-                normalizeTo(null);
-            }
-        }
-
-        private void normalizeTo(File normalizeDirectory) {
-            String message;
-            if (normalizeDirectory != null) {
-                message = String.format(
-                        "<html><h3>Transforming the raw data of '%s' into '%s' format</h3><br>" +
-                                "Writing to %s ",
-                        sipModel.getDataSetStore().getSpec(),
-                        sipModel.getMappingModel().getRecordMapping().getPrefix(),
-                        normalizeDirectory
-                );
-            }
-            else {
-                message = String.format(
-                        "<html><h3>Transforming the raw data of '%s' into '%s' format</h3>",
-                        sipModel.getDataSetStore().getSpec(),
-                        sipModel.getMappingModel().getRecordMapping().getPrefix()
-                );
-            }
-            ProgressMonitor progressMonitor = new ProgressMonitor(
-                    SwingUtilities.getRoot(TransformationFrame.this),
-                    "<html><h2>Normalizing</h2>",
-                    message,
-                    0, 100
-            );
-            sipModel.normalize(normalizeDirectory, discardInvalidBox.isSelected(), new ProgressListener.Adapter(progressMonitor) {
-                @Override
-                public void swingFinished(boolean success) {
-                    setEnabled(true);
-                }
-            });
-        }
-    };
-
 }

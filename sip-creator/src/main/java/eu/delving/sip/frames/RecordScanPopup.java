@@ -125,7 +125,7 @@ public class RecordScanPopup extends FrameBase {
                 return record.contains(Pattern.compile(regex));
             }
         }));
-        Utility.makeCompactGrid(this, getComponentCount() / 3, 3, 5, 5, 5, 5);
+        Utility.makeCompactGrid(content, getComponentCount() / 3, 3, 5, 5, 5, 5);
     }
 
     @Override

@@ -34,14 +34,27 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MappingModel {
 
     private RecordMapping recordMapping;
+    private FieldMapping selectedFieldMapping;
 
     public void setRecordMapping(RecordMapping recordMapping) {
         this.recordMapping = recordMapping;
-        fireChangeEvent(null);
+        fireMappingChanged();
     }
 
     public RecordMapping getRecordMapping() {
         return recordMapping;
+    }
+
+    public FieldMapping selectFieldMapping(FieldMapping fieldMapping) {
+        this.selectedFieldMapping = fieldMapping;
+        for (Listener listener : listeners) {
+            listener.select(selectedFieldMapping);
+        }
+        return selectedFieldMapping;
+    }
+
+    public FieldMapping getSelectedFieldMapping() {
+        return selectedFieldMapping;
     }
 
     public void setFact(String path, String value) {
@@ -56,7 +69,9 @@ public class MappingModel {
                 recordMapping.facts.put(path, value);
             }
             if (changed) {
-                fireChangeEvent(null);
+                for (Listener listener : listeners) {
+                    listener.factChanged();
+                }
             }
         }
     }
@@ -69,24 +84,29 @@ public class MappingModel {
         else {
             recordMapping.fieldMappings.put(path, fieldMapping);
         }
-        fireChangeEvent(null);
+        fireMappingChanged();
     }
 
     public void applyTemplate(RecordMapping template) {
         if (recordMapping.fieldMappings.isEmpty()) {
             recordMapping.applyTemplate(template);
-            fireChangeEvent(null);
+            fireMappingChanged();
         }
     }
 
-    public void changed(FieldMapping fieldMapping) {
-        fireChangeEvent(fieldMapping);
+    public void changeSelected() {
+        for (Listener listener : listeners) {
+            listener.selectedChanged();
+        }
     }
 
     // observable
 
     public interface Listener {
-        void mappingChanged(RecordMapping recordMapping, FieldMapping fieldMapping);
+        void factChanged();
+        void select(FieldMapping fieldMapping);
+        void selectedChanged();
+        void mappingChanged(RecordMapping recordMapping);
     }
 
     public void addListener(Listener listener) {
@@ -95,9 +115,11 @@ public class MappingModel {
 
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
-    private void fireChangeEvent(FieldMapping fieldMapping) {
+    private void fireMappingChanged() {
+        selectedFieldMapping = null;
         for (Listener listener : listeners) {
-            listener.mappingChanged(recordMapping, fieldMapping);
+            listener.mappingChanged(recordMapping);
+            listener.select(null);
         }
     }
 

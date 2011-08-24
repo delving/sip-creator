@@ -223,14 +223,7 @@ public class GroovyNode {
                 if (childNode.value() instanceof List && ((List) childNode.value).isEmpty()) {
                     continue;
                 }
-                Object childNodeName = childNode.name();
-                if (childNodeName instanceof QName) {
-                    QName qn = (QName) childNodeName;
-                    if (qn.matches(name)) {
-                        answer.add(childNode);
-                    }
-                }
-                else if (name.equals(childNodeName)) {
+                if (name.equals(childNode.name())) {
                     answer.add(childNode);
                 }
             }
