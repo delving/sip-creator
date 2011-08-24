@@ -73,7 +73,7 @@ class TestMappingEngine {
                 throw new Exception("WRONG");
               }
               Long total = System.currentTimeMillis() - now;
-              println "mapping time: " + total
+//              println "mapping time: " + total
 //              println mappingEngine
             }
             println "VALID!\n ${doc}"

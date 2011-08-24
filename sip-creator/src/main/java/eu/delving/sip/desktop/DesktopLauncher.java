@@ -25,7 +25,6 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.security.User;
-import eu.delving.sip.DataSetInfo;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.FileStoreException;
 import eu.delving.sip.FileStoreImpl;
@@ -35,12 +34,8 @@ import eu.delving.sip.desktop.navigation.NavigationMenu;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
-import eu.europeana.sip.localization.Constants;
-import eu.europeana.sip.model.SipModel;
-import eu.europeana.sip.model.UserNotifier;
-import eu.europeana.sip.util.DataSetClient;
-import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthSystemException;
+import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.UserNotifier;
 import org.apache.log4j.Logger;
 
 import javax.swing.JComponent;
@@ -57,7 +52,6 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -109,7 +103,7 @@ public class DesktopLauncher {
 
                     @Override
                     public void success(User user) {
-                        dataSetClient.setListFetchingEnabled(true);
+//                        dataSetClient.setListFetchingEnabled(true);
                         restoreWindows();
                     }
 
@@ -209,50 +203,50 @@ public class DesktopLauncher {
         }
     }
 
-    private DataSetClient dataSetClient = new DataSetClient(new DataSetClient.Context() {
-
-        @Override
-        public String getServerUrl() {
-            DesktopPreferences.Credentials credentials = authenticationWindow.getCredentials();
-            return String.format("http://%s:%d/%s/dataset", credentials.getServerAddress(), credentials.getServerPort(), credentials.getUsername());
-        }
-
-        @Override
-        public String getAccessToken() {
-            try {
-                DesktopPreferences.Credentials credentials = authenticationWindow.getCredentials();
-                return authenticationClient.getAccessToken(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()), credentials.getUsername());
-            }
-            catch (OAuthSystemException e) {
-                authenticationWindow.setVisible(true);
-            }
-            catch (OAuthProblemException e) {
-                authenticationWindow.setVisible(true);
-            }
-            return null;
-        }
-
-        @Override
-        public void setInfo(DataSetInfo dataSetInfo) {
-            // todo: update datasetwindow
-            LOG.info("Dataset received " + dataSetInfo.spec);
-        }
-
-        @Override
-        public void setList(List<DataSetInfo> list) {
-//            dataSetWindow.setData(list);
-        }
-
-        @Override
-        public void tellUser(String message) {
-            sipModel.getUserNotifier().tellUser(message);
-        }
-
-        @Override
-        public void disconnected() {
-            sipModel.getUserNotifier().tellUser(String.format("Disconnected from Repository at %s", getServerUrl()));
-        }
-    });
+//    private DataSetClient dataSetClient = new DataSetClient(new DataSetClient.Context() {
+//
+//        @Override
+//        public String getServerUrl() {
+//            DesktopPreferences.Credentials credentials = authenticationWindow.getCredentials();
+//            return String.format("http://%s:%d/%s/dataset", credentials.getServerAddress(), credentials.getServerPort(), credentials.getUsername());
+//        }
+//
+//        @Override
+//        public String getAccessToken() {
+//            try {
+//                DesktopPreferences.Credentials credentials = authenticationWindow.getCredentials();
+//                return authenticationClient.getAccessToken(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()), credentials.getUsername());
+//            }
+//            catch (OAuthSystemException e) {
+//                authenticationWindow.setVisible(true);
+//            }
+//            catch (OAuthProblemException e) {
+//                authenticationWindow.setVisible(true);
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        public void setInfo(DataSetInfo dataSetInfo) {
+//            // todo: update datasetwindow
+//            LOG.info("Dataset received " + dataSetInfo.spec);
+//        }
+//
+//        @Override
+//        public void setList(List<DataSetInfo> list) {
+////            dataSetWindow.setData(list);
+//        }
+//
+//        @Override
+//        public void tellUser(String message) {
+//            sipModel.getUserNotifier().tellUser(message);
+//        }
+//
+//        @Override
+//        public void disconnected() {
+//            sipModel.getUserNotifier().tellUser(String.format("Disconnected from Repository at %s", getServerUrl()));
+//        }
+//    });
 
     private static UserNotifier USER_NOTIFIER = new UserNotifier() {
         @Override

@@ -21,6 +21,7 @@
 
 package eu.delving.sip.desktop.navigation;
 
+import eu.delving.sip.desktop.Constants;
 import eu.delving.sip.desktop.DesktopLauncher;
 import eu.delving.sip.desktop.DesktopPreferences;
 import eu.delving.sip.desktop.DesktopStateImpl;
@@ -28,7 +29,6 @@ import eu.delving.sip.desktop.WindowState;
 import eu.delving.sip.desktop.WorkspaceImpl;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.WindowId;
-import eu.europeana.sip.localization.Constants;
 import org.apache.log4j.Logger;
 
 import javax.swing.AbstractAction;

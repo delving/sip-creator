@@ -24,7 +24,6 @@ package eu.delving.sip;
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Hasher;
-import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
@@ -255,7 +254,7 @@ public class FileStoreImpl implements FileStore {
                 Facts facts = getFacts();
                 if (facts.isDownloadedSource()) {
                     facts.setDownloadedSource(false);
-                    setFacts(facts);
+// todo                   setFacts(facts);
                 }
                 File statisticsFile = new File(directory, STATISTICS_FILE_NAME);
                 if (statisticsFile.exists()) {
@@ -361,20 +360,6 @@ public class FileStoreImpl implements FileStore {
             }
             catch (IOException e) {
                 throw new FileStoreException(String.format("Unable to save record hashes to %s", hashFile.getAbsolutePath()), e);
-            }
-        }
-
-        @Override
-        public void setFacts(Facts facts) throws FileStoreException {
-            File factsFile = new File(directory, FACTS_FILE_NAME);
-            try {
-                Facts.write(facts, new FileOutputStream(factsFile));
-            }
-            catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to save facts to %s", factsFile.getAbsolutePath()), e);
-            }
-            catch (MetadataException e) {
-                throw new FileStoreException("Unable to set facts", e);
             }
         }
 

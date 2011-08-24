@@ -21,7 +21,6 @@
 
 package eu.delving.sip;
 
-import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.MetadataException;
@@ -116,17 +115,6 @@ public class TestFileStore {
         stats = mock.getDataSetStore().getStatistics();
         Assert.assertEquals("Should be one stat", 1, stats.size());
         Assert.assertEquals("Path discrepancy", "/stat/path", stats.get(0).getPath().toString());
-    }
-
-    @Test
-    public void manipulateFacts() throws IOException, FileStoreException {
-        mock.getDataSetStore().importFile(MockFileStoreInput.sampleFile(), null);
-        Facts facts = mock.getDataSetStore().getFacts();
-        Assert.assertEquals("facts should be empty", "", facts.get("recordRootPath"));
-        facts.set("recordRootPath", "Wingy");
-        mock.getDataSetStore().setFacts(facts);
-        facts = mock.getDataSetStore().getFacts();
-        Assert.assertEquals("facts should be restored", "Wingy", facts.get("recordRootPath"));
     }
 
     @Test

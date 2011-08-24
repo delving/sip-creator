@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2010 DELVING BV
  *
  * Licensed under the EUPL, Version 1.0 or as soon they
  * will be approved by the European Commission - subsequent
@@ -19,25 +19,33 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.desktop.windows;
+package eu.delving.sip.frames;
 
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
+import eu.delving.metadata.CodeGenerator;
+import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.FileStore;
-import eu.delving.sip.frames.FieldStatisticsPanel;
+import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -47,61 +55,82 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The analyze window will present the following data:
- * <p/>
- * <ul>
- * <li>Statistics</li>
- * <li>Document structure</li>
- * </ul>
+ * The structure of the input data, tree, variables and statistics.
+ * From here mappings are made.
  *
- * @author Serkan Demirel <serkan@blackbuilt.nl>
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class AnalyzeWindow extends DesktopWindow {
+public class MappingFrame extends FrameBase {
     private static final String RUN_ANALYSIS = "Run the Analysis";
     private static final String ELEMENTS_PROCESSED = "%d Elements Processed";
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
     private JButton analyzeButton = new JButton(RUN_ANALYSIS);
-    private JTree statisticsJTree;
+    private JButton createObviousMappingButton = new JButton("Create obvious mappings");
+    private JTextField constantField = new JTextField("?");
     private FieldStatisticsPanel fieldStatisticsPanel = new FieldStatisticsPanel();
+    private JTree statisticsJTree;
+    private JList variablesList;
+    private TargetPopup targetPopup;
+    private ObviousMappingsPopup obviousMappingsPopup;
 
-    public AnalyzeWindow(SipModel sipModel) {
-        super(sipModel);
-        setLayout(new GridLayout(1, 2));
-        add(createTreePanel());
-        add(fieldStatisticsPanel);
+    public MappingFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Mapping", false);
+        this.targetPopup = new TargetPopup(this, new TargetPopup.Context() {
+
+            @Override
+            public List<SourceVariable> createSelectedVariableList() {
+                List<SourceVariable> list = new ArrayList<SourceVariable>();
+                for (Object sourceVariable : variablesList.getSelectedValues()) {
+                    list.add((SourceVariable) sourceVariable);
+                }
+                return list;
+            }
+
+            @Override
+            public String getConstantFieldValue() {
+                return constantField.getText();
+            }
+
+            @Override
+            public void clear() {
+                variablesList.clearSelection();
+                constantField.setText("");
+            }
+        });
+        obviousMappingsPopup = new ObviousMappingsPopup(this);
+        variablesList = new JList(sipModel.getVariablesListWithCountsModel());
+        statisticsJTree = new JTree(sipModel.getAnalysisTreeModel());
+        statisticsJTree.getModel().addTreeModelListener(new Expander());
+        statisticsJTree.setCellRenderer(new AnalysisTreeCellRenderer());
+        statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
     }
 
+    @Override
+    protected void buildContent(Container content) {
+        content.setLayout(new GridLayout(1, 0, 5, 5));
+        content.add(createLeft());
+        content.add(createRight());
+    }
+
+    @Override
+    protected void refresh() {
+    }
+
     private void wireUp() {
-        sipModel.addUpdateListener(new SipModel.UpdateListener() {
-            @Override
-            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
-                analyzeButton.setText(RUN_ANALYSIS);
-                analyzeButton.setEnabled(true);
-            }
-
-            @Override
-            public void updatedStatistics(final FieldStatistics fieldStatistics) {
-                fieldStatisticsPanel.setStatistics(fieldStatistics);
-            }
-
-            @Override
-            public void updatedRecordRoot(Path recordRoot, int recordCount) {
-            }
-
-            @Override
-            public void normalizationMessage(boolean complete, String message) {
-            }
-        });
         statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
@@ -126,6 +155,52 @@ public class AnalyzeWindow extends DesktopWindow {
                             sipModel.setStatistics(null);
                         }
                     });
+                }
+            }
+        });
+        sipModel.addUpdateListener(new SipModel.UpdateListener() {
+            @Override
+            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
+                variablesList.clearSelection();
+            }
+
+            @Override
+            public void updatedStatistics(final FieldStatistics fieldStatistics) {
+                fieldStatisticsPanel.setStatistics(fieldStatistics);
+            }
+
+            @Override
+            public void updatedRecordRoot(Path recordRoot, int recordCount) {
+            }
+
+            @Override
+            public void normalizationMessage(boolean complete, String message) {
+            }
+        });
+        createObviousMappingButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                obviousMappingDialog.setVisible(true);
+            }
+        });
+        constantField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                variablesList.clearSelection();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+            }
+        });
+        variablesList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+                final SourceVariable sourceVariable = (SourceVariable) variablesList.getSelectedValue();
+                if (sourceVariable != null && sourceVariable.hasStatistics()) {
+                    sipModel.setStatistics(sourceVariable.getStatistics());
+                    constantField.setText("?");
                 }
             }
         });
@@ -157,13 +232,48 @@ public class AnalyzeWindow extends DesktopWindow {
         });
     }
 
+    private JComponent createLeft() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.add("Document Structure", createTreePanel());
+        tabs.add("Variable Mapping", createVariableMappingPanel());
+        return tabs;
+    }
+
+    private JPanel createVariableMappingPanel() {
+        JPanel pp = new JPanel(new GridLayout(0, 1, 5, 5));
+        pp.add(new JButton(obviousMappingsPopup.getAction()));
+        pp.add(new JButton(targetPopup.getAction()));
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.add(createVariableMappingTop(), BorderLayout.CENTER);
+        p.add(pp, BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createVariableMappingTop() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.setBorder(BorderFactory.createEtchedBorder());
+        p.add(createVariableListPanel(), BorderLayout.CENTER);
+        p.add(createConstantFieldPanel(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createVariableListPanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.setBorder(BorderFactory.createTitledBorder("Input Field Source"));
+        p.add(scroll(variablesList), BorderLayout.CENTER);
+        return p;
+    }
+
+    private JPanel createConstantFieldPanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.setBorder(BorderFactory.createTitledBorder("Constant Source"));
+        p.add(constantField);
+        return p;
+    }
+
     private JPanel createTreePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
-        statisticsJTree = new JTree(sipModel.getAnalysisTreeModel());
-        statisticsJTree.getModel().addTreeModelListener(new Expander());
-        statisticsJTree.setCellRenderer(new AnalysisTreeCellRenderer());
-        statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         p.add(scroll(statisticsJTree), BorderLayout.CENTER);
         JPanel south = new JPanel(new GridLayout(0, 1));
         south.add(analyzeButton);
@@ -181,11 +291,27 @@ public class AnalyzeWindow extends DesktopWindow {
         return bp;
     }
 
-    private JScrollPane scroll(JComponent content) {
-        JScrollPane scroll = new JScrollPane(content);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        return scroll;
+    private JComponent createRight() {
+        return fieldStatisticsPanel;
+    }
+
+    private void prepareCreateMappingButtons() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                CodeGenerator codeGenerator = new CodeGenerator();
+                List<FieldMapping> obvious = codeGenerator.createObviousMappings(sipModel.getUnmappedFields(), sipModel.getVariables());
+                if (obvious.isEmpty()) {
+                    if (obviousMappingsPopup.isVisible()) {
+                        obviousMappingsPopup.closeFrame();
+                    }
+                    createObviousMappingButton.setEnabled(false);
+                }
+                else {
+                    createObviousMappingButton.setEnabled(true);
+                }
+            }
+        });
     }
 
     private void performAnalysis() {
@@ -289,4 +415,6 @@ public class AnalyzeWindow extends DesktopWindow {
         }
     }
 
+    // todo: popup for obvious mappings
+    // todo: popup for making a mapping
 }

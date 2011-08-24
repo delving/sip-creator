@@ -22,7 +22,7 @@
 package eu.delving.sip.desktop.windows;
 
 import eu.delving.sip.desktop.WindowState;
-import eu.europeana.sip.model.SipModel;
+import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
 import javax.swing.ImageIcon;

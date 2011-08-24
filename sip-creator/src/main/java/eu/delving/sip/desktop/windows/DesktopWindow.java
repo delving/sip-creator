@@ -22,10 +22,11 @@
 package eu.delving.sip.desktop.windows;
 
 import eu.delving.sip.desktop.WindowState;
-import eu.europeana.sip.model.SipModel;
+import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Action;
+import javax.swing.JInternalFrame;
+import java.awt.Dimension;
 
 /**
  * The base of all windows within the SIP-Creator.

@@ -21,7 +21,7 @@
 
 package eu.delving.sip.desktop.windows;
 
-import eu.europeana.sip.model.SipModel;
+import eu.delving.sip.model.SipModel;
 
 /**
  * todo: add description

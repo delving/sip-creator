@@ -25,7 +25,7 @@ import eu.delving.security.User;
 import eu.delving.sip.desktop.AuthenticationClient;
 import eu.delving.sip.desktop.CredentialsImpl;
 import eu.delving.sip.desktop.DesktopPreferences;
-import eu.europeana.sip.util.GridBagHelper;
+import eu.delving.sip.desktop.GridBagHelper;
 import org.apache.log4j.Logger;
 
 import javax.swing.JButton;

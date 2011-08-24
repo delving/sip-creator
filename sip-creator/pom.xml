@@ -88,7 +88,7 @@
                     <libPath/>
                     <jnlp>
                         <outputFile>sip-creator.jnlp</outputFile>
-                        <mainClass>eu.europeana.sip.gui.SipCreatorGUI</mainClass>
+                        <mainClass>eu.delving.sip.Application</mainClass>
                     </jnlp>
                     <sign>
                         <keystore>${basedir}/src/main/jnlp/snakeoil.keystore</keystore>

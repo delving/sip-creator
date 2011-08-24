@@ -4,15 +4,11 @@ import com.thoughtworks.xstream.XStream;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -142,12 +138,6 @@ public class Facts {
         return read(bais);
     }
 
-    public static byte[] toBytes(Facts facts) throws MetadataException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        write(facts, baos);
-        return baos.toByteArray();
-    }
-
     public static Facts read(InputStream inputStream) throws MetadataException {
         try {
             Facts facts = new Facts();
@@ -173,22 +163,6 @@ public class Facts {
         }
         catch (IOException e) {
             throw new MetadataException("Unable to read facts", e);
-        }
-    }
-
-    public static void write(Facts facts, OutputStream outputStream) throws MetadataException {
-        try {
-            Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
-            for (FactDefinition factDefinition : listDefinition.factDefinitions) {
-                writer.write(String.format("%s=%s\n", factDefinition.name, facts.get(factDefinition.name)));
-            }
-            writer.close();
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        catch (IOException e) {
-            throw new MetadataException("Unable to write facts", e);
         }
     }
 

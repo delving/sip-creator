@@ -80,8 +80,6 @@ public interface FileStore {
 
         void setRecordHashes(Properties hashes) throws FileStoreException;
 
-        void setFacts(Facts facts) throws FileStoreException;
-
         MappingOutput createMappingOutput(RecordMapping recordMapping, File normalizedDirectory) throws FileStoreException;
 
         void delete() throws FileStoreException;
@@ -112,7 +110,6 @@ public interface FileStore {
         void close(boolean abort) throws FileStoreException;
     }
 
-    String APP_CONFIG_FILE_NAME = "app-config.xml";
     String SOURCE_FILE_NAME = "source.xml.gz";
     String STATISTICS_FILE_NAME = "statistics.ser";
     String HASH_FILE_NAME = "hashes.txt";

@@ -19,19 +19,32 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.desktop.windows;
+package eu.delving.sip.desktop;
 
-import eu.delving.sip.model.SipModel;
+import java.awt.GridBagConstraints;
 
 /**
- * Display when user opened the SIP-Creator for the first time.
- * It will contain an introduction to the SIP-Creator and the documentation.
+ * Just speeding up the usage GridBagConstraints.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-public class WelcomeWindow extends DesktopWindow {
+public class GridBagHelper extends GridBagConstraints {
 
-    public WelcomeWindow(SipModel sipModel) {
-        super(sipModel);
+    public void reset() {
+        gridx = gridy = 0;
+    }
+
+    public void cell(int x, int y) {
+        gridx = x;
+        gridy = y;
+    }
+
+    public void line() {
+        gridx = 0;
+        gridy++;
+    }
+
+    public void right() {
+        gridx++;
     }
 }
