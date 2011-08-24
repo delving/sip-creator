@@ -26,7 +26,6 @@ import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.sip.FileStore;
-import eu.delving.sip.frames.FieldStatisticsPanel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -71,13 +70,10 @@ public class AnalyzeWindow extends DesktopWindow {
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
     private JButton analyzeButton = new JButton(RUN_ANALYSIS);
     private JTree statisticsJTree;
-    private FieldStatisticsPanel fieldStatisticsPanel = new FieldStatisticsPanel();
 
     public AnalyzeWindow(SipModel sipModel) {
         super(sipModel);
-        setLayout(new GridLayout(1, 2));
         add(createTreePanel());
-        add(fieldStatisticsPanel);
         wireUp();
     }
 
@@ -91,7 +87,6 @@ public class AnalyzeWindow extends DesktopWindow {
 
             @Override
             public void updatedStatistics(final FieldStatistics fieldStatistics) {
-                fieldStatisticsPanel.setStatistics(fieldStatistics);
             }
 
             @Override

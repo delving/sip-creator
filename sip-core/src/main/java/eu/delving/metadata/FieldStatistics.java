@@ -73,7 +73,7 @@ public class FieldStatistics implements Comparable<FieldStatistics>, Serializabl
     public String getSummary() {
         if (valueStats == null) {
             if (total == 1) {
-                return String.format("Element appears just once.");
+                return "Element appears just once.";
             }
             else {
                 return String.format("Element appears %d times.", total);

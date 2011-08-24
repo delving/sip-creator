@@ -30,6 +30,7 @@ import eu.delving.sip.base.OAuthClient;
 import eu.delving.sip.desktop.FileStoreFinder;
 import eu.delving.sip.frames.MappingFrame;
 import eu.delving.sip.frames.RefinementFrame;
+import eu.delving.sip.frames.StatisticsFrame;
 import eu.delving.sip.frames.TransformationFrame;
 import eu.delving.sip.menus.CultureHubMenu;
 import eu.delving.sip.menus.DataSetMenu;
@@ -80,6 +81,7 @@ public class Application {
     private MappingFrame mappingFrame;
     private RefinementFrame refinementFrame;
     private TransformationFrame transformationFrame;
+    private StatisticsFrame statisticsFrame;
 
     private Application(final File fileStoreDirectory) throws FileStoreException {
         MetadataModel metadataModel = loadMetadataModel();
@@ -97,6 +99,7 @@ public class Application {
         };
         desktop.setBackground(new Color(190, 190, 200));
         mappingFrame = new MappingFrame(desktop, sipModel);
+        statisticsFrame = new StatisticsFrame(desktop, sipModel);
         refinementFrame = new RefinementFrame(desktop, sipModel);
         transformationFrame = new TransformationFrame(desktop, sipModel);
         frame.getContentPane().add(desktop);
@@ -164,6 +167,7 @@ public class Application {
 
     private void putFrameStates() {
         mappingFrame.putState();
+        statisticsFrame.putState();
         refinementFrame.putState();
         transformationFrame.putState();
     }
@@ -186,6 +190,7 @@ public class Application {
     private JMenu createFrameMenu() {
         JMenu menu = new JMenu("Frames");
         menu.add(mappingFrame.getAction());
+        menu.add(statisticsFrame.getAction());
         menu.add(refinementFrame.getAction());
         menu.add(transformationFrame.getAction());
         return menu;
@@ -246,14 +251,18 @@ public class Application {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    String html = exception != null ?
-                            String.format("<html><h3>%s</h3><p>%s</p></html>", message, exception.getMessage()) :
-                            String.format("<html><h3>%s</h3></html>", message);
-                    if (exception instanceof ValidationException) {
-                        StringBuilder problemHtml = new StringBuilder(String.format("<html><h3>%s</h3><pre>", message));
-                        problemHtml.append(exception.getMessage());
-                        problemHtml.append("</pre></html>");
-                        html = problemHtml.toString();
+                    String html;
+                    if (exception != null) {
+                        html = String.format("<html><h3>%s</h3><p>%s</p></html>", message, exception.getMessage().replaceAll("<", "&lt;"));
+                        if (exception instanceof ValidationException) {
+                            StringBuilder problemHtml = new StringBuilder(String.format("<html><h3>%s</h3><pre>", message));
+                            problemHtml.append(exception.getMessage().replaceAll("<", "&lt;"));
+                            problemHtml.append("</pre></html>");
+                            html = problemHtml.toString();
+                        }
+                    }
+                    else {
+                        html = String.format("<html><h3>%s</h3></html>", message);
                     }
                     JOptionPane.showMessageDialog(null, html);
                 }

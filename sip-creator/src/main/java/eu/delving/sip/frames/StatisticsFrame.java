@@ -23,17 +23,23 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Histogram;
+import eu.delving.metadata.Path;
 import eu.delving.metadata.RandomSample;
+import eu.delving.sip.FileStore;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
+import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,59 +50,96 @@ import java.util.List;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class FieldStatisticsPanel extends JPanel {
-    private JLabel summaryLabel = new JLabel("Summary", JLabel.CENTER);
+public class StatisticsFrame extends FrameBase {
+    private final String EMPTY = "<html><center><h2>No Statistics</h2><b>Select an item from the document structure<br>or an input variable</b><br><br>";
+    private JLabel summaryLabel = new JLabel(EMPTY, JLabel.CENTER);
     private HistogramModel histogramModel = new HistogramModel();
     private RandomSampleModel randomSampleModel = new RandomSampleModel();
 
-    public FieldStatisticsPanel() {
-        super(new BorderLayout(5, 5));
-        setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createTitledBorder("Statistics"),
-                        BorderFactory.createEmptyBorder(0, 0, 8, 0)
-                )
-        );
-        add(createTabs(), BorderLayout.CENTER);
+    public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Statistics", false);
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
-        add(summaryLabel, BorderLayout.NORTH);
+        sipModel.addUpdateListener(new SipModel.UpdateListener() {
+            @Override
+            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
+            }
+
+            @Override
+            public void updatedStatistics(final FieldStatistics fieldStatistics) {
+                setStatistics(fieldStatistics);
+            }
+
+            @Override
+            public void updatedRecordRoot(Path recordRoot, int recordCount) {
+            }
+
+            @Override
+            public void normalizationMessage(boolean complete, String message) {
+            }
+        });
     }
 
-    public void setStatistics(final FieldStatistics fieldStatistics) {
+    @Override
+    protected void buildContent(Container content) {
+        add(createSummary(), BorderLayout.NORTH);
+        add(createListPanels(), BorderLayout.CENTER);
+    }
+
+    @Override
+    protected void refresh() {
+        // todo: implement
+    }
+
+    private void setSummary(FieldStatistics fieldStatistics) {
         if (fieldStatistics == null) {
-            summaryLabel.setText("No statistics.");
+            summaryLabel.setText(EMPTY);
+        }
+        else {
+            summaryLabel.setText(String.format("<html><center><h2>%s</h2><b>%s</b><br><br>", fieldStatistics.getPath(), fieldStatistics.getSummary()));
+        }
+    }
+
+    private void setStatistics(final FieldStatistics fieldStatistics) {
+        setSummary(fieldStatistics);
+        if (fieldStatistics == null) {
             histogramModel.setHistogram(null);
             randomSampleModel.setRandomSample(null);
         }
         else {
-            summaryLabel.setText(fieldStatistics.getSummary());
             histogramModel.setHistogram(fieldStatistics.getHistogram());
             randomSampleModel.setRandomSample(fieldStatistics.getRandomSample());
         }
     }
 
-    private JComponent createTabs() {
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Random Sample", createRandomSamplePanel());
-        tabbedPane.add("Histogram", createHistogramPanel());
-        return tabbedPane;
+    private JComponent createSummary() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder("Summary"));
+        p.add(summaryLabel, BorderLayout.CENTER);
+        p.setMinimumSize(new Dimension(300, 400));
+        return p;
+    }
+
+    private JComponent createListPanels() {
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createRandomSamplePanel(), createHistogramPanel());
+        split.setDividerLocation(0.5);
+        split.setResizeWeight(0.5);
+        return split;
     }
 
     private JComponent createRandomSamplePanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder("Random Sample"));
         JList list = new JList(randomSampleModel);
-        return scroll(list);
+        p.add(scroll(list));
+        return p;
     }
 
     private JComponent createHistogramPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder("Histogram"));
         JList list = new JList(histogramModel);
-        return scroll(list);
-    }
-
-    private JScrollPane scroll(JComponent content) {
-        JScrollPane scroll = new JScrollPane(content);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        return scroll;
+        p.add(scroll(list));
+        return p;
     }
 
     private class HistogramModel extends AbstractListModel {

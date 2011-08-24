@@ -80,7 +80,6 @@ public class MappingFrame extends FrameBase {
     private JButton analyzeButton = new JButton(RUN_ANALYSIS);
     private JButton createObviousMappingButton = new JButton("Create obvious mappings");
     private JTextField constantField = new JTextField("?");
-    private FieldStatisticsPanel fieldStatisticsPanel = new FieldStatisticsPanel();
     private JTree statisticsJTree;
     private JList variablesList;
     private TargetPopup targetPopup;
@@ -121,9 +120,7 @@ public class MappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.setLayout(new GridLayout(1, 0, 5, 5));
-        content.add(createLeft());
-        content.add(createRight());
+        content.add(createPanel());
     }
 
     @Override
@@ -166,7 +163,6 @@ public class MappingFrame extends FrameBase {
 
             @Override
             public void updatedStatistics(final FieldStatistics fieldStatistics) {
-                fieldStatisticsPanel.setStatistics(fieldStatistics);
             }
 
             @Override
@@ -232,7 +228,7 @@ public class MappingFrame extends FrameBase {
         });
     }
 
-    private JComponent createLeft() {
+    private JComponent createPanel() {
         JTabbedPane tabs = new JTabbedPane();
         tabs.add("Document Structure", createTreePanel());
         tabs.add("Variable Mapping", createVariableMappingPanel());
@@ -289,10 +285,6 @@ public class MappingFrame extends FrameBase {
         selectUniqueElementButton.setEnabled(false);
         bp.add(selectUniqueElementButton);
         return bp;
-    }
-
-    private JComponent createRight() {
-        return fieldStatisticsPanel;
     }
 
     private void prepareCreateMappingButtons() {
