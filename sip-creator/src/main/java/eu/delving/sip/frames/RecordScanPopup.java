@@ -62,7 +62,7 @@ public class RecordScanPopup extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.setLayout(new SpringLayout());
-        fields.add(createField("Record Number (modulo):", new FieldScanPredicate() {
+        fields.add(createField(content, "Record Number (modulo):", new FieldScanPredicate() {
 
             private int modulo;
 
@@ -89,7 +89,7 @@ public class RecordScanPopup extends FrameBase {
                 return modulo == 1 || record.getRecordNumber() % modulo == 0;
             }
         }));
-        fields.add(createField("Field Contains (Substring)", new FieldScanPredicate() {
+        fields.add(createField(content, "Field Contains (Substring)", new FieldScanPredicate() {
             private String substring;
 
             @Override
@@ -107,7 +107,7 @@ public class RecordScanPopup extends FrameBase {
                 return record.contains(Pattern.compile(String.format(".*%s.*", substring)));
             }
         }));
-        fields.add(createField("Field Equals (RegEx)", new FieldScanPredicate() {
+        fields.add(createField(content, "Field Equals (RegEx)", new FieldScanPredicate() {
             private String regex;
 
             @Override
@@ -160,7 +160,7 @@ public class RecordScanPopup extends FrameBase {
         sipModel.seekRecord(currentPredicate, progressListener);
     }
 
-    private JTextField createField(String prompt, final FieldScanPredicate fieldScanPredicate) {
+    private JTextField createField(Container container, String prompt, final FieldScanPredicate fieldScanPredicate) {
         JLabel label = new JLabel(prompt, JLabel.RIGHT);
         final JTextField field = new JTextField();
         label.setLabelFor(field);
@@ -174,9 +174,9 @@ public class RecordScanPopup extends FrameBase {
                 scan(true);
             }
         });
-        add(label);
-        add(field);
-        add(setButton);
+        container.add(label);
+        container.add(field);
+        container.add(setButton);
         return field;
     }
 

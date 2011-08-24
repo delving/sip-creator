@@ -26,9 +26,11 @@ import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.ValidationException;
 import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.OAuthClient;
 import eu.delving.sip.desktop.FileStoreFinder;
-import eu.delving.sip.frames.MappingFrame;
+import eu.delving.sip.frames.AnalysisFrame;
+import eu.delving.sip.frames.CreateFrame;
 import eu.delving.sip.frames.RefinementFrame;
 import eu.delving.sip.frames.StatisticsFrame;
 import eu.delving.sip.frames.TransformationFrame;
@@ -60,7 +62,9 @@ import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * The main application
@@ -72,16 +76,13 @@ public class Application {
     private ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
     private PopupExceptionHandler exceptionHandler;
     private SipModel sipModel;
-    private JFrame frame;
+    private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
     private MappingMenu mappingMenu;
     private CultureHubMenu cultureHubMenu;
     private OAuthClient oauthClient;
-    private MappingFrame mappingFrame;
-    private RefinementFrame refinementFrame;
-    private TransformationFrame transformationFrame;
-    private StatisticsFrame statisticsFrame;
+    private List<FrameBase> frames = new ArrayList<FrameBase>();
 
     private Application(final File fileStoreDirectory) throws FileStoreException {
         MetadataModel metadataModel = loadMetadataModel();
@@ -89,7 +90,7 @@ public class Application {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         this.exceptionHandler = new PopupExceptionHandler();
         this.sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, this.exceptionHandler);
-        frame = new JFrame("Delving SIP Creator");
+        home = new JFrame("Delving SIP Creator");
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
             public void paintComponent(Graphics g) {
@@ -98,14 +99,15 @@ public class Application {
             }
         };
         desktop.setBackground(new Color(190, 190, 200));
-        mappingFrame = new MappingFrame(desktop, sipModel);
-        statisticsFrame = new StatisticsFrame(desktop, sipModel);
-        refinementFrame = new RefinementFrame(desktop, sipModel);
-        transformationFrame = new TransformationFrame(desktop, sipModel);
-        frame.getContentPane().add(desktop);
-        frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setIconImage(logo.getImage());
+        frames.add(new AnalysisFrame(desktop, sipModel));
+        frames.add(new CreateFrame(desktop, sipModel));
+        frames.add(new StatisticsFrame(desktop, sipModel));
+        frames.add(new RefinementFrame(desktop, sipModel));
+        frames.add(new TransformationFrame(desktop, sipModel));
+        home.getContentPane().add(desktop);
+        home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+        home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        home.setIconImage(logo.getImage());
         this.dataSetMenu = new DataSetMenu(sipModel);
         this.mappingMenu = new MappingMenu(sipModel);
         this.oauthClient = new OAuthClient(
@@ -130,8 +132,8 @@ public class Application {
                 exceptionHandler.tellUser(message);
             }
         }));
-        frame.setJMenuBar(createMenuBar());
-        frame.addWindowListener(new WindowListener() {
+        home.setJMenuBar(createMenuBar());
+        home.addWindowListener(new WindowListener() {
             @Override
             public void windowOpened(WindowEvent windowEvent) {
             }
@@ -166,15 +168,14 @@ public class Application {
     }
 
     private void putFrameStates() {
-        mappingFrame.putState();
-        statisticsFrame.putState();
-        refinementFrame.putState();
-        transformationFrame.putState();
+        for (FrameBase frame : frames) {
+            frame.putState();
+        }
     }
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        bar.add(new FileMenu(frame, sipModel, new Runnable() {
+        bar.add(new FileMenu(home, sipModel, new Runnable() {
             @Override
             public void run() {
                 // todo: when a new data set is imported...
@@ -189,13 +190,11 @@ public class Application {
 
     private JMenu createFrameMenu() {
         JMenu menu = new JMenu("Frames");
-        menu.add(mappingFrame.getAction());
-        menu.add(statisticsFrame.getAction());
-        menu.add(refinementFrame.getAction());
-        menu.add(transformationFrame.getAction());
+        for (FrameBase frame : frames) {
+            menu.add(frame.getAction());
+        }
         return menu;
     }
-
 
     private MetadataModel loadMetadataModel() {
         try {
@@ -314,7 +313,7 @@ public class Application {
             public void run() {
                 try {
                     Application application = new Application(fileStoreDirectory);
-                    application.frame.setVisible(true);
+                    application.home.setVisible(true);
                 }
                 catch (FileStoreException e) {
                     JOptionPane.showMessageDialog(null, "Unable to create the file store");

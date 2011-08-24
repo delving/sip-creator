@@ -23,29 +23,18 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
-import eu.delving.metadata.CodeGenerator;
-import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.SourceVariable;
-import eu.delving.sip.FileStore;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -60,10 +49,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The structure of the input data, tree, variables and statistics.
@@ -72,50 +57,22 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class MappingFrame extends FrameBase {
+public class AnalysisFrame extends FrameBase {
     private static final String RUN_ANALYSIS = "Run the Analysis";
     private static final String ELEMENTS_PROCESSED = "%d Elements Processed";
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
     private JButton analyzeButton = new JButton(RUN_ANALYSIS);
-    private JButton createObviousMappingButton = new JButton("Create obvious mappings");
-    private JTextField constantField = new JTextField("?");
     private JTree statisticsJTree;
-    private JList variablesList;
-    private TargetPopup targetPopup;
-    private ObviousMappingsPopup obviousMappingsPopup;
 
-    public MappingFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Mapping", false);
-        this.targetPopup = new TargetPopup(this, new TargetPopup.Context() {
-
-            @Override
-            public List<SourceVariable> createSelectedVariableList() {
-                List<SourceVariable> list = new ArrayList<SourceVariable>();
-                for (Object sourceVariable : variablesList.getSelectedValues()) {
-                    list.add((SourceVariable) sourceVariable);
-                }
-                return list;
-            }
-
-            @Override
-            public String getConstantFieldValue() {
-                return constantField.getText();
-            }
-
-            @Override
-            public void clear() {
-                variablesList.clearSelection();
-                constantField.setText("");
-            }
-        });
-        obviousMappingsPopup = new ObviousMappingsPopup(this);
-        variablesList = new JList(sipModel.getVariablesListWithCountsModel());
+    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Analysis", false);
         statisticsJTree = new JTree(sipModel.getAnalysisTreeModel());
         statisticsJTree.getModel().addTreeModelListener(new Expander());
         statisticsJTree.setCellRenderer(new AnalysisTreeCellRenderer());
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
+        setDefaultSize(400, 800);
     }
 
     @Override
@@ -155,51 +112,6 @@ public class MappingFrame extends FrameBase {
                 }
             }
         });
-        sipModel.addUpdateListener(new SipModel.UpdateListener() {
-            @Override
-            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
-                variablesList.clearSelection();
-            }
-
-            @Override
-            public void updatedStatistics(final FieldStatistics fieldStatistics) {
-            }
-
-            @Override
-            public void updatedRecordRoot(Path recordRoot, int recordCount) {
-            }
-
-            @Override
-            public void normalizationMessage(boolean complete, String message) {
-            }
-        });
-        createObviousMappingButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                obviousMappingDialog.setVisible(true);
-            }
-        });
-        constantField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                variablesList.clearSelection();
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-            }
-        });
-        variablesList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) return;
-                final SourceVariable sourceVariable = (SourceVariable) variablesList.getSelectedValue();
-                if (sourceVariable != null && sourceVariable.hasStatistics()) {
-                    sipModel.setStatistics(sourceVariable.getStatistics());
-                    constantField.setText("?");
-                }
-            }
-        });
         selectRecordRootButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -228,46 +140,7 @@ public class MappingFrame extends FrameBase {
         });
     }
 
-    private JComponent createPanel() {
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.add("Document Structure", createTreePanel());
-        tabs.add("Variable Mapping", createVariableMappingPanel());
-        return tabs;
-    }
-
-    private JPanel createVariableMappingPanel() {
-        JPanel pp = new JPanel(new GridLayout(0, 1, 5, 5));
-        pp.add(new JButton(obviousMappingsPopup.getAction()));
-        pp.add(new JButton(targetPopup.getAction()));
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(createVariableMappingTop(), BorderLayout.CENTER);
-        p.add(pp, BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel createVariableMappingTop() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createEtchedBorder());
-        p.add(createVariableListPanel(), BorderLayout.CENTER);
-        p.add(createConstantFieldPanel(), BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel createVariableListPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Input Field Source"));
-        p.add(scroll(variablesList), BorderLayout.CENTER);
-        return p;
-    }
-
-    private JPanel createConstantFieldPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Constant Source"));
-        p.add(constantField);
-        return p;
-    }
-
-    private JPanel createTreePanel() {
+    private JPanel createPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
         p.add(scroll(statisticsJTree), BorderLayout.CENTER);
@@ -285,25 +158,6 @@ public class MappingFrame extends FrameBase {
         selectUniqueElementButton.setEnabled(false);
         bp.add(selectUniqueElementButton);
         return bp;
-    }
-
-    private void prepareCreateMappingButtons() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                CodeGenerator codeGenerator = new CodeGenerator();
-                List<FieldMapping> obvious = codeGenerator.createObviousMappings(sipModel.getUnmappedFields(), sipModel.getVariables());
-                if (obvious.isEmpty()) {
-                    if (obviousMappingsPopup.isVisible()) {
-                        obviousMappingsPopup.closeFrame();
-                    }
-                    createObviousMappingButton.setEnabled(false);
-                }
-                else {
-                    createObviousMappingButton.setEnabled(true);
-                }
-            }
-        });
     }
 
     private void performAnalysis() {
@@ -406,7 +260,4 @@ public class MappingFrame extends FrameBase {
             }
         }
     }
-
-    // todo: popup for obvious mappings
-    // todo: popup for making a mapping
 }
