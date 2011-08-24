@@ -27,6 +27,7 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.SwingUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -43,7 +44,12 @@ public class DataSetMenu extends JMenu {
     public DataSetMenu(SipModel sipModel) {
         super("Data Sets");
         this.sipModel = sipModel;
-        refresh();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                refresh();
+            }
+        });
     }
 
     public void refresh() {
