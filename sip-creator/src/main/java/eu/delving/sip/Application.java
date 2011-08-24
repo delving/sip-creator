@@ -43,7 +43,9 @@ import eu.delving.sip.menus.MappingMenu;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.UserNotifier;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,6 +59,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -108,7 +111,12 @@ public class Application {
         frames.add(new FieldMappingFrame(desktop, sipModel));
         frames.add(new RecordMappingFrame(desktop, sipModel));
         frames.add(new OutputFrame(desktop, sipModel));
-        home.getContentPane().add(desktop);
+        desktop.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createBevelBorder(0),
+                BorderFactory.createBevelBorder(0)
+        ));
+        home.getContentPane().add(desktop, BorderLayout.CENTER);
+        home.getContentPane().add(createFrameButtonPanel(), BorderLayout.SOUTH);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         home.setIconImage(logo.getImage());
@@ -169,6 +177,18 @@ public class Application {
             }
         });
         osxExtra();
+    }
+
+    private JPanel createFrameButtonPanel() {
+        JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
+        p.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                BorderFactory.createTitledBorder("Frames")
+        ));
+        for (FrameBase frame : frames) {
+            p.add(new JButton(frame.getAction()));
+        }
+        return p;
     }
 
     private void putFrameStates() {

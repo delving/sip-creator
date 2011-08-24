@@ -30,6 +30,7 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 import javax.swing.SpringLayout;
@@ -57,12 +58,13 @@ public class RecordScanPopup extends FrameBase {
     public RecordScanPopup(JComponent parent, SipModel sipModel, Listener listener) {
         super(parent, sipModel, "Scan Criteria", true);
         this.listener = listener;
+        setDefaultSize(400, 300);
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.setLayout(new SpringLayout());
-        fields.add(createField(content, "Record Number (modulo):", new FieldScanPredicate() {
+        JPanel p = new JPanel(new SpringLayout());
+        fields.add(createField(p, "Record Number (modulo):", new FieldScanPredicate() {
 
             private int modulo;
 
@@ -89,7 +91,7 @@ public class RecordScanPopup extends FrameBase {
                 return modulo == 1 || record.getRecordNumber() % modulo == 0;
             }
         }));
-        fields.add(createField(content, "Field Contains (Substring)", new FieldScanPredicate() {
+        fields.add(createField(p, "Field Contains (Substring)", new FieldScanPredicate() {
             private String substring;
 
             @Override
@@ -107,7 +109,7 @@ public class RecordScanPopup extends FrameBase {
                 return record.contains(Pattern.compile(String.format(".*%s.*", substring)));
             }
         }));
-        fields.add(createField(content, "Field Equals (RegEx)", new FieldScanPredicate() {
+        fields.add(createField(p, "Field Equals (RegEx)", new FieldScanPredicate() {
             private String regex;
 
             @Override
@@ -125,7 +127,8 @@ public class RecordScanPopup extends FrameBase {
                 return record.contains(Pattern.compile(regex));
             }
         }));
-        Utility.makeCompactGrid(content, getComponentCount() / 3, 3, 5, 5, 5, 5);
+        Utility.makeCompactGrid(p, p.getComponentCount() / 3, 3, 5, 5, 5, 5);
+        content.add(p);
     }
 
     @Override

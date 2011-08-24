@@ -93,6 +93,7 @@ public class InputFrame extends FrameBase {
                 recordScanPopup.scan(true);
             }
         });
+        setDefaultSize(400, 600);
     }
 
     @Override
