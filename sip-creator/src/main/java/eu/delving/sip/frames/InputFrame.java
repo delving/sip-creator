@@ -77,7 +77,6 @@ public class InputFrame extends FrameBase {
         this.recordScanPopup = new RecordScanPopup(this, sipModel, new RecordScanPopup.Listener() {
             @Override
             public void searchStarted(String description) {
-                closeFrame();
                 criterionLabel.setText(description);
             }
         });

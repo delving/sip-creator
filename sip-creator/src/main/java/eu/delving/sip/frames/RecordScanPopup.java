@@ -35,7 +35,9 @@ import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -58,7 +60,7 @@ public class RecordScanPopup extends FrameBase {
     public RecordScanPopup(JComponent parent, SipModel sipModel, Listener listener) {
         super(parent, sipModel, "Scan Criteria", true);
         this.listener = listener;
-        setDefaultSize(400, 300);
+        setDefaultSize(500, 240);
     }
 
     @Override
@@ -128,7 +130,8 @@ public class RecordScanPopup extends FrameBase {
             }
         }));
         Utility.makeCompactGrid(p, p.getComponentCount() / 3, 3, 5, 5, 5, 5);
-        content.add(p);
+        content.add(p, BorderLayout.CENTER);
+        content.add(createCancel(), BorderLayout.SOUTH);
     }
 
     @Override
@@ -136,6 +139,21 @@ public class RecordScanPopup extends FrameBase {
         for (JTextField field : fields) {
             field.setText(null);
         }
+    }
+
+    private JPanel createCancel() {
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                currentPredicate = DEFAULT_PREDICATE;
+                listener.searchStarted(currentPredicate.render());
+                closeFrame();
+            }
+        });
+        p.add(cancel);
+        return p;
     }
 
     public String getPredicateDescription() {
@@ -174,6 +192,7 @@ public class RecordScanPopup extends FrameBase {
                 fieldScanPredicate.setFieldValue(field.getText().trim());
                 currentPredicate = fieldScanPredicate;
                 listener.searchStarted(fieldScanPredicate.render());
+                closeFrame();
                 scan(true);
             }
         });
