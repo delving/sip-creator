@@ -57,7 +57,7 @@ public abstract class AbstractRecordParser implements Runnable {
         xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
         xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
         xmlif.configureForSpeed();
-        return (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), dataSetStore.createXmlInputStream());
+        return (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), dataSetStore.getSourceInputStream());
     }
 
     protected abstract void handleException(Exception e);

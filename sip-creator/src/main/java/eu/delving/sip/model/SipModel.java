@@ -41,8 +41,8 @@ import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.xml.AnalysisParser;
+import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
-import eu.delving.sip.xml.Normalizer;
 
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
@@ -327,16 +327,15 @@ public class SipModel {
         return facts;
     }
 
-    public void normalize(File normalizeDirectory, boolean discardInvalid, final ProgressListener progressListener) {
+    public void validateFile(boolean saveInvalidRecords, final ProgressListener progressListener) {
         checkSwingThread();
         normalizeMessage(false, "Normalizing and validating...");
-        executor.execute(new Normalizer(
+        executor.execute(new FileValidator(
                 this,
-                discardInvalid,
-                normalizeDirectory,
+                saveInvalidRecords,
                 groovyCodeResource,
                 progressListener,
-                new Normalizer.Listener() {
+                new FileValidator.Listener() {
                     @Override
                     public void invalidInput(final MappingException exception) {
                         userNotifier.tellUser("Problem normalizing " + exception.getMetadataRecord().toString(), exception);
@@ -360,15 +359,16 @@ public class SipModel {
                     }
 
                     @Override
-                    public void finished(final boolean success) {
+                    public void finished(final boolean aborted, int validCount, int invalidCount) {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                if (success) {
-                                    normalizeMessage(getMappingModel().getRecordMapping());
+                                if (aborted) {
+                                    normalizeMessage(false, "Normalization aborted");
                                 }
                                 else {
-                                    normalizeMessage(false, "Normalization aborted");
+                                    // todo: must use the counts
+                                    normalizeMessage(getMappingModel().getRecordMapping());
                                 }
                             }
                         });
@@ -589,7 +589,7 @@ public class SipModel {
             }
             try {
                 if (metadataParser == null) {
-                    metadataParser = new MetadataParser(dataSetStore.createXmlInputStream(), recordRoot, getRecordCount());
+                    metadataParser = new MetadataParser(dataSetStore.getSourceInputStream(), recordRoot, getRecordCount());
                 }
                 metadataParser.setProgressListener(progressListener);
                 while ((metadataRecord = metadataParser.nextRecord()) != null) {

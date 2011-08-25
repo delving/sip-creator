@@ -29,7 +29,6 @@ import eu.delving.sip.ProgressListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
@@ -58,7 +57,9 @@ public interface FileStore {
 
         Facts getFacts();
 
-        InputStream createXmlInputStream() throws FileStoreException;
+        InputStream getImportedInputStream() throws FileStoreException;
+
+        InputStream getSourceInputStream() throws FileStoreException;
 
         List<FieldStatistics> getStatistics();
 
@@ -68,11 +69,11 @@ public interface FileStore {
 
         void setRecordMapping(RecordMapping recordMapping) throws FileStoreException;
 
-        MappingOutput createMappingOutput(RecordMapping recordMapping, File normalizedDirectory) throws FileStoreException;
-
         void remove() throws FileStoreException;
 
         File getFactsFile();
+
+        File getImportedFile();
 
         File getSourceFile();
 
@@ -80,24 +81,13 @@ public interface FileStore {
 
         List<String> getMappingPrefixes();
 
+        File getDiscardedFile(RecordMapping recordMapping);
+
         void importSource(File inputFile, ProgressListener progressListener) throws FileStoreException;
 
         void convertSource(ProgressListener progressListener) throws FileStoreException;
 
         void acceptSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws IOException, FileStoreException;
-    }
-
-    public interface MappingOutput {
-
-        Writer getOutputWriter();
-
-        Writer getDiscardedWriter();
-
-        void recordNormalized();
-
-        void recordDiscarded();
-
-        void close(boolean abort) throws FileStoreException;
     }
 
     String IMPORTED_FILE_NAME = "imported.xml.gz";
@@ -107,4 +97,5 @@ public interface FileStore {
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
     String MAPPING_FILE_PREFIX = "mapping_";
     String MAPPING_FILE_SUFFIX = ".xml";
+    String DISCARDED_FILE_PATTERN = "discarded_%s.xml";
 }

@@ -64,7 +64,7 @@ class TestMappingEngine {
                 <priref>6389</priref>
                 """
             IndexDocument doc;
-            for (int x: 1..10000) {
+            for (int x: 1..10) {
               Long now = System.currentTimeMillis();
 //              record.replace("6389", new Random().toString())
               IndexDocument oldDoc = doc;
@@ -77,7 +77,7 @@ class TestMappingEngine {
 //              println mappingEngine
             }
             println "VALID!\n ${doc}"
-            println 'After 1000 runs:\n' + mappingEngine
+            println 'After 10 runs:\n' + mappingEngine
         }
         catch (ValidationException e) {
             println "The failed assertion:\n${e.message}\n${doc}"

@@ -177,9 +177,20 @@ public class FileStoreImpl implements FileStore {
             return facts;
         }
 
+        @Override
+        public InputStream getImportedInputStream() throws FileStoreException {
+            File imported = getImportedFile();
+            try {
+                return new GZIPInputStream(new FileInputStream(imported));
+            }
+            catch (IOException e) {
+                throw new FileStoreException(String.format("Unable to create input stream from %s", imported.getAbsolutePath()), e);
+            }
+        }
+
 
         @Override
-        public InputStream createXmlInputStream() throws FileStoreException {
+        public InputStream getSourceInputStream() throws FileStoreException {
             File source = getSourceFile();
             try {
                 return new GZIPInputStream(new FileInputStream(source));
@@ -257,11 +268,6 @@ public class FileStoreImpl implements FileStore {
         }
 
         @Override
-        public MappingOutput createMappingOutput(RecordMapping recordMapping, File normalizedDirectory) throws FileStoreException {
-            return new MappingOutputImpl(directory.getName(), recordMapping, normalizedDirectory);
-        }
-
-        @Override
         public void remove() throws FileStoreException {
             delete(directory);
         }
@@ -269,6 +275,11 @@ public class FileStoreImpl implements FileStore {
         @Override
         public File getFactsFile() {
             return findFactsFile(directory);
+        }
+
+        @Override
+        public File getImportedFile() {
+            return findImportedFile(directory);
         }
 
         @Override
@@ -291,6 +302,11 @@ public class FileStoreImpl implements FileStore {
                 prefixes.add(name);
             }
             return prefixes;
+        }
+
+        @Override
+        public File getDiscardedFile(RecordMapping recordMapping) {
+            return new File(directory, String.format(DISCARDED_FILE_PATTERN, recordMapping.getPrefix()));
         }
 
         @Override
@@ -409,7 +425,7 @@ public class FileStoreImpl implements FileStore {
         }
     }
 
-    private static class MappingOutputImpl implements MappingOutput {
+    private static class MappingOutputImpl {
         private RecordMapping recordMapping;
         private File discardedFile, normalizedFile;
         private Writer outputWriter, discardedWriter;
@@ -433,15 +449,6 @@ public class FileStoreImpl implements FileStore {
             }
         }
 
-        @Override
-        public Writer getOutputWriter() {
-            if (outputWriter == null) {
-                throw new RuntimeException("Normalized file was not to be stored");
-            }
-            return outputWriter;
-        }
-
-        @Override
         public Writer getDiscardedWriter() {
             if (discardedWriter == null) {
                 throw new RuntimeException("Discarded file was not to be stored");
@@ -449,17 +456,14 @@ public class FileStoreImpl implements FileStore {
             return discardedWriter;
         }
 
-        @Override
         public void recordNormalized() {
             recordsNormalized++;
         }
 
-        @Override
         public void recordDiscarded() {
             recordsDiscarded++;
         }
 
-        @Override
         public void close(boolean abort) throws FileStoreException {
             try {
                 if (abort) {
@@ -495,6 +499,23 @@ public class FileStoreImpl implements FileStore {
         switch (files.length) {
             case 0:
                 return new File(dir, FACTS_FILE_NAME);
+            case 1:
+                return files[0];
+            default:
+                for (File file : files) {
+                    if (Hasher.extractHash(file) == null) {
+                        return file;
+                    }
+                }
+                return getMostRecent(files);
+        }
+    }
+
+    private File findImportedFile(File dir) {
+        File[] files = dir.listFiles(new ImportedFileFilter());
+        switch (files.length) {
+            case 0:
+                return new File(dir, IMPORTED_FILE_NAME);
             case 1:
                 return files[0];
             default:
@@ -566,6 +587,13 @@ public class FileStoreImpl implements FileStore {
         @Override
         public boolean accept(File file) {
             return file.isFile() && FACTS_FILE_NAME.equals(Hasher.extractFileName(file));
+        }
+    }
+
+    private class ImportedFileFilter implements FileFilter {
+        @Override
+        public boolean accept(File file) {
+            return file.isFile() && IMPORTED_FILE_NAME.equals(Hasher.extractFileName(file));
         }
     }
 

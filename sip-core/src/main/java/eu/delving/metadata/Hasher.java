@@ -73,7 +73,7 @@ public class Hasher {
         else {
             Hasher hasher = new Hasher();
             hasher.update(file);
-            File hashedFile = new File(file.getParentFile(), hasher.getHashString() + SEPARATOR + file.getName());
+            File hashedFile = new File(file.getParentFile(), hasher.prefixFileName(file.getName()));
             if (!file.renameTo(hashedFile)) {
                 throw new IOException(String.format("Unable to rename %s to %s", file.getAbsolutePath(), hashedFile.getAbsolutePath())) ;
             }

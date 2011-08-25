@@ -65,15 +65,15 @@ public class TestFileStore {
     public void createDelete() throws IOException, FileStoreException {
         FileStore.DataSetStore store = mock.getDataSetStore();
         Assert.assertEquals("Should be no files", 0, mock.getSpecDirectory().listFiles().length);
-        Assert.assertNull(store.getSourceFile());
+        Assert.assertFalse(store.getImportedFile().exists());
         store.importSource(MockFileStoreInput.sampleFile(), null);
-        Assert.assertNotNull(store.getSourceFile());
+        Assert.assertTrue(store.getImportedFile().exists());
         Assert.assertEquals("Should be one file", 1, mock.getDirectory().listFiles().length);
         Assert.assertEquals("Should be one spec", 1, fileStore.getDataSetStores().size());
         Assert.assertEquals("Should be one file", 1, mock.getSpecDirectory().listFiles().length);
         log.info("Created " + mock.getSpecDirectory().listFiles()[0].getAbsolutePath());
         InputStream inputStream = MockFileStoreInput.sampleInputStream();
-        InputStream storedStream = mock.getDataSetStore().createXmlInputStream();
+        InputStream storedStream = mock.getDataSetStore().getImportedInputStream();
         int input = 0, stored;
         while (input != -1) {
             input = inputStream.read();
@@ -118,22 +118,4 @@ public class TestFileStore {
         Assert.assertEquals("Should be one stat", 1, stats.size());
         Assert.assertEquals("Path discrepancy", "/stat/path", stats.get(0).getPath().toString());
     }
-
-    @Test
-    public void pretendNormalize() throws IOException, FileStoreException, MetadataException {
-        mock.getDataSetStore().importSource(MockFileStoreInput.sampleFile(), null);
-        RecordMapping recordMapping = mock.getDataSetStore().getRecordMapping(mock.getMetadataPrefix());
-        FileStore.MappingOutput mo = mock.getDataSetStore().createMappingOutput(recordMapping, null);
-        mo.recordDiscarded();
-        mo.recordNormalized();
-        mo.recordNormalized();
-        Assert.assertEquals("Should be one file", 1, mock.getSpecDirectory().listFiles().length);
-        mo.close(false);
-        mock.getDataSetStore().setRecordMapping(recordMapping);
-        Assert.assertEquals("Should be two files", 2, mock.getSpecDirectory().listFiles().length);
-        recordMapping = mock.getDataSetStore().getRecordMapping(mock.getMetadataPrefix());
-        Assert.assertEquals("Mapping should contain facts", 1, recordMapping.getRecordsDiscarded());
-        Assert.assertEquals("Mapping should contain facts", 2, recordMapping.getRecordsNormalized());
-    }
-
 }

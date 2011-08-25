@@ -27,7 +27,6 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
-import eu.delving.metadata.MetadataNamespace;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.Uniqueness;
@@ -37,10 +36,11 @@ import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.SipModel;
 import groovy.util.Node;
-import org.apache.log4j.Logger;
 
 import javax.xml.stream.XMLStreamException;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -53,99 +53,88 @@ import java.util.Set;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class Normalizer implements Runnable {
-    private Logger log = Logger.getLogger(getClass());
+public class FileValidator implements Runnable {
     private SipModel sipModel;
-    private boolean discardInvalid;
-    private File normalizeDirectory;
     private GroovyCodeResource groovyCodeResource;
     private ProgressAdapter progressAdapter;
     private Listener listener;
-    private volatile boolean running = true;
+    private volatile boolean aborted = false;
+    private boolean saveInvalidRecords;
+    private int validCount, invalidCount;
 
     public interface Listener {
         void invalidInput(MappingException exception);
 
         void invalidOutput(ValidationException exception);
 
-        void finished(boolean success);
+        void finished(boolean aborted, int validCount, int invalidCount);
     }
 
-    public Normalizer(
+    public FileValidator(
             SipModel sipModel,
-            boolean discardInvalid,
-            File normalizeDirectory,
+            boolean saveInvalidRecords,
             GroovyCodeResource groovyCodeResource,
             ProgressListener progressListener,
             Listener listener
     ) {
         this.sipModel = sipModel;
-        this.discardInvalid = discardInvalid;
-        this.normalizeDirectory = normalizeDirectory;
+        this.saveInvalidRecords = saveInvalidRecords;
         this.groovyCodeResource = groovyCodeResource;
         this.progressAdapter = new ProgressAdapter(progressListener);
         this.listener = listener;
     }
 
     public void run() {
-        FileStore.MappingOutput fileSetOutput = null;
-        boolean store = normalizeDirectory != null;
+        FileStore.DataSetStore dataSetStore = sipModel.getDataSetStore();
+        if (dataSetStore == null) {
+            throw new RuntimeException("No data set store selected");
+        }
         Uniqueness uniqueness = new Uniqueness();
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
+        File discardedFile = null;
+        Writer discarded = null;
         try {
             RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
             if (recordMapping == null) {
                 return;
-            }
-            fileSetOutput = sipModel.getDataSetStore().createMappingOutput(recordMapping, normalizeDirectory);
-            if (store) {
-                Writer out = fileSetOutput.getOutputWriter();
-                out.write("<?xml version='1.0' encoding='UTF-8'?>\n");
-                out.write("<metadata");
-                writeNamespace(out, MetadataNamespace.DC);
-                writeNamespace(out, MetadataNamespace.DCTERMS);
-                writeNamespace(out, MetadataNamespace.EUROPEANA);
-                out.write(">\n");
             }
             MappingRunner mappingRunner = new MappingRunner(
                     groovyCodeResource,
                     recordMapping.toCompileCode(sipModel.getMetadataModel())
             );
             MetadataParser parser = new MetadataParser(
-                    sipModel.getDataSetStore().createXmlInputStream(),
+                    sipModel.getDataSetStore().getSourceInputStream(),
                     sipModel.getRecordRoot(),
                     sipModel.getRecordCount()
             );
             parser.setProgressListener(progressAdapter);
+            if (saveInvalidRecords) {
+                discardedFile = dataSetStore.getDiscardedFile(recordMapping);
+                discarded = new BufferedWriter(new FileWriter(discardedFile));
+            }
             MetadataRecord record;
-            while ((record = parser.nextRecord()) != null && running) {
+            while ((record = parser.nextRecord()) != null && !aborted) {
                 try {
                     Node outputNode = mappingRunner.runMapping(record);
                     StringWriter writer = new StringWriter();
                     XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
                     xmlNodePrinter.print(outputNode);
                     recordValidator.validateRecord(outputNode, record.getRecordNumber());
-                    if (store) {
-                        String validated = XmlNodePrinter.serialize(outputNode);
-                        fileSetOutput.getOutputWriter().write(validated);
-                    }
-                    fileSetOutput.recordNormalized();
+                    validCount++;
                 }
                 catch (MappingException e) {
-                    if (discardInvalid) {
-                        if (store) {
-                            try {
-                                fileSetOutput.getDiscardedWriter().write(record.toString());
-                                e.printStackTrace(new PrintWriter(fileSetOutput.getDiscardedWriter()));
-                                fileSetOutput.getDiscardedWriter().write("\n========================================\n");
-                            }
-                            catch (IOException e1) {
-                                sipModel.getUserNotifier().tellUser("Unable to write discarded record", e1);
-                                abort();
-                            }
+                    if (discarded != null) {
+                        try {
+                            discarded.write(record.toString());
+                            e.printStackTrace(new PrintWriter(discarded));
+                            discarded.write("\n========================================\n");
                         }
-                        fileSetOutput.recordDiscarded();
+                        catch (IOException e1) {
+                            sipModel.getUserNotifier().tellUser("Unable to write discarded record", e1);
+                            abort();
+                        }
+                        invalidCount++;
                     }
                     else {
                         listener.invalidInput(e);
@@ -153,19 +142,17 @@ public class Normalizer implements Runnable {
                     }
                 }
                 catch (ValidationException e) {
-                    if (discardInvalid) {
-                        if (store) {
-                            try {
-                                fileSetOutput.getDiscardedWriter().write(record.toString());
-                                e.printStackTrace(new PrintWriter(fileSetOutput.getDiscardedWriter()));
-                                fileSetOutput.getDiscardedWriter().write("\n========================================\n");
-                            }
-                            catch (IOException e1) {
-                                sipModel.getUserNotifier().tellUser("Unable to write discarded record", e1);
-                                abort();
-                            }
+                    if (discarded != null) {
+                        try {
+                            discarded.write(record.toString());
+                            e.printStackTrace(new PrintWriter(discarded));
+                            discarded.write("\n========================================\n");
                         }
-                        fileSetOutput.recordDiscarded();
+                        catch (IOException e1) {
+                            sipModel.getUserNotifier().tellUser("Unable to write discarded record", e1);
+                            abort();
+                        }
+                        invalidCount++;
                     }
                     else {
                         listener.invalidOutput(e);
@@ -173,37 +160,33 @@ public class Normalizer implements Runnable {
                     }
                 }
                 catch (DiscardRecordException e) {
-                    if (store) {
+                    if (discarded != null) {
                         try {
-                            fileSetOutput.getDiscardedWriter().write("Discarded explicitly: \n" + record.toString());
-                            fileSetOutput.getDiscardedWriter().write("\n========================================\n");
+                            discarded.write("Discarded explicitly: \n" + record.toString());
+                            discarded.write("\n========================================\n");
                         }
                         catch (IOException e1) {
                             sipModel.getUserNotifier().tellUser("Unable to write discarded record", e1);
                             abort();
                         }
                     }
-                    fileSetOutput.recordDiscarded();
+                    invalidCount++;
                 }
                 catch (Exception e) {
                     sipModel.getUserNotifier().tellUser("Problem writing output", e);
                     abort();
                 }
             }
-            if (store) {
-                fileSetOutput.getOutputWriter().write("</metadata>\n");
-            }
             Set<String> repeated = uniqueness.getRepeated();
             if (!repeated.isEmpty()) {
-                StringBuilder out = new StringBuilder();
-                int countdown = 6;
+                discarded.write("\n\nThere were non-unique identifiers:\n");
                 for (String line : repeated) {
-                    if (countdown-- == 0) break;
-                    out.append(line).append("<br>");
+                    discarded.write(line);
+                    discarded.write("\n");
                 }
-                sipModel.getUserNotifier().tellUser(String.format("<html>Identifier should be unique, but there were %d repeats, including:<br> ", repeated.size()) + out);
+                sipModel.getUserNotifier().tellUser("Identifier should be unique, but there were %d repeated values");
             }
-            fileSetOutput.close(!running);
+            discarded.write("\nTHE END\n");
         }
         catch (XMLStreamException e) {
             throw new RuntimeException("XML Problem", e);
@@ -215,34 +198,37 @@ public class Normalizer implements Runnable {
             throw new RuntimeException("Datastore Problem", e);
         }
         catch (MetadataParser.AbortException e) {
-            if (fileSetOutput != null) {
-                try {
-                    fileSetOutput.close(true);
-                }
-                catch (FileStoreException e1) {
-                    throw new RuntimeException("Couldn't close output properly");
-                }
-            }
+            aborted = true;
         }
         finally {
-            listener.finished(running);
+            if (discarded != null) {
+                try {
+                    discarded.close();
+                }
+                catch (IOException e) {
+                    sipModel.getUserNotifier().tellUser("Unable to close discarded records file", e);
+                }
+                if (aborted) {
+                    if (discardedFile != null) {
+                        if (!discardedFile.delete()) {
+                            sipModel.getUserNotifier().tellUser("Unable to delete discarded records file");
+                        }
+                    }
+                }
+            }
+            listener.finished(aborted, validCount, invalidCount);
             uniqueness.destroy();
-            if (!running) { // aborted, so metadataparser will not call finished()
+            if (aborted) { // aborted, so metadataparser will not call finished()
                 progressAdapter.finished(false);
             }
         }
     }
 
     private void abort() {
-        running = false;
-    }
-
-    private void writeNamespace(Writer writer, MetadataNamespace namespace) throws IOException {
-        writer.write(String.format(" xmlns:%s=\"%s\"", namespace.getPrefix(), namespace.getUri()));
+        aborted = true;
     }
 
     // just so we receive the cancel signal
-
     private class ProgressAdapter implements ProgressListener {
         private ProgressListener progressListener;
 
@@ -259,9 +245,9 @@ public class Normalizer implements Runnable {
         public boolean setProgress(int progress) {
             boolean proceed = progressListener.setProgress(progress);
             if (!proceed) {
-                running = false;
+                abort();
             }
-            return running && proceed;
+            return !aborted && proceed;
         }
 
         @Override

@@ -26,23 +26,19 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 /**
  * The transformation from input record to output
@@ -51,10 +47,7 @@ import java.io.File;
  */
 
 public class OutputFrame extends FrameBase {
-    private JCheckBox discardInvalidBox = new JCheckBox("Discard Invalid Records");
-    private JCheckBox storeNormalizedBox = new JCheckBox("Store Normalized XML");
-    //    private JLabel normalizeMessageLabel = new JLabel("?", JLabel.CENTER);
-    private JFileChooser chooser = new JFileChooser("Normalized Data Output Directory");
+    private JCheckBox saveDiscarded = new JCheckBox("Save discarded records");
 
     public OutputFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Output", false);
@@ -71,14 +64,12 @@ public class OutputFrame extends FrameBase {
     }
 
     private JComponent createSouth() {
-        JButton validate = new JButton("Validate all records");
-        JCheckBox discardInvalid = new JCheckBox("Discard invalid records");
-        JButton upload = new JButton("Upload Dataset and mapping");
+        JButton upload = new JButton("Upload dataset and mapping");
         upload.setEnabled(false);
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        p.add(validate);
-        p.add(discardInvalid);
-        p.add(upload);
+        p.add(new JButton(new ValidateAction()));
+        p.add(saveDiscarded);
+        p.add(new JButton(new UploadAction()));
         return p;
     }
 
@@ -86,78 +77,50 @@ public class OutputFrame extends FrameBase {
 
     private JPanel createOutputPanel() {
         JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Output Record"));
+        p.setBorder(BorderFactory.createTitledBorder("Output record"));
         JTextArea area = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
         area.setEditable(false);
         p.add(scroll(area));
         return p;
     }
 
-    private Action normalizeAction = new AbstractAction("Normalize") {
-        private final String NORM_DIR = "normalizeDirectory";
+    private class ValidateAction extends AbstractAction {
+
+        private ValidateAction() {
+            super("Validate all records");
+        }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (storeNormalizedBox.isSelected()) {
-                File normalizeDirectory = new File(sipModel.getPreferences().get(NORM_DIR, System.getProperty("user.home")));
-                chooser.setSelectedFile(normalizeDirectory); // todo: this doesn't work for some reason
-                chooser.setCurrentDirectory(normalizeDirectory.getParentFile());
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                chooser.setFileFilter(new FileFilter() {
-                    @Override
-                    public boolean accept(File file) {
-                        return file.isDirectory();
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "Directories";
-                    }
-                });
-                chooser.setMultiSelectionEnabled(false);
-                int choiceMade = chooser.showOpenDialog(OutputFrame.this);
-                if (choiceMade == JFileChooser.APPROVE_OPTION) {
-                    normalizeDirectory = chooser.getSelectedFile();
-                    sipModel.getPreferences().put(NORM_DIR, normalizeDirectory.getAbsolutePath());
-                    normalizeTo(normalizeDirectory);
-                }
-            }
-            else {
-                normalizeTo(null);
-            }
-        }
-
-        private void normalizeTo(File normalizeDirectory) {
-            String message;
-            if (normalizeDirectory != null) {
-                message = String.format(
-                        "<html><h3>Transforming the raw data of '%s' into '%s' format</h3><br>" +
-                                "Writing to %s ",
-                        sipModel.getDataSetStore().getSpec(),
-                        sipModel.getMappingModel().getRecordMapping().getPrefix(),
-                        normalizeDirectory
-                );
-            }
-            else {
-                message = String.format(
-                        "<html><h3>Transforming the raw data of '%s' into '%s' format</h3>",
-                        sipModel.getDataSetStore().getSpec(),
-                        sipModel.getMappingModel().getRecordMapping().getPrefix()
-                );
-            }
+            String message = String.format(
+                    "<html><h3>Transforming the raw data of '%s' into '%s' format</h3>",
+                    sipModel.getDataSetStore().getSpec(),
+                    sipModel.getMappingModel().getRecordMapping().getPrefix()
+            );
             ProgressMonitor progressMonitor = new ProgressMonitor(
                     SwingUtilities.getRoot(OutputFrame.this),
                     "<html><h2>Normalizing</h2>",
                     message,
                     0, 100
             );
-            sipModel.normalize(normalizeDirectory, discardInvalidBox.isSelected(), new ProgressListener.Adapter(progressMonitor) {
+            sipModel.validateFile(saveDiscarded.isSelected(), new ProgressListener.Adapter(progressMonitor) {
                 @Override
                 public void swingFinished(boolean success) {
                     setEnabled(true);
                 }
             });
         }
-    };
+    }
 
+    private class UploadAction extends AbstractAction {
+
+        private UploadAction() {
+            super("Upload to Culture Hub");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            // todo: implement somehow!
+        }
+    }
 }
