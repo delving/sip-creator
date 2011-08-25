@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -64,33 +63,6 @@ public class FileStoreImpl implements FileStore {
             if (!home.mkdirs()) {
                 throw new FileStoreException(String.format("Unable to create file store in %s", home.getAbsolutePath()));
             }
-        }
-    }
-
-    @Override
-    public String getCode(String fileName) throws FileStoreException {
-        File codeFile = new File(home, fileName);
-        try {
-            if (codeFile.exists()) {
-                return readFileCode(codeFile);
-            }
-            else {
-                return readResourceCode(fileName);
-            }
-        }
-        catch (IOException e) {
-            throw new FileStoreException("Unable to get code " + fileName, e);
-        }
-    }
-
-    @Override
-    public void setCode(String fileName, String code) throws FileStoreException {
-        File codeFile = new File(home, fileName);
-        try {
-            writeCode(codeFile, code);
-        }
-        catch (IOException e) {
-            throw new FileStoreException("Unable to set code " + fileName, e);
         }
     }
 
@@ -353,17 +325,6 @@ public class FileStoreImpl implements FileStore {
         }
 
         @Override
-        public void setRecordHashes(Properties hashes) throws FileStoreException {
-            File hashFile = new File(directory, HASH_FILE_NAME);
-            try {
-                hashes.store(new FileOutputStream(hashFile), "Record hashes");
-            }
-            catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to save record hashes to %s", hashFile.getAbsolutePath()), e);
-            }
-        }
-
-        @Override
         public MappingOutput createMappingOutput(RecordMapping recordMapping, File normalizedDirectory) throws FileStoreException {
             return new MappingOutputImpl(directory.getName(), recordMapping, normalizedDirectory);
         }
@@ -376,11 +337,6 @@ public class FileStoreImpl implements FileStore {
         @Override
         public File getFactsFile() {
             return findFactsFile(directory);
-        }
-
-        @Override
-        public File getRecordHashesFile() {
-            return findHashFile(directory);
         }
 
         @Override

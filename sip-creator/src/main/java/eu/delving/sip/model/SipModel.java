@@ -43,7 +43,6 @@ import eu.delving.sip.ProgressListener;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.sip.xml.Normalizer;
-import eu.delving.sip.xml.RecordAnalyzer;
 
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
@@ -175,10 +174,6 @@ public class SipModel {
         });
     }
 
-    public FactModel getFactModel() {
-        return factModel;
-    }
-
     public FileStore.DataSetStore getDataSetStore() {
         return dataSetStore;
     }
@@ -298,21 +293,7 @@ public class SipModel {
         }
     }
 
-    public void analyzeRecords(int recordCount, ProgressListener progressListener, RecordAnalyzer.Listener recordAnalyzerListener) {
-        try {
-            executor.execute(new RecordAnalyzer(
-                    this,
-                    fileStore.getCode(FileStore.RECORD_ANALYSIS_FILE_NAME),
-                    recordCount,
-                    progressListener,
-                    recordAnalyzerListener
-            ));
-        }
-        catch (Exception e) {
-            userNotifier.tellUser("Unable to start Record Analyzer", e);
-        }
-    }
-
+    @SuppressWarnings("unchecked")
     public void analyzeFields(final AnalysisListener listener) {
         checkSwingThread();
         executor.execute(new AnalysisParser(dataSetStore, new AnalysisParser.Listener() {

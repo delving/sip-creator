@@ -203,51 +203,6 @@ public class DesktopLauncher {
         }
     }
 
-//    private DataSetClient dataSetClient = new DataSetClient(new DataSetClient.Context() {
-//
-//        @Override
-//        public String getServerUrl() {
-//            DesktopPreferences.Credentials credentials = authenticationWindow.getCredentials();
-//            return String.format("http://%s:%d/%s/dataset", credentials.getServerAddress(), credentials.getServerPort(), credentials.getUsername());
-//        }
-//
-//        @Override
-//        public String getAccessToken() {
-//            try {
-//                DesktopPreferences.Credentials credentials = authenticationWindow.getCredentials();
-//                return authenticationClient.getAccessToken(String.format("%s:%s", credentials.getServerAddress(), credentials.getServerPort()), credentials.getUsername());
-//            }
-//            catch (OAuthSystemException e) {
-//                authenticationWindow.setVisible(true);
-//            }
-//            catch (OAuthProblemException e) {
-//                authenticationWindow.setVisible(true);
-//            }
-//            return null;
-//        }
-//
-//        @Override
-//        public void setInfo(DataSetInfo dataSetInfo) {
-//            // todo: update datasetwindow
-//            LOG.info("Dataset received " + dataSetInfo.spec);
-//        }
-//
-//        @Override
-//        public void setList(List<DataSetInfo> list) {
-////            dataSetWindow.setData(list);
-//        }
-//
-//        @Override
-//        public void tellUser(String message) {
-//            sipModel.getUserNotifier().tellUser(message);
-//        }
-//
-//        @Override
-//        public void disconnected() {
-//            sipModel.getUserNotifier().tellUser(String.format("Disconnected from Repository at %s", getServerUrl()));
-//        }
-//    });
-
     private static UserNotifier USER_NOTIFIER = new UserNotifier() {
         @Override
         public void tellUser(String message) {

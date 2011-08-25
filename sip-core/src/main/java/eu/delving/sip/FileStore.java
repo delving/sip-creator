@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -41,10 +40,6 @@ import java.util.zip.ZipInputStream;
  */
 
 public interface FileStore {
-
-    String getCode(String fileName) throws FileStoreException;
-
-    void setCode(String fileName, String code) throws FileStoreException;
 
     void setTemplate(String name, RecordMapping recordMapping) throws FileStoreException;
 
@@ -78,15 +73,11 @@ public interface FileStore {
 
         void setRecordMapping(RecordMapping recordMapping) throws FileStoreException;
 
-        void setRecordHashes(Properties hashes) throws FileStoreException;
-
         MappingOutput createMappingOutput(RecordMapping recordMapping, File normalizedDirectory) throws FileStoreException;
 
         void delete() throws FileStoreException;
 
         File getFactsFile();
-
-        File getRecordHashesFile();
 
         File getSourceFile();
 
@@ -117,5 +108,4 @@ public interface FileStore {
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
     String MAPPING_FILE_PREFIX = "mapping_";
     String MAPPING_FILE_SUFFIX = ".xml";
-    String RECORD_ANALYSIS_FILE_NAME = "RecordAnalysis.groovy";
 }

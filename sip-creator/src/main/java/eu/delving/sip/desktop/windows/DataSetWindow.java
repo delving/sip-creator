@@ -23,7 +23,6 @@ package eu.delving.sip.desktop.windows;
 
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
-import eu.delving.sip.DataSetInfo;
 import eu.delving.sip.FileStore;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
@@ -72,10 +71,6 @@ public class DataSetWindow extends DesktopWindow {
         setLayout(new BorderLayout());
         buildLayout();
         addActions();
-    }
-
-    public void setData(List<DataSetInfo> dataSetInfoList) {
-        LOG.info("todo: update dataModel " + dataSetInfoList.size());
     }
 
     private SipModel.UpdateListener updateListener = new SipModel.UpdateListener() {
