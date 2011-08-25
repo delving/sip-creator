@@ -57,6 +57,14 @@ public interface FileStore {
 
         Facts getFacts();
 
+//        Path getRecordRootPath();
+//
+//        void setRecordRootPath(Path path);
+//
+//        Path getUniqueElementPath();
+//
+//        void setUniqueElementPath(Path path);
+//
         InputStream getImportedInputStream() throws FileStoreException;
 
         InputStream getSourceInputStream() throws FileStoreException;
@@ -71,15 +79,7 @@ public interface FileStore {
 
         void remove() throws FileStoreException;
 
-        File getFactsFile();
-
-        File getImportedFile();
-
-        File getSourceFile();
-
-        File getMappingFile(String metadataPrefix);
-
-        List<String> getMappingPrefixes();
+        List<File> getUploadFiles();
 
         File getDiscardedFile(RecordMapping recordMapping);
 

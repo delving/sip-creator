@@ -33,23 +33,15 @@ import org.apache.commons.io.IOUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -64,12 +56,10 @@ import java.util.zip.ZipInputStream;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class FileStoreImpl implements FileStore {
+public class FileStoreImpl extends FileStoreBase implements FileStore {
 
     private File home;
     private MetadataModel metadataModel;
-    public static final int BLOCK_SIZE = 4096;
-    public static final int MAX_HASH_HISTORY = 3;
 
     public FileStoreImpl(File home, MetadataModel metadataModel) throws FileStoreException {
         this.home = home;
@@ -161,7 +151,7 @@ public class FileStoreImpl implements FileStore {
 
         @Override
         public Facts getFacts() {
-            File factsFile = getFactsFile();
+            File factsFile = findFactsFile(directory);
             Facts facts = null;
             if (factsFile.exists()) {
                 try {
@@ -179,7 +169,7 @@ public class FileStoreImpl implements FileStore {
 
         @Override
         public InputStream getImportedInputStream() throws FileStoreException {
-            File imported = getImportedFile();
+            File imported = findImportedFile(directory);
             try {
                 return new GZIPInputStream(new FileInputStream(imported));
             }
@@ -191,7 +181,7 @@ public class FileStoreImpl implements FileStore {
 
         @Override
         public InputStream getSourceInputStream() throws FileStoreException {
-            File source = getSourceFile();
+            File source = findSourceFile(directory);
             try {
                 return new GZIPInputStream(new FileInputStream(source));
             }
@@ -273,38 +263,25 @@ public class FileStoreImpl implements FileStore {
         }
 
         @Override
-        public File getFactsFile() {
-            return findFactsFile(directory);
+        public List<File> getUploadFiles() {
+            List<File> files = new ArrayList<File>();
+            files.add(findSourceFile(directory));
+            files.addAll(findMappingFiles(directory));
+//            findParseHintsFile(directory);
+            return files;
         }
 
-        @Override
-        public File getImportedFile() {
-            return findImportedFile(directory);
-        }
+//        public List<String> getMappingPrefixes() {
+//            List<String> prefixes = new ArrayList<String>();
+//            for (File mappingFile : findMappingFiles(directory)) {
+//                String name = Hasher.extractFileName(mappingFile);
+//                name = name.substring(MAPPING_FILE_PREFIX.length());
+//                name = name.substring(0, name.length() - MAPPING_FILE_SUFFIX.length());
+//                prefixes.add(name);
+//            }
+//            return prefixes;
+//        }
 
-        @Override
-        public File getSourceFile() {
-            return findSourceFile(directory);
-        }
-
-        @Override
-        public File getMappingFile(String metadataPrefix) {
-            return findMappingFile(directory, metadataPrefix);
-        }
-
-        @Override
-        public List<String> getMappingPrefixes() {
-            List<String> prefixes = new ArrayList<String>();
-            for (File mappingFile : findMappingFiles(directory)) {
-                String name = Hasher.extractFileName(mappingFile);
-                name = name.substring(MAPPING_FILE_PREFIX.length());
-                name = name.substring(0, name.length() - MAPPING_FILE_SUFFIX.length());
-                prefixes.add(name);
-            }
-            return prefixes;
-        }
-
-        @Override
         public File getDiscardedFile(RecordMapping recordMapping) {
             return new File(directory, String.format(DISCARDED_FILE_PATTERN, recordMapping.getPrefix()));
         }
@@ -422,249 +399,6 @@ public class FileStoreImpl implements FileStore {
         @Override
         public String toString() {
             return getSpec();
-        }
-    }
-
-    private static class MappingOutputImpl {
-        private RecordMapping recordMapping;
-        private File discardedFile, normalizedFile;
-        private Writer outputWriter, discardedWriter;
-        private int recordsNormalized, recordsDiscarded;
-
-        private MappingOutputImpl(String spec, RecordMapping recordMapping, File normalizedDirectory) throws FileStoreException {
-            this.recordMapping = recordMapping;
-            try {
-                if (normalizedDirectory != null) {
-                    this.normalizedFile = new File(normalizedDirectory, String.format("%s_%s_normalized.xml", spec, recordMapping.getPrefix()));
-                    this.discardedFile = new File(normalizedDirectory, String.format("%s_%s_discarded.txt", spec, recordMapping.getPrefix()));
-                    this.outputWriter = new OutputStreamWriter(new FileOutputStream(normalizedFile), "UTF-8");
-                    this.discardedWriter = new OutputStreamWriter(new FileOutputStream(discardedFile), "UTF-8");
-                }
-            }
-            catch (FileNotFoundException e) {
-                throw new FileStoreException("Unable to create output files", e);
-            }
-            catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public Writer getDiscardedWriter() {
-            if (discardedWriter == null) {
-                throw new RuntimeException("Discarded file was not to be stored");
-            }
-            return discardedWriter;
-        }
-
-        public void recordNormalized() {
-            recordsNormalized++;
-        }
-
-        public void recordDiscarded() {
-            recordsDiscarded++;
-        }
-
-        public void close(boolean abort) throws FileStoreException {
-            try {
-                if (abort) {
-                    recordMapping.setRecordsNormalized(0);
-                    recordMapping.setRecordsDiscarded(0);
-                    recordMapping.setNormalizeTime(0);
-                    if (outputWriter != null) {
-                        outputWriter.close();
-                        discardedWriter.close();
-                    }
-                    if (normalizedFile != null) {
-                        delete(normalizedFile);
-                    }
-                }
-                else {
-                    if (outputWriter != null) {
-                        outputWriter.close();
-                        discardedWriter.close();
-                    }
-                    recordMapping.setRecordsNormalized(recordsNormalized);
-                    recordMapping.setRecordsDiscarded(recordsDiscarded);
-                    recordMapping.setNormalizeTime(System.currentTimeMillis());
-                }
-            }
-            catch (IOException e) {
-                throw new FileStoreException("Unable to close output", e);
-            }
-        }
-    }
-
-    private File findFactsFile(File dir) {
-        File[] files = dir.listFiles(new FactsFileFilter());
-        switch (files.length) {
-            case 0:
-                return new File(dir, FACTS_FILE_NAME);
-            case 1:
-                return files[0];
-            default:
-                for (File file : files) {
-                    if (Hasher.extractHash(file) == null) {
-                        return file;
-                    }
-                }
-                return getMostRecent(files);
-        }
-    }
-
-    private File findImportedFile(File dir) {
-        File[] files = dir.listFiles(new ImportedFileFilter());
-        switch (files.length) {
-            case 0:
-                return new File(dir, IMPORTED_FILE_NAME);
-            case 1:
-                return files[0];
-            default:
-                for (File file : files) {
-                    if (Hasher.extractHash(file) == null) {
-                        return file;
-                    }
-                }
-                return getMostRecent(files);
-        }
-    }
-
-    private File findSourceFile(File dir) {
-        File[] files = dir.listFiles(new SourceFileFilter());
-        switch (files.length) {
-            case 0:
-                return new File(dir, SOURCE_FILE_NAME);
-            case 1:
-                return files[0];
-            default:
-                for (File file : files) {
-                    if (Hasher.extractHash(file) == null) {
-                        return file;
-                    }
-                }
-                return getMostRecent(files);
-        }
-    }
-
-    private Collection<File> findMappingFiles(File dir) {
-        File[] files = dir.listFiles(new MappingFileFilter());
-        Map<String, List<File>> map = new TreeMap<String, List<File>>();
-        for (File file : files) {
-            String prefix = getMetadataPrefix(file);
-            if (prefix == null) continue;
-            List<File> list = map.get(prefix);
-            if (list == null) {
-                map.put(prefix, list = new ArrayList<File>());
-            }
-            list.add(file);
-        }
-        List<File> mappingFiles = new ArrayList<File>();
-        for (Map.Entry<String, List<File>> entry : map.entrySet()) {
-            if (entry.getValue().size() == 1) {
-                mappingFiles.add(entry.getValue().get(0));
-            }
-            else {
-                mappingFiles.add(getMostRecent(entry.getValue().toArray(new File[entry.getValue().size()])));
-            }
-        }
-        return mappingFiles;
-    }
-
-    private File findMappingFile(File dir, String metadataPrefix) {
-        File mappingFile = null;
-        for (File file : findMappingFiles(dir)) {
-            String prefix = getMetadataPrefix(file);
-            if (prefix.equals(metadataPrefix)) {
-                mappingFile = file;
-            }
-        }
-        if (mappingFile == null) {
-            mappingFile = new File(dir, String.format(MAPPING_FILE_PATTERN, metadataPrefix));
-        }
-        return mappingFile;
-    }
-
-    private class FactsFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile() && FACTS_FILE_NAME.equals(Hasher.extractFileName(file));
-        }
-    }
-
-    private class ImportedFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile() && IMPORTED_FILE_NAME.equals(Hasher.extractFileName(file));
-        }
-    }
-
-    private class SourceFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile() && SOURCE_FILE_NAME.equals(Hasher.extractFileName(file));
-        }
-    }
-
-    private class MappingFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            String name = Hasher.extractFileName(file);
-            return file.isFile() && name.startsWith(MAPPING_FILE_PREFIX) && name.endsWith(MAPPING_FILE_SUFFIX);
-        }
-    }
-
-    private String getMetadataPrefix(File file) {
-        String name = Hasher.extractFileName(file);
-        if (name.startsWith(MAPPING_FILE_PREFIX) && name.endsWith(MAPPING_FILE_SUFFIX)) {
-            name = name.substring(MAPPING_FILE_PREFIX.length());
-            name = name.substring(0, name.length() - MAPPING_FILE_SUFFIX.length());
-            return name;
-        }
-        else {
-            return null;
-        }
-    }
-
-    static void delete(File file) throws FileStoreException {
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                for (File sub : file.listFiles()) {
-                    delete(sub);
-                }
-            }
-            if (!file.delete()) {
-                throw new FileStoreException(String.format("Unable to delete %s", file.getAbsolutePath()));
-            }
-        }
-    }
-
-    private File getMostRecent(File[] files) {
-        if (files.length > 0) {
-            Arrays.sort(files, new Comparator<File>() {
-                @Override
-                public int compare(File a, File b) {
-                    long lastA = a.lastModified();
-                    long lastB = b.lastModified();
-                    if (lastA > lastB) {
-                        return -1;
-                    }
-                    else if (lastA < lastB) {
-                        return 1;
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-            });
-            if (files.length > MAX_HASH_HISTORY) {
-                for (int walk = MAX_HASH_HISTORY; walk < files.length; walk++) {
-                    //noinspection ResultOfMethodCallIgnored
-                    files[walk].delete();
-                }
-            }
-            return files[0];
-        }
-        else {
-            return null;
         }
     }
 }
