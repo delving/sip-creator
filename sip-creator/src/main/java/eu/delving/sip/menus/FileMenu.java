@@ -22,8 +22,6 @@
 package eu.delving.sip.menus;
 
 import eu.delving.sip.ProgressListener;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -35,7 +33,6 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.Map;
 
 /**
  * The menu for handling files
@@ -94,49 +91,10 @@ public class FileMenu extends JMenu {
         if (!file.exists()) {
             return false;
         }
-        Map<String, FileStore.DataSetStore> dataSetStores = sipModel.getFileStore().getDataSetStores();
-        Object[] specs = new Object[dataSetStores.keySet().size() + 1];
-        int index = 0;
-        specs[index++] = "<New Data Set>";
-        for (String key : dataSetStores.keySet()) {
-            specs[index++] = key;
-        }
-        String spec = (String) JOptionPane.showInputDialog(
-                parent,
-                String.format(
-                        "<html>Please choose the Data Set into which<br><br>" +
-                                "<pre><strong>%s</strong></pre><br>" +
-                                "will be imported.  You may either choose an existing one<br>" +
-                                "or create a new one.<br><br>",
-                        file.getAbsolutePath()
-                ),
-                "Existing Data Set",
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                specs,
-                ""
-        );
-        if (spec == null) {
+        if (sipModel.getDataSetStore() == null) {
             return false;
         }
-        if (spec.startsWith("<")) {
-            spec = JOptionPane.showInputDialog(
-                    parent,
-                    String.format(
-                            "<html>You have selected the following file for importing:<br><br>" +
-                                    "<pre><strong>%s</strong></pre><br>" +
-                                    "To complete the import you must enter a Data Set Spec name which will serve<br>" +
-                                    "to identify it in the future. For consistency this cannot be changed later, so choose<br>" +
-                                    "carefully.<br><br>",
-                            file.getAbsolutePath()
-                    ),
-                    "Select and Enter Data Set Spec",
-                    JOptionPane.QUESTION_MESSAGE
-            );
-        }
-        if (spec == null || spec.trim().isEmpty()) {
-            return false;
-        }
+        String spec = sipModel.getDataSetStore().getSpec();
         int doImport = JOptionPane.showConfirmDialog(
                 parent,
                 String.format(
@@ -144,31 +102,22 @@ public class FileMenu extends JMenu {
                                 "<pre><strong>%s</strong></pre><br>" +
                                 "as a Data Set called '<strong>%s</strong>'?<br><br>",
                         file.getAbsolutePath(),
-                        spec
+                        spec // todo: could snag description and things from facts, if they were hardcoded
                 ),
                 "Verify your choice",
                 JOptionPane.YES_NO_OPTION
         );
         if (doImport == JOptionPane.YES_OPTION) {
             ProgressMonitor progressMonitor = new ProgressMonitor(parent, "Importing", "Storing data for " + spec, 0, 100);
-            try {
-                FileStore.DataSetStore store = dataSetStores.containsKey(spec) ? sipModel.getFileStore().getDataSetStores().get(spec) : sipModel.getFileStore().createDataSetStore(spec);
-                if (store.hasSource()) {
-                    store.clearSource();
-                }
-                sipModel.createDataSetStore(store, file, new ProgressListener.Adapter(progressMonitor) {
-                    @Override
-                    public void swingFinished(boolean success) {
-                        if (success) {
-                            dataStoreCreated.run();
-                        }
+            sipModel.importSource(file, new ProgressListener.Adapter(progressMonitor) {
+                @Override
+                public void swingFinished(boolean success) {
+                    if (success) {
+                        dataStoreCreated.run();
                     }
-                });
-                return true;
-            }
-            catch (FileStoreException e) {
-                sipModel.getUserNotifier().tellUser("Unable to import", e);
-            }
+                }
+            });
+            return true;
         }
         return false;
     }

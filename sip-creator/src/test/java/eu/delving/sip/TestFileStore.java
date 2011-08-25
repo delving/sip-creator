@@ -65,9 +65,9 @@ public class TestFileStore {
     public void createDelete() throws IOException, FileStoreException {
         FileStore.DataSetStore store = mock.getDataSetStore();
         Assert.assertEquals("Should be no files", 0, mock.getSpecDirectory().listFiles().length);
-        Assert.assertFalse(store.hasSource());
-        store.importFile(MockFileStoreInput.sampleFile(), null);
-        Assert.assertTrue(store.hasSource());
+        Assert.assertNull(store.getSourceFile());
+        store.importSource(MockFileStoreInput.sampleFile(), null);
+        Assert.assertNotNull(store.getSourceFile());
         Assert.assertEquals("Should be one file", 1, mock.getDirectory().listFiles().length);
         Assert.assertEquals("Should be one spec", 1, fileStore.getDataSetStores().size());
         Assert.assertEquals("Should be one file", 1, mock.getSpecDirectory().listFiles().length);
@@ -80,13 +80,13 @@ public class TestFileStore {
             stored = storedStream.read();
             Assert.assertEquals("Stream discrepancy", input, stored);
         }
-        store.delete();
+        store.remove();
         Assert.assertEquals("Should be zero files", 0, mock.getDirectory().listFiles().length);
     }
 
     @Test
     public void manipulateMapping() throws IOException, FileStoreException, MetadataException {
-        mock.getDataSetStore().importFile(MockFileStoreInput.sampleFile(), null);
+        mock.getDataSetStore().importSource(MockFileStoreInput.sampleFile(), null);
         Assert.assertEquals("Spec should be the same", MockFileStoreFactory.SPEC, mock.getDataSetStore().getSpec());
         RecordMapping recordMapping = mock.getDataSetStore().getRecordMapping(mock.getMetadataPrefix());
         Assert.assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recordMapping.getPrefix());
@@ -102,7 +102,7 @@ public class TestFileStore {
 
     @Test
     public void manipulateStatistics() throws IOException, FileStoreException {
-        mock.getDataSetStore().importFile(MockFileStoreInput.sampleFile(), null);
+        mock.getDataSetStore().importSource(MockFileStoreInput.sampleFile(), null);
         List<FieldStatistics> stats = mock.getDataSetStore().getStatistics();
         Assert.assertEquals("Should be one files", 1, mock.getSpecDirectory().listFiles().length);
         Assert.assertNull("No stats should be here", stats);
@@ -121,7 +121,7 @@ public class TestFileStore {
 
     @Test
     public void pretendNormalize() throws IOException, FileStoreException, MetadataException {
-        mock.getDataSetStore().importFile(MockFileStoreInput.sampleFile(), null);
+        mock.getDataSetStore().importSource(MockFileStoreInput.sampleFile(), null);
         RecordMapping recordMapping = mock.getDataSetStore().getRecordMapping(mock.getMetadataPrefix());
         FileStore.MappingOutput mo = mock.getDataSetStore().createMappingOutput(recordMapping, null);
         mo.recordDiscarded();

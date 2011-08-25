@@ -30,8 +30,22 @@ import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.ProgressListener;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
-import java.net.URL;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,7 +95,7 @@ public class FileStoreImpl implements FileStore {
     }
 
     @Override
-    public Map<String, RecordMapping> getTemplates() {
+    public Map<String, RecordMapping> getTemplates() throws FileStoreException {
         Map<String, RecordMapping> templates = new TreeMap<String, RecordMapping>();
         for (File templateFile : home.listFiles(new MappingFileFilter())) {
             try {
@@ -94,18 +108,16 @@ public class FileStoreImpl implements FileStore {
                 templates.put(name, recordMapping);
             }
             catch (Exception e) {
-                templateFile.delete();
+                delete(templateFile);
             }
         }
         return templates;
     }
 
     @Override
-    public void deleteTemplate(String name) {
+    public void deleteTemplate(String name) throws FileStoreException {
         File templateFile = new File(home, String.format(MAPPING_FILE_PATTERN, name));
-        if (templateFile.exists()) {
-            templateFile.delete();
-        }
+        delete(templateFile);
     }
 
     @Override
@@ -148,11 +160,6 @@ public class FileStoreImpl implements FileStore {
         }
 
         @Override
-        public boolean hasSource() {
-            return directory.listFiles(new SourceFileFilter()).length > 0;
-        }
-
-        @Override
         public Facts getFacts() {
             File factsFile = getFactsFile();
             Facts facts = null;
@@ -170,87 +177,6 @@ public class FileStoreImpl implements FileStore {
             return facts;
         }
 
-
-        @Override
-        public void importFile(File inputFile, ProgressListener progressListener) throws FileStoreException {
-            int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
-            if (progressListener != null) progressListener.setTotal(fileBlocks);
-            File source = new File(directory, SOURCE_FILE_NAME);
-            Hasher hasher = new Hasher();
-            boolean cancelled = false;
-            try {
-                InputStream inputStream;
-                if (inputFile.getName().endsWith(".xml")) {
-                    inputStream = new FileInputStream(inputFile);
-                }
-                else if (inputFile.getName().endsWith(".xml.gz")) {
-                    inputStream = new GZIPInputStream(new FileInputStream(inputFile));
-                }
-                else {
-                    throw new IllegalArgumentException("Input file should be .xml or .xml.gz, but it is " + inputFile.getName());
-                }
-                OutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(source));
-                byte[] buffer = new byte[BLOCK_SIZE];
-                long totalBytesRead = 0;
-                int bytesRead;
-                while (-1 != (bytesRead = inputStream.read(buffer))) {
-                    gzipOutputStream.write(buffer, 0, bytesRead);
-                    totalBytesRead += bytesRead;
-                    if (progressListener != null) {
-                        if (!progressListener.setProgress((int) (totalBytesRead / BLOCK_SIZE))) {
-                            cancelled = true;
-                            break;
-                        }
-                    }
-                    hasher.update(buffer, bytesRead);
-                }
-                if (progressListener != null) progressListener.finished(!cancelled);
-                inputStream.close();
-                gzipOutputStream.close();
-            }
-            catch (Exception e) {
-                if (progressListener != null) progressListener.finished(false);
-                throw new FileStoreException("Unable to capture XML input into " + source.getAbsolutePath(), e);
-            }
-            if (cancelled) {
-                if (!source.delete()) {
-                    throw new FileStoreException("Unable to delete " + source.getAbsolutePath());
-                }
-                clearSource();
-            }
-            else {
-                String hash = hasher.toString();
-                File hashedSource = new File(directory, hash + "__" + SOURCE_FILE_NAME);
-                if (!source.renameTo(hashedSource)) {
-                    throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
-                }
-                Facts facts = getFacts();
-                if (facts.isDownloadedSource()) {
-                    facts.setDownloadedSource(false);
-// todo                   setFacts(facts);
-                }
-                File statisticsFile = new File(directory, STATISTICS_FILE_NAME);
-                if (statisticsFile.exists()) {
-                    delete();
-                }
-            }
-        }
-
-        @Override
-        public void clearSource() throws FileStoreException {
-            File[] sources = directory.listFiles(new SourceFileFilter());
-            for (File sourceFile : sources) {
-                if (!sourceFile.delete()) {
-                    throw new FileStoreException(String.format("Unable to delete %s", sourceFile.getAbsolutePath()));
-                }
-            }
-            File statisticsFile = new File(directory, STATISTICS_FILE_NAME);
-            if (statisticsFile.exists()) {
-                if (!statisticsFile.delete()) {
-                    throw new FileStoreException("Unable to delete statistics file.");
-                }
-            }
-        }
 
         @Override
         public InputStream createXmlInputStream() throws FileStoreException {
@@ -275,7 +201,12 @@ public class FileStoreImpl implements FileStore {
                     return fieldStatisticsList;
                 }
                 catch (Exception e) {
-                    statisticsFile.delete();
+                    try {
+                        delete(statisticsFile);
+                    }
+                    catch (FileStoreException e1) {
+                        // give up
+                    }
                 }
             }
             return null;
@@ -331,7 +262,7 @@ public class FileStoreImpl implements FileStore {
         }
 
         @Override
-        public void delete() throws FileStoreException {
+        public void remove() throws FileStoreException {
             delete(directory);
         }
 
@@ -363,6 +294,72 @@ public class FileStoreImpl implements FileStore {
         }
 
         @Override
+        public void importSource(File inputFile, ProgressListener progressListener) throws FileStoreException {
+            int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
+            if (progressListener != null) progressListener.setTotal(fileBlocks);
+            File source = new File(directory, IMPORTED_FILE_NAME);
+            Hasher hasher = new Hasher();
+            boolean cancelled = false;
+            try {
+                InputStream inputStream;
+                if (inputFile.getName().endsWith(".xml")) {
+                    inputStream = new FileInputStream(inputFile);
+                }
+                else if (inputFile.getName().endsWith(".xml.gz")) {
+                    inputStream = new GZIPInputStream(new FileInputStream(inputFile));
+                }
+                else {
+                    throw new IllegalArgumentException("Input file should be .xml or .xml.gz, but it is " + inputFile.getName());
+                }
+                OutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(source));
+                byte[] buffer = new byte[BLOCK_SIZE];
+                long totalBytesRead = 0;
+                int bytesRead;
+                while (-1 != (bytesRead = inputStream.read(buffer))) {
+                    gzipOutputStream.write(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
+                    if (progressListener != null) {
+                        if (!progressListener.setProgress((int) (totalBytesRead / BLOCK_SIZE))) {
+                            cancelled = true;
+                            break;
+                        }
+                    }
+                    hasher.update(buffer, bytesRead);
+                }
+                if (progressListener != null) progressListener.finished(!cancelled);
+                inputStream.close();
+                gzipOutputStream.close();
+            }
+            catch (Exception e) {
+                if (progressListener != null) progressListener.finished(false);
+                throw new FileStoreException("Unable to capture XML input into " + source.getAbsolutePath(), e);
+            }
+            if (cancelled) {
+                delete(source);
+            }
+            else {
+                File hashedSource = new File(directory, hasher.prefixFileName(IMPORTED_FILE_NAME));
+                if (hashedSource.exists()) {
+                    delete(source);
+                    throw new FileStoreException("This import was identical to the previous one. Discarded.");
+                }
+                if (!source.renameTo(hashedSource)) {
+                    throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
+                }
+                File statisticsFile = new File(directory, STATISTICS_FILE_NAME);
+                delete(statisticsFile);
+            }
+        }
+
+        @Override
+        public void convertSource(ProgressListener progressListener) throws FileStoreException {
+            // todo: get the record root (assuming it has been set)
+            // todo: get the unique id path (minus the root is the unique id)
+            // todo: take IMPORTED_FILE_NAME, and create standard sip-creator source format file
+            // todo: include in the source: record root path and unique id path
+        }
+
+        @Override
         public void acceptSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws FileStoreException {
             ZipEntry zipEntry;
             byte[] buffer = new byte[BLOCK_SIZE];
@@ -390,8 +387,7 @@ public class FileStoreImpl implements FileStore {
                         }
                         if (progressListener != null) progressListener.finished(!cancelled);
                         outputStream.close();
-                        String hash = hasher.toString();
-                        File hashedSource = new File(directory, hash + "__" + SOURCE_FILE_NAME);
+                        File hashedSource = new File(directory, hasher.prefixFileName(SOURCE_FILE_NAME));
                         if (!file.renameTo(hashedSource)) {
                             throw new FileStoreException(String.format("Unable to rename %s to %s", file.getAbsolutePath(), hashedSource.getAbsolutePath()));
                         }
@@ -410,21 +406,6 @@ public class FileStoreImpl implements FileStore {
         @Override
         public String toString() {
             return getSpec();
-        }
-
-        private File mappingFile(String prefix) {
-            return new File(directory, String.format(MAPPING_FILE_PATTERN, prefix));
-        }
-
-        private void delete(File file) throws FileStoreException {
-            if (file.isDirectory()) {
-                for (File sub : file.listFiles()) {
-                    delete(sub);
-                }
-            }
-            if (!file.delete()) {
-                throw new FileStoreException(String.format("Unable to delete %s", file.getAbsolutePath()));
-            }
         }
     }
 
@@ -490,7 +471,7 @@ public class FileStoreImpl implements FileStore {
                         discardedWriter.close();
                     }
                     if (normalizedFile != null) {
-                        normalizedFile.delete();
+                        delete(normalizedFile);
                     }
                 }
                 else {
@@ -588,13 +569,6 @@ public class FileStoreImpl implements FileStore {
         }
     }
 
-    private class HashFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile() && HASH_FILE_NAME.equals(Hasher.extractFileName(file));
-        }
-    }
-
     private class SourceFileFilter implements FileFilter {
         @Override
         public boolean accept(File file) {
@@ -619,6 +593,19 @@ public class FileStoreImpl implements FileStore {
         }
         else {
             return null;
+        }
+    }
+
+    static void delete(File file) throws FileStoreException {
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                for (File sub : file.listFiles()) {
+                    delete(sub);
+                }
+            }
+            if (!file.delete()) {
+                throw new FileStoreException(String.format("Unable to delete %s", file.getAbsolutePath()));
+            }
         }
     }
 
@@ -651,37 +638,5 @@ public class FileStoreImpl implements FileStore {
         else {
             return null;
         }
-    }
-
-    private void writeCode(File file, String code) throws IOException {
-        FileWriter out = new FileWriter(file);
-        out.write(code);
-        out.close();
-    }
-
-    private String readFileCode(File file) throws IOException {
-        FileReader in = new FileReader(file);
-        return readCode(in);
-    }
-
-    private String readResourceCode(String fileName) throws IOException {
-        URL resource = getClass().getResource("/" + fileName);
-        InputStream in = resource.openStream();
-        Reader reader = new InputStreamReader(in);
-        return readCode(reader);
-    }
-
-    private String readCode(Reader reader) throws IOException {
-        BufferedReader in = new BufferedReader(reader);
-        StringBuilder out = new StringBuilder();
-        String line;
-        while ((line = in.readLine()) != null) {
-            if (line.isEmpty() || line.startsWith("//")) {
-                continue;
-            }
-            out.append(line).append('\n');
-        }
-        in.close();
-        return out.toString();
     }
 }

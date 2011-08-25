@@ -144,8 +144,8 @@ public class Hasher {
         return toHexadecimal(messageDigest.digest());
     }
 
-    public String toString() {
-        return getHashString();
+    public String prefixFileName(String fileName) {
+        return getHashString() + SEPARATOR + fileName;
     }
 
     static final String HEXES = "0123456789ABCDEF";

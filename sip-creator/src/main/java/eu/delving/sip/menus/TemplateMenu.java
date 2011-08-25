@@ -22,6 +22,7 @@
 package eu.delving.sip.menus;
 
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -38,12 +39,12 @@ import java.util.Map;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 
-public class MappingTemplateMenu extends JMenu {
+public class TemplateMenu extends JMenu {
     private Component parent;
     private SipModel sipModel;
 
-    public MappingTemplateMenu(Component parent, SipModel sipModel) {
-        super("Template");
+    public TemplateMenu(Component parent, SipModel sipModel) {
+        super("Templates");
         this.parent = parent;
         this.sipModel = sipModel;
         refresh();
@@ -58,11 +59,16 @@ public class MappingTemplateMenu extends JMenu {
         JMenu deleteMenu = new JMenu("Delete a template");
         this.add(deleteMenu);
         this.addSeparator();
-        Map<String, RecordMapping> templates = sipModel.getFileStore().getTemplates();
-        for (Map.Entry<String, RecordMapping> entry : templates.entrySet()) {
-            this.add(new ApplyTemplateAction(entry.getKey(), entry.getValue()));
-            updateMenu.add(new UpdateTemplateAction(entry.getKey()));
-            deleteMenu.add(new DeleteTemplateAction(entry.getKey()));
+        try {
+            Map<String, RecordMapping> templates = sipModel.getFileStore().getTemplates();
+            for (Map.Entry<String, RecordMapping> entry : templates.entrySet()) {
+                this.add(new ApplyTemplateAction(entry.getKey(), entry.getValue()));
+                updateMenu.add(new UpdateTemplateAction(entry.getKey()));
+                deleteMenu.add(new DeleteTemplateAction(entry.getKey()));
+            }
+        }
+        catch (FileStoreException e) {
+            sipModel.getUserNotifier().tellUser("Unable to load template", e);
         }
     }
 
@@ -123,7 +129,12 @@ public class MappingTemplateMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.getFileStore().deleteTemplate(name);
+            try {
+                sipModel.getFileStore().deleteTemplate(name);
+            }
+            catch (FileStoreException e) {
+                sipModel.getUserNotifier().tellUser("Unable to delete template", e);
+            }
             refresh();
         }
     }

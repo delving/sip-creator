@@ -22,7 +22,6 @@ import java.util.TreeSet;
  */
 
 public class Facts {
-    private static final String DOWNLOADED_SOURCE = "downloadedSource";
     private static final String RECORD_ROOT_PATH = "recordRootPath";
     private static final String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
     private static final String RECORD_COUNT = "recordCount";
@@ -56,25 +55,11 @@ public class Facts {
         return value;
     }
 
-    public boolean isDownloadedSource() {
-        return get(DOWNLOADED_SOURCE).equalsIgnoreCase("true");
-    }
-
-    public void setDownloadedSource(boolean downloadedSource) {
-        set(DOWNLOADED_SOURCE, String.valueOf(downloadedSource));
-    }
-
     public String getRecordRootPath() {
-        if (isDownloadedSource()) {
-            return String.format("/%s/%s", SourceStream.ENVELOPE_TAG, SourceStream.RECORD_TAG);
-        }
-        else {
-            return get(RECORD_ROOT_PATH);
-        }
+        return get(RECORD_ROOT_PATH);
     }
 
     public void setRecordRootPath(String value) {
-        setDownloadedSource(false);
         set(RECORD_ROOT_PATH, value);
     }
 
@@ -87,16 +72,10 @@ public class Facts {
     }
 
     public String getUniqueElementPath() {
-        if (isDownloadedSource()) {
-            return getRecordRootPath() + getRelativeUniquePath();
-        }
-        else {
-            return get(UNIQUE_ELEMENT_PATH);
-        }
+        return get(UNIQUE_ELEMENT_PATH);
     }
 
     public void setUniqueElementPath(String value) {
-        setDownloadedSource(false);
         set(UNIQUE_ELEMENT_PATH, value);
     }
 

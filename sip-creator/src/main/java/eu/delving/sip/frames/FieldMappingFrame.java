@@ -76,7 +76,6 @@ public class FieldMappingFrame extends FrameBase {
         dictionaryPopup = new DictionaryPopup(this);
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         groovyCodeArea.setTabSize(3);
-        groovyCodeArea.setToolTipText(Utility.GROOVY_TOOL_TIP);
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setEditable(false);
         Utility.attachUrlLauncher(outputArea);

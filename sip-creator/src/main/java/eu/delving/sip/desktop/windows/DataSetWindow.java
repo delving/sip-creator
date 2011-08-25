@@ -105,9 +105,6 @@ public class DataSetWindow extends DesktopWindow {
                         DataSetModel<FileStore.DataSetStore> model = dataSetModel;
                         FileStore.DataSetStore selectedItem = model.getSelectedItem(dataSets.getSelectedRow());
                         LOG.info(selectedItem.getSourceFile() + " exists? " + selectedItem.getSourceFile().exists());
-                        if (!selectedItem.hasSource()) {
-                            LOG.warn("No source found, download it first");
-                        }
                         int result = JOptionPane.showConfirmDialog(
                                 DataSetWindow.this,
                                 String.format("<html>You are switching to <b>%s</b>. Are you sure?<br/>Your current workspace will be saved.</html>",
@@ -180,7 +177,8 @@ public class DataSetWindow extends DesktopWindow {
                     o = dataSetInfo.getSpec();
                     break;
                 case 1:
-                    o = dataSetInfo.hasSource();
+//                    o = dataSetInfo.hasSource();
+                    o = false;
                     break;
                 case 2:
                     o = StringUtils.isEmpty(dataSetInfo.getFacts().getRecordCount()) ? "-" : dataSetInfo.getFacts().getRecordCount();

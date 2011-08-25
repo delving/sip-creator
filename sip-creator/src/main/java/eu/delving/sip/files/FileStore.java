@@ -44,9 +44,9 @@ public interface FileStore {
 
     void setTemplate(String name, RecordMapping recordMapping) throws FileStoreException;
 
-    Map<String, RecordMapping> getTemplates();
+    Map<String, RecordMapping> getTemplates() throws FileStoreException;
 
-    void deleteTemplate(String name);
+    void deleteTemplate(String name) throws FileStoreException;
 
     Map<String, DataSetStore> getDataSetStores();
 
@@ -56,13 +56,7 @@ public interface FileStore {
 
         String getSpec();
 
-        boolean hasSource();
-
         Facts getFacts();
-
-        void importFile(File inputFile, ProgressListener progressListener) throws FileStoreException;
-
-        void clearSource() throws FileStoreException;
 
         InputStream createXmlInputStream() throws FileStoreException;
 
@@ -76,7 +70,7 @@ public interface FileStore {
 
         MappingOutput createMappingOutput(RecordMapping recordMapping, File normalizedDirectory) throws FileStoreException;
 
-        void delete() throws FileStoreException;
+        void remove() throws FileStoreException;
 
         File getFactsFile();
 
@@ -85,6 +79,10 @@ public interface FileStore {
         File getMappingFile(String metadataPrefix);
 
         List<String> getMappingPrefixes();
+
+        void importSource(File inputFile, ProgressListener progressListener) throws FileStoreException;
+
+        void convertSource(ProgressListener progressListener) throws FileStoreException;
 
         void acceptSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws IOException, FileStoreException;
     }
@@ -102,9 +100,9 @@ public interface FileStore {
         void close(boolean abort) throws FileStoreException;
     }
 
+    String IMPORTED_FILE_NAME = "imported.xml.gz";
     String SOURCE_FILE_NAME = "source.xml.gz";
     String STATISTICS_FILE_NAME = "statistics.ser";
-    String HASH_FILE_NAME = "hashes.txt";
     String FACTS_FILE_NAME = "facts.txt";
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
     String MAPPING_FILE_PREFIX = "mapping_";

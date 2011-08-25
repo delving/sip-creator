@@ -43,6 +43,7 @@ import eu.delving.sip.menus.CultureHubMenu;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.FileMenu;
 import eu.delving.sip.menus.MappingMenu;
+import eu.delving.sip.menus.TemplateMenu;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.UserNotifier;
 
@@ -88,6 +89,7 @@ public class Application {
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
     private MappingMenu mappingMenu;
+    private TemplateMenu tempateMenu;
     private CultureHubMenu cultureHubMenu;
     private OAuthClient oauthClient;
     private List<FrameBase> frames = new ArrayList<FrameBase>();
@@ -125,6 +127,7 @@ public class Application {
         home.setIconImage(logo.getImage());
         this.dataSetMenu = new DataSetMenu(sipModel);
         this.mappingMenu = new MappingMenu(sipModel);
+        this.tempateMenu = new TemplateMenu(home, sipModel);
         this.oauthClient = new OAuthClient(
                 FileStoreFinder.getHostPort(fileStoreDirectory),
                 FileStoreFinder.getUser(fileStoreDirectory),
@@ -209,6 +212,7 @@ public class Application {
             }
         }));
         bar.add(dataSetMenu);
+        bar.add(tempateMenu);
         bar.add(mappingMenu);
         bar.add(cultureHubMenu);
         bar.add(createFrameMenu());

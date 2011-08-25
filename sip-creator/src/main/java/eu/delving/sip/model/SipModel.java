@@ -160,12 +160,13 @@ public class SipModel {
         return fileStore;
     }
 
-    public void createDataSetStore(final FileStore.DataSetStore dataSetStore, final File file, final ProgressListener progressListener) {
+    public void importSource(final File file, final ProgressListener progressListener) {
+        if (dataSetStore == null) throw new RuntimeException("Import requires that dataset store is set");
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    dataSetStore.importFile(file, progressListener);
+                    dataSetStore.importSource(file, progressListener);
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Couldn't create Data Set from " + file.getAbsolutePath(), e);
