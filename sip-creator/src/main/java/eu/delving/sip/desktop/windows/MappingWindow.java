@@ -24,8 +24,8 @@ package eu.delving.sip.desktop.windows;
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
-import eu.delving.sip.FileStore;
 import eu.delving.sip.desktop.GridBagHelper;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;

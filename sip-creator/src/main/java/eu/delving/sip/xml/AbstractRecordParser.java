@@ -2,8 +2,8 @@ package eu.delving.sip.xml;
 
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.FileStore;
-import eu.delving.sip.FileStoreException;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
 import org.apache.log4j.Logger;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;

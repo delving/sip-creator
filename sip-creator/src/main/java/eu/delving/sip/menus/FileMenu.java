@@ -21,9 +21,9 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.FileStore;
-import eu.delving.sip.FileStoreException;
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;

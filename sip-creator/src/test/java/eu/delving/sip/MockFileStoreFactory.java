@@ -2,6 +2,9 @@ package eu.delving.sip;
 
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.FileStoreImpl;
 
 import java.io.File;
 import java.util.Arrays;

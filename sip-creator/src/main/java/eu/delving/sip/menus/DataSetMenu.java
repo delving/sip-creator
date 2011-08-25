@@ -21,7 +21,7 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.FileStore;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;

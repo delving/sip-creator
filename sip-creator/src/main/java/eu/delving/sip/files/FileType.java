@@ -1,4 +1,4 @@
-package eu.delving.sip;
+package eu.delving.sip.files;
 
 /**
  * the types of files that are uploaded

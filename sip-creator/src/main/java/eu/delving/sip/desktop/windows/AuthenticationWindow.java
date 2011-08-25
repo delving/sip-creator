@@ -21,11 +21,11 @@
 
 package eu.delving.sip.desktop.windows;
 
-import eu.delving.security.User;
 import eu.delving.sip.desktop.AuthenticationClient;
 import eu.delving.sip.desktop.CredentialsImpl;
 import eu.delving.sip.desktop.DesktopPreferences;
 import eu.delving.sip.desktop.GridBagHelper;
+import eu.delving.sip.desktop.security.User;
 import org.apache.log4j.Logger;
 
 import javax.swing.JButton;

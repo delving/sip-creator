@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip;
+package eu.delving.sip.files;
 
 /**
  * Something went wrong with the file store

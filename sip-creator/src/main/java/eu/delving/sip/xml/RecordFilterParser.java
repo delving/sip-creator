@@ -3,8 +3,8 @@ package eu.delving.sip.xml;
 import com.ctc.wstx.sr.InputElementStack;
 import com.ctc.wstx.sr.ValidatingStreamReader;
 import eu.delving.metadata.Path;
-import eu.delving.sip.FileStore;
-import eu.delving.sip.FileStoreException;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codehaus.stax2.XMLStreamReader2;
 

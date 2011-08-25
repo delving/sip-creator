@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip;
+package eu.delving.sip.files;
 
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
@@ -27,6 +27,7 @@ import eu.delving.metadata.Hasher;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.ProgressListener;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -354,8 +355,8 @@ public class FileStoreImpl implements FileStore {
             List<String> prefixes = new ArrayList<String>();
             for (File mappingFile : findMappingFiles(directory)) {
                 String name = Hasher.extractFileName(mappingFile);
-                name = name.substring(FileStore.MAPPING_FILE_PREFIX.length());
-                name = name.substring(0, name.length() - FileStore.MAPPING_FILE_SUFFIX.length());
+                name = name.substring(MAPPING_FILE_PREFIX.length());
+                name = name.substring(0, name.length() - MAPPING_FILE_SUFFIX.length());
                 prefixes.add(name);
             }
             return prefixes;
@@ -372,7 +373,7 @@ public class FileStoreImpl implements FileStore {
                 while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                     String fileName = zipEntry.getName();
                     File file = new File(directory, fileName);
-                    if (fileName.equals(FileStore.SOURCE_FILE_NAME)) {
+                    if (fileName.equals(SOURCE_FILE_NAME)) {
                         Hasher hasher = new Hasher();
                         GZIPInputStream gzipInputStream = new GZIPInputStream(zipInputStream);
                         GZIPOutputStream outputStream = new GZIPOutputStream(new FileOutputStream(file));
@@ -513,23 +514,6 @@ public class FileStoreImpl implements FileStore {
         switch (files.length) {
             case 0:
                 return new File(dir, FACTS_FILE_NAME);
-            case 1:
-                return files[0];
-            default:
-                for (File file : files) {
-                    if (Hasher.extractHash(file) == null) {
-                        return file;
-                    }
-                }
-                return getMostRecent(files);
-        }
-    }
-
-    private File findHashFile(File dir) {
-        File[] files = dir.listFiles(new HashFileFilter());
-        switch (files.length) {
-            case 0:
-                return new File(dir, HASH_FILE_NAME);
             case 1:
                 return files[0];
             default:

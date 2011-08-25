@@ -23,7 +23,7 @@ package eu.delving.sip.desktop.windows;
 
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
-import eu.delving.sip.FileStore;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;

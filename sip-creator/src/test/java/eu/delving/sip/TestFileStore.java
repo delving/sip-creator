@@ -26,6 +26,8 @@ import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;

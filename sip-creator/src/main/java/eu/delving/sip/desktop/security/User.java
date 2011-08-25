@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.security;
+package eu.delving.sip.desktop.security;
 
 
 import java.security.Permission;

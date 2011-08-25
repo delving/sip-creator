@@ -27,8 +27,8 @@ import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.SourceVariable;
-import eu.delving.sip.FileStore;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.FieldListModel;
 import eu.delving.sip.model.SipModel;
 

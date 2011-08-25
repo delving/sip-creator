@@ -19,11 +19,12 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip;
+package eu.delving.sip.files;
 
 import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.ProgressListener;
 
 import java.io.File;
 import java.io.IOException;

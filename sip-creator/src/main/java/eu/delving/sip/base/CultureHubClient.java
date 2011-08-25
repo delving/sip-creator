@@ -22,9 +22,9 @@
 package eu.delving.sip.base;
 
 import eu.delving.metadata.Hasher;
-import eu.delving.sip.FileStore;
-import eu.delving.sip.FileType;
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileType;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;

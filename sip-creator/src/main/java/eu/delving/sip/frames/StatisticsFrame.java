@@ -25,8 +25,8 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Histogram;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RandomSample;
-import eu.delving.sip.FileStore;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractListModel;
