@@ -85,6 +85,7 @@ public class Application {
     private ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
     private PopupExceptionHandler exceptionHandler;
     private SipModel sipModel;
+    private CultureHubClient cultureHubClient;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
@@ -98,42 +99,9 @@ public class Application {
         MetadataModel metadataModel = loadMetadataModel();
         FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
-        this.exceptionHandler = new PopupExceptionHandler();
-        this.sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, this.exceptionHandler);
-        home = new JFrame("Delving SIP Creator");
-        final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
-        desktop = new JDesktopPane() {
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.drawImage(backgroundIcon.getImage(), 0, 0, desktop);
-            }
-        };
-        desktop.setBackground(new Color(190, 190, 200));
-        frames.add(new AnalysisFrame(desktop, sipModel));
-        frames.add(new CreateFrame(desktop, sipModel));
-        frames.add(new StatisticsFrame(desktop, sipModel));
-        frames.add(new InputFrame(desktop, sipModel));
-        frames.add(new FieldMappingFrame(desktop, sipModel));
-        frames.add(new RecordMappingFrame(desktop, sipModel));
-        frames.add(new OutputFrame(desktop, sipModel));
-        desktop.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createBevelBorder(0),
-                BorderFactory.createBevelBorder(0)
-        ));
-        home.getContentPane().add(desktop, BorderLayout.CENTER);
-        home.getContentPane().add(createFrameButtonPanel(), BorderLayout.SOUTH);
-        home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-        home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        home.setIconImage(logo.getImage());
-        this.dataSetMenu = new DataSetMenu(sipModel);
-        this.mappingMenu = new MappingMenu(sipModel);
-        this.tempateMenu = new TemplateMenu(home, sipModel);
-        this.oauthClient = new OAuthClient(
-                FileStoreFinder.getHostPort(fileStoreDirectory),
-                FileStoreFinder.getUser(fileStoreDirectory),
-                new PasswordFetcher(fileStoreDirectory)
-        );
-        this.cultureHubMenu = new CultureHubMenu(desktop, sipModel, new CultureHubClient(new CultureHubClient.Context() {
+        exceptionHandler = new PopupExceptionHandler();
+        sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, this.exceptionHandler);
+        cultureHubClient = new CultureHubClient(new CultureHubClient.Context() {
 
             @Override
             public String getServerUrl() {
@@ -149,7 +117,42 @@ public class Application {
             public void tellUser(String message) {
                 exceptionHandler.tellUser(message);
             }
-        }));
+        });
+
+        home = new JFrame("Delving SIP Creator");
+        final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
+        desktop = new JDesktopPane() {
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(backgroundIcon.getImage(), 0, 0, desktop);
+            }
+        };
+        desktop.setBackground(new Color(190, 190, 200));
+        frames.add(new AnalysisFrame(desktop, sipModel));
+        frames.add(new CreateFrame(desktop, sipModel));
+        frames.add(new StatisticsFrame(desktop, sipModel));
+        frames.add(new InputFrame(desktop, sipModel));
+        frames.add(new FieldMappingFrame(desktop, sipModel));
+        frames.add(new RecordMappingFrame(desktop, sipModel));
+        frames.add(new OutputFrame(desktop, sipModel, cultureHubClient));
+        desktop.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createBevelBorder(0),
+                BorderFactory.createBevelBorder(0)
+        ));
+        home.getContentPane().add(desktop, BorderLayout.CENTER);
+        home.getContentPane().add(createFrameButtonPanel(), BorderLayout.SOUTH);
+        home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+        home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        home.setIconImage(logo.getImage());
+        dataSetMenu = new DataSetMenu(sipModel);
+        mappingMenu = new MappingMenu(sipModel);
+        tempateMenu = new TemplateMenu(home, sipModel);
+        oauthClient = new OAuthClient(
+                FileStoreFinder.getHostPort(fileStoreDirectory),
+                FileStoreFinder.getUser(fileStoreDirectory),
+                new PasswordFetcher(fileStoreDirectory)
+        );
+        cultureHubMenu = new CultureHubMenu(desktop, sipModel, cultureHubClient);
         home.setJMenuBar(createMenuBar());
         home.addWindowListener(new WindowListener() {
             @Override

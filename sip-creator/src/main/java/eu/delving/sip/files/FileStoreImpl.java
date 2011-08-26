@@ -263,24 +263,25 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public List<File> getUploadFiles() {
-            List<File> files = new ArrayList<File>();
-            files.add(findSourceFile(directory));
-            files.addAll(findMappingFiles(directory));
-//            findParseHintsFile(directory);
-            return files;
+        public List<File> getUploadFiles() throws FileStoreException {
+            try {
+                List<File> files = new ArrayList<File>();
+//                files.add(Hasher.ensureFileHashed(findParseHintsFile(directory));
+                files.add(Hasher.ensureFileHashed(findSourceFile(directory)));
+                for (File file : findMappingFiles(directory)) {
+                    files.add(Hasher.ensureFileHashed(file));
+                }
+                return files;
+            }
+            catch (IOException e) {
+                throw new FileStoreException("Unable to collect upload files", e);
+            }
         }
 
-//        public List<String> getMappingPrefixes() {
-//            List<String> prefixes = new ArrayList<String>();
-//            for (File mappingFile : findMappingFiles(directory)) {
-//                String name = Hasher.extractFileName(mappingFile);
-//                name = name.substring(MAPPING_FILE_PREFIX.length());
-//                name = name.substring(0, name.length() - MAPPING_FILE_SUFFIX.length());
-//                prefixes.add(name);
-//            }
-//            return prefixes;
-//        }
+        @Override
+        public File getImportedFile() {
+            return findImportedFile(directory);
+        }
 
         public File getDiscardedFile(RecordMapping recordMapping) {
             return new File(directory, String.format(DISCARDED_FILE_PATTERN, recordMapping.getPrefix()));
@@ -289,7 +290,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         @Override
         public void importSource(File inputFile, ProgressListener progressListener) throws FileStoreException {
             int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
-            if (progressListener != null) progressListener.setTotal(fileBlocks);
+            if (progressListener != null) progressListener.prepareFor(fileBlocks);
             File source = new File(directory, IMPORTED_FILE_NAME);
             Hasher hasher = new Hasher();
             boolean cancelled = false;

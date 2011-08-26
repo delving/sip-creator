@@ -79,7 +79,9 @@ public interface FileStore {
 
         void remove() throws FileStoreException;
 
-        List<File> getUploadFiles();
+        List<File> getUploadFiles() throws FileStoreException;
+
+        File getImportedFile();
 
         File getDiscardedFile(RecordMapping recordMapping);
 

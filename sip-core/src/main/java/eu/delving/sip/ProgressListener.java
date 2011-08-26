@@ -33,7 +33,7 @@ import javax.swing.SwingUtilities;
 public interface ProgressListener {
     long PATIENCE = 250;
 
-    void setTotal(int total);
+    void prepareFor(int total);
 
     boolean setProgress(int progress);
 
@@ -48,10 +48,11 @@ public interface ProgressListener {
         }
 
         @Override
-        public void setTotal(final int total) {
+        public void prepareFor(final int total) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    progressMonitor.setProgress(0);
                     progressMonitor.setMaximum(total);
                 }
             });

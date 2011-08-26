@@ -22,15 +22,20 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.ProgressMonitor;
@@ -48,9 +53,13 @@ import java.awt.event.ActionEvent;
 
 public class OutputFrame extends FrameBase {
     private JCheckBox saveDiscarded = new JCheckBox("Save discarded records");
+    private CultureHubClient cultureHubClient;
+    private Action validateAction = new ValidateAction();
+    private Action uploadAction = new UploadAction();
 
-    public OutputFrame(JDesktopPane desktop, SipModel sipModel) {
+    public OutputFrame(JDesktopPane desktop, SipModel sipModel, CultureHubClient cultureHubClient) {
         super(desktop, sipModel, "Output", false);
+        this.cultureHubClient = cultureHubClient;
     }
 
     @Override
@@ -67,9 +76,9 @@ public class OutputFrame extends FrameBase {
         JButton upload = new JButton("Upload dataset and mapping");
         upload.setEnabled(false);
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        p.add(new JButton(new ValidateAction()));
+        p.add(new JButton(validateAction));
         p.add(saveDiscarded);
-        p.add(new JButton(new UploadAction()));
+        p.add(new JButton(uploadAction));
         return p;
     }
 
@@ -120,7 +129,36 @@ public class OutputFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            // todo: implement somehow!
+            FileStore.DataSetStore store = sipModel.getDataSetStore();
+            if (store == null) {
+                JOptionPane.showInternalMessageDialog(parent, "Data set and mapping must be selected");
+                return;
+            }
+            setEnabled(false);
+            String message = String.format(
+                    "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
+                    sipModel.getDataSetStore().getSpec()
+            );
+            ProgressMonitor progressMonitor = new ProgressMonitor(
+                    SwingUtilities.getRoot(parent),
+                    "<html><h2>Uploading</h2>",
+                    message,
+                    0, 100
+            );
+            try {
+                cultureHubClient.uploadFiles(store, new ProgressListener.Adapter(progressMonitor) {
+                    @Override
+                    public void swingFinished(boolean success) {
+                        setEnabled(true);
+                    }
+                });
+            }
+            catch (FileStoreException e) {
+                JOptionPane.showInternalMessageDialog(parent, "<html>Problem uploading files<br>"+e.getMessage());
+            }
+            finally {
+                setEnabled(true);
+            }
         }
     }
 }

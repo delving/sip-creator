@@ -237,8 +237,8 @@ public class FileValidator implements Runnable {
         }
 
         @Override
-        public void setTotal(int total) {
-            progressListener.setTotal(total);
+        public void prepareFor(int total) {
+            progressListener.prepareFor(total);
         }
 
         @Override

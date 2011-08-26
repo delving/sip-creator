@@ -24,12 +24,11 @@ package eu.delving.sip.menus;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.model.SipModel;
 
+import javax.swing.AbstractAction;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * The menu for interfacing with the culture hub
@@ -41,33 +40,70 @@ public class CultureHubMenu extends JMenu {
     private JDesktopPane parent;
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
-    private JMenuItem download = new JMenuItem("Download");
-    private JMenuItem upload = new JMenuItem("Upload");
+    private JMenu dataSetMenu = new JMenu("Download Data Set");
 
     public CultureHubMenu(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Culture Hub");
         this.parent = parent;
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
-        add(download);
-        add(upload);
-        wireUp();
+        dataSetMenu.setEnabled(false);
+        add(new FetchDataSetListAction());
+        addSeparator();
+        add(dataSetMenu);
     }
 
-    private void wireUp() {
-        download.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                JOptionPane.showInternalMessageDialog(parent, "Not implemented yet");
-                // todo: trigger upload of any files of current set not matching hash
+    private class FetchDataSetListAction extends AbstractAction {
+
+        private FetchDataSetListAction() {
+            super("Fetch Data Set List");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            // todo: fetch the list
+            // todo: refresh dataSetMenu with the values returned
+            // todo:  ..MINUS the ones we already have!
+            dataSetMenu.removeAll();
+            for (int walk=0; walk<3; walk++) {
+                dataSetMenu.add(new DownloadDatasetAction(String.valueOf((int)(Math.random()*10000))));
             }
-        });
-        upload.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                JOptionPane.showInternalMessageDialog(parent, "Not implemented yet");
-                // todo: trigger upload of any files of current set not matching hash
-            }
-        });
+        }
+    }
+
+    private class DownloadDatasetAction extends AbstractAction {
+        private String spec;
+
+        private DownloadDatasetAction(String spec) {
+            super(String.format("Download \"%s\"", spec));
+            this.spec = spec;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            setEnabled(false);
+            String message = String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>just kidding!",spec);
+            JOptionPane.showInternalMessageDialog(parent, message);
+//            ProgressMonitor progressMonitor = new ProgressMonitor(
+//                    SwingUtilities.getRoot(parent),
+//                    "<html><h2>Normalizing</h2>",
+//                    message,
+//                    0, 100
+//            );
+//            try {
+//                cultureHubClient.uploadFiles(store, new ProgressListener.Adapter(progressMonitor) {
+//                    @Override
+//                    public void swingFinished(boolean success) {
+//                        setEnabled(true);
+//                    }
+//                });
+//            }
+//            catch (FileStoreException e) {
+//                JOptionPane.showInternalMessageDialog(parent, "<html>Problem uploading files<br>"+e.getMessage());
+//            }
+//            finally {
+//                setEnabled(true);
+//            }
+        }
     }
 }

@@ -61,7 +61,6 @@ public class MappingWindow extends DesktopWindow {
         tabbedPane.addTab("Constant fields", new ConstantsPanel());
         tabbedPane.setPreferredSize(getPreferredSize());
         add(tabbedPane);
-        table.setDefaultRenderer(Object.class, new DataSetWindow.ColorRenderer());
         sipModel.addUpdateListener(
                 new SipModel.UpdateListener() {
 

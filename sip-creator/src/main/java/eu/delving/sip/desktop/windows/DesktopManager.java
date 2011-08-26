@@ -50,11 +50,9 @@ public class DesktopManager {
     private Map<WindowId, DesktopWindow> windows = new HashMap<WindowId, DesktopWindow>();
     private JDesktopPane desktop;
     private SipModel sipModel;
-    private DataSetWindow dataSetWindow;
 
     public DesktopManager(SipModel sipModel) {
         this.sipModel = sipModel;
-        this.dataSetWindow = new DataSetWindow(sipModel);
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
             public void paintComponent(Graphics g) {

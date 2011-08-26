@@ -71,7 +71,7 @@ public class MetadataParser {
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
         if (progressListener != null) {
-            progressListener.setTotal(recordCount);
+            progressListener.prepareFor(recordCount);
         }
     }
 
