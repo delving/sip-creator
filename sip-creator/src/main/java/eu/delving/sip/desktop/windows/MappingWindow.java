@@ -66,7 +66,7 @@ public class MappingWindow extends DesktopWindow {
 
                     @Override
                     public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
-                        table.setModel(new MapTableModel(dataSetStore.getFacts()));
+//                        table.setModel(new MapTableModel(dataSetStore.getDataSetFacts()));
                     }
 
                     @Override
@@ -75,13 +75,8 @@ public class MappingWindow extends DesktopWindow {
                     }
 
                     @Override
-                    public void updatedRecordRoot(Path recordRoot, int recordCount) {
-                        // todo: add body and return void;
-                    }
-
-                    @Override
-                    public void normalizationMessage(boolean complete, String message) {
-                        // todo: add body and return void;
+                    public void updatedRecordRoot(Path recordRoot) {
+                        // todo: implement
                     }
                 }
         );

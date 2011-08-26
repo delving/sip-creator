@@ -22,9 +22,11 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.Hasher;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +36,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static eu.delving.sip.files.FileStore.FACTS_FILE_NAME;
+import static eu.delving.sip.files.FileStore.HINTS_FILE_NAME;
 import static eu.delving.sip.files.FileStore.IMPORTED_FILE_NAME;
 import static eu.delving.sip.files.FileStore.MAPPING_FILE_PREFIX;
 import static eu.delving.sip.files.FileStore.MAPPING_FILE_SUFFIX;
@@ -47,47 +50,77 @@ import static eu.delving.sip.files.FileStore.SOURCE_FILE_NAME;
 
 public class FileStoreBase {
     public static final int BLOCK_SIZE = 4096;
-    public static final int MAX_HASH_HISTORY = 3;
+    public static final int MAX_HASH_HISTORY = 5;
 
-    File findFactsFile(File dir) {
-        File[] files = dir.listFiles(new FactsFileFilter());
-        switch (files.length) {
-            case 0:
-                return new File(dir, FACTS_FILE_NAME);
-            case 1:
-                return files[0];
-            default:
-                for (File file : files) {
-                    if (Hasher.extractHash(file) == null) {
-                        return file;
-                    }
+    Map<String, String> readFacts(File file) throws IOException {
+        Map<String, String> facts = new TreeMap<String, String>();
+        if (file.exists()) {
+            List<String> lines = FileUtils.readLines(file, "UTF-8");
+            for (String line : lines) {
+                if (line.startsWith("#")) continue;
+                int equals = line.indexOf("=");
+                if (equals < 0) {
+                    continue;
                 }
-                return getMostRecent(files);
+                String name = line.substring(0, equals).trim();
+                String value = line.substring(equals + 1).trim();
+                facts.put(name, value);
+            }
         }
+        return facts;
     }
 
-    File findImportedFile(File dir) {
-        File[] files = dir.listFiles(new ImportedFileFilter());
-        switch (files.length) {
-            case 0:
-                return new File(dir, IMPORTED_FILE_NAME);
-            case 1:
-                return files[0];
-            default:
-                for (File file : files) {
-                    if (Hasher.extractHash(file) == null) {
-                        return file;
-                    }
-                }
-                return getMostRecent(files);
+    void writeFacts(File file, Map<String, String> facts) throws IOException {
+        List<String> lines = new ArrayList<String>();
+        lines.add("#SIPCreator - facts");
+        for (Map.Entry<String, String> entry : facts.entrySet()) {
+            lines.add(String.format("%s=%s", entry.getKey(), entry.getValue()));
         }
+        FileUtils.writeLines(file, lines);
     }
 
-    File findSourceFile(File dir) {
-        File[] files = dir.listFiles(new SourceFileFilter());
+    File factsFile(File dir) {
+        return findOrCreate(dir, FACTS_FILE_NAME, new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isFile() && FileStore.FACTS_FILE_NAME.equals(Hasher.extractFileName(file));
+            }
+
+        });
+    }
+
+    File hintsFile(File dir) {
+        return findOrCreate(dir, HINTS_FILE_NAME, new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isFile() && FileStore.HINTS_FILE_NAME.equals(Hasher.extractFileName(file));
+            }
+        });
+    }
+
+    File importedFile(File dir) {
+        return findOrCreate(dir, IMPORTED_FILE_NAME, new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isFile() && IMPORTED_FILE_NAME.equals(Hasher.extractFileName(file));
+            }
+        });
+    }
+
+    File sourceFile(File dir) {
+        return findOrCreate(dir, SOURCE_FILE_NAME, new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isFile() && SOURCE_FILE_NAME.equals(Hasher.extractFileName(file));
+            }
+        });
+    }
+
+    private File findOrCreate(File directory, String name, FileFilter fileFilter) {
+        File[] files = directory.listFiles(fileFilter);
         switch (files.length) {
             case 0:
-                return new File(dir, SOURCE_FILE_NAME);
+                return new File(directory, name);
             case 1:
                 return files[0];
             default:
@@ -136,27 +169,6 @@ public class FileStoreBase {
             mappingFile = new File(dir, String.format(FileStore.MAPPING_FILE_PATTERN, metadataPrefix));
         }
         return mappingFile;
-    }
-
-    class FactsFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile() && FileStore.FACTS_FILE_NAME.equals(Hasher.extractFileName(file));
-        }
-    }
-
-    class ImportedFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile() && IMPORTED_FILE_NAME.equals(Hasher.extractFileName(file));
-        }
-    }
-
-    class SourceFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile() && SOURCE_FILE_NAME.equals(Hasher.extractFileName(file));
-        }
     }
 
     class MappingFileFilter implements FileFilter {

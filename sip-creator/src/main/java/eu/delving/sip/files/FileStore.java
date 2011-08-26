@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -21,7 +21,6 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.ProgressListener;
@@ -55,16 +54,12 @@ public interface FileStore {
 
         String getSpec();
 
-        Facts getFacts();
+        Map<String,String> getDataSetFacts();
 
-//        Path getRecordRootPath();
-//
-//        void setRecordRootPath(Path path);
-//
-//        Path getUniqueElementPath();
-//
-//        void setUniqueElementPath(Path path);
-//
+        Map<String, String> getHints();
+
+        void setHints(Map<String, String> hints) throws FileStoreException;
+
         InputStream getImportedInputStream() throws FileStoreException;
 
         InputStream getSourceInputStream() throws FileStoreException;
@@ -96,8 +91,13 @@ public interface FileStore {
     String SOURCE_FILE_NAME = "source.xml.gz";
     String STATISTICS_FILE_NAME = "statistics.ser";
     String FACTS_FILE_NAME = "facts.txt";
+    String HINTS_FILE_NAME = "hints.txt";
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
     String MAPPING_FILE_PREFIX = "mapping_";
     String MAPPING_FILE_SUFFIX = ".xml";
     String DISCARDED_FILE_PATTERN = "discarded_%s.xml";
+
+    String RECORD_ROOT_PATH = "recordRootPath";
+    String RECORD_COUNT = "recordCount";
+    String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
 }

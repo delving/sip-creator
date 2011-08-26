@@ -112,12 +112,21 @@ public class OutputFrame extends FrameBase {
                     message,
                     0, 100
             );
-            sipModel.validateFile(saveDiscarded.isSelected(), new ProgressListener.Adapter(progressMonitor) {
-                @Override
-                public void swingFinished(boolean success) {
-                    setEnabled(true);
-                }
-            });
+            sipModel.validateFile(
+                    saveDiscarded.isSelected(),
+                    new ProgressListener.Adapter(progressMonitor) {
+                        @Override
+                        public void swingFinished(boolean success) {
+                            setEnabled(true);
+                        }
+                    },
+                    new SipModel.ValidationListener() {
+                        @Override
+                        public void validationMessage(boolean aborted, int validCount, int invalidCount) {
+                            // todo: show this message somewhere
+                        }
+                    }
+            );
         }
     }
 
@@ -154,7 +163,7 @@ public class OutputFrame extends FrameBase {
                 });
             }
             catch (FileStoreException e) {
-                JOptionPane.showInternalMessageDialog(parent, "<html>Problem uploading files<br>"+e.getMessage());
+                JOptionPane.showInternalMessageDialog(parent, "<html>Problem uploading files<br>" + e.getMessage());
             }
             finally {
                 setEnabled(true);

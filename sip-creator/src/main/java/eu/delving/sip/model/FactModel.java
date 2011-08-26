@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -21,118 +21,71 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.FactDefinition;
-import eu.delving.metadata.Facts;
 import eu.delving.metadata.RecordMapping;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * All facts needed to define the constant things definining the data set, as well as
- * some of the constants used by the mapping
+ * An observable map, with knowledge of RecordMapping
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
 public class FactModel {
-    private Map<String, String> factMap = new LinkedHashMap<String, String>();
+    private Map<String, String> facts = new TreeMap<String,String>();
 
-    public void setFacts(Facts facts, String spec) {
-        boolean changed = false;
-        for (FactDefinition factDefinition : Facts.definitions()) {
-            String oldValue = get(factDefinition);
-            String newValue = facts.get(factDefinition.name);
-            if ("spec".equals(factDefinition.name)) {
-                newValue = spec;
-            }
-            if (!oldValue.equals(newValue)) {
-                if (put(factDefinition, newValue)) {
-                    changed = true;
-                }
-            }
-        }
-        if (changed) {
-            for (Listener listener : listeners) {
-                listener.updatedFact(this, true);
-            }
-        }
+    public String get(String key) {
+        return facts.get(key);
     }
 
-    public boolean fillFacts(Facts facts) {
-        boolean changed = false;
-        if (facts != null) {
-            for (FactDefinition factDefinition : Facts.definitions()) {
-                if (facts.set(factDefinition.name, get(factDefinition))) {
-                    changed = true;
-                }
-            }
-        }
-        return changed;
+    public Map<String, String> getFacts() {
+        return facts;
     }
 
-    public boolean fillRecordMapping(RecordMapping recordMapping) {
+    public void set(Map<String,String> newMap) {
+        facts = newMap;
+        fireAllUpdated();
+    }
+
+    public void set(String name, String value) {
+        facts.put(name, value);
+        fireFactUpdated(name);
+    }
+
+    public boolean copyToRecordMapping(RecordMapping recordMapping) {
         boolean changed = false;
-        for (FactDefinition factDefinition : Facts.definitions()) {
-            if (recordMapping.setFact(factDefinition.name, get(factDefinition))) {
+        for (Map.Entry<String,String> entry : facts.entrySet()) {
+            if (recordMapping.setFact(entry.getKey(), entry.getValue())) {
                 changed = true;
             }
         }
         return changed;
-    }
-
-    public void set(FactDefinition factDefinition, String value) {
-        if (put(factDefinition, value)) {
-            for (Listener listener : listeners) {
-                listener.updatedFact(this, true);
-            }
-        }
-    }
-
-    public void clear() {
-        boolean changed = false;
-        for (FactDefinition factDefinition : Facts.definitions()) {
-            if (put(factDefinition, factDefinition.defaultValue == null ? "" : factDefinition.defaultValue)) {
-                changed = true;
-            }
-        }
-        if (changed) {
-            for (Listener listener : listeners) {
-                listener.updatedFact(this, false);
-            }
-        }
-    }
-
-    public String get(FactDefinition factDefinition) {
-        String value = factMap.get(factDefinition.name);
-        if (value == null) {
-            factMap.put(factDefinition.name, value = "");
-        }
-        return value;
-    }
-
-    private boolean put(FactDefinition factDefinition, String value) {
-        String existing = get(factDefinition);
-        if (value.equals(existing)) {
-            return false;
-        }
-        if (value.isEmpty() && factDefinition.defaultValue != null) {
-            value = factDefinition.defaultValue;
-        }
-        factMap.put(factDefinition.name, value);
-        return true;
     }
 
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+
+    public void fireFactUpdated(String name) {
+        String value = facts.get(name);
+        for (Listener listener : listeners) {
+            listener.factUpdated(name, value);
+        }
+    }
+
+    public void fireAllUpdated() {
+        for (Listener listener : listeners) {
+            listener.allFactsUpdated();
+        }
+    }
 
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
 
     public interface Listener {
-        void updatedFact(FactModel factModel, boolean interactive);
+        void factUpdated(String name, String value);
+        void allFactsUpdated();
     }
-
 }

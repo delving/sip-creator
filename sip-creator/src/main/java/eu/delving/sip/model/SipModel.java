@@ -25,7 +25,6 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.AnalysisTree;
-import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldDefinition;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.FieldStatistics;
@@ -53,8 +52,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -73,7 +72,6 @@ public class SipModel {
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private FileStore.DataSetStore dataSetStore;
-    private Facts facts;
     private UserNotifier userNotifier;
     private List<FieldStatistics> fieldStatisticsList;
     private AnalysisTree analysisTree;
@@ -83,7 +81,8 @@ public class SipModel {
     private CompileModel fieldCompileModel;
     private MetadataParser metadataParser;
     private MetadataRecord metadataRecord;
-    private FactModel factModel = new FactModel();
+    private FactModel dataSetFacts = new FactModel();
+    private FactModel hints = new FactModel();
     private FieldMappingListModel fieldMappingListModel;
     private MappingModel mappingModel = new MappingModel();
     private VariableListModel variableListModel = new VariableListModel();
@@ -96,9 +95,7 @@ public class SipModel {
 
         void updatedStatistics(FieldStatistics fieldStatistics);
 
-        void updatedRecordRoot(Path recordRoot, int recordCount);
-
-        void normalizationMessage(boolean complete, String message);
+        void updatedRecordRoot(Path recordRoot);
     }
 
     public interface AnalysisListener {
@@ -132,6 +129,7 @@ public class SipModel {
         mappingModel.addListener(recordCompileModel);
         mappingModel.addListener(fieldCompileModel);
         mappingModel.addListener(new MappingSaveTimer());
+        hints.addListener(new HintSaveTimer());
         fieldCompileModel.addListener(new CompileModel.Listener() {
             @Override
             public void stateChanged(CompileModel.State state) {
@@ -158,6 +156,10 @@ public class SipModel {
 
     public FileStore getFileStore() {
         return fileStore;
+    }
+
+    public FactModel getDataSetFacts() {
+        return dataSetFacts;
     }
 
     public void importSource(final File file, final ProgressListener progressListener) {
@@ -199,13 +201,11 @@ public class SipModel {
                 @Override
                 public void run() {
                     final List<FieldStatistics> statistics = dataSetStore.getStatistics();
-                    final Facts facts = dataSetStore.getFacts();
+                    final Map<String, String> dataSetFacts = dataSetStore.getDataSetFacts();
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            SipModel.this.facts = facts;
-                            factModel.clear();
-                            factModel.setFacts(facts, dataSetStore.getSpec());
+                            SipModel.this.dataSetFacts.set(dataSetFacts);
                             setStatisticsList(statistics);
                             seekFirstRecord();
                             if (mappingModel.getRecordMapping() != null) {
@@ -235,22 +235,15 @@ public class SipModel {
             public void run() {
                 try {
                     final RecordMapping recordMapping = dataSetStore.getRecordMapping(metadataPrefix);
+                    final Map<String,String> hints = dataSetStore.getHints();
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             mappingModel.setRecordMapping(recordMapping);
                             recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
-                            if (recordMapping != null) {
-                                if (getRecordRoot() != null) {
-                                    setRecordRootInternal(new Path(facts.getRecordRootPath()), Integer.parseInt(facts.getRecordCount()));
-                                }
-                                if (recordMapping.getNormalizeTime() == 0) {
-                                    normalizeMessage(false, "Normalization not yet performed.");
-                                }
-                                else {
-                                    normalizeMessage(recordMapping);
-                                }
-                            }
+                            hints.putAll(hints);
+                            setRecordRootInternal(new Path(hints.get(FileStore.RECORD_ROOT_PATH)));
+                            setUniqueElement(new Path(hints.get(FileStore.UNIQUE_ELEMENT_PATH)));
                         }
                     });
                 }
@@ -323,13 +316,12 @@ public class SipModel {
         }));
     }
 
-    public Facts getFacts() {
-        return facts;
+    public interface ValidationListener {
+        void validationMessage(boolean aborted, int validCount, int invalidCount);
     }
 
-    public void validateFile(boolean saveInvalidRecords, final ProgressListener progressListener) {
+    public void validateFile(boolean saveInvalidRecords, final ProgressListener progressListener, final ValidationListener validationListener) {
         checkSwingThread();
-        normalizeMessage(false, "Normalizing and validating...");
         executor.execute(new FileValidator(
                 this,
                 saveInvalidRecords,
@@ -359,17 +351,11 @@ public class SipModel {
                     }
 
                     @Override
-                    public void finished(final boolean aborted, int validCount, int invalidCount) {
+                    public void finished(final boolean aborted, final int validCount, final int invalidCount) {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                if (aborted) {
-                                    normalizeMessage(false, "Normalization aborted");
-                                }
-                                else {
-                                    // todo: must use the counts
-                                    normalizeMessage(getMappingModel().getRecordMapping());
-                                }
+                                validationListener.validationMessage(aborted, validCount,  invalidCount);
                             }
                         });
                     }
@@ -382,39 +368,29 @@ public class SipModel {
     }
 
     public Path getUniqueElement() {
-        if (facts == null || facts.getUniqueElementPath().isEmpty()) {
-            return null;
-        }
-        return new Path(getFacts().getUniqueElementPath());
+        return new Path(hints.get(FileStore.UNIQUE_ELEMENT_PATH));
     }
 
     public void setUniqueElement(Path uniqueElement) {
-        facts.setUniqueElementPath(uniqueElement.toString());
-        factModel.setFacts(facts, dataSetStore.getSpec());
+        hints.set(FileStore.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
         AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
     }
 
     public Path getRecordRoot() {
-        if (facts == null || facts.getRecordRootPath().isEmpty()) {
-            return null;
-        }
-        return new Path(getFacts().getRecordRootPath());
+        return new Path(hints.get(FileStore.RECORD_ROOT_PATH));
     }
 
     public int getRecordCount() {
-        if (facts == null || facts.getRecordCount().isEmpty()) {
-            return 0;
-        }
-        return Integer.parseInt(getFacts().getRecordCount());
+        String recordCount = hints.get(FileStore.RECORD_COUNT);
+        return recordCount == null ? 0 : Integer.parseInt(recordCount);
     }
 
     public void setRecordRoot(Path recordRoot, int recordCount) {
         checkSwingThread();
-        setRecordRootInternal(recordRoot, recordCount);
+        setRecordRootInternal(recordRoot);
         seekFirstRecord();
-        facts.setRecordRootPath(recordRoot.toString());
-        facts.setRecordCount(String.valueOf(recordCount));
-        factModel.setFacts(facts, dataSetStore.getSpec());
+        hints.set(FileStore.RECORD_ROOT_PATH, recordRoot.toString());
+        hints.set(FileStore.RECORD_COUNT, String.valueOf(recordCount));
     }
 
     public long getElementCount() {
@@ -514,24 +490,7 @@ public class SipModel {
 
     // === privates
 
-    private void normalizeMessage(boolean complete, String message) {
-        for (UpdateListener updateListener : updateListeners) {
-            updateListener.normalizationMessage(complete, message);
-        }
-    }
-
-    private void normalizeMessage(RecordMapping recordMapping) {
-        Date date = new Date(recordMapping.getNormalizeTime());
-        String message = String.format(
-                "<html>Completed at %tT on %tY-%tm-%td<br>with %d normalized, and %d discarded",
-                date, date, date, date,
-                recordMapping.getRecordsNormalized(),
-                recordMapping.getRecordsDiscarded()
-        );
-        normalizeMessage(true, message);
-    }
-
-    private void setRecordRootInternal(Path recordRoot, int recordCount) {
+    private void setRecordRootInternal(Path recordRoot) {
         checkSwingThread();
         List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
         if (recordRoot != null) {
@@ -543,7 +502,7 @@ public class SipModel {
             variableListModel.clear();
         }
         for (UpdateListener updateListener : updateListeners) {
-            updateListener.updatedRecordRoot(recordRoot, recordCount);
+            updateListener.updatedRecordRoot(recordRoot);
         }
     }
 
@@ -616,6 +575,39 @@ public class SipModel {
         }
     }
 
+    private class HintSaveTimer implements FactModel.Listener, ActionListener, Runnable {
+        private Timer timer = new Timer(200, this);
+
+        private HintSaveTimer() {
+            timer.setRepeats(false);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            executor.execute(this);
+        }
+
+        @Override
+        public void run() {
+            try {
+                dataSetStore.setHints(hints.getFacts());
+            }
+            catch (FileStoreException e) {
+                userNotifier.tellUser("Unable to save mapping", e);
+            }
+        }
+
+        @Override
+        public void factUpdated(String name, String value) {
+            timer.restart();
+        }
+
+        @Override
+        public void allFactsUpdated() {
+            timer.restart();
+        }
+    }
+
     private class MappingSaveTimer implements MappingModel.Listener, ActionListener, Runnable {
         private Timer timer = new Timer(200, this);
 
@@ -633,7 +625,7 @@ public class SipModel {
             try {
                 RecordMapping recordMapping = mappingModel.getRecordMapping();
                 if (recordMapping != null) {
-                    factModel.fillRecordMapping(recordMapping);
+                    dataSetFacts.copyToRecordMapping(recordMapping);
                     dataSetStore.setRecordMapping(recordMapping);
                 }
             }

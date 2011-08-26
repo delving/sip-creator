@@ -100,11 +100,8 @@ public class CreateFrame extends FrameBase {
             }
 
             @Override
-            public void updatedRecordRoot(Path recordRoot, int recordCount) {
-            }
-
-            @Override
-            public void normalizationMessage(boolean complete, String message) {
+            public void updatedRecordRoot(Path recordRoot) {
+                // todo: implement
             }
         });
         createObviousMappingButton.addActionListener(new ActionListener() {

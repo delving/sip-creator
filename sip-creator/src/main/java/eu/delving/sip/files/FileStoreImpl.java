@@ -21,7 +21,6 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.MetadataModel;
@@ -150,26 +149,38 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public Facts getFacts() {
-            File factsFile = findFactsFile(directory);
-            Facts facts = null;
-            if (factsFile.exists()) {
-                try {
-                    facts = Facts.read(new FileInputStream(factsFile));
-                }
-                catch (Exception e) {
-                    // eat this exception
-                }
+        public Map<String, String> getDataSetFacts() {
+            try {
+                return readFacts(factsFile(directory));
             }
-            if (facts == null) {
-                facts = new Facts();
+            catch (IOException e) {
+                return new TreeMap<String,String>();
             }
-            return facts;
+        }
+
+        @Override
+        public Map<String, String> getHints() {
+            try {
+                return readFacts(hintsFile(directory));
+            }
+            catch (IOException e) {
+                return new TreeMap<String,String>();
+            }
+        }
+
+        @Override
+        public void setHints(Map<String,String> hints) throws FileStoreException {
+            try {
+                writeFacts(hintsFile(directory), hints);
+            }
+            catch (IOException e) {
+                throw new FileStoreException("Unable to set hints", e);
+            }
         }
 
         @Override
         public InputStream getImportedInputStream() throws FileStoreException {
-            File imported = findImportedFile(directory);
+            File imported = importedFile(directory);
             try {
                 return new GZIPInputStream(new FileInputStream(imported));
             }
@@ -181,7 +192,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public InputStream getSourceInputStream() throws FileStoreException {
-            File source = findSourceFile(directory);
+            File source = sourceFile(directory);
             try {
                 return new GZIPInputStream(new FileInputStream(source));
             }
@@ -266,8 +277,8 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         public List<File> getUploadFiles() throws FileStoreException {
             try {
                 List<File> files = new ArrayList<File>();
-//                files.add(Hasher.ensureFileHashed(findParseHintsFile(directory));
-                files.add(Hasher.ensureFileHashed(findSourceFile(directory)));
+                files.add(Hasher.ensureFileHashed(hintsFile(directory)));
+                files.add(Hasher.ensureFileHashed(sourceFile(directory)));
                 for (File file : findMappingFiles(directory)) {
                     files.add(Hasher.ensureFileHashed(file));
                 }
@@ -280,7 +291,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public File getImportedFile() {
-            return findImportedFile(directory);
+            return importedFile(directory);
         }
 
         public File getDiscardedFile(RecordMapping recordMapping) {
