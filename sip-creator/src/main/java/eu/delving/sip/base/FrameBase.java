@@ -67,6 +67,7 @@ public abstract class FrameBase extends JInternalFrame {
     protected JComponent focusOwner;
     protected SipModel sipModel;
     protected Action action;
+    private boolean modal;
     private boolean initialized;
 
     public FrameBase(JComponent parent, SipModel sipModel, String title, boolean modal) {
@@ -80,6 +81,7 @@ public abstract class FrameBase extends JInternalFrame {
         this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title, !modal);
+        this.modal = modal;
         this.desktopPane = parent instanceof FrameBase ? ((FrameBase) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
         setGlassPane(new ModalityInternalGlassPane(this));
         addFrameListener();
@@ -216,14 +218,22 @@ public abstract class FrameBase extends JInternalFrame {
         }
         if (add) {
             desktopPane.add(this);
-            Point storedLocation = getStoredLocation();
-            if (storedLocation != null) {
-                return storedLocation;
-            }
-            else {
+            if (modal) {
+                parent.getLocation(max);
                 max.x += 25;
                 max.y += 25;
                 return max;
+            }
+            else {
+                Point storedLocation = getStoredLocation();
+                if (storedLocation != null) {
+                    return storedLocation;
+                }
+                else {
+                    max.x += 25;
+                    max.y += 25;
+                    return max;
+                }
             }
         }
         else {

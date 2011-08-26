@@ -78,7 +78,7 @@ public interface FileStore {
 
         File getImportedFile();
 
-        File getDiscardedFile(RecordMapping recordMapping);
+        File getValidationFile(RecordMapping recordMapping);
 
         void importSource(File inputFile, ProgressListener progressListener) throws FileStoreException;
 
@@ -95,7 +95,7 @@ public interface FileStore {
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
     String MAPPING_FILE_PREFIX = "mapping_";
     String MAPPING_FILE_SUFFIX = ".xml";
-    String DISCARDED_FILE_PATTERN = "discarded_%s.xml";
+    String VALIDATION_FILE_PATTERN = "validation_%s.xml";
 
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";

@@ -294,8 +294,9 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             return importedFile(directory);
         }
 
-        public File getDiscardedFile(RecordMapping recordMapping) {
-            return new File(directory, String.format(DISCARDED_FILE_PATTERN, recordMapping.getPrefix()));
+        @Override
+        public File getValidationFile(RecordMapping recordMapping) {
+            return new File(directory, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
         }
 
         @Override

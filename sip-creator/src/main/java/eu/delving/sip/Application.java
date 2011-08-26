@@ -85,7 +85,6 @@ public class Application {
     private ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
     private PopupExceptionHandler exceptionHandler;
     private SipModel sipModel;
-    private CultureHubClient cultureHubClient;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
@@ -101,7 +100,7 @@ public class Application {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         exceptionHandler = new PopupExceptionHandler();
         sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, this.exceptionHandler);
-        cultureHubClient = new CultureHubClient(new CultureHubClient.Context() {
+        CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClient.Context() {
 
             @Override
             public String getServerUrl() {
@@ -215,9 +214,9 @@ public class Application {
             }
         }));
         bar.add(dataSetMenu);
-        bar.add(tempateMenu);
         bar.add(mappingMenu);
         bar.add(cultureHubMenu);
+        bar.add(tempateMenu);
         bar.add(createFrameMenu());
         return bar;
     }

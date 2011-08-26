@@ -42,7 +42,9 @@ import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
+import org.apache.commons.io.FileUtils;
 
+import javax.swing.AbstractListModel;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -51,6 +53,7 @@ import javax.swing.tree.TreeModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -82,9 +85,10 @@ public class SipModel {
     private MetadataParser metadataParser;
     private MetadataRecord metadataRecord;
     private FactModel dataSetFacts = new FactModel();
-    private FactModel hints = new FactModel();
+    private FactModel hintsModel = new FactModel();
     private FieldMappingListModel fieldMappingListModel;
     private MappingModel mappingModel = new MappingModel();
+    private ValidationFileModel validationFileModel = new ValidationFileModel();
     private VariableListModel variableListModel = new VariableListModel();
     private List<UpdateListener> updateListeners = new CopyOnWriteArrayList<UpdateListener>();
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
@@ -126,10 +130,11 @@ public class SipModel {
         parseListeners.add(fieldCompileModel);
         fieldMappingListModel = new FieldMappingListModel();
         mappingModel.addListener(fieldMappingListModel);
+        mappingModel.addListener(validationFileModel);
         mappingModel.addListener(recordCompileModel);
         mappingModel.addListener(fieldCompileModel);
         mappingModel.addListener(new MappingSaveTimer());
-        hints.addListener(new HintSaveTimer());
+        hintsModel.addListener(new HintSaveTimer());
         fieldCompileModel.addListener(new CompileModel.Listener() {
             @Override
             public void stateChanged(CompileModel.State state) {
@@ -189,6 +194,10 @@ public class SipModel {
         return mappingModel;
     }
 
+    public ListModel getValidationFileModel() {
+        return validationFileModel;
+    }
+
     public UserNotifier getUserNotifier() {
         return userNotifier;
     }
@@ -202,10 +211,14 @@ public class SipModel {
                 public void run() {
                     final List<FieldStatistics> statistics = dataSetStore.getStatistics();
                     final Map<String, String> dataSetFacts = dataSetStore.getDataSetFacts();
+                    final Map<String, String> hints = dataSetStore.getHints();
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             SipModel.this.dataSetFacts.set(dataSetFacts);
+                            hintsModel.set(hints);
+                            setRecordRootInternal(new Path(hints.get(FileStore.RECORD_ROOT_PATH)));
+                            setUniqueElement(new Path(hints.get(FileStore.UNIQUE_ELEMENT_PATH)));
                             setStatisticsList(statistics);
                             seekFirstRecord();
                             if (mappingModel.getRecordMapping() != null) {
@@ -235,15 +248,13 @@ public class SipModel {
             public void run() {
                 try {
                     final RecordMapping recordMapping = dataSetStore.getRecordMapping(metadataPrefix);
-                    final Map<String,String> hints = dataSetStore.getHints();
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
+                            dataSetFacts.set("spec", dataSetStore.getSpec());
+                            dataSetFacts.copyToRecordMapping(recordMapping);
                             mappingModel.setRecordMapping(recordMapping);
                             recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
-                            hints.putAll(hints);
-                            setRecordRootInternal(new Path(hints.get(FileStore.RECORD_ROOT_PATH)));
-                            setUniqueElement(new Path(hints.get(FileStore.UNIQUE_ELEMENT_PATH)));
                         }
                     });
                 }
@@ -316,15 +327,11 @@ public class SipModel {
         }));
     }
 
-    public interface ValidationListener {
-        void validationMessage(boolean aborted, int validCount, int invalidCount);
-    }
-
-    public void validateFile(boolean saveInvalidRecords, final ProgressListener progressListener, final ValidationListener validationListener) {
+    public void validateFile(boolean allowInvalid, final ProgressListener progressListener) {
         checkSwingThread();
         executor.execute(new FileValidator(
                 this,
-                saveInvalidRecords,
+                allowInvalid,
                 groovyCodeResource,
                 progressListener,
                 new FileValidator.Listener() {
@@ -352,12 +359,7 @@ public class SipModel {
 
                     @Override
                     public void finished(final boolean aborted, final int validCount, final int invalidCount) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                validationListener.validationMessage(aborted, validCount,  invalidCount);
-                            }
-                        });
+                        validationFileModel.kick();
                     }
                 }
         ));
@@ -368,20 +370,20 @@ public class SipModel {
     }
 
     public Path getUniqueElement() {
-        return new Path(hints.get(FileStore.UNIQUE_ELEMENT_PATH));
+        return new Path(hintsModel.get(FileStore.UNIQUE_ELEMENT_PATH));
     }
 
     public void setUniqueElement(Path uniqueElement) {
-        hints.set(FileStore.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
+        hintsModel.set(FileStore.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
         AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
     }
 
     public Path getRecordRoot() {
-        return new Path(hints.get(FileStore.RECORD_ROOT_PATH));
+        return new Path(hintsModel.get(FileStore.RECORD_ROOT_PATH));
     }
 
     public int getRecordCount() {
-        String recordCount = hints.get(FileStore.RECORD_COUNT);
+        String recordCount = hintsModel.get(FileStore.RECORD_COUNT);
         return recordCount == null ? 0 : Integer.parseInt(recordCount);
     }
 
@@ -389,8 +391,8 @@ public class SipModel {
         checkSwingThread();
         setRecordRootInternal(recordRoot);
         seekFirstRecord();
-        hints.set(FileStore.RECORD_ROOT_PATH, recordRoot.toString());
-        hints.set(FileStore.RECORD_COUNT, String.valueOf(recordCount));
+        hintsModel.set(FileStore.RECORD_ROOT_PATH, recordRoot.toString());
+        hintsModel.set(FileStore.RECORD_COUNT, String.valueOf(recordCount));
     }
 
     public long getElementCount() {
@@ -531,6 +533,73 @@ public class SipModel {
         setStatistics(null);
     }
 
+    private class ValidationFileModel extends AbstractListModel implements Runnable, MappingModel.Listener {
+
+        private File file;
+        private List<String> lines;
+
+        @Override
+        public int getSize() {
+            return lines == null ? 0 : lines.size();
+        }
+
+        @Override
+        public Object getElementAt(int i) {
+            return lines.get(i);
+        }
+
+        @Override
+        public void run() {
+            int size = getSize();
+            if (size > 0) {
+                lines = null;
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        fireIntervalRemoved(this, 0, getSize());
+                    }
+                });
+            }
+            if (file.exists()) {
+                try {
+                    final List<String> freshlines = FileUtils.readLines(file, "UTF-8");
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            lines = freshlines;
+                            fireIntervalAdded(ValidationFileModel.this, 0, getSize());
+                        }
+                    });
+                }
+                catch (IOException e) {
+                    userNotifier.tellUser("Unable to read " + file.getAbsolutePath(), e);
+                }
+            }
+        }
+
+        @Override
+        public void factChanged() {
+        }
+
+        @Override
+        public void select(FieldMapping fieldMapping) {
+        }
+
+        @Override
+        public void selectedChanged() {
+        }
+
+        @Override
+        public void mappingChanged(RecordMapping recordMapping) {
+            file = dataSetStore.getValidationFile(recordMapping);
+            executor.execute(this);
+        }
+
+        public void kick() {
+            mappingChanged(mappingModel.getRecordMapping()); // to fire it off
+        }
+    }
+
     private class RecordScanner implements Runnable {
         private ScanPredicate scanPredicate;
         private ProgressListener progressListener;
@@ -590,7 +659,7 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                dataSetStore.setHints(hints.getFacts());
+                dataSetStore.setHints(hintsModel.getFacts());
             }
             catch (FileStoreException e) {
                 userNotifier.tellUser("Unable to save mapping", e);
@@ -625,7 +694,6 @@ public class SipModel {
             try {
                 RecordMapping recordMapping = mappingModel.getRecordMapping();
                 if (recordMapping != null) {
-                    dataSetFacts.copyToRecordMapping(recordMapping);
                     dataSetStore.setRecordMapping(recordMapping);
                 }
             }

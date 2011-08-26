@@ -26,7 +26,6 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.Uniqueness;
@@ -43,7 +42,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Set;
 
@@ -59,7 +57,7 @@ public class FileValidator implements Runnable {
     private ProgressAdapter progressAdapter;
     private Listener listener;
     private volatile boolean aborted = false;
-    private boolean saveInvalidRecords;
+    private boolean allowInvalid;
     private int validCount, invalidCount;
 
     public interface Listener {
@@ -72,13 +70,13 @@ public class FileValidator implements Runnable {
 
     public FileValidator(
             SipModel sipModel,
-            boolean saveInvalidRecords,
+            boolean allowInvalidRecords,
             GroovyCodeResource groovyCodeResource,
             ProgressListener progressListener,
             Listener listener
     ) {
         this.sipModel = sipModel;
-        this.saveInvalidRecords = saveInvalidRecords;
+        this.allowInvalid = allowInvalidRecords;
         this.groovyCodeResource = groovyCodeResource;
         this.progressAdapter = new ProgressAdapter(progressListener);
         this.listener = listener;
@@ -92,8 +90,8 @@ public class FileValidator implements Runnable {
         Uniqueness uniqueness = new Uniqueness();
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
-        File discardedFile = null;
-        Writer discarded = null;
+        File validationFile = null;
+        Writer out = null;
         try {
             RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
             if (recordMapping == null) {
@@ -109,84 +107,68 @@ public class FileValidator implements Runnable {
                     sipModel.getRecordCount()
             );
             parser.setProgressListener(progressAdapter);
-            if (saveInvalidRecords) {
-                discardedFile = dataSetStore.getDiscardedFile(recordMapping);
-                discarded = new BufferedWriter(new FileWriter(discardedFile));
-            }
-            MetadataRecord record;
-            while ((record = parser.nextRecord()) != null && !aborted) {
-                try {
-                    Node outputNode = mappingRunner.runMapping(record);
-                    StringWriter writer = new StringWriter();
-                    XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
-                    xmlNodePrinter.print(outputNode);
-                    recordValidator.validateRecord(outputNode, record.getRecordNumber());
-                    validCount++;
-                }
-                catch (MappingException e) {
-                    if (discarded != null) {
-                        try {
-                            discarded.write(record.toString());
-                            e.printStackTrace(new PrintWriter(discarded));
-                            discarded.write("\n========================================\n");
-                        }
-                        catch (IOException e1) {
-                            sipModel.getUserNotifier().tellUser("Unable to write discarded record", e1);
+            validationFile = dataSetStore.getValidationFile(recordMapping);
+            out = new BufferedWriter(new FileWriter(validationFile));
+            try {
+                MetadataRecord record;
+                while ((record = parser.nextRecord()) != null && !aborted) {
+                    try {
+                        Node outputNode = mappingRunner.runMapping(record);
+                        recordValidator.validateRecord(outputNode, record.getRecordNumber());
+                        validCount++;
+//                    StringWriter writer = new StringWriter();
+//                    XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+//                    xmlNodePrinter.print(outputNode);
+                    }
+                    catch (MappingException e) {
+                        invalidCount++;
+                        out.write(record.toString());
+                        e.printStackTrace(new PrintWriter(out));
+                        out.write("\n========================================\n");
+                        if (!allowInvalid) {
+                            listener.invalidInput(e);
                             abort();
                         }
+                    }
+                    catch (ValidationException e) {
+                        invalidCount++;
+                        out.write(record.toString());
+                        e.printStackTrace(new PrintWriter(out));
+                        out.write("\n========================================\n");
+                        if (!allowInvalid) {
+                            listener.invalidOutput(e);
+                            abort();
+                        }
+                    }
+                    catch (DiscardRecordException e) {
+                        out.write("Discarded explicitly: \n" + record.toString());
+                        out.write("\n========================================\n");
                         invalidCount++;
                     }
-                    else {
-                        listener.invalidInput(e);
+                    catch (Exception e) {
+                        sipModel.getUserNotifier().tellUser("Problem writing output", e);
                         abort();
                     }
                 }
-                catch (ValidationException e) {
-                    if (discarded != null) {
-                        try {
-                            discarded.write(record.toString());
-                            e.printStackTrace(new PrintWriter(discarded));
-                            discarded.write("\n========================================\n");
-                        }
-                        catch (IOException e1) {
-                            sipModel.getUserNotifier().tellUser("Unable to write discarded record", e1);
-                            abort();
-                        }
-                        invalidCount++;
+                Set<String> repeated = uniqueness.getRepeated();
+                if (!repeated.isEmpty()) {
+                    out.write("\n\nThere were non-unique identifiers:\n");
+                    for (String line : repeated) {
+                        out.write(line);
+                        out.write("\n");
                     }
-                    else {
-                        listener.invalidOutput(e);
-                        abort();
-                    }
+                    sipModel.getUserNotifier().tellUser("Identifier should be unique, but there were %d repeated values");
                 }
-                catch (DiscardRecordException e) {
-                    if (discarded != null) {
-                        try {
-                            discarded.write("Discarded explicitly: \n" + record.toString());
-                            discarded.write("\n========================================\n");
-                        }
-                        catch (IOException e1) {
-                            sipModel.getUserNotifier().tellUser("Unable to write discarded record", e1);
-                            abort();
-                        }
-                    }
-                    invalidCount++;
-                }
-                catch (Exception e) {
-                    sipModel.getUserNotifier().tellUser("Problem writing output", e);
-                    abort();
-                }
+                out.write("\n");
+                out.write("Total Valid Records: " + validCount + "\n");
+                out.write("Total Invalid Records: " + invalidCount + "\n");
+                out.write("Total Records: " + (validCount + invalidCount) + "\n");
+                out.write("\nTHE END\n");
             }
-            Set<String> repeated = uniqueness.getRepeated();
-            if (!repeated.isEmpty()) {
-                discarded.write("\n\nThere were non-unique identifiers:\n");
-                for (String line : repeated) {
-                    discarded.write(line);
-                    discarded.write("\n");
-                }
-                sipModel.getUserNotifier().tellUser("Identifier should be unique, but there were %d repeated values");
+            catch (IOException e) {
+                sipModel.getUserNotifier().tellUser("Unable to write discarded record", e);
+                abort();
             }
-            discarded.write("\nTHE END\n");
         }
         catch (XMLStreamException e) {
             throw new RuntimeException("XML Problem", e);
@@ -201,16 +183,16 @@ public class FileValidator implements Runnable {
             aborted = true;
         }
         finally {
-            if (discarded != null) {
+            if (out != null) {
                 try {
-                    discarded.close();
+                    out.close();
                 }
                 catch (IOException e) {
                     sipModel.getUserNotifier().tellUser("Unable to close discarded records file", e);
                 }
                 if (aborted) {
-                    if (discardedFile != null) {
-                        if (!discardedFile.delete()) {
+                    if (validationFile != null) {
+                        if (!validationFile.delete()) {
                             sipModel.getUserNotifier().tellUser("Unable to delete discarded records file");
                         }
                     }

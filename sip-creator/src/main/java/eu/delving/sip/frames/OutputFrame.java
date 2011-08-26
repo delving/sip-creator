@@ -35,15 +35,20 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.ListModel;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * The transformation from input record to output
@@ -52,10 +57,11 @@ import java.awt.event.ActionEvent;
  */
 
 public class OutputFrame extends FrameBase {
-    private JCheckBox saveDiscarded = new JCheckBox("Save discarded records");
+    private JCheckBox allowInvalid = new JCheckBox("Allow invalid records");
     private CultureHubClient cultureHubClient;
     private Action validateAction = new ValidateAction();
     private Action uploadAction = new UploadAction();
+    private ValidationFilePopup validationFilePopup = new ValidationFilePopup(this);
 
     public OutputFrame(JDesktopPane desktop, SipModel sipModel, CultureHubClient cultureHubClient) {
         super(desktop, sipModel, "Output", false);
@@ -77,8 +83,8 @@ public class OutputFrame extends FrameBase {
         upload.setEnabled(false);
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         p.add(new JButton(validateAction));
-        p.add(saveDiscarded);
-        p.add(new JButton(uploadAction));
+        p.add(allowInvalid);
+        p.add(new JButton(validationFilePopup.getAction()));
         return p;
     }
 
@@ -102,28 +108,22 @@ public class OutputFrame extends FrameBase {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             String message = String.format(
-                    "<html><h3>Transforming the raw data of '%s' into '%s' format</h3>",
+                    "<html><h3>Transforming the raw data of '%s' into '%s' format and validating</h3>",
                     sipModel.getDataSetStore().getSpec(),
                     sipModel.getMappingModel().getRecordMapping().getPrefix()
             );
             ProgressMonitor progressMonitor = new ProgressMonitor(
                     SwingUtilities.getRoot(OutputFrame.this),
-                    "<html><h2>Normalizing</h2>",
+                    "<html><h2>Validating</h2>",
                     message,
                     0, 100
             );
             sipModel.validateFile(
-                    saveDiscarded.isSelected(),
+                    allowInvalid.isSelected(),
                     new ProgressListener.Adapter(progressMonitor) {
                         @Override
                         public void swingFinished(boolean success) {
                             setEnabled(true);
-                        }
-                    },
-                    new SipModel.ValidationListener() {
-                        @Override
-                        public void validationMessage(boolean aborted, int validCount, int invalidCount) {
-                            // todo: show this message somewhere
                         }
                     }
             );
@@ -168,6 +168,59 @@ public class OutputFrame extends FrameBase {
             finally {
                 setEnabled(true);
             }
+        }
+    }
+
+    private class ValidationFilePopup extends FrameBase {
+
+        private ListModel validationFileModel = sipModel.getValidationFileModel();
+        private JList list = new JList(validationFileModel);
+
+        public ValidationFilePopup(FrameBase parent) {
+            super(parent, parent.getSipModel(), "Validation Report", true);
+            getAction().setEnabled(false);
+            sipModel.getValidationFileModel().addListDataListener(new ListDataListener() {
+                @Override
+                public void intervalAdded(ListDataEvent listDataEvent) {
+                    getAction().setEnabled(true);
+                }
+
+                @Override
+                public void intervalRemoved(ListDataEvent listDataEvent) {
+                    getAction().setEnabled(false);
+                }
+
+                @Override
+                public void contentsChanged(ListDataEvent listDataEvent) {
+                }
+            });
+        }
+
+        @Override
+        protected void buildContent(Container content) {
+            JPanel p = new JPanel(new BorderLayout());
+            p.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            p.add(scroll(list), BorderLayout.CENTER);
+            p.add(createButtons(), BorderLayout.SOUTH);
+            content.add(p, BorderLayout.CENTER);
+        }
+
+        @Override
+        protected void refresh() {
+        }
+
+        private JPanel createButtons() {
+            JButton cancel = new JButton("Cancel");
+            cancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    closeFrame();
+                }
+            });
+            JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            p.add(cancel);
+            p.add(new JButton(uploadAction));
+            return p;
         }
     }
 }
