@@ -327,6 +327,21 @@ public class SipModel {
         }));
     }
 
+    public void convertSource(final ProgressListener progressListener) {
+        executor.execute(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    dataSetStore.convertSource(progressListener);
+                }
+                catch (FileStoreException e) {
+                    userNotifier.tellUser("Conversion failed", e);
+                }
+            }
+        });
+    }
+
     public void validateFile(boolean allowInvalid, final ProgressListener progressListener) {
         checkSwingThread();
         executor.execute(new FileValidator(

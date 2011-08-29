@@ -65,7 +65,7 @@ public class MetadataParser {
         xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
         xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
         xmlif.configureForSpeed();
-        this.input = (XMLStreamReader2) xmlif.createXMLStreamReader("Normalization", inputStream);
+        this.input = (XMLStreamReader2) xmlif.createXMLStreamReader("Metadata", inputStream);
     }
 
     public void setProgressListener(ProgressListener progressListener) {

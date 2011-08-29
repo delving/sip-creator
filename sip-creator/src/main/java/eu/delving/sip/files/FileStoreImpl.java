@@ -24,15 +24,19 @@ package eu.delving.sip.files;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.MetadataModel;
+import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.xml.SourceConverter;
 import org.apache.commons.io.IOUtils;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -154,7 +158,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 return readFacts(factsFile(directory));
             }
             catch (IOException e) {
-                return new TreeMap<String,String>();
+                return new TreeMap<String, String>();
             }
         }
 
@@ -164,12 +168,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 return readFacts(hintsFile(directory));
             }
             catch (IOException e) {
-                return new TreeMap<String,String>();
+                return new TreeMap<String, String>();
             }
         }
 
         @Override
-        public void setHints(Map<String,String> hints) throws FileStoreException {
+        public void setHints(Map<String, String> hints) throws FileStoreException {
             try {
                 writeFacts(hintsFile(directory), hints);
             }
@@ -359,10 +363,37 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public void convertSource(ProgressListener progressListener) throws FileStoreException {
-            // todo: get the record root (assuming it has been set)
-            // todo: get the unique id path (minus the root is the unique id)
-            // todo: take IMPORTED_FILE_NAME, and create standard sip-creator source format file
-            // todo: include in the source: record root path and unique id path
+            try {
+                Map<String, String> hints = getHints();
+                String recordRoot = hints.get(RECORD_ROOT_PATH);
+                String recordCount = hints.get(RECORD_COUNT);
+                if (recordRoot == null) {
+                    throw new FileStoreException("Must have record root path");
+                }
+                int count = 0;
+                try {
+                    count = Integer.parseInt(recordCount);
+                }
+                catch (Exception e) { /* nothing */ }
+                SourceConverter converter = new SourceConverter(new Path(recordRoot), count);
+                converter.setProgressListener(progressListener);
+                File importedFile = importedFile(directory);
+                FileInputStream inputStream = new FileInputStream(importedFile);
+                File sourceFile = new File("/tmp/source.xml"); // todo: this is just for testing
+                OutputStream outputStream = new FileOutputStream(sourceFile);
+                converter.parse(inputStream, outputStream);
+                inputStream.close();
+                outputStream.close();
+            }
+            catch (FileNotFoundException e) {
+                throw new FileStoreException("Unable to convert source", e);
+            }
+            catch (XMLStreamException e) {
+                throw new FileStoreException("Unable to convert source", e);
+            }
+            catch (IOException e) {
+                throw new FileStoreException("Unable to convert source", e);
+            }
         }
 
         @Override

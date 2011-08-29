@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.Path;
+import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
@@ -33,6 +34,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.TreeModelEvent;
@@ -63,6 +65,7 @@ public class AnalysisFrame extends FrameBase {
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
     private JButton analyzeButton = new JButton(RUN_ANALYSIS);
+    private JButton convertButton = new JButton("Convert!");
     private JTree statisticsJTree;
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel) {
@@ -138,6 +141,27 @@ public class AnalysisFrame extends FrameBase {
                 performAnalysis();
             }
         });
+        convertButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String message = String.format(
+                        "<html><h3>Converting source data of '%s' to standard form</h3>",
+                        sipModel.getDataSetStore().getSpec()
+                );
+                ProgressMonitor progressMonitor = new ProgressMonitor(
+                        SwingUtilities.getRoot(parent),
+                        "<html><h2>converting</h2>",
+                        message,
+                        0, 100
+                );
+                sipModel.convertSource(new ProgressListener.Adapter(progressMonitor) {
+                    @Override
+                    public void swingFinished(boolean success) {
+                        // todo: implement
+                    }
+                });
+            }
+        });
     }
 
     private JPanel createPanel() {
@@ -147,6 +171,7 @@ public class AnalysisFrame extends FrameBase {
         JPanel south = new JPanel(new GridLayout(0, 1));
         south.add(analyzeButton);
         south.add(createSelectButtonPanel());
+        south.add(convertButton);
         p.add(south, BorderLayout.SOUTH);
         return p;
     }
