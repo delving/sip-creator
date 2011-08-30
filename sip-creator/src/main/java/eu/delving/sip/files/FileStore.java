@@ -59,8 +59,8 @@ public interface FileStore {
         IMPORTED_PENDING_CONVERT,
         SOURCED_PENDING_ANALYZE,
         SOURCED_UNMAPPED,
-        SOURCED_MAPPED,
-        VALIDATED,
+        MAPPED_UNVALIDATED,
+        READY_FOR_UPLOAD,
         PHANTOM
     }
 
@@ -68,7 +68,11 @@ public interface FileStore {
 
         String getSpec();
 
-        MetadataModel getMetadataModel();
+        String getLatestPrefix();
+
+        void setLatestPrefix(String prefix) throws FileStoreException;
+
+        MetadataModel getMetadataModel() throws FileStoreException;
 
         StoreState getState();
 

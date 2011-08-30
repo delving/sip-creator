@@ -22,6 +22,8 @@
 package eu.delving.sip.menus;
 
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;
@@ -38,28 +40,37 @@ import java.awt.event.ActionListener;
  */
 
 public class MappingMenu extends JMenu {
-    private final String SELECTED = "selectedMapping";
     private SipModel sipModel;
 
     public MappingMenu(SipModel sipModel) {
         super("Mappings");
         this.sipModel = sipModel;
-        SwingUtilities.invokeLater(new Runnable() {
+        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
             @Override
-            public void run() {
-                build();
+            public void storeSet(FileStore.DataSetStore store) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+            }
+
+            @Override
+            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
             }
         });
     }
 
-    private void build() {
+    private void refresh() {
+        removeAll();
         String currentPrefix = null;
         RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
         if (recordMapping != null) {
             currentPrefix = recordMapping.getPrefix();
         }
-        if (currentPrefix == null) {
-            currentPrefix = sipModel.getPreferences().get(SELECTED, "");
+        if (currentPrefix == null && sipModel.getStoreModel().hasStore()) {
+            currentPrefix = sipModel.getStoreModel().getStore().getLatestPrefix();
             if (currentPrefix.isEmpty()) {
                 currentPrefix = null;
             }
@@ -76,7 +87,6 @@ public class MappingMenu extends JMenu {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     sipModel.setMetadataPrefix(actionEvent.getActionCommand());
-                    sipModel.getPreferences().put(SELECTED, actionEvent.getActionCommand());
                 }
             });
         }

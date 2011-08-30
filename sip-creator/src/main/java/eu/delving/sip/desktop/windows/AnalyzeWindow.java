@@ -23,9 +23,9 @@ package eu.delving.sip.desktop.windows;
 
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
-import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.sip.files.FileStore;
+import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -78,19 +78,15 @@ public class AnalyzeWindow extends DesktopWindow {
     }
 
     private void wireUp() {
-        sipModel.addUpdateListener(new SipModel.UpdateListener() {
+        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
             @Override
-            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
+            public void storeSet(FileStore.DataSetStore store) {
                 analyzeButton.setText(RUN_ANALYSIS);
                 analyzeButton.setEnabled(true);
             }
 
             @Override
-            public void updatedStatistics(final FieldStatistics fieldStatistics) {
-            }
-
-            @Override
-            public void updatedRecordRoot(Path recordRoot) {
+            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
                 // todo: implement
             }
         });

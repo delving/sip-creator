@@ -64,13 +64,14 @@ public class AnalysisTree implements Serializable {
         String getVariableName();
     }
 
-    public static void setRecordRoot(DefaultTreeModel model, Path recordRoot) {
+    public static int setRecordRoot(DefaultTreeModel model, Path recordRoot) {
         AnalysisTree.Node node = (AnalysisTree.Node) model.getRoot();
         List<AnalysisTree.Node> changedNodes = new ArrayList<AnalysisTree.Node>();
-        setRecordRoot(node, recordRoot, changedNodes);
+        int count = setRecordRoot(node, recordRoot, changedNodes);
         for (AnalysisTree.Node changedNode : changedNodes) {
             model.nodeChanged(changedNode);
         }
+        return count;
     }
 
     public static void setUniqueElement(DefaultTreeModel model, Path uniqueElement) {
@@ -108,13 +109,17 @@ public class AnalysisTree implements Serializable {
         this.root = root;
     }
 
-    private static void setRecordRoot(AnalysisTree.Node node, Path recordRoot, List<Node> changedNodes) {
+    private static int setRecordRoot(AnalysisTree.Node node, Path recordRoot, List<Node> changedNodes) {
         if (node.setRecordRoot(recordRoot)) {
             changedNodes.add(node);
+            if (node.isRecordRoot()) {
+                return node.getStatistics().getTotal();
+            }
         }
         for (AnalysisTree.Node child : node.getChildNodes()) {
             setRecordRoot(child, recordRoot, changedNodes);
         }
+        return 0;
     }
 
     private static void setUniqueElement(AnalysisTree.Node node, Path uniqueElement, List<Node> changedNodes) {

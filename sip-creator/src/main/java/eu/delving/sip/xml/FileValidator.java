@@ -79,10 +79,10 @@ public class FileValidator implements Runnable {
     }
 
     public void run() {
-        FileStore.DataSetStore dataSetStore = sipModel.getDataSetStore();
-        if (dataSetStore == null) {
+        if (!sipModel.hasDataSetStore()) {
             throw new RuntimeException("No data set store selected");
         }
+        FileStore.DataSetStore dataSetStore = sipModel.getStoreModel().getStore();
         Uniqueness uniqueness = new Uniqueness();
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
@@ -96,7 +96,7 @@ public class FileValidator implements Runnable {
                     recordMapping.toCompileCode(sipModel.getMetadataModel())
             );
             MetadataParser parser = new MetadataParser(
-                    sipModel.getDataSetStore().sourceInput(),
+                    sipModel.getStoreModel().getStore().sourceInput(),
                     sipModel.getRecordRoot(),
                     sipModel.getRecordCount()
             );

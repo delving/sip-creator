@@ -24,11 +24,10 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldDefinition;
 import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.Path;
 import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.files.FileStore;
+import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.FieldListModel;
 import eu.delving.sip.model.SipModel;
 
@@ -89,18 +88,15 @@ public class CreateFrame extends FrameBase {
     }
 
     private void wireUp() {
-        sipModel.addUpdateListener(new SipModel.UpdateListener() {
+        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+
             @Override
-            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
+            public void storeSet(FileStore.DataSetStore store) {
                 variablesList.clearSelection();
             }
 
             @Override
-            public void updatedStatistics(final FieldStatistics fieldStatistics) {
-            }
-
-            @Override
-            public void updatedRecordRoot(Path recordRoot) {
+            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
                 // todo: implement
             }
         });

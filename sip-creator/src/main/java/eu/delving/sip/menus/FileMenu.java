@@ -91,10 +91,10 @@ public class FileMenu extends JMenu {
         if (!file.exists()) {
             return false;
         }
-        if (sipModel.getDataSetStore() == null) {
+        if (!sipModel.hasDataSetStore()) {
             return false;
         }
-        String spec = sipModel.getDataSetStore().getSpec();
+        String spec = sipModel.getStoreModel().getStore().getSpec();
         int doImport = JOptionPane.showConfirmDialog(
                 parent,
                 String.format(

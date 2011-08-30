@@ -26,7 +26,6 @@ import eu.delving.metadata.Histogram;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractListModel;
@@ -60,10 +59,6 @@ public class StatisticsFrame extends FrameBase {
         super(desktop, sipModel, "Statistics", false);
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
         sipModel.addUpdateListener(new SipModel.UpdateListener() {
-            @Override
-            public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
-            }
-
             @Override
             public void updatedStatistics(final FieldStatistics fieldStatistics) {
                 setStatistics(fieldStatistics);

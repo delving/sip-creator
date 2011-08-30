@@ -69,10 +69,10 @@ import java.util.prefs.Preferences;
 public class SipModel {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private FileStore fileStore;
+    private DataSetStoreModel storeModel = new DataSetStoreModel();
     private MetadataModel metadataModel;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
-    private FileStore.DataSetStore dataSetStore;
     private UserNotifier userNotifier;
     private List<FieldStatistics> fieldStatisticsList;
     private AnalysisTree analysisTree;
@@ -92,8 +92,6 @@ public class SipModel {
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
 
     public interface UpdateListener {
-
-        void updatedDataSetStore(FileStore.DataSetStore dataSetStore);
 
         void updatedStatistics(FieldStatistics fieldStatistics);
 
@@ -166,12 +164,11 @@ public class SipModel {
     }
 
     public void importSource(final File file, final ProgressListener progressListener) {
-        if (dataSetStore == null) throw new RuntimeException("Import requires that dataset store is set");
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    dataSetStore.externalToImported(file, progressListener);
+                    storeModel.getStore().externalToImported(file, progressListener);
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Couldn't create Data Set from " + file.getAbsolutePath(), e);
@@ -180,8 +177,8 @@ public class SipModel {
         });
     }
 
-    public FileStore.DataSetStore getDataSetStore() {
-        return dataSetStore;
+    public DataSetStoreModel getStoreModel() {
+        return storeModel;
     }
 
     public MetadataModel getMetadataModel() {
@@ -190,6 +187,10 @@ public class SipModel {
 
     public MappingModel getMappingModel() {
         return mappingModel;
+    }
+
+    public boolean hasDataSetStore() {
+        return storeModel.hasStore();
     }
 
     public ListModel getValidationFileModel() {
@@ -202,41 +203,35 @@ public class SipModel {
 
     public void setDataSetStore(final FileStore.DataSetStore dataSetStore) {
         checkSwingThread();
-        this.dataSetStore = dataSetStore;
-        if (dataSetStore != null) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    final List<FieldStatistics> statistics = dataSetStore.getStatistics();
-                    final Map<String, String> dataSetFacts = dataSetStore.getDataSetFacts();
-                    final Map<String, String> hints = dataSetStore.getHints();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            SipModel.this.dataSetFacts.set(dataSetFacts);
-                            hintsModel.set(hints);
-                            setRecordRootInternal(new Path(hints.get(FileStore.RECORD_ROOT_PATH)));
-                            setUniqueElement(new Path(hints.get(FileStore.UNIQUE_ELEMENT_PATH)));
-                            setStatisticsList(statistics);
-                            seekFirstRecord();
-                            if (mappingModel.getRecordMapping() != null) {
-                                setMetadataPrefix(mappingModel.getRecordMapping().getPrefix());
-                            }
-                            variableListModel.clear();
-                            AnalysisTree.setUniqueElement(analysisTreeModel, getUniqueElement());
-                            for (UpdateListener updateListener : updateListeners) {
-                                updateListener.updatedDataSetStore(dataSetStore);
-                            }
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                storeModel.setStore(dataSetStore);
+                final List<FieldStatistics> statistics = dataSetStore.getStatistics();
+                final Map<String, String> dataSetFacts = dataSetStore.getDataSetFacts();
+                final Map<String, String> hints = dataSetStore.getHints();
+                final String latestPrefix = dataSetStore.getLatestPrefix();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        SipModel.this.dataSetFacts.set(dataSetFacts);
+                        hintsModel.set(hints);
+                        setRecordRootInternal(new Path(hints.get(FileStore.RECORD_ROOT_PATH)));
+                        setUniqueElement(new Path(hints.get(FileStore.UNIQUE_ELEMENT_PATH)));
+                        setStatisticsList(statistics);
+                        seekFirstRecord();
+                        if (mappingModel.getRecordMapping() != null) {
+                            setMetadataPrefix(mappingModel.getRecordMapping().getPrefix());
                         }
-                    });
-                }
-            });
-        }
-        else {
-            for (UpdateListener updateListener : updateListeners) {
-                updateListener.updatedDataSetStore(this.dataSetStore);
+                        variableListModel.clear();
+                        AnalysisTree.setUniqueElement(analysisTreeModel, getUniqueElement());
+                        if (latestPrefix != null) {
+                            setMetadataPrefix(latestPrefix); // todo: what about the menu?
+                        }
+                    }
+                });
             }
-        }
+        });
     }
 
     public void setMetadataPrefix(final String metadataPrefix) {
@@ -245,11 +240,12 @@ public class SipModel {
             @Override
             public void run() {
                 try {
-                    final RecordMapping recordMapping = dataSetStore.getRecordMapping(metadataPrefix);
+                    storeModel.getStore().setLatestPrefix(metadataPrefix);
+                    final RecordMapping recordMapping = storeModel.getStore().getRecordMapping(metadataPrefix);
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            dataSetFacts.set("spec", dataSetStore.getSpec());
+                            dataSetFacts.set("spec", storeModel.getStore().getSpec());
                             dataSetFacts.copyToRecordMapping(recordMapping);
                             mappingModel.setRecordMapping(recordMapping);
                             recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
@@ -299,8 +295,7 @@ public class SipModel {
     @SuppressWarnings("unchecked")
     public void analyzeFields(final AnalysisListener listener) {
         checkSwingThread();
-        executor.execute(new AnalysisParser(dataSetStore, new AnalysisParser.Listener() {
-
+        executor.execute(new AnalysisParser(storeModel.getStore(), new AnalysisParser.Listener() {
             @Override
             public void success(final Object list) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -327,11 +322,10 @@ public class SipModel {
 
     public void convertSource(final ProgressListener progressListener) {
         executor.execute(new Runnable() {
-
             @Override
             public void run() {
                 try {
-                    dataSetStore.importedToSource(progressListener);
+                    storeModel.getStore().importedToSource(progressListener);
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Conversion failed", e);
@@ -509,7 +503,8 @@ public class SipModel {
         checkSwingThread();
         List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
         if (recordRoot != null) {
-            AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+            int recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+            // todo: set the hint
             analysisTree.getVariables(variables);
             variableListModel.setVariableList(variables);
         }
@@ -573,7 +568,7 @@ public class SipModel {
                 });
             }
             try {
-                final List<String> freshLines = dataSetStore.getValidationReport(recordMapping);
+                final List<String> freshLines = storeModel.getStore().getValidationReport(recordMapping);
                 if (freshLines != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
@@ -630,7 +625,7 @@ public class SipModel {
             }
             try {
                 if (metadataParser == null) {
-                    metadataParser = new MetadataParser(dataSetStore.sourceInput(), recordRoot, getRecordCount());
+                    metadataParser = new MetadataParser(storeModel.getStore().sourceInput(), recordRoot, getRecordCount());
                 }
                 metadataParser.setProgressListener(progressListener);
                 while ((metadataRecord = metadataParser.nextRecord()) != null) {
@@ -672,7 +667,7 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                dataSetStore.setHints(hintsModel.getFacts());
+                storeModel.getStore().setHints(hintsModel.getFacts());
             }
             catch (FileStoreException e) {
                 userNotifier.tellUser("Unable to save mapping", e);
@@ -707,7 +702,7 @@ public class SipModel {
             try {
                 RecordMapping recordMapping = mappingModel.getRecordMapping();
                 if (recordMapping != null) {
-                    dataSetStore.setRecordMapping(recordMapping);
+                    storeModel.getStore().setRecordMapping(recordMapping);
                 }
             }
             catch (FileStoreException e) {

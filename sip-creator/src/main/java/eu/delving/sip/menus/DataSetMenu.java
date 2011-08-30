@@ -22,6 +22,7 @@
 package eu.delving.sip.menus;
 
 import eu.delving.sip.files.FileStore;
+import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;
@@ -44,10 +45,21 @@ public class DataSetMenu extends JMenu {
     public DataSetMenu(SipModel sipModel) {
         super("Data Sets");
         this.sipModel = sipModel;
-        SwingUtilities.invokeLater(new Runnable() {
+        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+
             @Override
-            public void run() {
-                refresh();
+            public void storeSet(FileStore.DataSetStore store) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+            }
+
+            @Override
+            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
+                // todo: implement
             }
         });
     }
@@ -67,11 +79,13 @@ public class DataSetMenu extends JMenu {
                     sipModel.getPreferences().put(SELECTED, item.getStore().getSpec());
                 }
             });
-            if (sipModel.getDataSetStore() == null && selectedSpec.equals(store.getSpec())) {
-                sipModel.setDataSetStore(store);
+            if (sipModel.hasDataSetStore()) {
+                if (store == sipModel.getStoreModel().getStore()) {
+                    item.setSelected(true);
+                }
             }
-            if (store == sipModel.getDataSetStore()) {
-                item.setSelected(true);
+            else if (selectedSpec.equals(store.getSpec())) {
+                sipModel.setDataSetStore(store);
             }
         }
     }

@@ -147,7 +147,7 @@ public class AnalysisFrame extends FrameBase {
             public void actionPerformed(ActionEvent actionEvent) {
                 String message = String.format(
                         "<html><h3>Converting source data of '%s' to standard form</h3>",
-                        sipModel.getDataSetStore().getSpec()
+                        sipModel.getStoreModel().getStore().getSpec()
                 );
                 ProgressMonitor progressMonitor = new ProgressMonitor(
                         SwingUtilities.getRoot(parent),

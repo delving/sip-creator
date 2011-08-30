@@ -190,7 +190,7 @@ public abstract class FrameBase extends JInternalFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (sipModel.getDataSetStore() == null || sipModel.getMappingModel().getRecordMapping() == null) {
+            if (!sipModel.hasDataSetStore() || sipModel.getMappingModel().getRecordMapping() == null) {
                 JOptionPane.showInternalMessageDialog(desktopPane, "A Dataset and Mapping must be selected from the menus", FrameBase.this.getTitle(), JOptionPane.PLAIN_MESSAGE);
             }
             else {

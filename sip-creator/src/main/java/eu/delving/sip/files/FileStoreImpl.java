@@ -24,6 +24,7 @@ package eu.delving.sip.files;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.MetadataModel;
+import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
@@ -46,6 +47,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -58,11 +60,11 @@ import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_FRESH;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
+import static eu.delving.sip.files.FileStore.StoreState.MAPPED_UNVALIDATED;
 import static eu.delving.sip.files.FileStore.StoreState.PHANTOM;
-import static eu.delving.sip.files.FileStore.StoreState.SOURCED_MAPPED;
+import static eu.delving.sip.files.FileStore.StoreState.READY_FOR_UPLOAD;
 import static eu.delving.sip.files.FileStore.StoreState.SOURCED_PENDING_ANALYZE;
 import static eu.delving.sip.files.FileStore.StoreState.SOURCED_UNMAPPED;
-import static eu.delving.sip.files.FileStore.StoreState.VALIDATED;
 
 /**
  * This interface describes how files are stored by the sip-creator
@@ -164,8 +166,39 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public MetadataModel getMetadataModel() {
-            return null;  // todo: build one from the record definitions found
+        public String getLatestPrefix() {
+            File latestMapping = latestMappingFileOrNull(here);
+            return latestMapping != null ? mappingPrefix(latestMapping) : null;
+        }
+
+        @Override
+        public void setLatestPrefix(String prefix) throws FileStoreException {
+            File latestForPrefix = findLatestMappingFile(here, prefix);
+            if (latestForPrefix == null) {
+                setRecordMapping(new RecordMapping(prefix));
+            }
+            else {
+                if (!latestForPrefix.setLastModified(System.currentTimeMillis())) {
+                    throw new FileStoreException("Couldn't touch the file to give it priority");
+                }
+            }
+        }
+
+        @Override
+        public MetadataModel getMetadataModel() throws FileStoreException {
+            try { // todo: this must be built from the record definition files present
+                MetadataModelImpl metadataModel = new MetadataModelImpl();
+                metadataModel.setRecordDefinitionResources(Arrays.asList(
+                        "/ese-record-definition.xml",
+                        "/icn-record-definition.xml",
+                        "/abm-record-definition.xml"
+                ));
+                metadataModel.setDefaultPrefix("ese");
+                return metadataModel;
+            }
+            catch (Exception e) {
+                throw new FileStoreException("Unable to load metadata model");
+            }
         }
 
         @Override
@@ -210,10 +243,10 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 File mapping = latestMappingFileOrNull(here);
                 if (mapping != null) {
                     if (validationFile(here, mapping).exists()) {
-                        return VALIDATED;
+                        return READY_FOR_UPLOAD;
                     }
                     else {
-                        return SOURCED_MAPPED;
+                        return MAPPED_UNVALIDATED;
                     }
                 }
                 else {
@@ -274,7 +307,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public List<FieldStatistics> getStatistics() {
-            File statisticsFile = new File(here, STATISTICS_FILE_NAME);
+            File statisticsFile = statisticsFile(here);
             if (statisticsFile.exists()) {
                 try {
                     ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(statisticsFile)));
@@ -297,7 +330,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public void setStatistics(List<FieldStatistics> fieldStatisticsList) throws FileStoreException {
-            File statisticsFile = new File(here, STATISTICS_FILE_NAME);
+            File statisticsFile = statisticsFile(here);
             try {
                 ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(statisticsFile)));
                 out.writeObject(fieldStatisticsList);
@@ -402,6 +435,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 if (progressListener != null) progressListener.finished(!cancelled);
                 inputStream.close();
                 gzipOutputStream.close();
+                delete(statisticsFile(here));
             }
             catch (Exception e) {
                 if (progressListener != null) progressListener.finished(false);
@@ -419,8 +453,6 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 if (!source.renameTo(hashedSource)) {
                     throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
                 }
-                File statisticsFile = new File(here, STATISTICS_FILE_NAME);
-                delete(statisticsFile);
             }
         }
 
@@ -444,6 +476,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 SourceConverter converter = new SourceConverter(new Path(recordRoot), count);
                 converter.setProgressListener(progressListener);
                 converter.parse(importedInput(), sourceOutput());
+                delete(statisticsFile(here));
             }
             catch (XMLStreamException e) {
                 throw new FileStoreException("Unable to convert source", e);

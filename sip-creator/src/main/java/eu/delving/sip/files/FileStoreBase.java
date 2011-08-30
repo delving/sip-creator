@@ -107,7 +107,7 @@ public class FileStoreBase {
     }
 
     File validationFile(File dir, File mappingFile) {
-        String prefix = getMetadataPrefix(mappingFile);
+        String prefix = mappingPrefix(mappingFile);
         return new File(dir, String.format(VALIDATION_FILE_PATTERN, prefix));
     }
 
@@ -139,7 +139,7 @@ public class FileStoreBase {
     File findLatestFile(File dir, String metadataPrefix, FileFilter fileFilter) {
         File mappingFile = null;
         for (File file : findLatestFiles(dir, fileFilter)) {
-            String prefix = getMetadataPrefix(file);
+            String prefix = mappingPrefix(file);
             if (prefix.equals(metadataPrefix)) {
                 mappingFile = file;
             }
@@ -158,7 +158,7 @@ public class FileStoreBase {
         File[] files = dir.listFiles(fileFilter);
         Map<String, List<File>> map = new TreeMap<String, List<File>>();
         for (File file : files) {
-            String prefix = getMetadataPrefix(file);
+            String prefix = mappingPrefix(file);
             if (prefix == null) continue;
             List<File> list = map.get(prefix);
             if (list == null) {
@@ -186,7 +186,7 @@ public class FileStoreBase {
         }
     }
 
-    String getMetadataPrefix(File file) {
+    String mappingPrefix(File file) {
         String name = Hasher.extractFileName(file);
         if (name.startsWith(MAPPING_FILE_PREFIX) && name.endsWith(MAPPING_FILE_SUFFIX)) {
             name = name.substring(MAPPING_FILE_PREFIX.length());

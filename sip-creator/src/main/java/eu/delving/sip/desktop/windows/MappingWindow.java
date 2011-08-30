@@ -25,7 +25,6 @@ import eu.delving.metadata.Facts;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.sip.desktop.GridBagHelper;
-import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -63,15 +62,8 @@ public class MappingWindow extends DesktopWindow {
         add(tabbedPane);
         sipModel.addUpdateListener(
                 new SipModel.UpdateListener() {
-
-                    @Override
-                    public void updatedDataSetStore(FileStore.DataSetStore dataSetStore) {
-//                        table.setModel(new MapTableModel(dataSetStore.getDataSetFacts()));
-                    }
-
                     @Override
                     public void updatedStatistics(FieldStatistics fieldStatistics) {
-                        // todo: add body and return void;
                     }
 
                     @Override
