@@ -54,6 +54,16 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
+import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_FRESH;
+import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
+import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
+import static eu.delving.sip.files.FileStore.StoreState.PHANTOM;
+import static eu.delving.sip.files.FileStore.StoreState.SOURCED_MAPPED;
+import static eu.delving.sip.files.FileStore.StoreState.SOURCED_PENDING_ANALYZE;
+import static eu.delving.sip.files.FileStore.StoreState.SOURCED_UNMAPPED;
+import static eu.delving.sip.files.FileStore.StoreState.VALIDATED;
+
 /**
  * This interface describes how files are stored by the sip-creator
  *
@@ -142,21 +152,83 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
     public class DataSetStoreImpl implements DataSetStore, Serializable {
 
-        private File directory;
+        private File here;
 
-        public DataSetStoreImpl(File directory) {
-            this.directory = directory;
+        public DataSetStoreImpl(File here) {
+            this.here = here;
         }
 
         @Override
         public String getSpec() {
-            return directory.getName();
+            return here.getName();
+        }
+
+        @Override
+        public MetadataModel getMetadataModel() {
+            return null;  // todo: build one from the record definitions found
+        }
+
+        @Override
+        public StoreState getState() {
+            if (phantomFile(here).exists()) {
+                return PHANTOM;
+            }
+            File imported = importedFile(here);
+            File source = sourceFile(here);
+            File statistics = statisticsFile(here);
+            if (imported.exists()) {
+                if (source.exists()) {
+                    if (imported.lastModified() > source.lastModified()) {
+                        if (statistics.exists()) { // first analysis (deleted during conversion, during import too)
+                            return IMPORTED_PENDING_CONVERT;
+                        }
+                        else {
+                            return IMPORTED_PENDING_ANALYZE;
+                        }
+                    }
+                    else {
+                        return statePostSource();
+                    }
+                }
+                else if (statistics.exists()) {
+                    return IMPORTED_PENDING_CONVERT;
+                }
+                else {
+                    return IMPORTED_FRESH;
+                }
+            }
+            else if (source.exists()) {
+                return statePostSource();
+            }
+            else {
+                return EMPTY;
+            }
+        }
+
+        private StoreState statePostSource() {
+            if (statisticsFile(here).exists()) {
+                File mapping = latestMappingFileOrNull(here);
+                if (mapping != null) {
+                    if (validationFile(here, mapping).exists()) {
+                        return VALIDATED;
+                    }
+                    else {
+                        return SOURCED_MAPPED;
+                    }
+                }
+                else {
+                    return SOURCED_UNMAPPED;
+                }
+            }
+            else {
+                return SOURCED_PENDING_ANALYZE;
+            }
         }
 
         @Override
         public Map<String, String> getDataSetFacts() {
             try {
-                return readFacts(factsFile(directory));
+                return readFacts(factsFile(here));
             }
             catch (IOException e) {
                 return new TreeMap<String, String>();
@@ -166,7 +238,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         @Override
         public Map<String, String> getHints() {
             try {
-                return readFacts(hintsFile(directory));
+                return readFacts(hintsFile(here));
             }
             catch (IOException e) {
                 return new TreeMap<String, String>();
@@ -176,7 +248,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         @Override
         public void setHints(Map<String, String> hints) throws FileStoreException {
             try {
-                writeFacts(hintsFile(directory), hints);
+                writeFacts(hintsFile(here), hints);
             }
             catch (IOException e) {
                 throw new FileStoreException("Unable to set hints", e);
@@ -185,24 +257,24 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public boolean isRecentlyImported() {
-            File importedFile = importedFile(directory);
-            File sourceFile = sourceFile(directory);
+            File importedFile = importedFile(here);
+            File sourceFile = sourceFile(here);
             return importedFile.exists() && (!sourceFile.exists() || importedFile.lastModified() > sourceFile.lastModified());
         }
 
         @Override
         public InputStream importedInput() throws FileStoreException {
-            return zipIn(importedFile(directory));
+            return zipIn(importedFile(here));
         }
 
         @Override
         public InputStream sourceInput() throws FileStoreException {
-            return zipIn(sourceFile(directory));
+            return zipIn(sourceFile(here));
         }
 
         @Override
         public List<FieldStatistics> getStatistics() {
-            File statisticsFile = new File(directory, STATISTICS_FILE_NAME);
+            File statisticsFile = new File(here, STATISTICS_FILE_NAME);
             if (statisticsFile.exists()) {
                 try {
                     ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(statisticsFile)));
@@ -225,7 +297,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public void setStatistics(List<FieldStatistics> fieldStatisticsList) throws FileStoreException {
-            File statisticsFile = new File(directory, STATISTICS_FILE_NAME);
+            File statisticsFile = new File(here, STATISTICS_FILE_NAME);
             try {
                 ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(statisticsFile)));
                 out.writeObject(fieldStatisticsList);
@@ -239,7 +311,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         @Override
         public RecordMapping getRecordMapping(String metadataPrefix) throws FileStoreException {
             RecordDefinition recordDefinition = metadataModel.getRecordDefinition(metadataPrefix);
-            File mappingFile = findMappingFile(directory, metadataPrefix);
+            File mappingFile = findLatestMappingFile(here, metadataPrefix);
             if (mappingFile.exists()) {
                 try {
                     FileInputStream is = new FileInputStream(mappingFile);
@@ -256,7 +328,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public void setRecordMapping(RecordMapping recordMapping) throws FileStoreException {
-            File mappingFile = new File(directory, String.format(MAPPING_FILE_PATTERN, recordMapping.getPrefix()));
+            File mappingFile = new File(here, String.format(MAPPING_FILE_PATTERN, recordMapping.getPrefix()));
             try {
                 FileOutputStream out = new FileOutputStream(mappingFile);
                 RecordMapping.write(recordMapping, out);
@@ -269,12 +341,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public void remove() throws FileStoreException {
-            delete(directory);
+            delete(here);
         }
 
         @Override
         public PrintWriter validationWriter(RecordMapping recordMapping) throws FileStoreException {
-            File file = new File(directory, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
+            File file = new File(here, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
             try {
                 return new PrintWriter(file);
             }
@@ -286,7 +358,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         @Override
         public List<String> getValidationReport(RecordMapping recordMapping) throws FileStoreException {
             try {
-                File file = new File(directory, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
+                File file = new File(here, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
                 return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
             }
             catch (IOException e) {
@@ -298,7 +370,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         public void externalToImported(File inputFile, ProgressListener progressListener) throws FileStoreException {
             int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
             if (progressListener != null) progressListener.prepareFor(fileBlocks);
-            File source = new File(directory, IMPORTED_FILE_NAME);
+            File source = new File(here, IMPORTED_FILE_NAME);
             Hasher hasher = new Hasher();
             boolean cancelled = false;
             try {
@@ -339,7 +411,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 delete(source);
             }
             else {
-                File hashedSource = new File(directory, hasher.prefixFileName(IMPORTED_FILE_NAME));
+                File hashedSource = new File(here, hasher.prefixFileName(IMPORTED_FILE_NAME));
                 if (hashedSource.exists()) {
                     delete(source);
                     throw new FileStoreException("This import was identical to the previous one. Discarded.");
@@ -347,7 +419,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 if (!source.renameTo(hashedSource)) {
                     throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
                 }
-                File statisticsFile = new File(directory, STATISTICS_FILE_NAME);
+                File statisticsFile = new File(here, STATISTICS_FILE_NAME);
                 delete(statisticsFile);
             }
         }
@@ -385,9 +457,9 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         public List<File> getUploadFiles() throws FileStoreException {
             try {
                 List<File> files = new ArrayList<File>();
-                files.add(Hasher.ensureFileHashed(hintsFile(directory)));
-                files.add(Hasher.ensureFileHashed(sourceFile(directory)));
-                for (File file : findMappingFiles(directory)) {
+                files.add(Hasher.ensureFileHashed(hintsFile(here)));
+                files.add(Hasher.ensureFileHashed(sourceFile(here)));
+                for (File file : findLatestMappingFiles(here)) {
                     files.add(Hasher.ensureFileHashed(file));
                 }
                 return files;
@@ -407,7 +479,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             try {
                 while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                     String fileName = zipEntry.getName();
-                    File file = new File(directory, fileName);
+                    File file = new File(here, fileName);
                     if (fileName.equals(SOURCE_FILE_NAME)) {
                         Hasher hasher = new Hasher();
                         GZIPInputStream gzipInputStream = new GZIPInputStream(zipInputStream);
@@ -425,7 +497,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                         }
                         if (progressListener != null) progressListener.finished(!cancelled);
                         outputStream.close();
-                        File hashedSource = new File(directory, hasher.prefixFileName(SOURCE_FILE_NAME));
+                        File hashedSource = new File(here, hasher.prefixFileName(SOURCE_FILE_NAME));
                         if (!file.renameTo(hashedSource)) {
                             throw new FileStoreException(String.format("Unable to rename %s to %s", file.getAbsolutePath(), hashedSource.getAbsolutePath()));
                         }
@@ -439,10 +511,6 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             catch (IOException e) {
                 throw new FileStoreException("Unable to accept SipZip file", e);
             }
-        }
-
-        public OutputStream importedOutput() throws FileStoreException {
-            return zipOut(IMPORTED_FILE_NAME);
         }
 
         public OutputStream sourceOutput() throws FileStoreException {
@@ -459,7 +527,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         private OutputStream zipOut(String fileName) throws FileStoreException {
-            File file = new File(directory, fileName);
+            File file = new File(here, fileName);
             try {
                 return new GZIPOutputStream(new FileOutputStream(file));
             }

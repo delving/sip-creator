@@ -40,7 +40,10 @@ import static eu.delving.sip.files.FileStore.HINTS_FILE_NAME;
 import static eu.delving.sip.files.FileStore.IMPORTED_FILE_NAME;
 import static eu.delving.sip.files.FileStore.MAPPING_FILE_PREFIX;
 import static eu.delving.sip.files.FileStore.MAPPING_FILE_SUFFIX;
+import static eu.delving.sip.files.FileStore.PHANTOM_FILE_NAME;
 import static eu.delving.sip.files.FileStore.SOURCE_FILE_NAME;
+import static eu.delving.sip.files.FileStore.STATISTICS_FILE_NAME;
+import static eu.delving.sip.files.FileStore.VALIDATION_FILE_PATTERN;
 
 /**
  * This class contains helpers for the FileStoreImpl to lean on
@@ -80,61 +83,79 @@ public class FileStoreBase {
     }
 
     File factsFile(File dir) {
-        return findOrCreate(dir, FACTS_FILE_NAME, new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile() && FileStore.FACTS_FILE_NAME.equals(Hasher.extractFileName(file));
-            }
-
-        });
+        return findOrCreate(dir, FACTS_FILE_NAME, new NameFileFilter(FACTS_FILE_NAME));
     }
 
     File hintsFile(File dir) {
-        return findOrCreate(dir, HINTS_FILE_NAME, new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile() && FileStore.HINTS_FILE_NAME.equals(Hasher.extractFileName(file));
-            }
-        });
+        return findOrCreate(dir, HINTS_FILE_NAME, new NameFileFilter(HINTS_FILE_NAME));
     }
 
     File importedFile(File dir) {
-        return findOrCreate(dir, IMPORTED_FILE_NAME, new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile() && IMPORTED_FILE_NAME.equals(Hasher.extractFileName(file));
-            }
-        });
+        return findOrCreate(dir, IMPORTED_FILE_NAME, new NameFileFilter(IMPORTED_FILE_NAME));
     }
 
     File sourceFile(File dir) {
-        return findOrCreate(dir, SOURCE_FILE_NAME, new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile() && SOURCE_FILE_NAME.equals(Hasher.extractFileName(file));
-            }
-        });
+        return findOrCreate(dir, SOURCE_FILE_NAME, new NameFileFilter(SOURCE_FILE_NAME));
+    }
+
+    File previousSourceOrNull(File dir) {
+        return findOrNull(dir, 1, new NameFileFilter(SOURCE_FILE_NAME));
+    }
+
+    File latestMappingFileOrNull(File dir) {
+        return findOrNull(dir, 0, new MappingFileFilter());
+    }
+
+    File validationFile(File dir, File mappingFile) {
+        String prefix = getMetadataPrefix(mappingFile);
+        return new File(dir, String.format(VALIDATION_FILE_PATTERN, prefix));
+    }
+
+    File statisticsFile(File dir) {
+        return new File(dir, STATISTICS_FILE_NAME);
+    }
+
+    File phantomFile(File dir) {
+        return new File(dir, PHANTOM_FILE_NAME);
     }
 
     private File findOrCreate(File directory, String name, FileFilter fileFilter) {
-        File[] files = directory.listFiles(fileFilter);
-        switch (files.length) {
-            case 0:
-                return new File(directory, name);
-            case 1:
-                return files[0];
-            default:
-                for (File file : files) {
-                    if (Hasher.extractHash(file) == null) {
-                        return file;
-                    }
-                }
-                return getMostRecent(files);
+        File file = findOrNull(directory, 0, fileFilter);
+        if (file == null) {
+            file = new File(directory, name);
         }
+        return file;
     }
 
-    Collection<File> findMappingFiles(File dir) {
-        File[] files = dir.listFiles(new MappingFileFilter());
+    private File findOrNull(File directory, int which, FileFilter fileFilter) {
+        File[] files = directory.listFiles(fileFilter);
+        return getRecent(files, which);
+    }
+
+    File findLatestMappingFile(File dir, String metadataPrefix) {
+        return findLatestFile(dir, metadataPrefix, new MappingFileFilter());
+    }
+
+    File findLatestFile(File dir, String metadataPrefix, FileFilter fileFilter) {
+        File mappingFile = null;
+        for (File file : findLatestFiles(dir, fileFilter)) {
+            String prefix = getMetadataPrefix(file);
+            if (prefix.equals(metadataPrefix)) {
+                mappingFile = file;
+            }
+        }
+        if (mappingFile == null) {
+            mappingFile = new File(dir, String.format(FileStore.MAPPING_FILE_PATTERN, metadataPrefix));
+        }
+        return mappingFile;
+    }
+
+    Collection<File> findLatestMappingFiles(File dir) {
+        return findLatestFiles(dir, new MappingFileFilter());
+    }
+
+    Collection<File> findLatestFiles(File dir, FileFilter fileFilter) {
+        File[] files = dir.listFiles(fileFilter);
         Map<String, List<File>> map = new TreeMap<String, List<File>>();
         for (File file : files) {
             String prefix = getMetadataPrefix(file);
@@ -145,30 +166,16 @@ public class FileStoreBase {
             }
             list.add(file);
         }
-        List<File> mappingFiles = new ArrayList<File>();
+        List<File> latestFiles = new ArrayList<File>();
         for (Map.Entry<String, List<File>> entry : map.entrySet()) {
             if (entry.getValue().size() == 1) {
-                mappingFiles.add(entry.getValue().get(0));
+                latestFiles.add(entry.getValue().get(0));
             }
             else {
-                mappingFiles.add(getMostRecent(entry.getValue().toArray(new File[entry.getValue().size()])));
+                latestFiles.add(getRecent(entry.getValue().toArray(new File[entry.getValue().size()]), 0));
             }
         }
-        return mappingFiles;
-    }
-
-    File findMappingFile(File dir, String metadataPrefix) {
-        File mappingFile = null;
-        for (File file : findMappingFiles(dir)) {
-            String prefix = getMetadataPrefix(file);
-            if (prefix.equals(metadataPrefix)) {
-                mappingFile = file;
-            }
-        }
-        if (mappingFile == null) {
-            mappingFile = new File(dir, String.format(FileStore.MAPPING_FILE_PATTERN, metadataPrefix));
-        }
-        return mappingFile;
+        return latestFiles;
     }
 
     class MappingFileFilter implements FileFilter {
@@ -204,34 +211,45 @@ public class FileStoreBase {
         }
     }
 
-    File getMostRecent(File[] files) {
-        if (files.length > 0) {
-            Arrays.sort(files, new Comparator<File>() {
-                @Override
-                public int compare(File a, File b) {
-                    long lastA = a.lastModified();
-                    long lastB = b.lastModified();
-                    if (lastA > lastB) {
-                        return -1;
-                    }
-                    else if (lastA < lastB) {
-                        return 1;
-                    }
-                    else {
-                        return 0;
-                    }
+    File getRecent(File[] files, int which) {
+        if (files.length <= which || which > MAX_HASH_HISTORY) {
+            return null;
+        }
+        Arrays.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File a, File b) {
+                long lastA = a.lastModified();
+                long lastB = b.lastModified();
+                if (lastA > lastB) {
+                    return -1;
                 }
-            });
-            if (files.length > MAX_HASH_HISTORY) {
-                for (int walk = MAX_HASH_HISTORY; walk < files.length; walk++) {
-                    //noinspection ResultOfMethodCallIgnored
-                    files[walk].delete();
+                else if (lastA < lastB) {
+                    return 1;
+                }
+                else {
+                    return 0;
                 }
             }
-            return files[0];
+        });
+        if (files.length > MAX_HASH_HISTORY) { // todo: vary this per file type
+            for (int walk = MAX_HASH_HISTORY; walk < files.length; walk++) {
+                //noinspection ResultOfMethodCallIgnored
+                files[walk].delete();
+            }
         }
-        else {
-            return null;
+        return files[which];
+    }
+
+    private class NameFileFilter implements FileFilter {
+        private String name;
+
+        private NameFileFilter(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public boolean accept(File file) {
+            return file.isFile() && Hasher.extractFileName(file).equals(name);
         }
     }
 }

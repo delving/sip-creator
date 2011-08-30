@@ -141,6 +141,7 @@ public class AnalysisFrame extends FrameBase {
                 performAnalysis();
             }
         });
+        // todo: convert buttons should only appear when DataSetStore says it makes sense
         convertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

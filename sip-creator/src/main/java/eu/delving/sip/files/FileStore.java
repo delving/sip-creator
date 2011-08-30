@@ -22,6 +22,7 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.ProgressListener;
 
@@ -51,9 +52,25 @@ public interface FileStore {
 
     DataSetStore createDataSetStore(String spec) throws FileStoreException;
 
+    public enum StoreState {
+        EMPTY,
+        IMPORTED_FRESH,
+        IMPORTED_PENDING_ANALYZE,
+        IMPORTED_PENDING_CONVERT,
+        SOURCED_PENDING_ANALYZE,
+        SOURCED_UNMAPPED,
+        SOURCED_MAPPED,
+        VALIDATED,
+        PHANTOM
+    }
+
     public interface DataSetStore {
 
         String getSpec();
+
+        MetadataModel getMetadataModel();
+
+        StoreState getState();
 
         Map<String,String> getDataSetFacts();
 
@@ -95,6 +112,7 @@ public interface FileStore {
     String STATISTICS_FILE_NAME = "statistics.ser";
     String FACTS_FILE_NAME = "facts.txt";
     String HINTS_FILE_NAME = "hints.txt";
+    String PHANTOM_FILE_NAME = "phantom.txt";
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
     String MAPPING_FILE_PREFIX = "mapping_";
     String MAPPING_FILE_SUFFIX = ".xml";

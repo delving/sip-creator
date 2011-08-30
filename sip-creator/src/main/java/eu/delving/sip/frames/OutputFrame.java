@@ -88,8 +88,6 @@ public class OutputFrame extends FrameBase {
         return p;
     }
 
-    // todo: view invalid records popup
-
     private JPanel createOutputPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
