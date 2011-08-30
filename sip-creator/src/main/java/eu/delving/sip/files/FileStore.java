@@ -28,6 +28,7 @@ import eu.delving.sip.ProgressListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
@@ -60,9 +61,11 @@ public interface FileStore {
 
         void setHints(Map<String, String> hints) throws FileStoreException;
 
-        InputStream getImportedInputStream() throws FileStoreException;
+        boolean isRecentlyImported();
 
-        InputStream getSourceInputStream() throws FileStoreException;
+        InputStream importedInput() throws FileStoreException;
+
+        InputStream sourceInput() throws FileStoreException;
 
         List<FieldStatistics> getStatistics();
 
@@ -74,17 +77,17 @@ public interface FileStore {
 
         void remove() throws FileStoreException;
 
+        PrintWriter validationWriter(RecordMapping recordMapping) throws FileStoreException;
+
+        List<String> getValidationReport(RecordMapping recordMapping) throws FileStoreException;
+
+        void externalToImported(File inputFile, ProgressListener progressListener) throws FileStoreException;
+
+        void importedToSource(ProgressListener progressListener) throws FileStoreException;
+
         List<File> getUploadFiles() throws FileStoreException;
 
-        File getImportedFile();
-
-        File getValidationFile(RecordMapping recordMapping);
-
-        void importSource(File inputFile, ProgressListener progressListener) throws FileStoreException;
-
-        void convertSource(ProgressListener progressListener) throws FileStoreException;
-
-        void acceptSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws IOException, FileStoreException;
+        void fromSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws IOException, FileStoreException;
     }
 
     String IMPORTED_FILE_NAME = "imported.xml.gz";

@@ -218,7 +218,7 @@ public class CultureHubClient {
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     HttpEntity entity = httpResponse.getEntity();
                     ZipInputStream zipInputStream = new ZipInputStream(entity.getContent());
-                    dataSetStore.acceptSipZip(zipInputStream, progressListener);
+                    dataSetStore.fromSipZip(zipInputStream, progressListener);
                 }
                 else {
                     log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());

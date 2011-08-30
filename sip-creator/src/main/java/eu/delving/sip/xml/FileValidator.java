@@ -37,12 +37,8 @@ import eu.delving.sip.model.SipModel;
 import groovy.util.Node;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.Set;
 
 /**
@@ -90,8 +86,6 @@ public class FileValidator implements Runnable {
         Uniqueness uniqueness = new Uniqueness();
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
-        File validationFile = null;
-        Writer out = null;
         try {
             RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
             if (recordMapping == null) {
@@ -102,13 +96,12 @@ public class FileValidator implements Runnable {
                     recordMapping.toCompileCode(sipModel.getMetadataModel())
             );
             MetadataParser parser = new MetadataParser(
-                    sipModel.getDataSetStore().getSourceInputStream(),
+                    sipModel.getDataSetStore().sourceInput(),
                     sipModel.getRecordRoot(),
                     sipModel.getRecordCount()
             );
             parser.setProgressListener(progressAdapter);
-            validationFile = dataSetStore.getValidationFile(recordMapping);
-            out = new BufferedWriter(new FileWriter(validationFile));
+            PrintWriter out = dataSetStore.validationWriter(recordMapping);
             try {
                 MetadataRecord record;
                 while ((record = parser.nextRecord()) != null && !aborted) {
@@ -121,49 +114,53 @@ public class FileValidator implements Runnable {
 //                    xmlNodePrinter.print(outputNode);
                     }
                     catch (MappingException e) {
-                        invalidCount++;
-                        out.write(record.toString());
-                        e.printStackTrace(new PrintWriter(out));
-                        out.write("\n========================================\n");
-                        if (!allowInvalid) {
-                            listener.invalidInput(e);
-                            abort();
-                        }
+                        out.println("Mapping exception!");
+                        out.println(record.toString());
+                        e.printStackTrace(out);
+                        out.println("========");
+                        listener.invalidInput(e);
+                        abort();
                     }
                     catch (ValidationException e) {
                         invalidCount++;
-                        out.write(record.toString());
-                        e.printStackTrace(new PrintWriter(out));
-                        out.write("\n========================================\n");
+                        out.println(record.toString());
+                        out.println("=========");
                         if (!allowInvalid) {
                             listener.invalidOutput(e);
                             abort();
                         }
                     }
                     catch (DiscardRecordException e) {
-                        out.write("Discarded explicitly: \n" + record.toString());
-                        out.write("\n========================================\n");
                         invalidCount++;
+                        out.println("Discarded explicitly: \n" + record.toString());
+                        out.println("=========");
                     }
                     catch (Exception e) {
                         sipModel.getUserNotifier().tellUser("Problem writing output", e);
+                        out.println("Unexpected exception!");
+                        e.printStackTrace(out);
                         abort();
                     }
                 }
                 Set<String> repeated = uniqueness.getRepeated();
                 if (!repeated.isEmpty()) {
-                    out.write("\n\nThere were non-unique identifiers:\n");
+                    out.println("There were non-unique identifiers:");
                     for (String line : repeated) {
-                        out.write(line);
-                        out.write("\n");
+                        out.println(line);
                     }
                     sipModel.getUserNotifier().tellUser("Identifier should be unique, but there were %d repeated values");
                 }
-                out.write("\n");
-                out.write("Total Valid Records: " + validCount + "\n");
-                out.write("Total Invalid Records: " + invalidCount + "\n");
-                out.write("Total Records: " + (validCount + invalidCount) + "\n");
-                out.write("\nTHE END\n");
+                out.println();
+                if (aborted) {
+                    out.println("Validation was aborted!");
+                }
+                else {
+                    out.println("Validation was completed:");
+                    out.println("Total Valid Records: " + validCount);
+                    out.println("Total Invalid Records: " + invalidCount);
+                    out.println("Total Records: " + (validCount + invalidCount));
+                    out.close();
+                }
             }
             catch (IOException e) {
                 sipModel.getUserNotifier().tellUser("Unable to write discarded record", e);
@@ -173,9 +170,6 @@ public class FileValidator implements Runnable {
         catch (XMLStreamException e) {
             throw new RuntimeException("XML Problem", e);
         }
-        catch (IOException e) {
-            throw new RuntimeException("IO Problem", e);
-        }
         catch (FileStoreException e) {
             throw new RuntimeException("Datastore Problem", e);
         }
@@ -183,21 +177,6 @@ public class FileValidator implements Runnable {
             aborted = true;
         }
         finally {
-            if (out != null) {
-                try {
-                    out.close();
-                }
-                catch (IOException e) {
-                    sipModel.getUserNotifier().tellUser("Unable to close discarded records file", e);
-                }
-                if (aborted) {
-                    if (validationFile != null) {
-                        if (!validationFile.delete()) {
-                            sipModel.getUserNotifier().tellUser("Unable to delete discarded records file");
-                        }
-                    }
-                }
-            }
             listener.finished(aborted, validCount, invalidCount);
             uniqueness.destroy();
             if (aborted) { // aborted, so metadataparser will not call finished()

@@ -29,6 +29,7 @@ import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.xml.SourceConverter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import javax.xml.stream.XMLStreamException;
@@ -36,13 +37,13 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -183,26 +184,20 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public InputStream getImportedInputStream() throws FileStoreException {
-            File imported = importedFile(directory);
-            try {
-                return new GZIPInputStream(new FileInputStream(imported));
-            }
-            catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to create input stream from %s", imported.getAbsolutePath()), e);
-            }
+        public boolean isRecentlyImported() {
+            File importedFile = importedFile(directory);
+            File sourceFile = sourceFile(directory);
+            return importedFile.exists() && (!sourceFile.exists() || importedFile.lastModified() > sourceFile.lastModified());
         }
 
+        @Override
+        public InputStream importedInput() throws FileStoreException {
+            return zipIn(importedFile(directory));
+        }
 
         @Override
-        public InputStream getSourceInputStream() throws FileStoreException {
-            File source = sourceFile(directory);
-            try {
-                return new GZIPInputStream(new FileInputStream(source));
-            }
-            catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to create input stream from %s", source.getAbsolutePath()), e);
-            }
+        public InputStream sourceInput() throws FileStoreException {
+            return zipIn(sourceFile(directory));
         }
 
         @Override
@@ -278,33 +273,29 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public List<File> getUploadFiles() throws FileStoreException {
+        public PrintWriter validationWriter(RecordMapping recordMapping) throws FileStoreException {
+            File file = new File(directory, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
             try {
-                List<File> files = new ArrayList<File>();
-                files.add(Hasher.ensureFileHashed(hintsFile(directory)));
-                files.add(Hasher.ensureFileHashed(sourceFile(directory)));
-                for (File file : findMappingFiles(directory)) {
-                    files.add(Hasher.ensureFileHashed(file));
-                }
-                return files;
+                return new PrintWriter(file);
             }
             catch (IOException e) {
-                throw new FileStoreException("Unable to collect upload files", e);
+                throw new FileStoreException("Cannot read validation report", e);
             }
         }
 
         @Override
-        public File getImportedFile() {
-            return importedFile(directory);
+        public List<String> getValidationReport(RecordMapping recordMapping) throws FileStoreException {
+            try {
+                File file = new File(directory, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
+                return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
+            }
+            catch (IOException e) {
+                throw new FileStoreException("Cannot read validation report", e);
+            }
         }
 
         @Override
-        public File getValidationFile(RecordMapping recordMapping) {
-            return new File(directory, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
-        }
-
-        @Override
-        public void importSource(File inputFile, ProgressListener progressListener) throws FileStoreException {
+        public void externalToImported(File inputFile, ProgressListener progressListener) throws FileStoreException {
             int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
             if (progressListener != null) progressListener.prepareFor(fileBlocks);
             File source = new File(directory, IMPORTED_FILE_NAME);
@@ -362,7 +353,10 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void convertSource(ProgressListener progressListener) throws FileStoreException {
+        public void importedToSource(ProgressListener progressListener) throws FileStoreException {
+            if (!isRecentlyImported()) {
+                throw new FileStoreException("Import to source would be redundant, since source is newer");
+            }
             try {
                 Map<String, String> hints = getHints();
                 String recordRoot = hints.get(RECORD_ROOT_PATH);
@@ -377,16 +371,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 catch (Exception e) { /* nothing */ }
                 SourceConverter converter = new SourceConverter(new Path(recordRoot), count);
                 converter.setProgressListener(progressListener);
-                File importedFile = importedFile(directory);
-                FileInputStream inputStream = new FileInputStream(importedFile);
-                File sourceFile = new File("/tmp/source.xml"); // todo: this is just for testing
-                OutputStream outputStream = new FileOutputStream(sourceFile);
-                converter.parse(inputStream, outputStream);
-                inputStream.close();
-                outputStream.close();
-            }
-            catch (FileNotFoundException e) {
-                throw new FileStoreException("Unable to convert source", e);
+                converter.parse(importedInput(), sourceOutput());
             }
             catch (XMLStreamException e) {
                 throw new FileStoreException("Unable to convert source", e);
@@ -397,7 +382,23 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void acceptSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws FileStoreException {
+        public List<File> getUploadFiles() throws FileStoreException {
+            try {
+                List<File> files = new ArrayList<File>();
+                files.add(Hasher.ensureFileHashed(hintsFile(directory)));
+                files.add(Hasher.ensureFileHashed(sourceFile(directory)));
+                for (File file : findMappingFiles(directory)) {
+                    files.add(Hasher.ensureFileHashed(file));
+                }
+                return files;
+            }
+            catch (IOException e) {
+                throw new FileStoreException("Unable to collect upload files", e);
+            }
+        }
+
+        @Override
+        public void fromSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws FileStoreException {
             ZipEntry zipEntry;
             byte[] buffer = new byte[BLOCK_SIZE];
             long totalBytesRead = 0;
@@ -437,6 +438,33 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             }
             catch (IOException e) {
                 throw new FileStoreException("Unable to accept SipZip file", e);
+            }
+        }
+
+        public OutputStream importedOutput() throws FileStoreException {
+            return zipOut(IMPORTED_FILE_NAME);
+        }
+
+        public OutputStream sourceOutput() throws FileStoreException {
+            return zipOut(SOURCE_FILE_NAME);
+        }
+
+        private InputStream zipIn(File file) throws FileStoreException {
+            try {
+                return new GZIPInputStream(new FileInputStream(file));
+            }
+            catch (IOException e) {
+                throw new FileStoreException(String.format("Unable to create input stream from %s", file.getAbsolutePath()), e);
+            }
+        }
+
+        private OutputStream zipOut(String fileName) throws FileStoreException {
+            File file = new File(directory, fileName);
+            try {
+                return new GZIPOutputStream(new FileOutputStream(file));
+            }
+            catch (IOException e) {
+                throw new FileStoreException(String.format("Unable to create output stream from %s", file.getAbsolutePath()), e);
             }
         }
 

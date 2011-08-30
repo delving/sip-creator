@@ -42,7 +42,6 @@ import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
-import org.apache.commons.io.FileUtils;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ListModel;
@@ -53,7 +52,6 @@ import javax.swing.tree.TreeModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -173,7 +171,7 @@ public class SipModel {
             @Override
             public void run() {
                 try {
-                    dataSetStore.importSource(file, progressListener);
+                    dataSetStore.externalToImported(file, progressListener);
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Couldn't create Data Set from " + file.getAbsolutePath(), e);
@@ -333,7 +331,7 @@ public class SipModel {
             @Override
             public void run() {
                 try {
-                    dataSetStore.convertSource(progressListener);
+                    dataSetStore.importedToSource(progressListener);
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Conversion failed", e);
@@ -549,9 +547,8 @@ public class SipModel {
     }
 
     private class ValidationFileModel extends AbstractListModel implements Runnable, MappingModel.Listener {
-
-        private File file;
         private List<String> lines;
+        private RecordMapping recordMapping;
 
         @Override
         public int getSize() {
@@ -575,20 +572,21 @@ public class SipModel {
                     }
                 });
             }
-            if (file.exists()) {
-                try {
-                    final List<String> freshlines = FileUtils.readLines(file, "UTF-8");
+            try {
+                final List<String> freshLines = dataSetStore.getValidationReport(recordMapping);
+                if (freshLines != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            lines = freshlines;
+                            lines = freshLines;
                             fireIntervalAdded(ValidationFileModel.this, 0, getSize());
                         }
                     });
+
                 }
-                catch (IOException e) {
-                    userNotifier.tellUser("Unable to read " + file.getAbsolutePath(), e);
-                }
+            }
+            catch (FileStoreException e) {
+                userNotifier.tellUser("Validation Report", e);
             }
         }
 
@@ -606,7 +604,7 @@ public class SipModel {
 
         @Override
         public void mappingChanged(RecordMapping recordMapping) {
-            file = dataSetStore.getValidationFile(recordMapping);
+            this.recordMapping = recordMapping;
             executor.execute(this);
         }
 
@@ -632,7 +630,7 @@ public class SipModel {
             }
             try {
                 if (metadataParser == null) {
-                    metadataParser = new MetadataParser(dataSetStore.getSourceInputStream(), recordRoot, getRecordCount());
+                    metadataParser = new MetadataParser(dataSetStore.sourceInput(), recordRoot, getRecordCount());
                 }
                 metadataParser.setProgressListener(progressListener);
                 while ((metadataRecord = metadataParser.nextRecord()) != null) {

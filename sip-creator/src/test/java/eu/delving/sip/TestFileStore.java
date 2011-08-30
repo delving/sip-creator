@@ -65,15 +65,13 @@ public class TestFileStore {
     public void createDelete() throws IOException, FileStoreException {
         FileStore.DataSetStore store = mock.getDataSetStore();
         Assert.assertEquals("Should be no files", 0, mock.getSpecDirectory().listFiles().length);
-        Assert.assertFalse(store.getImportedFile().exists());
-        store.importSource(MockFileStoreInput.sampleFile(), null);
-        Assert.assertTrue(store.getImportedFile().exists());
+        store.externalToImported(MockFileStoreInput.sampleFile(), null);
         Assert.assertEquals("Should be one file", 1, mock.getDirectory().listFiles().length);
         Assert.assertEquals("Should be one spec", 1, fileStore.getDataSetStores().size());
         Assert.assertEquals("Should be one file", 1, mock.getSpecDirectory().listFiles().length);
         log.info("Created " + mock.getSpecDirectory().listFiles()[0].getAbsolutePath());
         InputStream inputStream = MockFileStoreInput.sampleInputStream();
-        InputStream storedStream = mock.getDataSetStore().getImportedInputStream();
+        InputStream storedStream = mock.getDataSetStore().importedInput();
         int input = 0, stored;
         while (input != -1) {
             input = inputStream.read();
@@ -86,7 +84,7 @@ public class TestFileStore {
 
     @Test
     public void manipulateMapping() throws IOException, FileStoreException, MetadataException {
-        mock.getDataSetStore().importSource(MockFileStoreInput.sampleFile(), null);
+        mock.getDataSetStore().externalToImported(MockFileStoreInput.sampleFile(), null);
         Assert.assertEquals("Spec should be the same", MockFileStoreFactory.SPEC, mock.getDataSetStore().getSpec());
         RecordMapping recordMapping = mock.getDataSetStore().getRecordMapping(mock.getMetadataPrefix());
         Assert.assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recordMapping.getPrefix());
@@ -102,7 +100,7 @@ public class TestFileStore {
 
     @Test
     public void manipulateStatistics() throws IOException, FileStoreException {
-        mock.getDataSetStore().importSource(MockFileStoreInput.sampleFile(), null);
+        mock.getDataSetStore().externalToImported(MockFileStoreInput.sampleFile(), null);
         List<FieldStatistics> stats = mock.getDataSetStore().getStatistics();
         Assert.assertEquals("Should be one files", 1, mock.getSpecDirectory().listFiles().length);
         Assert.assertNull("No stats should be here", stats);
