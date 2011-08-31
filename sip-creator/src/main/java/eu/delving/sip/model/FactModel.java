@@ -76,7 +76,7 @@ public class FactModel {
 
     public void fireAllUpdated() {
         for (Listener listener : listeners) {
-            listener.allFactsUpdated();
+            listener.allFactsUpdated(facts);
         }
     }
 
@@ -86,6 +86,6 @@ public class FactModel {
 
     public interface Listener {
         void factUpdated(String name, String value);
-        void allFactsUpdated();
+        void allFactsUpdated(Map<String,String> map);
     }
 }

@@ -33,7 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import java.awt.Color;
@@ -80,7 +79,7 @@ public abstract class FrameBase extends JInternalFrame {
         );
         this.parent = parent;
         this.sipModel = sipModel;
-        this.action = new PopupAction(title, !modal);
+        this.action = new PopupAction(title);
         this.modal = modal;
         this.desktopPane = parent instanceof FrameBase ? ((FrameBase) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
         setGlassPane(new ModalityInternalGlassPane(this));
@@ -90,13 +89,20 @@ public abstract class FrameBase extends JInternalFrame {
             setFocusTraversalKeysEnabled(false);
         }
         if (getStoredSize() != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Exec.swingLater(new Runnable() {
                 @Override
                 public void run() {
                     show();
                 }
             });
         }
+    }
+
+    public void setAccelerator(int number) {
+        action.putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_0 + number, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
     }
 
     public void setDefaultSize(int width, int height) {
@@ -175,17 +181,8 @@ public abstract class FrameBase extends JInternalFrame {
 
     private class PopupAction extends AbstractAction {
 
-        public PopupAction(String title, boolean withAccelerator) {
+        public PopupAction(String title) {
             super(title);
-            if (withAccelerator) {
-                this.putValue(
-                        Action.ACCELERATOR_KEY,
-                        KeyStroke.getKeyStroke(
-                                KeyEvent.VK_A + (title.charAt(0) - 'A'),
-                                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
-                        )
-                );
-            }
         }
 
         @Override

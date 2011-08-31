@@ -25,6 +25,7 @@ import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldDefinition;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.SourceVariable;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.DataSetStoreModel;
@@ -41,7 +42,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
@@ -211,7 +211,7 @@ public class CreateFrame extends FrameBase {
 
 
     private void prepareCreateMappingButtons() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Exec.swing(new Runnable() {
             @Override
             public void run() {
                 CodeGenerator codeGenerator = new CodeGenerator();

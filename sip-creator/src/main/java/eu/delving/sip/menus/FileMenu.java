@@ -21,7 +21,7 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -108,7 +108,7 @@ public class FileMenu extends JMenu {
         if (doImport == JOptionPane.YES_OPTION) {
             FileMenu.this.setEnabled(false);
             ProgressMonitor progressMonitor = new ProgressMonitor(parent, "Importing", "Storing data for " + spec, 0, 100);
-            sipModel.importSource(file, new ProgressListener.Adapter(progressMonitor) {
+            sipModel.importSource(file, new ProgressAdapter(progressMonitor) {
                 @Override
                 public void swingFinished(boolean success) {
                     FileMenu.this.setEnabled(true);

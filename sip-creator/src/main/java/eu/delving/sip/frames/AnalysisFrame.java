@@ -24,8 +24,9 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.Path;
-import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -94,24 +95,14 @@ public class AnalysisFrame extends FrameBase {
                 TreePath path = event.getPath();
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
                     final AnalysisTree.Node node = (AnalysisTree.Node) path.getLastPathComponent();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
-                            selectUniqueElementButton.setEnabled(!node.couldBeRecordRoot());
-                            sipModel.getAnalysisModel().selectStatistics(node.getStatistics());
-                        }
-                    });
+                    selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
+                    selectUniqueElementButton.setEnabled(!node.couldBeRecordRoot());
+                    sipModel.getAnalysisModel().selectStatistics(node.getStatistics());
                 }
                 else {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            selectRecordRootButton.setEnabled(false);
-                            selectUniqueElementButton.setEnabled(false);
-                            sipModel.getAnalysisModel().selectStatistics(null);
-                        }
-                    });
+                    selectRecordRootButton.setEnabled(false);
+                    selectUniqueElementButton.setEnabled(false);
+                    sipModel.getAnalysisModel().selectStatistics(null);
                 }
             }
         });
@@ -155,7 +146,7 @@ public class AnalysisFrame extends FrameBase {
                         message,
                         0, 100
                 );
-                sipModel.convertSource(new ProgressListener.Adapter(progressMonitor) {
+                sipModel.convertSource(new ProgressAdapter(progressMonitor) {
                     @Override
                     public void swingFinished(boolean success) {
                         // todo: implement
@@ -191,7 +182,7 @@ public class AnalysisFrame extends FrameBase {
 
             @Override
             public void finished(boolean success) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         setElementsProcessed(sipModel.getAnalysisModel().getElementCount());
@@ -202,7 +193,7 @@ public class AnalysisFrame extends FrameBase {
 
             @Override
             public void analysisProgress(final long elementCount) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         setElementsProcessed(elementCount);

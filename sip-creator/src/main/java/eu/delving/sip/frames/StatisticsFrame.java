@@ -71,6 +71,7 @@ public class StatisticsFrame extends FrameBase {
                     histogramModel.setHistogram(fieldStatistics.getHistogram());
                     randomSampleModel.setRandomSample(fieldStatistics.getRandomSample());
                 }
+                moveToFront();
             }
 
             @Override

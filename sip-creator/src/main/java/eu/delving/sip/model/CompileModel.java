@@ -33,9 +33,9 @@ import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.ValidationException;
+import eu.delving.sip.base.Exec;
 import groovy.util.Node;
 
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -48,8 +48,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * This model is behind the scenario with input data, groovy code, and output record
@@ -59,7 +57,6 @@ import java.util.concurrent.Executors;
 
 public class CompileModel implements SipModel.ParseListener, MappingModel.Listener {
     public final static int COMPILE_DELAY = 500;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private RecordMapping recordMapping;
     private FieldMapping selectedFieldMapping;
     private MetadataRecord metadataRecord;
@@ -106,7 +103,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             selectedFieldMapping = fieldMapping;
             notifyStateChange(State.PRISTINE);
         }
-        SwingUtilities.invokeLater(new DocumentSetter(codeDocument, getDisplayCode()));
+        Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
         compileSoon();
     }
 
@@ -119,7 +116,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     public void mappingChanged(RecordMapping recordMapping) {
         this.recordMapping = recordMapping;
         this.editedCode = null;
-        SwingUtilities.invokeLater(new DocumentSetter(codeDocument, getDisplayCode()));
+        Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
         notifyStateChange(State.PRISTINE);
         compileSoon();
     }
@@ -129,7 +126,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     public void refreshCode() {
-        SwingUtilities.invokeLater(new DocumentSetter(codeDocument, getDisplayCode()));
+        Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
         compileSoon();
     }
 
@@ -286,7 +283,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         }
 
         private void compilationComplete(final String result) {
-            SwingUtilities.invokeLater(new DocumentSetter(outputDocument, result));
+            Exec.swing(new DocumentSetter(outputDocument, result));
         }
 
         public String toString() {
@@ -341,7 +338,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         @Override
         public void actionPerformed(ActionEvent e) {
             timer.stop();
-            executor.execute(new CompilationRunner());
+            Exec.work(new CompilationRunner());
         }
 
         public void triggerSoon() {
@@ -349,7 +346,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         }
     }
 
-    private void notifyStateChange(State state) {
+    private void notifyStateChange(final State state) {
         for (Listener listener : listeners) {
             listener.stateChanged(state);
         }

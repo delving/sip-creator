@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStore;
 
 import javax.swing.SwingUtilities;
@@ -67,7 +68,7 @@ public class DataSetStoreModel {
                 }
             }
             else {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         for (Listener listener : listeners) {

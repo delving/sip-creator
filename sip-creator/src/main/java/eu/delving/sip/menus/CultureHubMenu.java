@@ -91,7 +91,7 @@ public class CultureHubMenu extends JMenu {
 //                    0, 100
 //            );
 //            try {
-//                cultureHubClient.uploadFiles(store, new ProgressListener.Adapter(progressMonitor) {
+//                cultureHubClient.uploadFiles(store, new ProgressAdapter(progressMonitor) {
 //                    @Override
 //                    public void swingFinished(boolean success) {
 //                        setEnabled(true);

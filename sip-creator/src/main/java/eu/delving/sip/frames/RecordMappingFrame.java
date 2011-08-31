@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.FieldMappingListModel;
 import eu.delving.sip.model.SipModel;
@@ -130,9 +131,14 @@ public class RecordMappingFrame extends FrameBase {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
-                FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
+                final FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
                 removeMappingButton.setEnabled(fieldMapping != null);
-                sipModel.getMappingModel().selectFieldMapping(fieldMapping);
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getMappingModel().selectFieldMapping(fieldMapping);
+                    }
+                });
             }
         });
     }

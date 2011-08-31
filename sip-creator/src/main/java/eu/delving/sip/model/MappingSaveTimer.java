@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStoreException;
 
 import javax.swing.Timer;
@@ -48,7 +49,7 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        sipModel.execute(this);
+        Exec.work(this);
     }
 
     @Override

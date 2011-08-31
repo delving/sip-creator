@@ -25,6 +25,7 @@ import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.SourceVariable;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
 
@@ -182,7 +183,7 @@ public class AnalysisModel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            sipModel.execute(this);
+            Exec.work(this);
         }
 
         @Override
@@ -201,7 +202,7 @@ public class AnalysisModel {
         }
 
         @Override
-        public void allFactsUpdated() {
+        public void allFactsUpdated(Map<String,String> map) {
             timer.restart();
         }
     }

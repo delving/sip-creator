@@ -26,6 +26,7 @@ import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.ValidationException;
 import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.OAuthClient;
 import eu.delving.sip.files.FileStore;
@@ -39,6 +40,7 @@ import eu.delving.sip.frames.InputFrame;
 import eu.delving.sip.frames.OutputFrame;
 import eu.delving.sip.frames.RecordMappingFrame;
 import eu.delving.sip.frames.StatisticsFrame;
+import eu.delving.sip.frames.StatusFrame;
 import eu.delving.sip.menus.CultureHubMenu;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.FileMenu;
@@ -58,7 +60,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -127,6 +128,7 @@ public class Application {
             }
         };
         desktop.setBackground(new Color(190, 190, 200));
+        frames.add(new StatusFrame(desktop, sipModel));
         frames.add(new AnalysisFrame(desktop, sipModel));
         frames.add(new CreateFrame(desktop, sipModel));
         frames.add(new StatisticsFrame(desktop, sipModel));
@@ -194,7 +196,9 @@ public class Application {
 
     private JMenu createFrameMenu() {
         JMenu menu = new JMenu("Frames");
+        int index = 1;
         for (FrameBase frame : frames) {
+            frame.setAccelerator(index++);
             menu.add(frame.getAction());
         }
         return menu;
@@ -251,7 +255,7 @@ public class Application {
 
         @Override
         public void tellUser(final String message, final Exception exception) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Exec.swing(new Runnable() {
                 @Override
                 public void run() {
                     String html;
@@ -263,6 +267,7 @@ public class Application {
                             problemHtml.append("</pre></html>");
                             html = problemHtml.toString();
                         }
+                        exception.printStackTrace();
                     }
                     else {
                         html = String.format("<html><h3>%s</h3></html>", message);
@@ -294,7 +299,7 @@ public class Application {
                     }
                 };
                 Class quitHandlerInterface = Class.forName("com.apple.eawt.QuitHandler");
-                Object quitHandlerProxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {quitHandlerInterface}, handler);
+                Object quitHandlerProxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{quitHandlerInterface}, handler);
                 Class applicationClass = Class.forName("com.apple.eawt.Application");
                 Method getApplication = applicationClass.getDeclaredMethod("getApplication");
                 Object applicationInstance = getApplication.invoke(null);

@@ -21,9 +21,9 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.SipModel;
 
@@ -117,7 +117,7 @@ public class OutputFrame extends FrameBase {
             );
             sipModel.validateFile(
                     allowInvalid.isSelected(),
-                    new ProgressListener.Adapter(progressMonitor) {
+                    new ProgressAdapter(progressMonitor) {
                         @Override
                         public void swingFinished(boolean success) {
                             setEnabled(true);
@@ -151,7 +151,7 @@ public class OutputFrame extends FrameBase {
                     0, 100
             );
             try {
-                cultureHubClient.uploadFiles(sipModel.getStoreModel().getStore(), new ProgressListener.Adapter(progressMonitor) {
+                cultureHubClient.uploadFiles(sipModel.getStoreModel().getStore(), new ProgressAdapter(progressMonitor) {
                     @Override
                     public void swingFinished(boolean success) {
                         setEnabled(true);

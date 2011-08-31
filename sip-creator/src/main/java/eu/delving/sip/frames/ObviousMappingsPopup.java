@@ -25,6 +25,7 @@ import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.FieldMappingListModel;
 
@@ -36,7 +37,6 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -158,7 +158,7 @@ public class ObviousMappingsPopup extends FrameBase {
                 fireIntervalAdded(this, 0, getSize());
             }
             else {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         closeFrame();

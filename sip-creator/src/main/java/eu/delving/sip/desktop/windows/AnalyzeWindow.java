@@ -24,6 +24,7 @@ package eu.delving.sip.desktop.windows;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.Path;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
@@ -35,7 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -96,7 +96,7 @@ public class AnalyzeWindow extends DesktopWindow {
                 TreePath path = event.getPath();
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
                     final AnalysisTree.Node node = (AnalysisTree.Node) path.getLastPathComponent();
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Exec.swing(new Runnable() {
                         @Override
                         public void run() {
                             selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
@@ -106,7 +106,7 @@ public class AnalyzeWindow extends DesktopWindow {
                     });
                 }
                 else {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Exec.swing(new Runnable() {
                         @Override
                         public void run() {
                             selectRecordRootButton.setEnabled(false);
@@ -181,7 +181,7 @@ public class AnalyzeWindow extends DesktopWindow {
 
             @Override
             public void finished(boolean success) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         setElementsProcessed(sipModel.getAnalysisModel().getElementCount());
@@ -192,7 +192,7 @@ public class AnalyzeWindow extends DesktopWindow {
 
             @Override
             public void analysisProgress(final long elementCount) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         setElementsProcessed(elementCount);

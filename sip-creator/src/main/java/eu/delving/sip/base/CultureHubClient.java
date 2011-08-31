@@ -37,7 +37,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-import javax.swing.SwingUtilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,8 +45,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.zip.ZipInputStream;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -63,7 +60,6 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 public class CultureHubClient {
     private static final int BLOCK_SIZE = 4096;
     private Logger log = Logger.getLogger(getClass());
-    private Executor executor = Executors.newSingleThreadExecutor();
     private Context context;
 
     public interface Context {
@@ -102,11 +98,11 @@ public class CultureHubClient {
     }
 
     public void uploadFiles(FileStore.DataSetStore store, ProgressListener progressListener) throws FileStoreException {
-        executor.execute(new FileUploader(store, progressListener));
+        Exec.work(new FileUploader(store, progressListener));
     }
 
     public void downloadDataSet(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
-        executor.execute(new DataSetDownloader(dataSetStore, progressListener));
+        Exec.work(new DataSetDownloader(dataSetStore, progressListener));
     }
 
     public class FileUploader implements Runnable {
@@ -258,11 +254,11 @@ public class CultureHubClient {
     }
 
     private void notifyUser(final String message) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Exec.swing(new Runnable() {
             @Override
             public void run() {
                 log.warn("Problem communicating with CultureHub: " + message);
-                context.tellUser("<html>Sorry, there was a problem communicating with Repository<br>"+message);
+                context.tellUser("<html>Sorry, there was a problem communicating with Repository<br>" + message);
             }
         });
     }
@@ -305,7 +301,7 @@ public class CultureHubClient {
                     int blocks = (int) (bytesSent / BLOCK_SIZE);
                     if (blocks > blocksReported) {
                         blocksReported = blocks;
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Exec.swing(new Runnable() {
                             @Override
                             public void run() {
                                 if (!progressListener.setProgress(blocksReported)) {

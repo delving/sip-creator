@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
@@ -171,7 +172,7 @@ public class RecordScanPopup extends FrameBase {
                     currentPredicate.render(),
                     0, 100
             );
-            progressListener = new ProgressListener.Adapter(progressMonitor) {
+            progressListener = new ProgressAdapter(progressMonitor) {
                 @Override
                 public void swingFinished(boolean success) {
                     for (JTextField field : fields) field.setEnabled(true);

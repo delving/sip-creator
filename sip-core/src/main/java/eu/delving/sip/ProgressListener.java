@@ -21,9 +21,6 @@
 
 package eu.delving.sip;
 
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
-
 /**
  * Ties a process to a ProgressMonitor
  *
@@ -38,62 +35,4 @@ public interface ProgressListener {
     boolean setProgress(int progress);
 
     void finished(boolean success);
-
-    public abstract class Adapter implements ProgressListener {
-        private long lastProgress;
-        private ProgressMonitor progressMonitor;
-
-        public Adapter(ProgressMonitor progressMonitor) {
-            this.progressMonitor = progressMonitor;
-        }
-
-        @Override
-        public void prepareFor(final int total) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    progressMonitor.setProgress(0);
-                    progressMonitor.setMaximum(total);
-                }
-            });
-        }
-
-        @Override
-        public boolean setProgress(final int progress) {
-            if (System.currentTimeMillis() > lastProgress + PATIENCE) { // not too many events
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressMonitor.setProgress(progress);
-                    }
-                });
-                lastProgress = System.currentTimeMillis();
-            }
-            boolean cancelled = progressMonitor.isCanceled();
-            if (cancelled) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressMonitor.close();
-                        swingFinished(false);
-                    }
-                });
-            }
-            return !cancelled;
-        }
-
-        @Override
-        public void finished(final boolean success) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    progressMonitor.close();
-                    swingFinished(success);
-                }
-            });
-        }
-
-        public abstract void swingFinished(boolean success);
-    }
-
 }

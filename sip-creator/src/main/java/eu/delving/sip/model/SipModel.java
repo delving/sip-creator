@@ -34,6 +34,7 @@ import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.ValidationException;
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.xml.AnalysisParser;
@@ -41,14 +42,11 @@ import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
 
 import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
 
 /**
@@ -58,7 +56,6 @@ import java.util.prefs.Preferences;
  */
 
 public class SipModel {
-    private final ExecutorService executrix = Executors.newSingleThreadExecutor();
     private FileStore fileStore;
     private MetadataModel metadataModel;
     private GroovyCodeResource groovyCodeResource;
@@ -76,10 +73,6 @@ public class SipModel {
     private MappingModel mappingModel = new MappingModel();
     private ValidationFileModel validationFileModel = new ValidationFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
-
-    public void execute(Runnable runnable) {
-        executrix.execute(runnable);
-    }
 
     public interface AnalysisListener {
         void finished(boolean success);
@@ -203,8 +196,7 @@ public class SipModel {
     }
 
     public void setDataSetStore(final FileStore.DataSetStore dataSetStore) {
-        checkSwingThread();
-        execute(new Runnable() {
+        Exec.work(new Runnable() {
             @Override
             public void run() {
                 storeModel.setStore(dataSetStore);
@@ -212,7 +204,7 @@ public class SipModel {
                 final Map<String, String> facts = dataSetStore.getDataSetFacts();
                 final Map<String, String> hints = dataSetStore.getHints();
                 final String latestPrefix = dataSetStore.getLatestPrefix();
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         dataSetFacts.set(facts);
@@ -228,21 +220,15 @@ public class SipModel {
     }
 
     public void setMetadataPrefix(final String metadataPrefix, final boolean promoteToLatest) {
-        checkSwingThread();
-        execute(new Runnable() {
+        Exec.work(new Runnable() {
             @Override
             public void run() {
                 try {
                     final RecordMapping recordMapping = promoteToLatest ? storeModel.getStore().setLatestPrefix(metadataPrefix) : storeModel.getStore().getRecordMapping(metadataPrefix);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            dataSetFacts.set("spec", storeModel.getStore().getSpec());
-                            dataSetFacts.copyToRecordMapping(recordMapping);
-                            mappingModel.setRecordMapping(recordMapping);
-                            recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
-                        }
-                    });
+                    dataSetFacts.set("spec", storeModel.getStore().getSpec());
+                    dataSetFacts.copyToRecordMapping(recordMapping);
+                    mappingModel.setRecordMapping(recordMapping);
+                    recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Unable to select Metadata Prefix " + metadataPrefix, e);
@@ -285,7 +271,7 @@ public class SipModel {
     }
 
     public void importSource(final File file, final ProgressListener progressListener) {
-        execute(new Runnable() {
+        Exec.work(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -300,11 +286,10 @@ public class SipModel {
     }
 
     public void analyzeFields(final AnalysisListener listener) {
-        checkSwingThread();
-        execute(new AnalysisParser(storeModel.getStore(), new AnalysisParser.Listener() {
+        Exec.work(new AnalysisParser(storeModel.getStore(), new AnalysisParser.Listener() {
             @Override
             public void success(final List<FieldStatistics> list) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         analysisModel.setStatisticsList(list);
@@ -329,7 +314,7 @@ public class SipModel {
     }
 
     public void convertSource(final ProgressListener progressListener) {
-        execute(new Runnable() {
+        Exec.work(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -344,8 +329,7 @@ public class SipModel {
     }
 
     public void validateFile(boolean allowInvalid, final ProgressListener progressListener) {
-        checkSwingThread();
-        execute(new FileValidator(
+        Exec.work(new FileValidator(
                 this,
                 allowInvalid,
                 groovyCodeResource,
@@ -354,7 +338,7 @@ public class SipModel {
                     @Override
                     public void invalidInput(final MappingException exception) {
                         userNotifier.tellUser("Problem validating " + exception.getMetadataRecord().toString(), exception);
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Exec.swing(new Runnable() {
                             @Override
                             public void run() {
                                 seekRecordNumber(exception.getMetadataRecord().getRecordNumber(), progressListener);
@@ -365,7 +349,7 @@ public class SipModel {
                     @Override
                     public void invalidOutput(final ValidationException exception) {
                         userNotifier.tellUser("Invalid output record", exception);
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Exec.swing(new Runnable() {
                             @Override
                             public void run() {
                                 seekRecordNumber(exception.getRecordNumber(), progressListener);
@@ -407,9 +391,8 @@ public class SipModel {
     }
 
     public void seekRecord(ScanPredicate scanPredicate, ProgressListener progressListener) {
-        checkSwingThread();
         if (analysisModel.hasRecordRoot()) {
-            execute(new RecordScanner(scanPredicate, progressListener));
+            Exec.work(new RecordScanner(scanPredicate, progressListener));
         }
     }
 
@@ -440,17 +423,12 @@ public class SipModel {
                 metadataParser.setProgressListener(progressListener);
                 while ((metadataRecord = metadataParser.nextRecord()) != null) {
                     if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                for (ParseListener parseListener : parseListeners) {
-                                    parseListener.updatedRecord(metadataRecord);
-                                }
-                                if (progressListener != null) {
-                                    progressListener.finished(true);
-                                }
-                            }
-                        });
+                        for (ParseListener parseListener : parseListeners) {
+                            parseListener.updatedRecord(metadataRecord);
+                        }
+                        if (progressListener != null) {
+                            progressListener.finished(true);
+                        }
                         break;
                     }
                 }
@@ -459,18 +437,6 @@ public class SipModel {
                 userNotifier.tellUser("Unable to fetch the next record", e);
                 metadataParser = null;
             }
-        }
-    }
-
-    private static void checkWorkerThread() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Expected Worker thread");
-        }
-    }
-
-    private static void checkSwingThread() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Expected Swing thread");
         }
     }
 }

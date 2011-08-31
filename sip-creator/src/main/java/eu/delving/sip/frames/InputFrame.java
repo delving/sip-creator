@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  * Licensed under the EUPL, Version 1.0 or as soon they
  * will be approved by the European Commission - subsequent
@@ -22,6 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.groovy.MetadataRecord;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
@@ -32,7 +33,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -67,10 +67,10 @@ public class InputFrame extends FrameBase {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {
                 if (metadataRecord == null) {
-                    SwingUtilities.invokeLater(new DocumentSetter(inputDocument, "<html><h1>No input</h1>"));
+                    Exec.swing(new DocumentSetter(inputDocument, "<html><h1>No input</h1>"));
                 }
                 else {
-                    SwingUtilities.invokeLater(new DocumentSetter(inputDocument, metadataRecord.toHtml()));
+                    Exec.swing(new DocumentSetter(inputDocument, metadataRecord.toHtml()));
                 }
             }
         });
@@ -112,7 +112,7 @@ public class InputFrame extends FrameBase {
         recordView.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swingLater(new Runnable() {
                     @Override
                     public void run() {
                         recordView.setCaretPosition(0);

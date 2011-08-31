@@ -27,6 +27,7 @@ import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.SourceVariable;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CompileModel;
@@ -41,7 +42,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
@@ -250,17 +250,26 @@ public class FieldMappingFrame extends FrameBase {
         sipModel.getFieldCompileModel().getCodeDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                sipModel.getFieldCompileModel().setCode(groovyCodeArea.getText());
+                setCode();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                sipModel.getFieldCompileModel().setCode(groovyCodeArea.getText());
+                setCode();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                sipModel.getFieldCompileModel().setCode(groovyCodeArea.getText());
+                setCode();
+            }
+
+            private void setCode() {
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getFieldCompileModel().setCode(groovyCodeArea.getText());
+                    }
+                });
             }
         });
         groovyCodeArea.addFocusListener(new FocusListener() {
@@ -270,19 +279,19 @@ public class FieldMappingFrame extends FrameBase {
 
             @Override
             public void focusLost(FocusEvent e) {
-                sipModel.getRecordCompileModel().refreshCode(); // todo: somebody else do this?
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getRecordCompileModel().refreshCode(); // todo: somebody else do this?
+                    }
+                });
             }
         });
         sipModel.getFieldCompileModel().addListener(new ModelStateListener());
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        outputArea.setCaretPosition(0);
-                    }
-                });
+                outputArea.setCaretPosition(0);
             }
 
             @Override
@@ -300,7 +309,7 @@ public class FieldMappingFrame extends FrameBase {
 
         @Override
         public void stateChanged(final CompileModel.State state) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Exec.swing(new Runnable() {
 
                 @Override
                 public void run() {

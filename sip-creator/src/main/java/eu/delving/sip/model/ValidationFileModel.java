@@ -24,10 +24,10 @@ package eu.delving.sip.model;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStoreException;
 
 import javax.swing.AbstractListModel;
-import javax.swing.SwingUtilities;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ import java.util.List;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class ValidationFileModel extends AbstractListModel implements Runnable, MappingModel.Listener {
+public class ValidationFileModel extends AbstractListModel implements MappingModel.Listener {
     private SipModel sipModel;
     private List<String> lines;
     private RecordMapping recordMapping;
@@ -55,12 +55,11 @@ public class ValidationFileModel extends AbstractListModel implements Runnable, 
         return lines.get(i);
     }
 
-    @Override
-    public void run() {
+    public void refresh() {
         int size = getSize();
         if (size > 0) {
             lines = null;
-            SwingUtilities.invokeLater(new Runnable() {
+            Exec.swing(new Runnable() {
                 @Override
                 public void run() {
                     fireIntervalRemoved(this, 0, getSize());
@@ -70,7 +69,7 @@ public class ValidationFileModel extends AbstractListModel implements Runnable, 
         try {
             final List<String> freshLines = sipModel.getStoreModel().getStore().getValidationReport(recordMapping);
             if (freshLines != null) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         lines = freshLines;
@@ -100,7 +99,7 @@ public class ValidationFileModel extends AbstractListModel implements Runnable, 
     @Override
     public void mappingChanged(RecordMapping recordMapping) {
         this.recordMapping = recordMapping;
-        sipModel.execute(this);
+        refresh();
     }
 
     public void kick() {
