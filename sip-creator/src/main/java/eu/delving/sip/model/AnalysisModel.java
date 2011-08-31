@@ -23,7 +23,6 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.files.FileStore;
@@ -39,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executor;
 
 /**
  * An observable hole to put the things related to analysis: statistics, analysis tree, some list models
@@ -48,21 +46,15 @@ import java.util.concurrent.Executor;
  */
 
 public class AnalysisModel {
-    private Executor executor;
+    private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
-    private DataSetStoreModel storeModel;
-    private MappingModel mappingModel;
-    private UserNotifier userNotifier;
     private List<FieldStatistics> statisticsList;
     private AnalysisTree analysisTree = AnalysisTree.create("Select a Data Set from the File menu");
     private DefaultTreeModel analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
     private VariableListModel variableListModel = new VariableListModel();
 
-    public AnalysisModel(Executor executor, DataSetStoreModel dataSetStoreModel, MappingModel mappingModel, UserNotifier userNotifier) {
-        this.executor = executor;
-        this.storeModel = dataSetStoreModel;
-        this.mappingModel = mappingModel;
-        this.userNotifier = userNotifier;
+    public AnalysisModel(SipModel sipModel) {
+        this.sipModel = sipModel;
         hintsModel.addListener(new HintSaveTimer());
     }
 
@@ -137,7 +129,7 @@ public class AnalysisModel {
     }
 
     public ListModel getVariablesListWithCountsModel() {
-        return variableListModel.getWithCounts(mappingModel);
+        return variableListModel.getWithCounts(sipModel.getMappingModel());
     }
 
     public List<SourceVariable> getVariables() {
@@ -190,16 +182,16 @@ public class AnalysisModel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            executor.execute(this);
+            sipModel.execute(this);
         }
 
         @Override
         public void run() {
             try {
-                storeModel.getStore().setHints(hintsModel.getFacts());
+                sipModel.getStoreModel().getStore().setHints(hintsModel.getFacts());
             }
             catch (FileStoreException e) {
-                userNotifier.tellUser("Unable to save analysis hints", e);
+                sipModel.getUserNotifier().tellUser("Unable to save analysis hints", e);
             }
         }
 

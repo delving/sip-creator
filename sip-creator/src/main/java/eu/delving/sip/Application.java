@@ -65,8 +65,8 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -153,35 +153,11 @@ public class Application {
         );
         cultureHubMenu = new CultureHubMenu(desktop, sipModel, cultureHubClient);
         home.setJMenuBar(createMenuBar());
-        home.addWindowListener(new WindowListener() {
-            @Override
-            public void windowOpened(WindowEvent windowEvent) {
-            }
-
+        home.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
                 putFrameStates();
                 System.exit(0);
-            }
-
-            @Override
-            public void windowClosed(WindowEvent windowEvent) {
-            }
-
-            @Override
-            public void windowIconified(WindowEvent windowEvent) {
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent windowEvent) {
-            }
-
-            @Override
-            public void windowActivated(WindowEvent windowEvent) {
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent windowEvent) {
             }
         });
         osxExtra();
@@ -207,12 +183,7 @@ public class Application {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        bar.add(new FileMenu(home, sipModel, new Runnable() {
-            @Override
-            public void run() {
-                // todo: when a new data set is imported...
-            }
-        }));
+        bar.add(new FileMenu(home, sipModel));
         bar.add(dataSetMenu);
         bar.add(mappingMenu);
         bar.add(cultureHubMenu);

@@ -45,13 +45,11 @@ public class FileMenu extends JMenu {
     private final String RECENT_DIR = "recentImportDirectory";
     private Component parent;
     private SipModel sipModel;
-    private Runnable dataStoreCreated;
 
-    public FileMenu(Component parent, SipModel sipModel, Runnable dataStoreCreated) {
+    public FileMenu(Component parent, SipModel sipModel) {
         super("File");
         this.parent = parent;
         this.sipModel = sipModel;
-        this.dataStoreCreated = dataStoreCreated;
         refresh();
     }
 
@@ -108,13 +106,12 @@ public class FileMenu extends JMenu {
                 JOptionPane.YES_NO_OPTION
         );
         if (doImport == JOptionPane.YES_OPTION) {
+            FileMenu.this.setEnabled(false);
             ProgressMonitor progressMonitor = new ProgressMonitor(parent, "Importing", "Storing data for " + spec, 0, 100);
             sipModel.importSource(file, new ProgressListener.Adapter(progressMonitor) {
                 @Override
                 public void swingFinished(boolean success) {
-                    if (success) {
-                        dataStoreCreated.run();
-                    }
+                    FileMenu.this.setEnabled(true);
                 }
             });
             return true;

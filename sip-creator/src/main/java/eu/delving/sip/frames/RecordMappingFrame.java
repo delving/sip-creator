@@ -122,7 +122,7 @@ public class RecordMappingFrame extends FrameBase {
             public void actionPerformed(ActionEvent e) {
                 FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
                 if (fieldMapping != null) {
-                    sipModel.removeFieldMapping(fieldMapping);
+                    sipModel.getMappingModel().removeMapping(fieldMapping);
                 }
             }
         });

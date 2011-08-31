@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.sip.files.FileStore;
 
+import javax.swing.SwingUtilities;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -55,12 +56,25 @@ public class DataSetStoreModel {
         }
     }
 
-    public void checkState() { // todo: somebody has to call this when things may have changed!
-        FileStore.StoreState actualState = dataSetStore.getState();
+    // note: doesn't matter which thread calls this
+    public void checkState() {
+        final FileStore.StoreState actualState = dataSetStore.getState();
         if (actualState != storeState) {
             storeState = actualState;
-            for (Listener listener : listeners) {
-                listener.storeStateChanged(dataSetStore, actualState);
+            if (SwingUtilities.isEventDispatchThread()) {
+                for (Listener listener : listeners) {
+                    listener.storeStateChanged(dataSetStore, actualState);
+                }
+            }
+            else {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Listener listener : listeners) {
+                            listener.storeStateChanged(dataSetStore, actualState);
+                        }
+                    }
+                });
             }
         }
     }
@@ -73,6 +87,7 @@ public class DataSetStoreModel {
 
     public interface Listener {
         void storeSet(FileStore.DataSetStore store);
+
         void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState);
     }
 }

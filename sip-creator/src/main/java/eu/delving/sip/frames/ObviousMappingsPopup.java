@@ -121,7 +121,7 @@ public class ObviousMappingsPopup extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             for (Object fm : obviousMappingsList.getSelectedValues()) {
                 FieldMapping fieldMapping = (FieldMapping) fm;
-                sipModel.addFieldMapping(fieldMapping);
+                sipModel.getMappingModel().addMapping(fieldMapping);
             }
             obviousListModel.refresh();
         }

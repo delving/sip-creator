@@ -25,7 +25,6 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.FieldDefinition;
-import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.MetadataModel;
@@ -41,12 +40,8 @@ import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
 
-import javax.swing.AbstractListModel;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +58,7 @@ import java.util.prefs.Preferences;
  */
 
 public class SipModel {
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executrix = Executors.newSingleThreadExecutor();
     private FileStore fileStore;
     private MetadataModel metadataModel;
     private GroovyCodeResource groovyCodeResource;
@@ -79,8 +74,12 @@ public class SipModel {
     private FactModel dataSetFacts = new FactModel();
     private FieldMappingListModel fieldMappingListModel = new FieldMappingListModel();
     private MappingModel mappingModel = new MappingModel();
-    private ValidationFileModel validationFileModel = new ValidationFileModel();
+    private ValidationFileModel validationFileModel = new ValidationFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
+
+    public void execute(Runnable runnable) {
+        executrix.execute(runnable);
+    }
 
     public interface AnalysisListener {
         void finished(boolean success);
@@ -110,8 +109,8 @@ public class SipModel {
         mappingModel.addListener(validationFileModel);
         mappingModel.addListener(recordCompileModel);
         mappingModel.addListener(fieldCompileModel);
-        mappingModel.addListener(new MappingSaveTimer());
-        analysisModel = new AnalysisModel(executor, storeModel, mappingModel, userNotifier);
+        mappingModel.addListener(new MappingSaveTimer(this));
+        analysisModel = new AnalysisModel(this);
         analysisModel.addListener(new AnalysisModel.Listener() {
             @Override
             public void statisticsSelected(FieldStatistics fieldStatistics) {
@@ -150,20 +149,6 @@ public class SipModel {
         return dataSetFacts;
     }
 
-    public void importSource(final File file, final ProgressListener progressListener) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    storeModel.getStore().externalToImported(file, progressListener);
-                }
-                catch (FileStoreException e) {
-                    userNotifier.tellUser("Couldn't create Data Set from " + file.getAbsolutePath(), e);
-                }
-            }
-        });
-    }
-
     public DataSetStoreModel getStoreModel() {
         return storeModel;
     }
@@ -192,9 +177,34 @@ public class SipModel {
         return userNotifier;
     }
 
+    public ListModel getUnmappedFieldListModel() {
+        return fieldListModel.getUnmapped(getMappingModel());
+    }
+
+    public CompileModel getRecordCompileModel() {
+        return recordCompileModel;
+    }
+
+    public CompileModel getFieldCompileModel() {
+        return fieldCompileModel;
+    }
+
+    public List<FieldDefinition> getUnmappedFields() {
+        List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
+        ListModel listModel = getUnmappedFieldListModel();
+        for (int walkField = 0; walkField < listModel.getSize(); walkField++) {
+            fields.add((FieldDefinition) listModel.getElementAt(walkField));
+        }
+        return fields;
+    }
+
+    public ListModel getFieldMappingListModel() {
+        return fieldMappingListModel;
+    }
+
     public void setDataSetStore(final FileStore.DataSetStore dataSetStore) {
         checkSwingThread();
-        executor.execute(new Runnable() {
+        execute(new Runnable() {
             @Override
             public void run() {
                 storeModel.setStore(dataSetStore);
@@ -219,7 +229,7 @@ public class SipModel {
 
     public void setMetadataPrefix(final String metadataPrefix, final boolean promoteToLatest) {
         checkSwingThread();
-        executor.execute(new Runnable() {
+        execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -274,16 +284,31 @@ public class SipModel {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    public void importSource(final File file, final ProgressListener progressListener) {
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    storeModel.getStore().externalToImported(file, progressListener);
+                    storeModel.checkState();
+                }
+                catch (FileStoreException e) {
+                    userNotifier.tellUser("Couldn't create Data Set from " + file.getAbsolutePath(), e);
+                }
+            }
+        });
+    }
+
     public void analyzeFields(final AnalysisListener listener) {
         checkSwingThread();
-        executor.execute(new AnalysisParser(storeModel.getStore(), new AnalysisParser.Listener() {
+        execute(new AnalysisParser(storeModel.getStore(), new AnalysisParser.Listener() {
             @Override
             public void success(final List<FieldStatistics> list) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         analysisModel.setStatisticsList(list);
+                        storeModel.checkState();
                     }
                 });
                 listener.finished(true);
@@ -293,6 +318,7 @@ public class SipModel {
             public void failure(Exception exception) {
                 listener.finished(false);
                 userNotifier.tellUser("Analysis failed", exception);
+                storeModel.checkState();
             }
 
             @Override
@@ -303,11 +329,12 @@ public class SipModel {
     }
 
     public void convertSource(final ProgressListener progressListener) {
-        executor.execute(new Runnable() {
+        execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     storeModel.getStore().importedToSource(progressListener);
+                    storeModel.checkState();
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Conversion failed", e);
@@ -318,7 +345,7 @@ public class SipModel {
 
     public void validateFile(boolean allowInvalid, final ProgressListener progressListener) {
         checkSwingThread();
-        executor.execute(new FileValidator(
+        execute(new FileValidator(
                 this,
                 allowInvalid,
                 groovyCodeResource,
@@ -326,7 +353,7 @@ public class SipModel {
                 new FileValidator.Listener() {
                     @Override
                     public void invalidInput(final MappingException exception) {
-                        userNotifier.tellUser("Problem normalizing " + exception.getMetadataRecord().toString(), exception);
+                        userNotifier.tellUser("Problem validating " + exception.getMetadataRecord().toString(), exception);
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -349,36 +376,10 @@ public class SipModel {
                     @Override
                     public void finished(final boolean aborted, final int validCount, final int invalidCount) {
                         validationFileModel.kick();
+                        storeModel.checkState();
                     }
                 }
         ));
-    }
-
-    public ListModel getUnmappedFieldListModel() {
-        return fieldListModel.getUnmapped(getMappingModel());
-    }
-
-    public List<FieldDefinition> getUnmappedFields() {
-        List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
-        ListModel listModel = getUnmappedFieldListModel();
-        for (int walkField = 0; walkField < listModel.getSize(); walkField++) {
-            fields.add((FieldDefinition) listModel.getElementAt(walkField));
-        }
-        return fields;
-    }
-
-    public void addFieldMapping(FieldMapping fieldMapping) {
-        checkSwingThread();
-        getMappingModel().setMapping(fieldMapping.getDefinition().path.toString(), fieldMapping);
-    }
-
-    public void removeFieldMapping(FieldMapping fieldMapping) {
-        checkSwingThread();
-        getMappingModel().setMapping(fieldMapping.getDefinition().path.toString(), null);
-    }
-
-    public ListModel getFieldMappingListModel() {
-        return fieldMappingListModel;
     }
 
     public void seekFresh() {
@@ -408,86 +409,11 @@ public class SipModel {
     public void seekRecord(ScanPredicate scanPredicate, ProgressListener progressListener) {
         checkSwingThread();
         if (analysisModel.hasRecordRoot()) {
-            executor.execute(new RecordScanner(scanPredicate, progressListener));
+            execute(new RecordScanner(scanPredicate, progressListener));
         }
-    }
-
-    public CompileModel getRecordCompileModel() {
-        return recordCompileModel;
-    }
-
-    public CompileModel getFieldCompileModel() {
-        return fieldCompileModel;
     }
 
     // === privates
-
-    private class ValidationFileModel extends AbstractListModel implements Runnable, MappingModel.Listener {
-        private List<String> lines;
-        private RecordMapping recordMapping;
-
-        @Override
-        public int getSize() {
-            return lines == null ? 0 : lines.size();
-        }
-
-        @Override
-        public Object getElementAt(int i) {
-            return lines.get(i);
-        }
-
-        @Override
-        public void run() {
-            int size = getSize();
-            if (size > 0) {
-                lines = null;
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        fireIntervalRemoved(this, 0, getSize());
-                    }
-                });
-            }
-            try {
-                final List<String> freshLines = storeModel.getStore().getValidationReport(recordMapping);
-                if (freshLines != null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            lines = freshLines;
-                            fireIntervalAdded(ValidationFileModel.this, 0, getSize());
-                        }
-                    });
-
-                }
-            }
-            catch (FileStoreException e) {
-                userNotifier.tellUser("Validation Report", e);
-            }
-        }
-
-        @Override
-        public void factChanged() {
-        }
-
-        @Override
-        public void select(FieldMapping fieldMapping) {
-        }
-
-        @Override
-        public void selectedChanged() {
-        }
-
-        @Override
-        public void mappingChanged(RecordMapping recordMapping) {
-            this.recordMapping = recordMapping;
-            executor.execute(this);
-        }
-
-        public void kick() {
-            mappingChanged(mappingModel.getRecordMapping()); // to fire it off
-        }
-    }
 
     private class RecordScanner implements Runnable {
         private ScanPredicate scanPredicate;
@@ -533,52 +459,6 @@ public class SipModel {
                 userNotifier.tellUser("Unable to fetch the next record", e);
                 metadataParser = null;
             }
-        }
-    }
-
-    private class MappingSaveTimer implements MappingModel.Listener, ActionListener, Runnable {
-        private Timer timer = new Timer(200, this);
-
-        private MappingSaveTimer() {
-            timer.setRepeats(false);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            executor.execute(this);
-        }
-
-        @Override
-        public void run() {
-            try {
-                RecordMapping recordMapping = mappingModel.getRecordMapping();
-                if (recordMapping != null) {
-                    storeModel.getStore().setRecordMapping(recordMapping);
-                }
-            }
-            catch (FileStoreException e) {
-                userNotifier.tellUser("Unable to save mapping", e);
-            }
-        }
-
-        @Override
-        public void factChanged() {
-            timer.restart();
-        }
-
-        @Override
-        public void select(FieldMapping fieldMapping) {
-            timer.restart();
-        }
-
-        @Override
-        public void selectedChanged() {
-            timer.restart();
-        }
-
-        @Override
-        public void mappingChanged(RecordMapping recordMapping) {
-            timer.restart();
         }
     }
 

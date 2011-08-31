@@ -76,14 +76,17 @@ public class MappingModel {
         }
     }
 
-    public void setMapping(String path, FieldMapping fieldMapping) {
+    public void addMapping(FieldMapping fieldMapping) {
         if (recordMapping == null) return;
-        if (fieldMapping == null) {
-            recordMapping.fieldMappings.remove(path);
-        }
-        else {
-            recordMapping.fieldMappings.put(path, fieldMapping);
-        }
+        String path = fieldMapping.getDefinition().path.toString();
+        recordMapping.fieldMappings.put(path, fieldMapping);
+        fireMappingChanged();
+    }
+
+    public void removeMapping(FieldMapping fieldMapping) {
+        if (recordMapping == null) return;
+        String path = fieldMapping.getDefinition().path.toString();
+        recordMapping.fieldMappings.remove(path);
         fireMappingChanged();
     }
 
