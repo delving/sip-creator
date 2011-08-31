@@ -54,7 +54,6 @@ public interface FileStore {
 
     public enum StoreState {
         EMPTY,
-        IMPORTED_FRESH,
         IMPORTED_PENDING_ANALYZE,
         IMPORTED_PENDING_CONVERT,
         SOURCED_PENDING_ANALYZE,

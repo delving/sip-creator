@@ -93,8 +93,6 @@ public class StatusFrame extends FrameBase {
         switch (storeState) {
             case EMPTY:
                 return "has no source yet";
-            case IMPORTED_FRESH:
-                return "";
             case IMPORTED_PENDING_ANALYZE:
                 return "imported - needs analysis";
             case IMPORTED_PENDING_CONVERT:

@@ -116,10 +116,14 @@ public class AnalysisTree implements Serializable {
                 return node.getStatistics().getTotal();
             }
         }
+        int total = 0;
         for (AnalysisTree.Node child : node.getChildNodes()) {
-            setRecordRoot(child, recordRoot, changedNodes);
+            int subtotal = setRecordRoot(child, recordRoot, changedNodes);
+            if (subtotal > 0) {
+                total = subtotal;
+            }
         }
-        return 0;
+        return total;
     }
 
     private static void setUniqueElement(AnalysisTree.Node node, Path uniqueElement, List<Node> changedNodes) {

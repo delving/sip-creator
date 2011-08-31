@@ -57,7 +57,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
-import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_FRESH;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
 import static eu.delving.sip.files.FileStore.StoreState.MAPPED_UNVALIDATED;
@@ -231,7 +230,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                     return IMPORTED_PENDING_CONVERT;
                 }
                 else {
-                    return IMPORTED_FRESH;
+                    return IMPORTED_PENDING_ANALYZE;
                 }
             }
             else if (source.exists()) {
@@ -464,6 +463,9 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         public void importedToSource(ProgressListener progressListener) throws FileStoreException {
             if (!isRecentlyImported()) {
                 throw new FileStoreException("Import to source would be redundant, since source is newer");
+            }
+            if (!statisticsFile(here).exists()) {
+                throw new FileStoreException("No statistics so conversion doesn't trust the record count");
             }
             try {
                 Map<String, String> hints = getHints();

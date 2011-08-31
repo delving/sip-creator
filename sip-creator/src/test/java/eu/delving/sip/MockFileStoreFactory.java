@@ -1,13 +1,19 @@
 package eu.delving.sip;
 
+import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
+import eu.delving.metadata.Path;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.files.FileStoreImpl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Create a file store for testing
@@ -18,7 +24,7 @@ import java.util.Arrays;
 public class MockFileStoreFactory {
     public static final String SPEC = "spek";
     private String metadataPrefix = "abm";
-    private File directory;
+    private File root;
     private File specDirectory;
     private FileStore fileStore;
     private FileStore.DataSetStore dataSetStore;
@@ -31,15 +37,15 @@ public class MockFileStoreFactory {
                 throw new RuntimeException("Target directory not found");
             }
         }
-        directory = new File(target, "file-store");
-        if (directory.exists()) {
-            delete(directory);
+        root = new File(target, "file-store");
+        if (root.exists()) {
+            delete(root);
         }
-        if (!directory.mkdirs()) {
-            throw new RuntimeException("Unable to create directory " + directory.getAbsolutePath());
+        if (!root.mkdirs()) {
+            throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
         }
-        specDirectory = new File(directory, SPEC);
-        fileStore = new FileStoreImpl(directory, getMetadataModel());
+        specDirectory = new File(root, SPEC);
+        fileStore = new FileStoreImpl(root, getMetadataModel());
         dataSetStore = fileStore.createDataSetStore(SPEC);
     }
 
@@ -51,20 +57,38 @@ public class MockFileStoreFactory {
         return metadataPrefix;
     }
 
-    public FileStore.DataSetStore getDataSetStore() {
+    public FileStore.DataSetStore store() {
         return dataSetStore;
     }
 
-    public File getDirectory() {
-        return directory;
+    public File [] files() {
+        return specDirectory.listFiles();
     }
 
-    public File getSpecDirectory() {
-        return specDirectory;
+    public File [] directories() {
+        return root.listFiles();
+    }
+
+    public Map<String,String> hints() {
+        Map<String,String> hints = new TreeMap<String,String>();
+        hints.put(FileStore.RECORD_ROOT_PATH, "/adlibXML/recordList/record");
+        hints.put(FileStore.RECORD_COUNT, "0");
+        hints.put(FileStore.UNIQUE_ELEMENT_PATH, "/adlibXML/recordList/record/priref");
+        return hints;
+    }
+
+    public List<FieldStatistics> stats() {
+        List<FieldStatistics> stats = new ArrayList<FieldStatistics>();
+        FieldStatistics fieldStatistics = new FieldStatistics(new Path("/stat/path"));
+        fieldStatistics.recordOccurrence();
+        fieldStatistics.recordValue("booger");
+        fieldStatistics.finish();
+        stats.add(fieldStatistics);
+        return stats;
     }
 
     public void delete() {
-        delete(directory);
+        delete(root);
     }
 
     private void delete(File file) {

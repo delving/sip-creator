@@ -289,14 +289,21 @@ public class SipModel {
         Exec.work(new AnalysisParser(storeModel.getStore(), new AnalysisParser.Listener() {
             @Override
             public void success(final List<FieldStatistics> list) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        analysisModel.setStatisticsList(list);
-                        storeModel.checkState();
-                    }
-                });
-                listener.finished(true);
+                try {
+                    storeModel.getStore().setStatistics(list);
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            analysisModel.setStatisticsList(list);
+                            storeModel.checkState();
+                        }
+                    });
+                    listener.finished(true);
+                }
+                catch (FileStoreException e) {
+                    userNotifier.tellUser("Problem storing statistics", e);
+                    listener.finished(false);
+                }
             }
 
             @Override

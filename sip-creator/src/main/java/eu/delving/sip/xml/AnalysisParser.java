@@ -129,7 +129,6 @@ public class AnalysisParser implements Runnable {
             for (FieldStatistics fieldStatistics : fieldStatisticsList) {
                 fieldStatistics.finish();
             }
-            dataSetStore.setStatistics(fieldStatisticsList);
             listener.success(fieldStatisticsList);
         }
         catch (Exception e) {
