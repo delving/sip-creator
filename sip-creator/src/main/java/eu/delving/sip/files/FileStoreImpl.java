@@ -172,16 +172,20 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void setLatestPrefix(String prefix) throws FileStoreException {
+        public RecordMapping setLatestPrefix(String prefix) throws FileStoreException {
             File latestForPrefix = findLatestMappingFile(here, prefix);
+            RecordMapping recordMapping;
             if (latestForPrefix == null) {
-                setRecordMapping(new RecordMapping(prefix));
+                recordMapping = new RecordMapping(prefix);
+                setRecordMapping(recordMapping);
             }
             else {
                 if (!latestForPrefix.setLastModified(System.currentTimeMillis())) {
                     throw new FileStoreException("Couldn't touch the file to give it priority");
                 }
+                recordMapping = getRecordMapping(prefix);
             }
+            return recordMapping;
         }
 
         @Override

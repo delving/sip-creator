@@ -1,0 +1,218 @@
+/*
+ * Copyright 2011 DELVING BV
+ *
+ *  Licensed under the EUPL, Version 1.0 or? as soon they
+ *  will be approved by the European Commission - subsequent
+ *  versions of the EUPL (the "Licence");
+ *  you may not use this work except in compliance with the
+ *  Licence.
+ *  You may obtain a copy of the Licence at:
+ *
+ *  http://ec.europa.eu/idabc/eupl
+ *
+ *  Unless required by applicable law or agreed to in
+ *  writing, software distributed under the Licence is
+ *  distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ *  express or implied.
+ *  See the Licence for the specific language governing
+ *  permissions and limitations under the Licence.
+ */
+
+package eu.delving.sip.model;
+
+import eu.delving.metadata.AnalysisTree;
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.SourceVariable;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
+
+import javax.swing.ListModel;
+import javax.swing.Timer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executor;
+
+/**
+ * An observable hole to put the things related to analysis: statistics, analysis tree, some list models
+ *
+ * @author Gerald de Jong <geralddejong@gmail.com>
+ */
+
+public class AnalysisModel {
+    private Executor executor;
+    private FactModel hintsModel = new FactModel();
+    private DataSetStoreModel storeModel;
+    private MappingModel mappingModel;
+    private UserNotifier userNotifier;
+    private List<FieldStatistics> statisticsList;
+    private AnalysisTree analysisTree = AnalysisTree.create("Select a Data Set from the File menu");
+    private DefaultTreeModel analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
+    private VariableListModel variableListModel = new VariableListModel();
+
+    public AnalysisModel(Executor executor, DataSetStoreModel dataSetStoreModel, MappingModel mappingModel, UserNotifier userNotifier) {
+        this.executor = executor;
+        this.storeModel = dataSetStoreModel;
+        this.mappingModel = mappingModel;
+        this.userNotifier = userNotifier;
+        hintsModel.addListener(new HintSaveTimer());
+    }
+
+    public void setStatisticsList(List<FieldStatistics> statisticsList) {
+        this.statisticsList = statisticsList;
+        if (statisticsList != null) {
+            analysisTree = AnalysisTree.create(statisticsList);
+        }
+        else {
+            analysisTree = AnalysisTree.create("Analysis not yet performed");
+        }
+        analysisTreeModel.setRoot(analysisTree.getRoot());
+        Path recordRoot = getRecordRoot();
+        if (recordRoot != null) {
+            AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+            List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
+            analysisTree.getVariables(variables);
+            variableListModel.setVariableList(variables);
+        }
+        else {
+            variableListModel.clear();
+        }
+        Path uniqueElement = getUniqueElement();
+        if (uniqueElement != null) {
+            AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
+        }
+        selectStatistics(null);
+    }
+
+    public void set(Map<String, String> hints) {
+        hintsModel.set(hints);
+        fireRecordRootSet();
+    }
+
+    public boolean hasRecordRoot() {
+        return hintsModel.get(FileStore.RECORD_ROOT_PATH) != null && !hintsModel.get(FileStore.RECORD_ROOT_PATH).isEmpty();
+    }
+
+    public void setRecordRoot(Path recordRoot) {
+        int recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+        hintsModel.set(FileStore.RECORD_ROOT_PATH, recordRoot.toString());
+        hintsModel.set(FileStore.RECORD_COUNT, String.valueOf(recordCount));
+        fireRecordRootSet();
+    }
+
+    public Path getRecordRoot() {
+        return new Path(hintsModel.get(FileStore.RECORD_ROOT_PATH));
+    }
+
+    public int getRecordCount() {
+        String recordCount = hintsModel.get(FileStore.RECORD_COUNT);
+        return recordCount == null ? 0 : Integer.parseInt(recordCount);
+    }
+
+    public void setUniqueElement(Path uniqueElement) {
+        AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
+        hintsModel.set(FileStore.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
+    }
+
+    public Path getUniqueElement() {
+        return new Path(hintsModel.get(FileStore.UNIQUE_ELEMENT_PATH));
+    }
+
+    public void selectStatistics(FieldStatistics fieldStatistics) {
+        for (Listener listener : listeners) {
+            listener.statisticsSelected(fieldStatistics);
+        }
+    }
+
+    public TreeModel getAnalysisTreeModel() {
+        return analysisTreeModel;
+    }
+
+    public ListModel getVariablesListWithCountsModel() {
+        return variableListModel.getWithCounts(mappingModel);
+    }
+
+    public List<SourceVariable> getVariables() {
+        List<AnalysisTree.Node> nodes = new ArrayList<AnalysisTree.Node>();
+        analysisTree.getVariables(nodes);
+        List<SourceVariable> variables = new ArrayList<SourceVariable>(nodes.size());
+        for (AnalysisTree.Node node : nodes) {
+            variables.add(new SourceVariable(node));
+        }
+        return variables;
+    }
+
+    public long getElementCount() {
+        if (statisticsList != null) {
+            long total = 0L;
+            for (FieldStatistics stats : statisticsList) {
+                total += stats.getTotal();
+            }
+            return total;
+        }
+        else {
+            return 0L;
+        }
+    }
+
+    private void fireRecordRootSet() {
+        Path recordRoot = getRecordRoot();
+        for (Listener listener : listeners) {
+            listener.recordRootSet(recordRoot);
+        }
+    }
+
+    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+
+    public void addListener(Listener listener) {
+        listeners.add(listener);
+    }
+
+    public interface Listener {
+        void statisticsSelected(FieldStatistics fieldStatistics);
+        void recordRootSet(Path recordRootPath);
+    }
+
+    private class HintSaveTimer implements FactModel.Listener, ActionListener, Runnable {
+        private Timer timer = new Timer(200, this);
+
+        private HintSaveTimer() {
+            timer.setRepeats(false);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            executor.execute(this);
+        }
+
+        @Override
+        public void run() {
+            try {
+                storeModel.getStore().setHints(hintsModel.getFacts());
+            }
+            catch (FileStoreException e) {
+                userNotifier.tellUser("Unable to save analysis hints", e);
+            }
+        }
+
+        @Override
+        public void factUpdated(String name, String value) {
+            timer.restart();
+        }
+
+        @Override
+        public void allFactsUpdated() {
+            timer.restart();
+        }
+    }
+
+
+}

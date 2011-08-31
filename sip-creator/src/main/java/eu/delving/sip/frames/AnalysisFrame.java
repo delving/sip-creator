@@ -70,7 +70,7 @@ public class AnalysisFrame extends FrameBase {
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Analysis", false);
-        statisticsJTree = new JTree(sipModel.getAnalysisTreeModel());
+        statisticsJTree = new JTree(sipModel.getAnalysisModel().getAnalysisTreeModel());
         statisticsJTree.getModel().addTreeModelListener(new Expander());
         statisticsJTree.setCellRenderer(new AnalysisTreeCellRenderer());
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -99,7 +99,7 @@ public class AnalysisFrame extends FrameBase {
                         public void run() {
                             selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
                             selectUniqueElementButton.setEnabled(!node.couldBeRecordRoot());
-                            sipModel.setStatistics(node.getStatistics());
+                            sipModel.getAnalysisModel().selectStatistics(node.getStatistics());
                         }
                     });
                 }
@@ -109,7 +109,7 @@ public class AnalysisFrame extends FrameBase {
                         public void run() {
                             selectRecordRootButton.setEnabled(false);
                             selectUniqueElementButton.setEnabled(false);
-                            sipModel.setStatistics(null);
+                            sipModel.getAnalysisModel().selectStatistics(null);
                         }
                     });
                 }
@@ -122,7 +122,7 @@ public class AnalysisFrame extends FrameBase {
                 AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
                 Path recordRoot = node.getPath();
                 if (recordRoot != null) {
-                    sipModel.setRecordRoot(recordRoot, node.getStatistics().getTotal());
+                    sipModel.getAnalysisModel().setRecordRoot(recordRoot);
                 }
             }
         });
@@ -131,7 +131,7 @@ public class AnalysisFrame extends FrameBase {
             public void actionPerformed(ActionEvent e) {
                 TreePath path = statisticsJTree.getSelectionPath();
                 AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
-                sipModel.setUniqueElement(node.getPath());
+                sipModel.getAnalysisModel().setUniqueElement(node.getPath());
             }
         });
         analyzeButton.addActionListener(new ActionListener() {
@@ -194,7 +194,7 @@ public class AnalysisFrame extends FrameBase {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        setElementsProcessed(sipModel.getElementCount());
+                        setElementsProcessed(sipModel.getAnalysisModel().getElementCount());
                         analyzeButton.setEnabled(true);
                     }
                 });

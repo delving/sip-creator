@@ -101,7 +101,7 @@ public class AnalyzeWindow extends DesktopWindow {
                         public void run() {
                             selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
                             selectUniqueElementButton.setEnabled(!node.couldBeRecordRoot());
-                            sipModel.setStatistics(node.getStatistics());
+                            sipModel.getAnalysisModel().selectStatistics(node.getStatistics());
                         }
                     });
                 }
@@ -111,7 +111,7 @@ public class AnalyzeWindow extends DesktopWindow {
                         public void run() {
                             selectRecordRootButton.setEnabled(false);
                             selectUniqueElementButton.setEnabled(false);
-                            sipModel.setStatistics(null);
+                            sipModel.getAnalysisModel().selectStatistics(null);
                         }
                     });
                 }
@@ -124,7 +124,7 @@ public class AnalyzeWindow extends DesktopWindow {
                 AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
                 Path recordRoot = node.getPath();
                 if (recordRoot != null) {
-                    sipModel.setRecordRoot(recordRoot, node.getStatistics().getTotal());
+                    sipModel.getAnalysisModel().setRecordRoot(recordRoot);
                 }
             }
         });
@@ -133,7 +133,7 @@ public class AnalyzeWindow extends DesktopWindow {
             public void actionPerformed(ActionEvent e) {
                 TreePath path = statisticsJTree.getSelectionPath();
                 AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
-                sipModel.setUniqueElement(node.getPath());
+                sipModel.getAnalysisModel().setUniqueElement(node.getPath());
             }
         });
         analyzeButton.addActionListener(new ActionListener() {
@@ -148,7 +148,7 @@ public class AnalyzeWindow extends DesktopWindow {
     private JPanel createTreePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
-        statisticsJTree = new JTree(sipModel.getAnalysisTreeModel());
+        statisticsJTree = new JTree(sipModel.getAnalysisModel().getAnalysisTreeModel());
         statisticsJTree.getModel().addTreeModelListener(new Expander());
         statisticsJTree.setCellRenderer(new AnalysisTreeCellRenderer());
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -184,7 +184,7 @@ public class AnalyzeWindow extends DesktopWindow {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        setElementsProcessed(sipModel.getElementCount());
+                        setElementsProcessed(sipModel.getAnalysisModel().getElementCount());
                         analyzeButton.setEnabled(true);
                     }
                 });

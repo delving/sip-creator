@@ -21,15 +21,18 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.metadata.FieldMapping;
+import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -41,19 +44,43 @@ import java.awt.event.ActionListener;
 
 public class MappingMenu extends JMenu {
     private SipModel sipModel;
+    private MetadataModel metadataModel;
 
     public MappingMenu(SipModel sipModel) {
         super("Mappings");
         this.sipModel = sipModel;
+        wireUp(sipModel);
+    }
+
+    private void wireUp(final SipModel sipModel) {
+        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+            @Override
+            public void factChanged() {
+            }
+
+            @Override
+            public void select(FieldMapping fieldMapping) {
+            }
+
+            @Override
+            public void selectedChanged() {
+            }
+
+            @Override
+            public void mappingChanged(RecordMapping recordMapping) {
+                refresh();
+            }
+        });
         sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
             @Override
             public void storeSet(FileStore.DataSetStore store) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        refresh();
-                    }
-                });
+                try {
+                    metadataModel = store.getMetadataModel();
+                    refresh();
+                }
+                catch (FileStoreException e) {
+                    sipModel.getUserNotifier().tellUser("Unable to fetch metadata model from data set store", e);
+                }
             }
 
             @Override
@@ -69,15 +96,6 @@ public class MappingMenu extends JMenu {
         if (recordMapping != null) {
             currentPrefix = recordMapping.getPrefix();
         }
-        if (currentPrefix == null && sipModel.getStoreModel().hasStore()) {
-            currentPrefix = sipModel.getStoreModel().getStore().getLatestPrefix();
-            if (currentPrefix.isEmpty()) {
-                currentPrefix = null;
-            }
-            else {
-                sipModel.setMetadataPrefix(currentPrefix);
-            }
-        }
         ButtonGroup bg = new ButtonGroup();
         for (String prefix : sipModel.getMetadataModel().getPrefixes()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(prefix, prefix.equals(currentPrefix));
@@ -86,7 +104,7 @@ public class MappingMenu extends JMenu {
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    sipModel.setMetadataPrefix(actionEvent.getActionCommand());
+                    sipModel.setMetadataPrefix(actionEvent.getActionCommand(), true);
                 }
             });
         }

@@ -26,6 +26,7 @@ import eu.delving.metadata.Histogram;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.model.AnalysisModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractListModel;
@@ -58,15 +59,22 @@ public class StatisticsFrame extends FrameBase {
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Statistics", false);
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
-        sipModel.addUpdateListener(new SipModel.UpdateListener() {
+        sipModel.getAnalysisModel().addListener(new AnalysisModel.Listener() {
             @Override
-            public void updatedStatistics(final FieldStatistics fieldStatistics) {
-                setStatistics(fieldStatistics);
+            public void statisticsSelected(FieldStatistics fieldStatistics) {
+                setSummary(fieldStatistics);
+                if (fieldStatistics == null) {
+                    histogramModel.setHistogram(null);
+                    randomSampleModel.setRandomSample(null);
+                }
+                else {
+                    histogramModel.setHistogram(fieldStatistics.getHistogram());
+                    randomSampleModel.setRandomSample(fieldStatistics.getRandomSample());
+                }
             }
 
             @Override
-            public void updatedRecordRoot(Path recordRoot) {
-                // todo: implement
+            public void recordRootSet(Path recordRootPath) {
             }
         });
     }
@@ -79,7 +87,6 @@ public class StatisticsFrame extends FrameBase {
 
     @Override
     protected void refresh() {
-        // todo: implement
     }
 
     private void setSummary(FieldStatistics fieldStatistics) {

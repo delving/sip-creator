@@ -70,7 +70,7 @@ public interface FileStore {
 
         String getLatestPrefix();
 
-        void setLatestPrefix(String prefix) throws FileStoreException;
+        RecordMapping setLatestPrefix(String prefix) throws FileStoreException;
 
         MetadataModel getMetadataModel() throws FileStoreException;
 

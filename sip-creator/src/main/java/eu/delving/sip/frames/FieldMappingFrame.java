@@ -154,7 +154,7 @@ public class FieldMappingFrame extends FrameBase {
         SourceVariable found = null;
         if (variableNames.size() == 1) {
             String variableName = variableNames.get(0);
-            for (SourceVariable sourceVariable : sipModel.getVariables()) {
+            for (SourceVariable sourceVariable : sipModel.getAnalysisModel().getVariables()) {
                 if (sourceVariable.getVariableName().equals(variableName)) {
                     return sourceVariable;
                 }

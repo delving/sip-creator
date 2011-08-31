@@ -70,7 +70,7 @@ public class CreateFrame extends FrameBase {
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Create", false);
         obviousMappingsPopup = new ObviousMappingsPopup(this);
-        variablesList = new JList(sipModel.getVariablesListWithCountsModel());
+        variablesList = new JList(sipModel.getAnalysisModel().getVariablesListWithCountsModel());
         targetFieldList = new JList(sipModel.getUnmappedFieldListModel());
         targetFieldList.setCellRenderer(new FieldListModel.CellRenderer());
         targetFieldList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -122,7 +122,7 @@ public class CreateFrame extends FrameBase {
                 if (e.getValueIsAdjusting()) return;
                 final SourceVariable sourceVariable = (SourceVariable) variablesList.getSelectedValue();
                 if (sourceVariable != null && sourceVariable.hasStatistics()) {
-                    sipModel.setStatistics(sourceVariable.getStatistics());
+                    sipModel.getAnalysisModel().selectStatistics(sourceVariable.getStatistics());
                     constantField.setText("?");
                 }
             }
@@ -215,7 +215,7 @@ public class CreateFrame extends FrameBase {
             @Override
             public void run() {
                 CodeGenerator codeGenerator = new CodeGenerator();
-                List<FieldMapping> obvious = codeGenerator.createObviousMappings(sipModel.getUnmappedFields(), sipModel.getVariables());
+                List<FieldMapping> obvious = codeGenerator.createObviousMappings(sipModel.getUnmappedFields(), sipModel.getAnalysisModel().getVariables());
                 if (obvious.isEmpty()) {
                     if (obviousMappingsPopup.isVisible()) {
                         obviousMappingsPopup.closeFrame();

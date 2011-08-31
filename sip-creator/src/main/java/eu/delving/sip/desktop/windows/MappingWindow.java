@@ -22,8 +22,6 @@
 package eu.delving.sip.desktop.windows;
 
 import eu.delving.metadata.Facts;
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.Path;
 import eu.delving.sip.desktop.GridBagHelper;
 import eu.delving.sip.model.SipModel;
 
@@ -60,18 +58,6 @@ public class MappingWindow extends DesktopWindow {
         tabbedPane.addTab("Constant fields", new ConstantsPanel());
         tabbedPane.setPreferredSize(getPreferredSize());
         add(tabbedPane);
-        sipModel.addUpdateListener(
-                new SipModel.UpdateListener() {
-                    @Override
-                    public void updatedStatistics(FieldStatistics fieldStatistics) {
-                    }
-
-                    @Override
-                    public void updatedRecordRoot(Path recordRoot) {
-                        // todo: implement
-                    }
-                }
-        );
     }
 
     private class MappingPanel extends JPanel {
