@@ -35,10 +35,10 @@ import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -69,7 +69,7 @@ public class SourceConverter {
         this.progressListener = progressListener;
     }
 
-    public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, UnsupportedEncodingException {
+    public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException {
         if (progressListener != null) progressListener.prepareFor(recordCount);
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
@@ -126,12 +126,15 @@ public class SourceConverter {
                         out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
                         out.add(eventFactory.createCharacters("\n"));
                         out.add(eventFactory.createEndDocument());
+                        out.flush();
                         finished = true;
                         break;
                     case XMLEvent.CHARACTERS:
-                        String string = ValueFilter.filter(event.asCharacters().getData());
-                        if (!string.isEmpty()) {
-                            out.add(eventFactory.createCharacters(string));
+                        if (withinRecord) {
+                            String string = ValueFilter.filter(event.asCharacters().getData());
+                            if (!string.isEmpty()) {
+                                out.add(eventFactory.createCharacters(string));
+                            }
                         }
                         break;
                     default:
@@ -144,8 +147,8 @@ public class SourceConverter {
         }
         finally {
             if (progressListener != null) progressListener.finished(finished);
-            in.close();
-            out.close();
+            inputStream.close();
+            outputStream.close();
         }
     }
 

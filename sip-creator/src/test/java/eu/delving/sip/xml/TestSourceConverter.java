@@ -7,8 +7,8 @@ import org.junit.Test;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * todo: javadoc
@@ -47,7 +47,7 @@ public class TestSourceConverter {
     private SourceConverter converter = new SourceConverter(ROOT, 2);
 
     @Test
-    public void runThrough() throws UnsupportedEncodingException, XMLStreamException {
+    public void runThrough() throws IOException, XMLStreamException {
         String inputString = StringUtils.join(INPUT, "\n");
         InputStream in = new ByteArrayInputStream(inputString.getBytes("UTF-8"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();

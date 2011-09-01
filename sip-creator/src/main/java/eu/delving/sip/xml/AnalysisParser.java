@@ -25,12 +25,14 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
 import org.apache.log4j.Logger;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,7 +81,19 @@ public class AnalysisParser implements Runnable {
             xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
             xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
             xmlif.configureForSpeed();
-            XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), dataSetStore.importedInput()); // todo: imported here, but source must be done as well
+            InputStream inputStream;
+            switch (dataSetStore.getState()) {
+                case IMPORTED_PENDING_ANALYZE:
+                    inputStream = dataSetStore.importedInput();
+                    break;
+                case SOURCED_PENDING_ANALYZE:
+                    inputStream = dataSetStore.sourceInput();
+                    break;
+                default :
+                    listener.failure(new FileStoreException("For analysis, the dataset store state must be *_PENDING_ANALYZE, but it was "+dataSetStore.getState()));
+                    return;
+            }
+            XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
             StringBuilder text = new StringBuilder();
             long count = 0;
             while (!abort) {

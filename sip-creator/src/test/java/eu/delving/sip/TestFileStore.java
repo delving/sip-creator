@@ -115,9 +115,8 @@ public class TestFileStore {
         assertEquals(SOURCED_PENDING_ANALYZE, mock.store().getState());
         analyze();
         assertEquals("Should be imported, hints, source, stats", 4, mock.files().length);
-// todo: this still fails:
-//        int newRecordCount = Integer.parseInt(mock.store().getHints().get(FileStore.RECORD_COUNT));
-//        assertEquals("Record counts different", recordCount, newRecordCount);
+        int newRecordCount = Integer.parseInt(mock.store().getHints().get(FileStore.RECORD_COUNT));
+        assertEquals("Record counts different", recordCount, newRecordCount);
         assertFalse("Zero variables!", variables.isEmpty());
     }
 
