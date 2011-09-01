@@ -111,9 +111,10 @@ public class MetadataParser {
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (node != null) {
-                        String valueString = removeMultiLines(value.toString());
+                        String valueString = ValueFilter.filter(value.toString());
                         value.setLength(0);
-                        if (valueString.length() > 0) {
+                        if (!valueString.isEmpty()) {
+                            // todo: perhaps check if there is already an array of children in there.
                             node.setValue(valueString);
                         }
                         if (path.equals(recordRoot)) {
@@ -156,15 +157,6 @@ public class MetadataParser {
         }
         catch (XMLStreamException e) {
             e.printStackTrace(); // should never happen
-        }
-    }
-
-    private static String removeMultiLines(String multi) {
-        if (multi.contains("\n")) {
-            return multi.replaceAll("\n", " ").replaceAll(" +", " ").trim();
-        }
-        else {
-            return multi;
         }
     }
 

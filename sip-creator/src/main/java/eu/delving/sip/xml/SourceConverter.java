@@ -129,16 +129,9 @@ public class SourceConverter {
                         finished = true;
                         break;
                     case XMLEvent.CHARACTERS:
-                        String string = event.asCharacters().getData();
-                        if (string.contains("\n")) {
-                            string = string.replaceAll("\n", " ").replaceAll(" +", " ").trim();
+                        String string = ValueFilter.filter(event.asCharacters().getData());
+                        if (!string.isEmpty()) {
                             out.add(eventFactory.createCharacters(string));
-                        }
-                        else {
-                            string = string.trim();
-                            if (!string.isEmpty()) {
-                                out.add(eventFactory.createCharacters(string));
-                            }
                         }
                         break;
                     default:
