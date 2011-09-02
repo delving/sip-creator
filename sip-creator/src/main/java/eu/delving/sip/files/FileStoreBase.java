@@ -23,6 +23,7 @@ package eu.delving.sip.files;
 
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.RecordMapping;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -45,6 +46,7 @@ import static eu.delving.sip.files.FileStore.MAPPING_FILE_SUFFIX;
 import static eu.delving.sip.files.FileStore.PHANTOM_FILE_NAME;
 import static eu.delving.sip.files.FileStore.RECORD_COUNT;
 import static eu.delving.sip.files.FileStore.RECORD_ROOT_PATH;
+import static eu.delving.sip.files.FileStore.REPORT_FILE_PATTERN;
 import static eu.delving.sip.files.FileStore.SOURCE_FILE_NAME;
 import static eu.delving.sip.files.FileStore.SOURCE_STATS_FILE_NAME;
 import static eu.delving.sip.files.FileStore.UNIQUE_ELEMENT_PATH;
@@ -143,6 +145,10 @@ public class FileStoreBase {
     File validationFile(File dir, File mappingFile) {
         String prefix = mappingPrefix(mappingFile);
         return new File(dir, String.format(VALIDATION_FILE_PATTERN, prefix));
+    }
+
+    File reportFile(File dir, RecordMapping recordMapping) {
+        return new File(dir, String.format(REPORT_FILE_PATTERN, recordMapping.getPrefix()));
     }
 
     File statisticsFile(File dir, boolean sourceFormat) {

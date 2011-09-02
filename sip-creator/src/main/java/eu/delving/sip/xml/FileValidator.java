@@ -39,6 +39,7 @@ import groovy.util.Node;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.BitSet;
 import java.util.Set;
 
 /**
@@ -55,13 +56,14 @@ public class FileValidator implements Runnable {
     private volatile boolean aborted = false;
     private boolean allowInvalid;
     private int validCount, invalidCount;
+    private BitSet valid;
 
     public interface Listener {
         void invalidInput(MappingException exception);
 
         void invalidOutput(ValidationException exception);
 
-        void finished(boolean aborted, int validCount, int invalidCount);
+        void finished(BitSet valid);
     }
 
     public FileValidator(
@@ -86,6 +88,7 @@ public class FileValidator implements Runnable {
         Uniqueness uniqueness = new Uniqueness();
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
+        valid = new BitSet(sipModel.getAnalysisModel().getRecordCount());
         try {
             RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
             if (recordMapping == null) {
@@ -101,7 +104,7 @@ public class FileValidator implements Runnable {
                     sipModel.getAnalysisModel().getRecordCount()
             );
             parser.setProgressListener(progressAdapter);
-            PrintWriter out = dataSetStore.validationWriter(recordMapping);
+            PrintWriter out = dataSetStore.reportWriter(recordMapping);
             try {
                 MetadataRecord record;
                 while ((record = parser.nextRecord()) != null && !aborted) {
@@ -109,9 +112,7 @@ public class FileValidator implements Runnable {
                         Node outputNode = mappingRunner.runMapping(record);
                         recordValidator.validateRecord(outputNode, record.getRecordNumber());
                         validCount++;
-//                    StringWriter writer = new StringWriter();
-//                    XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
-//                    xmlNodePrinter.print(outputNode);
+                        valid.set(record.getRecordNumber());
                     }
                     catch (MappingException e) {
                         out.println("Mapping exception!");
@@ -177,7 +178,7 @@ public class FileValidator implements Runnable {
             aborted = true;
         }
         finally {
-            listener.finished(aborted, validCount, invalidCount);
+            listener.finished(aborted ? null : valid);
             uniqueness.destroy();
             if (aborted) { // aborted, so metadataparser will not call finished()
                 progressAdapter.finished(false);
@@ -188,6 +189,12 @@ public class FileValidator implements Runnable {
     private void abort() {
         aborted = true;
     }
+
+//    private void write(Node outputNode) {
+//        StringWriter writer = new StringWriter();
+//        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+//        xmlNodePrinter.print(outputNode);
+//    }
 
     // just so we receive the cancel signal
     private class ProgressAdapter implements ProgressListener {

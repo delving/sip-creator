@@ -36,12 +36,12 @@ import java.util.List;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class ValidationFileModel extends AbstractListModel implements MappingModel.Listener {
+public class ReportFileModel extends AbstractListModel implements MappingModel.Listener {
     private SipModel sipModel;
     private List<String> lines;
     private RecordMapping recordMapping;
 
-    public ValidationFileModel(SipModel sipModel) {
+    public ReportFileModel(SipModel sipModel) {
         this.sipModel = sipModel;
     }
 
@@ -67,13 +67,13 @@ public class ValidationFileModel extends AbstractListModel implements MappingMod
             });
         }
         try {
-            final List<String> freshLines = sipModel.getStoreModel().getStore().getValidationReport(recordMapping);
+            final List<String> freshLines = sipModel.getStoreModel().getStore().getReport(recordMapping);
             if (freshLines != null) {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         lines = freshLines;
-                        fireIntervalAdded(ValidationFileModel.this, 0, getSize());
+                        fireIntervalAdded(ReportFileModel.this, 0, getSize());
                     }
                 });
 

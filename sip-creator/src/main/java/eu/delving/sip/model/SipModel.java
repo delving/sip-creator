@@ -45,6 +45,7 @@ import eu.delving.sip.xml.MetadataParser;
 import javax.swing.ListModel;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -71,7 +72,7 @@ public class SipModel {
     private FactModel dataSetFacts = new FactModel();
     private FieldMappingListModel fieldMappingListModel = new FieldMappingListModel();
     private MappingModel mappingModel = new MappingModel();
-    private ValidationFileModel validationFileModel = new ValidationFileModel(this);
+    private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
 
     public interface AnalysisListener {
@@ -99,7 +100,7 @@ public class SipModel {
         parseListeners.add(recordCompileModel);
         parseListeners.add(fieldCompileModel);
         mappingModel.addListener(fieldMappingListModel);
-        mappingModel.addListener(validationFileModel);
+        mappingModel.addListener(reportFileModel);
         mappingModel.addListener(recordCompileModel);
         mappingModel.addListener(fieldCompileModel);
         mappingModel.addListener(new MappingSaveTimer(this));
@@ -162,8 +163,8 @@ public class SipModel {
         return analysisModel;
     }
 
-    public ListModel getValidationFileModel() {
-        return validationFileModel;
+    public ListModel getReportFileModel() {
+        return reportFileModel;
     }
 
     public UserNotifier getUserNotifier() {
@@ -366,8 +367,8 @@ public class SipModel {
                     }
 
                     @Override
-                    public void finished(final boolean aborted, final int validCount, final int invalidCount) {
-                        validationFileModel.kick();
+                    public void finished(final BitSet valid) {
+                        reportFileModel.kick();
                         storeModel.checkState();
                     }
                 }

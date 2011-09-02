@@ -35,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 import javax.xml.stream.XMLStreamException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -47,6 +48,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -356,14 +358,14 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         @Override
         public RecordMapping getRecordMapping(String metadataPrefix) throws FileStoreException {
             RecordDefinition recordDefinition = metadataModel.getRecordDefinition(metadataPrefix);
-            File mappingFile = findLatestMappingFile(here, metadataPrefix);
-            if (mappingFile.exists()) {
+            File file = findLatestMappingFile(here, metadataPrefix);
+            if (file.exists()) {
                 try {
-                    FileInputStream is = new FileInputStream(mappingFile);
+                    FileInputStream is = new FileInputStream(file);
                     return RecordMapping.read(is, metadataModel);
                 }
                 catch (Exception e) {
-                    throw new FileStoreException(String.format("Unable to read mapping from %s", mappingFile.getAbsolutePath()), e);
+                    throw new FileStoreException(String.format("Unable to read mapping from %s", file.getAbsolutePath()), e);
                 }
             }
             else {
@@ -373,25 +375,37 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
 
         @Override
         public void setRecordMapping(RecordMapping recordMapping) throws FileStoreException {
-            File mappingFile = new File(here, String.format(MAPPING_FILE_PATTERN, recordMapping.getPrefix()));
+            File file = new File(here, String.format(MAPPING_FILE_PATTERN, recordMapping.getPrefix()));
             try {
-                FileOutputStream out = new FileOutputStream(mappingFile);
+                FileOutputStream out = new FileOutputStream(file);
                 RecordMapping.write(recordMapping, out);
                 out.close();
             }
             catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to save mapping to %s", mappingFile.getAbsolutePath()), e);
+                throw new FileStoreException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
             }
         }
 
         @Override
-        public void remove() throws FileStoreException {
-            delete(here);
+        public void setValidation(String metadataPrefix, BitSet validation) throws FileStoreException {
+            File file = new File(here, String.format(VALIDATION_FILE_PATTERN, metadataPrefix));
+            try {
+                DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
+                int invalidCount = validation.size() - validation.cardinality();
+                out.writeInt(invalidCount);
+                for (int index = validation.nextClearBit(0); index > 0; index = validation.nextClearBit(index+1)) {
+                    out.writeInt(index);
+                }
+                out.close();
+            }
+            catch (IOException e) {
+                throw new FileStoreException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
+            }
         }
 
         @Override
-        public PrintWriter validationWriter(RecordMapping recordMapping) throws FileStoreException {
-            File file = new File(here, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
+        public PrintWriter reportWriter(RecordMapping recordMapping) throws FileStoreException {
+            File file = new File(here, String.format(REPORT_FILE_PATTERN, recordMapping.getPrefix()));
             try {
                 return new PrintWriter(file);
             }
@@ -401,9 +415,9 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public List<String> getValidationReport(RecordMapping recordMapping) throws FileStoreException {
+        public List<String> getReport(RecordMapping recordMapping) throws FileStoreException {
             try {
-                File file = new File(here, String.format(VALIDATION_FILE_PATTERN, recordMapping.getPrefix()));
+                File file = reportFile(here, recordMapping);
                 return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
             }
             catch (IOException e) {
@@ -550,6 +564,11 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             catch (IOException e) {
                 throw new FileStoreException("Unable to accept SipZip file", e);
             }
+        }
+
+        @Override
+        public void remove() throws FileStoreException {
+            delete(here);
         }
 
         public OutputStream sourceOutput() throws FileStoreException {

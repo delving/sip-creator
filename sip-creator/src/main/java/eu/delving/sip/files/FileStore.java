@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
@@ -96,11 +97,11 @@ public interface FileStore {
 
         void setRecordMapping(RecordMapping recordMapping) throws FileStoreException;
 
-        void remove() throws FileStoreException;
+        void setValidation(String metadataPrefix, BitSet validation) throws FileStoreException;
 
-        PrintWriter validationWriter(RecordMapping recordMapping) throws FileStoreException;
+        PrintWriter reportWriter(RecordMapping recordMapping) throws FileStoreException;
 
-        List<String> getValidationReport(RecordMapping recordMapping) throws FileStoreException;
+        List<String> getReport(RecordMapping recordMapping) throws FileStoreException;
 
         void externalToImported(File inputFile, ProgressListener progressListener) throws FileStoreException;
 
@@ -109,6 +110,9 @@ public interface FileStore {
         List<File> getUploadFiles() throws FileStoreException;
 
         void fromSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws IOException, FileStoreException;
+
+        void remove() throws FileStoreException;
+
     }
 
     String IMPORTED_FILE_NAME = "imported.xml.gz";
@@ -121,7 +125,8 @@ public interface FileStore {
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
     String MAPPING_FILE_PREFIX = "mapping_";
     String MAPPING_FILE_SUFFIX = ".xml";
-    String VALIDATION_FILE_PATTERN = "validation_%s.xml";
+    String VALIDATION_FILE_PATTERN = "validation_%s.txt";
+    String REPORT_FILE_PATTERN = "report_%s.txt";
 
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";

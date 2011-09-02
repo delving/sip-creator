@@ -60,7 +60,7 @@ public class OutputFrame extends FrameBase {
     private CultureHubClient cultureHubClient;
     private Action validateAction = new ValidateAction();
     private Action uploadAction = new UploadAction();
-    private ValidationFilePopup validationFilePopup = new ValidationFilePopup(this);
+    private ReportFilePopup reportFilePopup = new ReportFilePopup(this);
 
     public OutputFrame(JDesktopPane desktop, SipModel sipModel, CultureHubClient cultureHubClient) {
         super(desktop, sipModel, "Output", false);
@@ -83,7 +83,7 @@ public class OutputFrame extends FrameBase {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         p.add(new JButton(validateAction));
         p.add(allowInvalid);
-        p.add(new JButton(validationFilePopup.getAction()));
+        p.add(new JButton(reportFilePopup.getAction()));
         return p;
     }
 
@@ -167,15 +167,15 @@ public class OutputFrame extends FrameBase {
         }
     }
 
-    private class ValidationFilePopup extends FrameBase {
+    private class ReportFilePopup extends FrameBase {
 
-        private ListModel validationFileModel = sipModel.getValidationFileModel();
-        private JList list = new JList(validationFileModel);
+        private ListModel reportFileModel = sipModel.getReportFileModel();
+        private JList list = new JList(reportFileModel);
 
-        public ValidationFilePopup(FrameBase parent) {
+        public ReportFilePopup(FrameBase parent) {
             super(parent, parent.getSipModel(), "Validation Report", true);
             getAction().setEnabled(false);
-            sipModel.getValidationFileModel().addListDataListener(new ListDataListener() {
+            sipModel.getReportFileModel().addListDataListener(new ListDataListener() {
                 @Override
                 public void intervalAdded(ListDataEvent listDataEvent) {
                     getAction().setEnabled(true);
