@@ -27,6 +27,10 @@ public class Exec {
         SwingUtilities.invokeLater(runnable);
     }
 
+    public static void swingAny(Runnable runnable) {
+        SwingUtilities.invokeLater(runnable);
+    }
+
     public static void work(Runnable runnable) {
         if (!SwingUtilities.isEventDispatchThread()) {
             throw new RuntimeException("Call to Worker thread must be made from Swing");

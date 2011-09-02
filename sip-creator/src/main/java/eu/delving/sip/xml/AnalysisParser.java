@@ -31,6 +31,7 @@ import org.codehaus.stax2.XMLStreamReader2;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +49,7 @@ public class AnalysisParser implements Runnable {
     private Path path = new Path();
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
     private Listener listener;
-    private FileStore.DataSetStore dataSetStore;
+    private FileStore.DataSetStore store;
 
     public interface Listener {
 
@@ -59,8 +60,8 @@ public class AnalysisParser implements Runnable {
         void progress(long elementCount);
     }
 
-    public AnalysisParser(FileStore.DataSetStore dataSetStore, Listener listener) {
-        this.dataSetStore = dataSetStore;
+    public AnalysisParser(FileStore.DataSetStore store, Listener listener) {
+        this.store = store;
         this.listener = listener;
     }
 
@@ -72,7 +73,20 @@ public class AnalysisParser implements Runnable {
             xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
             xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
             xmlif.configureForSpeed();
-            XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), dataSetStore.importedInput());
+            InputStream inputStream;
+            boolean sourceFormat = false;
+            switch(store.getState()) {
+                case IMPORTED_PENDING_ANALYZE:
+                    inputStream = store.importedInput();
+                    break;
+                case SOURCED:
+                    inputStream = store.sourceInput();
+                    sourceFormat = true;
+                    break;
+                default :
+                    throw new IllegalStateException("Expected one of two states. See the code here.");
+            }
+            XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
             StringBuilder text = new StringBuilder();
             long count = 0;
             while (true) {
@@ -111,7 +125,7 @@ public class AnalysisParser implements Runnable {
                 input.next();
             }
             List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
-            listener.success(new Statistics(fieldStatisticsList));
+            listener.success(new Statistics(fieldStatisticsList, sourceFormat));
         }
         catch (Exception e) {
             listener.failure(e);

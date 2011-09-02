@@ -21,7 +21,6 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
@@ -49,12 +48,12 @@ public class DataSetMenu extends JMenu {
 
             @Override
             public void storeSet(FileStore.DataSetStore store) {
-                swingRefresh();
+                refresh();
             }
 
             @Override
             public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
-                swingRefresh();
+                refresh();
             }
         });
         String selectedSpec = sipModel.getPreferences().get(SELECTED, "");
@@ -64,15 +63,6 @@ public class DataSetMenu extends JMenu {
                 sipModel.setDataSetStore(store);
             }
         }
-    }
-
-    private void swingRefresh() {
-        Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                refresh();
-            }
-        });
     }
 
     public void refresh() {

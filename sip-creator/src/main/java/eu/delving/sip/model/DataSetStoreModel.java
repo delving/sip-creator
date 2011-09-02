@@ -49,11 +49,23 @@ public class DataSetStoreModel {
         return dataSetStore;
     }
 
-    public void setStore(FileStore.DataSetStore dataSetStore) {
+    public void setStore(final FileStore.DataSetStore dataSetStore) {
         this.dataSetStore = dataSetStore;
         this.storeState = dataSetStore.getState();
-        for (Listener listener : listeners) {
-            listener.storeSet(dataSetStore);
+        if (SwingUtilities.isEventDispatchThread()) {
+            for (Listener listener : listeners) {
+                listener.storeSet(dataSetStore);
+            }
+        }
+        else {
+            Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    for (Listener listener : listeners) {
+                        listener.storeSet(dataSetStore);
+                    }
+                }
+            });
         }
     }
 

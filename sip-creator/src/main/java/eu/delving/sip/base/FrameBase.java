@@ -107,7 +107,7 @@ public abstract class FrameBase extends JInternalFrame {
         boolean enabled = shouldBeEnabled(state);
         action.setEnabled(enabled);
         if (enabled && getStoredSize() != null) {
-            Exec.swing(new Runnable() {
+            Exec.swingAny(new Runnable() {
                 @Override
                 public void run() {
                     show();
@@ -120,7 +120,8 @@ public abstract class FrameBase extends JInternalFrame {
     }
 
     private boolean shouldBeEnabled(FileStore.StoreState state) {
-        return state.ordinal() >= getMinimumStoreState().ordinal();
+        FileStore.StoreState min = getMinimumStoreState();
+        return min != null ? state.ordinal() >= getMinimumStoreState().ordinal() : isEnabledInState(state);
     }
 
     public void setAccelerator(int number) {
@@ -216,7 +217,13 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
-    protected abstract FileStore.StoreState getMinimumStoreState();
+    protected FileStore.StoreState getMinimumStoreState() {
+        return null;
+    }
+
+    protected boolean isEnabledInState(FileStore.StoreState state) {
+        throw new IllegalStateException("Implement either this method or getMinimumStoreState");
+    }
 
     private Point addIfAbsent() {
         boolean add = true;

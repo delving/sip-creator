@@ -85,7 +85,7 @@ public class MockFileStoreFactory {
         fieldStatistics.recordValue("booger");
         fieldStatistics.finish();
         stats.add(fieldStatistics);
-        return new Statistics(stats);
+        return new Statistics(stats, false);
     }
 
     public void delete() {

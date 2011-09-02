@@ -24,7 +24,6 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.Path;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.files.FileStore;
@@ -63,11 +62,8 @@ import java.awt.event.ActionListener;
  */
 
 public class AnalysisFrame extends FrameBase {
-    private static final String RUN_ANALYSIS = "Run the Analysis";
-    private static final String ELEMENTS_PROCESSED = "%d Elements Processed";
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
-    private JButton analyzeButton = new JButton(RUN_ANALYSIS);
     private JButton convertButton = new JButton("Convert!");
     private JTree statisticsJTree;
 
@@ -91,8 +87,8 @@ public class AnalysisFrame extends FrameBase {
     }
 
     @Override
-    protected FileStore.StoreState getMinimumStoreState() {
-        return FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
+    protected boolean isEnabledInState(FileStore.StoreState state) {
+        return state == FileStore.StoreState.IMPORTED_PENDING_ANALYZE || state == FileStore.StoreState.ANALYZED;
     }
 
     private void wireUp() {
@@ -130,13 +126,6 @@ public class AnalysisFrame extends FrameBase {
                 TreePath path = statisticsJTree.getSelectionPath();
                 AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
                 sipModel.getAnalysisModel().setUniqueElement(node.getPath());
-            }
-        });
-        analyzeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                analyzeButton.setEnabled(false);
-                performAnalysis();
             }
         });
         sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
@@ -178,7 +167,6 @@ public class AnalysisFrame extends FrameBase {
         p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
         p.add(scroll(statisticsJTree), BorderLayout.CENTER);
         JPanel south = new JPanel(new GridLayout(0, 1));
-        south.add(analyzeButton);
         south.add(createSelectButtonPanel());
         south.add(convertButton);
         p.add(south, BorderLayout.SOUTH);
@@ -192,36 +180,6 @@ public class AnalysisFrame extends FrameBase {
         selectUniqueElementButton.setEnabled(false);
         bp.add(selectUniqueElementButton);
         return bp;
-    }
-
-    private void performAnalysis() {
-        sipModel.analyzeFields(new SipModel.AnalysisListener() {
-
-            @Override
-            public void finished(boolean success) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        setElementsProcessed(sipModel.getAnalysisModel().getElementCount());
-                        analyzeButton.setEnabled(true);
-                    }
-                });
-            }
-
-            @Override
-            public void analysisProgress(final long elementCount) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        setElementsProcessed(elementCount);
-                    }
-                });
-            }
-        });
-    }
-
-    private void setElementsProcessed(long count) {
-        analyzeButton.setText(String.format(ELEMENTS_PROCESSED, count));
     }
 
     private class AnalysisTreeCellRenderer extends DefaultTreeCellRenderer {

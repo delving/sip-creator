@@ -43,7 +43,8 @@ public class Statistics implements Serializable {
     private boolean sourceFormat;
     private List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>();
 
-    public Statistics(Collection<FieldStatistics> statsList) {
+    public Statistics(Collection<FieldStatistics> statsList, boolean sourceFormat) {
+        this.sourceFormat = sourceFormat;
         fieldStatisticsList.addAll(statsList);
         Collections.sort(fieldStatisticsList);
         for (FieldStatistics fieldStatistics : fieldStatisticsList) {
