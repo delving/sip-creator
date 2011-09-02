@@ -144,7 +144,8 @@ public class FileStoreBase {
 
     File validationFile(File dir, File mappingFile) {
         String prefix = mappingPrefix(mappingFile);
-        return new File(dir, String.format(VALIDATION_FILE_PATTERN, prefix));
+        String name = String.format(VALIDATION_FILE_PATTERN, prefix);
+        return findOrCreate(dir, name, new NameFileFilter(name));
     }
 
     File reportFile(File dir, RecordMapping recordMapping) {

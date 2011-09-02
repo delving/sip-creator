@@ -393,7 +393,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
                 int invalidCount = recordCount - validation.cardinality();
                 out.writeInt(invalidCount);
-                for (int index = validation.nextClearBit(0); index >= 0 && index < recordCount; index = validation.nextClearBit(index+1)) {
+                for (int index = validation.nextClearBit(0); index >= 0 && index < recordCount; index = validation.nextClearBit(index + 1)) {
                     out.writeInt(index);
                 }
                 out.close();
@@ -511,10 +511,14 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             try {
                 List<File> files = new ArrayList<File>();
                 files.add(Hasher.ensureFileHashed(hintsFile(here)));
-                files.add(Hasher.ensureFileHashed(sourceFile(here)));
                 for (File file : findLatestMappingFiles(here)) {
-                    files.add(Hasher.ensureFileHashed(file));
+                    File validationFile = validationFile(here, file);
+                    if (validationFile.exists()) {
+                        files.add(Hasher.ensureFileHashed(file));
+                        files.add(Hasher.ensureFileHashed(validationFile));
+                    }
                 }
+                files.add(Hasher.ensureFileHashed(sourceFile(here)));
                 return files;
             }
             catch (IOException e) {
