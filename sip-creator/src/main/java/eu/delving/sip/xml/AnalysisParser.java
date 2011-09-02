@@ -26,7 +26,6 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.Statistics;
-import org.apache.log4j.Logger;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
@@ -46,7 +45,6 @@ import java.util.Map;
 
 public class AnalysisParser implements Runnable {
     private static final int ELEMENT_STEP = 10000;
-    private final Logger LOG = Logger.getLogger(getClass());
     private Path path = new Path();
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
     private Listener listener;
@@ -79,9 +77,6 @@ public class AnalysisParser implements Runnable {
             long count = 0;
             while (true) {
                 switch (input.getEventType()) {
-                    case XMLEvent.START_DOCUMENT:
-                        LOG.info("Starting document");
-                        break;
                     case XMLEvent.START_ELEMENT:
                         if (++count % ELEMENT_STEP == 0) {
                             if (null != listener) {
@@ -109,10 +104,6 @@ public class AnalysisParser implements Runnable {
                         text.setLength(0);
                         path.pop();
                         break;
-                    case XMLEvent.END_DOCUMENT: {
-                        LOG.info("Ending document");
-                        break;
-                    }
                 }
                 if (!input.hasNext()) {
                     break;
@@ -123,7 +114,6 @@ public class AnalysisParser implements Runnable {
             listener.success(new Statistics(fieldStatisticsList));
         }
         catch (Exception e) {
-            LOG.error("Analysis Failed!", e);
             listener.failure(e);
         }
     }

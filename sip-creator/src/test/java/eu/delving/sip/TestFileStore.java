@@ -48,6 +48,7 @@ import java.util.Map;
 import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
+import static eu.delving.sip.files.FileStore.StoreState.MAPPED;
 import static eu.delving.sip.files.FileStore.StoreState.SOURCED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -101,7 +102,7 @@ public class TestFileStore {
     }
 
     @Test
-    public void convert() throws IOException, FileStoreException {
+    public void cycle() throws IOException, FileStoreException {
         mock.store().externalToImported(MockFileStoreInput.sampleFile(), null);
         mock.store().setHints(mock.hints());
         assertEquals("Should be imported and hints", 2, mock.files().length);
@@ -126,39 +127,22 @@ public class TestFileStore {
         assertTrue("Should be source format", statistics.isSourceFormat());
         AnalysisTree tree = statistics.createAnalysisTree();
         assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.create(FileStore.ENVELOPE_TAG)));
-    }
-
-    @Test
-    public void manipulateMapping() throws IOException, FileStoreException, MetadataException {
-        mock.store().externalToImported(MockFileStoreInput.sampleFile(), null);
-        assertEquals("Spec should be the same", MockFileStoreFactory.SPEC, mock.store().getSpec());
         RecordMapping recordMapping = mock.store().getRecordMapping(mock.getMetadataPrefix());
         assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recordMapping.getPrefix());
-        log.info("Mapping created with prefix " + recordMapping.getPrefix());
         MappingModel mappingModel = new MappingModel();
         mappingModel.setRecordMapping(recordMapping);
         mappingModel.setFact("/some/path", "value");
         mock.store().setRecordMapping(recordMapping);
-        assertEquals("Should be two files", 2, mock.files().length);
+        assertEquals("Should be two files", 6, mock.files().length);
         recordMapping = mock.store().getRecordMapping(mock.getMetadataPrefix());
         assertEquals("Should have held fact", "value", recordMapping.getFact("/some/path"));
-    }
-
-    @Test
-    public void manipulateStatistics() throws IOException, FileStoreException {
-        mock.store().externalToImported(MockFileStoreInput.sampleFile(), null);
-        Assert.assertNull("No stats should be here", mock.store().getLatestStatistics());
-        assertEquals("Should be one files", 1, mock.files().length);
-        mock.store().setStatistics(mock.stats());
-        assertEquals("Should be two files ", 2, mock.files().length);
-        assertEquals("Should be one stat", 1, mock.store().getLatestStatistics().size());
+        assertEquals(MAPPED, mock.store().getState());
     }
 
     private void analyze() {
         AnalysisParser parser = new AnalysisParser(mock.store(), new AnalysisParser.Listener() {
             @Override
             public void success(Statistics statistics) {
-                log.info("stats are in!");
                 try {
                     mock.store().setStatistics(statistics);
                     analysisTree = statistics.createAnalysisTree();
