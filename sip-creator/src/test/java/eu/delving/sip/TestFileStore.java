@@ -22,13 +22,15 @@
 package eu.delving.sip;
 
 import eu.delving.metadata.AnalysisTree;
-import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.Tag;
 import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreBase;
 import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.Statistics;
 import eu.delving.sip.xml.AnalysisParser;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -46,7 +48,7 @@ import java.util.Map;
 import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
-import static eu.delving.sip.files.FileStore.StoreState.SOURCED_PENDING_ANALYZE;
+import static eu.delving.sip.files.FileStore.StoreState.SOURCED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -107,17 +109,23 @@ public class TestFileStore {
         analyze();
         assertEquals("Should be imported, hints, and stats", 3, mock.files().length);
         assertFalse("Zero variables!", variables.isEmpty());
+        Statistics statistics = mock.store().getLatestStatistics();
+        assertFalse("Should be analysis format", statistics.isSourceFormat());
+        int statsSize = statistics.size();
         int recordCount = Integer.parseInt(mock.store().getHints().get(FileStore.RECORD_COUNT));
         assertTrue("Zero records!", recordCount > 0);
         assertEquals(IMPORTED_PENDING_CONVERT, mock.store().getState());
         mock.store().importedToSource(null);
-        assertEquals("Should be imported, hints, and source", 3, mock.files().length);
-        assertEquals(SOURCED_PENDING_ANALYZE, mock.store().getState());
-        analyze();
-        assertEquals("Should be imported, hints, source, stats", 4, mock.files().length);
-        int newRecordCount = Integer.parseInt(mock.store().getHints().get(FileStore.RECORD_COUNT));
-        assertEquals("Record counts different", recordCount, newRecordCount);
-        assertFalse("Zero variables!", variables.isEmpty());
+        assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
+        statistics.convertToSourcePaths(FileStoreBase.getRecordRoot(mock.hints()));
+        mock.store().setStatistics(statistics);
+        assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
+        assertEquals(SOURCED, mock.store().getState());
+        statistics = mock.store().getLatestStatistics();
+        assertTrue("Should be less items in analysis", statistics.size() < statsSize);
+        assertTrue("Should be source format", statistics.isSourceFormat());
+        AnalysisTree tree = statistics.createAnalysisTree();
+        assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.create(FileStore.ENVELOPE_TAG)));
     }
 
     @Test
@@ -139,29 +147,29 @@ public class TestFileStore {
     @Test
     public void manipulateStatistics() throws IOException, FileStoreException {
         mock.store().externalToImported(MockFileStoreInput.sampleFile(), null);
-        Assert.assertNull("No stats should be here", mock.store().getStatistics());
+        Assert.assertNull("No stats should be here", mock.store().getLatestStatistics());
         assertEquals("Should be one files", 1, mock.files().length);
         mock.store().setStatistics(mock.stats());
         assertEquals("Should be two files ", 2, mock.files().length);
-        assertEquals("Should be one stat", 1, mock.store().getStatistics().size());
+        assertEquals("Should be one stat", 1, mock.store().getLatestStatistics().size());
     }
 
     private void analyze() {
         AnalysisParser parser = new AnalysisParser(mock.store(), new AnalysisParser.Listener() {
             @Override
-            public void success(final List<FieldStatistics> list) {
+            public void success(Statistics statistics) {
                 log.info("stats are in!");
                 try {
-                    mock.store().setStatistics(list);
-                    analysisTree = AnalysisTree.create(list);
+                    mock.store().setStatistics(statistics);
+                    analysisTree = statistics.createAnalysisTree();
                     analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
                     Path recordRoot = null;
                     switch (mock.store().getState()) {
                         case IMPORTED_PENDING_CONVERT:
                             recordRoot = recordRoot();
                             break;
-                        case SOURCED_UNMAPPED:
-                            recordRoot = new Path("/delving-sip-source/input");
+                        case SOURCED:
+                            recordRoot = FileStore.RECORD_ROOT;
                             break;
                         default:
                             Assert.fail("strange state " + mock.store().getState());

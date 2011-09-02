@@ -70,9 +70,10 @@ public class Path implements Comparable<Path>, Serializable {
         string = null;
     }
 
-    public void pop() {
+    public Path pop() {
         stack.pop();
         string = null;
+        return this;
     }
 
     @Override

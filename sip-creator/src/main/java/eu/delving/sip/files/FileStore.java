@@ -21,8 +21,8 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MetadataModel;
+import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.ProgressListener;
 
@@ -56,10 +56,9 @@ public interface FileStore {
         EMPTY,
         IMPORTED_PENDING_ANALYZE,
         IMPORTED_PENDING_CONVERT,
-        SOURCED_PENDING_ANALYZE,
-        SOURCED_UNMAPPED,
-        MAPPED_UNVALIDATED,
-        READY_FOR_UPLOAD,
+        SOURCED,
+        MAPPED,
+        VALIDATED,
         PHANTOM
     }
 
@@ -87,9 +86,11 @@ public interface FileStore {
 
         InputStream sourceInput() throws FileStoreException;
 
-        List<FieldStatistics> getStatistics();
+        Statistics getLatestStatistics();
 
-        void setStatistics(List<FieldStatistics> fieldStatisticsList) throws FileStoreException;
+        Statistics getStatistics(boolean sourceFormat);
+
+        void setStatistics(Statistics statistics) throws FileStoreException;
 
         RecordMapping getRecordMapping(String metadataPrefix) throws FileStoreException;
 
@@ -112,7 +113,8 @@ public interface FileStore {
 
     String IMPORTED_FILE_NAME = "imported.xml.gz";
     String SOURCE_FILE_NAME = "source.xml.gz";
-    String STATISTICS_FILE_NAME = "statistics.ser";
+    String ANALYSIS_STATS_FILE_NAME = "analysis_stats.ser";
+    String SOURCE_STATS_FILE_NAME = "source_stats.ser";
     String FACTS_FILE_NAME = "facts.txt";
     String HINTS_FILE_NAME = "hints.txt";
     String PHANTOM_FILE_NAME = "phantom.txt";
@@ -124,4 +126,8 @@ public interface FileStore {
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";
     String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
+
+    String ENVELOPE_TAG = "delving-sip-source";
+    String RECORD_TAG = "input";
+    Path RECORD_ROOT = new Path(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
 }

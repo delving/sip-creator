@@ -28,6 +28,7 @@ import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.Statistics;
 
 import javax.swing.ListModel;
 import javax.swing.Timer;
@@ -49,7 +50,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class AnalysisModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
-    private List<FieldStatistics> statisticsList;
+    private Statistics statistics;
     private AnalysisTree analysisTree = AnalysisTree.create("Select a Data Set from the File menu");
     private DefaultTreeModel analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
     private VariableListModel variableListModel = new VariableListModel();
@@ -59,10 +60,10 @@ public class AnalysisModel {
         hintsModel.addListener(new HintSaveTimer());
     }
 
-    public void setStatisticsList(List<FieldStatistics> statisticsList) {
-        this.statisticsList = statisticsList;
-        if (statisticsList != null) {
-            analysisTree = AnalysisTree.create(statisticsList);
+    public void setStatistics(Statistics statistics) {
+        this.statistics = statistics;
+        if (statistics != null) {
+            analysisTree = statistics.createAnalysisTree();
         }
         else {
             analysisTree = AnalysisTree.create("Analysis not yet performed");
@@ -83,6 +84,14 @@ public class AnalysisModel {
             AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
         }
         selectStatistics(null);
+    }
+
+    public Statistics convertStatistics() {
+        if (statistics == null) {
+            throw new IllegalStateException("No statistics");
+        }
+        statistics.convertToSourcePaths(getRecordRoot());
+        return statistics;
     }
 
     public void set(Map<String, String> hints) {
@@ -108,6 +117,10 @@ public class AnalysisModel {
     public int getRecordCount() {
         String recordCount = hintsModel.get(FileStore.RECORD_COUNT);
         return recordCount == null ? 0 : Integer.parseInt(recordCount);
+    }
+
+    public long getElementCount() {
+        return statistics.getElementCount();
     }
 
     public void setUniqueElement(Path uniqueElement) {
@@ -141,19 +154,6 @@ public class AnalysisModel {
             variables.add(new SourceVariable(node));
         }
         return variables;
-    }
-
-    public long getElementCount() {
-        if (statisticsList != null) {
-            long total = 0L;
-            for (FieldStatistics stats : statisticsList) {
-                total += stats.getTotal();
-            }
-            return total;
-        }
-        else {
-            return 0L;
-        }
     }
 
     private void fireRecordRootSet() {

@@ -37,6 +37,7 @@ import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.Statistics;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
@@ -65,7 +66,6 @@ public class SipModel {
     private CompileModel recordCompileModel;
     private CompileModel fieldCompileModel;
     private MetadataParser metadataParser;
-    private MetadataRecord metadataRecord;
     private AnalysisModel analysisModel;
     private DataSetStoreModel storeModel = new DataSetStoreModel();
     private FactModel dataSetFacts = new FactModel();
@@ -200,7 +200,7 @@ public class SipModel {
             @Override
             public void run() {
                 storeModel.setStore(dataSetStore);
-                final List<FieldStatistics> statistics = dataSetStore.getStatistics();
+                final Statistics statistics = dataSetStore.getLatestStatistics();
                 final Map<String, String> facts = dataSetStore.getDataSetFacts();
                 final Map<String, String> hints = dataSetStore.getHints();
                 final String latestPrefix = dataSetStore.getLatestPrefix();
@@ -209,7 +209,7 @@ public class SipModel {
                     public void run() {
                         dataSetFacts.set(facts);
                         analysisModel.set(hints);
-                        analysisModel.setStatisticsList(statistics);
+                        analysisModel.setStatistics(statistics);
                         if (latestPrefix != null) {
                             setMetadataPrefix(latestPrefix, false);
                         }
@@ -288,13 +288,13 @@ public class SipModel {
     public void analyzeFields(final AnalysisListener listener) {
         Exec.work(new AnalysisParser(storeModel.getStore(), new AnalysisParser.Listener() {
             @Override
-            public void success(final List<FieldStatistics> list) {
+            public void success(final Statistics statistics) {
                 try {
-                    storeModel.getStore().setStatistics(list);
+                    storeModel.getStore().setStatistics(statistics);
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
-                            analysisModel.setStatisticsList(list);
+                            analysisModel.setStatistics(statistics);
                             storeModel.checkState();
                         }
                     });
@@ -326,6 +326,7 @@ public class SipModel {
             public void run() {
                 try {
                     storeModel.getStore().importedToSource(progressListener);
+                    storeModel.getStore().setStatistics(analysisModel.convertStatistics());
                     storeModel.checkState();
                 }
                 catch (FileStoreException e) {
@@ -428,6 +429,7 @@ public class SipModel {
                     );
                 }
                 metadataParser.setProgressListener(progressListener);
+                MetadataRecord metadataRecord;
                 while ((metadataRecord = metadataParser.nextRecord()) != null) {
                     if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
                         for (ParseListener parseListener : parseListeners) {

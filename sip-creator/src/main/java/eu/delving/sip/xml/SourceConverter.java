@@ -43,6 +43,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static eu.delving.sip.files.FileStore.ENVELOPE_TAG;
+import static eu.delving.sip.files.FileStore.RECORD_TAG;
+
 /**
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
  * the recordRootPath
@@ -51,8 +54,6 @@ import java.util.TreeMap;
  */
 
 public class SourceConverter {
-    public static final String ENVELOPE_TAG = "delving-sip-source";
-    public static final String RECORD_TAG = "input";
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();

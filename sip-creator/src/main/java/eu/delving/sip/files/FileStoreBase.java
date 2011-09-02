@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -22,6 +22,7 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.Hasher;
+import eu.delving.metadata.Path;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -35,14 +36,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static eu.delving.sip.files.FileStore.ANALYSIS_STATS_FILE_NAME;
 import static eu.delving.sip.files.FileStore.FACTS_FILE_NAME;
 import static eu.delving.sip.files.FileStore.HINTS_FILE_NAME;
 import static eu.delving.sip.files.FileStore.IMPORTED_FILE_NAME;
 import static eu.delving.sip.files.FileStore.MAPPING_FILE_PREFIX;
 import static eu.delving.sip.files.FileStore.MAPPING_FILE_SUFFIX;
 import static eu.delving.sip.files.FileStore.PHANTOM_FILE_NAME;
+import static eu.delving.sip.files.FileStore.RECORD_COUNT;
+import static eu.delving.sip.files.FileStore.RECORD_ROOT_PATH;
 import static eu.delving.sip.files.FileStore.SOURCE_FILE_NAME;
-import static eu.delving.sip.files.FileStore.STATISTICS_FILE_NAME;
+import static eu.delving.sip.files.FileStore.SOURCE_STATS_FILE_NAME;
+import static eu.delving.sip.files.FileStore.UNIQUE_ELEMENT_PATH;
 import static eu.delving.sip.files.FileStore.VALIDATION_FILE_PATTERN;
 
 /**
@@ -54,6 +59,35 @@ import static eu.delving.sip.files.FileStore.VALIDATION_FILE_PATTERN;
 public class FileStoreBase {
     public static final int BLOCK_SIZE = 4096;
     public static final int MAX_HASH_HISTORY = 5;
+
+    public static Path getRecordRoot(Map<String,String> hints) throws FileStoreException {
+        String recordRoot = hints.get(RECORD_ROOT_PATH);
+        if (recordRoot == null) {
+            throw new FileStoreException("Must have record root path");
+        }
+        return new Path(recordRoot);
+    }
+
+    public static int getRecordCount(Map<String,String> hints) throws FileStoreException {
+        String recordCount = hints.get(RECORD_COUNT);
+        int count = 0;
+        try {
+            count = Integer.parseInt(recordCount);
+        }
+        catch (Exception e) { /* nothing */ }
+        if (count == 0) {
+            throw new FileStoreException("Must have nonzero record count");
+        }
+        return count;
+    }
+
+    public static Path getUniqueElement(Map<String,String> hints) throws FileStoreException {
+        String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
+        if (uniqueElement == null) {
+            throw new FileStoreException("Must have unique element path");
+        }
+        return new Path(uniqueElement);
+    }
 
     Map<String, String> readFacts(File file) throws IOException {
         Map<String, String> facts = new TreeMap<String, String>();
@@ -111,8 +145,8 @@ public class FileStoreBase {
         return new File(dir, String.format(VALIDATION_FILE_PATTERN, prefix));
     }
 
-    File statisticsFile(File dir) {
-        return new File(dir, STATISTICS_FILE_NAME);
+    File statisticsFile(File dir, boolean sourceFormat) {
+        return new File(dir, sourceFormat ? SOURCE_STATS_FILE_NAME : ANALYSIS_STATS_FILE_NAME);
     }
 
     File phantomFile(File dir) {

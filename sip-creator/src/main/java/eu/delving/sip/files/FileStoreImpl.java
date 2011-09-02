@@ -21,7 +21,6 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
@@ -59,11 +58,10 @@ import java.util.zip.ZipInputStream;
 import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
-import static eu.delving.sip.files.FileStore.StoreState.MAPPED_UNVALIDATED;
+import static eu.delving.sip.files.FileStore.StoreState.MAPPED;
 import static eu.delving.sip.files.FileStore.StoreState.PHANTOM;
-import static eu.delving.sip.files.FileStore.StoreState.READY_FOR_UPLOAD;
-import static eu.delving.sip.files.FileStore.StoreState.SOURCED_PENDING_ANALYZE;
-import static eu.delving.sip.files.FileStore.StoreState.SOURCED_UNMAPPED;
+import static eu.delving.sip.files.FileStore.StoreState.SOURCED;
+import static eu.delving.sip.files.FileStore.StoreState.VALIDATED;
 
 /**
  * This interface describes how files are stored by the sip-creator
@@ -211,11 +209,10 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             }
             File imported = importedFile(here);
             File source = sourceFile(here);
-            File statistics = statisticsFile(here);
             if (imported.exists()) {
                 if (source.exists()) {
                     if (imported.lastModified() > source.lastModified()) {
-                        if (statistics.exists()) { // first analysis (deleted during conversion, during import too)
+                        if (statisticsFile(here, false).exists()) {
                             return IMPORTED_PENDING_CONVERT;
                         }
                         else {
@@ -226,7 +223,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                         return statePostSource();
                     }
                 }
-                else if (statistics.exists()) {
+                else if (statisticsFile(here, false).exists()) {
                     return IMPORTED_PENDING_CONVERT;
                 }
                 else {
@@ -242,22 +239,17 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         private StoreState statePostSource() {
-            if (statisticsFile(here).exists()) {
-                File mapping = latestMappingFileOrNull(here);
-                if (mapping != null) {
-                    if (validationFile(here, mapping).exists()) {
-                        return READY_FOR_UPLOAD;
-                    }
-                    else {
-                        return MAPPED_UNVALIDATED;
-                    }
+            File mapping = latestMappingFileOrNull(here);
+            if (mapping != null) {
+                if (validationFile(here, mapping).exists()) {
+                    return VALIDATED;
                 }
                 else {
-                    return SOURCED_UNMAPPED;
+                    return MAPPED;
                 }
             }
             else {
-                return SOURCED_PENDING_ANALYZE;
+                return SOURCED;
             }
         }
 
@@ -309,15 +301,32 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public List<FieldStatistics> getStatistics() {
-            File statisticsFile = statisticsFile(here);
+        public Statistics getLatestStatistics() {
+            File analysis = statisticsFile(here, false);
+            File source = statisticsFile(here, true);
+            if (analysis.exists()) {
+                if (source.exists()) {
+                    return getStatistics(source.lastModified() >= analysis.lastModified());
+                }
+                else {
+                    return getStatistics(false);
+                }
+            }
+            else {
+                return getStatistics(true);
+            }
+        }
+
+        @Override
+        public Statistics getStatistics(boolean sourceFormat) {
+            File statisticsFile = statisticsFile(here, sourceFormat);
             if (statisticsFile.exists()) {
                 try {
                     ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(statisticsFile)));
                     @SuppressWarnings("unchecked")
-                    List<FieldStatistics> fieldStatisticsList = (List<FieldStatistics>) in.readObject();
+                    Statistics statistics = (Statistics) in.readObject();
                     in.close();
-                    return fieldStatisticsList;
+                    return statistics;
                 }
                 catch (Exception e) {
                     try {
@@ -332,11 +341,11 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void setStatistics(List<FieldStatistics> fieldStatisticsList) throws FileStoreException {
-            File statisticsFile = statisticsFile(here);
+        public void setStatistics(Statistics statistics) throws FileStoreException {
+            File statisticsFile = statisticsFile(here, statistics.isSourceFormat());
             try {
                 ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(statisticsFile)));
-                out.writeObject(fieldStatisticsList);
+                out.writeObject(statistics);
                 out.close();
             }
             catch (IOException e) {
@@ -438,7 +447,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 if (progressListener != null) progressListener.finished(!cancelled);
                 inputStream.close();
                 gzipOutputStream.close();
-                delete(statisticsFile(here));
+                delete(statisticsFile(here, false));
             }
             catch (Exception e) {
                 if (progressListener != null) progressListener.finished(false);
@@ -464,25 +473,16 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             if (!isRecentlyImported()) {
                 throw new FileStoreException("Import to source would be redundant, since source is newer");
             }
-            if (!statisticsFile(here).exists()) {
-                throw new FileStoreException("No statistics so conversion doesn't trust the record count");
+            if (!statisticsFile(here, false).exists()) {
+                throw new FileStoreException("No analysis stats so conversion doesn't trust the record count");
             }
             try {
                 Map<String, String> hints = getHints();
-                String recordRoot = hints.get(RECORD_ROOT_PATH);
-                String recordCount = hints.get(RECORD_COUNT);
-                if (recordRoot == null) {
-                    throw new FileStoreException("Must have record root path");
-                }
-                int count = 0;
-                try {
-                    count = Integer.parseInt(recordCount);
-                }
-                catch (Exception e) { /* nothing */ }
-                SourceConverter converter = new SourceConverter(new Path(recordRoot), count);
+                Path recordRoot = getRecordRoot(hints);
+                int recordCount = getRecordCount(hints);
+                SourceConverter converter = new SourceConverter(recordRoot, recordCount);
                 converter.setProgressListener(progressListener);
                 converter.parse(importedInput(), sourceOutput());
-                delete(statisticsFile(here));
             }
             catch (XMLStreamException e) {
                 throw new FileStoreException("Unable to convert source", e);

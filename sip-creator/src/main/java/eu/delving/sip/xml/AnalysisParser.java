@@ -25,16 +25,14 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.Statistics;
 import org.apache.log4j.Logger;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,11 +51,10 @@ public class AnalysisParser implements Runnable {
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
     private Listener listener;
     private FileStore.DataSetStore dataSetStore;
-    private boolean abort;
 
     public interface Listener {
 
-        void success(List<FieldStatistics> list);
+        void success(Statistics statistics);
 
         void failure(Exception exception);
 
@@ -69,10 +66,6 @@ public class AnalysisParser implements Runnable {
         this.listener = listener;
     }
 
-    public void abort() {
-        abort = true;
-    }
-
     @Override
     public void run() {
         try {
@@ -81,22 +74,10 @@ public class AnalysisParser implements Runnable {
             xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
             xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
             xmlif.configureForSpeed();
-            InputStream inputStream;
-            switch (dataSetStore.getState()) {
-                case IMPORTED_PENDING_ANALYZE:
-                    inputStream = dataSetStore.importedInput();
-                    break;
-                case SOURCED_PENDING_ANALYZE:
-                    inputStream = dataSetStore.sourceInput();
-                    break;
-                default :
-                    listener.failure(new FileStoreException("For analysis, the dataset store state must be *_PENDING_ANALYZE, but it was "+dataSetStore.getState()));
-                    return;
-            }
-            XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
+            XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), dataSetStore.importedInput());
             StringBuilder text = new StringBuilder();
             long count = 0;
-            while (!abort) {
+            while (true) {
                 switch (input.getEventType()) {
                     case XMLEvent.START_DOCUMENT:
                         LOG.info("Starting document");
@@ -139,11 +120,7 @@ public class AnalysisParser implements Runnable {
                 input.next();
             }
             List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
-            Collections.sort(fieldStatisticsList);
-            for (FieldStatistics fieldStatistics : fieldStatisticsList) {
-                fieldStatistics.finish();
-            }
-            listener.success(fieldStatisticsList);
+            listener.success(new Statistics(fieldStatisticsList));
         }
         catch (Exception e) {
             LOG.error("Analysis Failed!", e);

@@ -7,6 +7,7 @@ import eu.delving.metadata.Path;
 import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.files.FileStoreImpl;
+import eu.delving.sip.files.Statistics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,14 +78,14 @@ public class MockFileStoreFactory {
         return hints;
     }
 
-    public List<FieldStatistics> stats() {
+    public Statistics stats() {
         List<FieldStatistics> stats = new ArrayList<FieldStatistics>();
         FieldStatistics fieldStatistics = new FieldStatistics(new Path("/stat/path"));
         fieldStatistics.recordOccurrence();
         fieldStatistics.recordValue("booger");
         fieldStatistics.finish();
         stats.add(fieldStatistics);
-        return stats;
+        return new Statistics(stats);
     }
 
     public void delete() {

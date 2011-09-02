@@ -97,13 +97,11 @@ public class StatusFrame extends FrameBase {
                 return "imported - needs analysis";
             case IMPORTED_PENDING_CONVERT:
                 return "can now convert to standard format";
-            case SOURCED_PENDING_ANALYZE:
-                return "source present - needs analysis";
-            case SOURCED_UNMAPPED:
+            case SOURCED:
                 return "analysis complete - mapping possible";
-            case MAPPED_UNVALIDATED:
+            case MAPPED:
                 return "mapping exists - not yet validated";
-            case READY_FOR_UPLOAD:
+            case VALIDATED:
                 return "ready for upload!";
             default:
                 throw new IllegalArgumentException("Unknown store state: "+storeState);
