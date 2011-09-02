@@ -72,17 +72,15 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
 
     @Override
     public void select(FieldMapping fieldMapping) {
+    }
+
+    @Override
+    public void fieldMappingChanged() {
         timer.restart();
     }
 
     @Override
-    public void selectedChanged() {
-        timer.restart();
-    }
-
-    @Override
-    public void mappingChanged(RecordMapping recordMapping) {
-        timer.restart();
+    public void recordMappingChanged(RecordMapping recordMapping) {
     }
 }
 

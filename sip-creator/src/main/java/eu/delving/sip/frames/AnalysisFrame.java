@@ -27,6 +27,8 @@ import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressAdapter;
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -88,6 +90,11 @@ public class AnalysisFrame extends FrameBase {
     protected void refresh() {
     }
 
+    @Override
+    protected FileStore.StoreState getMinimumStoreState() {
+        return FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
+    }
+
     private void wireUp() {
         statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             @Override
@@ -132,7 +139,17 @@ public class AnalysisFrame extends FrameBase {
                 performAnalysis();
             }
         });
-        // todo: convert buttons should only appear when DataSetStore says it makes sense
+        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+            @Override
+            public void storeSet(FileStore.DataSetStore store) {
+                storeStateChanged(store, store.getState());
+            }
+
+            @Override
+            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
+                convertButton.setEnabled(storeState.ordinal() >= FileStore.StoreState.IMPORTED_PENDING_CONVERT.ordinal());
+            }
+        });
         convertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

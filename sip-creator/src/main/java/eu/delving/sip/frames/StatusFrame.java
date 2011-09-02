@@ -80,6 +80,11 @@ public class StatusFrame extends FrameBase {
     protected void refresh() {
     }
 
+    @Override
+    protected FileStore.StoreState getMinimumStoreState() {
+        return FileStore.StoreState.EMPTY;
+    }
+
     private void showStatus(final FileStore.StoreState storeState) {
         Exec.swing(new Runnable() {
             @Override

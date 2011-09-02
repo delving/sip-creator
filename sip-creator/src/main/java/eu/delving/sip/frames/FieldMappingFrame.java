@@ -30,6 +30,7 @@ import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.CompileModel;
 import eu.delving.sip.model.SipModel;
 
@@ -89,6 +90,11 @@ public class FieldMappingFrame extends FrameBase {
 
     @Override
     protected void refresh() {
+    }
+
+    @Override
+    protected FileStore.StoreState getMinimumStoreState() {
+        return FileStore.StoreState.ANALYZED;
     }
 
     private JPanel createPanel() {
@@ -175,11 +181,11 @@ public class FieldMappingFrame extends FrameBase {
             }
 
             @Override
-            public void selectedChanged() {
+            public void fieldMappingChanged() {
             }
 
             @Override
-            public void mappingChanged(RecordMapping recordMapping) {
+            public void recordMappingChanged(RecordMapping recordMapping) {
             }
         });
         dictionaryCreate.addActionListener(new ActionListener() {

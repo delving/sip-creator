@@ -93,16 +93,16 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
     }
 
     @Override
-    public void selectedChanged() {
+    public void fieldMappingChanged() {
     }
 
     @Override
-    public void mappingChanged(RecordMapping recordMapping) {
+    public void recordMappingChanged(RecordMapping recordMapping) {
         this.recordMapping = recordMapping;
         refresh();
     }
 
     public void kick() {
-        mappingChanged(sipModel.getMappingModel().getRecordMapping()); // to fire it off
+        recordMappingChanged(sipModel.getMappingModel().getRecordMapping()); // to fire it off
     }
 }

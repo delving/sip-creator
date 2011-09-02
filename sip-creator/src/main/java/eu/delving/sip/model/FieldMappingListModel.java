@@ -68,11 +68,11 @@ public class FieldMappingListModel extends AbstractListModel implements MappingM
     }
 
     @Override
-    public void selectedChanged() {
+    public void fieldMappingChanged() {
     }
 
     @Override
-    public void mappingChanged(RecordMapping recordMapping) {
+    public void recordMappingChanged(RecordMapping recordMapping) {
         clear();
         if (recordMapping != null) {
             for (FieldMapping fieldMapping : recordMapping.getFieldMappings()) {

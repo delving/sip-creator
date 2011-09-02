@@ -143,11 +143,11 @@ public class VariableListModel extends AbstractListModel {
         }
 
         @Override
-        public void selectedChanged() {
+        public void fieldMappingChanged() {
         }
 
         @Override
-        public void mappingChanged(RecordMapping recordMapping) {
+        public void recordMappingChanged(RecordMapping recordMapping) {
             refresh();
         }
     }

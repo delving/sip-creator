@@ -21,6 +21,8 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.files.FileStore;
+import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -65,7 +67,7 @@ public abstract class FrameBase extends JInternalFrame {
     protected FrameBase childFrame;
     protected JComponent focusOwner;
     protected SipModel sipModel;
-    protected Action action;
+    protected PopupAction action;
     private boolean modal;
     private boolean initialized;
 
@@ -88,14 +90,37 @@ public abstract class FrameBase extends JInternalFrame {
         if (modal) {
             setFocusTraversalKeysEnabled(false);
         }
-        if (getStoredSize() != null) {
-            Exec.swingLater(new Runnable() {
+        this.sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+            @Override
+            public void storeSet(FileStore.DataSetStore store) {
+                checkEnableStatus(store.getState());
+            }
+
+            @Override
+            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState state) {
+                checkEnableStatus(state);
+            }
+        });
+    }
+
+    private void checkEnableStatus(FileStore.StoreState state) {
+        boolean enabled = shouldBeEnabled(state);
+        action.setEnabled(enabled);
+        if (enabled && getStoredSize() != null) {
+            Exec.swing(new Runnable() {
                 @Override
                 public void run() {
                     show();
                 }
             });
         }
+        if (isVisible() && !enabled) {
+            hide();
+        }
+    }
+
+    private boolean shouldBeEnabled(FileStore.StoreState state) {
+        return state.ordinal() >= getMinimumStoreState().ordinal();
     }
 
     public void setAccelerator(int number) {
@@ -187,15 +212,11 @@ public abstract class FrameBase extends JInternalFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (!sipModel.hasDataSetStore() || sipModel.getMappingModel().getRecordMapping() == null) {
-                JOptionPane.showInternalMessageDialog(desktopPane, "A Dataset and Mapping must be selected from the menus", FrameBase.this.getTitle(), JOptionPane.PLAIN_MESSAGE);
-            }
-            else {
-                show();
-            }
+            show();
         }
-
     }
+
+    protected abstract FileStore.StoreState getMinimumStoreState();
 
     private Point addIfAbsent() {
         boolean add = true;

@@ -58,6 +58,7 @@ public interface FileStore {
         IMPORTED_PENDING_ANALYZE,
         IMPORTED_PENDING_CONVERT,
         SOURCED,
+        ANALYZED,
         MAPPED,
         VALIDATED,
         PHANTOM

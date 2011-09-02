@@ -97,9 +97,9 @@ public class MappingModel {
         }
     }
 
-    public void changeSelected() {
+    public void notifySelectedFieldMappingChange() {
         for (Listener listener : listeners) {
-            listener.selectedChanged();
+            listener.fieldMappingChanged();
         }
     }
 
@@ -108,8 +108,8 @@ public class MappingModel {
     public interface Listener {
         void factChanged();
         void select(FieldMapping fieldMapping);
-        void selectedChanged();
-        void mappingChanged(RecordMapping recordMapping);
+        void fieldMappingChanged();
+        void recordMappingChanged(RecordMapping recordMapping);
     }
 
     public void addListener(Listener listener) {
@@ -121,7 +121,7 @@ public class MappingModel {
     private void fireMappingChanged() {
         selectedFieldMapping = null;
         for (Listener listener : listeners) {
-            listener.mappingChanged(recordMapping);
+            listener.recordMappingChanged(recordMapping);
             listener.select(null);
         }
     }

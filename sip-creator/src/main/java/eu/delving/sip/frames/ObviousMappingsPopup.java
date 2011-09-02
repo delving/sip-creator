@@ -27,6 +27,7 @@ import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.FieldMappingListModel;
 
 import javax.swing.AbstractAction;
@@ -70,11 +71,11 @@ public class ObviousMappingsPopup extends FrameBase {
             }
 
             @Override
-            public void selectedChanged() {
+            public void fieldMappingChanged() {
             }
 
             @Override
-            public void mappingChanged(RecordMapping recordMapping) {
+            public void recordMappingChanged(RecordMapping recordMapping) {
                 obviousListModel.refresh();
             }
         });
@@ -90,6 +91,11 @@ public class ObviousMappingsPopup extends FrameBase {
     @Override
     protected void refresh() {
         obviousListModel.refresh();
+    }
+
+    @Override
+    protected FileStore.StoreState getMinimumStoreState() {
+        return FileStore.StoreState.EMPTY;
     }
 
     private JComponent createCenter() {

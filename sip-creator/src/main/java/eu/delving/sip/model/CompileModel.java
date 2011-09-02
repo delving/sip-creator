@@ -108,12 +108,12 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     @Override
-    public void selectedChanged() {
+    public void fieldMappingChanged() {
         compileSoon();
     }
 
     @Override
-    public void mappingChanged(RecordMapping recordMapping) {
+    public void recordMappingChanged(RecordMapping recordMapping) {
         this.recordMapping = recordMapping;
         this.editedCode = null;
         Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));

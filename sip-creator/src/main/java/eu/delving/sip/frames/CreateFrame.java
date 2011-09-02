@@ -87,6 +87,11 @@ public class CreateFrame extends FrameBase {
     protected void refresh() {
     }
 
+    @Override
+    protected FileStore.StoreState getMinimumStoreState() {
+        return FileStore.StoreState.ANALYZED;
+    }
+
     private void wireUp() {
         sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
 

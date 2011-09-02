@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressAdapter;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.SipModel;
 
@@ -75,6 +76,11 @@ public class OutputFrame extends FrameBase {
 
     @Override
     protected void refresh() {
+    }
+
+    @Override
+    protected FileStore.StoreState getMinimumStoreState() {
+        return FileStore.StoreState.MAPPED;
     }
 
     private JComponent createSouth() {
@@ -203,6 +209,11 @@ public class OutputFrame extends FrameBase {
 
         @Override
         protected void refresh() {
+        }
+
+        @Override
+        protected FileStore.StoreState getMinimumStoreState() {
+            return FileStore.StoreState.EMPTY;
         }
 
         private JPanel createButtons() {

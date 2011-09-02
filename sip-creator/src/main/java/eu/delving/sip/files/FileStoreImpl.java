@@ -57,6 +57,7 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static eu.delving.sip.files.FileStore.StoreState.ANALYZED;
 import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
 import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
@@ -174,15 +175,15 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         public RecordMapping setLatestPrefix(String prefix) throws FileStoreException {
             File latestForPrefix = findLatestMappingFile(here, prefix);
             RecordMapping recordMapping;
-            if (latestForPrefix == null) {
-                recordMapping = new RecordMapping(prefix);
-                setRecordMapping(recordMapping);
-            }
-            else {
+            if (latestForPrefix.exists()) {
                 if (!latestForPrefix.setLastModified(System.currentTimeMillis())) {
                     throw new FileStoreException("Couldn't touch the file to give it priority");
                 }
                 recordMapping = getRecordMapping(prefix);
+            }
+            else {
+                recordMapping = new RecordMapping(prefix);
+                setRecordMapping(recordMapping);
             }
             return recordMapping;
         }
@@ -214,22 +215,14 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             if (imported.exists()) {
                 if (source.exists()) {
                     if (imported.lastModified() > source.lastModified()) {
-                        if (statisticsFile(here, false).exists()) {
-                            return IMPORTED_PENDING_CONVERT;
-                        }
-                        else {
-                            return IMPORTED_PENDING_ANALYZE;
-                        }
+                        return statisticsFile(here, false).exists() ? IMPORTED_PENDING_CONVERT : IMPORTED_PENDING_ANALYZE;
                     }
                     else {
                         return statePostSource();
                     }
                 }
-                else if (statisticsFile(here, false).exists()) {
-                    return IMPORTED_PENDING_CONVERT;
-                }
                 else {
-                    return IMPORTED_PENDING_ANALYZE;
+                    return statisticsFile(here, false).exists() ? IMPORTED_PENDING_CONVERT : IMPORTED_PENDING_ANALYZE;
                 }
             }
             else if (source.exists()) {
@@ -241,13 +234,13 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         private StoreState statePostSource() {
-            File mapping = latestMappingFileOrNull(here);
-            if (mapping != null) {
-                if (validationFile(here, mapping).exists()) {
-                    return VALIDATED;
+            if (statisticsFile(here, true).exists()) {
+                File mapping = latestMappingFileOrNull(here);
+                if (mapping != null) {
+                    return validationFile(here, mapping).exists() ? VALIDATED : MAPPED;
                 }
                 else {
-                    return MAPPED;
+                    return ANALYZED;
                 }
             }
             else {

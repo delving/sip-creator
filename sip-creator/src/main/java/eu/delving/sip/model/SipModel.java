@@ -121,7 +121,7 @@ public class SipModel {
                 switch (state) {
                     case COMMITTED:
                     case REGENERATED:
-                        mappingModel.changeSelected();
+                        mappingModel.notifySelectedFieldMappingChange();
                 }
             }
         });

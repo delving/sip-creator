@@ -49,17 +49,12 @@ public class DataSetMenu extends JMenu {
 
             @Override
             public void storeSet(FileStore.DataSetStore store) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        refresh();
-                    }
-                });
+                swingRefresh();
             }
 
             @Override
             public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
-                // todo: implement
+                swingRefresh();
             }
         });
         String selectedSpec = sipModel.getPreferences().get(SELECTED, "");
@@ -69,6 +64,15 @@ public class DataSetMenu extends JMenu {
                 sipModel.setDataSetStore(store);
             }
         }
+    }
+
+    private void swingRefresh() {
+        Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                refresh();
+            }
+        });
     }
 
     public void refresh() {
@@ -86,7 +90,7 @@ public class DataSetMenu extends JMenu {
                 }
             });
             if (sipModel.hasDataSetStore()) {
-                if (store == sipModel.getStoreModel().getStore()) {
+                if (store.getSpec().equals(sipModel.getStoreModel().getStore().getSpec())) {
                     item.setSelected(true);
                 }
             }

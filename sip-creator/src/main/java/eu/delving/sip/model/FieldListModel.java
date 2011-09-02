@@ -101,11 +101,11 @@ public class FieldListModel extends AbstractListModel {
         }
 
         @Override
-        public void selectedChanged() {
+        public void fieldMappingChanged() {
         }
 
         @Override
-        public void mappingChanged(RecordMapping recordMapping) {
+        public void recordMappingChanged(RecordMapping recordMapping) {
             int sizeBefore = getSize();
             unmappedFields.clear();
             fieldDefinitions.clear();

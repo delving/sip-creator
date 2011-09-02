@@ -26,6 +26,7 @@ import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.FieldMappingListModel;
 import eu.delving.sip.model.SipModel;
 
@@ -77,6 +78,11 @@ public class RecordMappingFrame extends FrameBase {
     protected void refresh() {
     }
 
+    @Override
+    protected FileStore.StoreState getMinimumStoreState() {
+        return FileStore.StoreState.MAPPED;
+    }
+
     private JPanel createCodePanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.add(scroll(codeArea), BorderLayout.CENTER);
@@ -109,11 +115,11 @@ public class RecordMappingFrame extends FrameBase {
             }
 
             @Override
-            public void selectedChanged() {
+            public void fieldMappingChanged() {
             }
 
             @Override
-            public void mappingChanged(RecordMapping recordMapping) {
+            public void recordMappingChanged(RecordMapping recordMapping) {
                 String code = recordMapping.toDisplayCode(sipModel.getMetadataModel());
                 codeArea.setText(code);
             }
