@@ -31,8 +31,8 @@ import java.util.Set;
  */
 
 public class FieldStatistics implements Comparable<FieldStatistics>, Serializable {
-    private static final int RANDOM_SAMPLE_SIZE = 300;
-    private static final int HISTOGRAM_MAX_STORAGE_SIZE = 1024 * 64;
+    private static final int RANDOM_SAMPLE_SIZE = 200;
+    private static final int HISTOGRAM_MAX_STORAGE_SIZE = 1024 * 128;
     private static final int HISTOGRAM_MAX_SIZE = 2400;
 
     private Path path;
