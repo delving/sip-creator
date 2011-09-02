@@ -56,14 +56,13 @@ public class FileValidator implements Runnable {
     private volatile boolean aborted = false;
     private boolean allowInvalid;
     private int validCount, invalidCount;
-    private BitSet valid;
 
     public interface Listener {
         void invalidInput(MappingException exception);
 
         void invalidOutput(ValidationException exception);
 
-        void finished(BitSet valid);
+        void finished(BitSet valid, int recordCount);
     }
 
     public FileValidator(
@@ -88,7 +87,7 @@ public class FileValidator implements Runnable {
         Uniqueness uniqueness = new Uniqueness();
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
-        valid = new BitSet(sipModel.getAnalysisModel().getRecordCount());
+        BitSet valid = new BitSet(sipModel.getAnalysisModel().getRecordCount());
         try {
             RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
             if (recordMapping == null) {
@@ -178,7 +177,7 @@ public class FileValidator implements Runnable {
             aborted = true;
         }
         finally {
-            listener.finished(aborted ? null : valid);
+            listener.finished(aborted ? null : valid, sipModel.getAnalysisModel().getRecordCount());
             uniqueness.destroy();
             if (aborted) { // aborted, so metadataparser will not call finished()
                 progressAdapter.finished(false);

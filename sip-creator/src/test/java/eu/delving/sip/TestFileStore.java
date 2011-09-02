@@ -39,9 +39,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.swing.tree.DefaultTreeModel;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
@@ -137,6 +140,29 @@ public class TestFileStore {
         recordMapping = mock.store().getRecordMapping(mock.getMetadataPrefix());
         assertEquals("Should have held fact", "value", recordMapping.getFact("/some/path"));
         assertEquals(MAPPED, mock.store().getState());
+    }
+
+    @Test
+    public void validation() throws FileStoreException, IOException {
+        int bits = 100;
+        BitSet valid = new BitSet(bits);
+        for (int walk=0; walk<bits; walk++) {
+            if ((walk % 25) > 0) {
+                valid.set(walk);
+            }
+        }
+        assertEquals("Cardinality unexpected", 96, valid.cardinality());
+        mock.store().setValidation("bla", valid, bits);
+        assertEquals("Should have held fact", 1, mock.files().length);
+        DataInputStream dis = new DataInputStream(new FileInputStream(mock.files()[0]));
+        int size = dis.readInt();
+        BitSet invalid = new BitSet(bits);
+        for (int walk=0; walk<size; walk++) {
+            int index = dis.readInt();
+            invalid.set(index);
+        }
+        invalid.xor(valid);
+        assertEquals("Should not be any clear bits in the first "+bits, bits, invalid.nextClearBit(0));
     }
 
     private void analyze() {

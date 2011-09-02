@@ -387,13 +387,13 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void setValidation(String metadataPrefix, BitSet validation) throws FileStoreException {
+        public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws FileStoreException {
             File file = new File(here, String.format(VALIDATION_FILE_PATTERN, metadataPrefix));
             try {
                 DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
-                int invalidCount = validation.size() - validation.cardinality();
+                int invalidCount = recordCount - validation.cardinality();
                 out.writeInt(invalidCount);
-                for (int index = validation.nextClearBit(0); index > 0; index = validation.nextClearBit(index+1)) {
+                for (int index = validation.nextClearBit(0); index >= 0 && index < recordCount; index = validation.nextClearBit(index+1)) {
                     out.writeInt(index);
                 }
                 out.close();

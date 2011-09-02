@@ -367,7 +367,7 @@ public class SipModel {
                     }
 
                     @Override
-                    public void finished(final BitSet valid) {
+                    public void finished(final BitSet valid, int recordCount) {
                         reportFileModel.kick();
                         storeModel.checkState();
                     }

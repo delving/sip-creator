@@ -97,7 +97,7 @@ public interface FileStore {
 
         void setRecordMapping(RecordMapping recordMapping) throws FileStoreException;
 
-        void setValidation(String metadataPrefix, BitSet validation) throws FileStoreException;
+        void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws FileStoreException;
 
         PrintWriter reportWriter(RecordMapping recordMapping) throws FileStoreException;
 
