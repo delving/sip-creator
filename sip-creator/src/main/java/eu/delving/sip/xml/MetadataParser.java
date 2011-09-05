@@ -27,6 +27,7 @@ import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.files.FileStore;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
@@ -49,16 +50,14 @@ import java.util.TreeMap;
 public class MetadataParser {
     private InputStream inputStream;
     private XMLStreamReader2 input;
-    private Path recordRoot;
     private int recordIndex, recordCount;
     private Path path = new Path();
     private Map<String, String> namespaces = new TreeMap<String, String>();
     private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;
 
-    public MetadataParser(InputStream inputStream, Path recordRoot, int recordCount) throws XMLStreamException {
+    public MetadataParser(InputStream inputStream, int recordCount) throws XMLStreamException {
         this.inputStream = inputStream;
-        this.recordRoot = recordRoot;
         this.recordCount = recordCount;
         XMLInputFactory2 xmlif = (XMLInputFactory2) XMLInputFactory2.newInstance();
         xmlif.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
@@ -86,7 +85,7 @@ public class MetadataParser {
                     break;
                 case XMLEvent.START_ELEMENT:
                     path.push(Tag.create(input.getName().getPrefix(), input.getName().getLocalPart()));
-                    if (node == null && path.equals(recordRoot)) {
+                    if (node == null && path.equals(FileStore.RECORD_ROOT)) {
                         node = new GroovyNode(null, "input");
                     }
                     else if (node != null) {
@@ -117,7 +116,7 @@ public class MetadataParser {
                             // todo: perhaps check if there is already an array of children in there.
                             node.setValue(valueString);
                         }
-                        if (path.equals(recordRoot)) {
+                        if (path.equals(FileStore.RECORD_ROOT)) {
                             if (node.parent() != null) {
                                 throw new RuntimeException("Expected to be at root node");
                             }

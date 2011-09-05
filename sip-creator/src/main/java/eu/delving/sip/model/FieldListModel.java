@@ -122,7 +122,7 @@ public class FieldListModel extends AbstractListModel {
                 nextVariable:
                 for (FieldDefinition fieldDefinition : fieldDefinitions) {
                     for (FieldMapping fieldMapping : recordMapping.getFieldMappings()) {
-                        if (fieldMapping.fieldDefinition == fieldDefinition) {
+                        if (fieldMapping.fieldDefinition.getTag().equals(fieldDefinition.getTag())) {
                             continue nextVariable;
                         }
                     }

@@ -62,16 +62,17 @@ public class AnalysisModel {
 
     public void setStatistics(Statistics statistics) {
         this.statistics = statistics;
+        Path recordRoot = null;
         if (statistics != null) {
             analysisTree = statistics.createAnalysisTree();
+            recordRoot = statistics.isSourceFormat() ? FileStore.RECORD_ROOT : getRecordRoot();
         }
         else {
             analysisTree = AnalysisTree.create("Analysis not yet performed");
         }
         analysisTreeModel.setRoot(analysisTree.getRoot());
-        Path recordRoot = getRecordRoot();
         if (recordRoot != null) {
-            AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+            AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot); // todo:
             List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
             analysisTree.getVariables(variables);
             variableListModel.setVariableList(variables);
@@ -171,6 +172,7 @@ public class AnalysisModel {
 
     public interface Listener {
         void statisticsSelected(FieldStatistics fieldStatistics);
+
         void recordRootSet(Path recordRootPath);
     }
 
@@ -202,7 +204,7 @@ public class AnalysisModel {
         }
 
         @Override
-        public void allFactsUpdated(Map<String,String> map) {
+        public void allFactsUpdated(Map<String, String> map) {
             timer.restart();
         }
     }

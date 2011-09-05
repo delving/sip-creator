@@ -207,7 +207,6 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             List<RecordDefinition> definitions = new ArrayList<RecordDefinition>();
             try {
                 List<File> recDefFile = findRecordDefinitionFiles(here);
-                XStream stream = recordStream();
                 for (File file : recDefFile) {
                     RecordDefinition recordDefinition = readRecordDefinition(new FileInputStream(file), factDefinitions);
                     recordDefinition.initialize(factDefinitions);

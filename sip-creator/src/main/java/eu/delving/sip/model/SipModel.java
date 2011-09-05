@@ -418,14 +418,13 @@ public class SipModel {
 
         @Override
         public void run() {
-            if (!analysisModel.hasRecordRoot()) {
-                return;
-            }
             try {
+                if (!analysisModel.hasRecordRoot() || storeModel.getStore().getState().ordinal() < FileStore.StoreState.ANALYZED.ordinal()) {
+                    return;
+                }
                 if (metadataParser == null) {
                     metadataParser = new MetadataParser(
                             storeModel.getStore().sourceInput(),
-                            analysisModel.getRecordRoot(),
                             analysisModel.getRecordCount()
                     );
                 }

@@ -115,7 +115,7 @@ public abstract class FrameBase extends JInternalFrame {
             });
         }
         if (isVisible() && !enabled) {
-            hide();
+            closeFrame();
         }
     }
 

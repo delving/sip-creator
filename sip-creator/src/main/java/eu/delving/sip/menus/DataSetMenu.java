@@ -63,6 +63,7 @@ public class DataSetMenu extends JMenu {
                 sipModel.setDataSetStore(store);
             }
         }
+        refresh();
     }
 
     public void refresh() {

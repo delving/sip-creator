@@ -88,7 +88,7 @@ public class AnalysisFrame extends FrameBase {
 
     @Override
     protected boolean isEnabledInState(FileStore.StoreState state) {
-        return state == FileStore.StoreState.IMPORTED_PENDING_ANALYZE || state == FileStore.StoreState.ANALYZED;
+        return state == FileStore.StoreState.IMPORTED_PENDING_CONVERT || state == FileStore.StoreState.ANALYZED;
     }
 
     private void wireUp() {

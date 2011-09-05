@@ -99,7 +99,6 @@ public class FileValidator implements Runnable {
             );
             MetadataParser parser = new MetadataParser(
                     sipModel.getStoreModel().getStore().sourceInput(),
-                    sipModel.getAnalysisModel().getRecordRoot(),
                     sipModel.getAnalysisModel().getRecordCount()
             );
             parser.setProgressListener(progressAdapter);
