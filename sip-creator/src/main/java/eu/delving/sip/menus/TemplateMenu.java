@@ -60,7 +60,8 @@ public class TemplateMenu extends JMenu {
         this.add(deleteMenu);
         this.addSeparator();
         try {
-            Map<String, RecordMapping> templates = sipModel.getFileStore().getTemplates();
+            Map<String, RecordMapping> templates = sipModel.getFileStore().getTemplates(sipModel.getStoreModel());
+            // todo: templates are stored above all datasets but the metadata model is set-specific, a problem.
             for (Map.Entry<String, RecordMapping> entry : templates.entrySet()) {
                 this.add(new ApplyTemplateAction(entry.getKey(), entry.getValue()));
                 updateMenu.add(new UpdateTemplateAction(entry.getKey()));

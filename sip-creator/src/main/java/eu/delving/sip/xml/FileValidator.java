@@ -95,7 +95,7 @@ public class FileValidator implements Runnable {
             }
             MappingRunner mappingRunner = new MappingRunner(
                     groovyCodeResource,
-                    recordMapping.toCompileCode(sipModel.getMetadataModel())
+                    recordMapping.toCompileCode(sipModel.getStoreModel())
             );
             MetadataParser parser = new MetadataParser(
                     sipModel.getStoreModel().getStore().sourceInput(),

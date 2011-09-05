@@ -152,7 +152,8 @@ public class ObviousMappingsPopup extends FrameBase {
             CodeGenerator codeGenerator = new CodeGenerator();
             List<FieldMapping> fresh = codeGenerator.createObviousMappings(
                     sipModel.getUnmappedFields(),
-                    sipModel.getAnalysisModel().getVariables()
+                    sipModel.getAnalysisModel().getVariables(),
+                    sipModel.getStoreModel().getFactDefinitions()
             );
             if (!obvious.isEmpty()) {
                 int size = obvious.size();

@@ -29,7 +29,6 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.ValidationException;
@@ -57,13 +56,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CompileModel implements SipModel.ParseListener, MappingModel.Listener {
     public final static int COMPILE_DELAY = 500;
+    private DataSetStoreModel storeModel;
     private RecordMapping recordMapping;
     private FieldMapping selectedFieldMapping;
     private MetadataRecord metadataRecord;
     private Document codeDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
     private CompileTimer compileTimer = new CompileTimer();
-    private MetadataModel metadataModel;
     private Type type;
     private RecordValidator recordValidator;
     private String editedCode;
@@ -83,9 +82,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         REGENERATED
     }
 
-    public CompileModel(Type type, MetadataModel metadataModel, GroovyCodeResource groovyCodeResource) {
+    public CompileModel(Type type, DataSetStoreModel storeModel, GroovyCodeResource groovyCodeResource) {
         this.type = type;
-        this.metadataModel = metadataModel;
+        this.storeModel = storeModel;
         this.groovyCodeResource = groovyCodeResource;
     }
 
@@ -178,7 +177,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         switch (type) {
             case RECORD:
                 if (recordMapping != null) {
-                    return recordMapping.toDisplayCode(metadataModel);
+                    return recordMapping.toDisplayCode(storeModel);
                 }
                 else {
                     return "// no mapping";
@@ -188,7 +187,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                     return "// no code";
                 }
                 else {
-                    return recordMapping.toDisplayCode(metadataModel, getSelectedPath());
+                    return recordMapping.toDisplayCode(storeModel, getSelectedPath());
                 }
             default:
                 throw new RuntimeException();
@@ -198,9 +197,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private String getCompileCode() {
         switch (type) {
             case RECORD:
-                return recordMapping != null ? recordMapping.toCompileCode(metadataModel) : "";
+                return recordMapping != null ? recordMapping.toCompileCode(storeModel) : "";
             case FIELD:
-                return selectedFieldMapping != null ? recordMapping.toCompileCode(metadataModel, getSelectedPath()) : "";
+                return selectedFieldMapping != null ? recordMapping.toCompileCode(storeModel, getSelectedPath()) : "";
             default:
                 throw new RuntimeException();
         }
@@ -214,7 +213,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             return "print 'nothing selected'";
         }
         else {
-            return recordMapping.toCompileCode(metadataModel, getSelectedPath(), editedCode);
+            return recordMapping.toCompileCode(storeModel, getSelectedPath(), editedCode);
         }
     }
 

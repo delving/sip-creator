@@ -98,11 +98,11 @@ public class ElementDefinition {
         return null;
     }
 
-    public void setFactDefinitions() throws MetadataException {
+    public void setFactDefinitions(List<FactDefinition>  factDefinitions) throws MetadataException {
         if (fields != null) {
             for (FieldDefinition fieldDefinition : fields) {
                 if (fieldDefinition.factName != null) {
-                    for (FactDefinition factDefinition : Facts.definitions()) {
+                    for (FactDefinition factDefinition : factDefinitions) {
                         if (fieldDefinition.factName.equals(factDefinition.name)) {
                             fieldDefinition.factDefinition = factDefinition;
                             break;
@@ -116,7 +116,7 @@ public class ElementDefinition {
         }
         if (elements != null) {
             for (ElementDefinition elementDefinition : elements) {
-                elementDefinition.setFactDefinitions();
+                elementDefinition.setFactDefinitions(factDefinitions);
             }
         }
     }

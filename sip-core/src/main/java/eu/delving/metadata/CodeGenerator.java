@@ -37,7 +37,7 @@ public class CodeGenerator {
         return fieldDefinition.hasOptions() && node.getStatistics().getHistogramValues() != null;
     }
 
-    public List<FieldMapping> createObviousMappings(List<FieldDefinition> unmappedFieldDefinitions, List<SourceVariable> variables) {
+    public List<FieldMapping> createObviousMappings(List<FieldDefinition> unmappedFieldDefinitions, List<SourceVariable> variables, List<FactDefinition> factDefinitions) {
         List<FieldMapping> fieldMappings = new ArrayList<FieldMapping>();
         FieldMapping uniqueMapping = createUniqueMapping(unmappedFieldDefinitions, variables);
         if (uniqueMapping != null) {
@@ -45,7 +45,7 @@ public class CodeGenerator {
         }
         for (FieldDefinition fieldDefinition : unmappedFieldDefinitions) {
             if (fieldDefinition.factName != null) {
-                FieldMapping fieldMapping = createObviousMappingFromFact(fieldDefinition);
+                FieldMapping fieldMapping = createObviousMappingFromFact(fieldDefinition, factDefinitions);
                 if (fieldMapping != null) {
                     fieldMappings.add(fieldMapping);
                 }
@@ -123,9 +123,9 @@ public class CodeGenerator {
         return null;  //To change body of created methods use File | Settings | File Templates.
     }
 
-    private FieldMapping createObviousMappingFromFact(FieldDefinition fieldDefinition) {
+    private FieldMapping createObviousMappingFromFact(FieldDefinition fieldDefinition, List<FactDefinition>  factDefinitions) {
         FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
-        for (FactDefinition factDefinition : Facts.definitions()) {
+        for (FactDefinition factDefinition : factDefinitions) {
             if (factDefinition.name.equals(fieldDefinition.factName)) {
                 line(fieldMapping, factDefinition.name);
             }

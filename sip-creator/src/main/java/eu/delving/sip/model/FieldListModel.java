@@ -24,7 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.FieldDefinition;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.MetadataModel;
+import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 
 import javax.swing.AbstractListModel;
@@ -44,12 +44,12 @@ import java.util.List;
  */
 
 public class FieldListModel extends AbstractListModel {
-    private MetadataModel metadataModel;
+    private DataSetStoreModel storeModel;
     private List<FieldDefinition> fieldDefinitions;
     private Unmapped unmapped;
 
-    public FieldListModel(MetadataModel metadataModel) {
-        this.metadataModel = metadataModel;
+    public FieldListModel(DataSetStoreModel storeModel) {
+        this.storeModel = storeModel;
         this.fieldDefinitions = new ArrayList<FieldDefinition>();
     }
 
@@ -111,7 +111,8 @@ public class FieldListModel extends AbstractListModel {
             fieldDefinitions.clear();
             fireIntervalRemoved(this, 0, sizeBefore);
             if (recordMapping != null) {
-                fieldDefinitions.addAll(metadataModel.getRecordDefinition(recordMapping.getPrefix()).getMappableFields());
+                RecordDefinition recordDefinition = storeModel.getRecordDefinition(recordMapping.getPrefix());
+                fieldDefinitions.addAll(recordDefinition.getMappableFields());
                 Collections.sort(fieldDefinitions, new Comparator<FieldDefinition>() {
                     @Override
                     public int compare(FieldDefinition field0, FieldDefinition field1) {

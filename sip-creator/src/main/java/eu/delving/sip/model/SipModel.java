@@ -27,7 +27,6 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.FieldDefinition;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
@@ -59,7 +58,6 @@ import java.util.prefs.Preferences;
 
 public class SipModel {
     private FileStore fileStore;
-    private MetadataModel metadataModel;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private UserNotifier userNotifier;
@@ -89,14 +87,13 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(FileStore fileStore, MetadataModel metadataModel, GroovyCodeResource groovyCodeResource, UserNotifier userNotifier) throws FileStoreException {
+    public SipModel(FileStore fileStore, GroovyCodeResource groovyCodeResource, UserNotifier userNotifier) throws FileStoreException {
         this.fileStore = fileStore;
-        this.metadataModel = metadataModel;
         this.groovyCodeResource = groovyCodeResource;
         this.userNotifier = userNotifier;
-        fieldListModel = new FieldListModel(metadataModel);
-        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, metadataModel, groovyCodeResource);
-        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, metadataModel, groovyCodeResource);
+        fieldListModel = new FieldListModel(storeModel);
+        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, storeModel, groovyCodeResource);
+        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, storeModel, groovyCodeResource);
         parseListeners.add(recordCompileModel);
         parseListeners.add(fieldCompileModel);
         mappingModel.addListener(fieldMappingListModel);
@@ -145,10 +142,6 @@ public class SipModel {
 
     public DataSetStoreModel getStoreModel() {
         return storeModel;
-    }
-
-    public MetadataModel getMetadataModel() {
-        return metadataModel;
     }
 
     public MappingModel getMappingModel() {
@@ -200,22 +193,27 @@ public class SipModel {
         Exec.work(new Runnable() {
             @Override
             public void run() {
-                storeModel.setStore(dataSetStore);
-                final Statistics statistics = dataSetStore.getLatestStatistics();
-                final Map<String, String> facts = dataSetStore.getDataSetFacts();
-                final Map<String, String> hints = dataSetStore.getHints();
-                final String latestPrefix = dataSetStore.getLatestPrefix();
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        dataSetFacts.set(facts);
-                        analysisModel.set(hints);
-                        analysisModel.setStatistics(statistics);
-                        if (latestPrefix != null) {
-                            setMetadataPrefix(latestPrefix, false);
+                try {
+                    final Statistics statistics = dataSetStore.getLatestStatistics();
+                    final Map<String, String> facts = dataSetStore.getDataSetFacts();
+                    final Map<String, String> hints = dataSetStore.getHints();
+                    final String latestPrefix = dataSetStore.getLatestPrefix();
+                    storeModel.setStore(dataSetStore);
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            dataSetFacts.set(facts);
+                            analysisModel.set(hints);
+                            analysisModel.setStatistics(statistics);
+                            if (latestPrefix != null) {
+                                setMetadataPrefix(latestPrefix, false);
+                            }
                         }
-                    }
-                });
+                    });
+                }
+                catch (FileStoreException e) {
+                    userNotifier.tellUser(String.format("Unable to switch to data set %s", dataSetStore.getSpec()), e);
+                }
             }
         });
     }
@@ -225,7 +223,9 @@ public class SipModel {
             @Override
             public void run() {
                 try {
-                    final RecordMapping recordMapping = promoteToLatest ? storeModel.getStore().setLatestPrefix(metadataPrefix) : storeModel.getStore().getRecordMapping(metadataPrefix);
+                    final RecordMapping recordMapping = promoteToLatest ?
+                            storeModel.getStore().setLatestPrefix(metadataPrefix, storeModel) :
+                            storeModel.getStore().getRecordMapping(metadataPrefix, storeModel);
                     dataSetFacts.set("spec", storeModel.getStore().getSpec());
                     dataSetFacts.copyToRecordMapping(recordMapping);
                     mappingModel.setRecordMapping(recordMapping);
@@ -243,7 +243,7 @@ public class SipModel {
         if (recordMapping == null) {
             return null;
         }
-        return metadataModel.getRecordDefinition(recordMapping.getPrefix());
+        return storeModel.getRecordDefinition(recordMapping.getPrefix());
     }
 
     public void saveAsTemplate(final String name) {

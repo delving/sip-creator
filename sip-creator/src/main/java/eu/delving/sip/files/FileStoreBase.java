@@ -21,14 +21,25 @@
 
 package eu.delving.sip.files;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import eu.delving.metadata.ElementDefinition;
+import eu.delving.metadata.FactDefinition;
+import eu.delving.metadata.FieldDefinition;
 import eu.delving.metadata.Hasher;
+import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,12 +50,14 @@ import java.util.TreeMap;
 
 import static eu.delving.sip.files.FileStore.ANALYSIS_STATS_FILE_NAME;
 import static eu.delving.sip.files.FileStore.FACTS_FILE_NAME;
+import static eu.delving.sip.files.FileStore.FACT_DEFINITION_FILE_NAME;
 import static eu.delving.sip.files.FileStore.HINTS_FILE_NAME;
 import static eu.delving.sip.files.FileStore.IMPORTED_FILE_NAME;
 import static eu.delving.sip.files.FileStore.MAPPING_FILE_PREFIX;
 import static eu.delving.sip.files.FileStore.MAPPING_FILE_SUFFIX;
 import static eu.delving.sip.files.FileStore.PHANTOM_FILE_NAME;
 import static eu.delving.sip.files.FileStore.RECORD_COUNT;
+import static eu.delving.sip.files.FileStore.RECORD_DEFINITION_FILE_SUFFIX;
 import static eu.delving.sip.files.FileStore.RECORD_ROOT_PATH;
 import static eu.delving.sip.files.FileStore.REPORT_FILE_PATTERN;
 import static eu.delving.sip.files.FileStore.SOURCE_FILE_NAME;
@@ -173,6 +186,15 @@ public class FileStoreBase {
         return getRecent(files, which);
     }
 
+    File factDefinitionFile(File dir) {
+        return new File(dir, FACT_DEFINITION_FILE_NAME);
+    }
+
+    List<File> findRecordDefinitionFiles(File dir) {
+        File [] files = dir.listFiles(new RecordDefinitionFileFilter());
+        return Arrays.asList(files);
+    }
+
     File findLatestMappingFile(File dir, String metadataPrefix) {
         return findLatestFile(dir, metadataPrefix, new MappingFileFilter());
     }
@@ -224,6 +246,14 @@ public class FileStoreBase {
         public boolean accept(File file) {
             String name = Hasher.extractFileName(file);
             return file.isFile() && name.startsWith(MAPPING_FILE_PREFIX) && name.endsWith(MAPPING_FILE_SUFFIX);
+        }
+    }
+
+    class RecordDefinitionFileFilter implements FileFilter {
+        @Override
+        public boolean accept(File file) {
+            String name = file.getName();
+            return file.isFile() && name.endsWith(RECORD_DEFINITION_FILE_SUFFIX);
         }
     }
 
@@ -293,4 +323,31 @@ public class FileStoreBase {
             return file.isFile() && Hasher.extractFileName(file).equals(name);
         }
     }
+
+    public static RecordDefinition readRecordDefinition(InputStream in, List<FactDefinition> factDefinitions) throws MetadataException {
+        try {
+            Reader inReader = new InputStreamReader(in, "UTF-8");
+            RecordDefinition recordDefinition = (RecordDefinition) recordStream().fromXML(inReader);
+            recordDefinition.initialize(factDefinitions);
+            return recordDefinition;
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+    static XStream recordStream() {
+        XStream stream = new XStream(new PureJavaReflectionProvider());
+        stream.processAnnotations(new Class[]{
+                FactDefinition.List.class,
+                RecordDefinition.class,
+                ElementDefinition.class,
+                FieldDefinition.class
+        });
+        return stream;
+    }
+
+
 }

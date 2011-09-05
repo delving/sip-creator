@@ -21,9 +21,16 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,39 +43,23 @@ import java.util.TreeMap;
  */
 
 public class MetadataModelImpl implements MetadataModel {
-
+    private List<FactDefinition> factDefinitions = new ArrayList<FactDefinition>();
     private Map<String, RecordDefinition> recordDefinitions = new TreeMap<String, RecordDefinition>();
-    private String defaultPrefix;
-
-    public MetadataModelImpl() {
-    }
-
-    public MetadataModelImpl(String path, String prefix) {
-            try {
-                setRecordDefinitionResources(Arrays.asList(new String[]{path}));
-                setDefaultPrefix(prefix);
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-    }
 
     public void setRecordDefinitionResources(List<String> paths) throws IOException, MetadataException {
+        URL url = getClass().getResource("/fact-definition-list.xml");
+        FactDefinition.List definitionList = readFacts(url.openStream());
+        factDefinitions.clear();
+        factDefinitions.addAll((definitionList.factDefinitions));
         for (String path : paths) {
-            URL url = getClass().getResource(path);
-            RecordDefinition recordDefinition = RecordDefinition.read(url.openStream());
+            url = getClass().getResource(path);
+            RecordDefinition recordDefinition = readRecordDefinition(url.openStream());
             recordDefinitions.put(recordDefinition.prefix, recordDefinition);
         }
     }
 
-    public void setDefaultPrefix(String defaultPrefix) {
-        this.defaultPrefix = defaultPrefix;
-    }
-
-    @Override
-    public RecordDefinition getRecordDefinition() {
-        return getRecordDefinition(defaultPrefix);
+    public List<FactDefinition> getFactDefinitions() {
+        return factDefinitions;
     }
 
     @Override
@@ -84,4 +75,38 @@ public class MetadataModelImpl implements MetadataModel {
         }
         return definition;
     }
+
+    private FactDefinition.List readFacts(InputStream in) {
+        XStream stream = stream();
+        Reader reader = new InputStreamReader(in);
+        return (FactDefinition.List) stream.fromXML(reader);
+    }
+
+    private RecordDefinition readRecordDefinition(InputStream in) throws MetadataException {
+        try {
+            Reader inReader = new InputStreamReader(in, "UTF-8");
+            RecordDefinition recordDefinition = (RecordDefinition) stream().fromXML(inReader);
+            recordDefinition.initialize(factDefinitions);
+            return recordDefinition;
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String toString(RecordDefinition recordDefinition) {
+        return stream().toXML(recordDefinition);
+    }
+
+    private static XStream stream() {
+        XStream stream = new XStream(new PureJavaReflectionProvider());
+        stream.processAnnotations(new Class[]{
+                FactDefinition.List.class,
+                RecordDefinition.class,
+                ElementDefinition.class,
+                FieldDefinition.class
+        });
+        return stream;
+    }
+
 }

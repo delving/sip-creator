@@ -23,10 +23,8 @@ package eu.delving.sip.menus;
 
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
 
@@ -44,7 +42,6 @@ import java.awt.event.ActionListener;
 
 public class MappingMenu extends JMenu {
     private SipModel sipModel;
-    private MetadataModel metadataModel;
 
     public MappingMenu(SipModel sipModel) {
         super("Mappings");
@@ -74,13 +71,7 @@ public class MappingMenu extends JMenu {
         sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
             @Override
             public void storeSet(FileStore.DataSetStore store) {
-                try {
-                    metadataModel = store.getMetadataModel();
-                    refresh();
-                }
-                catch (FileStoreException e) {
-                    sipModel.getUserNotifier().tellUser("Unable to fetch metadata model from data set store", e);
-                }
+                refresh();
             }
 
             @Override
@@ -97,7 +88,7 @@ public class MappingMenu extends JMenu {
             currentPrefix = recordMapping.getPrefix();
         }
         ButtonGroup bg = new ButtonGroup();
-        for (String prefix : sipModel.getMetadataModel().getPrefixes()) {
+        for (String prefix : sipModel.getStoreModel().getPrefixes()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(prefix, prefix.equals(currentPrefix));
             add(item);
             bg.add(item);

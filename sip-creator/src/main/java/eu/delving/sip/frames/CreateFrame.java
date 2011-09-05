@@ -220,7 +220,11 @@ public class CreateFrame extends FrameBase {
             @Override
             public void run() {
                 CodeGenerator codeGenerator = new CodeGenerator();
-                List<FieldMapping> obvious = codeGenerator.createObviousMappings(sipModel.getUnmappedFields(), sipModel.getAnalysisModel().getVariables());
+                List<FieldMapping> obvious = codeGenerator.createObviousMappings(
+                        sipModel.getUnmappedFields(),
+                        sipModel.getAnalysisModel().getVariables(),
+                        sipModel.getStoreModel().getFactDefinitions()
+                );
                 if (obvious.isEmpty()) {
                     if (obviousMappingsPopup.isVisible()) {
                         obviousMappingsPopup.closeFrame();

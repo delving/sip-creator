@@ -21,9 +21,10 @@
 
 package eu.delving.sip.files;
 
+import com.thoughtworks.xstream.XStream;
+import eu.delving.metadata.FactDefinition;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
@@ -41,13 +42,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -75,11 +77,9 @@ import static eu.delving.sip.files.FileStore.StoreState.VALIDATED;
 public class FileStoreImpl extends FileStoreBase implements FileStore {
 
     private File home;
-    private MetadataModel metadataModel;
 
-    public FileStoreImpl(File home, MetadataModel metadataModel) throws FileStoreException {
+    public FileStoreImpl(File home) throws FileStoreException {
         this.home = home;
-        this.metadataModel = metadataModel;
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new FileStoreException(String.format("Unable to create file store in %s", home.getAbsolutePath()));
@@ -101,7 +101,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
     }
 
     @Override
-    public Map<String, RecordMapping> getTemplates() throws FileStoreException {
+    public Map<String, RecordMapping> getTemplates(MetadataModel metadataModel) throws FileStoreException {
         Map<String, RecordMapping> templates = new TreeMap<String, RecordMapping>();
         for (File templateFile : home.listFiles(new MappingFileFilter())) {
             try {
@@ -172,14 +172,14 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public RecordMapping setLatestPrefix(String prefix) throws FileStoreException {
+        public RecordMapping setLatestPrefix(String prefix, MetadataModel metadataModel) throws FileStoreException {
             File latestForPrefix = findLatestMappingFile(here, prefix);
             RecordMapping recordMapping;
             if (latestForPrefix.exists()) {
                 if (!latestForPrefix.setLastModified(System.currentTimeMillis())) {
                     throw new FileStoreException("Couldn't touch the file to give it priority");
                 }
-                recordMapping = getRecordMapping(prefix);
+                recordMapping = getRecordMapping(prefix, metadataModel);
             }
             else {
                 recordMapping = new RecordMapping(prefix);
@@ -189,20 +189,35 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public MetadataModel getMetadataModel() throws FileStoreException {
-            try { // todo: this must be built from the record definition files present
-                MetadataModelImpl metadataModel = new MetadataModelImpl();
-                metadataModel.setRecordDefinitionResources(Arrays.asList(
-                        "/ese-record-definition.xml",
-                        "/icn-record-definition.xml",
-                        "/abm-record-definition.xml"
-                ));
-                metadataModel.setDefaultPrefix("ese");
-                return metadataModel;
+        public List<FactDefinition> getFactDefinitions() throws FileStoreException {
+            try {
+                File factDefFile = factDefinitionFile(here);
+                XStream stream = recordStream();
+                Reader reader = new InputStreamReader(new FileInputStream(factDefFile), "UTF-8");
+                FactDefinition.List factDefinitions = (FactDefinition.List) stream.fromXML(reader);
+                return factDefinitions.factDefinitions;
+            }
+            catch (Exception e) {
+                throw new FileStoreException("Unable to load fact definitions", e);
+            }
+        }
+
+        @Override
+        public List<RecordDefinition> getRecordDefinitions(List<FactDefinition> factDefinitions) throws FileStoreException {
+            List<RecordDefinition> definitions = new ArrayList<RecordDefinition>();
+            try {
+                List<File> recDefFile = findRecordDefinitionFiles(here);
+                XStream stream = recordStream();
+                for (File file : recDefFile) {
+                    RecordDefinition recordDefinition = readRecordDefinition(new FileInputStream(file), factDefinitions);
+                    recordDefinition.initialize(factDefinitions);
+                    definitions.add(recordDefinition);
+                }
             }
             catch (Exception e) {
                 throw new FileStoreException("Unable to load metadata model");
             }
+            return definitions;
         }
 
         @Override
@@ -349,9 +364,8 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public RecordMapping getRecordMapping(String metadataPrefix) throws FileStoreException {
-            RecordDefinition recordDefinition = metadataModel.getRecordDefinition(metadataPrefix);
-            File file = findLatestMappingFile(here, metadataPrefix);
+        public RecordMapping getRecordMapping(String prefix, MetadataModel metadataModel) throws FileStoreException {
+            File file = findLatestMappingFile(here, prefix);
             if (file.exists()) {
                 try {
                     FileInputStream is = new FileInputStream(file);
@@ -362,7 +376,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 }
             }
             else {
-                return new RecordMapping(recordDefinition.prefix);
+                return new RecordMapping(prefix);
             }
         }
 

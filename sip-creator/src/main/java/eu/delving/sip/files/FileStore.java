@@ -21,8 +21,10 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.metadata.FactDefinition;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.ProgressListener;
 
@@ -45,7 +47,7 @@ public interface FileStore {
 
     void setTemplate(String name, RecordMapping recordMapping) throws FileStoreException;
 
-    Map<String, RecordMapping> getTemplates() throws FileStoreException;
+    Map<String, RecordMapping> getTemplates(MetadataModel me) throws FileStoreException;
 
     void deleteTemplate(String name) throws FileStoreException;
 
@@ -70,9 +72,11 @@ public interface FileStore {
 
         String getLatestPrefix();
 
-        RecordMapping setLatestPrefix(String prefix) throws FileStoreException;
+        RecordMapping setLatestPrefix(String prefix, MetadataModel metadataModel) throws FileStoreException;
 
-        MetadataModel getMetadataModel() throws FileStoreException;
+        List<FactDefinition> getFactDefinitions() throws FileStoreException;
+
+        List<RecordDefinition> getRecordDefinitions(List<FactDefinition> factDefinitions) throws FileStoreException;
 
         StoreState getState();
 
@@ -94,7 +98,7 @@ public interface FileStore {
 
         void setStatistics(Statistics statistics) throws FileStoreException;
 
-        RecordMapping getRecordMapping(String metadataPrefix) throws FileStoreException;
+        RecordMapping getRecordMapping(String prefix, MetadataModel metadataModel) throws FileStoreException;
 
         void setRecordMapping(RecordMapping recordMapping) throws FileStoreException;
 
@@ -128,6 +132,8 @@ public interface FileStore {
     String MAPPING_FILE_SUFFIX = ".xml";
     String VALIDATION_FILE_PATTERN = "validation_%s.int";
     String REPORT_FILE_PATTERN = "report_%s.txt";
+    String RECORD_DEFINITION_FILE_SUFFIX = "-record-definition.xml.xml";
+    String FACT_DEFINITION_FILE_NAME = "fact-definition-list.xml";
 
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";

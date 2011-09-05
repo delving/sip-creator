@@ -79,8 +79,7 @@ public class DesktopLauncher {
     private AuthenticationWindow authenticationWindow;
 
     public DesktopLauncher(File fileStoreDirectory) throws FileStoreException {
-        MetadataModel metadataModel = loadMetadataModel();
-        FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
+        FileStore fileStore = new FileStoreImpl(fileStoreDirectory);
         UserNotifier userNotifier = new UserNotifier() {
             @Override
             public void tellUser(String message) {
@@ -92,7 +91,7 @@ public class DesktopLauncher {
                 JOptionPane.showMessageDialog(null, "Error from SipModel", String.format("%s%n%s", message, exception.getMessage()), JOptionPane.ERROR_MESSAGE);
             }
         };
-        sipModel = new SipModel(fileStore, metadataModel, new GroovyCodeResource(getClass().getClassLoader()), userNotifier);
+        sipModel = new SipModel(fileStore, new GroovyCodeResource(getClass().getClassLoader()), userNotifier);
         desktopManager = new DesktopManager(sipModel);
         actions = new Actions(desktopManager);
         authenticationWindow = new AuthenticationWindow(desktopPreferences, authenticationClient,
@@ -194,7 +193,6 @@ public class DesktopLauncher {
                     "/icn-record-definition.xml",
                     "/abm-record-definition.xml"
             ));
-            metadataModel.setDefaultPrefix("ese");
             return metadataModel;
         }
         catch (Exception e) {

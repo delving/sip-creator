@@ -22,8 +22,6 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.ValidationException;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Exec;
@@ -73,7 +71,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -96,11 +93,10 @@ public class Application {
     private List<FrameBase> frames = new ArrayList<FrameBase>();
 
     private Application(final File fileStoreDirectory) throws FileStoreException {
-        MetadataModel metadataModel = loadMetadataModel();
-        FileStore fileStore = new FileStoreImpl(fileStoreDirectory, metadataModel);
+        FileStore fileStore = new FileStoreImpl(fileStoreDirectory);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         exceptionHandler = new PopupExceptionHandler();
-        sipModel = new SipModel(fileStore, metadataModel, groovyCodeResource, this.exceptionHandler);
+        sipModel = new SipModel(fileStore, groovyCodeResource, this.exceptionHandler);
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClient.Context() {
 
             @Override
@@ -202,24 +198,6 @@ public class Application {
             menu.add(frame.getAction());
         }
         return menu;
-    }
-
-    private MetadataModel loadMetadataModel() {
-        try {
-            MetadataModelImpl metadataModel = new MetadataModelImpl();
-            metadataModel.setRecordDefinitionResources(Arrays.asList(
-                    "/ese-record-definition.xml",
-                    "/icn-record-definition.xml",
-                    "/abm-record-definition.xml"
-            ));
-            metadataModel.setDefaultPrefix("ese");
-            return metadataModel;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-            return null;
-        }
     }
 
     private class PasswordFetcher implements OAuthClient.PasswordRequest {

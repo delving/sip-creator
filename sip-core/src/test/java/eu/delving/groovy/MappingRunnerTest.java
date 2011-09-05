@@ -21,12 +21,6 @@
 
 package eu.delving.groovy;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
-
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.MappingEngine;
@@ -37,6 +31,12 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Verify if the MappingRunner is behaving as expected. This is done by providing a sample record and a sample

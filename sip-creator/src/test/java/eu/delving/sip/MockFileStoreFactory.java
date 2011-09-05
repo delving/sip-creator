@@ -46,7 +46,7 @@ public class MockFileStoreFactory {
             throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
         }
         specDirectory = new File(root, SPEC);
-        fileStore = new FileStoreImpl(root, getMetadataModel());
+        fileStore = new FileStoreImpl(root);
         dataSetStore = fileStore.createDataSetStore(SPEC);
     }
 
@@ -103,11 +103,10 @@ public class MockFileStoreFactory {
         }
     }
 
-    private MetadataModel getMetadataModel() {
+    MetadataModel getMetadataModel() {
         try {
             MetadataModelImpl metadataModel = new MetadataModelImpl();
             metadataModel.setRecordDefinitionResources(Arrays.asList("/abm-record-definition.xml"));
-            metadataModel.setDefaultPrefix(metadataPrefix);
             return metadataModel;
         }
         catch (Exception e) {

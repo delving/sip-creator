@@ -1,10 +1,5 @@
 package eu.delving.sip;
 
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Map;
-import javax.xml.stream.XMLStreamException;
-
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
@@ -18,6 +13,11 @@ import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.ValidationException;
 import groovy.util.Node;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Wrapping the mapping mechanism for easy access from Scala
@@ -97,7 +97,6 @@ public class MappingEngine {
                     "/icn-record-definition.xml",
                     "/abm-record-definition.xml"
             ));
-            metadataModel.setDefaultPrefix("ese");
             return metadataModel;
         }
         catch (Exception e) {
