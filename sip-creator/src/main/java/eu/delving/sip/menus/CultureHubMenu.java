@@ -68,8 +68,10 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
             public void run() {
                 Map<String, FileStore.DataSetStore> stores = sipModel.getFileStore().getDataSetStores();
                 dataSetMenu.removeAll();
-                for (CultureHubClient.DataSetEntry entry : entries) {
-                    dataSetMenu.add(new DownloadDatasetAction(entry, stores.get(entry.spec)));
+                if (entries != null) {
+                    for (CultureHubClient.DataSetEntry entry : entries) {
+                        dataSetMenu.add(new DownloadDatasetAction(entry, stores.get(entry.spec)));
+                    }
                 }
                 dataSetMenu.setEnabled(true);
 //                Exec.swingLater(new Runnable() {

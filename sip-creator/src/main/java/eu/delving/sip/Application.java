@@ -213,6 +213,16 @@ public class Application {
         }
 
         @Override
+        public void storeCreated(final FileStore.DataSetStore store) {
+            Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    sipModel.setDataSetStore(store);
+                }
+            });
+        }
+
+        @Override
         public void tellUser(String message) {
             exceptionHandler.tellUser(message);
         }
@@ -227,7 +237,7 @@ public class Application {
 
         @Override
         public String getPassword() {
-            final JPasswordField passwordField = new JPasswordField(15);
+            final JPasswordField passwordField = new JPasswordField(15); // todo: problem here is that it doesn't get focus
             JLabel labelA = new JLabel("Password");
             labelA.setLabelFor(passwordField);
             JPanel p = new JPanel(new BorderLayout(10, 10));
@@ -235,12 +245,6 @@ public class Application {
             p.add(passwordField, BorderLayout.CENTER);
             JPanel wrap = new JPanel();
             wrap.add(p);
-            Exec.swing(new Runnable() {
-                @Override
-                public void run() {
-                    passwordField.requestFocus();
-                }
-            });
             int answer = JOptionPane.showConfirmDialog(
                     home,
                     wrap,

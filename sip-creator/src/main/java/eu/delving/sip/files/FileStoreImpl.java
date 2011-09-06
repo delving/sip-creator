@@ -50,6 +50,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serializable;
+import java.security.DigestOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -509,7 +510,14 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 Path uniqueElement = getUniqueElement(hints);
                 SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement);
                 converter.setProgressListener(progressListener);
-                converter.parse(importedInput(), sourceOutput());
+                Hasher hasher = new Hasher();
+                DigestOutputStream digestOut = hasher.createDigestOutputStream(sourceOutput());
+                converter.parse(importedInput(), digestOut);
+                File source = new File(here, SOURCE_FILE_NAME);
+                File hashedSource = new File(here, hasher.prefixFileName(SOURCE_FILE_NAME));
+                if (!source.renameTo(hashedSource)) {
+                    throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
+                }
             }
             catch (XMLStreamException e) {
                 throw new FileStoreException("Unable to convert source", e);
@@ -554,9 +562,8 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                     File file = new File(here, fileName);
                     if (fileName.equals(SOURCE_FILE_NAME)) {
                         Hasher hasher = new Hasher();
-                        GZIPInputStream gzipInputStream = new GZIPInputStream(zipInputStream);
                         GZIPOutputStream outputStream = new GZIPOutputStream(new FileOutputStream(file));
-                        while (!cancelled && -1 != (bytesRead = gzipInputStream.read(buffer))) {
+                        while (!cancelled && -1 != (bytesRead = zipInputStream.read(buffer))) {
                             outputStream.write(buffer, 0, bytesRead);
                             if (progressListener != null) {
                                 if (!progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
@@ -579,7 +586,6 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                             progressListener.finished(false);
                             break;
                         }
-                        Hasher.ensureFileHashed(file);
                     }
                 }
             }

@@ -72,6 +72,8 @@ public class CultureHubClient {
 
         String getAccessToken();
 
+        void storeCreated(FileStore.DataSetStore store);
+
         void tellUser(String message);
     }
 
@@ -184,6 +186,7 @@ public class CultureHubClient {
                 else {
                     log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
                 }
+                context.storeCreated(dataSetStore);
             }
             catch (Exception e) {
                 log.warn("Unable to download source", e);
