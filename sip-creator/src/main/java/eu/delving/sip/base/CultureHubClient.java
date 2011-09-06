@@ -21,6 +21,10 @@
 
 package eu.delving.sip.base;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.FileStore;
@@ -45,7 +49,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipInputStream;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -68,6 +71,10 @@ public class CultureHubClient {
         String getAccessToken();
 
         void tellUser(String message);
+    }
+
+    public interface ListReceiver {
+        void listReceived(List<DataSetEntry> entries);
     }
 
     public enum Code {
@@ -97,12 +104,87 @@ public class CultureHubClient {
         this.context = context;
     }
 
-    public void uploadFiles(FileStore.DataSetStore store, ProgressListener progressListener) throws FileStoreException {
-        Exec.work(new FileUploader(store, progressListener));
+    public void fetchDataSetList(ListReceiver listReceiver) {
+        Exec.work(new ListFetcher(listReceiver));
     }
 
     public void downloadDataSet(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
         Exec.work(new DataSetDownloader(dataSetStore, progressListener));
+    }
+
+    public void uploadFiles(FileStore.DataSetStore store, ProgressListener progressListener) throws FileStoreException {
+        Exec.work(new FileUploader(store, progressListener));
+    }
+
+    private class ListFetcher implements Runnable {
+        private ListReceiver listReceiver;
+
+        public ListFetcher(ListReceiver listReceiver) {
+            this.listReceiver = listReceiver;
+        }
+
+        @Override
+        public void run() {
+            try {
+                String url = String.format(
+                        "%s/list?accessKey=%s",
+                        context.getServerUrl(),
+                        context.getAccessToken()
+                );
+                log.info("requesting list: "+url);
+                HttpGet get = new HttpGet(url);
+                get.setHeader("Accept", "text/xml");
+                HttpResponse httpResponse = execute(get);
+                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    HttpEntity entity = httpResponse.getEntity();
+                    DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
+                    log.info("list received:\n"+dataSetList);
+                    listReceiver.listReceived(dataSetList.list);
+                }
+                else {
+                    log.warn("Unable to fetch data set list. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
+                }
+            }
+            catch (Exception e) {
+                log.warn("Unable to download source", e);
+                context.tellUser("Unable to download source");
+            }
+        }
+    }
+
+    private class DataSetDownloader implements Runnable {
+        private FileStore.DataSetStore dataSetStore;
+        private ProgressListener progressListener;
+
+        private DataSetDownloader(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
+            this.dataSetStore = dataSetStore;
+            this.progressListener = progressListener;
+        }
+
+        @Override
+        public void run() {
+            try {
+                HttpGet get = new HttpGet(String.format(
+                        "%s/fetch/%s-sip.zip?accessKey=%s",
+                        context.getServerUrl(),
+                        dataSetStore.getSpec(),
+                        context.getAccessToken()
+                ));
+                get.setHeader("Accept", "application/zip");
+                HttpResponse httpResponse = execute(get);
+                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    HttpEntity entity = httpResponse.getEntity();
+                    dataSetStore.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                }
+                else {
+                    log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
+                }
+            }
+            catch (Exception e) {
+                log.warn("Unable to download source", e);
+                context.tellUser("Unable to download source");
+            }
+        }
     }
 
     public class FileUploader implements Runnable {
@@ -128,7 +210,7 @@ public class CultureHubClient {
                         HttpEntity entity = response.getEntity();
                         String listString = EntityUtils.toString(entity);
                         List<File> filteredUploadFiles = new ArrayList<File>();
-                        for (String fileName: listString.split("\n")) {
+                        for (String fileName : listString.split("\n")) {
                             for (File file : uploadFiles) {
                                 if (file.getName().equals(fileName)) {
                                     filteredUploadFiles.add(file);
@@ -140,7 +222,7 @@ public class CultureHubClient {
                     case UNAUTHORIZED:
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
-                        throw new IOException("Unable to fetch file list, response: "+Code.from(response));
+                        throw new IOException("Unable to fetch file list, response: " + Code.from(response));
                 }
                 for (File file : uploadFiles) {
                     log.info("Uploading " + file);
@@ -153,7 +235,7 @@ public class CultureHubClient {
                         case UNAUTHORIZED:
                         case SYSTEM_ERROR:
                         case UNKNOWN_RESPONSE:
-                            throw new IOException("Unable to upload file, response: "+Code.from(response));
+                            throw new IOException("Unable to upload file, response: " + Code.from(response));
                     }
                 }
             }
@@ -190,47 +272,20 @@ public class CultureHubClient {
         }
     }
 
-    private class DataSetDownloader implements Runnable {
-        private FileStore.DataSetStore dataSetStore;
-        private ProgressListener progressListener;
-
-        private DataSetDownloader(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
-            this.dataSetStore = dataSetStore;
-            this.progressListener = progressListener;
-        }
-
-        @Override
-        public void run() {
-            HttpClient httpClient = new DefaultHttpClient();
-            try {
-                HttpGet get = new HttpGet(String.format(
-                        "%s/fetch/%s-sip.zip?accessKey=%s",
-                        context.getServerUrl(),
-                        dataSetStore.getSpec(),
-                        context.getAccessToken()
-                ));
-                get.setHeader("Accept", "application/zip");
-                HttpResponse httpResponse = httpClient.execute(get);
-                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    HttpEntity entity = httpResponse.getEntity();
-                    ZipInputStream zipInputStream = new ZipInputStream(entity.getContent());
-                    dataSetStore.fromSipZip(zipInputStream, progressListener);
-                }
-                else {
-                    log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
-                }
-            }
-            catch (Exception e) {
-                log.warn("Unable to download source", e);
-                context.tellUser("Unable to download source");
-            }
-        }
-    }
-
     private HttpResponse execute(HttpPost httpPost) throws IOException {
         HttpClient httpClient = new DefaultHttpClient();
         try {
             return httpClient.execute(httpPost);
+        }
+        finally {
+            httpClient.getConnectionManager().shutdown();
+        }
+    }
+
+    private HttpResponse execute(HttpGet httpGet) throws IOException {
+        HttpClient httpClient = new DefaultHttpClient();
+        try {
+            return httpClient.execute(httpGet);
         }
         finally {
             httpClient.getConnectionManager().shutdown();
@@ -249,7 +304,7 @@ public class CultureHubClient {
             return "text/xml";
         }
         else {
-            throw new RuntimeException("Cannot determine content type of "+file.getAbsolutePath());
+            throw new RuntimeException("Cannot determine content type of " + file.getAbsolutePath());
         }
     }
 
@@ -328,4 +383,51 @@ public class CultureHubClient {
         }
     }
 
+    private XStream listStream() {
+        XStream stream = new XStream(new PureJavaReflectionProvider());
+        stream.processAnnotations(DataSetList.class);
+        return stream;
+    }
+
+    @XStreamAlias("data-set-list")
+    public static class DataSetList {
+        @XStreamImplicit
+        List<DataSetEntry> list;
+
+        public String toString() {
+            StringBuilder out = new StringBuilder("data-set-list");
+            if (list == null || list.isEmpty()) {
+                out.append(" (empty)");
+            }
+            else {
+                out.append('\n');
+                for (DataSetEntry entry : list) {
+                    out.append('\t');
+                    out.append(entry);
+                    out.append('\n');
+                }
+            }
+            return out.toString();
+        }
+    }
+
+    @XStreamAlias("data-set")
+    public static class DataSetEntry {
+        public String spec;
+        String name;
+        String state;
+        int recordCount;
+        Ownership ownership;
+
+        public String toString() {
+            return "data-set spec="+spec;
+        }
+    }
+
+    @XStreamAlias("ownership")
+    public static class Ownership {
+        String username;
+        String fullname;
+        String email;
+    }
 }

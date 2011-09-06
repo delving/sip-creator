@@ -22,13 +22,20 @@
 package eu.delving.sip.menus;
 
 import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.ProgressAdapter;
+import eu.delving.sip.files.FileStore;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
-import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingUtilities;
 import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The menu for interfacing with the culture hub
@@ -36,7 +43,7 @@ import java.awt.event.ActionEvent;
  * @author Gerald de Jong, Delving BV, <geralddejong@gmail.com>
  */
 
-public class CultureHubMenu extends JMenu {
+public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiver {
     private JDesktopPane parent;
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
@@ -53,6 +60,28 @@ public class CultureHubMenu extends JMenu {
         add(dataSetMenu);
     }
 
+    @Override
+    public void listReceived(final List<CultureHubClient.DataSetEntry> entries) {
+        Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                Map<String,FileStore.DataSetStore> stores = sipModel.getFileStore().getDataSetStores();
+                dataSetMenu.removeAll();
+                for (CultureHubClient.DataSetEntry entry : entries) {
+                    dataSetMenu.add(new DownloadDatasetAction(entry, stores.get(entry.spec)));
+                }
+                dataSetMenu.setEnabled(true);
+//                Exec.swingLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        CultureHubMenu.this.doClick();
+//                        dataSetMenu.doClick();
+//                    }
+//                });
+            }
+        });
+    }
+
     private class FetchDataSetListAction extends AbstractAction {
 
         private FetchDataSetListAction() {
@@ -61,49 +90,37 @@ public class CultureHubMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            // todo: fetch the list
-            // todo: refresh dataSetMenu with the values returned
-            // todo:  ..MINUS the ones we already have!
-            dataSetMenu.removeAll();
-            for (int walk=0; walk<3; walk++) {
-                dataSetMenu.add(new DownloadDatasetAction(String.valueOf((int)(Math.random()*10000))));
-            }
+            cultureHubClient.fetchDataSetList(CultureHubMenu.this);
         }
     }
 
     private class DownloadDatasetAction extends AbstractAction {
-        private String spec;
+        private CultureHubClient.DataSetEntry entry;
+        private FileStore.DataSetStore store;
 
-        private DownloadDatasetAction(String spec) {
-            super(String.format("Download \"%s\"", spec));
-            this.spec = spec;
+        private DownloadDatasetAction(CultureHubClient.DataSetEntry entry, FileStore.DataSetStore store) {
+            this.entry = entry;
+            this.store = store;
+            putValue(Action.NAME, String.format("<html>Download \"%s\"", entry.spec));
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
-            String message = String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>just kidding!",spec);
-            JOptionPane.showInternalMessageDialog(parent, message);
-//            ProgressMonitor progressMonitor = new ProgressMonitor(
-//                    SwingUtilities.getRoot(parent),
-//                    "<html><h2>Normalizing</h2>",
-//                    message,
-//                    0, 100
-//            );
-//            try {
-//                cultureHubClient.uploadFiles(store, new ProgressAdapter(progressMonitor) {
-//                    @Override
-//                    public void swingFinished(boolean success) {
-//                        setEnabled(true);
-//                    }
-//                });
-//            }
-//            catch (FileStoreException e) {
-//                JOptionPane.showInternalMessageDialog(parent, "<html>Problem uploading files<br>"+e.getMessage());
-//            }
-//            finally {
-//                setEnabled(true);
-//            }
+            String message = String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", entry.spec);
+            ProgressMonitor progressMonitor = new ProgressMonitor(
+                    SwingUtilities.getRoot(parent),
+                    "<html><h2>Download</h2>",
+                    message,
+                    0, 100
+            );
+            FileStore.DataSetStore store = null;
+            cultureHubClient.downloadDataSet(store, new ProgressAdapter(progressMonitor) {
+                @Override
+                public void swingFinished(boolean success) {
+                    setEnabled(true);
+                }
+            });
         }
     }
 }

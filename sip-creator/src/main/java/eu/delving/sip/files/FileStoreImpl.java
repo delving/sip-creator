@@ -32,6 +32,7 @@ import eu.delving.sip.ProgressListener;
 import eu.delving.sip.xml.SourceConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CountingInputStream;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.BufferedInputStream;
@@ -534,12 +535,14 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void fromSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws FileStoreException {
+        public void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws FileStoreException {
             ZipEntry zipEntry;
             byte[] buffer = new byte[BLOCK_SIZE];
-            long totalBytesRead = 0;
             int bytesRead;
             boolean cancelled = false;
+            if (progressListener != null) progressListener.prepareFor((int)(streamLength / BLOCK_SIZE));
+            CountingInputStream counting = new CountingInputStream(inputStream);
+            ZipInputStream zipInputStream = new ZipInputStream(counting);
             try {
                 while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                     String fileName = zipEntry.getName();
@@ -550,9 +553,8 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                         GZIPOutputStream outputStream = new GZIPOutputStream(new FileOutputStream(file));
                         while (!cancelled && -1 != (bytesRead = gzipInputStream.read(buffer))) {
                             outputStream.write(buffer, 0, bytesRead);
-                            totalBytesRead += bytesRead;
                             if (progressListener != null) {
-                                if (!progressListener.setProgress((int) (totalBytesRead / BLOCK_SIZE))) {
+                                if (!progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
                                     cancelled = true;
                                     break;
                                 }
@@ -568,6 +570,10 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                     }
                     else {
                         IOUtils.copy(zipInputStream, new FileOutputStream(file));
+                        if (progressListener != null && !progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
+                            progressListener.finished(false);
+                            break;
+                        }
                         Hasher.ensureFileHashed(file);
                     }
                 }

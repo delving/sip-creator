@@ -101,7 +101,7 @@ public class Application {
 
             @Override
             public String getServerUrl() {
-                return String.format("http://%s/dataset", FileStoreFinder.getHostPortUser(fileStoreDirectory));
+                return String.format("http://%s/dataset/sip-creator", FileStoreFinder.getHostPortUser(fileStoreDirectory));
             }
 
             @Override

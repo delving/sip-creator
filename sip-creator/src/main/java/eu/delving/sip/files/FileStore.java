@@ -35,7 +35,6 @@ import java.io.PrintWriter;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipInputStream;
 
 /**
  * This interface describes how files are stored by the sip-creator
@@ -114,7 +113,7 @@ public interface FileStore {
 
         List<File> getUploadFiles() throws FileStoreException;
 
-        void fromSipZip(ZipInputStream zipInputStream, ProgressListener progressListener) throws IOException, FileStoreException;
+        void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws IOException, FileStoreException;
 
         void remove() throws FileStoreException;
 
