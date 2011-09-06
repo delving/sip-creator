@@ -64,6 +64,8 @@ public class CultureHubClient {
     private static final int BLOCK_SIZE = 4096;
     private Logger log = Logger.getLogger(getClass());
     private Context context;
+    private HttpClient httpClient = new DefaultHttpClient();
+
 
     public interface Context {
         String getServerUrl();
@@ -134,12 +136,13 @@ public class CultureHubClient {
                 log.info("requesting list: "+url);
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
-                HttpResponse httpResponse = execute(get);
+                HttpResponse httpResponse = httpClient.execute(get);
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     HttpEntity entity = httpResponse.getEntity();
                     DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
                     log.info("list received:\n"+dataSetList);
                     listReceiver.listReceived(dataSetList.list);
+                    entity.consumeContent();
                 }
                 else {
                     log.warn("Unable to fetch data set list. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
@@ -163,6 +166,7 @@ public class CultureHubClient {
 
         @Override
         public void run() {
+            boolean success = false;
             try {
                 HttpGet get = new HttpGet(String.format(
                         "%s/fetch/%s-sip.zip?accessKey=%s",
@@ -171,10 +175,11 @@ public class CultureHubClient {
                         context.getAccessToken()
                 ));
                 get.setHeader("Accept", "application/zip");
-                HttpResponse httpResponse = execute(get);
+                HttpResponse httpResponse = httpClient.execute(get);
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     HttpEntity entity = httpResponse.getEntity();
                     dataSetStore.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                    success = true;
                 }
                 else {
                     log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
@@ -183,6 +188,15 @@ public class CultureHubClient {
             catch (Exception e) {
                 log.warn("Unable to download source", e);
                 context.tellUser("Unable to download source");
+                try {
+                    dataSetStore.remove();
+                }
+                catch (FileStoreException e1) {
+                    context.tellUser("Unable to remove local data set");
+                }
+            }
+            finally {
+                progressListener.finished(success);
             }
         }
     }
@@ -204,7 +218,7 @@ public class CultureHubClient {
                 HttpPost post = new HttpPost(createListRequestUrl());
                 post.setEntity(createListEntity());
                 post.setHeader("Accept", "text/plain");
-                HttpResponse response = execute(post);
+                HttpResponse response = httpClient.execute(post);
                 switch (Code.from(response)) {
                     case OK:
                         HttpEntity entity = response.getEntity();
@@ -228,7 +242,7 @@ public class CultureHubClient {
                     log.info("Uploading " + file);
                     post = new HttpPost(createFileRequestUrl(file));
                     post.setEntity(new FileEntity(file, progressListener));
-                    response = execute(post);
+                    response = httpClient.execute(post);
                     switch (Code.from(response)) {
                         case OK:
                             break;
@@ -269,26 +283,6 @@ public class CultureHubClient {
                     file.getName(),
                     context.getAccessToken()
             );
-        }
-    }
-
-    private HttpResponse execute(HttpPost httpPost) throws IOException {
-        HttpClient httpClient = new DefaultHttpClient();
-        try {
-            return httpClient.execute(httpPost);
-        }
-        finally {
-            httpClient.getConnectionManager().shutdown();
-        }
-    }
-
-    private HttpResponse execute(HttpGet httpGet) throws IOException {
-        HttpClient httpClient = new DefaultHttpClient();
-        try {
-            return httpClient.execute(httpGet);
-        }
-        finally {
-            httpClient.getConnectionManager().shutdown();
         }
     }
 
@@ -418,6 +412,7 @@ public class CultureHubClient {
         public String state;
         public int recordCount;
         public Ownership ownership;
+        public LockedBy lockedBy;
 
         public String toString() {
             return "data-set spec="+spec;
@@ -426,6 +421,13 @@ public class CultureHubClient {
 
     @XStreamAlias("ownership")
     public static class Ownership {
+        public String username;
+        public String fullname;
+        public String email;
+    }
+
+    @XStreamAlias("lockedBy")
+    public static class LockedBy {
         public String username;
         public String fullname;
         public String email;

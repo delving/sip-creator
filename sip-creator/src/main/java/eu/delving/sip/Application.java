@@ -98,24 +98,6 @@ public class Application {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         exceptionHandler = new PopupExceptionHandler();
         sipModel = new SipModel(fileStore, groovyCodeResource, this.exceptionHandler);
-        CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClient.Context() {
-
-            @Override
-            public String getServerUrl() {
-                return String.format("http://%s/dataset/sip-creator", FileStoreFinder.getHostPortUser(fileStoreDirectory));
-            }
-
-            @Override
-            public String getAccessToken() {
-                return oauthClient.getToken();
-            }
-
-            @Override
-            public void tellUser(String message) {
-                exceptionHandler.tellUser(message);
-            }
-        });
-
         home = new JFrame("Delving SIP Creator");
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -125,6 +107,7 @@ public class Application {
             }
         };
         desktop.setBackground(new Color(190, 190, 200));
+        CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(fileStoreDirectory));
         frames.add(new StatusFrame(desktop, sipModel));
         frames.add(new AnalysisFrame(desktop, sipModel));
         frames.add(new CreateFrame(desktop, sipModel));
@@ -211,6 +194,30 @@ public class Application {
         return menu;
     }
 
+    private class CultureHubClientContext implements CultureHubClient.Context {
+
+        private File fileStoreDirectory;
+
+        public CultureHubClientContext(File fileStoreDirectory) {
+            this.fileStoreDirectory = fileStoreDirectory;
+        }
+
+        @Override
+        public String getServerUrl() {
+            return String.format("http://%s/dataset/sip-creator", FileStoreFinder.getHostPortUser(fileStoreDirectory));
+        }
+
+        @Override
+        public String getAccessToken() {
+            return oauthClient.getToken();
+        }
+
+        @Override
+        public void tellUser(String message) {
+            exceptionHandler.tellUser(message);
+        }
+    }
+
     private class PasswordFetcher implements OAuthClient.PasswordRequest {
         private File fileStoreDirectory;
 
@@ -220,7 +227,7 @@ public class Application {
 
         @Override
         public String getPassword() {
-            JPasswordField passwordField = new JPasswordField(15);
+            final JPasswordField passwordField = new JPasswordField(15);
             JLabel labelA = new JLabel("Password");
             labelA.setLabelFor(passwordField);
             JPanel p = new JPanel(new BorderLayout(10, 10));
@@ -228,8 +235,14 @@ public class Application {
             p.add(passwordField, BorderLayout.CENTER);
             JPanel wrap = new JPanel();
             wrap.add(p);
-            int answer = JOptionPane.showInternalConfirmDialog(
-                    desktop,
+            Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    passwordField.requestFocus();
+                }
+            });
+            int answer = JOptionPane.showConfirmDialog(
+                    home,
                     wrap,
                     String.format("Authenticate for %s", FileStoreFinder.getHostPortUser(fileStoreDirectory)),
                     JOptionPane.OK_CANCEL_OPTION,

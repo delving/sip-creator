@@ -25,6 +25,7 @@ import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -65,7 +66,7 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
         Exec.swing(new Runnable() {
             @Override
             public void run() {
-                Map<String,FileStore.DataSetStore> stores = sipModel.getFileStore().getDataSetStores();
+                Map<String, FileStore.DataSetStore> stores = sipModel.getFileStore().getDataSetStores();
                 dataSetMenu.removeAll();
                 for (CultureHubClient.DataSetEntry entry : entries) {
                     dataSetMenu.add(new DownloadDatasetAction(entry, stores.get(entry.spec)));
@@ -103,12 +104,12 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
             this.store = store;
             if (store == null) {
                 String localUser = sipModel.getFileStore().getUsername();
-                if (entry.ownership != null) {
-                    if (localUser.equals(entry.ownership.username)) {
-                        setName("Owned by yourself, downloaded elsewhere", false);
+                if (entry.lockedBy != null) {
+                    if (localUser.equals(entry.lockedBy.username)) {
+                        setName("Locked by yourself, downloaded elsewhere", false);
                     }
                     else {
-                        setName(String.format("Owned by '%s' <%s>", entry.ownership.username, entry.ownership.email), false);
+                        setName(String.format("Owned by '%s' <%s>", entry.lockedBy.username, entry.lockedBy.email), false);
                     }
                 }
                 else {
@@ -135,13 +136,18 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
                     message,
                     0, 100
             );
-            FileStore.DataSetStore store = null;
-            cultureHubClient.downloadDataSet(store, new ProgressAdapter(progressMonitor) {
-                @Override
-                public void swingFinished(boolean success) {
-                    setEnabled(true);
-                }
-            });
+            try {
+                FileStore.DataSetStore store = sipModel.getFileStore().createDataSetStore(entry.spec);
+                cultureHubClient.downloadDataSet(store, new ProgressAdapter(progressMonitor) {
+                    @Override
+                    public void swingFinished(boolean success) {
+                        setEnabled(true);
+                    }
+                });
+            }
+            catch (FileStoreException e) {
+                sipModel.getUserNotifier().tellUser("Unable to create file store called "+entry.spec, e);
+            }
         }
     }
 }
