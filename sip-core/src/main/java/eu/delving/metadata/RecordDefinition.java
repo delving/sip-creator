@@ -21,15 +21,9 @@
 
 package eu.delving.metadata;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +45,13 @@ public class RecordDefinition {
 
     public ElementDefinition root;
 
-    void initialize() throws MetadataException {
+    public ViewDefinition views;
+
+    public String validation;
+
+    public void initialize(List<FactDefinition> factDefinitions) throws MetadataException {
         root.setPaths(new Path());
-        root.setFactDefinitions();
+        root.setFactDefinitions(factDefinitions);
     }
 
     public List<FieldDefinition> getMappableFields() {
@@ -91,35 +89,6 @@ public class RecordDefinition {
     }
 
     public String toString() {
-        return toString(this);
+        return String.format("RecordDefinition(%s)", prefix);
     }
-
-    // handy static methods
-
-    public static RecordDefinition read(InputStream in) throws MetadataException {
-        try {
-            Reader inReader = new InputStreamReader(in, "UTF-8");
-            RecordDefinition recordDefinition = (RecordDefinition) stream().fromXML(inReader);
-            recordDefinition.initialize();
-            return recordDefinition;
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String toString(RecordDefinition recordDefinition) {
-        return stream().toXML(recordDefinition);
-    }
-
-    private static XStream stream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(new Class[]{
-                RecordDefinition.class,
-                ElementDefinition.class,
-                FieldDefinition.class
-        });
-        return stream;
-    }
-
 }

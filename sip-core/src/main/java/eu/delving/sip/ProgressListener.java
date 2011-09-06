@@ -21,9 +21,6 @@
 
 package eu.delving.sip;
 
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
-
 /**
  * Ties a process to a ProgressMonitor
  *
@@ -33,66 +30,9 @@ import javax.swing.SwingUtilities;
 public interface ProgressListener {
     long PATIENCE = 250;
 
-    void setTotal(int total);
+    void prepareFor(int total);
 
     boolean setProgress(int progress);
 
     void finished(boolean success);
-
-    public abstract class Adapter implements ProgressListener {
-        private long lastProgress;
-        private ProgressMonitor progressMonitor;
-
-        public Adapter(ProgressMonitor progressMonitor) {
-            this.progressMonitor = progressMonitor;
-        }
-
-        @Override
-        public void setTotal(final int total) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    progressMonitor.setMaximum(total);
-                }
-            });
-        }
-
-        @Override
-        public boolean setProgress(final int progress) {
-            if (System.currentTimeMillis() > lastProgress + PATIENCE) { // not too many events
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressMonitor.setProgress(progress);
-                    }
-                });
-                lastProgress = System.currentTimeMillis();
-            }
-            boolean cancelled = progressMonitor.isCanceled();
-            if (cancelled) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressMonitor.close();
-                        swingFinished(false);
-                    }
-                });
-            }
-            return !cancelled;
-        }
-
-        @Override
-        public void finished(final boolean success) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    progressMonitor.close();
-                    swingFinished(success);
-                }
-            });
-        }
-
-        public abstract void swingFinished(boolean success);
-    }
-
 }

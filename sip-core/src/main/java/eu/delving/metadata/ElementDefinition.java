@@ -98,25 +98,25 @@ public class ElementDefinition {
         return null;
     }
 
-    public void setFactDefinitions() throws MetadataException {
+    public void setFactDefinitions(List<FactDefinition>  factDefinitions) throws MetadataException {
         if (fields != null) {
             for (FieldDefinition fieldDefinition : fields) {
-                if (fieldDefinition.validation != null && fieldDefinition.validation.factName != null) {
-                    for (FactDefinition factDefinition : Facts.definitions()) {
-                        if (fieldDefinition.validation.factName.equals(factDefinition.name)) {
-                            fieldDefinition.validation.factDefinition = factDefinition;
+                if (fieldDefinition.factName != null) {
+                    for (FactDefinition factDefinition : factDefinitions) {
+                        if (fieldDefinition.factName.equals(factDefinition.name)) {
+                            fieldDefinition.factDefinition = factDefinition;
                             break;
                         }
                     }
-                    if (fieldDefinition.validation.factDefinition == null) {
-                        throw new MetadataException(String.format("Record Definition %s requires fact %s", prefix, fieldDefinition.validation.factName));
+                    if (fieldDefinition.factDefinition == null) {
+                        throw new MetadataException(String.format("Record Definition %s requires fact %s", prefix, fieldDefinition.factName));
                     }
                 }
             }
         }
         if (elements != null) {
             for (ElementDefinition elementDefinition : elements) {
-                elementDefinition.setFactDefinitions();
+                elementDefinition.setFactDefinitions(factDefinitions);
             }
         }
     }

@@ -31,7 +31,7 @@
     <artifactId>sip-creator</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Creator</name>
-    <version>0.3.1</version>
+    <version>0.3.4-SNAPSHOT</version>
     <inceptionYear>2008</inceptionYear>
 
     <organization>
@@ -66,7 +66,7 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-parent</artifactId>
-        <version>0.3.1</version>
+        <version>0.3.4-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -88,7 +88,7 @@
                     <libPath/>
                     <jnlp>
                         <outputFile>sip-creator.jnlp</outputFile>
-                        <mainClass>eu.europeana.sip.gui.SipCreatorGUI</mainClass>
+                        <mainClass>eu.delving.sip.Application</mainClass>
                     </jnlp>
                     <sign>
                         <keystore>${basedir}/src/main/jnlp/snakeoil.keystore</keystore>
@@ -108,30 +108,28 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.amber</groupId>
+            <artifactId>oauth2-client</artifactId>
+        </dependency>
+        <!-- todo: remove the following when DataSetClient is removed -->
+        <dependency>
+            <groupId>org.ostermiller</groupId>
+            <artifactId>utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>sip-core</artifactId>
-            <version>0.3.1-SNAPSHOT</version>
+            <version>0.3.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.jnlp</groupId>
             <artifactId>jnlp-api</artifactId>
             <version>1.5.0</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.9.0</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

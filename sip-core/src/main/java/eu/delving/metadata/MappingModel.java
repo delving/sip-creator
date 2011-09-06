@@ -34,19 +34,32 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MappingModel {
 
     private RecordMapping recordMapping;
+    private FieldMapping selectedFieldMapping;
 
     public void setRecordMapping(RecordMapping recordMapping) {
         this.recordMapping = recordMapping;
-        fireChangeEvent();
+        fireMappingChanged();
     }
 
     public RecordMapping getRecordMapping() {
         return recordMapping;
     }
 
+    public FieldMapping selectFieldMapping(FieldMapping fieldMapping) {
+        this.selectedFieldMapping = fieldMapping;
+        for (Listener listener : listeners) {
+            listener.select(selectedFieldMapping);
+        }
+        return selectedFieldMapping;
+    }
+
+    public FieldMapping getSelectedFieldMapping() {
+        return selectedFieldMapping;
+    }
+
     public void setFact(String path, String value) {
         if (recordMapping != null) {
-            boolean changed = false;
+            boolean changed;
             if (value == null) {
                 changed = recordMapping.facts.containsKey(path);
                 recordMapping.facts.remove(path);
@@ -56,33 +69,47 @@ public class MappingModel {
                 recordMapping.facts.put(path, value);
             }
             if (changed) {
-                fireChangeEvent();
+                for (Listener listener : listeners) {
+                    listener.factChanged();
+                }
             }
         }
     }
 
-    public void setMapping(String path, FieldMapping fieldMapping) {
+    public void addMapping(FieldMapping fieldMapping) {
         if (recordMapping == null) return;
-        if (fieldMapping == null) {
-            recordMapping.fieldMappings.remove(path);
-        }
-        else {
-            recordMapping.fieldMappings.put(path, fieldMapping);
-        }
-        fireChangeEvent();
+        String path = fieldMapping.getDefinition().path.toString();
+        recordMapping.fieldMappings.put(path, fieldMapping);
+        fireMappingChanged();
+    }
+
+    public void removeMapping(FieldMapping fieldMapping) {
+        if (recordMapping == null) return;
+        String path = fieldMapping.getDefinition().path.toString();
+        recordMapping.fieldMappings.remove(path);
+        fireMappingChanged();
     }
 
     public void applyTemplate(RecordMapping template) {
         if (recordMapping.fieldMappings.isEmpty()) {
             recordMapping.applyTemplate(template);
-            fireChangeEvent();
+            fireMappingChanged();
+        }
+    }
+
+    public void notifySelectedFieldMappingChange() {
+        for (Listener listener : listeners) {
+            listener.fieldMappingChanged();
         }
     }
 
     // observable
 
     public interface Listener {
-        void mappingChanged(RecordMapping recordMapping);
+        void factChanged();
+        void select(FieldMapping fieldMapping);
+        void fieldMappingChanged();
+        void recordMappingChanged(RecordMapping recordMapping);
     }
 
     public void addListener(Listener listener) {
@@ -91,9 +118,11 @@ public class MappingModel {
 
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
-    private void fireChangeEvent() {
+    private void fireMappingChanged() {
+        selectedFieldMapping = null;
         for (Listener listener : listeners) {
-            listener.mappingChanged(recordMapping);
+            listener.recordMappingChanged(recordMapping);
+            listener.select(null);
         }
     }
 

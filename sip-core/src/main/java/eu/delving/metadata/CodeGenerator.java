@@ -34,20 +34,18 @@ import java.util.List;
 public class CodeGenerator {
 
     public static boolean isDictionaryPossible(FieldDefinition fieldDefinition, AnalysisTree.Node node) {
-        return fieldDefinition.validation != null &&
-                fieldDefinition.validation.hasOptions() &&
-                node.getStatistics().getHistogramValues() != null;
+        return fieldDefinition.hasOptions() && node.getStatistics().getHistogramValues() != null;
     }
 
-    public List<FieldMapping> createObviousMappings(List<FieldDefinition> unmappedFieldDefinitions, List<SourceVariable> variables) {
+    public List<FieldMapping> createObviousMappings(List<FieldDefinition> unmappedFieldDefinitions, List<SourceVariable> variables, List<FactDefinition> factDefinitions) {
         List<FieldMapping> fieldMappings = new ArrayList<FieldMapping>();
         FieldMapping uniqueMapping = createUniqueMapping(unmappedFieldDefinitions, variables);
         if (uniqueMapping != null) {
             fieldMappings.add(uniqueMapping);
         }
         for (FieldDefinition fieldDefinition : unmappedFieldDefinitions) {
-            if (fieldDefinition.validation != null && fieldDefinition.validation.factName != null) {
-                FieldMapping fieldMapping = createObviousMappingFromFact(fieldDefinition);
+            if (fieldDefinition.factName != null) {
+                FieldMapping fieldMapping = createObviousMappingFromFact(fieldDefinition, factDefinitions);
                 if (fieldMapping != null) {
                     fieldMappings.add(fieldMapping);
                 }
@@ -114,7 +112,7 @@ public class CodeGenerator {
         for (SourceVariable variable : variables) {
             if (variable.getNode().isUniqueElement()) {
                 for (FieldDefinition definition : unmappedFieldDefinitions) {
-                    if (definition.validation != null && definition.validation.id) {
+                    if (definition.identifierField) {
                         FieldMapping fieldMapping = new FieldMapping(definition);
                         eachBlock(fieldMapping, variable.getNode().getVariableName());
                         return fieldMapping;
@@ -125,10 +123,10 @@ public class CodeGenerator {
         return null;  //To change body of created methods use File | Settings | File Templates.
     }
 
-    private FieldMapping createObviousMappingFromFact(FieldDefinition fieldDefinition) {
+    private FieldMapping createObviousMappingFromFact(FieldDefinition fieldDefinition, List<FactDefinition>  factDefinitions) {
         FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
-        for (FactDefinition factDefinition : Facts.definitions()) {
-            if (factDefinition.name.equals(fieldDefinition.validation.factName)) {
+        for (FactDefinition factDefinition : factDefinitions) {
+            if (factDefinition.name.equals(fieldDefinition.factName)) {
                 line(fieldMapping, factDefinition.name);
             }
         }

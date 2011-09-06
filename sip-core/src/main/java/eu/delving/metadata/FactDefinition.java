@@ -51,4 +51,8 @@ public class FactDefinition {
         public java.util.List<FactDefinition> factDefinitions;
 
     }
+
+    public String toString() {
+        return String.format("FactDefinition(%s)", name);
+    }
 }

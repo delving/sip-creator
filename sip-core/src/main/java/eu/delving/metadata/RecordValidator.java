@@ -21,25 +21,22 @@
 
 package eu.delving.metadata;
 
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.GroovyNode;
+import groovy.lang.Binding;
+import groovy.lang.GString;
+import groovy.lang.Script;
+import groovy.util.Node;
+import groovy.util.NodeList;
+import groovy.xml.QName;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
-import org.xml.sax.InputSource;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * Parse, filter, validate a record
@@ -49,171 +46,107 @@ import java.util.TreeSet;
 
 public class RecordValidator {
     private Logger log = Logger.getLogger(getClass());
-    private RecordDefinition recordDefinition;
-    private List<FieldDefinition> validatableFields = new ArrayList<FieldDefinition>();
     private Uniqueness idUniqueness;
-    private String context;
-    private int contextBegin, contextEnd;
-    private long totalParseTime, totalValidateTime, totalWriteTime;
-    private SAXReader reader = new SAXReader();
+    private Script script;
+    private RecordDefinition recordDefinition;
+    private Map<Path, FieldDefinition> fieldDefinitionCache = new TreeMap<Path, FieldDefinition>();
 
-    public RecordValidator(RecordDefinition recordDefinition) {
+    public RecordValidator(GroovyCodeResource groovyCodeResource, RecordDefinition recordDefinition) {
         this.recordDefinition = recordDefinition;
-        StringBuilder contextString = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<validate\n");
-        for (NamespaceDefinition namespaceDefinition : recordDefinition.namespaces) {
-            contextString.append(String.format("xmlns:%s=\"%s\"\n", namespaceDefinition.prefix, namespaceDefinition.uri));
-        }
-        contextString.append(">\n%s</validate>\n");
-        this.context = contextString.toString();
-        this.contextBegin = this.context.indexOf("%s");
-        int afterPercentS = contextBegin + 2;
-        this.contextEnd = this.context.length() - afterPercentS;
-        for (FieldDefinition fieldDefinition : recordDefinition.getMappableFields()) {
-            if (fieldDefinition.validation != null) {
-                validatableFields.add(fieldDefinition);
-            }
-        }
+        this.script = groovyCodeResource.createValidationScript(recordDefinition.validation);
     }
 
     public void guardUniqueness(Uniqueness uniqueness) {
         this.idUniqueness = uniqueness;
     }
 
-    public String validateRecord(String recordString, List<String> problems) {
-        if (!recordString.contains("<")) {
-            return recordString;
-        }
-        String contextualizedRecord = String.format(context, recordString);
-        StringWriter out = new StringWriter();
-        try {
-            long before = System.currentTimeMillis();
-            InputSource source = new InputSource(new StringReader(contextualizedRecord));
-            source.setEncoding("UTF-8");
-            Document document = reader.read(source);
-            totalParseTime += System.currentTimeMillis() - before;
-            Map<Path, Counter> counters = new TreeMap<Path, Counter>();
-            before = System.currentTimeMillis();
-            validateDocument(document, problems, new TreeSet<String>(), counters);
-            validateCardinalities(counters, problems);
-            totalValidateTime += System.currentTimeMillis() - before;
-            before = System.currentTimeMillis();
-            XMLWriter writer = new XMLWriter(out, OutputFormat.createPrettyPrint());
-            writer.write(document);
-            totalWriteTime += System.currentTimeMillis() - before;
-        }
-        catch (Exception e) {
-            problems.add("Problem parsing: " + e.toString());
-            return "Invalid";
-        }
-        out.getBuffer().delete(0, contextBegin);
-        out.getBuffer().delete(out.getBuffer().length() - contextEnd, out.getBuffer().length());
-        return out.toString();
+    public interface ValidationReference {
+        boolean allowOption(Node node);
+        boolean isUnique(String string);
     }
 
-    public void report() {
-        log.info(String.format("Parse %d", totalParseTime));
-        log.info(String.format("Validate %d", totalValidateTime));
-        log.info(String.format("Write %d", totalWriteTime));
-    }
-
-    private void validateCardinalities(Map<Path, Counter> counters, List<String> problems) {
-        Map<String, Boolean> requiredGroupMap = new TreeMap<String, Boolean>();
-        for (FieldDefinition fieldDefinition : validatableFields) {
-            if (fieldDefinition.validation.requiredGroup != null) {
-                requiredGroupMap.put(fieldDefinition.validation.requiredGroup, false);
-            }
-            Counter counter = counters.get(fieldDefinition.path);
-            if (!fieldDefinition.validation.multivalued && counter != null && counter.count > 1) {
-                problems.add(String.format("Single-valued field [%s] has more than one value", fieldDefinition.path));
-            }
-        }
-        for (Map.Entry<Path, Counter> entry : counters.entrySet()) {
-            FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(entry.getKey());
-            if (fieldDefinition.validation != null) {
-                if (fieldDefinition.validation.requiredGroup != null) {
-                    requiredGroupMap.put(fieldDefinition.validation.requiredGroup, true);
+    public void validateRecord(Node record, int recordNumber) throws ValidationException {
+        sanitizeRecord(record);
+        Binding binding = new Binding();
+        binding.setVariable("record", record);
+        binding.setVariable("validationReference", new ValidationReference() {
+            @Override
+            public boolean allowOption(Node node) {
+                Path path = nodeToPath(node);
+                FieldDefinition definition = fieldDefinitionCache.get(path);
+                if (definition == null) {
+                    fieldDefinitionCache.put(path, definition = recordDefinition.getFieldDefinition(path));
                 }
+                return definition.allowOption(node.value().toString());
             }
+
+            @Override
+            public boolean isUnique(String string) {
+                return idUniqueness == null || !idUniqueness.isRepeated(string);
+            }
+        });
+        script.setBinding(binding);
+        try {
+            script.run();
         }
-        for (Map.Entry<String, Boolean> entry : requiredGroupMap.entrySet()) {
-            if (!entry.getValue()) {
-                problems.add(String.format("Required field violation for [%s]", entry.getKey()));
-            }
+        catch (AssertionError e) {
+            throw new ValidationException(e, record, recordNumber);
         }
     }
 
-    private void validateDocument(Document document, List<String> problems, Set<String> entries, Map<Path, Counter> counters) {
-        Element rootElement = document.getRootElement();
-        if (!rootElement.getQName().getName().equals("validate")) {
-            throw new RuntimeException("Root element should be 'validate'");
-        }
-        Element recordElement = rootElement.element("record");
-        validateElement(recordElement, new Path(), problems, entries, counters);
+    private Path nodeToPath(Node node) {
+        Path path = new Path();
+        nodeToPath(node, path);
+        return path;
     }
 
-    private boolean validateElement(Element element, Path path, List<String> problems, Set<String> entries, Map<Path, Counter> counters) {
-        path.push(Tag.create(element.getNamespacePrefix(), element.getName()));
-        boolean hasElements = false;
-        Iterator walk = element.elementIterator();
-        while (walk.hasNext()) {
-            Element subelement = (Element) walk.next();
-            boolean remove = validateElement(subelement, path, problems, entries, counters);
-            if (remove) {
-                walk.remove();
-            }
-            hasElements = true;
+    private void nodeToPath(Node node, Path path) {
+        if (node.parent() != null) {
+            nodeToPath(node.parent(), path);
         }
-        if (!hasElements) {
-            boolean fieldRemove = validatePath(element.getTextTrim(), path, problems, entries, counters);
-            path.pop();
-            return fieldRemove;
+        if (node.name() instanceof String) {
+            path.push(Tag.create((String)node.name()));
         }
-        path.pop();
-        return false;
-    }
-
-    private boolean validatePath(String text, Path path, List<String> problems, Set<String> entries, Map<Path, Counter> counters) {
-        FieldDefinition field = recordDefinition.getFieldDefinition(path);
-        if (field == null) {
-            problems.add(String.format("No field definition found for path [%s]", path));
-            return true;
-        }
-        String entryString = field + "=" + text;
-        if (text.isEmpty() || entries.contains(entryString)) {
-            return true;
+        else if (node.name() instanceof QName) {
+            QName q = (QName) node.name();
+            path.push(Tag.create(q.getPrefix(), q.getLocalPart()));
         }
         else {
-            entries.add(entryString);
-            Counter counter = counters.get(field.path);
-            if (counter == null) {
-                counters.put(field.path, counter = new Counter());
-            }
-            counter.count++;
-            validateField(text, field, problems);
-            return false;
+            throw new IllegalStateException("Node name type is not recognized: "+node.name().getClass());
         }
     }
 
-    private void validateField(String text, FieldDefinition fieldDefinition, List<String> problems) {
-        FieldDefinition.Validation validation = fieldDefinition.validation;
-        if (validation != null) {
-            if (validation.hasOptions()) {
-                if (!validation.allowOption(text)) {
-                    problems.add(String.format("Value for [%s] was [%s] which does not belong to [%s]", fieldDefinition.path, text, validation.getOptionsString()));
+    private void sanitizeRecord(Node record) {
+        sanitizeNode(record);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void sanitizeNode(Node node) {
+        if (node.value() instanceof List) {
+            for (Object nodeObject : new NodeList(((List) node.value()))) { // cloning to avoid concurrent modification
+                sanitizeNode((Node) nodeObject);
+            }
+            List list = (List) node.value(); // after cleaning
+            Collections.sort(list, NODE_COMPARATOR);
+            Node current = null;
+            Iterator walk = list.iterator();
+            while (walk.hasNext()) {
+                Node next = (Node)walk.next();
+                if (current != null && current.name().equals(next.name()) && current.value().equals(next.value())) {
+                    walk.remove();
+                }
+                else {
+                    current = next;
                 }
             }
-            if (validation.url) {
-                try {
-                    new URL(text);
-                }
-                catch (MalformedURLException e) {
-                    problems.add(String.format("URL value for [%s] was [%s] which is malformed", fieldDefinition.path, text));
-                }
+        }
+        else {
+            String valueString = valueToString(node.value());
+            if (valueString.isEmpty()) {
+                node.parent().remove(node);
             }
-            if (validation.id && idUniqueness != null) {
-                if (idUniqueness.isRepeated(text)) {
-                    problems.add(String.format("Identifier [%s] must be unique but the value [%s] appears more than once", fieldDefinition.path, text));
-                }
+            else {
+                node.setValue(valueString);
             }
         }
     }
@@ -222,4 +155,36 @@ public class RecordValidator {
         int count;
     }
 
+    private static Comparator<Object> NODE_COMPARATOR = new Comparator<Object>() {
+        @Override
+        public int compare(Object a, Object b) {
+            Node nodeA = (Node) a;
+            Node nodeB = (Node) b;
+            QName nameA = (QName) nodeA.name();
+            QName nameB = (QName) nodeB.name();
+            int comp = nameA.toString().compareTo(nameB.toString());
+            if (comp != 0) {
+                return comp;
+            }
+            return valueToString(nodeA.value()).compareTo(valueToString(nodeB.value()));
+        }
+    };
+
+    private static String valueToString(Object object) {
+        if (object instanceof String) {
+            return (String)object;
+        }
+        else if (object instanceof GString) {
+            return object.toString();
+        }
+        else if (object instanceof GroovyNode) {
+            return valueToString(((GroovyNode) object).value());
+        }
+        else if (object instanceof Node) {
+            return valueToString(((Node) object).value());
+        }
+        else {
+            throw new IllegalStateException("Could not deal with class "+object.getClass());
+        }
+    }
 }

@@ -21,6 +21,7 @@
 
 package eu.delving.metadata;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,7 +31,9 @@ import java.util.Set;
  */
 
 public interface MetadataModel {
-    RecordDefinition getRecordDefinition();
+    List<FactDefinition> getFactDefinitions();
+
     Set<String> getPrefixes();
+
     RecordDefinition getRecordDefinition(String prefix);
 }

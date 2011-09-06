@@ -51,12 +51,15 @@ public class RecordMapping {
     @XStreamAsAttribute
     String prefix;
 
+    @Deprecated
     @XStreamAlias("records-normalized")
     int recordsNormalized;
 
+    @Deprecated
     @XStreamAlias("records-discarded")
     int recordsDiscarded;
 
+    @Deprecated
     @XStreamAlias("normalize-time")
     long normalizeTime;
 
@@ -72,30 +75,6 @@ public class RecordMapping {
 
     public String getPrefix() {
         return prefix;
-    }
-
-    public int getRecordsNormalized() {
-        return recordsNormalized;
-    }
-
-    public void setRecordsNormalized(int recordsNormalized) {
-        this.recordsNormalized = recordsNormalized;
-    }
-
-    public int getRecordsDiscarded() {
-        return recordsDiscarded;
-    }
-
-    public void setRecordsDiscarded(int recordsDiscarded) {
-        this.recordsDiscarded = recordsDiscarded;
-    }
-
-    public long getNormalizeTime() {
-        return normalizeTime;
-    }
-
-    public void setNormalizeTime(long normalizeTime) {
-        this.normalizeTime = normalizeTime;
     }
 
     public String getFact(String fieldName) {
@@ -115,6 +94,10 @@ public class RecordMapping {
         else {
             return false;
         }
+    }
+
+    public Map<String, String> getFacts() {
+        return facts;
     }
 
     public Set<FieldMapping> getFieldMappings() {

@@ -37,10 +37,6 @@ import java.util.List;
 @XStreamAlias("field")
 public class FieldDefinition implements Comparable<FieldDefinition> {
 
-    public FieldDefinition() {
-        fullDoc = true;
-    }
-
     @XStreamAsAttribute
     public String prefix;
 
@@ -48,10 +44,7 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     public String localName;
 
     @XStreamAsAttribute
-    public boolean briefDoc;
-
-    @XStreamAsAttribute
-    public boolean fullDoc;
+    public String factName;
 
     @XStreamAsAttribute
     public boolean systemField;
@@ -68,7 +61,11 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     @XStreamAsAttribute
     public String searchField;
 
-    public Validation validation;
+    public boolean identifierField;
+
+    public Converter converter;
+
+    public List<String> options;
 
     @XStreamOmitField
     public Path path;
@@ -77,6 +74,9 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
 
     @XStreamOmitField
     private Tag tag;
+
+    @XStreamOmitField
+    public FactDefinition factDefinition;
 
     public Tag getTag() {
         if (tag == null) {
@@ -123,62 +123,22 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     }
 
     public String addOptionalConverter(String variable) {
-        if (validation != null && validation.converter != null) {
-            return variable + validation.converter.call;
+        if (converter != null) {
+            return variable + converter.call;
         }
         else {
             return variable;
         }
     }
 
-    @XStreamAlias("validation")
-    public static class Validation {
+    public boolean hasOptions() {
+        return options != null || factDefinition != null && factDefinition.options != null;
+    }
 
-        public Validation() {
-            multivalued = true;
-            required = true;
-        }
-
-        @XStreamAsAttribute
-        public String factName;
-
-        @XStreamAsAttribute
-        public String requiredGroup;
-
-        @XStreamAsAttribute
-        public boolean url;
-
-        @XStreamAsAttribute
-        public boolean object;
-
-        @XStreamAsAttribute
-        public boolean unique;
-
-        @XStreamAsAttribute
-        public boolean id;
-
-        @XStreamAsAttribute
-        public boolean type;
-
-        @XStreamAsAttribute
-        public boolean multivalued;
-
-        @XStreamAsAttribute
-        public boolean required;
-
-        public List<String> options;
-
-        public Converter converter;
-
-        @XStreamOmitField
-        public FactDefinition factDefinition;
-
-        public boolean hasOptions() {
-            return options != null || factDefinition != null && factDefinition.options != null;
-        }
-
-        public boolean allowOption(String value) {
-            for (String option : getOptions()) {
+    public boolean allowOption(String value) {
+        List<String> options = getOptions();
+        if (options != null) {
+            for (String option : options) {
                 if (option.endsWith(":")) {
                     int colon = value.indexOf(':');
                     if (colon > 0) {
@@ -196,31 +156,31 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
                     return true;
                 }
             }
-            return false;
         }
+        return false;
+    }
 
-        public String getOptionsString() {
-            StringBuilder enumString = new StringBuilder();
-            Iterator<String> walk = getOptions().iterator();
-            while (walk.hasNext()) {
-                enumString.append(walk.next());
-                if (walk.hasNext()) {
-                    enumString.append(',');
-                }
+    public String getOptionsString() {
+        StringBuilder enumString = new StringBuilder();
+        Iterator<String> walk = getOptions().iterator();
+        while (walk.hasNext()) {
+            enumString.append(walk.next());
+            if (walk.hasNext()) {
+                enumString.append(',');
             }
-            return enumString.toString();
         }
+        return enumString.toString();
+    }
 
-        public List<String> getOptions() {
-            if (options != null) {
-                return options;
-            }
-            else if (factDefinition != null) {
-                return factDefinition.options;
-            }
-            else {
-                return null;
-            }
+    public List<String> getOptions() {
+        if (options != null) {
+            return options;
+        }
+        else if (factDefinition != null) {
+            return factDefinition.options;
+        }
+        else {
+            return null;
         }
     }
 
