@@ -44,6 +44,7 @@ import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.FileMenu;
 import eu.delving.sip.menus.MappingMenu;
 import eu.delving.sip.menus.TemplateMenu;
+import eu.delving.sip.model.DataSetStoreModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.UserNotifier;
 
@@ -156,6 +157,16 @@ public class Application {
             public void windowClosing(WindowEvent windowEvent) {
                 putFrameStates();
                 System.exit(0);
+            }
+        });
+        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+            @Override
+            public void storeSet(FileStore.DataSetStore store) {
+                home.setTitle(String.format("Delving SIP Creator [%s - %s]", store.getSpec(), store.getDataSetFacts().get("name")));
+            }
+
+            @Override
+            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
             }
         });
         osxExtra();

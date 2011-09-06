@@ -89,6 +89,11 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
     }
 
     @Override
+    public String getUsername() {
+        return FileStoreFinder.getUser(home);
+    }
+
+    @Override
     public void setTemplate(String name, RecordMapping recordMapping) throws FileStoreException {
         File templateFile = new File(home, String.format(MAPPING_FILE_PATTERN, name));
         try {

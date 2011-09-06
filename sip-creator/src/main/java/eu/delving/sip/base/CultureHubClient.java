@@ -414,10 +414,10 @@ public class CultureHubClient {
     @XStreamAlias("data-set")
     public static class DataSetEntry {
         public String spec;
-        String name;
-        String state;
-        int recordCount;
-        Ownership ownership;
+        public String name;
+        public String state;
+        public int recordCount;
+        public Ownership ownership;
 
         public String toString() {
             return "data-set spec="+spec;
@@ -426,8 +426,8 @@ public class CultureHubClient {
 
     @XStreamAlias("ownership")
     public static class Ownership {
-        String username;
-        String fullname;
-        String email;
+        public String username;
+        public String fullname;
+        public String email;
     }
 }

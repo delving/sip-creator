@@ -101,7 +101,28 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
         private DownloadDatasetAction(CultureHubClient.DataSetEntry entry, FileStore.DataSetStore store) {
             this.entry = entry;
             this.store = store;
-            putValue(Action.NAME, String.format("<html>Download \"%s\"", entry.spec));
+            if (store == null) {
+                String localUser = sipModel.getFileStore().getUsername();
+                if (entry.ownership != null) {
+                    if (localUser.equals(entry.ownership.username)) {
+                        setName("Owned by yourself, downloaded elsewhere", false);
+                    }
+                    else {
+                        setName(String.format("Owned by '%s' <%s>", entry.ownership.username, entry.ownership.email), false);
+                    }
+                }
+                else {
+                    setName("Download", true);
+                }
+            }
+            else {
+                setName("Already in workspace", false);
+            }
+        }
+
+        private void setName(String message, boolean enabled) {
+            putValue(Action.NAME, String.format("<html><font size=+1><b>%s</b> - </font><i>%s</i>", entry.spec, message));
+            setEnabled(enabled);
         }
 
         @Override

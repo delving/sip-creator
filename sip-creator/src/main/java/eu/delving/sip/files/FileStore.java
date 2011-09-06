@@ -44,6 +44,8 @@ import java.util.Map;
 
 public interface FileStore {
 
+    String getUsername();
+
     void setTemplate(String name, RecordMapping recordMapping) throws FileStoreException;
 
     Map<String, RecordMapping> getTemplates(MetadataModel me) throws FileStoreException;
