@@ -500,7 +500,8 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 Map<String, String> hints = getHints();
                 Path recordRoot = getRecordRoot(hints);
                 int recordCount = getRecordCount(hints);
-                SourceConverter converter = new SourceConverter(recordRoot, recordCount);
+                Path uniqueElement = getUniqueElement(hints);
+                SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement);
                 converter.setProgressListener(progressListener);
                 converter.parse(importedInput(), sourceOutput());
             }

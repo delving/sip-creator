@@ -39,7 +39,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -58,12 +61,14 @@ public class SourceConverter {
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
     private Path recordRootPath;
+    private Path uniqueElementPath;
     private int recordCount;
     private ProgressListener progressListener;
 
-    public SourceConverter(Path recordRootPath, int recordCount) {
+    public SourceConverter(Path recordRootPath, int recordCount, Path uniqueElementPath) {
         this.recordRootPath = recordRootPath;
         this.recordCount = recordCount;
+        this.uniqueElementPath = uniqueElementPath;
     }
 
     public void setProgressListener(ProgressListener progressListener) {
@@ -75,7 +80,9 @@ public class SourceConverter {
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         Path path = new Path();
-        boolean withinRecord = false;
+        StringBuilder uniqueBuilder = null;
+        String uniqueValue = null;
+        List<XMLEvent> recordEvents = new ArrayList<XMLEvent>();
         int count = 0;
         boolean finished = false;
         NamespaceCollector namespaceCollector = new NamespaceCollector();
@@ -90,19 +97,23 @@ public class SourceConverter {
                     case XMLEvent.START_ELEMENT:
                         StartElement start = event.asStartElement();
                         path.push(Tag.create(start.getName().getPrefix(), start.getName().getLocalPart()));
-                        if (withinRecord) {
-                            out.add(event);
+                        if (!recordEvents.isEmpty()) {
+                            if (path.equals(uniqueElementPath)) {
+                                uniqueBuilder = new StringBuilder();
+                                uniqueValue = null;
+                            }
+                            else {
+                                recordEvents.add(event);
+                            }
                         }
                         else if (path.equals(recordRootPath)) {
-                            withinRecord = true;
                             if (namespaceCollector != null) {
                                 namespaceCollector.gatherFrom(start);
                                 out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, namespaceCollector.iterator()));
                                 out.add(eventFactory.createCharacters("\n"));
                                 namespaceCollector = null;
                             }
-                            out.add(eventFactory.createStartElement("", "", RECORD_TAG));
-                            out.add(eventFactory.createCharacters("\n"));
+                            recordEvents.add(eventFactory.createCharacters("\n")); // flag that record has started
                             if (progressListener != null) progressListener.setProgress(count);
                         }
                         else if (namespaceCollector != null) {
@@ -110,16 +121,33 @@ public class SourceConverter {
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
-                        if (withinRecord) {
+                        if (!recordEvents.isEmpty()) {
                             if (path.equals(recordRootPath)) {
-                                withinRecord = false;
-                                count++;
-                                out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                                if (uniqueValue == null) {
+                                    throw new IOException("Record has no unique value"); // todo: maybe discard it, but then record the loss
+                                }
+                                else {
+                                    Iterator attributes = Arrays.asList(eventFactory.createAttribute("id", uniqueValue)).iterator();
+                                    uniqueValue = null;
+                                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, attributes, null));
+                                    for (XMLEvent saved : recordEvents) {
+                                        out.add(saved);
+                                    }
+                                    out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                                    out.add(eventFactory.createCharacters("\n"));
+                                    recordEvents.clear();
+                                    uniqueBuilder = null;
+                                    count++;
+                                }
+                            }
+                            else if (path.equals(uniqueElementPath)) {
+                                uniqueValue = uniqueBuilder.toString();
+                                uniqueBuilder = null;
                             }
                             else {
-                                out.add(event);
+                                recordEvents.add(event);
+                                recordEvents.add(eventFactory.createCharacters("\n"));
                             }
-                            out.add(eventFactory.createCharacters("\n"));
                         }
                         path.pop();
                         break;
@@ -131,16 +159,22 @@ public class SourceConverter {
                         finished = true;
                         break;
                     case XMLEvent.CHARACTERS:
-                        if (withinRecord) {
+                    case XMLEvent.CDATA:
+                        if (!recordEvents.isEmpty()) {
                             String string = ValueFilter.filter(event.asCharacters().getData());
                             if (!string.isEmpty()) {
-                                out.add(eventFactory.createCharacters(string));
+                                if (uniqueBuilder != null) {
+                                    uniqueBuilder.append(string);
+                                }
+                                else {
+                                    recordEvents.add(eventFactory.createCharacters(string));
+                                }
                             }
                         }
                         break;
                     default:
-                        if (withinRecord) {
-                            out.add(event);
+                        if (!recordEvents.isEmpty()) {
+                            recordEvents.add(event);
                         }
                         break;
                 }
