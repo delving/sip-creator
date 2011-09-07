@@ -78,6 +78,10 @@ public class StatisticsFrame extends FrameBase {
             @Override
             public void recordRootSet(Path recordRootPath) {
             }
+
+            @Override
+            public void uniqueElementSet(Path uniqueElementPath) {
+            }
         });
     }
 

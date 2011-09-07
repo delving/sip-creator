@@ -87,8 +87,8 @@ public class AnalysisFrame extends FrameBase {
     }
 
     @Override
-    protected boolean isEnabledInState(FileStore.StoreState state) {
-        return state == FileStore.StoreState.IMPORTED_PENDING_CONVERT || state == FileStore.StoreState.ANALYZED;
+    protected FileStore.StoreState getMinimumStoreState() {
+        return FileStore.StoreState.IMPORTED_ANALYZED;
     }
 
     private void wireUp() {
@@ -99,7 +99,7 @@ public class AnalysisFrame extends FrameBase {
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
                     final AnalysisTree.Node node = (AnalysisTree.Node) path.getLastPathComponent();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
-                    selectUniqueElementButton.setEnabled(!node.couldBeRecordRoot());
+                    selectUniqueElementButton.setEnabled(!node.couldBeUniqueElement());
                     sipModel.getAnalysisModel().selectStatistics(node.getStatistics());
                 }
                 else {
@@ -136,12 +136,13 @@ public class AnalysisFrame extends FrameBase {
 
             @Override
             public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
-                convertButton.setEnabled(storeState.ordinal() >= FileStore.StoreState.IMPORTED_PENDING_CONVERT.ordinal());
+                convertButton.setEnabled(storeState.ordinal() >= FileStore.StoreState.IMPORTED_HINTS_SET.ordinal());
             }
         });
         convertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                convertButton.setEnabled(false);
                 String message = String.format(
                         "<html><h3>Converting source data of '%s' to standard form</h3>",
                         sipModel.getStoreModel().getStore().getSpec()
@@ -155,7 +156,7 @@ public class AnalysisFrame extends FrameBase {
                 sipModel.convertSource(new ProgressAdapter(progressMonitor) {
                     @Override
                     public void swingFinished(boolean success) {
-                        // todo: implement
+                        convertButton.setEnabled(true);
                     }
                 });
             }

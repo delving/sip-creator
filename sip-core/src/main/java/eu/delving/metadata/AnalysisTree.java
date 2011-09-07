@@ -61,6 +61,8 @@ public class AnalysisTree implements Serializable {
 
         boolean couldBeRecordRoot();
 
+        boolean couldBeUniqueElement();
+
         String getVariableName();
     }
 

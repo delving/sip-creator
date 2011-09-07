@@ -109,7 +109,23 @@ public class SipModel {
 
             @Override
             public void recordRootSet(Path recordRootPath) {
-                seekFirstRecord();
+                deleteSourceFile();
+            }
+
+            @Override
+            public void uniqueElementSet(Path uniqueElementPath) {
+                deleteSourceFile();
+            }
+
+            private void deleteSourceFile() {
+                FileStore.DataSetStore store = storeModel.getStore();
+                try {
+                    store.deleteConverted();
+                }
+                catch (FileStoreException e) {
+                    SipModel.this.userNotifier.tellUser("Unable to delete converted source file", e);
+                }
+                storeModel.checkState();
             }
         });
         fieldCompileModel.addListener(new CompileModel.Listener() {

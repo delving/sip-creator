@@ -99,10 +99,12 @@ public class StatusFrame extends FrameBase {
         switch (storeState) {
             case EMPTY:
                 return "has no source yet";
-            case IMPORTED_PENDING_ANALYZE:
-                return "imported - needs analysis";
-            case IMPORTED_PENDING_CONVERT:
-                return "can now convert to standard format";
+            case IMPORTED:
+                return "imported - analyze";
+            case IMPORTED_ANALYZED:
+                return "imported - choose record root and unique element";
+            case IMPORTED_HINTS_SET:
+                return "imported - ready for conversion to source";
             case SOURCED:
                 return "sourced";
             case ANALYZED:
@@ -193,7 +195,7 @@ public class StatusFrame extends FrameBase {
         }
 
         public void setEnabledByState(FileStore.StoreState state) {
-            setEnabled(state == FileStore.StoreState.SOURCED || state == FileStore.StoreState.IMPORTED_PENDING_ANALYZE);
+            setEnabled(state == FileStore.StoreState.SOURCED || state == FileStore.StoreState.IMPORTED);
         }
     }
 

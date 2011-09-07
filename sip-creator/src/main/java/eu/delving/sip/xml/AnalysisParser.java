@@ -76,7 +76,7 @@ public class AnalysisParser implements Runnable {
             InputStream inputStream;
             boolean sourceFormat = false;
             switch(store.getState()) {
-                case IMPORTED_PENDING_ANALYZE:
+                case IMPORTED:
                     inputStream = store.importedInput();
                     break;
                 case SOURCED:

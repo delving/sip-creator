@@ -70,10 +70,10 @@ public class MockFileStoreFactory {
         return root.listFiles();
     }
 
-    public Map<String,String> hints() {
+    public Map<String,String> hints(int recordCount) {
         Map<String,String> hints = new TreeMap<String,String>();
         hints.put(FileStore.RECORD_ROOT_PATH, "/adlibXML/recordList/record");
-        hints.put(FileStore.RECORD_COUNT, "0");
+        hints.put(FileStore.RECORD_COUNT, String.valueOf(recordCount));
         hints.put(FileStore.UNIQUE_ELEMENT_PATH, "/adlibXML/recordList/record/priref");
         return hints;
     }

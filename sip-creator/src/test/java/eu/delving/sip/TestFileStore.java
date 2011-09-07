@@ -47,12 +47,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
 
 import static eu.delving.sip.files.FileStore.StoreState.ANALYZED;
 import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
-import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
-import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
+import static eu.delving.sip.files.FileStore.StoreState.IMPORTED;
+import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_HINTS_SET;
 import static eu.delving.sip.files.FileStore.StoreState.MAPPED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -70,6 +69,7 @@ public class TestFileStore {
     private FileStore fileStore;
     private AnalysisTree analysisTree;
     private DefaultTreeModel analysisTreeModel;
+    private int recordCount;
     private List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
 
     @Before
@@ -89,7 +89,7 @@ public class TestFileStore {
         assertEquals("Should be no files", 0, mock.files().length);
         store().externalToImported(MockFileStoreInput.sampleFile(), null);
         assertEquals("Should be one file", 1, mock.directories().length);
-        assertEquals("Should be IMPORTED_FRESH", IMPORTED_PENDING_ANALYZE, store().getState());
+        assertEquals("Should be IMPORTED", IMPORTED, store().getState());
         assertEquals("Should be one spec", 1, fileStore.getDataSetStores().size());
         assertEquals("Should be one file", 1, mock.files().length);
         log.info("Created " + mock.files()[0].getAbsolutePath());
@@ -108,21 +108,21 @@ public class TestFileStore {
     @Test
     public void cycle() throws IOException, FileStoreException {
         store().externalToImported(MockFileStoreInput.sampleFile(), null);
-        store().setHints(mock.hints());
-        assertEquals("Should be imported and hints", 2, mock.files().length);
-        assertEquals(IMPORTED_PENDING_ANALYZE, store().getState());
+        assertEquals(IMPORTED, store().getState());
         analyze();
-        assertEquals("Should be imported, hints, and stats", 3, mock.files().length);
+        assertEquals("Should be imported and stats", 2, mock.files().length);
         assertFalse("Zero variables!", variables.isEmpty());
+        store().setHints(mock.hints(recordCount));
+        assertEquals("Should be imported, stats and hints", 3, mock.files().length);
+        assertEquals(IMPORTED_HINTS_SET, store().getState());
         Statistics statistics = store().getLatestStatistics();
         assertFalse("Should be analysis format", statistics.isSourceFormat());
         int statsSize = statistics.size();
         int recordCount = Integer.parseInt(store().getHints().get(FileStore.RECORD_COUNT));
         assertTrue("Zero records!", recordCount > 0);
-        assertEquals(IMPORTED_PENDING_CONVERT, store().getState());
         store().importedToSource(null);
         assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
-        statistics.convertToSourcePaths(FileStoreBase.getRecordRoot(mock.hints()));
+        statistics.convertToSourcePaths(FileStoreBase.getRecordRoot(store().getHints()));
         store().setStatistics(statistics);
         assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
         assertEquals(ANALYZED, store().getState());
@@ -182,19 +182,16 @@ public class TestFileStore {
                     analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
                     Path recordRoot = null;
                     switch (store().getState()) {
-                        case IMPORTED_PENDING_CONVERT:
-                            recordRoot = recordRoot();
+                        case IMPORTED_ANALYZED:
+                            recordRoot = new Path("/adlibXML/recordList/record");
                             break;
-                        case SOURCED:
+                        case SOURCED: // todo: not analyzed?
                             recordRoot = FileStore.RECORD_ROOT;
                             break;
                         default:
                             Assert.fail("strange state " + store().getState());
                     }
-                    int recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
-                    Map<String,String> hints = store().getHints();
-                    hints.put(FileStore.RECORD_COUNT, String.valueOf(recordCount));
-                    store().setHints(hints);
+                    recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
                     analysisTree.getVariables(variables);
                 }
                 catch (FileStoreException e) {
@@ -214,11 +211,6 @@ public class TestFileStore {
         parser.run();
     }
 
-    private Path recordRoot() {
-        Map<String,String> hints = store().getHints();
-        return new Path(hints.get(FileStore.RECORD_ROOT_PATH));
-    }
-    
     private FileStore.DataSetStore store() {
         return mock.store();
     }

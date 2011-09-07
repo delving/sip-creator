@@ -63,8 +63,9 @@ import java.util.zip.ZipInputStream;
 
 import static eu.delving.sip.files.FileStore.StoreState.ANALYZED;
 import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
-import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_ANALYZE;
-import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_PENDING_CONVERT;
+import static eu.delving.sip.files.FileStore.StoreState.IMPORTED;
+import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_ANALYZED;
+import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_HINTS_SET;
 import static eu.delving.sip.files.FileStore.StoreState.MAPPED;
 import static eu.delving.sip.files.FileStore.StoreState.PHANTOM;
 import static eu.delving.sip.files.FileStore.StoreState.SOURCED;
@@ -236,14 +237,14 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             if (imported.exists()) {
                 if (source.exists()) {
                     if (imported.lastModified() > source.lastModified()) {
-                        return statisticsFile(here, false).exists() ? IMPORTED_PENDING_CONVERT : IMPORTED_PENDING_ANALYZE;
+                        return stateImportReadiness();
                     }
                     else {
                         return statePostSource();
                     }
                 }
                 else {
-                    return statisticsFile(here, false).exists() ? IMPORTED_PENDING_CONVERT : IMPORTED_PENDING_ANALYZE;
+                    return stateImportReadiness();
                 }
             }
             else if (source.exists()) {
@@ -251,6 +252,15 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             }
             else {
                 return EMPTY;
+            }
+        }
+
+        private StoreState stateImportReadiness() {
+            if (statisticsFile(here, false).exists()) {
+                return allHintsSet(getHints()) ? IMPORTED_HINTS_SET : IMPORTED_ANALYZED;
+            }
+            else {
+                return IMPORTED;
             }
         }
 
@@ -304,6 +314,14 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             File importedFile = importedFile(here);
             File sourceFile = sourceFile(here);
             return importedFile.exists() && (!sourceFile.exists() || importedFile.lastModified() > sourceFile.lastModified());
+        }
+
+        @Override
+        public void deleteConverted() throws FileStoreException {
+            if (!isRecentlyImported()) {
+                File sourceFile = sourceFile(here);
+                delete(sourceFile);
+            }
         }
 
         @Override

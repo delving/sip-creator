@@ -122,6 +122,21 @@ public class FileStoreBase {
         return facts;
     }
 
+    boolean allHintsSet(Map<String, String> hints) {
+        String recordRoot = hints.get(RECORD_ROOT_PATH);
+        String recordCount = hints.get(RECORD_COUNT);
+        String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
+        if (recordRoot == null || recordCount == null || uniqueElement == null) return false;
+        if (!uniqueElement.startsWith(recordRoot)) return false;
+        try {
+            if (Integer.parseInt(recordCount) <= 0) return false;
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
     void writeFacts(File file, Map<String, String> facts) throws IOException {
         List<String> lines = new ArrayList<String>();
         lines.add("#SIPCreator - facts");

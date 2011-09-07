@@ -103,8 +103,7 @@ public class AnalysisModel {
     }
 
     public void set(Map<String, String> hints) {
-        hintsModel.set(hints);
-        fireRecordRootSet();
+        hintsModel.set(hints); // todo: no event needed?
     }
 
     public boolean hasRecordRoot() {
@@ -134,6 +133,7 @@ public class AnalysisModel {
     public void setUniqueElement(Path uniqueElement) {
         AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
         hintsModel.set(FileStore.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
+        fireUniqueElementSet();
     }
 
     public Path getUniqueElement() {
@@ -171,6 +171,13 @@ public class AnalysisModel {
         }
     }
 
+    private void fireUniqueElementSet() {
+        Path uniqueElement = getUniqueElement();
+        for (Listener listener : listeners) {
+            listener.uniqueElementSet(uniqueElement);
+        }
+    }
+
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
     public void addListener(Listener listener) {
@@ -181,6 +188,8 @@ public class AnalysisModel {
         void statisticsSelected(FieldStatistics fieldStatistics);
 
         void recordRootSet(Path recordRootPath);
+
+        void uniqueElementSet(Path uniqueElementPath);
     }
 
     private class HintSaveTimer implements FactModel.Listener, ActionListener, Runnable {

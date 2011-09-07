@@ -131,6 +131,17 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
     }
 
     @Override
+    public boolean couldBeUniqueElement() {
+        if (couldBeRecordRoot()) return false;
+        AnalysisTreeNode walk = parent;
+        while (walk != null) { // ancestor must be record root
+            if (walk.isRecordRoot()) return true;
+            walk = walk.parent;
+        }
+        return false;
+    }
+
+    @Override
     public String getVariableName() {
         List<AnalysisTreeNode> path = new ArrayList<AnalysisTreeNode>();
         AnalysisTreeNode node = this;

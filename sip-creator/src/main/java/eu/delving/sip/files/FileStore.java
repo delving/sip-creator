@@ -58,8 +58,9 @@ public interface FileStore {
 
     public enum StoreState {
         EMPTY,
-        IMPORTED_PENDING_ANALYZE,
-        IMPORTED_PENDING_CONVERT,
+        IMPORTED,
+        IMPORTED_ANALYZED,
+        IMPORTED_HINTS_SET,
         SOURCED,
         ANALYZED,
         MAPPED,
@@ -88,6 +89,8 @@ public interface FileStore {
         void setHints(Map<String, String> hints) throws FileStoreException;
 
         boolean isRecentlyImported();
+
+        void deleteConverted() throws FileStoreException;
 
         InputStream importedInput() throws FileStoreException;
 
