@@ -34,6 +34,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Map;
@@ -45,10 +47,13 @@ import java.util.Map;
  */
 
 public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiver {
+    private static String FETCH = "Fetch Data Set List";
+    private static String FETCHING = "Fetching.. Please wait";
     private JDesktopPane parent;
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
     private JMenu dataSetMenu = new JMenu("Download Data Set");
+    private FetchDataSetListAction fetchDataSetListAction = new FetchDataSetListAction();
 
     public CultureHubMenu(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Culture Hub");
@@ -56,9 +61,25 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
         dataSetMenu.setEnabled(false);
-        add(new FetchDataSetListAction());
+        add(fetchDataSetListAction);
         addSeparator();
         add(dataSetMenu);
+        addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent menuEvent) {
+                if (dataSetMenu.getItemCount() == 0) {
+                    fetchDataSetListAction.go();
+                }
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent menuEvent) {
+            }
+
+            @Override
+            public void menuCanceled(MenuEvent menuEvent) {
+            }
+        });
     }
 
     @Override
@@ -66,6 +87,7 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
         Exec.swing(new Runnable() {
             @Override
             public void run() {
+                fetchDataSetListAction.wakeUp();
                 Map<String, FileStore.DataSetStore> stores = sipModel.getFileStore().getDataSetStores();
                 dataSetMenu.removeAll();
                 if (entries != null) {
@@ -74,13 +96,6 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
                     }
                 }
                 dataSetMenu.setEnabled(true);
-//                Exec.swingLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        CultureHubMenu.this.doClick();
-//                        dataSetMenu.doClick();
-//                    }
-//                });
             }
         });
     }
@@ -88,12 +103,23 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
     private class FetchDataSetListAction extends AbstractAction {
 
         private FetchDataSetListAction() {
-            super("Fetch Data Set List");
+            super(FETCH);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            go();
+        }
+
+        public void go() {
+            putValue(Action.NAME, FETCHING);
+            setEnabled(false);
             cultureHubClient.fetchDataSetList(CultureHubMenu.this);
+        }
+
+        public void wakeUp() {
+            putValue(Action.NAME, FETCH);
+            setEnabled(true);
         }
     }
 

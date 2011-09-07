@@ -29,6 +29,9 @@ import eu.delving.sip.files.FileStore;
 import eu.delving.sip.files.FileStoreException;
 
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +50,10 @@ public class DataSetStoreModel implements MetadataModel {
     private FileStore.StoreState storeState = FileStore.StoreState.EMPTY;
     private List<FactDefinition> factDefinitions = new ArrayList<FactDefinition>();
     private Map<String, RecordDefinition> recordDefinitions = new TreeMap<String,RecordDefinition>();
+
+    public DataSetStoreModel() {
+        new StateCheckTimer();
+    }
 
     public boolean hasStore() {
         return dataSetStore != null;
@@ -104,26 +111,35 @@ public class DataSetStoreModel implements MetadataModel {
         }
     }
 
-    // note: doesn't matter which thread calls this
-    public void checkState() {
-        final FileStore.StoreState actualState = dataSetStore.getState();
-        if (actualState != storeState) {
-            storeState = actualState;
-            if (SwingUtilities.isEventDispatchThread()) {
-                for (Listener listener : listeners) {
-                    listener.storeStateChanged(dataSetStore, actualState);
+    private class StateCheckTimer implements Runnable, ActionListener {
+        private Timer timer = new Timer(1000, this);
+
+        private StateCheckTimer() {
+            timer.setRepeats(true);
+            timer.start();
+        }
+
+        @Override
+        public void run() {
+            if (hasStore()) {
+                final FileStore.StoreState actualState = dataSetStore.getState();
+                if (actualState != storeState) {
+                    storeState = actualState;
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (Listener listener : listeners) {
+                                listener.storeStateChanged(dataSetStore, actualState);
+                            }
+                        }
+                    });
                 }
             }
-            else {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Listener listener : listeners) {
-                            listener.storeStateChanged(dataSetStore, actualState);
-                        }
-                    }
-                });
-            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Exec.work(this);
         }
     }
 

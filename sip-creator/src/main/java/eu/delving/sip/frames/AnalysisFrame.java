@@ -64,7 +64,7 @@ import java.awt.event.ActionListener;
 public class AnalysisFrame extends FrameBase {
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
-    private JButton convertButton = new JButton("Convert!"); // todo: should be disabled until there is recroot/unique
+    private JButton convertButton = new JButton("Convert!");
     private JTree statisticsJTree;
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel) {
@@ -75,6 +75,20 @@ public class AnalysisFrame extends FrameBase {
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
         setDefaultSize(400, 800);
+        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+            @Override
+            public void storeSet(FileStore.DataSetStore store) {
+                storeStateChanged(store, store.getState());
+            }
+
+            @Override
+            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
+// todo: when the analysis was done on the source format, we don't want these enabled!
+//                selectUniqueElementButton.setEnabled(??);
+//                selectRecordRootButton.setEnabled(??);
+                convertButton.setEnabled(storeState.ordinal() >= FileStore.StoreState.IMPORTED_HINTS_SET.ordinal());
+            }
+        });
     }
 
     @Override
@@ -99,7 +113,7 @@ public class AnalysisFrame extends FrameBase {
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
                     final AnalysisTree.Node node = (AnalysisTree.Node) path.getLastPathComponent();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
-                    selectUniqueElementButton.setEnabled(!node.couldBeUniqueElement());
+                    selectUniqueElementButton.setEnabled(node.couldBeUniqueElement());
                     sipModel.getAnalysisModel().selectStatistics(node.getStatistics());
                 }
                 else {
@@ -126,17 +140,6 @@ public class AnalysisFrame extends FrameBase {
                 TreePath path = statisticsJTree.getSelectionPath();
                 AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
                 sipModel.getAnalysisModel().setUniqueElement(node.getPath());
-            }
-        });
-        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
-            @Override
-            public void storeSet(FileStore.DataSetStore store) {
-                storeStateChanged(store, store.getState());
-            }
-
-            @Override
-            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
-                convertButton.setEnabled(storeState.ordinal() >= FileStore.StoreState.IMPORTED_HINTS_SET.ordinal());
             }
         });
         convertButton.addActionListener(new ActionListener() {

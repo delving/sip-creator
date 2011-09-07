@@ -125,7 +125,6 @@ public class SipModel {
                 catch (FileStoreException e) {
                     SipModel.this.userNotifier.tellUser("Unable to delete converted source file", e);
                 }
-                storeModel.checkState();
             }
         });
         fieldCompileModel.addListener(new CompileModel.Listener() {
@@ -293,7 +292,6 @@ public class SipModel {
             public void run() {
                 try {
                     storeModel.getStore().externalToImported(file, progressListener);
-                    storeModel.checkState();
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Couldn't create Data Set from " + file.getAbsolutePath(), e);
@@ -312,7 +310,6 @@ public class SipModel {
                         @Override
                         public void run() {
                             analysisModel.setStatistics(statistics);
-                            storeModel.checkState();
                         }
                     });
                     listener.finished(true);
@@ -327,7 +324,6 @@ public class SipModel {
             public void failure(Exception exception) {
                 listener.finished(false);
                 userNotifier.tellUser("Analysis failed", exception);
-                storeModel.checkState();
             }
 
             @Override
@@ -344,8 +340,6 @@ public class SipModel {
                 try {
                     storeModel.getStore().importedToSource(progressListener);
                     storeModel.getStore().setStatistics(analysisModel.convertStatistics());
-                    storeModel.checkState();
-                    // todo: make the variables list refresh
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Conversion failed", e);
@@ -386,7 +380,6 @@ public class SipModel {
                     @Override
                     public void finished(final BitSet valid, int recordCount) {
                         reportFileModel.kick();
-                        storeModel.checkState();
                     }
                 }
         ));

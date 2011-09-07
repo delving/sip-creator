@@ -29,6 +29,7 @@ import eu.delving.sip.files.Statistics;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
 import java.io.InputStream;
@@ -75,7 +76,7 @@ public class AnalysisParser implements Runnable {
             xmlif.configureForSpeed();
             InputStream inputStream;
             boolean sourceFormat = false;
-            switch(store.getState()) {
+            switch (store.getState()) {
                 case IMPORTED:
                     inputStream = store.importedInput();
                     break;
@@ -83,7 +84,7 @@ public class AnalysisParser implements Runnable {
                     inputStream = store.sourceInput();
                     sourceFormat = true;
                     break;
-                default :
+                default:
                     throw new IllegalStateException("Expected one of two states. See the code here.");
             }
             XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
@@ -98,14 +99,14 @@ public class AnalysisParser implements Runnable {
                             }
                         }
                         path.push(Tag.create(input.getName().getPrefix(), input.getName().getLocalPart()));
-//                        if (input.getAttributeCount() > 0) {
-//                            for (int walk = 0; walk < input.getAttributeCount(); walk++) {
-//                                QName attributeName = input.getAttributeName(walk);
-//                                path.push(Tag.create(attributeName.getPrefix(), attributeName.getLocalPart()));
-//                                recordValue(input.getAttributeValue(walk));
-//                                path.pop();
-//                            }
-//                        }
+                        if (input.getAttributeCount() > 0) {
+                            for (int walk = 0; walk < input.getAttributeCount(); walk++) {
+                                QName attributeName = input.getAttributeName(walk);
+                                path.push(Tag.create(attributeName.getPrefix(), '@' + attributeName.getLocalPart()));
+                                recordValue(input.getAttributeValue(walk));
+                                path.pop();
+                            }
+                        }
                         break;
                     case XMLEvent.CHARACTERS:
                         text.append(input.getText());

@@ -68,7 +68,7 @@ public class AnalysisModel {
             analysisTree = statistics.createAnalysisTree();
             if (statistics.isSourceFormat()) {
                 recordRoot = FileStore.RECORD_ROOT;
-                uniqueElement = null;
+                uniqueElement = FileStore.UNIQUE_ELEMENT;
             }
             else {
                 recordRoot = getRecordRoot();
@@ -103,7 +103,7 @@ public class AnalysisModel {
     }
 
     public void set(Map<String, String> hints) {
-        hintsModel.set(hints); // todo: no event needed?
+        hintsModel.set(hints);
     }
 
     public boolean hasRecordRoot() {
@@ -190,6 +190,19 @@ public class AnalysisModel {
         void recordRootSet(Path recordRootPath);
 
         void uniqueElementSet(Path uniqueElementPath);
+    }
+
+    private class HintSaver implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                sipModel.getStoreModel().getStore().setHints(hintsModel.getFacts());
+            }
+            catch (FileStoreException e) {
+                sipModel.getUserNotifier().tellUser("Unable to save analysis hints", e);
+            }
+        }
     }
 
     private class HintSaveTimer implements FactModel.Listener, ActionListener, Runnable {

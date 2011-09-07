@@ -147,4 +147,5 @@ public interface FileStore {
     String ENVELOPE_TAG = "delving-sip-source";
     String RECORD_TAG = "input";
     Path RECORD_ROOT = new Path(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
+    Path UNIQUE_ELEMENT = new Path(String.format("/%s/%s/@id", ENVELOPE_TAG, RECORD_TAG));
 }
