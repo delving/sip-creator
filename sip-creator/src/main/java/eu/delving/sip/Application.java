@@ -52,6 +52,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -62,9 +63,12 @@ import javax.swing.JPasswordField;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -121,7 +125,7 @@ public class Application {
                 BorderFactory.createBevelBorder(0)
         ));
         home.getContentPane().add(desktop, BorderLayout.CENTER);
-        home.getContentPane().add(createFrameButtonPanel(), BorderLayout.SOUTH);
+        home.getContentPane().add(createFrameButtonPanel(), BorderLayout.WEST);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         home.setIconImage(logo.getImage());
@@ -131,7 +135,7 @@ public class Application {
         oauthClient = new OAuthClient(
                 FileStoreFinder.getHostPort(fileStoreDirectory),
                 FileStoreFinder.getUser(fileStoreDirectory),
-                new PasswordFetcher(fileStoreDirectory)
+                new PasswordFetcher()
         );
         cultureHubMenu = new CultureHubMenu(desktop, sipModel, cultureHubClient);
         home.setJMenuBar(createMenuBar());
@@ -156,7 +160,7 @@ public class Application {
     }
 
     private JPanel createFrameButtonPanel() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
+        JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Frames")
@@ -217,6 +221,7 @@ public class Application {
             Exec.swing(new Runnable() {
                 @Override
                 public void run() {
+                    dataSetMenu.setPreference(store);
                     sipModel.setDataSetStore(store);
                 }
             });
@@ -228,32 +233,48 @@ public class Application {
         }
     }
 
-    private class PasswordFetcher implements OAuthClient.PasswordRequest {
-        private File fileStoreDirectory;
-
-        private PasswordFetcher(File fileStoreDirectory) {
-            this.fileStoreDirectory = fileStoreDirectory;
-        }
+    private class PasswordFetcher implements OAuthClient.PasswordRequest, ActionListener {
+        private JDialog dialog = new JDialog(home, "Culture Hub", true);
+        private JPasswordField passwordField = new JPasswordField(15);
+        private StringBuilder password = new StringBuilder();
 
         @Override
         public String getPassword() {
-            final JPasswordField passwordField = new JPasswordField(15); // todo: problem here is that it doesn't get focus
-            JLabel labelA = new JLabel("Password");
+            JLabel labelA = new JLabel("Password: ");
             labelA.setLabelFor(passwordField);
-            JPanel p = new JPanel(new BorderLayout(10, 10));
-            p.add(labelA, BorderLayout.WEST);
-            p.add(passwordField, BorderLayout.CENTER);
-            JPanel wrap = new JPanel();
-            wrap.add(p);
-            int answer = JOptionPane.showConfirmDialog(
-                    home,
-                    wrap,
-                    String.format("Authenticate for %s", FileStoreFinder.getHostPortUser(fileStoreDirectory)),
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    logo
+            passwordField.addActionListener(this);
+
+            JPanel fieldPanel = new JPanel(new BorderLayout(10, 10));
+            fieldPanel.add(labelA, BorderLayout.WEST);
+            fieldPanel.add(passwordField, BorderLayout.CENTER);
+
+            JButton ok = new JButton("Ok");
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            buttonPanel.add(ok);
+
+            JPanel wrap = new JPanel(new BorderLayout(5,5));
+            wrap.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            wrap.add(fieldPanel, BorderLayout.CENTER);
+            wrap.add(buttonPanel, BorderLayout.SOUTH);
+
+            dialog.getContentPane().add(wrap, BorderLayout.CENTER);
+            dialog.pack();
+            dialog.setLocation(
+                    (Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getSize().width) / 2,
+                    (Toolkit.getDefaultToolkit().getScreenSize().height - dialog.getSize().height) / 2
             );
-            return answer == JOptionPane.OK_OPTION ? new String(passwordField.getPassword()) : null;
+
+            ok.addActionListener(this);
+
+            dialog.setVisible(true);
+            dialog.dispose();
+            return password.length() == 0 ? null : password.toString();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            password.append(new String(passwordField.getPassword()));
+            dialog.setVisible(false);
         }
     }
 

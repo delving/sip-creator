@@ -66,6 +66,10 @@ public class DataSetMenu extends JMenu {
         refresh();
     }
 
+    public void setPreference(FileStore.DataSetStore store) {
+        sipModel.getPreferences().put(SELECTED, store.getSpec());
+    }
+
     public void refresh() {
         removeAll();
         ButtonGroup bg = new ButtonGroup();
@@ -77,7 +81,7 @@ public class DataSetMenu extends JMenu {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     sipModel.setDataSetStore(item.getStore());
-                    sipModel.getPreferences().put(SELECTED, item.getStore().getSpec());
+                    setPreference(item.getStore());
                 }
             });
             if (sipModel.hasDataSetStore()) {

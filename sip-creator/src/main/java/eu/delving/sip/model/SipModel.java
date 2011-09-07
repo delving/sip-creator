@@ -329,6 +329,7 @@ public class SipModel {
                     storeModel.getStore().importedToSource(progressListener);
                     storeModel.getStore().setStatistics(analysisModel.convertStatistics());
                     storeModel.checkState();
+                    // todo: make the variables list refresh
                 }
                 catch (FileStoreException e) {
                     userNotifier.tellUser("Conversion failed", e);

@@ -64,7 +64,7 @@ import java.awt.event.ActionListener;
 public class AnalysisFrame extends FrameBase {
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
-    private JButton convertButton = new JButton("Convert!");
+    private JButton convertButton = new JButton("Convert!"); // todo: should be disabled until there is recroot/unique
     private JTree statisticsJTree;
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel) {

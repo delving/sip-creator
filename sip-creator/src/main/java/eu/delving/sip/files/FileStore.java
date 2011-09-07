@@ -123,6 +123,7 @@ public interface FileStore {
 
     String IMPORTED_FILE_NAME = "imported.xml.gz";
     String SOURCE_FILE_NAME = "source.xml.gz";
+    String UNZIPPED_SOURCE_FILE_NAME = "records.xml";
     String ANALYSIS_STATS_FILE_NAME = "analysis_stats.ser";
     String SOURCE_STATS_FILE_NAME = "source_stats.ser";
     String FACTS_FILE_NAME = "dataset-facts.txt";

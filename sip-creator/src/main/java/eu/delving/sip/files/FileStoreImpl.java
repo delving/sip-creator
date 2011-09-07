@@ -559,10 +559,10 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             try {
                 while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                     String fileName = zipEntry.getName();
-                    File file = new File(here, fileName);
-                    if (fileName.equals(SOURCE_FILE_NAME)) {
+                    if (fileName.equals(UNZIPPED_SOURCE_FILE_NAME)) {
                         Hasher hasher = new Hasher();
-                        GZIPOutputStream outputStream = new GZIPOutputStream(new FileOutputStream(file));
+                        File source = new File(here, SOURCE_FILE_NAME);
+                        GZIPOutputStream outputStream = new GZIPOutputStream(new FileOutputStream(source));
                         while (!cancelled && -1 != (bytesRead = zipInputStream.read(buffer))) {
                             outputStream.write(buffer, 0, bytesRead);
                             if (progressListener != null) {
@@ -576,11 +576,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                         if (progressListener != null) progressListener.finished(!cancelled);
                         outputStream.close();
                         File hashedSource = new File(here, hasher.prefixFileName(SOURCE_FILE_NAME));
-                        if (!file.renameTo(hashedSource)) {
-                            throw new FileStoreException(String.format("Unable to rename %s to %s", file.getAbsolutePath(), hashedSource.getAbsolutePath()));
+                        if (!source.renameTo(hashedSource)) {
+                            throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
                         }
                     }
                     else {
+                        File file = new File(here, fileName);
                         IOUtils.copy(zipInputStream, new FileOutputStream(file));
                         if (progressListener != null && !progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
                             progressListener.finished(false);

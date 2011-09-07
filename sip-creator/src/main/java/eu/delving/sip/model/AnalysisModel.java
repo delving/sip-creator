@@ -63,16 +63,24 @@ public class AnalysisModel {
     public void setStatistics(Statistics statistics) {
         this.statistics = statistics;
         Path recordRoot = null;
+        Path uniqueElement = null;
         if (statistics != null) {
             analysisTree = statistics.createAnalysisTree();
-            recordRoot = statistics.isSourceFormat() ? FileStore.RECORD_ROOT : getRecordRoot();
+            if (statistics.isSourceFormat()) {
+                recordRoot = FileStore.RECORD_ROOT;
+                uniqueElement = null;
+            }
+            else {
+                recordRoot = getRecordRoot();
+                uniqueElement = getUniqueElement();
+            }
         }
         else {
             analysisTree = AnalysisTree.create("Analysis not yet performed");
         }
         analysisTreeModel.setRoot(analysisTree.getRoot());
         if (recordRoot != null) {
-            AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot); // todo:
+            AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
             List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
             analysisTree.getVariables(variables);
             variableListModel.setVariableList(variables);
@@ -80,7 +88,6 @@ public class AnalysisModel {
         else {
             variableListModel.clear();
         }
-        Path uniqueElement = getUniqueElement();
         if (uniqueElement != null) {
             AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
         }

@@ -72,7 +72,6 @@ public class StatusFrame extends FrameBase {
         });
         statusLabel.setFont(new Font("Sans", Font.BOLD, 24));
         sipModel.getDataSetFacts().addListener(factsTableModel);
-        setDefaultSize(400, 600);
     }
 
     @Override
