@@ -47,7 +47,7 @@ public class DataSetActions {
         actions.add(new ImportAction(parent, sipModel));
         actions.add(new MapAction());
         actions.add(new ValidateAction());
-        actions.add(new UploadAction());
+        actions.add(new UploadAction(parent, sipModel, cultureHubClient));
     }
 
     public List<? extends Action> getActions() {
@@ -70,18 +70,6 @@ public class DataSetActions {
 
         private ValidateAction() {
             super("Validate");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            JOptionPane.showMessageDialog(parent, actionEvent.getActionCommand());
-        }
-    }
-
-    private class UploadAction extends AbstractAction {
-
-        private UploadAction() {
-            super("Upload");
         }
 
         @Override

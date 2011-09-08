@@ -21,11 +21,9 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -35,20 +33,14 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.ListModel;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * The transformation from input record to output
@@ -58,14 +50,10 @@ import java.awt.event.ActionListener;
 
 public class OutputFrame extends FrameBase {
     private JCheckBox allowInvalid = new JCheckBox("Allow invalid records");
-    private CultureHubClient cultureHubClient;
     private Action validateAction = new ValidateAction();
-    private Action uploadAction = new UploadAction();
-    private ReportFilePopup reportFilePopup = new ReportFilePopup(this);
 
-    public OutputFrame(JDesktopPane desktop, SipModel sipModel, CultureHubClient cultureHubClient) {
+    public OutputFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Output", false);
-        this.cultureHubClient = cultureHubClient;
     }
 
     @Override
@@ -89,7 +77,6 @@ public class OutputFrame extends FrameBase {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         p.add(new JButton(validateAction));
         p.add(allowInvalid);
-        p.add(new JButton(reportFilePopup.getAction()));
         return p;
     }
 
@@ -130,104 +117,6 @@ public class OutputFrame extends FrameBase {
                         }
                     }
             );
-        }
-    }
-
-    private class UploadAction extends AbstractAction {
-
-        private UploadAction() {
-            super("Upload to Culture Hub");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            if (!sipModel.hasDataSet()) {
-                JOptionPane.showInternalMessageDialog(parent, "Data set and mapping must be selected");
-                return;
-            }
-            setEnabled(false);
-            String message = String.format(
-                    "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
-                    sipModel.getDataSetModel().getDataSet().getSpec()
-            );
-            ProgressMonitor progressMonitor = new ProgressMonitor(
-                    SwingUtilities.getRoot(parent),
-                    "<html><h2>Uploading</h2>",
-                    message,
-                    0, 100
-            );
-            try {
-                cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new ProgressAdapter(progressMonitor) {
-                    @Override
-                    public void swingFinished(boolean success) {
-                        setEnabled(true);
-                    }
-                });
-            }
-            catch (StorageException e) {
-                JOptionPane.showInternalMessageDialog(parent, "<html>Problem uploading files<br>" + e.getMessage());
-            }
-            finally {
-                setEnabled(true);
-            }
-        }
-    }
-
-    private class ReportFilePopup extends FrameBase {
-
-        private ListModel reportFileModel = sipModel.getReportFileModel();
-        private JList list = new JList(reportFileModel);
-
-        public ReportFilePopup(FrameBase parent) {
-            super(parent, parent.getSipModel(), "Validation Report", true);
-            getAction().setEnabled(false);
-            sipModel.getReportFileModel().addListDataListener(new ListDataListener() {
-                @Override
-                public void intervalAdded(ListDataEvent listDataEvent) {
-                    getAction().setEnabled(true);
-                }
-
-                @Override
-                public void intervalRemoved(ListDataEvent listDataEvent) {
-                    getAction().setEnabled(false);
-                }
-
-                @Override
-                public void contentsChanged(ListDataEvent listDataEvent) {
-                }
-            });
-        }
-
-        @Override
-        protected void buildContent(Container content) {
-            JPanel p = new JPanel(new BorderLayout());
-            p.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            p.add(scroll(list), BorderLayout.CENTER);
-            p.add(createButtons(), BorderLayout.SOUTH);
-            content.add(p, BorderLayout.CENTER);
-        }
-
-        @Override
-        protected void refresh() {
-        }
-
-        @Override
-        protected DataSetState getMinDataSetState() {
-            return DataSetState.EMPTY;
-        }
-
-        private JPanel createButtons() {
-            JButton cancel = new JButton("Cancel");
-            cancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    closeFrame();
-                }
-            });
-            JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-            p.add(cancel);
-            p.add(new JButton(uploadAction));
-            return p;
         }
     }
 }

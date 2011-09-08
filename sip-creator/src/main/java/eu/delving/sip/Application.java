@@ -119,7 +119,7 @@ public class Application {
         frames.add(new InputFrame(desktop, sipModel));
         frames.add(new FieldMappingFrame(desktop, sipModel));
         frames.add(new RecordMappingFrame(desktop, sipModel));
-        frames.add(new OutputFrame(desktop, sipModel, cultureHubClient));
+        frames.add(new OutputFrame(desktop, sipModel));
         desktop.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createBevelBorder(0)
