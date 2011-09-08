@@ -482,7 +482,7 @@ public abstract class FrameBase extends JInternalFrame {
         sipModel.getPreferences().putInt(String.format("%s:%s", title, name), value);
     }
 
-    protected static JScrollPane scroll(JComponent content) {
+    public static JScrollPane scroll(JComponent content) {
         JScrollPane scroll = new JScrollPane(content);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);

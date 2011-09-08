@@ -24,7 +24,7 @@ package eu.delving.sip;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.ValidationException;
 import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.DataSetStateActions;
+import eu.delving.sip.base.DataSetActions;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.OAuthClient;
@@ -42,9 +42,7 @@ import eu.delving.sip.frames.OutputFrame;
 import eu.delving.sip.frames.RecordMappingFrame;
 import eu.delving.sip.frames.StatisticsFrame;
 import eu.delving.sip.frames.StatusFrame;
-import eu.delving.sip.menus.CultureHubMenu;
 import eu.delving.sip.menus.DataSetMenu;
-import eu.delving.sip.menus.FileMenu;
 import eu.delving.sip.menus.MappingMenu;
 import eu.delving.sip.menus.TemplateMenu;
 import eu.delving.sip.model.DataSetModel;
@@ -92,13 +90,12 @@ public class Application {
     private ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
     private PopupExceptionHandler exceptionHandler;
     private SipModel sipModel;
-    private DataSetStateActions stateActions;
+    private DataSetActions actions;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
     private MappingMenu mappingMenu;
     private TemplateMenu tempateMenu;
-    private CultureHubMenu cultureHubMenu;
     private OAuthClient oauthClient;
     private List<FrameBase> frames = new ArrayList<FrameBase>();
 
@@ -107,7 +104,6 @@ public class Application {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         exceptionHandler = new PopupExceptionHandler();
         sipModel = new SipModel(storage, groovyCodeResource, this.exceptionHandler);
-        stateActions = new DataSetStateActions(sipModel);
         home = new JFrame("Delving SIP Creator");
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -118,6 +114,7 @@ public class Application {
         };
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
+        actions = new DataSetActions(home, sipModel, cultureHubClient, frames);
         frames.add(new StatusFrame(desktop, sipModel));
         frames.add(new AnalysisFrame(desktop, sipModel));
         frames.add(new CreateFrame(desktop, sipModel));
@@ -143,7 +140,6 @@ public class Application {
                 StorageFinder.getUser(storageDirectory),
                 new PasswordFetcher()
         );
-        cultureHubMenu = new CultureHubMenu(desktop, sipModel, cultureHubClient);
         home.setJMenuBar(createMenuBar());
         home.addWindowListener(new WindowAdapter() {
             @Override
@@ -171,7 +167,7 @@ public class Application {
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("States")
         ));
-        for (Action action : stateActions.getActions()) {
+        for (Action action : actions.getActions()) {
             p.add(new JButton(action));
         }
         return p;
@@ -185,10 +181,8 @@ public class Application {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        bar.add(new FileMenu(home, sipModel));
         bar.add(dataSetMenu);
         bar.add(mappingMenu);
-        bar.add(cultureHubMenu);
         bar.add(tempateMenu);
         bar.add(createFrameMenu());
         return bar;
