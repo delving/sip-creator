@@ -27,8 +27,8 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.ProgressListener;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.StorageException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -72,7 +72,7 @@ public class CultureHubClient {
 
         String getAccessToken();
 
-        void storeCreated(FileStore.DataSetStore store);
+        void dataSetCreated(DataSet dataSet);
 
         void tellUser(String message);
     }
@@ -112,12 +112,12 @@ public class CultureHubClient {
         Exec.work(new ListFetcher(listReceiver));
     }
 
-    public void downloadDataSet(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
-        Exec.work(new DataSetDownloader(dataSetStore, progressListener));
+    public void downloadDataSet(DataSet dataSet, ProgressListener progressListener) {
+        Exec.work(new DataSetDownloader(dataSet, progressListener));
     }
 
-    public void uploadFiles(FileStore.DataSetStore store, ProgressListener progressListener) throws FileStoreException {
-        Exec.work(new FileUploader(store, progressListener));
+    public void uploadFiles(DataSet dataSet, ProgressListener progressListener) throws StorageException {
+        Exec.work(new FileUploader(dataSet, progressListener));
     }
 
     private class ListFetcher implements Runnable {
@@ -158,11 +158,11 @@ public class CultureHubClient {
     }
 
     private class DataSetDownloader implements Runnable {
-        private FileStore.DataSetStore dataSetStore;
+        private DataSet dataSet;
         private ProgressListener progressListener;
 
-        private DataSetDownloader(FileStore.DataSetStore dataSetStore, ProgressListener progressListener) {
-            this.dataSetStore = dataSetStore;
+        private DataSetDownloader(DataSet dataSet, ProgressListener progressListener) {
+            this.dataSet = dataSet;
             this.progressListener = progressListener;
         }
 
@@ -173,28 +173,28 @@ public class CultureHubClient {
                 HttpGet get = new HttpGet(String.format(
                         "%s/fetch/%s-sip.zip?accessKey=%s",
                         context.getServerUrl(),
-                        dataSetStore.getSpec(),
+                        dataSet.getSpec(),
                         context.getAccessToken()
                 ));
                 get.setHeader("Accept", "application/zip");
                 HttpResponse httpResponse = httpClient.execute(get);
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     HttpEntity entity = httpResponse.getEntity();
-                    dataSetStore.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                    dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
                     success = true;
                 }
                 else {
                     log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
                 }
-                context.storeCreated(dataSetStore);
+                context.dataSetCreated(dataSet);
             }
             catch (Exception e) {
                 log.warn("Unable to download source", e);
                 context.tellUser("Unable to download source");
                 try {
-                    dataSetStore.remove();
+                    dataSet.remove();
                 }
-                catch (FileStoreException e1) {
+                catch (StorageException e1) {
                     context.tellUser("Unable to remove local data set");
                 }
             }
@@ -205,13 +205,13 @@ public class CultureHubClient {
     }
 
     public class FileUploader implements Runnable {
-        private FileStore.DataSetStore store;
+        private DataSet dataSet;
         private List<File> uploadFiles;
         private ProgressListener progressListener;
 
-        public FileUploader(FileStore.DataSetStore store, ProgressListener progressListener) throws FileStoreException {
-            this.store = store;
-            this.uploadFiles = store.getUploadFiles();
+        public FileUploader(DataSet dataSet, ProgressListener progressListener) throws StorageException {
+            this.dataSet = dataSet;
+            this.uploadFiles = dataSet.getUploadFiles();
             this.progressListener = progressListener;
         }
 
@@ -273,7 +273,7 @@ public class CultureHubClient {
             return String.format(
                     "%s/submit/%s?accessToken=%s",
                     context.getServerUrl(),
-                    store.getSpec(),
+                    dataSet.getSpec(),
                     context.getAccessToken()
             );
         }
@@ -282,7 +282,7 @@ public class CultureHubClient {
             return String.format(
                     "%s/submit/%s/%s?accessToken=%s",
                     context.getServerUrl(),
-                    store.getSpec(),
+                    dataSet.getSpec(),
                     file.getName(),
                     context.getAccessToken()
             );

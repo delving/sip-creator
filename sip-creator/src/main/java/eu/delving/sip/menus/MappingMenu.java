@@ -24,8 +24,9 @@ package eu.delving.sip.menus;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.model.DataSetStoreModel;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;
@@ -68,14 +69,14 @@ public class MappingMenu extends JMenu {
                 refresh();
             }
         });
-        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void storeSet(FileStore.DataSetStore store) {
+            public void dataSetChanged(DataSet dataSet) {
                 refresh();
             }
 
             @Override
-            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
             }
         });
     }
@@ -88,7 +89,7 @@ public class MappingMenu extends JMenu {
             currentPrefix = recordMapping.getPrefix();
         }
         ButtonGroup bg = new ButtonGroup();
-        for (String prefix : sipModel.getStoreModel().getPrefixes()) {
+        for (String prefix : sipModel.getDataSetModel().getPrefixes()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(prefix, prefix.equals(currentPrefix));
             add(item);
             bg.add(item);

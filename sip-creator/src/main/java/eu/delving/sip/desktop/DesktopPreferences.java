@@ -71,7 +71,7 @@ public interface DesktopPreferences extends Serializable {
     }
 
     /**
-     * Store a hashed password.
+     * DataSet a hashed password.
      *
      * @param credentials The credentials to remember.
      */

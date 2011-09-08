@@ -44,12 +44,12 @@ import java.util.List;
  */
 
 public class FieldListModel extends AbstractListModel {
-    private DataSetStoreModel storeModel;
+    private DataSetModel dataSetModel;
     private List<FieldDefinition> fieldDefinitions;
     private Unmapped unmapped;
 
-    public FieldListModel(DataSetStoreModel storeModel) {
-        this.storeModel = storeModel;
+    public FieldListModel(DataSetModel dataSetModel) {
+        this.dataSetModel = dataSetModel;
         this.fieldDefinitions = new ArrayList<FieldDefinition>();
     }
 
@@ -111,7 +111,7 @@ public class FieldListModel extends AbstractListModel {
             fieldDefinitions.clear();
             fireIntervalRemoved(this, 0, sizeBefore);
             if (recordMapping != null) {
-                RecordDefinition recordDefinition = storeModel.getRecordDefinition(recordMapping.getPrefix());
+                RecordDefinition recordDefinition = dataSetModel.getRecordDefinition(recordMapping.getPrefix());
                 fieldDefinitions.addAll(recordDefinition.getMappableFields());
                 Collections.sort(fieldDefinitions, new Comparator<FieldDefinition>() {
                     @Override

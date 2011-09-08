@@ -26,7 +26,7 @@ import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.FieldMappingListModel;
 import eu.delving.sip.model.SipModel;
 
@@ -79,8 +79,8 @@ public class RecordMappingFrame extends FrameBase {
     }
 
     @Override
-    protected FileStore.StoreState getMinimumStoreState() {
-        return FileStore.StoreState.MAPPED;
+    protected DataSetState getMinDataSetState() {
+        return DataSetState.MAPPED;
     }
 
     private JPanel createCodePanel() {
@@ -120,7 +120,7 @@ public class RecordMappingFrame extends FrameBase {
 
             @Override
             public void recordMappingChanged(RecordMapping recordMapping) {
-                String code = recordMapping.toDisplayCode(sipModel.getStoreModel());
+                String code = recordMapping.toDisplayCode(sipModel.getDataSetModel());
                 codeArea.setText(code);
             }
         });

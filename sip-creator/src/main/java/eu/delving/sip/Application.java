@@ -27,10 +27,12 @@ import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.OAuthClient;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
-import eu.delving.sip.files.FileStoreFinder;
-import eu.delving.sip.files.FileStoreImpl;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.StorageFinder;
+import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.frames.AnalysisFrame;
 import eu.delving.sip.frames.CreateFrame;
 import eu.delving.sip.frames.FieldMappingFrame;
@@ -44,7 +46,7 @@ import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.FileMenu;
 import eu.delving.sip.menus.MappingMenu;
 import eu.delving.sip.menus.TemplateMenu;
-import eu.delving.sip.model.DataSetStoreModel;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.UserNotifier;
 
@@ -97,11 +99,11 @@ public class Application {
     private OAuthClient oauthClient;
     private List<FrameBase> frames = new ArrayList<FrameBase>();
 
-    private Application(final File fileStoreDirectory) throws FileStoreException {
-        FileStore fileStore = new FileStoreImpl(fileStoreDirectory);
+    private Application(final File storageDirectory) throws StorageException {
+        Storage storage = new StorageImpl(storageDirectory);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         exceptionHandler = new PopupExceptionHandler();
-        sipModel = new SipModel(fileStore, groovyCodeResource, this.exceptionHandler);
+        sipModel = new SipModel(storage, groovyCodeResource, this.exceptionHandler);
         home = new JFrame("Delving SIP Creator");
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -111,7 +113,7 @@ public class Application {
             }
         };
         desktop.setBackground(new Color(190, 190, 200));
-        CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(fileStoreDirectory));
+        CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         frames.add(new StatusFrame(desktop, sipModel));
         frames.add(new AnalysisFrame(desktop, sipModel));
         frames.add(new CreateFrame(desktop, sipModel));
@@ -133,8 +135,8 @@ public class Application {
         mappingMenu = new MappingMenu(sipModel);
         tempateMenu = new TemplateMenu(home, sipModel);
         oauthClient = new OAuthClient(
-                FileStoreFinder.getHostPort(fileStoreDirectory),
-                FileStoreFinder.getUser(fileStoreDirectory),
+                StorageFinder.getHostPort(storageDirectory),
+                StorageFinder.getUser(storageDirectory),
                 new PasswordFetcher()
         );
         cultureHubMenu = new CultureHubMenu(desktop, sipModel, cultureHubClient);
@@ -146,14 +148,14 @@ public class Application {
                 System.exit(0);
             }
         });
-        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void storeSet(FileStore.DataSetStore store) {
-                home.setTitle(String.format("Delving SIP Creator [%s - %s]", store.getSpec(), store.getDataSetFacts().get("name")));
+            public void dataSetChanged(DataSet dataSet) {
+                home.setTitle(String.format("Delving SIP Creator [%s - %s]", dataSet.getSpec(), dataSet.getDataSetFacts().get("name")));
             }
 
             @Override
-            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
             }
         });
         osxExtra();
@@ -200,15 +202,15 @@ public class Application {
 
     private class CultureHubClientContext implements CultureHubClient.Context {
 
-        private File fileStoreDirectory;
+        private File storageDirectory;
 
-        public CultureHubClientContext(File fileStoreDirectory) {
-            this.fileStoreDirectory = fileStoreDirectory;
+        public CultureHubClientContext(File storageDirectory) {
+            this.storageDirectory = storageDirectory;
         }
 
         @Override
         public String getServerUrl() {
-            return String.format("http://%s/dataset/sip-creator", FileStoreFinder.getHostPortUser(fileStoreDirectory));
+            return String.format("http://%s/dataset/sip-creator", StorageFinder.getHostPortUser(storageDirectory));
         }
 
         @Override
@@ -217,12 +219,12 @@ public class Application {
         }
 
         @Override
-        public void storeCreated(final FileStore.DataSetStore store) {
+        public void dataSetCreated(final DataSet dataSet) {
             Exec.swing(new Runnable() {
                 @Override
                 public void run() {
-                    dataSetMenu.setPreference(store);
-                    sipModel.setDataSetStore(store);
+                    dataSetMenu.setPreference(dataSet);
+                    sipModel.setDataSet(dataSet);
                 }
             });
         }
@@ -343,16 +345,16 @@ public class Application {
         }
     }
 
-    public static void main(String[] args) throws FileStoreException {
-        final File fileStoreDirectory = FileStoreFinder.getFileStoreDirectory();
+    public static void main(String[] args) throws StorageException {
+        final File storageDirectory = StorageFinder.getStorageDirectory();
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    Application application = new Application(fileStoreDirectory);
+                    Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
                 }
-                catch (FileStoreException e) {
-                    JOptionPane.showMessageDialog(null, "Unable to create the file store");
+                catch (StorageException e) {
+                    JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
                     e.printStackTrace();
                 }
             }

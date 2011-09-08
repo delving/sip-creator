@@ -31,8 +31,8 @@ import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.Uniqueness;
 import eu.delving.metadata.ValidationException;
 import eu.delving.sip.ProgressListener;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import groovy.util.Node;
 
@@ -80,10 +80,10 @@ public class FileValidator implements Runnable {
     }
 
     public void run() {
-        if (!sipModel.hasDataSetStore()) {
-            throw new RuntimeException("No data set store selected");
+        if (!sipModel.hasDataSet()) {
+            throw new RuntimeException("No data set selected");
         }
-        FileStore.DataSetStore dataSetStore = sipModel.getStoreModel().getStore();
+        DataSet dataSet = sipModel.getDataSetModel().getDataSet();
         Uniqueness uniqueness = new Uniqueness();
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
@@ -95,14 +95,14 @@ public class FileValidator implements Runnable {
             }
             MappingRunner mappingRunner = new MappingRunner(
                     groovyCodeResource,
-                    recordMapping.toCompileCode(sipModel.getStoreModel())
+                    recordMapping.toCompileCode(sipModel.getDataSetModel())
             );
             MetadataParser parser = new MetadataParser(
-                    sipModel.getStoreModel().getStore().sourceInput(),
+                    sipModel.getDataSetModel().getDataSet().sourceInput(),
                     sipModel.getAnalysisModel().getRecordCount()
             );
             parser.setProgressListener(progressAdapter);
-            PrintWriter out = dataSetStore.reportWriter(recordMapping);
+            PrintWriter out = dataSet.reportWriter(recordMapping);
             try {
                 MetadataRecord record;
                 while ((record = parser.nextRecord()) != null && !aborted) {
@@ -169,8 +169,8 @@ public class FileValidator implements Runnable {
         catch (XMLStreamException e) {
             throw new RuntimeException("XML Problem", e);
         }
-        catch (FileStoreException e) {
-            throw new RuntimeException("Datastore Problem", e);
+        catch (StorageException e) {
+            throw new RuntimeException("Storage Problem", e);
         }
         catch (MetadataParser.AbortException e) {
             aborted = true;

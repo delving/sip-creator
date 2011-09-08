@@ -26,9 +26,9 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
 import eu.delving.sip.files.Statistics;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
 
 import javax.swing.ListModel;
 import javax.swing.Timer;
@@ -67,8 +67,8 @@ public class AnalysisModel {
         if (statistics != null) {
             analysisTree = statistics.createAnalysisTree();
             if (statistics.isSourceFormat()) {
-                recordRoot = FileStore.RECORD_ROOT;
-                uniqueElement = FileStore.UNIQUE_ELEMENT;
+                recordRoot = Storage.RECORD_ROOT;
+                uniqueElement = Storage.UNIQUE_ELEMENT;
             }
             else {
                 recordRoot = getRecordRoot();
@@ -107,22 +107,22 @@ public class AnalysisModel {
     }
 
     public boolean hasRecordRoot() {
-        return hintsModel.get(FileStore.RECORD_ROOT_PATH) != null && !hintsModel.get(FileStore.RECORD_ROOT_PATH).isEmpty();
+        return hintsModel.get(Storage.RECORD_ROOT_PATH) != null && !hintsModel.get(Storage.RECORD_ROOT_PATH).isEmpty();
     }
 
     public void setRecordRoot(Path recordRoot) {
         int recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
-        hintsModel.set(FileStore.RECORD_ROOT_PATH, recordRoot.toString());
-        hintsModel.set(FileStore.RECORD_COUNT, String.valueOf(recordCount));
+        hintsModel.set(Storage.RECORD_ROOT_PATH, recordRoot.toString());
+        hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         fireRecordRootSet();
     }
 
     public Path getRecordRoot() {
-        return new Path(hintsModel.get(FileStore.RECORD_ROOT_PATH));
+        return new Path(hintsModel.get(Storage.RECORD_ROOT_PATH));
     }
 
     public int getRecordCount() {
-        String recordCount = hintsModel.get(FileStore.RECORD_COUNT);
+        String recordCount = hintsModel.get(Storage.RECORD_COUNT);
         return recordCount == null ? 0 : Integer.parseInt(recordCount);
     }
 
@@ -132,12 +132,12 @@ public class AnalysisModel {
 
     public void setUniqueElement(Path uniqueElement) {
         AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
-        hintsModel.set(FileStore.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
+        hintsModel.set(Storage.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
         fireUniqueElementSet();
     }
 
     public Path getUniqueElement() {
-        return new Path(hintsModel.get(FileStore.UNIQUE_ELEMENT_PATH));
+        return new Path(hintsModel.get(Storage.UNIQUE_ELEMENT_PATH));
     }
 
     public void selectStatistics(FieldStatistics fieldStatistics) {
@@ -197,9 +197,9 @@ public class AnalysisModel {
         @Override
         public void run() {
             try {
-                sipModel.getStoreModel().getStore().setHints(hintsModel.getFacts());
+                sipModel.getDataSetModel().getDataSet().setHints(hintsModel.getFacts());
             }
-            catch (FileStoreException e) {
+            catch (StorageException e) {
                 sipModel.getUserNotifier().tellUser("Unable to save analysis hints", e);
             }
         }
@@ -220,9 +220,9 @@ public class AnalysisModel {
         @Override
         public void run() {
             try {
-                sipModel.getStoreModel().getStore().setHints(hintsModel.getFacts());
+                sipModel.getDataSetModel().getDataSet().setHints(hintsModel.getFacts());
             }
-            catch (FileStoreException e) {
+            catch (StorageException e) {
                 sipModel.getUserNotifier().tellUser("Unable to save analysis hints", e);
             }
         }

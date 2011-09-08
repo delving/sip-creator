@@ -4,10 +4,11 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.Path;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
-import eu.delving.sip.files.FileStoreImpl;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.StorageImpl;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,20 +18,20 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Create a file store for testing
+ * Create a data set for testing
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class MockFileStoreFactory {
+public class MockDataSetFactory {
     public static final String SPEC = "spek";
     private String metadataPrefix = "abm";
     private File root;
     private File specDirectory;
-    private FileStore fileStore;
-    private FileStore.DataSetStore dataSetStore;
+    private Storage storage;
+    private DataSet dataSet;
 
-    public MockFileStoreFactory() throws FileStoreException {
+    public MockDataSetFactory() throws StorageException {
         File target = new File("sip-core/target");
         if (!target.exists()) {
             target = new File("target");
@@ -38,7 +39,7 @@ public class MockFileStoreFactory {
                 throw new RuntimeException("Target directory not found");
             }
         }
-        root = new File(target, "file-store");
+        root = new File(target, "dataSet");
         if (root.exists()) {
             delete(root);
         }
@@ -46,20 +47,20 @@ public class MockFileStoreFactory {
             throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
         }
         specDirectory = new File(root, SPEC);
-        fileStore = new FileStoreImpl(root);
-        dataSetStore = fileStore.createDataSetStore(SPEC);
+        storage = new StorageImpl(root);
+        dataSet = storage.createDataSet(SPEC);
     }
 
-    public FileStore getFileStore() {
-        return fileStore;
+    public Storage getStorage() {
+        return storage;
     }
 
     public String getMetadataPrefix() {
         return metadataPrefix;
     }
 
-    public FileStore.DataSetStore store() {
-        return dataSetStore;
+    public DataSet dataSet() {
+        return dataSet;
     }
 
     public File [] files() {
@@ -72,9 +73,9 @@ public class MockFileStoreFactory {
 
     public Map<String,String> hints(int recordCount) {
         Map<String,String> hints = new TreeMap<String,String>();
-        hints.put(FileStore.RECORD_ROOT_PATH, "/adlibXML/recordList/record");
-        hints.put(FileStore.RECORD_COUNT, String.valueOf(recordCount));
-        hints.put(FileStore.UNIQUE_ELEMENT_PATH, "/adlibXML/recordList/record/priref");
+        hints.put(Storage.RECORD_ROOT_PATH, "/adlibXML/recordList/record");
+        hints.put(Storage.RECORD_COUNT, String.valueOf(recordCount));
+        hints.put(Storage.UNIQUE_ELEMENT_PATH, "/adlibXML/recordList/record/priref");
         return hints;
     }
 

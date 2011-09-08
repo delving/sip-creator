@@ -26,7 +26,7 @@ import eu.delving.metadata.Histogram;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.AnalysisModel;
 import eu.delving.sip.model.SipModel;
 
@@ -96,8 +96,8 @@ public class StatisticsFrame extends FrameBase {
     }
 
     @Override
-    protected FileStore.StoreState getMinimumStoreState() {
-        return FileStore.StoreState.ANALYZED;
+    protected DataSetState getMinDataSetState() {
+        return DataSetState.ANALYZED;
     }
 
     private void setSummary(FieldStatistics fieldStatistics) {

@@ -25,7 +25,7 @@ import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.StorageException;
 
 import javax.swing.AbstractListModel;
 import java.util.List;
@@ -67,7 +67,7 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
             });
         }
         try {
-            final List<String> freshLines = sipModel.getStoreModel().getStore().getReport(recordMapping);
+            final List<String> freshLines = sipModel.getDataSetModel().getDataSet().getReport(recordMapping);
             if (freshLines != null) {
                 Exec.swing(new Runnable() {
                     @Override
@@ -79,7 +79,7 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
 
             }
         }
-        catch (FileStoreException e) {
+        catch (StorageException e) {
             sipModel.getUserNotifier().tellUser("Validation Report", e);
         }
     }

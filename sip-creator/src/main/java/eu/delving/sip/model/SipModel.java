@@ -34,9 +34,11 @@ import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.ValidationException;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Statistics;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
@@ -57,7 +59,7 @@ import java.util.prefs.Preferences;
  */
 
 public class SipModel {
-    private FileStore fileStore;
+    private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private UserNotifier userNotifier;
@@ -66,7 +68,7 @@ public class SipModel {
     private CompileModel fieldCompileModel;
     private MetadataParser metadataParser;
     private AnalysisModel analysisModel;
-    private DataSetStoreModel storeModel = new DataSetStoreModel();
+    private DataSetModel dataSetModel = new DataSetModel();
     private FactModel dataSetFacts = new FactModel();
     private FieldMappingListModel fieldMappingListModel = new FieldMappingListModel();
     private MappingModel mappingModel = new MappingModel();
@@ -87,13 +89,13 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(FileStore fileStore, GroovyCodeResource groovyCodeResource, UserNotifier userNotifier) throws FileStoreException {
-        this.fileStore = fileStore;
+    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, UserNotifier userNotifier) throws StorageException {
+        this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.userNotifier = userNotifier;
-        fieldListModel = new FieldListModel(storeModel);
-        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, storeModel, groovyCodeResource);
-        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, storeModel, groovyCodeResource);
+        fieldListModel = new FieldListModel(dataSetModel);
+        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, dataSetModel, groovyCodeResource);
+        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, dataSetModel, groovyCodeResource);
         parseListeners.add(recordCompileModel);
         parseListeners.add(fieldCompileModel);
         mappingModel.addListener(fieldMappingListModel);
@@ -118,11 +120,11 @@ public class SipModel {
             }
 
             private void deleteSourceFile() {
-                FileStore.DataSetStore store = storeModel.getStore();
+                DataSet dataSet = dataSetModel.getDataSet();
                 try {
-                    store.deleteConverted();
+                    dataSet.deleteConverted();
                 }
-                catch (FileStoreException e) {
+                catch (StorageException e) {
                     SipModel.this.userNotifier.tellUser("Unable to delete converted source file", e);
                 }
             }
@@ -147,24 +149,24 @@ public class SipModel {
         return preferences;
     }
 
-    public FileStore getFileStore() {
-        return fileStore;
+    public Storage getStorage() {
+        return storage;
     }
 
     public FactModel getDataSetFacts() {
         return dataSetFacts;
     }
 
-    public DataSetStoreModel getStoreModel() {
-        return storeModel;
+    public DataSetModel getDataSetModel() {
+        return dataSetModel;
     }
 
     public MappingModel getMappingModel() {
         return mappingModel;
     }
 
-    public boolean hasDataSetStore() {
-        return storeModel.hasStore();
+    public boolean hasDataSet() {
+        return dataSetModel.hasDataSet();
     }
 
     public AnalysisModel getAnalysisModel() {
@@ -204,16 +206,16 @@ public class SipModel {
         return fieldMappingListModel;
     }
 
-    public void setDataSetStore(final FileStore.DataSetStore dataSetStore) {
+    public void setDataSet(final DataSet dataSet) {
         Exec.work(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final Statistics statistics = dataSetStore.getLatestStatistics();
-                    final Map<String, String> facts = dataSetStore.getDataSetFacts();
-                    final Map<String, String> hints = dataSetStore.getHints();
-                    final String latestPrefix = dataSetStore.getLatestPrefix();
-                    storeModel.setStore(dataSetStore);
+                    final Statistics statistics = dataSet.getLatestStatistics();
+                    final Map<String, String> facts = dataSet.getDataSetFacts();
+                    final Map<String, String> hints = dataSet.getHints();
+                    final String latestPrefix = dataSet.getLatestPrefix();
+                    dataSetModel.setDataSet(dataSet);
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
@@ -226,8 +228,8 @@ public class SipModel {
                         }
                     });
                 }
-                catch (FileStoreException e) {
-                    userNotifier.tellUser(String.format("Unable to switch to data set %s", dataSetStore.getSpec()), e);
+                catch (StorageException e) {
+                    userNotifier.tellUser(String.format("Unable to switch to data set %s", dataSet.getSpec()), e);
                 }
             }
         });
@@ -239,14 +241,14 @@ public class SipModel {
             public void run() {
                 try {
                     final RecordMapping recordMapping = promoteToLatest ?
-                            storeModel.getStore().setLatestPrefix(metadataPrefix, storeModel) :
-                            storeModel.getStore().getRecordMapping(metadataPrefix, storeModel);
-                    dataSetFacts.set("spec", storeModel.getStore().getSpec());
+                            dataSetModel.getDataSet().setLatestPrefix(metadataPrefix, dataSetModel) :
+                            dataSetModel.getDataSet().getRecordMapping(metadataPrefix, dataSetModel);
+                    dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
                     dataSetFacts.copyToRecordMapping(recordMapping);
                     mappingModel.setRecordMapping(recordMapping);
                     recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
                 }
-                catch (FileStoreException e) {
+                catch (StorageException e) {
                     userNotifier.tellUser("Unable to select Metadata Prefix " + metadataPrefix, e);
                 }
             }
@@ -258,15 +260,15 @@ public class SipModel {
         if (recordMapping == null) {
             return null;
         }
-        return storeModel.getRecordDefinition(recordMapping.getPrefix());
+        return dataSetModel.getRecordDefinition(recordMapping.getPrefix());
     }
 
     public void saveAsTemplate(final String name) {
         try {
-            fileStore.setTemplate(name, mappingModel.getRecordMapping());
+            storage.setTemplate(name, mappingModel.getRecordMapping());
         }
-        catch (FileStoreException e) {
-            userNotifier.tellUser("Unable to store template", e);
+        catch (StorageException e) {
+            userNotifier.tellUser("Unable to save template", e);
         }
     }
 
@@ -291,9 +293,9 @@ public class SipModel {
             @Override
             public void run() {
                 try {
-                    storeModel.getStore().externalToImported(file, progressListener);
+                    dataSetModel.getDataSet().externalToImported(file, progressListener);
                 }
-                catch (FileStoreException e) {
+                catch (StorageException e) {
                     userNotifier.tellUser("Couldn't create Data Set from " + file.getAbsolutePath(), e);
                 }
             }
@@ -301,11 +303,11 @@ public class SipModel {
     }
 
     public void analyzeFields(final AnalysisListener listener) {
-        Exec.work(new AnalysisParser(storeModel.getStore(), new AnalysisParser.Listener() {
+        Exec.work(new AnalysisParser(dataSetModel.getDataSet(), new AnalysisParser.Listener() {
             @Override
             public void success(final Statistics statistics) {
                 try {
-                    storeModel.getStore().setStatistics(statistics);
+                    dataSetModel.getDataSet().setStatistics(statistics);
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
@@ -314,7 +316,7 @@ public class SipModel {
                     });
                     listener.finished(true);
                 }
-                catch (FileStoreException e) {
+                catch (StorageException e) {
                     userNotifier.tellUser("Problem storing statistics", e);
                     listener.finished(false);
                 }
@@ -338,10 +340,10 @@ public class SipModel {
             @Override
             public void run() {
                 try {
-                    storeModel.getStore().importedToSource(progressListener);
-                    storeModel.getStore().setStatistics(analysisModel.convertStatistics());
+                    dataSetModel.getDataSet().importedToSource(progressListener);
+                    dataSetModel.getDataSet().setStatistics(analysisModel.convertStatistics());
                 }
-                catch (FileStoreException e) {
+                catch (StorageException e) {
                     userNotifier.tellUser("Conversion failed", e);
                 }
             }
@@ -429,12 +431,12 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                if (!analysisModel.hasRecordRoot() || storeModel.getStore().getState().ordinal() < FileStore.StoreState.ANALYZED.ordinal()) {
+                if (!analysisModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED.ordinal()) {
                     return;
                 }
                 if (metadataParser == null) {
                     metadataParser = new MetadataParser(
-                            storeModel.getStore().sourceInput(),
+                            dataSetModel.getDataSet().sourceInput(),
                             analysisModel.getRecordCount()
                     );
                 }

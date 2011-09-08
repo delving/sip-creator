@@ -29,17 +29,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Locate the workspace and make sure the user has chosen a file store directory
+ * Locate the workspace and make sure the user has chosen a storage directory
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class FileStoreFinder {
+public class StorageFinder {
     private static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "SIPCreatorWorkspace");
     private static final Pattern HPU_HUMAN = Pattern.compile("([A-Za-z0-9.]+):([0-9]+)/([A-Za-z0-9]+)");
     private static final Pattern HPU_DIRECTORY = Pattern.compile("([A-Za-z0-9_]+)__([0-9]+)___([A-Za-z0-9]+)");
 
-    public static File getFileStoreDirectory() {
+    public static File getStorageDirectory() {
         if (!WORKSPACE_DIR.exists()) {
             if (!WORKSPACE_DIR.mkdirs()) {
                 throw new RuntimeException(String.format("Unable to create %s", WORKSPACE_DIR.getAbsolutePath()));
@@ -142,6 +142,6 @@ public class FileStoreFinder {
     }
 
     public static void main(String[] args) {
-        System.out.println("FileStore directory: " + getFileStoreDirectory().getAbsolutePath());
+        System.out.println("Storage directory: " + getStorageDirectory().getAbsolutePath());
     }
 }

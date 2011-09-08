@@ -21,8 +21,9 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.model.DataSetStoreModel;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;
@@ -44,48 +45,48 @@ public class DataSetMenu extends JMenu {
     public DataSetMenu(SipModel sipModel) {
         super("Data Sets");
         this.sipModel = sipModel;
-        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
 
             @Override
-            public void storeSet(FileStore.DataSetStore store) {
+            public void dataSetChanged(DataSet dataSet) {
                 refresh();
             }
 
             @Override
-            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 refresh();
             }
         });
         String selectedSpec = sipModel.getPreferences().get(SELECTED, "");
         if (!selectedSpec.isEmpty()) {
-            final FileStore.DataSetStore store = sipModel.getFileStore().getDataSetStores().get(selectedSpec);
-            if (store != null) {
-                sipModel.setDataSetStore(store);
+            final DataSet dataSet = sipModel.getStorage().getDataSets().get(selectedSpec);
+            if (dataSet != null) {
+                sipModel.setDataSet(dataSet);
             }
         }
         refresh();
     }
 
-    public void setPreference(FileStore.DataSetStore store) {
-        sipModel.getPreferences().put(SELECTED, store.getSpec());
+    public void setPreference(DataSet dataSet) {
+        sipModel.getPreferences().put(SELECTED, dataSet.getSpec());
     }
 
     public void refresh() {
         removeAll();
         ButtonGroup bg = new ButtonGroup();
-        for (FileStore.DataSetStore store : sipModel.getFileStore().getDataSetStores().values()) {
-            final DataSetItem item = new DataSetItem(store);
+        for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
+            final DataSetItem item = new DataSetItem(dataSet);
             bg.add(item);
             add(item);
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    sipModel.setDataSetStore(item.getStore());
-                    setPreference(item.getStore());
+                    sipModel.setDataSet(item.getDataSet());
+                    setPreference(item.getDataSet());
                 }
             });
-            if (sipModel.hasDataSetStore()) {
-                if (store.getSpec().equals(sipModel.getStoreModel().getStore().getSpec())) {
+            if (sipModel.hasDataSet()) {
+                if (dataSet.getSpec().equals(sipModel.getDataSetModel().getDataSet().getSpec())) {
                     item.setSelected(true);
                 }
             }
@@ -93,15 +94,15 @@ public class DataSetMenu extends JMenu {
     }
 
     private class DataSetItem extends JRadioButtonMenuItem {
-        private FileStore.DataSetStore store;
+        private DataSet dataSet;
 
-        private DataSetItem(FileStore.DataSetStore store) {
-            super(store.getSpec());
-            this.store = store;
+        private DataSetItem(DataSet dataSet) {
+            super(dataSet.getSpec());
+            this.dataSet = dataSet;
         }
 
-        public FileStore.DataSetStore getStore() {
-            return store;
+        public DataSet getDataSet() {
+            return dataSet;
         }
     }
 }

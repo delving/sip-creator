@@ -21,8 +21,9 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.model.DataSetStoreModel;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -90,23 +91,23 @@ public abstract class FrameBase extends JInternalFrame {
         if (modal) {
             setFocusTraversalKeysEnabled(false);
         }
-        this.sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+        this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void storeSet(FileStore.DataSetStore store) {
-                checkEnableStatus(store.getState());
+            public void dataSetChanged(DataSet dataSet) {
+                checkEnableStatus(dataSet.getState());
             }
 
             @Override
-            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState state) {
+            public void dataSetStateChanged(DataSet dataSet, DataSetState state) {
                 checkEnableStatus(state);
             }
         });
     }
 
-    private void checkEnableStatus(FileStore.StoreState state) {
+    private void checkEnableStatus(DataSetState state) {
         boolean enabled = shouldBeEnabled(state);
         action.setEnabled(enabled);
-        if (enabled && getStoredSize() != null) {
+        if (enabled && getSavedSize() != null) {
             Exec.swingAny(new Runnable() {
                 @Override
                 public void run() {
@@ -119,9 +120,9 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
-    private boolean shouldBeEnabled(FileStore.StoreState state) {
-        FileStore.StoreState min = getMinimumStoreState();
-        return min != null ? state.ordinal() >= getMinimumStoreState().ordinal() : isEnabledInState(state);
+    private boolean shouldBeEnabled(DataSetState state) {
+        DataSetState min = getMinDataSetState();
+        return min != null ? state.ordinal() >= getMinDataSetState().ordinal() : isEnabledInState(state);
     }
 
     public void setAccelerator(int number) {
@@ -157,9 +158,9 @@ public abstract class FrameBase extends JInternalFrame {
         super.show();
         if (added != null) {
             setLocation(added);
-            Dimension storedSize = getStoredSize();
-            if (storedSize != null) {
-                setSize(storedSize);
+            Dimension savedSize = getSavedSize();
+            if (savedSize != null) {
+                setSize(savedSize);
             }
             else {
                 setSize(defaultSize); // after show
@@ -217,12 +218,12 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
-    protected FileStore.StoreState getMinimumStoreState() {
+    protected DataSetState getMinDataSetState() {
         return null;
     }
 
-    protected boolean isEnabledInState(FileStore.StoreState state) {
-        throw new IllegalStateException("Implement either this method or getMinimumStoreState");
+    protected boolean isEnabledInState(DataSetState state) {
+        throw new IllegalStateException("Implement either this method or getMinDataSetState");
     }
 
     private Point addIfAbsent() {
@@ -250,9 +251,9 @@ public abstract class FrameBase extends JInternalFrame {
                 return max;
             }
             else {
-                Point storedLocation = getStoredLocation();
-                if (storedLocation != null) {
-                    return storedLocation;
+                Point savedLocation = getSavedLocation();
+                if (savedLocation != null) {
+                    return savedLocation;
                 }
                 else {
                     max.x += 25;
@@ -448,36 +449,36 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
-    private Dimension getStoredSize() {
-        Dimension size = new Dimension(getStoredInt("width"), getStoredInt("height"));
+    private Dimension getSavedSize() {
+        Dimension size = new Dimension(getSavedInt("width"), getSavedInt("height"));
         return size.width > 100 && size.height > 100 ? size : null;
     }
 
-    private Point getStoredLocation() {
-        Point location = new Point(getStoredInt("x"), getStoredInt("y"));
+    private Point getSavedLocation() {
+        Point location = new Point(getSavedInt("x"), getSavedInt("y"));
         return location.x >= 0 && location.y >= 0 ? location : null;
     }
 
-    private int getStoredInt(String name) {
+    private int getSavedInt(String name) {
         return sipModel.getPreferences().getInt(String.format("%s:%s", title, name), -1);
     }
 
     public void putState() {
         if (isVisible()) {
-            putStoredInt("x", getLocation().x);
-            putStoredInt("y", getLocation().y);
-            putStoredInt("width", getSize().width);
-            putStoredInt("height", getSize().height);
+            putSavedInt("x", getLocation().x);
+            putSavedInt("y", getLocation().y);
+            putSavedInt("width", getSize().width);
+            putSavedInt("height", getSize().height);
         }
         else {
-            putStoredInt("x", -1);
-            putStoredInt("y", -1);
-            putStoredInt("width", -1);
-            putStoredInt("height", -1);
+            putSavedInt("x", -1);
+            putSavedInt("y", -1);
+            putSavedInt("width", -1);
+            putSavedInt("height", -1);
         }
     }
 
-    private void putStoredInt(String name, int value) {
+    private void putSavedInt(String name, int value) {
         sipModel.getPreferences().putInt(String.format("%s:%s", title, name), value);
     }
 

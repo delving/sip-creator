@@ -48,42 +48,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static eu.delving.sip.files.FileStore.ANALYSIS_STATS_FILE_NAME;
-import static eu.delving.sip.files.FileStore.FACTS_FILE_NAME;
-import static eu.delving.sip.files.FileStore.FACT_DEFINITION_FILE_NAME;
-import static eu.delving.sip.files.FileStore.HINTS_FILE_NAME;
-import static eu.delving.sip.files.FileStore.IMPORTED_FILE_NAME;
-import static eu.delving.sip.files.FileStore.MAPPING_FILE_PREFIX;
-import static eu.delving.sip.files.FileStore.MAPPING_FILE_SUFFIX;
-import static eu.delving.sip.files.FileStore.PHANTOM_FILE_NAME;
-import static eu.delving.sip.files.FileStore.RECORD_COUNT;
-import static eu.delving.sip.files.FileStore.RECORD_DEFINITION_FILE_SUFFIX;
-import static eu.delving.sip.files.FileStore.RECORD_ROOT_PATH;
-import static eu.delving.sip.files.FileStore.REPORT_FILE_PATTERN;
-import static eu.delving.sip.files.FileStore.SOURCE_FILE_NAME;
-import static eu.delving.sip.files.FileStore.SOURCE_STATS_FILE_NAME;
-import static eu.delving.sip.files.FileStore.UNIQUE_ELEMENT_PATH;
-import static eu.delving.sip.files.FileStore.VALIDATION_FILE_PATTERN;
+import static eu.delving.sip.files.Storage.ANALYSIS_STATS_FILE_NAME;
+import static eu.delving.sip.files.Storage.FACTS_FILE_NAME;
+import static eu.delving.sip.files.Storage.FACT_DEFINITION_FILE_NAME;
+import static eu.delving.sip.files.Storage.HINTS_FILE_NAME;
+import static eu.delving.sip.files.Storage.IMPORTED_FILE_NAME;
+import static eu.delving.sip.files.Storage.MAPPING_FILE_PREFIX;
+import static eu.delving.sip.files.Storage.MAPPING_FILE_SUFFIX;
+import static eu.delving.sip.files.Storage.PHANTOM_FILE_NAME;
+import static eu.delving.sip.files.Storage.RECORD_COUNT;
+import static eu.delving.sip.files.Storage.RECORD_DEFINITION_FILE_SUFFIX;
+import static eu.delving.sip.files.Storage.RECORD_ROOT_PATH;
+import static eu.delving.sip.files.Storage.REPORT_FILE_PATTERN;
+import static eu.delving.sip.files.Storage.SOURCE_FILE_NAME;
+import static eu.delving.sip.files.Storage.SOURCE_STATS_FILE_NAME;
+import static eu.delving.sip.files.Storage.UNIQUE_ELEMENT_PATH;
+import static eu.delving.sip.files.Storage.VALIDATION_FILE_PATTERN;
 
 /**
- * This class contains helpers for the FileStoreImpl to lean on
+ * This class contains helpers for the StorageImpl to lean on
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class FileStoreBase {
+public class StorageBase {
     public static final int BLOCK_SIZE = 4096;
     public static final int MAX_HASH_HISTORY = 5;
 
-    public static Path getRecordRoot(Map<String,String> hints) throws FileStoreException {
+    public static Path getRecordRoot(Map<String,String> hints) throws StorageException {
         String recordRoot = hints.get(RECORD_ROOT_PATH);
         if (recordRoot == null) {
-            throw new FileStoreException("Must have record root path");
+            throw new StorageException("Must have record root path");
         }
         return new Path(recordRoot);
     }
 
-    public static int getRecordCount(Map<String,String> hints) throws FileStoreException {
+    public static int getRecordCount(Map<String,String> hints) throws StorageException {
         String recordCount = hints.get(RECORD_COUNT);
         int count = 0;
         try {
@@ -91,15 +91,15 @@ public class FileStoreBase {
         }
         catch (Exception e) { /* nothing */ }
         if (count == 0) {
-            throw new FileStoreException("Must have nonzero record count");
+            throw new StorageException("Must have nonzero record count");
         }
         return count;
     }
 
-    public static Path getUniqueElement(Map<String,String> hints) throws FileStoreException {
+    public static Path getUniqueElement(Map<String,String> hints) throws StorageException {
         String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
         if (uniqueElement == null) {
-            throw new FileStoreException("Must have unique element path");
+            throw new StorageException("Must have unique element path");
         }
         return new Path(uniqueElement);
     }
@@ -223,7 +223,7 @@ public class FileStoreBase {
             }
         }
         if (mappingFile == null) {
-            mappingFile = new File(dir, String.format(FileStore.MAPPING_FILE_PATTERN, metadataPrefix));
+            mappingFile = new File(dir, String.format(Storage.MAPPING_FILE_PATTERN, metadataPrefix));
         }
         return mappingFile;
     }
@@ -284,7 +284,7 @@ public class FileStoreBase {
         }
     }
 
-    static void delete(File file) throws FileStoreException {
+    static void delete(File file) throws StorageException {
         if (file.exists()) {
             if (file.isDirectory()) {
                 for (File sub : file.listFiles()) {
@@ -292,7 +292,7 @@ public class FileStoreBase {
                 }
             }
             if (!file.delete()) {
-                throw new FileStoreException(String.format("Unable to delete %s", file.getAbsolutePath()));
+                throw new StorageException(String.format("Unable to delete %s", file.getAbsolutePath()));
             }
         }
     }

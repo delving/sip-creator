@@ -22,7 +22,7 @@
 package eu.delving.sip.menus;
 
 import eu.delving.metadata.RecordMapping;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -60,15 +60,15 @@ public class TemplateMenu extends JMenu {
         this.add(deleteMenu);
         this.addSeparator();
         try {
-            Map<String, RecordMapping> templates = sipModel.getFileStore().getTemplates(sipModel.getStoreModel());
-            // todo: templates are stored above all datasets but the metadata model is set-specific, a problem.
+            Map<String, RecordMapping> templates = sipModel.getStorage().getTemplates(sipModel.getDataSetModel());
+            // todo: templates are saved above all datasets but the metadata model is set-specific, a problem.
             for (Map.Entry<String, RecordMapping> entry : templates.entrySet()) {
                 this.add(new ApplyTemplateAction(entry.getKey(), entry.getValue()));
                 updateMenu.add(new UpdateTemplateAction(entry.getKey()));
                 deleteMenu.add(new DeleteTemplateAction(entry.getKey()));
             }
         }
-        catch (FileStoreException e) {
+        catch (StorageException e) {
             sipModel.getUserNotifier().tellUser("Unable to load template", e);
         }
     }
@@ -131,9 +131,9 @@ public class TemplateMenu extends JMenu {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             try {
-                sipModel.getFileStore().deleteTemplate(name);
+                sipModel.getStorage().deleteTemplate(name);
             }
-            catch (FileStoreException e) {
+            catch (StorageException e) {
                 sipModel.getUserNotifier().tellUser("Unable to delete template", e);
             }
             refresh();

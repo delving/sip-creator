@@ -23,8 +23,9 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.model.DataSetStoreModel;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.FactModel;
 import eu.delving.sip.model.SipModel;
 
@@ -59,15 +60,15 @@ public class StatusFrame extends FrameBase {
 
     public StatusFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Status", false);
-        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void storeSet(FileStore.DataSetStore store) {
-                showStatus(store.getState());
+            public void dataSetChanged(DataSet dataSet) {
+                showStatus(dataSet.getState());
             }
 
             @Override
-            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
-                showStatus(storeState);
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                showStatus(dataSetState);
             }
         });
         statusLabel.setFont(new Font("Sans", Font.BOLD, 24));
@@ -86,17 +87,17 @@ public class StatusFrame extends FrameBase {
     }
 
     @Override
-    protected boolean isEnabledInState(FileStore.StoreState state) {
+    protected boolean isEnabledInState(DataSetState state) {
         analyzeAction.setEnabledByState(state);
         return true;
     }
 
-    private void showStatus(final FileStore.StoreState storeState) {
-        statusLabel.setText(String.format("<html><b>Status:</b><i>%s</i>", storeStateDescription(storeState)));
+    private void showStatus(final DataSetState dataSetState) {
+        statusLabel.setText(String.format("<html><b>Status:</b><i>%s</i>", saveStateDescription(dataSetState)));
     }
 
-    private String storeStateDescription(FileStore.StoreState storeState) {
-        switch (storeState) {
+    private String saveStateDescription(DataSetState dataSetState) {
+        switch (dataSetState) {
             case EMPTY:
                 return "has no source yet";
             case IMPORTED:
@@ -114,7 +115,7 @@ public class StatusFrame extends FrameBase {
             case VALIDATED:
                 return "validated, ready for upload!";
             default:
-                throw new IllegalArgumentException("Unknown store state: " + storeState);
+                throw new IllegalArgumentException("Unknown data set state: " + dataSetState);
         }
     }
 
@@ -194,8 +195,8 @@ public class StatusFrame extends FrameBase {
             performAnalysis();
         }
 
-        public void setEnabledByState(FileStore.StoreState state) {
-            setEnabled(state == FileStore.StoreState.SOURCED || state == FileStore.StoreState.IMPORTED);
+        public void setEnabledByState(DataSetState state) {
+            setEnabled(state == DataSetState.SOURCED || state == DataSetState.IMPORTED);
         }
     }
 

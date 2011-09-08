@@ -27,8 +27,9 @@ import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.model.DataSetStoreModel;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.FieldListModel;
 import eu.delving.sip.model.SipModel;
 
@@ -88,20 +89,20 @@ public class CreateFrame extends FrameBase {
     }
 
     @Override
-    protected FileStore.StoreState getMinimumStoreState() {
-        return FileStore.StoreState.ANALYZED;
+    protected DataSetState getMinDataSetState() {
+        return DataSetState.ANALYZED;
     }
 
     private void wireUp() {
-        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
 
             @Override
-            public void storeSet(FileStore.DataSetStore store) {
+            public void dataSetChanged(DataSet dataSet) {
                 variablesList.clearSelection();
             }
 
             @Override
-            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 // todo: implement
             }
         });
@@ -223,7 +224,7 @@ public class CreateFrame extends FrameBase {
                 List<FieldMapping> obvious = codeGenerator.createObviousMappings(
                         sipModel.getUnmappedFields(),
                         sipModel.getAnalysisModel().getVariables(),
-                        sipModel.getStoreModel().getFactDefinitions()
+                        sipModel.getDataSetModel().getFactDefinitions()
                 );
                 if (obvious.isEmpty()) {
                     if (obviousMappingsPopup.isVisible()) {

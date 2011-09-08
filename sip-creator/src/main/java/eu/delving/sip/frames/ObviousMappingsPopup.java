@@ -27,7 +27,7 @@ import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.FieldMappingListModel;
 
 import javax.swing.AbstractAction;
@@ -94,8 +94,8 @@ public class ObviousMappingsPopup extends FrameBase {
     }
 
     @Override
-    protected FileStore.StoreState getMinimumStoreState() {
-        return FileStore.StoreState.EMPTY;
+    protected DataSetState getMinDataSetState() {
+        return DataSetState.EMPTY;
     }
 
     private JComponent createCenter() {
@@ -153,7 +153,7 @@ public class ObviousMappingsPopup extends FrameBase {
             List<FieldMapping> fresh = codeGenerator.createObviousMappings(
                     sipModel.getUnmappedFields(),
                     sipModel.getAnalysisModel().getVariables(),
-                    sipModel.getStoreModel().getFactDefinitions()
+                    sipModel.getDataSetModel().getFactDefinitions()
             );
             if (!obvious.isEmpty()) {
                 int size = obvious.size();

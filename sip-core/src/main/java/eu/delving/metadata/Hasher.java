@@ -33,7 +33,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.GZIPInputStream;
 
 /**
- * This interface describes how files are stored by the sip-creator
+ * This class manages all aspects of using an MD5 hash as prefix in the naming of files in the data set,
+ * so that files are not uploaded repeatedly.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */

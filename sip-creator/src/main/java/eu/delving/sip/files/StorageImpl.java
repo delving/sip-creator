@@ -61,42 +61,42 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static eu.delving.sip.files.FileStore.StoreState.ANALYZED;
-import static eu.delving.sip.files.FileStore.StoreState.EMPTY;
-import static eu.delving.sip.files.FileStore.StoreState.IMPORTED;
-import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_ANALYZED;
-import static eu.delving.sip.files.FileStore.StoreState.IMPORTED_HINTS_SET;
-import static eu.delving.sip.files.FileStore.StoreState.MAPPED;
-import static eu.delving.sip.files.FileStore.StoreState.PHANTOM;
-import static eu.delving.sip.files.FileStore.StoreState.SOURCED;
-import static eu.delving.sip.files.FileStore.StoreState.VALIDATED;
+import static eu.delving.sip.files.DataSetState.ANALYZED;
+import static eu.delving.sip.files.DataSetState.EMPTY;
+import static eu.delving.sip.files.DataSetState.IMPORTED;
+import static eu.delving.sip.files.DataSetState.IMPORTED_ANALYZED;
+import static eu.delving.sip.files.DataSetState.IMPORTED_HINTS_SET;
+import static eu.delving.sip.files.DataSetState.MAPPED;
+import static eu.delving.sip.files.DataSetState.PHANTOM;
+import static eu.delving.sip.files.DataSetState.SOURCED;
+import static eu.delving.sip.files.DataSetState.VALIDATED;
 
 /**
- * This interface describes how files are stored by the sip-creator
+ * This is an implementation of the Storage interface
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class FileStoreImpl extends FileStoreBase implements FileStore {
+public class StorageImpl extends StorageBase implements Storage {
 
     private File home;
 
-    public FileStoreImpl(File home) throws FileStoreException {
+    public StorageImpl(File home) throws StorageException {
         this.home = home;
         if (!home.exists()) {
             if (!home.mkdirs()) {
-                throw new FileStoreException(String.format("Unable to create file store in %s", home.getAbsolutePath()));
+                throw new StorageException(String.format("Unable to create storage directory in %s", home.getAbsolutePath()));
             }
         }
     }
 
     @Override
     public String getUsername() {
-        return FileStoreFinder.getUser(home);
+        return StorageFinder.getUser(home);
     }
 
     @Override
-    public void setTemplate(String name, RecordMapping recordMapping) throws FileStoreException {
+    public void setTemplate(String name, RecordMapping recordMapping) throws StorageException {
         File templateFile = new File(home, String.format(MAPPING_FILE_PATTERN, name));
         try {
             FileOutputStream fos = new FileOutputStream(templateFile);
@@ -104,12 +104,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             fos.close();
         }
         catch (IOException e) {
-            throw new FileStoreException(String.format("Unable to save template to %s", templateFile.getAbsolutePath()), e);
+            throw new StorageException(String.format("Unable to save template to %s", templateFile.getAbsolutePath()), e);
         }
     }
 
     @Override
-    public Map<String, RecordMapping> getTemplates(MetadataModel metadataModel) throws FileStoreException {
+    public Map<String, RecordMapping> getTemplates(MetadataModel metadataModel) throws StorageException {
         Map<String, RecordMapping> templates = new TreeMap<String, RecordMapping>();
         for (File templateFile : home.listFiles(new MappingFileFilter())) {
             try {
@@ -129,19 +129,19 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
     }
 
     @Override
-    public void deleteTemplate(String name) throws FileStoreException {
+    public void deleteTemplate(String name) throws StorageException {
         File templateFile = new File(home, String.format(MAPPING_FILE_PATTERN, name));
         delete(templateFile);
     }
 
     @Override
-    public Map<String, DataSetStore> getDataSetStores() {
-        Map<String, DataSetStore> map = new TreeMap<String, DataSetStore>();
+    public Map<String, DataSet> getDataSets() {
+        Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
         if (list != null) {
             for (File file : list) {
                 if (file.isDirectory()) {
-                    map.put(file.getName(), new DataSetStoreImpl(file));
+                    map.put(file.getName(), new DataSetImpl(file));
                 }
             }
         }
@@ -149,22 +149,22 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
     }
 
     @Override
-    public DataSetStore createDataSetStore(String spec) throws FileStoreException {
+    public DataSet createDataSet(String spec) throws StorageException {
         File directory = new File(home, spec);
         if (directory.exists()) {
-            throw new FileStoreException(String.format("Data store directory %s already exists", directory.getAbsolutePath()));
+            throw new StorageException(String.format("Data set directory %s already exists", directory.getAbsolutePath()));
         }
         if (!directory.mkdirs()) {
-            throw new FileStoreException(String.format("Unable to create data store directory %s", directory.getAbsolutePath()));
+            throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }
-        return new DataSetStoreImpl(directory);
+        return new DataSetImpl(directory);
     }
 
-    public class DataSetStoreImpl implements DataSetStore, Serializable {
+    public class DataSetImpl implements DataSet, Serializable {
 
         private File here;
 
-        public DataSetStoreImpl(File here) {
+        public DataSetImpl(File here) {
             this.here = here;
         }
 
@@ -180,12 +180,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public RecordMapping setLatestPrefix(String prefix, MetadataModel metadataModel) throws FileStoreException {
+        public RecordMapping setLatestPrefix(String prefix, MetadataModel metadataModel) throws StorageException {
             File latestForPrefix = findLatestMappingFile(here, prefix);
             RecordMapping recordMapping;
             if (latestForPrefix.exists()) {
                 if (!latestForPrefix.setLastModified(System.currentTimeMillis())) {
-                    throw new FileStoreException("Couldn't touch the file to give it priority");
+                    throw new StorageException("Couldn't touch the file to give it priority");
                 }
                 recordMapping = getRecordMapping(prefix, metadataModel);
             }
@@ -197,7 +197,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public List<FactDefinition> getFactDefinitions() throws FileStoreException {
+        public List<FactDefinition> getFactDefinitions() throws StorageException {
             try {
                 File factDefFile = factDefinitionFile(here);
                 XStream stream = recordStream();
@@ -206,12 +206,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 return factDefinitions.factDefinitions;
             }
             catch (Exception e) {
-                throw new FileStoreException("Unable to load fact definitions", e);
+                throw new StorageException("Unable to load fact definitions", e);
             }
         }
 
         @Override
-        public List<RecordDefinition> getRecordDefinitions(List<FactDefinition> factDefinitions) throws FileStoreException {
+        public List<RecordDefinition> getRecordDefinitions(List<FactDefinition> factDefinitions) throws StorageException {
             List<RecordDefinition> definitions = new ArrayList<RecordDefinition>();
             try {
                 List<File> recDefFile = findRecordDefinitionFiles(here);
@@ -222,13 +222,13 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 }
             }
             catch (Exception e) {
-                throw new FileStoreException("Unable to load metadata model");
+                throw new StorageException("Unable to load metadata model");
             }
             return definitions;
         }
 
         @Override
-        public StoreState getState() {
+        public DataSetState getState() {
             if (phantomFile(here).exists()) {
                 return PHANTOM;
             }
@@ -255,7 +255,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             }
         }
 
-        private StoreState stateImportReadiness() {
+        private DataSetState stateImportReadiness() {
             if (statisticsFile(here, false).exists()) {
                 return allHintsSet(getHints()) ? IMPORTED_HINTS_SET : IMPORTED_ANALYZED;
             }
@@ -264,7 +264,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             }
         }
 
-        private StoreState statePostSource() {
+        private DataSetState statePostSource() {
             if (statisticsFile(here, true).exists()) {
                 File mapping = latestMappingFileOrNull(here);
                 if (mapping != null) {
@@ -300,12 +300,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void setHints(Map<String, String> hints) throws FileStoreException {
+        public void setHints(Map<String, String> hints) throws StorageException {
             try {
                 writeFacts(hintsFile(here), hints);
             }
             catch (IOException e) {
-                throw new FileStoreException("Unable to set hints", e);
+                throw new StorageException("Unable to set hints", e);
             }
         }
 
@@ -317,7 +317,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void deleteConverted() throws FileStoreException {
+        public void deleteConverted() throws StorageException {
             if (!isRecentlyImported()) {
                 File sourceFile = sourceFile(here);
                 delete(sourceFile);
@@ -325,12 +325,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public InputStream importedInput() throws FileStoreException {
+        public InputStream importedInput() throws StorageException {
             return zipIn(importedFile(here));
         }
 
         @Override
-        public InputStream sourceInput() throws FileStoreException {
+        public InputStream sourceInput() throws StorageException {
             return zipIn(sourceFile(here));
         }
 
@@ -366,7 +366,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                     try {
                         delete(statisticsFile);
                     }
-                    catch (FileStoreException e1) {
+                    catch (StorageException e1) {
                         // give up
                     }
                 }
@@ -375,7 +375,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void setStatistics(Statistics statistics) throws FileStoreException {
+        public void setStatistics(Statistics statistics) throws StorageException {
             File statisticsFile = statisticsFile(here, statistics.isSourceFormat());
             try {
                 ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(statisticsFile)));
@@ -383,12 +383,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 out.close();
             }
             catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to save statistics file to %s", statisticsFile.getAbsolutePath()), e);
+                throw new StorageException(String.format("Unable to save statistics file to %s", statisticsFile.getAbsolutePath()), e);
             }
         }
 
         @Override
-        public RecordMapping getRecordMapping(String prefix, MetadataModel metadataModel) throws FileStoreException {
+        public RecordMapping getRecordMapping(String prefix, MetadataModel metadataModel) throws StorageException {
             File file = findLatestMappingFile(here, prefix);
             if (file.exists()) {
                 try {
@@ -396,7 +396,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                     return RecordMapping.read(is, metadataModel);
                 }
                 catch (Exception e) {
-                    throw new FileStoreException(String.format("Unable to read mapping from %s", file.getAbsolutePath()), e);
+                    throw new StorageException(String.format("Unable to read mapping from %s", file.getAbsolutePath()), e);
                 }
             }
             else {
@@ -405,7 +405,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
         }
 
         @Override
-        public void setRecordMapping(RecordMapping recordMapping) throws FileStoreException {
+        public void setRecordMapping(RecordMapping recordMapping) throws StorageException {
             File file = new File(here, String.format(MAPPING_FILE_PATTERN, recordMapping.getPrefix()));
             try {
                 FileOutputStream out = new FileOutputStream(file);
@@ -413,12 +413,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 out.close();
             }
             catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
+                throw new StorageException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
             }
         }
 
         @Override
-        public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws FileStoreException {
+        public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException {
             File file = new File(here, String.format(VALIDATION_FILE_PATTERN, metadataPrefix));
             try {
                 DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
@@ -430,34 +430,34 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 out.close();
             }
             catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
+                throw new StorageException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
             }
         }
 
         @Override
-        public PrintWriter reportWriter(RecordMapping recordMapping) throws FileStoreException {
+        public PrintWriter reportWriter(RecordMapping recordMapping) throws StorageException {
             File file = new File(here, String.format(REPORT_FILE_PATTERN, recordMapping.getPrefix()));
             try {
                 return new PrintWriter(file);
             }
             catch (IOException e) {
-                throw new FileStoreException("Cannot read validation report", e);
+                throw new StorageException("Cannot read validation report", e);
             }
         }
 
         @Override
-        public List<String> getReport(RecordMapping recordMapping) throws FileStoreException {
+        public List<String> getReport(RecordMapping recordMapping) throws StorageException {
             try {
                 File file = reportFile(here, recordMapping);
                 return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
             }
             catch (IOException e) {
-                throw new FileStoreException("Cannot read validation report", e);
+                throw new StorageException("Cannot read validation report", e);
             }
         }
 
         @Override
-        public void externalToImported(File inputFile, ProgressListener progressListener) throws FileStoreException {
+        public void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException {
             int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
             if (progressListener != null) progressListener.prepareFor(fileBlocks);
             File source = new File(here, IMPORTED_FILE_NAME);
@@ -496,7 +496,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
             }
             catch (Exception e) {
                 if (progressListener != null) progressListener.finished(false);
-                throw new FileStoreException("Unable to capture XML input into " + source.getAbsolutePath(), e);
+                throw new StorageException("Unable to capture XML input into " + source.getAbsolutePath(), e);
             }
             if (cancelled) {
                 delete(source);
@@ -505,21 +505,21 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 File hashedSource = new File(here, hasher.prefixFileName(IMPORTED_FILE_NAME));
                 if (hashedSource.exists()) {
                     delete(source);
-                    throw new FileStoreException("This import was identical to the previous one. Discarded.");
+                    throw new StorageException("This import was identical to the previous one. Discarded.");
                 }
                 if (!source.renameTo(hashedSource)) {
-                    throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
+                    throw new StorageException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
                 }
             }
         }
 
         @Override
-        public void importedToSource(ProgressListener progressListener) throws FileStoreException {
+        public void importedToSource(ProgressListener progressListener) throws StorageException {
             if (!isRecentlyImported()) {
-                throw new FileStoreException("Import to source would be redundant, since source is newer");
+                throw new StorageException("Import to source would be redundant, since source is newer");
             }
             if (!statisticsFile(here, false).exists()) {
-                throw new FileStoreException("No analysis stats so conversion doesn't trust the record count");
+                throw new StorageException("No analysis stats so conversion doesn't trust the record count");
             }
             try {
                 Map<String, String> hints = getHints();
@@ -534,19 +534,19 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 File source = new File(here, SOURCE_FILE_NAME);
                 File hashedSource = new File(here, hasher.prefixFileName(SOURCE_FILE_NAME));
                 if (!source.renameTo(hashedSource)) {
-                    throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
+                    throw new StorageException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
                 }
             }
             catch (XMLStreamException e) {
-                throw new FileStoreException("Unable to convert source", e);
+                throw new StorageException("Unable to convert source", e);
             }
             catch (IOException e) {
-                throw new FileStoreException("Unable to convert source", e);
+                throw new StorageException("Unable to convert source", e);
             }
         }
 
         @Override
-        public List<File> getUploadFiles() throws FileStoreException {
+        public List<File> getUploadFiles() throws StorageException {
             try {
                 List<File> files = new ArrayList<File>();
                 files.add(Hasher.ensureFileHashed(hintsFile(here)));
@@ -561,12 +561,12 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 return files;
             }
             catch (IOException e) {
-                throw new FileStoreException("Unable to collect upload files", e);
+                throw new StorageException("Unable to collect upload files", e);
             }
         }
 
         @Override
-        public void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws FileStoreException {
+        public void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws StorageException {
             ZipEntry zipEntry;
             byte[] buffer = new byte[BLOCK_SIZE];
             int bytesRead;
@@ -595,7 +595,7 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                         outputStream.close();
                         File hashedSource = new File(here, hasher.prefixFileName(SOURCE_FILE_NAME));
                         if (!source.renameTo(hashedSource)) {
-                            throw new FileStoreException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
+                            throw new StorageException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
                         }
                     }
                     else {
@@ -609,35 +609,35 @@ public class FileStoreImpl extends FileStoreBase implements FileStore {
                 }
             }
             catch (IOException e) {
-                throw new FileStoreException("Unable to accept SipZip file", e);
+                throw new StorageException("Unable to accept SipZip file", e);
             }
         }
 
         @Override
-        public void remove() throws FileStoreException {
+        public void remove() throws StorageException {
             delete(here);
         }
 
-        public OutputStream sourceOutput() throws FileStoreException {
+        public OutputStream sourceOutput() throws StorageException {
             return zipOut(SOURCE_FILE_NAME);
         }
 
-        private InputStream zipIn(File file) throws FileStoreException {
+        private InputStream zipIn(File file) throws StorageException {
             try {
                 return new GZIPInputStream(new FileInputStream(file));
             }
             catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to create input stream from %s", file.getAbsolutePath()), e);
+                throw new StorageException(String.format("Unable to create input stream from %s", file.getAbsolutePath()), e);
             }
         }
 
-        private OutputStream zipOut(String fileName) throws FileStoreException {
+        private OutputStream zipOut(String fileName) throws StorageException {
             File file = new File(here, fileName);
             try {
                 return new GZIPOutputStream(new FileOutputStream(file));
             }
             catch (IOException e) {
-                throw new FileStoreException(String.format("Unable to create output stream from %s", file.getAbsolutePath()), e);
+                throw new StorageException(String.format("Unable to create output stream from %s", file.getAbsolutePath()), e);
             }
         }
 

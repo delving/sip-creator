@@ -31,10 +31,10 @@ import eu.delving.sip.desktop.security.User;
 import eu.delving.sip.desktop.windows.AuthenticationWindow;
 import eu.delving.sip.desktop.windows.DesktopManager;
 import eu.delving.sip.desktop.windows.DesktopWindow;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
-import eu.delving.sip.files.FileStoreFinder;
-import eu.delving.sip.files.FileStoreImpl;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.StorageFinder;
+import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.UserNotifier;
 import org.apache.log4j.Logger;
@@ -78,8 +78,8 @@ public class DesktopLauncher {
     private AuthenticationClient authenticationClient = new AuthenticationClient();
     private AuthenticationWindow authenticationWindow;
 
-    public DesktopLauncher(File fileStoreDirectory) throws FileStoreException {
-        FileStore fileStore = new FileStoreImpl(fileStoreDirectory);
+    public DesktopLauncher(File storageDirectory) throws StorageException {
+        Storage storage = new StorageImpl(storageDirectory);
         UserNotifier userNotifier = new UserNotifier() {
             @Override
             public void tellUser(String message) {
@@ -91,7 +91,7 @@ public class DesktopLauncher {
                 JOptionPane.showMessageDialog(null, "Error from SipModel", String.format("%s%n%s", message, exception.getMessage()), JOptionPane.ERROR_MESSAGE);
             }
         };
-        sipModel = new SipModel(fileStore, new GroovyCodeResource(getClass().getClassLoader()), userNotifier);
+        sipModel = new SipModel(storage, new GroovyCodeResource(getClass().getClassLoader()), userNotifier);
         desktopManager = new DesktopManager(sipModel);
         actions = new Actions(desktopManager);
         authenticationWindow = new AuthenticationWindow(desktopPreferences, authenticationClient,
@@ -214,9 +214,9 @@ public class DesktopLauncher {
         }
     };
 
-    public static void main(String... args) throws FileStoreException {
-        File fileStoreDirectory = FileStoreFinder.getFileStoreDirectory();
-        final DesktopLauncher desktopLauncher = new DesktopLauncher(fileStoreDirectory);
+    public static void main(String... args) throws StorageException {
+        File storageDirectory = StorageFinder.getStorageDirectory();
+        final DesktopLauncher desktopLauncher = new DesktopLauncher(storageDirectory);
         JFrame main = new JFrame(Constants.SIP_CREATOR_TITLE);
         main.getContentPane().add(desktopLauncher.buildNavigation(), BorderLayout.CENTER);
         main.setExtendedState(Frame.MAXIMIZED_BOTH);

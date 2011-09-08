@@ -27,7 +27,7 @@ import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.ProgressListener;
-import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.Storage;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
@@ -85,7 +85,7 @@ public class MetadataParser {
                     break;
                 case XMLEvent.START_ELEMENT:
                     path.push(Tag.create(input.getName().getPrefix(), input.getName().getLocalPart()));
-                    if (node == null && path.equals(FileStore.RECORD_ROOT)) {
+                    if (node == null && path.equals(Storage.RECORD_ROOT)) {
                         node = new GroovyNode(null, "input");
                     }
                     else if (node != null) {
@@ -116,7 +116,7 @@ public class MetadataParser {
                             // todo: perhaps check if there is already an array of children in there.
                             node.setValue(valueString);
                         }
-                        if (path.equals(FileStore.RECORD_ROOT)) {
+                        if (path.equals(Storage.RECORD_ROOT)) {
                             if (node.parent() != null) {
                                 throw new RuntimeException("Expected to be at root node");
                             }

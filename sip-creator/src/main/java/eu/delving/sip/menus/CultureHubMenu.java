@@ -24,8 +24,8 @@ package eu.delving.sip.menus;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressAdapter;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -88,11 +88,11 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
             @Override
             public void run() {
                 fetchDataSetListAction.wakeUp();
-                Map<String, FileStore.DataSetStore> stores = sipModel.getFileStore().getDataSetStores();
+                Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
                 dataSetMenu.removeAll();
                 if (entries != null) {
                     for (CultureHubClient.DataSetEntry entry : entries) {
-                        dataSetMenu.add(new DownloadDatasetAction(entry, stores.get(entry.spec)));
+                        dataSetMenu.add(new DownloadDatasetAction(entry, dataSets.get(entry.spec)));
                     }
                 }
                 dataSetMenu.setEnabled(true);
@@ -125,13 +125,13 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
 
     private class DownloadDatasetAction extends AbstractAction {
         private CultureHubClient.DataSetEntry entry;
-        private FileStore.DataSetStore store;
+        private DataSet dataSet;
 
-        private DownloadDatasetAction(CultureHubClient.DataSetEntry entry, FileStore.DataSetStore store) {
+        private DownloadDatasetAction(CultureHubClient.DataSetEntry entry, DataSet dataSet) {
             this.entry = entry;
-            this.store = store;
-            if (store == null) {
-                String localUser = sipModel.getFileStore().getUsername();
+            this.dataSet = dataSet;
+            if (dataSet == null) {
+                String localUser = sipModel.getStorage().getUsername();
                 if (entry.lockedBy != null) {
                     if (localUser.equals(entry.lockedBy.username)) {
                         setName("Locked by yourself, downloaded elsewhere", false);
@@ -165,16 +165,16 @@ public class CultureHubMenu extends JMenu implements CultureHubClient.ListReceiv
                     0, 100
             );
             try {
-                FileStore.DataSetStore store = sipModel.getFileStore().createDataSetStore(entry.spec);
-                cultureHubClient.downloadDataSet(store, new ProgressAdapter(progressMonitor) {
+                DataSet dataSet = sipModel.getStorage().createDataSet(entry.spec);
+                cultureHubClient.downloadDataSet(dataSet, new ProgressAdapter(progressMonitor) {
                     @Override
                     public void swingFinished(boolean success) {
                         setEnabled(true);
                     }
                 });
             }
-            catch (FileStoreException e) {
-                sipModel.getUserNotifier().tellUser("Unable to create file store called "+entry.spec, e);
+            catch (StorageException e) {
+                sipModel.getUserNotifier().tellUser("Unable to create data set called "+entry.spec, e);
             }
         }
     }

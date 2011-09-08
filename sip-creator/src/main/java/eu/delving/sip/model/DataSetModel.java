@@ -25,8 +25,9 @@ import eu.delving.metadata.FactDefinition;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.StorageException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -40,30 +41,30 @@ import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * An observable hole to put the current data set store
+ * An observable hole to put the current data set
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class DataSetStoreModel implements MetadataModel {
-    private FileStore.DataSetStore dataSetStore;
-    private FileStore.StoreState storeState = FileStore.StoreState.EMPTY;
+public class DataSetModel implements MetadataModel {
+    private DataSet dataSet;
+    private DataSetState dataSetState = DataSetState.EMPTY;
     private List<FactDefinition> factDefinitions = new ArrayList<FactDefinition>();
     private Map<String, RecordDefinition> recordDefinitions = new TreeMap<String,RecordDefinition>();
 
-    public DataSetStoreModel() {
+    public DataSetModel() {
         new StateCheckTimer();
     }
 
-    public boolean hasStore() {
-        return dataSetStore != null;
+    public boolean hasDataSet() {
+        return dataSet != null;
     }
 
-    public FileStore.DataSetStore getStore() {
-        if (dataSetStore == null) {
-            throw new IllegalStateException("There is no dataset store in the model!");
+    public DataSet getDataSet() {
+        if (dataSet == null) {
+            throw new IllegalStateException("There is no data set in the model!");
         }
-        return dataSetStore;
+        return dataSet;
     }
 
     @Override
@@ -85,18 +86,18 @@ public class DataSetStoreModel implements MetadataModel {
         return def;
     }
 
-    public void setStore(final FileStore.DataSetStore dataSetStore) throws FileStoreException {
-        this.dataSetStore = dataSetStore;
+    public void setDataSet(final DataSet dataSet) throws StorageException {
+        this.dataSet = dataSet;
         this.factDefinitions.clear();
-        this.factDefinitions.addAll(dataSetStore.getFactDefinitions());
+        this.factDefinitions.addAll(dataSet.getFactDefinitions());
         this.recordDefinitions.clear();
-        for (RecordDefinition recordDefinition : dataSetStore.getRecordDefinitions(factDefinitions)) {
+        for (RecordDefinition recordDefinition : dataSet.getRecordDefinitions(factDefinitions)) {
             recordDefinitions.put(recordDefinition.prefix, recordDefinition);
         }
-        this.storeState = dataSetStore.getState();
+        this.dataSetState = dataSet.getState();
         if (SwingUtilities.isEventDispatchThread()) {
             for (Listener listener : listeners) {
-                listener.storeSet(dataSetStore);
+                listener.dataSetChanged(dataSet);
             }
         }
         else {
@@ -104,7 +105,7 @@ public class DataSetStoreModel implements MetadataModel {
                 @Override
                 public void run() {
                     for (Listener listener : listeners) {
-                        listener.storeSet(dataSetStore);
+                        listener.dataSetChanged(dataSet);
                     }
                 }
             });
@@ -121,15 +122,15 @@ public class DataSetStoreModel implements MetadataModel {
 
         @Override
         public void run() {
-            if (hasStore()) {
-                final FileStore.StoreState actualState = dataSetStore.getState();
-                if (actualState != storeState) {
-                    storeState = actualState;
+            if (hasDataSet()) {
+                final DataSetState actualState = dataSet.getState();
+                if (actualState != dataSetState) {
+                    dataSetState = actualState;
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
                             for (Listener listener : listeners) {
-                                listener.storeStateChanged(dataSetStore, actualState);
+                                listener.dataSetStateChanged(dataSet, actualState);
                             }
                         }
                     });
@@ -150,8 +151,8 @@ public class DataSetStoreModel implements MetadataModel {
     }
 
     public interface Listener {
-        void storeSet(FileStore.DataSetStore store);
+        void dataSetChanged(DataSet dataSet);
 
-        void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState);
+        void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState);
     }
 }

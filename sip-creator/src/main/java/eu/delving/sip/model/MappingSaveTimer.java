@@ -25,7 +25,7 @@ import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.StorageException;
 
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
@@ -57,10 +57,10 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
         try {
             RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
             if (recordMapping != null) {
-                sipModel.getStoreModel().getStore().setRecordMapping(recordMapping);
+                sipModel.getDataSetModel().getDataSet().setRecordMapping(recordMapping);
             }
         }
-        catch (FileStoreException e) {
+        catch (StorageException e) {
             sipModel.getUserNotifier().tellUser("Unable to save mapping", e);
         }
     }

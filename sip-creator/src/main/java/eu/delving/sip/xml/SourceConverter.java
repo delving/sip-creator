@@ -46,8 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static eu.delving.sip.files.FileStore.ENVELOPE_TAG;
-import static eu.delving.sip.files.FileStore.RECORD_TAG;
+import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
+import static eu.delving.sip.files.Storage.RECORD_TAG;
 
 /**
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by

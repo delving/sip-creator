@@ -23,7 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.FieldMapping;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.DataSetState;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -115,8 +115,8 @@ public class DictionaryPopup extends FrameBase {
     }
 
     @Override
-    protected FileStore.StoreState getMinimumStoreState() {
-        return FileStore.StoreState.EMPTY;
+    protected DataSetState getMinDataSetState() {
+        return DataSetState.EMPTY;
     }
 
     private JPanel createSouth() {

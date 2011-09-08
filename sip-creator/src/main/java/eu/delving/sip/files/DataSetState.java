@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -22,18 +22,19 @@
 package eu.delving.sip.files;
 
 /**
- * Something went wrong with the file store
+ * The different states that a data set can be in.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class FileStoreException extends Exception {
-
-    public FileStoreException(String s) {
-        super(s);
-    }
-
-    public FileStoreException(String s, Throwable throwable) {
-        super(s, throwable);
-    }
+public enum DataSetState {
+    EMPTY,
+    IMPORTED,
+    IMPORTED_ANALYZED,
+    IMPORTED_HINTS_SET,
+    SOURCED,
+    ANALYZED,
+    MAPPED,
+    VALIDATED,
+    PHANTOM
 }

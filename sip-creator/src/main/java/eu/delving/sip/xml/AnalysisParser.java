@@ -24,7 +24,7 @@ package eu.delving.sip.xml;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.files.FileStore;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
@@ -50,7 +50,7 @@ public class AnalysisParser implements Runnable {
     private Path path = new Path();
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
     private Listener listener;
-    private FileStore.DataSetStore store;
+    private DataSet dataSet;
 
     public interface Listener {
 
@@ -61,8 +61,8 @@ public class AnalysisParser implements Runnable {
         void progress(long elementCount);
     }
 
-    public AnalysisParser(FileStore.DataSetStore store, Listener listener) {
-        this.store = store;
+    public AnalysisParser(DataSet dataSet, Listener listener) {
+        this.dataSet = dataSet;
         this.listener = listener;
     }
 
@@ -76,12 +76,12 @@ public class AnalysisParser implements Runnable {
             xmlif.configureForSpeed();
             InputStream inputStream;
             boolean sourceFormat = false;
-            switch (store.getState()) {
+            switch (dataSet.getState()) {
                 case IMPORTED:
-                    inputStream = store.importedInput();
+                    inputStream = dataSet.importedInput();
                     break;
                 case SOURCED:
-                    inputStream = store.sourceInput();
+                    inputStream = dataSet.sourceInput();
                     sourceFormat = true;
                     break;
                 default:

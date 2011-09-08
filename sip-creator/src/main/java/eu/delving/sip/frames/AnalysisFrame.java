@@ -26,8 +26,9 @@ import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressAdapter;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.model.DataSetStoreModel;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -75,18 +76,18 @@ public class AnalysisFrame extends FrameBase {
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
         setDefaultSize(400, 800);
-        sipModel.getStoreModel().addListener(new DataSetStoreModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void storeSet(FileStore.DataSetStore store) {
-                storeStateChanged(store, store.getState());
+            public void dataSetChanged(DataSet dataSet) {
+                dataSetStateChanged(dataSet, dataSet.getState());
             }
 
             @Override
-            public void storeStateChanged(FileStore.DataSetStore store, FileStore.StoreState storeState) {
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
 // todo: when the analysis was done on the source format, we don't want these enabled!
 //                selectUniqueElementButton.setEnabled(??);
 //                selectRecordRootButton.setEnabled(??);
-                convertButton.setEnabled(storeState.ordinal() >= FileStore.StoreState.IMPORTED_HINTS_SET.ordinal());
+                convertButton.setEnabled(dataSetState.ordinal() >= DataSetState.IMPORTED_HINTS_SET.ordinal());
             }
         });
     }
@@ -101,8 +102,8 @@ public class AnalysisFrame extends FrameBase {
     }
 
     @Override
-    protected FileStore.StoreState getMinimumStoreState() {
-        return FileStore.StoreState.IMPORTED_ANALYZED;
+    protected DataSetState getMinDataSetState() {
+        return DataSetState.IMPORTED_ANALYZED;
     }
 
     private void wireUp() {
@@ -148,7 +149,7 @@ public class AnalysisFrame extends FrameBase {
                 convertButton.setEnabled(false);
                 String message = String.format(
                         "<html><h3>Converting source data of '%s' to standard form</h3>",
-                        sipModel.getStoreModel().getStore().getSpec()
+                        sipModel.getDataSetModel().getDataSet().getSpec()
                 );
                 ProgressMonitor progressMonitor = new ProgressMonitor(
                         SwingUtilities.getRoot(parent),

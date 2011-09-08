@@ -24,8 +24,8 @@ package eu.delving.sip.frames;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressAdapter;
-import eu.delving.sip.files.FileStore;
-import eu.delving.sip.files.FileStoreException;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -79,8 +79,8 @@ public class OutputFrame extends FrameBase {
     }
 
     @Override
-    protected FileStore.StoreState getMinimumStoreState() {
-        return FileStore.StoreState.MAPPED;
+    protected DataSetState getMinDataSetState() {
+        return DataSetState.MAPPED;
     }
 
     private JComponent createSouth() {
@@ -112,7 +112,7 @@ public class OutputFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             String message = String.format(
                     "<html><h3>Transforming the raw data of '%s' into '%s' format and validating</h3>",
-                    sipModel.getStoreModel().getStore().getSpec(),
+                    sipModel.getDataSetModel().getDataSet().getSpec(),
                     sipModel.getMappingModel().getRecordMapping().getPrefix()
             );
             ProgressMonitor progressMonitor = new ProgressMonitor(
@@ -141,14 +141,14 @@ public class OutputFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (!sipModel.hasDataSetStore()) {
+            if (!sipModel.hasDataSet()) {
                 JOptionPane.showInternalMessageDialog(parent, "Data set and mapping must be selected");
                 return;
             }
             setEnabled(false);
             String message = String.format(
                     "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
-                    sipModel.getStoreModel().getStore().getSpec()
+                    sipModel.getDataSetModel().getDataSet().getSpec()
             );
             ProgressMonitor progressMonitor = new ProgressMonitor(
                     SwingUtilities.getRoot(parent),
@@ -157,14 +157,14 @@ public class OutputFrame extends FrameBase {
                     0, 100
             );
             try {
-                cultureHubClient.uploadFiles(sipModel.getStoreModel().getStore(), new ProgressAdapter(progressMonitor) {
+                cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new ProgressAdapter(progressMonitor) {
                     @Override
                     public void swingFinished(boolean success) {
                         setEnabled(true);
                     }
                 });
             }
-            catch (FileStoreException e) {
+            catch (StorageException e) {
                 JOptionPane.showInternalMessageDialog(parent, "<html>Problem uploading files<br>" + e.getMessage());
             }
             finally {
@@ -212,8 +212,8 @@ public class OutputFrame extends FrameBase {
         }
 
         @Override
-        protected FileStore.StoreState getMinimumStoreState() {
-            return FileStore.StoreState.EMPTY;
+        protected DataSetState getMinDataSetState() {
+            return DataSetState.EMPTY;
         }
 
         private JPanel createButtons() {

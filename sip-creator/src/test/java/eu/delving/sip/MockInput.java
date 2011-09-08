@@ -11,15 +11,15 @@ import java.util.zip.GZIPInputStream;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class MockFileStoreInput {
-    private static final String SAMPLE_INPUT = "/mock-file-store-input.xml.gz";
+public class MockInput {
+    private static final String SAMPLE_INPUT = "/mock-input.xml.gz";
 
     public static File sampleFile() throws IOException {
-        return new File(MockFileStoreInput.class.getResource(SAMPLE_INPUT).getFile());
+        return new File(MockInput.class.getResource(SAMPLE_INPUT).getFile());
     }
 
     public static InputStream sampleInputStream() throws IOException {
-        return new GZIPInputStream(MockFileStoreInput.class.getResource(SAMPLE_INPUT).openStream());
+        return new GZIPInputStream(MockInput.class.getResource(SAMPLE_INPUT).openStream());
     }
 
 }

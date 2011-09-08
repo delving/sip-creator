@@ -29,7 +29,7 @@ import java.awt.Point;
 import java.io.Serializable;
 
 /**
- * Store the state of a DesktopWindow.
+ * DataSet the state of a DesktopWindow.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
