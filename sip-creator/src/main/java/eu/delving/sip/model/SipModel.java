@@ -74,11 +74,17 @@ public class SipModel {
     private MappingModel mappingModel = new MappingModel();
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
+    private boolean allowInvalidRecords;
 
     public interface AnalysisListener {
         void finished(boolean success);
 
         void analysisProgress(long elementCount);
+    }
+
+    public interface ValidationListener {
+
+        void failed(ValidationException validationException);
     }
 
     public interface ParseListener {
@@ -191,6 +197,14 @@ public class SipModel {
 
     public CompileModel getFieldCompileModel() {
         return fieldCompileModel;
+    }
+
+    public boolean isAllowInvalidRecords() {
+        return allowInvalidRecords;
+    }
+
+    public void setAllowInvalidRecords(boolean allowInvalidRecords) {
+        this.allowInvalidRecords = allowInvalidRecords;
     }
 
     public List<FieldDefinition> getUnmappedFields() {
@@ -350,10 +364,10 @@ public class SipModel {
         });
     }
 
-    public void validateFile(boolean allowInvalid, final ProgressListener progressListener) {
+    public void validateFile(final ProgressListener progressListener, final ValidationListener validationListener) {
         Exec.work(new FileValidator(
                 this,
-                allowInvalid,
+                allowInvalidRecords,
                 groovyCodeResource,
                 progressListener,
                 new FileValidator.Listener() {
@@ -370,7 +384,7 @@ public class SipModel {
 
                     @Override
                     public void invalidOutput(final ValidationException exception) {
-                        userNotifier.tellUser("Invalid output record", exception);
+                        validationListener.failed(exception);
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {

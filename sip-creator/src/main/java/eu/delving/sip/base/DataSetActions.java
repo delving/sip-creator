@@ -46,7 +46,7 @@ public class DataSetActions {
         actions.add(new DownloadAction(parent, sipModel, cultureHubClient));
         actions.add(new ImportAction(parent, sipModel));
         actions.add(new MapAction());
-        actions.add(new ValidateAction());
+        actions.add(new ValidateAction(parent, sipModel));
         actions.add(new UploadAction(parent, sipModel, cultureHubClient));
     }
 
@@ -58,18 +58,6 @@ public class DataSetActions {
 
         private MapAction() {
             super("Map");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            JOptionPane.showMessageDialog(parent, actionEvent.getActionCommand());
-        }
-    }
-
-    private class ValidateAction extends AbstractAction {
-
-        private ValidateAction() {
-            super("Validate");
         }
 
         @Override
