@@ -189,9 +189,16 @@ public class CreateFrame extends FrameBase {
             FieldDefinition fieldDefinition = (FieldDefinition) targetFieldList.getSelectedValue();
             if (fieldDefinition != null) {
                 CodeGenerator generator = new CodeGenerator();
-                FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
+                final FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
                 generator.generateCodeFor(fieldMapping, createSelectedVariableList(), getConstantFieldValue());
-                sipModel.getMappingModel().addMapping(fieldMapping);
+                Exec.work(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                sipModel.getMappingModel().addMapping(fieldMapping);
+                            }
+                        }
+                );
             }
             clear();
             closeFrame();

@@ -69,7 +69,7 @@ public class DataSetModel implements MetadataModel {
 
     @Override
     public List<FactDefinition> getFactDefinitions() {
-        return null;  // todo: implement
+        return factDefinitions;
     }
 
     @Override
