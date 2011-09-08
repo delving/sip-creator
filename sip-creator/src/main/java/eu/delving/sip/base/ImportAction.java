@@ -24,8 +24,8 @@ package eu.delving.sip.base;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
+import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.filechooser.FileFilter;
@@ -39,12 +39,12 @@ import java.io.File;
  */
 
 public class ImportAction extends AbstractAction {
-    private JFrame parent;
+    private JDesktopPane parent;
     private SipModel sipModel;
     private final String RECENT_DIR = "recentImportDirectory";
     private JFileChooser chooser = new JFileChooser("XML Metadata Source File");
 
-    public ImportAction(JFrame parent, SipModel sipModel) {
+    public ImportAction(JDesktopPane parent, SipModel sipModel) {
         super("Import");
         this.parent = parent;
         this.sipModel = sipModel;

@@ -25,7 +25,7 @@ import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JFrame;
+import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -38,10 +38,10 @@ import java.util.List;
  */
 
 public class DataSetActions {
-    private JFrame parent;
+    private JDesktopPane parent;
     private List<Action> actions = new ArrayList<Action>();
 
-    public DataSetActions(JFrame parent, SipModel sipModel, CultureHubClient cultureHubClient, List<FrameBase> frames) {
+    public DataSetActions(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient, List<FrameBase> frames) {
         this.parent = parent;
         actions.add(new DownloadAction(parent, sipModel, cultureHubClient));
         actions.add(new ImportAction(parent, sipModel));

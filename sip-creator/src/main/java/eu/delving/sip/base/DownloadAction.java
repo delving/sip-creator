@@ -30,6 +30,7 @@ import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -59,7 +60,7 @@ import java.util.Map;
 
 public class DownloadAction extends AbstractAction implements CultureHubClient.ListReceiver {
     private Font font = new Font("Sans", Font.BOLD, 18);
-    private JFrame parent;
+    private JDesktopPane parent;
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
     private JDialog dialog;
@@ -68,12 +69,12 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
     private DataSetListModel listModel = new DataSetListModel();
     private JList list = new JList(listModel);
 
-    public DownloadAction(JFrame parent, SipModel sipModel, CultureHubClient cultureHubClient) {
+    public DownloadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Download");
         this.parent = parent;
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
-        dialog = new JDialog(parent, "Download", false);
+        dialog = new JDialog((JFrame)SwingUtilities.getWindowAncestor(parent), "Download", false);
         createDialog(dialog.getContentPane());
         list.setCellRenderer(new DataSetCellRenderer(sipModel.getStorage().getUsername()));
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

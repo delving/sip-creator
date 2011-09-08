@@ -112,7 +112,6 @@ public class Application {
         };
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
-        actions = new DataSetActions(home, sipModel, cultureHubClient, frames);
         frames.add(new StatusFrame(desktop, sipModel));
         frames.add(new AnalysisFrame(desktop, sipModel));
         frames.add(new CreateFrame(desktop, sipModel));
@@ -126,6 +125,7 @@ public class Application {
                 BorderFactory.createBevelBorder(0)
         ));
         home.getContentPane().add(desktop, BorderLayout.CENTER);
+        actions = new DataSetActions(desktop, sipModel, cultureHubClient, frames);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
