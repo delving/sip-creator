@@ -35,6 +35,5 @@ public enum DataSetState {
     SOURCED,
     ANALYZED,
     MAPPED,
-    VALIDATED,
-    PHANTOM
+    VALIDATED
 }

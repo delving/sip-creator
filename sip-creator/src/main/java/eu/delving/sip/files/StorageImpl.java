@@ -67,7 +67,6 @@ import static eu.delving.sip.files.DataSetState.IMPORTED;
 import static eu.delving.sip.files.DataSetState.IMPORTED_ANALYZED;
 import static eu.delving.sip.files.DataSetState.IMPORTED_HINTS_SET;
 import static eu.delving.sip.files.DataSetState.MAPPED;
-import static eu.delving.sip.files.DataSetState.PHANTOM;
 import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.DataSetState.VALIDATED;
 
@@ -229,9 +228,9 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public DataSetState getState() {
-            if (phantomFile(here).exists()) {
-                return PHANTOM;
-            }
+//            if (phantomFile(here).exists()) {
+//                return PHANTOM;
+//            }
             File imported = importedFile(here);
             File source = sourceFile(here);
             if (imported.exists()) {

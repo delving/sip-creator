@@ -24,6 +24,7 @@ package eu.delving.sip;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.ValidationException;
 import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.DataSetStateActions;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.OAuthClient;
@@ -50,6 +51,7 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.UserNotifier;
 
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -90,6 +92,7 @@ public class Application {
     private ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
     private PopupExceptionHandler exceptionHandler;
     private SipModel sipModel;
+    private DataSetStateActions stateActions;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
@@ -104,6 +107,7 @@ public class Application {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         exceptionHandler = new PopupExceptionHandler();
         sipModel = new SipModel(storage, groovyCodeResource, this.exceptionHandler);
+        stateActions = new DataSetStateActions(sipModel);
         home = new JFrame("Delving SIP Creator");
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -127,7 +131,7 @@ public class Application {
                 BorderFactory.createBevelBorder(0)
         ));
         home.getContentPane().add(desktop, BorderLayout.CENTER);
-        home.getContentPane().add(createFrameButtonPanel(), BorderLayout.WEST);
+        home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         home.setIconImage(logo.getImage());
@@ -161,14 +165,14 @@ public class Application {
         osxExtra();
     }
 
-    private JPanel createFrameButtonPanel() {
-        JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
+    private JPanel createStatePanel() {
+        JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createTitledBorder("Frames")
+                BorderFactory.createTitledBorder("States")
         ));
-        for (FrameBase frame : frames) {
-            p.add(new JButton(frame.getAction()));
+        for (Action action : stateActions.getActions()) {
+            p.add(new JButton(action));
         }
         return p;
     }
