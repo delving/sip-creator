@@ -33,7 +33,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * The menu for choosing from local data sets
+ * The menu for choosing from local data sets.
  *
  * @author Gerald de Jong, Beautiful Code BV, <geralddejong@gmail.com>
  */
@@ -75,34 +75,44 @@ public class DataSetMenu extends JMenu {
         removeAll();
         ButtonGroup bg = new ButtonGroup();
         for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
-            final DataSetItem item = new DataSetItem(dataSet);
-            bg.add(item);
-            add(item);
-            item.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    sipModel.setDataSet(item.getDataSet());
-                    setPreference(item.getDataSet());
-                }
-            });
-            if (sipModel.hasDataSet()) {
-                if (dataSet.getSpec().equals(sipModel.getDataSetModel().getDataSet().getSpec())) {
-                    item.setSelected(true);
+            for (String prefix : sipModel.getDataSetModel().getPrefixes()) {
+                final DataSetItem item = new DataSetItem(dataSet, prefix);
+                bg.add(item);
+                add(item);
+                item.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        sipModel.setDataSet(item.getDataSet());
+                        sipModel.setMetadataPrefix(item.getPrefix(), true);
+                        setPreference(item.getDataSet());
+                    }
+                });
+                if (sipModel.hasDataSet()) {
+                    if (dataSet.getSpec().equals(sipModel.getDataSetModel().getDataSet().getSpec())) {
+                        item.setSelected(true);
+                    }
                 }
             }
         }
     }
 
     private class DataSetItem extends JRadioButtonMenuItem {
-        private DataSet dataSet;
 
-        private DataSetItem(DataSet dataSet) {
-            super(dataSet.getSpec());
+        private DataSet dataSet;
+        private String prefix;
+
+        private DataSetItem(DataSet dataSet, String prefix) {
+            super(String.format("%s - %s", dataSet.getSpec(), prefix));
             this.dataSet = dataSet;
+            this.prefix = prefix;
         }
 
         public DataSet getDataSet() {
             return dataSet;
+        }
+
+        public String getPrefix() {
+            return prefix;
         }
     }
 }

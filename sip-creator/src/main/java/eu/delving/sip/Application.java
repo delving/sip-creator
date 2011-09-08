@@ -43,7 +43,6 @@ import eu.delving.sip.frames.RecordMappingFrame;
 import eu.delving.sip.frames.StatisticsFrame;
 import eu.delving.sip.frames.StatusFrame;
 import eu.delving.sip.menus.DataSetMenu;
-import eu.delving.sip.menus.MappingMenu;
 import eu.delving.sip.menus.TemplateMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
@@ -94,7 +93,6 @@ public class Application {
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
-    private MappingMenu mappingMenu;
     private TemplateMenu tempateMenu;
     private OAuthClient oauthClient;
     private List<FrameBase> frames = new ArrayList<FrameBase>();
@@ -133,7 +131,6 @@ public class Application {
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         home.setIconImage(logo.getImage());
         dataSetMenu = new DataSetMenu(sipModel);
-        mappingMenu = new MappingMenu(sipModel);
         tempateMenu = new TemplateMenu(home, sipModel);
         oauthClient = new OAuthClient(
                 StorageFinder.getHostPort(storageDirectory),
@@ -182,7 +179,6 @@ public class Application {
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
         bar.add(dataSetMenu);
-        bar.add(mappingMenu);
         bar.add(tempateMenu);
         bar.add(createFrameMenu());
         return bar;
