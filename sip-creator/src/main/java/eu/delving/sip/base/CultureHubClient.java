@@ -135,14 +135,14 @@ public class CultureHubClient {
                         context.getServerUrl(),
                         context.getAccessToken()
                 );
-                log.info("requesting list: "+url);
+                log.info("requesting list: " + url);
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
                 HttpResponse httpResponse = httpClient.execute(get);
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     HttpEntity entity = httpResponse.getEntity();
                     DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
-                    log.info("list received:\n"+dataSetList);
+                    log.info("list received:\n" + dataSetList);
                     listReceiver.listReceived(dataSetList.list);
                     entity.consumeContent();
                 }
@@ -182,23 +182,26 @@ public class CultureHubClient {
                     HttpEntity entity = httpResponse.getEntity();
                     dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
                     success = true;
+                    context.dataSetCreated(dataSet);
                 }
                 else {
                     log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
+                    context.tellUser("Unable to download data set"); // todo: tell them why
                 }
-                context.dataSetCreated(dataSet);
             }
             catch (Exception e) {
-                log.warn("Unable to download source", e);
-                context.tellUser("Unable to download source");
-                try {
-                    dataSet.remove();
-                }
-                catch (StorageException e1) {
-                    context.tellUser("Unable to remove local data set");
-                }
+                log.warn("Unable to download data set", e);
+                context.tellUser("Unable to download data set"); // todo: tell them why
             }
             finally {
+                if (!success) {
+                    try {
+                        dataSet.remove();
+                    }
+                    catch (StorageException e1) {
+                        context.tellUser("Unable to remove local data set");
+                    }
+                }
                 progressListener.finished(success);
             }
         }
@@ -418,7 +421,7 @@ public class CultureHubClient {
         public LockedBy lockedBy;
 
         public String toString() {
-            return "data-set spec="+spec;
+            return "data-set spec=" + spec;
         }
     }
 

@@ -298,7 +298,7 @@ public class StorageBase {
     }
 
     File getRecent(File[] files, int which) {
-        if (files.length <= which || which > MAX_HASH_HISTORY) {
+        if (files == null || files.length <= which || which > MAX_HASH_HISTORY) {
             return null;
         }
         Arrays.sort(files, new Comparator<File>() {
