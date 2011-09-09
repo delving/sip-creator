@@ -34,7 +34,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -56,6 +55,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -79,6 +79,7 @@ import static eu.delving.sip.files.DataSetState.VALIDATED;
 public class StorageImpl extends StorageBase implements Storage {
 
     private File home;
+    private final static Logger LOG = Logger.getAnonymousLogger();
 
     public StorageImpl(File home) throws StorageException {
         this.home = home;
@@ -497,10 +498,9 @@ public class StorageImpl extends StorageBase implements Storage {
                     throw new StorageException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
                 }
             }
-            catch (XMLStreamException e) {
-                throw new StorageException("Unable to convert source", e);
-            }
-            catch (IOException e) {
+            catch (Exception e) {
+                File source = new File(here, SOURCE_FILE_NAME);
+                delete(source);
                 throw new StorageException("Unable to convert source", e);
             }
         }
@@ -531,7 +531,7 @@ public class StorageImpl extends StorageBase implements Storage {
             byte[] buffer = new byte[BLOCK_SIZE];
             int bytesRead;
             boolean cancelled = false;
-            if (progressListener != null) progressListener.prepareFor((int)(streamLength / BLOCK_SIZE));
+            if (progressListener != null) progressListener.prepareFor((int) (streamLength / BLOCK_SIZE));
             CountingInputStream counting = new CountingInputStream(inputStream);
             ZipInputStream zipInputStream = new ZipInputStream(counting);
             try {

@@ -11,9 +11,23 @@ public class MappingCategory {
             return a
         }
         else if (a instanceof List) {
-          def groovyList = new GroovyList()
-          groovyList.addAll(a)
-          return groovyList
+            if (!a) {
+                return new GroovyList()
+            }
+            else if (a.size() == 1) {
+                if (a[0] instanceof GroovyList) {
+                    return (GroovyList)a[0]
+                }
+                else if (a instanceof List) {
+                    return toList(a[0])
+                }
+                else {
+                    return new GroovyList(a[0])
+                }
+            }
+            else {
+                throw new RuntimeException("List")
+            }
         }
         else if (a instanceof GroovyNode) {
             return toList(((GroovyNode)a).value())
