@@ -163,6 +163,7 @@ public class Application {
             @Override
             public void dataSetChanged(DataSet dataSet) {
                 home.setTitle(String.format("Delving SIP Creator [%s - %s]", dataSet.getSpec(), dataSet.getDataSetFacts().get("name")));
+                frames.get(0).show();
             }
 
             @Override
