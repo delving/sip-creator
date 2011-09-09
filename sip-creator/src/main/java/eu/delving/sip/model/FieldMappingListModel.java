@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.base.Exec;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListCellRenderer;
@@ -48,14 +49,25 @@ public class FieldMappingListModel extends AbstractListModel implements MappingM
 
     @Override
     public Object getElementAt(int index) {
+        // Dirty fix, added to prevent IndexOutOfBounds exceptions, take a deeper look into this.
+        if (index > list.size()) {
+            return list.get(0);
+        }
         return list.get(index);
     }
 
     private void clear() {
-        int size = getSize();
+        final int size = getSize();
         if (size > 0) {
             this.list.clear();
-            fireIntervalRemoved(this, 0, size);
+            Exec.swing(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            fireIntervalRemoved(this, 0, size);
+                        }
+                    }
+            );
         }
     }
 
@@ -78,7 +90,14 @@ public class FieldMappingListModel extends AbstractListModel implements MappingM
             for (FieldMapping fieldMapping : recordMapping.getFieldMappings()) {
                 list.add(fieldMapping);
             }
-            fireIntervalAdded(this, 0, getSize());
+            Exec.swing(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            fireIntervalAdded(this, 0, getSize());
+                        }
+                    }
+            );
         }
     }
 

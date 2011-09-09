@@ -81,6 +81,7 @@ public class ValidateAction extends AbstractAction {
                         pane.add(new JLabel(String.format("Error in record #%d, do you want to fix this problem?",
                                 validationException.getRecordNumber())
                         ));
+                        validationException.printStackTrace();
                         pane.add(allowInvalidCheckBox);
                         allowInvalidCheckBox.setSelected(sipModel.isAllowInvalidRecords());
                         allowInvalidCheckBox.addActionListener(

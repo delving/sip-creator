@@ -121,9 +121,17 @@ public class RecordMappingFrame extends FrameBase {
         removeMappingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
+                final FieldMapping fieldMapping = (FieldMapping) mappingList.getSelectedValue();
                 if (fieldMapping != null) {
-                    sipModel.getMappingModel().removeMapping(fieldMapping);
+                    Exec.work(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    sipModel.getMappingModel().removeMapping(fieldMapping);
+
+                                }
+                            }
+                    );
                 }
             }
         });

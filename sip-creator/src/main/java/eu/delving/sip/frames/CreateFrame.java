@@ -196,7 +196,6 @@ public class CreateFrame extends FrameBase {
                 );
             }
             clear();
-            closeFrame();
         }
 
         private void clear() {
