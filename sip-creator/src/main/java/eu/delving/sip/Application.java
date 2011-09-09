@@ -233,6 +233,11 @@ public class Application {
         }
 
         @Override
+        public void invalidateTokens() {
+            oauthClient.invalidateTokens();
+        }
+
+        @Override
         public void dataSetCreated(final DataSet dataSet) {
             Exec.swing(new Runnable() {
                 @Override

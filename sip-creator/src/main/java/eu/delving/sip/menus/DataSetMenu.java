@@ -21,8 +21,11 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.metadata.FactDefinition;
+import eu.delving.metadata.RecordDefinition;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
@@ -31,6 +34,7 @@ import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 /**
  * The menu for choosing from local data sets.
@@ -74,26 +78,34 @@ public class DataSetMenu extends JMenu {
     public void refresh() {
         removeAll();
         ButtonGroup bg = new ButtonGroup();
-        for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
-            for (String prefix : sipModel.getDataSetModel().getPrefixes()) {
-                final DataSetItem item = new DataSetItem(dataSet, prefix);
-                bg.add(item);
-                add(item);
-                item.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        sipModel.setDataSet(item.getDataSet());
-                        sipModel.setMetadataPrefix(item.getPrefix(), true);
-                        setPreference(item.getDataSet());
-                    }
-                });
-                if (sipModel.hasDataSet()) {
-                    if (dataSet.getSpec().equals(sipModel.getDataSetModel().getDataSet().getSpec())) {
-                        item.setSelected(true);
+        try {
+            for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
+                List<FactDefinition> factDefinitions = dataSet.getFactDefinitions();
+                for (RecordDefinition recordDefinition : dataSet.getRecordDefinitions(factDefinitions)) {
+                    String prefix = recordDefinition.prefix;
+                    final DataSetItem item = new DataSetItem(dataSet, prefix);
+                    bg.add(item);
+                    add(item);
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            sipModel.setDataSet(item.getDataSet());
+                            sipModel.setMetadataPrefix(item.getPrefix(), true);
+                            setPreference(item.getDataSet());
+                        }
+                    });
+                    if (sipModel.hasDataSet()) {
+                        if (dataSet.getSpec().equals(sipModel.getDataSetModel().getDataSet().getSpec())) {
+                            item.setSelected(true);
+                        }
                     }
                 }
             }
         }
+        catch (StorageException e) {
+            sipModel.getUserNotifier().tellUser("Problem loading data set list", e);
+        }
+
     }
 
     private class DataSetItem extends JRadioButtonMenuItem {

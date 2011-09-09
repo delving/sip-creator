@@ -77,6 +77,10 @@ public class OAuthClient {
 
     }
 
+    public void invalidateTokens() {
+        accessToken = refreshToken = null;
+    }
+
     private void requestWithPassword() throws OAuthSystemException, OAuthProblemException {
         OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
                 .setGrantType(GrantType.PASSWORD).setUsername(username).setPassword(password)
