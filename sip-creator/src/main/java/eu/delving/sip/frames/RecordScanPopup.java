@@ -26,7 +26,6 @@ import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.base.Utility;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.JButton;
@@ -141,11 +140,6 @@ public class RecordScanPopup extends FrameBase {
         for (JTextField field : fields) {
             field.setText(null);
         }
-    }
-
-    @Override
-    protected DataSetState getMinDataSetState() {
-        return DataSetState.EMPTY;
     }
 
     private JPanel createCancel() {

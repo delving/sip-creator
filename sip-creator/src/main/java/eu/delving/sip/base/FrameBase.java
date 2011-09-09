@@ -21,9 +21,6 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -91,38 +88,6 @@ public abstract class FrameBase extends JInternalFrame {
         if (modal) {
             setFocusTraversalKeysEnabled(false);
         }
-        this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
-            @Override
-            public void dataSetChanged(DataSet dataSet) {
-                checkEnableStatus(dataSet.getState());
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState state) {
-                checkEnableStatus(state);
-            }
-        });
-    }
-
-    private void checkEnableStatus(DataSetState state) {
-        boolean enabled = shouldBeEnabled(state);
-        action.setEnabled(enabled);
-        if (enabled && getSavedSize() != null) {
-            Exec.swingAny(new Runnable() {
-                @Override
-                public void run() {
-                    show();
-                }
-            });
-        }
-        if (isVisible() && !enabled) {
-            closeFrame();
-        }
-    }
-
-    private boolean shouldBeEnabled(DataSetState state) {
-        DataSetState min = getMinDataSetState();
-        return min != null ? state.ordinal() >= getMinDataSetState().ordinal() : isEnabledInState(state);
     }
 
     public void setAccelerator(int number) {
@@ -221,14 +186,6 @@ public abstract class FrameBase extends JInternalFrame {
                 show();
             }
         }
-    }
-
-    protected DataSetState getMinDataSetState() {
-        return null;
-    }
-
-    protected boolean isEnabledInState(DataSetState state) {
-        throw new IllegalStateException("Implement either this method or getMinDataSetState");
     }
 
     private Point addIfAbsent() {

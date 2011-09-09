@@ -101,11 +101,6 @@ public class AnalysisFrame extends FrameBase {
     protected void refresh() {
     }
 
-    @Override
-    protected DataSetState getMinDataSetState() {
-        return DataSetState.IMPORTED_ANALYZED;
-    }
-
     private void wireUp() {
         statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             @Override

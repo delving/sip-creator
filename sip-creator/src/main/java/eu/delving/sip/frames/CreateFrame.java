@@ -88,11 +88,6 @@ public class CreateFrame extends FrameBase {
     protected void refresh() {
     }
 
-    @Override
-    protected DataSetState getMinDataSetState() {
-        return DataSetState.ANALYZED;
-    }
-
     private void wireUp() {
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
 

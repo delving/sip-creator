@@ -21,7 +21,10 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -62,6 +65,17 @@ public class UploadAction extends AbstractAction {
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
         this.reportFilePopup = new ReportFilePopup();
+        this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void dataSetChanged(DataSet dataSet) {
+                dataSetStateChanged(dataSet, dataSet.getState());
+            }
+
+            @Override
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                setEnabled(dataSetState == DataSetState.VALIDATED);
+            }
+        });
     }
 
     @Override

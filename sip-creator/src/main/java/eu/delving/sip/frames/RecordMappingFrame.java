@@ -26,7 +26,6 @@ import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.FieldMappingListModel;
 import eu.delving.sip.model.SipModel;
 
@@ -76,11 +75,6 @@ public class RecordMappingFrame extends FrameBase {
 
     @Override
     protected void refresh() {
-    }
-
-    @Override
-    protected DataSetState getMinDataSetState() {
-        return DataSetState.MAPPED;
     }
 
     private JPanel createCodePanel() {

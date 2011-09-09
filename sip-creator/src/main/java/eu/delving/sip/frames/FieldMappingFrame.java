@@ -30,7 +30,6 @@ import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.CompileModel;
 import eu.delving.sip.model.SipModel;
 
@@ -90,11 +89,6 @@ public class FieldMappingFrame extends FrameBase {
 
     @Override
     protected void refresh() {
-    }
-
-    @Override
-    protected DataSetState getMinDataSetState() {
-        return DataSetState.ANALYZED;
     }
 
     private JPanel createPanel() {

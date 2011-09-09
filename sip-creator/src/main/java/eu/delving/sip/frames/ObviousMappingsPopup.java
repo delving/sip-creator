@@ -27,7 +27,6 @@ import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.FieldMappingListModel;
 
 import javax.swing.AbstractAction;
@@ -91,11 +90,6 @@ public class ObviousMappingsPopup extends FrameBase {
     @Override
     protected void refresh() {
         obviousListModel.refresh();
-    }
-
-    @Override
-    protected DataSetState getMinDataSetState() {
-        return DataSetState.EMPTY;
     }
 
     private JComponent createCenter() {

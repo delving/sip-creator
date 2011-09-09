@@ -86,12 +86,6 @@ public class StatusFrame extends FrameBase {
     protected void refresh() {
     }
 
-    @Override
-    protected boolean isEnabledInState(DataSetState state) {
-        analyzeAction.setEnabledByState(state);
-        return true;
-    }
-
     private void showStatus(final DataSetState dataSetState) {
         statusLabel.setText(String.format("<html><b>Status:</b><i>%s</i>", saveStateDescription(dataSetState)));
     }

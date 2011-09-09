@@ -24,7 +24,6 @@ package eu.delving.sip.frames;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -104,11 +103,6 @@ public class InputFrame extends FrameBase {
 
     @Override
     protected void refresh() {
-    }
-
-    @Override
-    protected DataSetState getMinDataSetState() {
-        return DataSetState.ANALYZED;
     }
 
     private JComponent createRecordView() {

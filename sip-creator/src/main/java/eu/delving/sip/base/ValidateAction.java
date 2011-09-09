@@ -47,7 +47,7 @@ public class ValidateAction extends AbstractAction {
     private JDesktopPane parent;
 
     public ValidateAction(JDesktopPane parent, SipModel sipModel) {
-        super("Validate all records");
+        super("Validate");
         this.sipModel = sipModel;
         this.parent = parent;
     }

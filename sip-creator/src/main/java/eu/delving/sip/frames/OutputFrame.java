@@ -22,7 +22,6 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -51,11 +50,6 @@ public class OutputFrame extends FrameBase {
 
     @Override
     protected void refresh() {
-    }
-
-    @Override
-    protected DataSetState getMinDataSetState() {
-        return DataSetState.MAPPED;
     }
 
     private JPanel createOutputPanel() {
