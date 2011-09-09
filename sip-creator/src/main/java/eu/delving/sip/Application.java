@@ -125,7 +125,21 @@ public class Application {
                 BorderFactory.createBevelBorder(0)
         ));
         home.getContentPane().add(desktop, BorderLayout.CENTER);
-        actions = new DataSetActions(desktop, sipModel, cultureHubClient, frames);
+        actions = new DataSetActions(desktop, sipModel, cultureHubClient, new Runnable() {
+            @Override
+            public void run() {
+                int index = 0;
+                for (FrameBase frame : frames) {
+                    if (index > 1) {
+                        frame.show();
+                    }
+                    else {
+                        frame.closeFrame();
+                    }
+                    index++;
+                }
+            }
+        });
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

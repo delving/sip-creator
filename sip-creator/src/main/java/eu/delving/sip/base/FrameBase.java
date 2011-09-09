@@ -214,7 +214,12 @@ public abstract class FrameBase extends JInternalFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            show();
+            if (isVisible()) {
+                closeFrame();
+            }
+            else {
+                show();
+            }
         }
     }
 

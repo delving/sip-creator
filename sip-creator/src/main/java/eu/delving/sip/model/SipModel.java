@@ -236,6 +236,7 @@ public class SipModel {
                             dataSetFacts.set(facts);
                             analysisModel.set(hints);
                             analysisModel.setStatistics(statistics);
+                            seekFirstRecord();
                             if (latestPrefix != null) {
                                 setMetadataPrefix(latestPrefix, false);
                             }

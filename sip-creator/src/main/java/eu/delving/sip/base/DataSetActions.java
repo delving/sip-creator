@@ -39,10 +39,12 @@ import java.util.List;
 
 public class DataSetActions {
     private JDesktopPane parent;
+    private Runnable mapMode;
     private List<Action> actions = new ArrayList<Action>();
 
-    public DataSetActions(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient, List<FrameBase> frames) {
+    public DataSetActions(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient, Runnable mapMode) {
         this.parent = parent;
+        this.mapMode = mapMode;
         actions.add(new DownloadAction(parent, sipModel, cultureHubClient));
         actions.add(new ImportAction(parent, sipModel));
         actions.add(new MapAction());
@@ -62,7 +64,7 @@ public class DataSetActions {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            JOptionPane.showMessageDialog(parent, actionEvent.getActionCommand());
+            mapMode.run();
         }
     }
 
