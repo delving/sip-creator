@@ -133,7 +133,8 @@ public class StorageFinder {
         JComboBox box = new JComboBox(hostPorts);
         int okCancel = JOptionPane.showConfirmDialog(null, box, "Choose server", JOptionPane.OK_CANCEL_OPTION);
         if (okCancel == JOptionPane.CANCEL_OPTION) {
-            throw new RuntimeException("No directory created");
+            System.exit(0);
+            return null;
         }
         else {
             String hostPort = (String)box.getSelectedItem();
