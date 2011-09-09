@@ -168,6 +168,11 @@ public class Application {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                switch (dataSetState) {
+                    case IMPORTED_ANALYZED:
+                        frames.get(1).show();
+                        break;
+                }
             }
         });
         osxExtra();
