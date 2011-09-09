@@ -353,6 +353,7 @@ public class CultureHubClient {
             this.progressListener = progressListener;
             setChunked(true);
             setContentType(deriveContentType(file));
+            progressListener.prepareFor((int) (getContentLength() / BLOCK_SIZE));
         }
 
         public boolean isRepeatable() {
@@ -368,7 +369,6 @@ public class CultureHubClient {
         }
 
         public void writeTo(OutputStream outputStream) throws IOException {
-            progressListener.prepareFor((int) (getContentLength() / BLOCK_SIZE));
             InputStream inputStream = new FileInputStream(this.file);
             try {
                 byte[] buffer = new byte[BLOCK_SIZE];
