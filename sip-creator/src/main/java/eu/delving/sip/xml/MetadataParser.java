@@ -31,6 +31,7 @@ import eu.delving.sip.files.Storage;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
@@ -94,8 +95,8 @@ public class MetadataParser {
                         }
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
-                                GroovyNode subNode = new GroovyNode(node, input.getAttributeNamespace(walk), input.getAttributeLocalName(walk), input.getAttributePrefix(walk));
-                                subNode.setValue(input.getAttributeValue(walk));
+                                QName attributeName = input.getAttributeName(walk);
+                                node.attributes().put(attributeName.getLocalPart(), input.getAttributeValue(walk));
                             }
                         }
                         value.setLength(0);

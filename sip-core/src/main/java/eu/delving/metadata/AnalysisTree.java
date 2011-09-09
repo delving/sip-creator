@@ -142,7 +142,9 @@ public class AnalysisTree implements Serializable {
     private static void getVariables(AnalysisTreeNode node, boolean withinRecord, List<Node> variables) {
         if (node.isLeaf()) {
             if (withinRecord) {
-                variables.add(node);
+                if (!node.getTag().getLocalName().startsWith("@")) {
+                    variables.add(node);
+                }
             }
         }
         else {
