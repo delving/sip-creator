@@ -52,7 +52,7 @@ public interface Storage {
     String UNZIPPED_SOURCE_FILE_NAME = "records.xml";
     String ANALYSIS_STATS_FILE_NAME = "analysis_stats.ser";
     String SOURCE_STATS_FILE_NAME = "source_stats.ser";
-    String FACTS_FILE_NAME = "dataset-facts.txt";
+    String FACTS_FILE_NAME = "dataset_facts.txt";
     String HINTS_FILE_NAME = "hints.txt";
     String PHANTOM_FILE_NAME = "phantom.txt";
     String MAPPING_FILE_PATTERN = "mapping_%s.xml";
