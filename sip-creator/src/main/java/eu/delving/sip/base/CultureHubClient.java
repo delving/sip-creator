@@ -31,7 +31,6 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -72,9 +71,12 @@ public class CultureHubClient {
 
         String getAccessToken();
 
+        void invalidateTokens();
+
         void dataSetCreated(DataSet dataSet);
 
         void tellUser(String message);
+
     }
 
     public interface ListReceiver {
@@ -138,16 +140,24 @@ public class CultureHubClient {
                 log.info("requesting list: " + url);
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
-                HttpResponse httpResponse = httpClient.execute(get);
-                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    HttpEntity entity = httpResponse.getEntity();
-                    DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
-                    log.info("list received:\n" + dataSetList);
-                    listReceiver.listReceived(dataSetList.list);
-                    entity.consumeContent();
-                }
-                else {
-                    log.warn("Unable to fetch data set list. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
+                HttpResponse response = httpClient.execute(get);
+                switch (Code.from(response)) {
+                    case OK:
+                        HttpEntity entity = response.getEntity();
+                        DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
+                        log.info("list received:\n" + dataSetList);
+                        listReceiver.listReceived(dataSetList.list);
+                        entity.consumeContent();
+                        break;
+                    case UNAUTHORIZED:
+                        context.invalidateTokens();
+                        notifyUser("Authorization failure, please try again");
+                        break;
+                    case SYSTEM_ERROR:
+                    case UNKNOWN_RESPONSE:
+                        log.warn("Unable to fetch data set list. HTTP response " + response.getStatusLine().getReasonPhrase());
+                        context.tellUser("Unable to download data set list"); // todo: tell them why
+                        break;
                 }
             }
             catch (Exception e) {
@@ -177,16 +187,23 @@ public class CultureHubClient {
                         context.getAccessToken()
                 ));
                 get.setHeader("Accept", "application/zip");
-                HttpResponse httpResponse = httpClient.execute(get);
-                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    HttpEntity entity = httpResponse.getEntity();
-                    dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
-                    success = true;
-                    context.dataSetCreated(dataSet);
-                }
-                else {
-                    log.warn("Unable to download source. HTTP response " + httpResponse.getStatusLine().getReasonPhrase());
-                    context.tellUser("Unable to download data set"); // todo: tell them why
+                HttpResponse response = httpClient.execute(get);
+                switch (Code.from(response)) {
+                    case OK:
+                        HttpEntity entity = response.getEntity();
+                        dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                        success = true;
+                        context.dataSetCreated(dataSet);
+                        break;
+                    case UNAUTHORIZED:
+                        context.invalidateTokens();
+                        notifyUser("Authorization failure, please try again");
+                        break;
+                    case SYSTEM_ERROR:
+                    case UNKNOWN_RESPONSE:
+                        log.warn("Unable to download source. HTTP response " + response.getStatusLine().getReasonPhrase());
+                        context.tellUser("Unable to download data set"); // todo: tell them why
+                        break;
                 }
             }
             catch (Exception e) {
@@ -241,6 +258,9 @@ public class CultureHubClient {
                         uploadFiles = filteredUploadFiles;
                         break;
                     case UNAUTHORIZED:
+                        context.invalidateTokens();
+                        notifyUser("Authorization failure, please try again");
+                        break;
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
                         throw new IOException("Unable to fetch file list, response: " + Code.from(response));
@@ -255,6 +275,9 @@ public class CultureHubClient {
                         case OK:
                             break;
                         case UNAUTHORIZED:
+                            context.invalidateTokens();
+                            notifyUser("Authorization failure, please try again");
+                            break;
                         case SYSTEM_ERROR:
                         case UNKNOWN_RESPONSE:
                             throw new IOException(String.format("Unable to upload file %s, response: %s", file.getName(), Code.from(response)));
