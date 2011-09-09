@@ -22,7 +22,6 @@
 package eu.delving.sip.menus;
 
 import eu.delving.metadata.RecordMapping;
-import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -30,7 +29,6 @@ import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.Map;
 
 /**
  * The menu for handling files
@@ -59,18 +57,18 @@ public class TemplateMenu extends JMenu {
         JMenu deleteMenu = new JMenu("Delete a template");
         this.add(deleteMenu);
         this.addSeparator();
-        try {
-            Map<String, RecordMapping> templates = sipModel.getStorage().getTemplates(sipModel.getDataSetModel());
+//        try {
+//            Map<String, RecordMapping> templates = sipModel.getStorage().getTemplates(sipModel.getDataSetModel());
             // todo: templates are saved above all datasets but the metadata model is set-specific, a problem.
-            for (Map.Entry<String, RecordMapping> entry : templates.entrySet()) {
-                this.add(new ApplyTemplateAction(entry.getKey(), entry.getValue()));
-                updateMenu.add(new UpdateTemplateAction(entry.getKey()));
-                deleteMenu.add(new DeleteTemplateAction(entry.getKey()));
-            }
-        }
-        catch (StorageException e) {
-            sipModel.getUserNotifier().tellUser("Unable to load template", e);
-        }
+//            for (Map.Entry<String, RecordMapping> entry : templates.entrySet()) {
+//                this.add(new ApplyTemplateAction(entry.getKey(), entry.getValue()));
+//                updateMenu.add(new UpdateTemplateAction(entry.getKey()));
+//                deleteMenu.add(new DeleteTemplateAction(entry.getKey()));
+//            }
+//        }
+//        catch (StorageException e) {
+//            sipModel.getUserNotifier().tellUser("Unable to load template", e);
+//        }
     }
 
     private class SaveNewTemplateAction extends AbstractAction {
@@ -83,7 +81,7 @@ public class TemplateMenu extends JMenu {
         public void actionPerformed(ActionEvent actionEvent) {
             String name = JOptionPane.showInputDialog(parent, "What name should this template be given");
             if (name != null && !name.isEmpty()) {
-                sipModel.saveAsTemplate(name);
+//                sipModel.saveAsTemplate(name);
                 refresh();
             }
         }
@@ -99,7 +97,7 @@ public class TemplateMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.saveAsTemplate(prefix);
+//            sipModel.saveAsTemplate(prefix);
             refresh();
         }
     }
@@ -116,7 +114,7 @@ public class TemplateMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.applyTemplate(recordMapping);
+//            sipModel.applyTemplate(recordMapping);
         }
     }
 
@@ -130,12 +128,12 @@ public class TemplateMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            try {
-                sipModel.getStorage().deleteTemplate(name);
-            }
-            catch (StorageException e) {
-                sipModel.getUserNotifier().tellUser("Unable to delete template", e);
-            }
+//            try {
+//                sipModel.getStorage().deleteTemplate(name);
+//            }
+//            catch (StorageException e) {
+//                sipModel.getUserNotifier().tellUser("Unable to delete template", e);
+//            }
             refresh();
         }
     }

@@ -278,30 +278,30 @@ public class SipModel {
         return dataSetModel.getRecordDefinition(recordMapping.getPrefix());
     }
 
-    public void saveAsTemplate(final String name) {
-        try {
-            storage.setTemplate(name, mappingModel.getRecordMapping());
-        }
-        catch (StorageException e) {
-            userNotifier.tellUser("Unable to save template", e);
-        }
-    }
-
-    public void applyTemplate(RecordMapping template) {
-        if (!mappingModel.getRecordMapping().getFieldMappings().isEmpty()) {
-            userNotifier.tellUser("Record must be empty to use a template.");
-        }
-        else {
-            try {
-                template.apply(getRecordDefinition());
-                mappingModel.applyTemplate(template);
-                seekFirstRecord();
-            }
-            catch (Exception e) {
-                userNotifier.tellUser("Unable to load template", e);
-            }
-        }
-    }
+//    public void saveAsTemplate(final String name) {
+//        try {
+//            storage.setTemplate(name, mappingModel.getRecordMapping());
+//        }
+//        catch (StorageException e) {
+//            userNotifier.tellUser("Unable to save template", e);
+//        }
+//    }
+//
+//    public void applyTemplate(RecordMapping template) {
+//        if (!mappingModel.getRecordMapping().getFieldMappings().isEmpty()) {
+//            userNotifier.tellUser("Record must be empty to use a template.");
+//        }
+//        else {
+//            try {
+//                template.apply(getRecordDefinition());
+//                mappingModel.applyTemplate(template);
+//                seekFirstRecord();
+//            }
+//            catch (Exception e) {
+//                userNotifier.tellUser("Unable to load template", e);
+//            }
+//        }
+//    }
 
     public void importSource(final File file, final ProgressListener progressListener) {
         Exec.work(new Runnable() {

@@ -21,9 +21,7 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordMapping;
 
 import java.util.Map;
 
@@ -36,12 +34,6 @@ import java.util.Map;
 public interface Storage {
 
     String getUsername();
-
-    void setTemplate(String name, RecordMapping recordMapping) throws StorageException;
-
-    Map<String, RecordMapping> getTemplates(MetadataModel me) throws StorageException;
-
-    void deleteTemplate(String name) throws StorageException;
 
     Map<String, DataSet> getDataSets();
 

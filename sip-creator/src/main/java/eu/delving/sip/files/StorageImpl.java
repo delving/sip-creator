@@ -95,45 +95,6 @@ public class StorageImpl extends StorageBase implements Storage {
     }
 
     @Override
-    public void setTemplate(String name, RecordMapping recordMapping) throws StorageException {
-        File templateFile = new File(home, String.format(MAPPING_FILE_PATTERN, name));
-        try {
-            FileOutputStream fos = new FileOutputStream(templateFile);
-            RecordMapping.write(recordMapping, fos);
-            fos.close();
-        }
-        catch (IOException e) {
-            throw new StorageException(String.format("Unable to save template to %s", templateFile.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public Map<String, RecordMapping> getTemplates(MetadataModel metadataModel) throws StorageException {
-        Map<String, RecordMapping> templates = new TreeMap<String, RecordMapping>();
-        for (File templateFile : home.listFiles(new MappingFileFilter())) {
-            try {
-                FileInputStream fis = new FileInputStream(templateFile);
-                RecordMapping recordMapping = RecordMapping.read(fis, metadataModel);
-                fis.close();
-                String name = templateFile.getName();
-                name = name.substring(MAPPING_FILE_PREFIX.length());
-                name = name.substring(0, name.length() - MAPPING_FILE_SUFFIX.length());
-                templates.put(name, recordMapping);
-            }
-            catch (Exception e) {
-                delete(templateFile);
-            }
-        }
-        return templates;
-    }
-
-    @Override
-    public void deleteTemplate(String name) throws StorageException {
-        File templateFile = new File(home, String.format(MAPPING_FILE_PATTERN, name));
-        delete(templateFile);
-    }
-
-    @Override
     public Map<String, DataSet> getDataSets() {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
