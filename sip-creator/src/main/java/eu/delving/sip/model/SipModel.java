@@ -396,6 +396,12 @@ public class SipModel {
 
                     @Override
                     public void finished(final BitSet valid, int recordCount) {
+                        try {
+                            dataSetModel.getDataSet().setValidation(getMappingModel().getRecordMapping().getPrefix(), valid, recordCount);
+                        }
+                        catch (StorageException e) {
+                            userNotifier.tellUser("Unable to store validation results", e);
+                        }
                         reportFileModel.kick();
                     }
                 }

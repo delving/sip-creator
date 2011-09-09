@@ -38,8 +38,6 @@ import javax.swing.JPanel;
 import javax.swing.ListModel;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -120,19 +118,15 @@ public class UploadAction extends AbstractAction {
                     true, // maximizable
                     false // iconifiable
             );
-            sipModel.getReportFileModel().addListDataListener(new ListDataListener() {
+            sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
                 @Override
-                public void intervalAdded(ListDataEvent listDataEvent) {
-                    setActionEnabled(true);
+                public void dataSetChanged(DataSet dataSet) {
+                    dataSetStateChanged(dataSet, dataSet.getState());
                 }
 
                 @Override
-                public void intervalRemoved(ListDataEvent listDataEvent) {
-                    setActionEnabled(false);
-                }
-
-                @Override
-                public void contentsChanged(ListDataEvent listDataEvent) {
+                public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                    setActionEnabled(dataSetState == DataSetState.VALIDATED);
                 }
             });
             buildContent(getContentPane());

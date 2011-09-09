@@ -229,6 +229,7 @@ public class CultureHubClient {
                     case OK:
                         HttpEntity entity = response.getEntity();
                         String listString = EntityUtils.toString(entity);
+                        entity.consumeContent();
                         List<File> filteredUploadFiles = new ArrayList<File>();
                         for (String fileName : listString.split("\n")) {
                             for (File file : uploadFiles) {
@@ -249,13 +250,14 @@ public class CultureHubClient {
                     post = new HttpPost(createFileRequestUrl(file));
                     post.setEntity(new FileEntity(file, progressListener));
                     response = httpClient.execute(post);
+                    response.getEntity().consumeContent();
                     switch (Code.from(response)) {
                         case OK:
                             break;
                         case UNAUTHORIZED:
                         case SYSTEM_ERROR:
                         case UNKNOWN_RESPONSE:
-                            throw new IOException("Unable to upload file, response: " + Code.from(response));
+                            throw new IOException(String.format("Unable to upload file %s, response: %s", file.getName(), Code.from(response)));
                     }
                 }
             }
@@ -274,7 +276,7 @@ public class CultureHubClient {
 
         private String createListRequestUrl() {
             return String.format(
-                    "%s/submit/%s?accessToken=%s",
+                    "%s/submit/%s?accessKey=%s",
                     context.getServerUrl(),
                     dataSet.getSpec(),
                     context.getAccessToken()
@@ -283,7 +285,7 @@ public class CultureHubClient {
 
         private String createFileRequestUrl(File file) {
             return String.format(
-                    "%s/submit/%s/%s?accessToken=%s",
+                    "%s/submit/%s/%s?accessKey=%s",
                     context.getServerUrl(),
                     dataSet.getSpec(),
                     file.getName(),
@@ -303,19 +305,17 @@ public class CultureHubClient {
         else if (name.endsWith(".xml")) {
             return "text/xml";
         }
+        else if (name.endsWith(".int")) {
+            return "application/octet-stream";
+        }
         else {
             throw new RuntimeException("Cannot determine content type of " + file.getAbsolutePath());
         }
     }
 
     private void notifyUser(final String message) {
-        Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                log.warn("Problem communicating with CultureHub: " + message);
-                context.tellUser("<html>Sorry, there was a problem communicating with Repository<br>" + message);
-            }
-        });
+        log.warn("Problem communicating with CultureHub: " + message);
+        context.tellUser("<html>Sorry, there was a problem communicating with Repository<br>" + message);
     }
 
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {
@@ -356,14 +356,9 @@ public class CultureHubClient {
                     int blocks = (int) (bytesSent / BLOCK_SIZE);
                     if (blocks > blocksReported) {
                         blocksReported = blocks;
-                        Exec.swing(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!progressListener.setProgress(blocksReported)) {
-                                    abort = true;
-                                }
-                            }
-                        });
+                        if (!progressListener.setProgress(blocksReported)) {
+                            abort = true;
+                        }
                     }
                 }
                 outputStream.flush();
