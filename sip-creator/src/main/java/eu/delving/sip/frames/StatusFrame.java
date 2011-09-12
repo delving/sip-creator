@@ -29,10 +29,7 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.FactModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,7 +38,6 @@ import javax.swing.table.AbstractTableModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +52,6 @@ public class StatusFrame extends FrameBase {
     private FactsTableModel factsTableModel = new FactsTableModel();
     private JLabel statusLabel = new JLabel();
     private JTable factsTable = new JTable(factsTableModel);
-    private AnalyzeAction analyzeAction = new AnalyzeAction();
 
     public StatusFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Status", false);
@@ -79,7 +74,6 @@ public class StatusFrame extends FrameBase {
     protected void buildContent(Container content) {
         content.add(createStatusPanel(), BorderLayout.NORTH);
         content.add(createFactsPanel(), BorderLayout.CENTER);
-        content.add(createButtonPanel(), BorderLayout.SOUTH);
     }
 
     @Override
@@ -95,6 +89,7 @@ public class StatusFrame extends FrameBase {
             case EMPTY:
                 return "has no source yet";
             case IMPORTED:
+                performAnalysis();
                 return "imported - analyze";
             case IMPORTED_ANALYZED:
                 return "imported - choose record root and unique element";
@@ -125,12 +120,6 @@ public class StatusFrame extends FrameBase {
         p.setBorder(BorderFactory.createTitledBorder("Data Set Facts"));
         p.add(factsTable.getTableHeader(), BorderLayout.NORTH);
         p.add(factsTable, BorderLayout.CENTER);
-        return p;
-    }
-
-    private JPanel createButtonPanel() {
-        JPanel p = new JPanel();
-        p.add(new JButton(analyzeAction));
         return p;
     }
 
@@ -177,23 +166,6 @@ public class StatusFrame extends FrameBase {
         }
     }
 
-    private class AnalyzeAction extends AbstractAction {
-
-        private AnalyzeAction() {
-            super("Analyze Imported Data");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            setEnabled(false);
-            performAnalysis();
-        }
-
-        public void setEnabledByState(DataSetState state) {
-            setEnabled(state == DataSetState.SOURCED || state == DataSetState.IMPORTED);
-        }
-    }
-
     private void performAnalysis() {
         sipModel.analyzeFields(new SipModel.AnalysisListener() {
 
@@ -220,7 +192,7 @@ public class StatusFrame extends FrameBase {
     }
 
     private void setElementsProcessed(long count) {
-        analyzeAction.putValue(Action.NAME, String.format("%d elements processed", count));
+        statusLabel.setText(String.format("%d elements processed", count));
     }
 
 

@@ -23,6 +23,8 @@ package eu.delving.sip.xml;
 import com.ctc.wstx.stax.WstxInputFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.metadata.Uniqueness;
+import eu.delving.metadata.UniquenessException;
 import eu.delving.sip.ProgressListener;
 
 import javax.xml.stream.XMLEventFactory;
@@ -64,6 +66,7 @@ public class SourceConverter {
     private Path uniqueElementPath;
     private int recordCount;
     private ProgressListener progressListener;
+    private final Uniqueness uniqueness = new Uniqueness();
 
     public SourceConverter(Path recordRootPath, int recordCount, Path uniqueElementPath) {
         this.recordRootPath = recordRootPath;
@@ -75,7 +78,7 @@ public class SourceConverter {
         this.progressListener = progressListener;
     }
 
-    public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException {
+    public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException, UniquenessException {
         if (progressListener != null) progressListener.prepareFor(recordCount);
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
@@ -142,6 +145,9 @@ public class SourceConverter {
                             }
                             else if (path.equals(uniqueElementPath)) {
                                 uniqueValue = uniqueBuilder.toString();
+                                if(uniqueness.isRepeated(uniqueValue)) {
+                                    throw new UniquenessException(uniqueElementPath, count);
+                                }
                                 uniqueBuilder = null;
                             }
                             else {
