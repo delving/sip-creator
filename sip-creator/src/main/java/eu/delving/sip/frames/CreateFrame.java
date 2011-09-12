@@ -32,6 +32,7 @@ import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.FieldListModel;
 import eu.delving.sip.model.SipModel;
+import org.apache.commons.lang.StringUtils;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -43,6 +44,8 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
@@ -67,9 +70,11 @@ public class CreateFrame extends FrameBase {
     private JList variablesList;
     private JList targetFieldList;
     private ObviousMappingsPopup obviousMappingsPopup;
+    private final CreateMappingAction createMappingAction = new CreateMappingAction();
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Create", false);
+        createMappingAction.setEnabled(false);
         obviousMappingsPopup = new ObviousMappingsPopup(this);
         variablesList = new JList(sipModel.getAnalysisModel().getVariablesListWithCountsModel());
         targetFieldList = new JList(sipModel.getUnmappedFieldListModel());
@@ -81,7 +86,7 @@ public class CreateFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.add(createPanel(), BorderLayout.CENTER);
-        content.add(new JButton(new CreateMappingAction()), BorderLayout.SOUTH);
+        content.add(new JButton(createMappingAction), BorderLayout.SOUTH);
     }
 
     @Override
@@ -141,6 +146,14 @@ public class CreateFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Unmapped Output Fields"));
         p.add(scroll(targetFieldList), BorderLayout.CENTER);
+        targetFieldList.addListSelectionListener(
+                new ListSelectionListener() {
+                    @Override
+                    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                        enableCreateMapping();
+                    }
+                }
+        );
         return p;
     }
 
@@ -163,12 +176,52 @@ public class CreateFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Input Field Source"));
         p.add(scroll(variablesList), BorderLayout.CENTER);
+        variablesList.addListSelectionListener(
+                new ListSelectionListener() {
+                    @Override
+                    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                        enableCreateMapping();
+                    }
+                }
+        );
         return p;
+    }
+
+    /**
+     * Activate createMappingAction when:
+     * <ul>
+     * <li>Target field is selected</li>
+     * <li>Source field is selected OR constant field is defined</li>
+     * </ul>
+     */
+    private void enableCreateMapping() {
+        boolean target = !targetFieldList.isSelectionEmpty();
+        boolean source = !variablesList.isSelectionEmpty();
+        boolean constant = !constantField.getText().equals("?") && !StringUtils.isEmpty(constantField.getText());
+        createMappingAction.setEnabled(target && (source || constant));
     }
 
     private JPanel createConstantFieldPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Constant Source"));
+        constantField.getDocument().addDocumentListener(
+                new DocumentListener() {
+                    @Override
+                    public void insertUpdate(DocumentEvent documentEvent) {
+                        enableCreateMapping();
+                    }
+
+                    @Override
+                    public void removeUpdate(DocumentEvent documentEvent) {
+                        insertUpdate(documentEvent);
+                    }
+
+                    @Override
+                    public void changedUpdate(DocumentEvent documentEvent) {
+                        insertUpdate(documentEvent);
+                    }
+                }
+        );
         p.add(constantField);
         return p;
     }
