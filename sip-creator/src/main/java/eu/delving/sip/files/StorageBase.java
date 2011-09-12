@@ -176,6 +176,11 @@ public class StorageBase {
         return findOrCreate(dir, name, new NameFileFilter(name));
     }
 
+    File[] validationFiles(File dir, String prefix) {
+        String name = String.format(VALIDATION_FILE_PATTERN, prefix);
+        return dir.listFiles(new NameFileFilter(name));
+    }
+
     File reportFile(File dir, RecordMapping recordMapping) {
         return new File(dir, String.format(REPORT_FILE_PATTERN, recordMapping.getPrefix()));
     }

@@ -25,6 +25,7 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.FieldDefinition;
+import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.Path;
@@ -109,6 +110,28 @@ public class SipModel {
         mappingModel.addListener(recordCompileModel);
         mappingModel.addListener(fieldCompileModel);
         mappingModel.addListener(new MappingSaveTimer(this));
+        mappingModel.addListener(
+                new MappingModel.Listener() {
+
+                    @Override
+                    public void factChanged() {
+                    }
+
+                    @Override
+                    public void select(FieldMapping fieldMapping) {
+                    }
+
+                    @Override
+                    public void fieldMappingChanged() {
+                        clearValidation(mappingModel.getRecordMapping());
+                    }
+
+                    @Override
+                    public void recordMappingChanged(RecordMapping recordMapping) {
+                        clearValidation(recordMapping);
+                    }
+                }
+        );
         analysisModel = new AnalysisModel(this);
         analysisModel.addListener(new AnalysisModel.Listener() {
             @Override
@@ -145,6 +168,15 @@ public class SipModel {
                 }
             }
         });
+    }
+
+    private void clearValidation(RecordMapping recordMapping) {
+        try {
+            dataSetModel.getDataSet().deleteValidation(recordMapping.getPrefix());
+        }
+        catch (StorageException e) {
+            System.err.printf("Error while deleting file: %s%n", e);
+        }
     }
 
     public void addParseListener(ParseListener parseListener) {

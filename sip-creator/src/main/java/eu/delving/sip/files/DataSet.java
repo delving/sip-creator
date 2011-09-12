@@ -65,6 +65,8 @@ public interface DataSet {
 
     void deleteConverted() throws StorageException;
 
+    void deleteValidation(String metadataPrefix) throws StorageException;
+
     InputStream importedInput() throws StorageException;
 
     InputStream sourceInput() throws StorageException;
