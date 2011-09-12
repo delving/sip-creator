@@ -144,6 +144,7 @@ public class CultureHubClient {
 
         @Override
         public void run() {
+            HttpEntity entity = null;
             try {
                 String url = String.format(
                         "%s/list?accessKey=%s",
@@ -156,11 +157,10 @@ public class CultureHubClient {
                 HttpResponse response = httpClient.execute(get);
                 switch (Code.from(response)) {
                     case OK:
-                        HttpEntity entity = response.getEntity();
+                        entity = response.getEntity();
                         DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
                         log.info("list received:\n" + dataSetList);
                         listReceiveNotifier.listReceived(dataSetList.list);
-                        entity.consumeContent();
                         break;
                     case UNAUTHORIZED:
                         context.invalidateTokens();
@@ -178,6 +178,16 @@ public class CultureHubClient {
                 log.error("Unable to download source", e);
                 context.tellUser(String.format("Error fetching list from server:<br><br>%s", e.getMessage()));
                 listReceiveNotifier.failed(e);
+            }
+            finally {
+                if (null != entity) {
+                    try {
+                        entity.consumeContent();
+                    }
+                    catch (IOException e) {
+                        log.warn(String.format("Error consuming entity: %s", e.getMessage()));
+                    }
+                }
             }
         }
     }

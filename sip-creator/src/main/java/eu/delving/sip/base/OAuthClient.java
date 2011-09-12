@@ -67,9 +67,11 @@ public class OAuthClient {
             return accessToken;
         }
         catch (OAuthProblemException e) {
+            password = null;
             throw new ClientException(e.getMessage());
         }
         catch (OAuthSystemException e) {
+            password = null;
             throw new ClientException(e.getMessage());
         }
 
