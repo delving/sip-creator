@@ -69,7 +69,7 @@ public class CultureHubClient {
     public interface Context {
         String getServerUrl();
 
-        String getAccessToken();
+        String getAccessToken() throws ClientException;
 
         void invalidateTokens();
 
@@ -79,8 +79,21 @@ public class CultureHubClient {
 
     }
 
-    public interface ListReceiver {
+    public interface ListReceiveNotifier {
+
+        /**
+         * Successfully received lists from server.
+         *
+         * @param entries The entry list.
+         */
         void listReceived(List<DataSetEntry> entries);
+
+        /**
+         * Error fetching list.
+         *
+         * @param e What went wrong?
+         */
+        void failed(Exception e);
     }
 
     public enum Code {
@@ -110,8 +123,8 @@ public class CultureHubClient {
         this.context = context;
     }
 
-    public void fetchDataSetList(ListReceiver listReceiver) {
-        Exec.work(new ListFetcher(listReceiver));
+    public void fetchDataSetList(ListReceiveNotifier listReceiveNotifier) {
+        Exec.work(new ListFetcher(listReceiveNotifier));
     }
 
     public void downloadDataSet(DataSet dataSet, ProgressListener progressListener) {
@@ -123,10 +136,10 @@ public class CultureHubClient {
     }
 
     private class ListFetcher implements Runnable {
-        private ListReceiver listReceiver;
+        private ListReceiveNotifier listReceiveNotifier;
 
-        public ListFetcher(ListReceiver listReceiver) {
-            this.listReceiver = listReceiver;
+        public ListFetcher(ListReceiveNotifier listReceiveNotifier) {
+            this.listReceiveNotifier = listReceiveNotifier;
         }
 
         @Override
@@ -146,23 +159,25 @@ public class CultureHubClient {
                         HttpEntity entity = response.getEntity();
                         DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
                         log.info("list received:\n" + dataSetList);
-                        listReceiver.listReceived(dataSetList.list);
+                        listReceiveNotifier.listReceived(dataSetList.list);
                         entity.consumeContent();
                         break;
                     case UNAUTHORIZED:
                         context.invalidateTokens();
                         notifyUser("Authorization failure, please try again");
+                        log.error("Authorization failure, please try again");
                         break;
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
                         log.warn("Unable to fetch data set list. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.tellUser("Unable to download data set list"); // todo: tell them why
+                        context.tellUser(String.format("Error fetching list from server:<br><br>%s", response.getStatusLine().getReasonPhrase()));
                         break;
                 }
             }
             catch (Exception e) {
-                log.warn("Unable to download source", e);
-                context.tellUser("Unable to download source");
+                log.error("Unable to download source", e);
+                context.tellUser(String.format("Error fetching list from server:<br><br>%s", e.getMessage()));
+                listReceiveNotifier.failed(e);
             }
         }
     }
@@ -285,6 +300,11 @@ public class CultureHubClient {
                 }
             }
             catch (IOException e) {
+                log.error("Error while connecting", e);
+                notifyUser(e.getMessage());
+            }
+            catch (ClientException e) {
+                log.error("Error ");
                 notifyUser(e.getMessage());
             }
         }
@@ -297,7 +317,7 @@ public class CultureHubClient {
             return new StringEntity(fileList.toString());
         }
 
-        private String createListRequestUrl() {
+        private String createListRequestUrl() throws ClientException {
             return String.format(
                     "%s/submit/%s?accessKey=%s",
                     context.getServerUrl(),
@@ -306,7 +326,7 @@ public class CultureHubClient {
             );
         }
 
-        private String createFileRequestUrl(File file) {
+        private String createFileRequestUrl(File file) throws ClientException {
             return String.format(
                     "%s/submit/%s/%s?accessKey=%s",
                     context.getServerUrl(),

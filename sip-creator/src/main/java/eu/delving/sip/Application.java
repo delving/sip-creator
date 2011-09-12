@@ -23,6 +23,7 @@ package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.ValidationException;
+import eu.delving.sip.base.ClientException;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.DataSetActions;
 import eu.delving.sip.base.Exec;
@@ -46,6 +47,7 @@ import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.UserNotifier;
+import org.apache.commons.lang.StringUtils;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -60,6 +62,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -224,7 +228,7 @@ public class Application {
         }
 
         @Override
-        public String getAccessToken() {
+        public String getAccessToken() throws ClientException {
             return oauthClient.getToken();
         }
 
@@ -251,9 +255,34 @@ public class Application {
     }
 
     private class PasswordFetcher implements OAuthClient.PasswordRequest, ActionListener {
+
         private JDialog dialog = new JDialog(home, "Culture Hub", true);
         private JPasswordField passwordField = new JPasswordField(15);
         private StringBuilder password = new StringBuilder();
+        private JButton ok = new JButton("Ok");
+
+        {
+            // We disable the submit button by default and if the content != empty
+            ok.setEnabled(false);
+            passwordField.getDocument().addDocumentListener(
+                    new DocumentListener() {
+                        @Override
+                        public void insertUpdate(DocumentEvent documentEvent) {
+                            ok.setEnabled(!StringUtils.isWhitespace(new String(passwordField.getPassword())));
+                        }
+
+                        @Override
+                        public void removeUpdate(DocumentEvent documentEvent) {
+                            insertUpdate(documentEvent);
+                        }
+
+                        @Override
+                        public void changedUpdate(DocumentEvent documentEvent) {
+                            insertUpdate(documentEvent);
+                        }
+                    }
+            );
+        }
 
         @Override
         public String getPassword() {
@@ -265,11 +294,10 @@ public class Application {
             fieldPanel.add(labelA, BorderLayout.WEST);
             fieldPanel.add(passwordField, BorderLayout.CENTER);
 
-            JButton ok = new JButton("Ok");
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             buttonPanel.add(ok);
 
-            JPanel wrap = new JPanel(new BorderLayout(5,5));
+            JPanel wrap = new JPanel(new BorderLayout(5, 5));
             wrap.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             wrap.add(fieldPanel, BorderLayout.CENTER);
             wrap.add(buttonPanel, BorderLayout.SOUTH);

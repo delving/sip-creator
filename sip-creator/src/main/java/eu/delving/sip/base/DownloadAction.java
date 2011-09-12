@@ -24,6 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
+import org.apache.log4j.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -58,7 +59,8 @@ import java.util.Map;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class DownloadAction extends AbstractAction implements CultureHubClient.ListReceiver {
+public class DownloadAction extends AbstractAction implements CultureHubClient.ListReceiveNotifier {
+    private final static Logger LOG = Logger.getRootLogger();
     private Font font = new Font("Sans", Font.BOLD, 18);
     private JDesktopPane parent;
     private SipModel sipModel;
@@ -74,7 +76,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         this.parent = parent;
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
-        dialog = new JDialog((JFrame)SwingUtilities.getWindowAncestor(parent), "Download", false);
+        dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(parent), "Download", false);
         createDialog(dialog.getContentPane());
         list.setCellRenderer(new DataSetCellRenderer(sipModel.getStorage().getUsername()));
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -93,8 +95,9 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         dialog.setVisible(true);
-        if (listModel.getSize() == 0) {
-            listModel.setLoading();
+        if (listModel.getSize() == 0 || !listModel.isLoading()) {
+            LOG.info("Not loading and no data sets, will start loading");
+            listModel.setLoading(true);
             cultureHubClient.fetchDataSetList(this);
         }
     }
@@ -107,6 +110,11 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
                 listModel.setEntries(entries);
             }
         });
+    }
+
+    @Override
+    public void failed(Exception e) {
+        listModel.setLoading(false);
     }
 
     private void createDialog(Container content) {
@@ -195,11 +203,11 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         private boolean loading;
         private List<Entry> entries = new ArrayList<Entry>();
 
-        public void setLoading() {
+        public void setLoading(boolean isLoading) {
             int size = getSize();
             entries.clear();
             fireIntervalRemoved(this, 0, size);
-            loading = true;
+            loading = isLoading;
             fireIntervalAdded(this, 0, getSize());
         }
 
@@ -215,6 +223,10 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
                 }
             }
             fireIntervalAdded(this, 0, getSize());
+        }
+
+        public boolean isLoading() {
+            return loading;
         }
 
         @Override
