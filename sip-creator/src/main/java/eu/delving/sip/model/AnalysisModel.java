@@ -98,7 +98,7 @@ public class AnalysisModel {
         if (statistics == null) {
             throw new IllegalStateException("No statistics");
         }
-        statistics.convertToSourcePaths(getRecordRoot());
+        statistics.convertToSourcePaths(getRecordRoot(), getUniqueElement());
         return statistics;
     }
 

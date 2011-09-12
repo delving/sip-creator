@@ -60,7 +60,7 @@ public class Statistics implements Serializable {
         return AnalysisTree.create(fieldStatisticsList);
     }
 
-    public void convertToSourcePaths(Path recordRoot) {
+    public void convertToSourcePaths(Path recordRoot, Path uniqueElement) {
         if (sourceFormat) throw new IllegalStateException("Statistics already in source format");
         Iterator<FieldStatistics> walk = fieldStatisticsList.iterator();
         String underRoot = new Path(recordRoot).pop().toString();

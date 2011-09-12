@@ -123,7 +123,7 @@ public class TestStorage {
         assertTrue("Zero records!", recordCount > 0);
         dataSet().importedToSource(null);
         assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
-        statistics.convertToSourcePaths(StorageBase.getRecordRoot(dataSet().getHints()));
+        statistics.convertToSourcePaths(StorageBase.getRecordRoot(dataSet().getHints()), StorageBase.getUniqueElement(dataSet().getHints()));
         dataSet().setStatistics(statistics);
         assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
         assertEquals(ANALYZED, dataSet().getState());
