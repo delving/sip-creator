@@ -105,9 +105,7 @@ public class SourceConverter {
                                 uniqueBuilder = new StringBuilder();
                                 uniqueValue = null;
                             }
-                            else {
-                                recordEvents.add(event);
-                            }
+                            recordEvents.add(event);
                         }
                         else if (path.equals(recordRootPath)) {
                             if (namespaceCollector != null) {
@@ -143,14 +141,14 @@ public class SourceConverter {
                                     count++;
                                 }
                             }
-                            else if (path.equals(uniqueElementPath)) {
-                                uniqueValue = uniqueBuilder.toString();
-                                if(uniqueness.isRepeated(uniqueValue)) {
-                                    throw new UniquenessException(uniqueElementPath, count);
-                                }
-                                uniqueBuilder = null;
-                            }
                             else {
+                                if (path.equals(uniqueElementPath)) {
+                                    uniqueValue = uniqueBuilder.toString();
+                                    if (uniqueness.isRepeated(uniqueValue)) {
+                                        throw new UniquenessException(uniqueElementPath, count);
+                                    }
+                                    uniqueBuilder = null;
+                                }
                                 recordEvents.add(event);
                                 recordEvents.add(eventFactory.createCharacters("\n"));
                             }
@@ -172,9 +170,7 @@ public class SourceConverter {
                                 if (uniqueBuilder != null) {
                                     uniqueBuilder.append(string);
                                 }
-                                else {
-                                    recordEvents.add(eventFactory.createCharacters(string));
-                                }
+                                recordEvents.add(eventFactory.createCharacters(string));
                             }
                         }
                         break;

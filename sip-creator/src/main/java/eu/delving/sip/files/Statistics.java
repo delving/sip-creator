@@ -68,13 +68,8 @@ public class Statistics implements Serializable {
             FieldStatistics stats = walk.next();
             String pathString = stats.getPath().toString();
             if (pathString.startsWith(recordRoot.toString())) {
-                if (pathString.equals(uniqueElement.toString())) {
-                    walk.remove();
-                }
-                else {
-                    String fixed = Storage.RECORD_ROOT.toString() + pathString.substring(recordRoot.toString().length());
-                    stats.setPath(new Path(fixed));
-                }
+                String fixed = Storage.RECORD_ROOT.toString() + pathString.substring(recordRoot.toString().length());
+                stats.setPath(new Path(fixed));
             }
             else if (pathString.equals(underRoot)) {
                 stats.setPath(new Path(Storage.ENVELOPE_TAG));
