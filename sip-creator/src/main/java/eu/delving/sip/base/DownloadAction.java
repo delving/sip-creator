@@ -80,6 +80,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         createDialog(dialog.getContentPane());
         list.setCellRenderer(new DataSetCellRenderer(sipModel.getStorage().getUsername()));
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        download.setEnabled(false);
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
@@ -146,6 +147,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
             Entry entry = (Entry) list.getSelectedValue();
+            if (entry == null) return;
             String message = String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", entry.getSpec());
             ProgressMonitor progressMonitor = new ProgressMonitor(
                     SwingUtilities.getRoot(parent),

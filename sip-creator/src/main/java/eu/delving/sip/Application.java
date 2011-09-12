@@ -261,8 +261,9 @@ public class Application {
         private StringBuilder password = new StringBuilder();
         private JButton ok = new JButton("Ok");
 
-        {
+        private PasswordFetcher() {
             // We disable the submit button by default and if the content != empty
+            ok.addActionListener(this);
             ok.setEnabled(false);
             passwordField.getDocument().addDocumentListener(
                     new DocumentListener() {
@@ -282,10 +283,6 @@ public class Application {
                         }
                     }
             );
-        }
-
-        @Override
-        public String getPassword() {
             JLabel labelA = new JLabel("Password: ");
             labelA.setLabelFor(passwordField);
             passwordField.addActionListener(this);
@@ -304,20 +301,22 @@ public class Application {
 
             dialog.getContentPane().add(wrap, BorderLayout.CENTER);
             dialog.pack();
+        }
+
+        @Override
+        public String getPassword() {
+            passwordField.setText(null);
             dialog.setLocation(
                     (Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getSize().width) / 2,
                     (Toolkit.getDefaultToolkit().getScreenSize().height - dialog.getSize().height) / 2
             );
-
-            ok.addActionListener(this);
-
             dialog.setVisible(true);
-            dialog.dispose();
             return password.length() == 0 ? null : password.toString();
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            password.setLength(0);
             password.append(new String(passwordField.getPassword()));
             dialog.setVisible(false);
         }
