@@ -355,6 +355,16 @@ public class Application {
     }
 
     private void osxExtra() {
+// todo: #17 replace osx specific code with this shutdown hook.¬
+//        Runtime.getRuntime().addShutdownHook(
+//                new Thread() {
+//
+//                    @Override
+//                    public void run() {
+//                        putFrameStates();
+//                    }
+//                }
+//        );
         boolean osx = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
         if (osx) {
             try {
