@@ -60,7 +60,7 @@ public class Statistics implements Serializable {
         return AnalysisTree.create(fieldStatisticsList);
     }
 
-    public void convertToSourcePaths(Path recordRoot) {
+    public void convertToSourcePaths(Path recordRoot, Path uniqueElement) {
         if (sourceFormat) throw new IllegalStateException("Statistics already in source format");
         Iterator<FieldStatistics> walk = fieldStatisticsList.iterator();
         String underRoot = new Path(recordRoot).pop().toString();
@@ -68,8 +68,13 @@ public class Statistics implements Serializable {
             FieldStatistics stats = walk.next();
             String pathString = stats.getPath().toString();
             if (pathString.startsWith(recordRoot.toString())) {
-                String fixed = Storage.RECORD_ROOT.toString() + pathString.substring(recordRoot.toString().length());
-                stats.setPath(new Path(fixed));
+                if (pathString.equals(uniqueElement.toString())) {
+                    walk.remove();
+                }
+                else {
+                    String fixed = Storage.RECORD_ROOT.toString() + pathString.substring(recordRoot.toString().length());
+                    stats.setPath(new Path(fixed));
+                }
             }
             else if (pathString.equals(underRoot)) {
                 stats.setPath(new Path(Storage.ENVELOPE_TAG));
