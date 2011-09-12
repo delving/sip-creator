@@ -46,7 +46,7 @@ public class OAuthClient {
         this.passwordRequest = passwordRequest;
     }
 
-    public String getToken() {
+    public String getToken() throws ClientException {
         try {
             if (System.currentTimeMillis() - requestTimeStamp > expirationSeconds * 1000) {
                 accessToken = null;
@@ -67,12 +67,12 @@ public class OAuthClient {
             return accessToken;
         }
         catch (OAuthProblemException e) {
-            log.warn("OAuth Problem", e);
-            return null;
+            password = null;
+            throw new ClientException(e.getMessage());
         }
         catch (OAuthSystemException e) {
-            log.warn("OAuth System Problem", e);
-            return null;
+            password = null;
+            throw new ClientException(e.getMessage());
         }
 
     }
@@ -81,21 +81,24 @@ public class OAuthClient {
         accessToken = refreshToken = null;
     }
 
-    private void requestWithPassword() throws OAuthSystemException, OAuthProblemException {
+    private void requestWithPassword() throws OAuthSystemException, OAuthProblemException, ClientException {
         OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
                 .setGrantType(GrantType.PASSWORD).setUsername(username).setPassword(password)
                 .buildQueryMessage();
         acceptResponse(OAUTH_CLIENT.accessToken(request));
     }
 
-    private void requestWithRefreshToken() throws OAuthSystemException, OAuthProblemException {
+    private void requestWithRefreshToken() throws OAuthSystemException, OAuthProblemException, ClientException {
         OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
                 .setGrantType(GrantType.REFRESH_TOKEN).setRefreshToken(refreshToken)
                 .buildQueryMessage();
         acceptResponse(OAUTH_CLIENT.accessToken(request));
     }
 
-    private void acceptResponse(OAuthJSONAccessTokenResponse response) {
+    private void acceptResponse(OAuthJSONAccessTokenResponse response) throws ClientException {
+        if (null == response) {
+            throw new ClientException("Response is null");
+        }
         requestTimeStamp = System.currentTimeMillis();
         accessToken = response.getAccessToken();
         refreshToken = response.getRefreshToken();
@@ -122,9 +125,10 @@ public class OAuthClient {
                 );
             }
             catch (IOException e) {
-                log.error("OAuth Client problem", e); // todo: something sensible
+                password = null;
+                log.error("OAuth Client problem", e);
+                throw new OAuthSystemException("Can't connect to server", e);
             }
-            return null;
         }
     });
 }
