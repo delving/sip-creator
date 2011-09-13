@@ -21,12 +21,14 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +43,25 @@ public class DataSetActions {
     private JDesktopPane parent;
     private Runnable mapMode;
     private List<Action> actions = new ArrayList<Action>();
+    private final MapAction mapAction = new MapAction();
 
     public DataSetActions(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient, Runnable mapMode) {
         this.parent = parent;
         this.mapMode = mapMode;
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void dataSetChanged(DataSet dataSet) {
+                dataSetStateChanged(dataSet, dataSet.getState());
+            }
+
+            @Override
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                mapAction.setEnabled(dataSetState.ordinal() >= DataSetState.ANALYZED.ordinal());
+            }
+        });
         actions.add(new DownloadAction(parent, sipModel, cultureHubClient));
         actions.add(new ImportAction(parent, sipModel));
-        actions.add(new MapAction());
+        actions.add(mapAction);
         actions.add(new ValidateAction(parent, sipModel));
         actions.add(new UploadAction(parent, sipModel, cultureHubClient));
     }
