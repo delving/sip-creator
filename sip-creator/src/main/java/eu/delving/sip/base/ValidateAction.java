@@ -22,7 +22,11 @@
 package eu.delving.sip.base;
 
 import eu.delving.metadata.ValidationException;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
+import org.apache.log4j.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
@@ -43,6 +47,8 @@ import java.awt.event.ActionListener;
  */
 public class ValidateAction extends AbstractAction {
 
+    private static final Logger LOG = Logger.getLogger(ValidateAction.class);
+
     private SipModel sipModel;
     private JDesktopPane parent;
 
@@ -50,6 +56,19 @@ public class ValidateAction extends AbstractAction {
         super("Validate");
         this.sipModel = sipModel;
         this.parent = parent;
+        this.sipModel.getDataSetModel().addListener(
+                new DataSetModel.Listener() {
+                    @Override
+                    public void dataSetChanged(DataSet dataSet) {
+                        setEnabled(dataSet.getState().ordinal() >= DataSetState.MAPPED.ordinal());
+                    }
+
+                    @Override
+                    public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                        setEnabled(dataSetState.ordinal() >= DataSetState.MAPPED.ordinal());
+                    }
+                }
+        );
     }
 
     @Override
