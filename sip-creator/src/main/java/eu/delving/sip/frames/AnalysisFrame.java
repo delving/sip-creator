@@ -67,6 +67,7 @@ public class AnalysisFrame extends FrameBase {
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
     private JButton convertButton = new JButton("Convert!");
     private JTree statisticsJTree;
+    private DataSetState dataSetState;
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Analysis", false);
@@ -80,14 +81,16 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void dataSetChanged(DataSet dataSet) {
                 dataSetStateChanged(dataSet, dataSet.getState());
+                dataSetState = dataSet.getState();
             }
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                AnalysisFrame.this.dataSetState = dataSetState;
 // todo: when the analysis was done on the source format, we don't want these enabled!
 //                selectUniqueElementButton.setEnabled(??);
 //                selectRecordRootButton.setEnabled(??);
-                convertButton.setEnabled(dataSetState.ordinal() >= DataSetState.IMPORTED_HINTS_SET.ordinal());
+                convertButton.setEnabled(dataSetState.ordinal() >= DataSetState.IMPORTED_HINTS_SET.ordinal() && adjustable());
             }
         });
     }
@@ -108,8 +111,8 @@ public class AnalysisFrame extends FrameBase {
                 TreePath path = event.getPath();
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
                     final AnalysisTree.Node node = (AnalysisTree.Node) path.getLastPathComponent();
-                    selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
-                    selectUniqueElementButton.setEnabled(node.couldBeUniqueElement());
+                    selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
+                    selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
                     sipModel.getAnalysisModel().selectStatistics(node.getStatistics());
                 }
                 else {
@@ -160,6 +163,10 @@ public class AnalysisFrame extends FrameBase {
                 });
             }
         });
+    }
+
+    private boolean adjustable() {
+        return dataSetState == null ? true : dataSetState.ordinal() <= DataSetState.SOURCED.ordinal();
     }
 
     private JPanel createPanel() {
