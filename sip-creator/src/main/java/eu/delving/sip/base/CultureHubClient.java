@@ -204,6 +204,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             boolean success = false;
+            HttpEntity entity = null;
             try {
                 HttpGet get = new HttpGet(String.format(
                         "%s/fetch/%s-sip.zip?accessKey=%s",
@@ -213,9 +214,9 @@ public class CultureHubClient {
                 ));
                 get.setHeader("Accept", "application/zip");
                 HttpResponse response = httpClient.execute(get);
+                entity = response.getEntity();
                 switch (Code.from(response)) {
                     case OK:
-                        HttpEntity entity = response.getEntity();
                         dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
                         success = true;
                         context.dataSetCreated(dataSet);
@@ -236,6 +237,14 @@ public class CultureHubClient {
                 context.tellUser("Unable to download data set"); // todo: tell them why
             }
             finally {
+                if (entity != null) {
+                    try {
+                        entity.consumeContent();
+                    }
+                    catch (IOException e) {
+                        log.error("Cannot consume entity content", e);
+                    }
+                }
                 if (!success) {
                     try {
                         dataSet.remove();
