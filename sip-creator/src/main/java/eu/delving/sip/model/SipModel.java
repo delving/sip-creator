@@ -178,8 +178,10 @@ public class SipModel {
 
     private void clearValidation(RecordMapping recordMapping) {
         try {
-            dataSetModel.getDataSet().deleteValidation(recordMapping.getPrefix());
-            LOG.info(String.format("Validation file deleted for '%s' mapping", recordMapping.getPrefix()));
+            if (dataSetModel.hasDataSet()) {
+                dataSetModel.getDataSet().deleteValidation(recordMapping.getPrefix());
+                LOG.info(String.format("Validation file deleted for '%s' mapping", recordMapping.getPrefix()));
+            }
         }
         catch (StorageException e) {
             LOG.warning(String.format("Error while deleting file: %s%n", e));
