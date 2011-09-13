@@ -79,6 +79,12 @@ public class AnalysisModel {
             analysisTree = AnalysisTree.create("Analysis not yet performed");
         }
         analysisTreeModel.setRoot(analysisTree.getRoot());
+        setHints(recordRoot, uniqueElement);
+        selectStatistics(null);
+    }
+
+    // todo: think of a better name
+    private void setHints(Path recordRoot, Path uniqueElement) {
         if (recordRoot != null) {
             AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
             List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
@@ -91,7 +97,6 @@ public class AnalysisModel {
         if (uniqueElement != null) {
             AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
         }
-        selectStatistics(null);
     }
 
     public Statistics convertStatistics() {
@@ -99,6 +104,7 @@ public class AnalysisModel {
             throw new IllegalStateException("No statistics");
         }
         statistics.convertToSourcePaths(getRecordRoot(), getUniqueElement());
+        setHints(Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
         return statistics;
     }
 

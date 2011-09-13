@@ -96,7 +96,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     @Override
     public void select(FieldMapping fieldMapping) {
         if (fieldMapping == selectedFieldMapping) {
-            notifyStateChange(State.REGENERATED);
+            if (null != fieldMapping) {
+                notifyStateChange(State.REGENERATED);
+            }
         }
         else {
             selectedFieldMapping = fieldMapping;
