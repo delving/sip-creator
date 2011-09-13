@@ -61,9 +61,9 @@ public class FieldMapping implements Comparable<FieldMapping> {
     }
 
     public void createDictionary(Set<String> domainValues) {
-        this.dictionary = new TreeMap<String,String>();
+        this.dictionary = new TreeMap<String, String>();
         for (String key : domainValues) {
-            this.dictionary.put(key,"");
+            this.dictionary.put(key, "");
         }
     }
 
@@ -76,6 +76,9 @@ public class FieldMapping implements Comparable<FieldMapping> {
                     String var = matcher.group(0);
                     if (var.endsWith("(")) {
                         var = var.substring(0, var.lastIndexOf('.'));
+                    }
+                    if(var.endsWith("'")) {
+                        var = String.format("constant value '%s'", matcher.group(2));
                     }
                     variables.add(var);
                 }
@@ -100,7 +103,7 @@ public class FieldMapping implements Comparable<FieldMapping> {
         }
         return !walk.hasNext();
     }
-    
+
     public void setCode(String code) {
         if (this.code == null) {
             this.code = new ArrayList<String>();
@@ -118,11 +121,11 @@ public class FieldMapping implements Comparable<FieldMapping> {
             return fieldName;
         }
         else {
-            return fieldName + " from " + getVariableNames();
+            return String.format("%s from %s", fieldName, getVariableNames());
         }
     }
 
-    private static final Pattern VARIABLE_PATTERN = Pattern.compile("input(\\.\\w+)+[\\(]?"); // todo: doesn't catch facts
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("input(\\.\\w+)+[\\(]?|\\w.+\'(.*)\'");
 
     @Override
     public int compareTo(FieldMapping fieldMapping) {
