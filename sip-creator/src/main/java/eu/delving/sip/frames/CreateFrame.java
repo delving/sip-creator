@@ -67,7 +67,7 @@ import java.util.List;
 public class CreateFrame extends FrameBase {
 
     private final static String SELECT_CAPTION = "<html><table cellpadding=10><tr><td>Select from the input fields or fill in a constant and select an output field.</td><td></table></html>";
-    private final static String CREATE_CAPTION = "<html><h2>Create Mapping</h2></html>";
+    private final static String CREATE_CAPTION = "<html><h3>Create Mapping</h3></html>";
 
     private JButton createObviousMappingButton = new JButton("Create obvious mappings");
     private JTextField constantField = new JTextField("?");
