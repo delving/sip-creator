@@ -65,6 +65,10 @@ import java.util.List;
  */
 
 public class CreateFrame extends FrameBase {
+
+    private final static String SELECT_CAPTION = "<html><table cellpadding=10><tr><td>Select from the input fields or fill in a constant and select an output field.</td><td></table></html>";
+    private final static String CREATE_CAPTION = "<html><h2>Create Mapping</h2></html>";
+
     private JButton createObviousMappingButton = new JButton("Create obvious mappings");
     private JTextField constantField = new JTextField("?");
     private JList variablesList;
@@ -198,7 +202,9 @@ public class CreateFrame extends FrameBase {
         boolean target = !targetFieldList.isSelectionEmpty();
         boolean source = !variablesList.isSelectionEmpty();
         boolean constant = !constantField.getText().equals("?") && !StringUtils.isEmpty(constantField.getText());
-        createMappingAction.setEnabled(target && (source || constant));
+        boolean enabled = target && (source || constant);
+        createMappingAction.putValue("Name", enabled ? CREATE_CAPTION : SELECT_CAPTION);
+        createMappingAction.setEnabled(enabled);
     }
 
     private JPanel createConstantFieldPanel() {
@@ -229,7 +235,7 @@ public class CreateFrame extends FrameBase {
     private class CreateMappingAction extends AbstractAction {
 
         private CreateMappingAction() {
-            super("<html><table cellpadding=10><tr><td>Select from the input fields or fill in a constant and select an output field.</td><td><h2>Create Mapping</h2></td></table>");
+            super(SELECT_CAPTION);
         }
 
         @Override
