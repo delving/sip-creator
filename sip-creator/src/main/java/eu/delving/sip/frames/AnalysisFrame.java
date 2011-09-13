@@ -166,7 +166,7 @@ public class AnalysisFrame extends FrameBase {
     }
 
     private boolean adjustable() {
-        return dataSetState == null ? true : dataSetState.ordinal() <= DataSetState.SOURCED.ordinal();
+        return dataSetState == null || dataSetState.ordinal() <= DataSetState.SOURCED.ordinal();
     }
 
     private JPanel createPanel() {
