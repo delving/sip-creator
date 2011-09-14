@@ -51,7 +51,6 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 /**
@@ -61,8 +60,6 @@ import java.util.prefs.Preferences;
  */
 
 public class SipModel {
-
-    private static final Logger LOG = Logger.getLogger(SipModel.class.getName());
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
@@ -157,7 +154,6 @@ public class SipModel {
                 DataSet dataSet = dataSetModel.getDataSet();
                 try {
                     dataSet.deleteConverted();
-                    LOG.info("Source file is deleted");
                 }
                 catch (StorageException e) {
                     SipModel.this.userNotifier.tellUser("Unable to delete converted source file", e);
@@ -180,11 +176,10 @@ public class SipModel {
         try {
             if (dataSetModel.hasDataSet()) {
                 dataSetModel.getDataSet().deleteValidation(recordMapping.getPrefix());
-                LOG.info(String.format("Validation file deleted for '%s' mapping", recordMapping.getPrefix()));
             }
         }
         catch (StorageException e) {
-            LOG.warning(String.format("Error while deleting file: %s%n", e));
+//            LOG.warning(String.format("Error while deleting file: %s%n", e));
         }
     }
 
@@ -396,13 +391,10 @@ public class SipModel {
             @Override
             public void run() {
                 try {
-                    LOG.info("Converting to source format");
                     dataSetModel.getDataSet().importedToSource(progressListener);
                     dataSetModel.getDataSet().setStatistics(analysisModel.convertStatistics());
-                    LOG.info("Finished converting to source format");
                 }
                 catch (StorageException e) {
-                    LOG.warning(String.format("Error converting to source format: %s", e));
                     userNotifier.tellUser("Conversion failed", e);
                 }
             }

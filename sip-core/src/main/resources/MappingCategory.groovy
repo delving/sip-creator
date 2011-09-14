@@ -45,6 +45,18 @@ public class MappingCategory {
         return node.toString()[what]
     }
 
+    static int indexOf(GroovyNode node, String string) {
+        return node.text().indexOf(string)
+    }
+
+    static String substring(GroovyNode node, int from) {
+        return node.text().substring(from);
+    }
+
+    static String substring(GroovyNode node, int from, int to) {
+        return node.text().substring(from, to);
+    }
+
     static GroovyList ifAbsentUse(GroovyList list, Object factVariable) {
         if (!list) {
             list += factVariable
