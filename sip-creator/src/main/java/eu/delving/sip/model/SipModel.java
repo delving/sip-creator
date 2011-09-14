@@ -128,7 +128,7 @@ public class SipModel {
 
                     @Override
                     public void recordMappingChanged(RecordMapping recordMapping) {
-                        clearValidation(recordMapping);
+//                        clearValidation(recordMapping); todo: not sure if we need to remove this
                     }
                 }
         );
