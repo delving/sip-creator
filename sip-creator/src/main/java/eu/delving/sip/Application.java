@@ -164,7 +164,6 @@ public class Application {
             @Override
             public void dataSetChanged(DataSet dataSet) {
                 home.setTitle(String.format("Delving SIP Creator [%s - %s]", dataSet.getSpec(), dataSet.getDataSetFacts().get("name")));
-                frames.get(0).show();
             }
 
             @Override
@@ -404,6 +403,11 @@ public class Application {
                 try {
                     Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
+                    for (FrameBase frame : application.frames) {
+                        if (frame.wasVisible()) {
+                            frame.show();
+                        }
+                    }
                 }
                 catch (StorageException e) {
                     JOptionPane.showMessageDialog(null, "Unable to create the storage directory");

@@ -411,6 +411,10 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
+    public boolean wasVisible() {
+        return getSavedInt("visible") == 1;
+    }
+
     private Dimension getSavedSize() {
         Dimension size = new Dimension(getSavedInt("width"), getSavedInt("height"));
         return size.width > 100 && size.height > 100 ? size : null;
@@ -431,12 +435,10 @@ public abstract class FrameBase extends JInternalFrame {
             putSavedInt("y", getLocation().y);
             putSavedInt("width", getSize().width);
             putSavedInt("height", getSize().height);
+            putSavedInt("visible", 1);
         }
         else {
-            putSavedInt("x", -1);
-            putSavedInt("y", -1);
-            putSavedInt("width", -1);
-            putSavedInt("height", -1);
+            putSavedInt("visible", 0);
         }
     }
 
