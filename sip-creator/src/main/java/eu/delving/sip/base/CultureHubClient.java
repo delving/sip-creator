@@ -79,7 +79,7 @@ public class CultureHubClient {
 
     }
 
-    public interface ListReceiveNotifier {
+    public interface ListReceiveListener {
 
         /**
          * Successfully received lists from server.
@@ -94,6 +94,10 @@ public class CultureHubClient {
          * @param e What went wrong?
          */
         void failed(Exception e);
+    }
+
+    public interface UnlockListener {
+        void unlockComplete(boolean successful);
     }
 
     public enum Code {
@@ -123,8 +127,12 @@ public class CultureHubClient {
         this.context = context;
     }
 
-    public void fetchDataSetList(ListReceiveNotifier listReceiveNotifier) {
-        Exec.work(new ListFetcher(listReceiveNotifier));
+    public void fetchDataSetList(ListReceiveListener listReceiveListener) {
+        Exec.work(new ListFetcher(listReceiveListener));
+    }
+
+    public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
+        Exec.work(new Unlocker(dataSet, unlockListener));
     }
 
     public void downloadDataSet(DataSet dataSet, ProgressListener progressListener) {
@@ -136,10 +144,10 @@ public class CultureHubClient {
     }
 
     private class ListFetcher implements Runnable {
-        private ListReceiveNotifier listReceiveNotifier;
+        private ListReceiveListener listReceiveListener;
 
-        public ListFetcher(ListReceiveNotifier listReceiveNotifier) {
-            this.listReceiveNotifier = listReceiveNotifier;
+        public ListFetcher(ListReceiveListener listReceiveListener) {
+            this.listReceiveListener = listReceiveListener;
         }
 
         @Override
@@ -160,7 +168,7 @@ public class CultureHubClient {
                         entity = response.getEntity();
                         DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
                         log.info("list received:\n" + dataSetList);
-                        listReceiveNotifier.listReceived(dataSetList.list);
+                        listReceiveListener.listReceived(dataSetList.list);
                         break;
                     case UNAUTHORIZED:
                         context.invalidateTokens();
@@ -175,9 +183,68 @@ public class CultureHubClient {
                 }
             }
             catch (Exception e) {
-                log.error("Unable to download source", e);
+                log.error("Unable to fetch list", e);
                 context.tellUser(String.format("Error fetching list from server:<br><br>%s", e.getMessage()));
-                listReceiveNotifier.failed(e);
+                listReceiveListener.failed(e);
+            }
+            finally {
+                if (null != entity) {
+                    try {
+                        entity.consumeContent();
+                    }
+                    catch (IOException e) {
+                        log.warn(String.format("Error consuming entity: %s", e.getMessage()));
+                    }
+                }
+            }
+        }
+    }
+
+    private class Unlocker implements Runnable {
+        private DataSet dataSet;
+        private UnlockListener unlockListener;
+
+        public Unlocker(DataSet dataSet, UnlockListener unlockListener) {
+            this.dataSet = dataSet;
+            this.unlockListener = unlockListener;
+        }
+
+        @Override
+        public void run() {
+            HttpEntity entity = null;
+            try {
+                String url = String.format(
+                        "%s/%s/unlock?accessKey=%s",
+                        context.getServerUrl(),
+                        dataSet.getSpec(),
+                        context.getAccessToken()
+                );
+                HttpGet get = new HttpGet(url);
+                get.setHeader("Accept", "text/xml");
+                HttpResponse response = httpClient.execute(get);
+                entity = response.getEntity();
+                switch (Code.from(response)) {
+                    case OK:
+                        String reply = EntityUtils.toString(entity);
+                        log.info("Unlock reply: " + reply);
+                        unlockListener.unlockComplete("Ok".equals(reply));
+                        break;
+                    case UNAUTHORIZED:
+                        context.invalidateTokens();
+                        notifyUser("Authorization failure, please try again");
+                        log.error("Authorization failure, please try again");
+                        break;
+                    case SYSTEM_ERROR:
+                    case UNKNOWN_RESPONSE:
+                        log.warn("Unable to unlock dataset. HTTP response " + response.getStatusLine().getReasonPhrase());
+                        context.tellUser(String.format("Error unlocking dataset:<br><br>%s", response.getStatusLine().getReasonPhrase()));
+                        break;
+                }
+            }
+            catch (Exception e) {
+                log.error("Unable to unlock dataset", e);
+                context.tellUser(String.format("Error unlocking dataset server:<br><br>%s", e.getMessage()));
+                unlockListener.unlockComplete(false);
             }
             finally {
                 if (null != entity) {

@@ -59,7 +59,7 @@ import java.util.Map;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class DownloadAction extends AbstractAction implements CultureHubClient.ListReceiveNotifier {
+public class DownloadAction extends AbstractAction implements CultureHubClient.ListReceiveListener {
     private final static Logger LOG = Logger.getRootLogger();
     private Font font = new Font("Sans", Font.BOLD, 18);
     private JDesktopPane parent;
