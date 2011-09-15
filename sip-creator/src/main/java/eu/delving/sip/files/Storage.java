@@ -60,6 +60,7 @@ public interface Storage {
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";
     String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
+    String HARVEST_URL = "harvestUrl";
     Path RECORD_ROOT = new Path(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
     Path UNIQUE_ELEMENT = new Path(String.format("/%s/%s/@id", ENVELOPE_TAG, RECORD_TAG));
 }

@@ -55,7 +55,6 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -77,9 +76,7 @@ import static eu.delving.sip.files.DataSetState.VALIDATED;
  */
 
 public class StorageImpl extends StorageBase implements Storage {
-
     private File home;
-    private final static Logger LOG = Logger.getAnonymousLogger();
 
     public StorageImpl(File home) throws StorageException {
         this.home = home;
@@ -287,9 +284,14 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void deleteValidation(String metadataPrefix) throws StorageException {
-            for(File file : validationFiles(here, metadataPrefix)) {
+            for (File file : validationFiles(here, metadataPrefix)) {
                 delete(file);
             }
+        }
+
+        @Override
+        public OutputStream importedOutput() throws StorageException {
+            return zipOut(importedFile(here));
         }
 
         @Override
@@ -497,7 +499,7 @@ public class StorageImpl extends StorageBase implements Storage {
                 SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement);
                 converter.setProgressListener(progressListener);
                 Hasher hasher = new Hasher();
-                DigestOutputStream digestOut = hasher.createDigestOutputStream(sourceOutput());
+                DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, SOURCE_FILE_NAME)));
                 converter.parse(importedInput(), digestOut);
                 File source = new File(here, SOURCE_FILE_NAME);
                 File hashedSource = new File(here, hasher.prefixFileName(SOURCE_FILE_NAME));
@@ -585,10 +587,6 @@ public class StorageImpl extends StorageBase implements Storage {
             delete(here);
         }
 
-        public OutputStream sourceOutput() throws StorageException {
-            return zipOut(SOURCE_FILE_NAME);
-        }
-
         private InputStream zipIn(File file) throws StorageException {
             try {
                 return new GZIPInputStream(new FileInputStream(file));
@@ -598,8 +596,7 @@ public class StorageImpl extends StorageBase implements Storage {
             }
         }
 
-        private OutputStream zipOut(String fileName) throws StorageException {
-            File file = new File(here, fileName);
+        private OutputStream zipOut(File file) throws StorageException {
             try {
                 return new GZIPOutputStream(new FileOutputStream(file));
             }
