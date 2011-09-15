@@ -24,10 +24,6 @@ package eu.delving.sip.base;
 import com.ctc.wstx.stax.WstxInputFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.ProgressListener;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.ValueFilter;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -46,6 +42,9 @@ import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,6 +52,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -71,23 +71,255 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class Harvestor {
-    private static final Path RECORD_ROOT = new Path("");
-    private static final Path RESUMPTION_TOKEN = new Path("");
+public class Harvestor implements Runnable {
+    private static final Path RECORD_ROOT = new Path("/OAI-PMH/ListRecords/record");
+    private static final Path ERROR = new Path("/OAI-PMH/error");
+    private static final Path RESUMPTION_TOKEN = new Path("/OAI-PMH/ListRecords/resumptionToken");
     private Logger log = Logger.getLogger(getClass());
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
     private HttpClient httpClient = new DefaultHttpClient();
+    private OutputStream outputStream;
+    private XMLEventWriter out;
+    private NamespaceCollector namespaceCollector = new NamespaceCollector();
     private Context context;
+    private int recordCount;
 
     public interface Context {
+
+        File outputFile();
+
+        String harvestUrl();
+
+        String harvestPrefix();
+
+        String harvestSpec();
+
+        void progress(int recordCount);
 
         void tellUser(String message);
 
     }
 
-    public enum Code {
+    public Harvestor(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public void run() {
+        if (!okURL(context.harvestUrl(), "Harvest Base URL")) return;
+        if (!okValue(context.harvestPrefix(), "Harvest Metadata Prefix")) return;
+        if (!prepareOutput()) return;
+        try {
+            context.progress(recordCount);
+            HttpEntity fetchedRecords = fetchFirstEntity();
+            String resumptionToken = saveRecords(fetchedRecords, out);
+            while (resumptionToken != null && !resumptionToken.trim().isEmpty() && recordCount > 0) {
+                fetchedRecords.consumeContent();
+                context.progress(recordCount);
+                fetchedRecords = fetchNextEntity(resumptionToken);
+                resumptionToken = saveRecords(fetchedRecords, out);
+            }
+            if (recordCount > 0) {
+                finishOutput();
+                context.tellUser(String.format("Harvest complete, %d records", recordCount));
+            }
+            else {
+                outputStream.close();
+                if (!context.outputFile().delete()) {
+                    context.tellUser("Unable to delete output file");
+                }
+            }
+        }
+        catch (IOException e) {
+            log.error(String.format("Unable to complete harvest of %s because of a streaming problem", context.harvestUrl()), e);
+            context.tellUser("Unable to complete harvest");
+        }
+        catch (XMLStreamException e) {
+            log.error(String.format("Unable to complete harvest of %s because of an xml problem", context.harvestUrl()), e);
+            context.tellUser("Unable to complete harvest");
+        }
+    }
+
+    private String saveRecords(HttpEntity fetchedRecords, XMLEventWriter out) throws IOException, XMLStreamException {
+        InputStream inputStream = fetchedRecords.getContent();
+        XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
+        Path path = new Path();
+        StringBuilder tokenBuilder = null;
+        StringBuilder errorBuilder = null;
+        String tokenValue = null;
+        List<XMLEvent> recordEvents = new ArrayList<XMLEvent>();
+        boolean finished = false;
+        while (!finished) {
+            XMLEvent event = in.nextEvent();
+            switch (event.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    StartElement start = event.asStartElement();
+                    path.push(Tag.create(start.getName().getPrefix(), start.getName().getLocalPart()));
+                    if (!recordEvents.isEmpty()) {
+                        recordEvents.add(event);
+                    }
+                    else if (path.equals(RECORD_ROOT)) {
+                        if (namespaceCollector != null) {
+                            namespaceCollector.gatherFrom(start);
+                            out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, namespaceCollector.iterator()));
+                            out.add(eventFactory.createCharacters("\n"));
+                            namespaceCollector = null;
+                        }
+                        recordEvents.add(eventFactory.createCharacters("\n")); // flag that record has started
+                    }
+                    else if (path.equals(RESUMPTION_TOKEN)) {
+                        tokenBuilder = new StringBuilder();
+                        tokenValue = null;
+                    }
+                    else if (path.equals(ERROR)) {
+                        errorBuilder = new StringBuilder();
+                    }
+                    else if (namespaceCollector != null) {
+                        namespaceCollector.gatherFrom(start);
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (!recordEvents.isEmpty()) {
+                        if (path.equals(RECORD_ROOT)) {
+                            out.add(eventFactory.createStartElement("", "", RECORD_TAG, null, null));
+                            for (XMLEvent saved : recordEvents) {
+                                out.add(saved);
+                            }
+                            out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                            out.add(eventFactory.createCharacters("\n"));
+                            recordEvents.clear();
+                            tokenBuilder = null;
+                            recordCount++;
+                        }
+                        else {
+                            recordEvents.add(event);
+                            recordEvents.add(eventFactory.createCharacters("\n"));
+                        }
+                    }
+                    else if (path.equals(RESUMPTION_TOKEN) && tokenBuilder != null) {
+                        tokenValue = tokenBuilder.toString();
+                        tokenBuilder = null;
+                    }
+                    else if (path.equals(ERROR) && errorBuilder != null) {
+                        context.tellUser(String.format("OAI-PMH Error: %s", errorBuilder));
+                    }
+                    path.pop();
+                    break;
+                case XMLEvent.END_DOCUMENT:
+                    finished = true;
+                    break;
+                case XMLEvent.CHARACTERS:
+                case XMLEvent.CDATA:
+                    if (!recordEvents.isEmpty()) {
+                        String string = ValueFilter.filter(event.asCharacters().getData());
+                        if (!string.isEmpty()) {
+                            recordEvents.add(eventFactory.createCharacters(string));
+                        }
+                    }
+                    else if (tokenBuilder != null) {
+                        tokenBuilder.append(event.asCharacters().getData());
+                    }
+                    else if (errorBuilder != null) {
+                        errorBuilder.append(event.asCharacters().getData());
+                    }
+                    break;
+                default:
+                    if (!recordEvents.isEmpty()) {
+                        recordEvents.add(event);
+                    }
+                    break;
+            }
+        }
+        return tokenValue;
+    }
+
+    private HttpEntity fetchFirstEntity() throws IOException {
+        String url = String.format(
+                "%s/oai-pmh?verb=ListRecords&metadataPrefix=%s",
+                context.harvestUrl(),
+                context.harvestPrefix()
+        );
+        if (context.harvestSpec() != null && !context.harvestSpec().isEmpty()) {
+            url += String.format("&set=%s", context.harvestSpec());
+        }
+        return doGet(url);
+    }
+
+    private HttpEntity fetchNextEntity(String resumptionToken) throws IOException {
+        String url = String.format(
+                "%s/oai-pmh?verb=ListRecords&resumptionToken=%s",
+                context.harvestUrl(),
+                URLEncoder.encode(resumptionToken,"UTF-8")
+        );
+        return doGet(url);
+    }
+
+    private HttpEntity doGet(String url) throws IOException {
+        HttpGet get = new HttpGet(url);
+//        get.setHeader("Accept", "text/xml");
+        HttpResponse response = httpClient.execute(get);
+        switch (Code.from(response)) {
+            case OK:
+                break;
+            case UNAUTHORIZED:
+                break;
+            case SYSTEM_ERROR:
+            case UNKNOWN_RESPONSE:
+//                    log.warn("Unable to download source. HTTP response " + response.getStatusLine().getReasonPhrase());
+//                    context.tellUser("Unable to download data set"); // todo: tell them why
+                break;
+        }
+        return response.getEntity();
+    }
+
+    private boolean prepareOutput() {
+        try {
+            outputStream = new FileOutputStream(context.outputFile());
+            out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            out.add(eventFactory.createStartDocument());
+            out.add(eventFactory.createCharacters("\n"));
+            return true;
+        }
+        catch (FileNotFoundException e) {
+            context.tellUser("Unable to create file to receive harvested data");
+            return false;
+        }
+        catch (XMLStreamException e) {
+            context.tellUser("Unable to stream to file to receive harvested data");
+            return false;
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void finishOutput() throws XMLStreamException, IOException {
+        out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
+        out.add(eventFactory.createCharacters("\n"));
+        out.add(eventFactory.createEndDocument());
+        out.flush();
+        outputStream.close();
+    }
+
+    private class NamespaceCollector {
+        private Map<String, Namespace> map = new TreeMap<String, Namespace>();
+
+        public void gatherFrom(StartElement start) {
+            Iterator walk = start.getNamespaces();
+            while (walk.hasNext()) {
+                Namespace ns = (Namespace) walk.next();
+                map.put(ns.getPrefix(), ns);
+            }
+        }
+
+        public Iterator iterator() {
+            return map.values().iterator();
+        }
+    }
+
+    private enum Code {
         OK(SC_OK),
         UNAUTHORIZED(SC_UNAUTHORIZED),
         SYSTEM_ERROR(SC_INTERNAL_SERVER_ERROR),
@@ -110,248 +342,61 @@ public class Harvestor {
         }
     }
 
-    public Harvestor(Context context) {
-        this.context = context;
+    private boolean okValue(String string, String description) {
+        boolean ok = string != null && !string.trim().isEmpty();
+        if (!ok) {
+            context.tellUser("Missing value for " + description);
+        }
+        return ok;
     }
 
-    public void downloadDataSet(DataSet dataSet, ProgressListener progressListener) {
-        Exec.work(new Fetcher(dataSet, progressListener));
+    private boolean okURL(String url, String description) {
+        if (!okValue(url, description)) {
+            return false;
+        }
+        try {
+            new URL(url);
+            return true;
+        }
+        catch (MalformedURLException e) {
+            context.tellUser("Malformed URL: " + url);
+            return false;
+        }
     }
 
-    private class Fetcher implements Runnable {
-        private DataSet dataSet;
-        private ProgressListener progressListener;
-        private String harvestUrl;
-        private String resumptionToken;
-        private OutputStream outputStream;
-        private XMLEventWriter out;
-        private NamespaceCollector namespaceCollector = new NamespaceCollector();
+    public static void main(String[] args) {
+        Harvestor harvestor = new Harvestor(new Context() {
 
-        private Fetcher(DataSet dataSet, ProgressListener progressListener) {
-            this.dataSet = dataSet;
-            this.progressListener = progressListener;
-            this.harvestUrl = getHarvestUrl();
-        }
+            @Override
+            public File outputFile() {
+                return new File("/tmp/harvest.xml");
+            }
 
-        @Override
-        public void run() {
-            if (harvestUrl == null) return;
-            if (!prepareOutput()) return;
-            try {
-//                if (progressListener != null) progressListener.prepareFor(total);
-                HttpEntity fetchedRecords = fetchFirstEntity();
-                resumptionToken = saveRecords(fetchedRecords, out);
-                fetchedRecords.consumeContent();
-                while (resumptionToken != null && !resumptionToken.trim().isEmpty()) {
-                    fetchedRecords = fetchNextEntity();
-                    resumptionToken = saveRecords(fetchedRecords, out);
-                    fetchedRecords.consumeContent();
-                }
-                finishOutput();
-                if (progressListener != null) progressListener.finished(true);
+            @Override
+            public String harvestUrl() {
+                return "http://arno.uvt.nl/oai/tha.uvt.nl.cgi";
             }
-            catch (IOException e) {
-                e.printStackTrace();  // todo: something
-                if (progressListener != null) progressListener.finished(false);
-            }
-            catch (XMLStreamException e) {
-                e.printStackTrace();  // todo: something
-                if (progressListener != null) progressListener.finished(false);
-            }
-        }
 
-        private String saveRecords(HttpEntity fetchedRecords, XMLEventWriter out) throws IOException, XMLStreamException {
-            InputStream inputStream = fetchedRecords.getContent();
-            XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
-            Path path = new Path();
-            StringBuilder tokenBuilder = null;
-            String tokenValue = null;
-            List<XMLEvent> recordEvents = new ArrayList<XMLEvent>();
-            int count = 0;
-            boolean finished = false;
-            try {
-                while (!finished) {
-                    XMLEvent event = in.nextEvent();
-                    switch (event.getEventType()) {
-                        case XMLEvent.START_ELEMENT:
-                            StartElement start = event.asStartElement();
-                            path.push(Tag.create(start.getName().getPrefix(), start.getName().getLocalPart()));
-                            if (!recordEvents.isEmpty()) {
-                                recordEvents.add(event);
-                            }
-                            else if (path.equals(RECORD_ROOT)) {
-                                if (namespaceCollector != null) {
-                                    namespaceCollector.gatherFrom(start);
-                                    out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, namespaceCollector.iterator()));
-                                    out.add(eventFactory.createCharacters("\n"));
-                                    namespaceCollector = null;
-                                }
-                                recordEvents.add(eventFactory.createCharacters("\n")); // flag that record has started
-                                if (progressListener != null) progressListener.setProgress(count);
-                            }
-                            else if (path.equals(RESUMPTION_TOKEN)) {
-                                tokenBuilder = new StringBuilder();
-                                tokenValue = null;
-                            }
-                            else if (namespaceCollector != null) {
-                                namespaceCollector.gatherFrom(start);
-                            }
-                            break;
-                        case XMLEvent.END_ELEMENT:
-                            if (!recordEvents.isEmpty()) {
-                                if (path.equals(RECORD_ROOT)) {
-                                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, null, null));
-                                    for (XMLEvent saved : recordEvents) {
-                                        out.add(saved);
-                                    }
-                                    out.add(eventFactory.createEndElement("", "", RECORD_TAG));
-                                    out.add(eventFactory.createCharacters("\n"));
-                                    recordEvents.clear();
-                                    tokenBuilder = null;
-                                    count++;
-                                }
-                                else {
-                                    recordEvents.add(event);
-                                    recordEvents.add(eventFactory.createCharacters("\n"));
-                                }
-                            }
-                            else if (path.equals(RESUMPTION_TOKEN)) {
-                                tokenValue = tokenBuilder.toString();
-                                tokenBuilder = null;
-                            }
-                            path.pop();
-                            break;
-                        case XMLEvent.END_DOCUMENT:
-                            out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
-                            out.add(eventFactory.createCharacters("\n"));
-                            out.add(eventFactory.createEndDocument());
-                            out.flush();
-                            finished = true;
-                            break;
-                        case XMLEvent.CHARACTERS:
-                        case XMLEvent.CDATA:
-                            if (!recordEvents.isEmpty()) {
-                                String string = ValueFilter.filter(event.asCharacters().getData());
-                                if (!string.isEmpty()) {
-                                    recordEvents.add(eventFactory.createCharacters(string));
-                                }
-                            }
-                            else if (tokenBuilder != null) {
-                                tokenBuilder.append(event.asCharacters().getData());
-                            }
-                            break;
-                        default:
-                            if (!recordEvents.isEmpty()) {
-                                recordEvents.add(event);
-                            }
-                            break;
-                    }
-                }
+            @Override
+            public String harvestPrefix() {
+                return "arno_tib";
             }
-            finally {
-                if (progressListener != null) progressListener.finished(finished);
-            }
-            return tokenValue;
-        }
 
-        private HttpEntity fetchFirstEntity() throws IOException {
-            String metadataPrefix = "raw"; // todo
-            String url = String.format(
-                    "%s/oai-pmh?verb=ListRecords&metadataPrefix=%s&set=%s",
-                    harvestUrl,
-                    metadataPrefix,
-                    dataSet.getSpec()
-            );
-            return doGet(url);
-        }
-
-        private HttpEntity fetchNextEntity() throws IOException {
-            String url = String.format(
-                    "%s/oai-pmh?verb=ListRecords&resumptionToken=%s",
-                    harvestUrl,
-                    resumptionToken
-            );
-            return doGet(url);
-        }
-
-        private HttpEntity doGet(String url) throws IOException {
-            HttpGet get = new HttpGet(url);
-            get.setHeader("Accept", "text/xml");
-            HttpResponse response = httpClient.execute(get);
-            switch (Code.from(response)) {
-                case OK:
-                    break;
-                case UNAUTHORIZED:
-                    break;
-                case SYSTEM_ERROR:
-                case UNKNOWN_RESPONSE:
-//                    log.warn("Unable to download source. HTTP response " + response.getStatusLine().getReasonPhrase());
-//                    context.tellUser("Unable to download data set"); // todo: tell them why
-                    break;
-            }
-            return response.getEntity();
-        }
-
-        private boolean prepareOutput() {
-            try {
-                outputStream = dataSet.importedOutput();
-                out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                out.add(eventFactory.createStartDocument());
-                out.add(eventFactory.createCharacters("\n"));
-                return true;
-            }
-            catch (StorageException e) {
-                context.tellUser("Unable to create file to receive harvested data");
-                return false;
-            }
-            catch (XMLStreamException e) {
-                context.tellUser("Unable to stream to file to receive harvested data");
-                return false;
-            }
-            catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private void finishOutput() throws XMLStreamException, IOException {
-            out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
-            out.add(eventFactory.createCharacters("\n"));
-            out.add(eventFactory.createEndDocument());
-            out.flush();
-            outputStream.close();
-        }
-
-        private String getHarvestUrl() {
-            String harvestUrl = dataSet.getHints().get(Storage.HARVEST_URL);
-            if (harvestUrl == null || harvestUrl.trim().isEmpty()) {
-                context.tellUser("Cannot harvest unless a URL is given");
+            @Override
+            public String harvestSpec() {
                 return null;
             }
-            try {
-                new URL(harvestUrl);
+
+            @Override
+            public void progress(int recordCount) {
+                Logger.getLogger("Harvestor.Progress").info(String.format("Harvested %d", recordCount));
             }
-            catch (MalformedURLException e) {
-                context.tellUser("Cannot harvest since the URL is malformed: " + harvestUrl);
-                return null;
+
+            @Override
+            public void tellUser(String message) {
+                Logger.getLogger("Harvestor.Main").info(message);
             }
-            return harvestUrl;
-        }
-    }
-
-
-    private class NamespaceCollector {
-        private Map<String, Namespace> map = new TreeMap<String, Namespace>();
-
-        public void gatherFrom(StartElement start) {
-            Iterator walk = start.getNamespaces();
-            while (walk.hasNext()) {
-                Namespace ns = (Namespace) walk.next();
-                map.put(ns.getPrefix(), ns);
-            }
-        }
-
-        public Iterator iterator() {
-            return map.values().iterator();
-        }
+        });
+        harvestor.run();
     }
 }
