@@ -103,7 +103,7 @@ public class TestStorage {
             assertEquals("Stream discrepancy", input, stored);
         }
         dataSet().remove();
-        assertEquals("Should be zero files", 0, mock.directories().length);
+        assertEquals("Should be one file", 1, mock.directories().length);
     }
 
     @Test

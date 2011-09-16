@@ -596,10 +596,7 @@ public class StorageImpl extends StorageBase implements Storage {
             File phantomFile = phantomFile(here);
             try {
                 Writer out = new FileWriter(phantomFile);
-                for (File file : getUploadFiles()) {
-                    out.write(file.getName());
-                    out.write('\n');
-                }
+                out.write("This file marks a dataset as absent");
                 out.close();
             }
             catch (IOException e) {
