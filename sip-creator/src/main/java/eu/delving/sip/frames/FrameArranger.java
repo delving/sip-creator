@@ -34,6 +34,7 @@ public class FrameArranger {
         actions.add(new Exploration(frames.get("analysis"), frames.get("statistics")));
         actions.add(new DeepCodeDelving(frames.get("field-mapping")));
         actions.add(new Tweaking(frames.get("record-mapping"), frames.get("field-mapping"), frames.get("output")));
+        actions.add(new ClickMapping(frames.get("create"), frames.get("record-mapping"), frames.get("statistics"), frames.get("output")));
     }
 
     public List<Action> getActions() {
@@ -115,19 +116,55 @@ public class FrameArranger {
             desktop.getDesktopManager().openFrame(recordMapping);
             desktop.getDesktopManager().openFrame(fieldMapping);
             desktop.getDesktopManager().openFrame(output);
-            Dimension desktopSize = desktop.getSize();
-            desktop.getDesktopManager().setBoundsForFrame(recordMapping,
-                    0, 0, desktopSize.width / 2, desktopSize.height / 3 * 2);
-            desktop.getDesktopManager().setBoundsForFrame(fieldMapping,
-                    recordMapping.getX() + recordMapping.getWidth(), 0, desktopSize.width / 2, desktopSize.height / 3 * 2);
-            desktop.getDesktopManager().setBoundsForFrame(output,
-                    0, recordMapping.getY() + recordMapping.getHeight(), desktopSize.width, desktopSize.height / 3);
+            createFaceLayout(recordMapping, fieldMapping, output);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             arrange();
         }
+    }
+
+    private class ClickMapping extends AbstractAction {
+
+        private FrameBase createMapping;
+        private FrameBase recordMapping; // todo: not sure if we will use this
+        private FrameBase statistics;
+        private FrameBase output;
+
+        private ClickMapping(FrameBase createMapping, FrameBase recordMapping, FrameBase statistics, FrameBase output) {
+            super("Click Mapping");
+            this.createMapping = createMapping;
+            this.recordMapping = recordMapping;
+            this.statistics = statistics;
+            this.output = output;
+        }
+
+        private void arrange() {
+            closeAllFrames();
+            desktop.add(createMapping);
+            desktop.add(statistics);
+            desktop.add(output);
+            desktop.getDesktopManager().openFrame(createMapping);
+            desktop.getDesktopManager().openFrame(statistics);
+            desktop.getDesktopManager().openFrame(output);
+            createFaceLayout(createMapping, statistics, output);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            arrange();
+        }
+    }
+
+    private void createFaceLayout(FrameBase leftEye, FrameBase rightEye, FrameBase mouth) {
+        Dimension desktopSize = desktop.getSize();
+        desktop.getDesktopManager().setBoundsForFrame(leftEye,
+                0, 0, desktopSize.width / 2, desktopSize.height / 3 * 2);
+        desktop.getDesktopManager().setBoundsForFrame(rightEye,
+                leftEye.getX() + leftEye.getWidth(), 0, desktopSize.width / 2, desktopSize.height / 3 * 2);
+        desktop.getDesktopManager().setBoundsForFrame(mouth,
+                0, leftEye.getY() + leftEye.getHeight(), desktopSize.width, desktopSize.height / 3);
     }
 
     private void closeAllFrames() {
