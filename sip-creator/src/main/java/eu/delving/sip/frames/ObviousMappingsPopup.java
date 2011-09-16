@@ -77,6 +77,11 @@ public class ObviousMappingsPopup extends FrameBase {
             public void recordMappingChanged(RecordMapping recordMapping) {
                 obviousListModel.refresh();
             }
+
+            @Override
+            public void recordMappingSelected(RecordMapping recordMapping) {
+                obviousListModel.refresh();
+            }
         });
         setDefaultSize(400, 400);
     }

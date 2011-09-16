@@ -82,5 +82,10 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
     @Override
     public void recordMappingChanged(RecordMapping recordMapping) {
     }
+
+    @Override
+    public void recordMappingSelected(RecordMapping recordMapping) {
+
+    }
 }
 

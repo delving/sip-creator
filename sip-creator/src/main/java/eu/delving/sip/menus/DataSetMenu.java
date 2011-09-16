@@ -95,6 +95,7 @@ public class DataSetMenu extends JMenu {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
                             sipModel.setDataSet(item.getDataSet());
+                            // todo: happens in set dataset as well, these methods should be combined
                             sipModel.setMetadataPrefix(item.getPrefix(), true);
                             setPreference(item.getDataSet());
                         }

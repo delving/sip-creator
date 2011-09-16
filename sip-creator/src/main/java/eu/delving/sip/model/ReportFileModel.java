@@ -102,6 +102,11 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
         refresh();
     }
 
+    @Override
+    public void recordMappingSelected(RecordMapping recordMapping) {
+        recordMappingChanged(recordMapping);
+    }
+
     public void kick() {
         recordMappingChanged(sipModel.getMappingModel().getRecordMapping()); // to fire it off
     }

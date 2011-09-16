@@ -38,7 +38,7 @@ public class MappingModel {
 
     public void setRecordMapping(RecordMapping recordMapping) {
         this.recordMapping = recordMapping;
-        fireMappingChanged();
+        fireMappingSelected();
     }
 
     public RecordMapping getRecordMapping() {
@@ -106,10 +106,38 @@ public class MappingModel {
     // observable
 
     public interface Listener {
+
+        /**
+         * @deprecated Shouldn't happen anymore, only when data set is selected
+         */
+        @Deprecated
         void factChanged();
+
+        /**
+         * Set the current field mapping.
+         *
+         * @param fieldMapping The selected field mapping.
+         */
         void select(FieldMapping fieldMapping);
+
+        /**
+         * The code of an existing field mapping has changed.
+         */
         void fieldMappingChanged();
-        void recordMappingChanged(RecordMapping recordMapping);
+
+        /**
+         * The record mapping has changed, could be triggered by removing or adding new field mappings.
+         *
+         * @param recordMapping The record mapping.
+         */
+        void recordMappingChanged(@Deprecated RecordMapping recordMapping);
+
+        /**
+         * A new data set has been loaded and its record mapping is set.
+         *
+         * @param recordMapping The selected record mapping.
+         */
+        void recordMappingSelected(RecordMapping recordMapping);
     }
 
     public void addListener(Listener listener) {
@@ -117,6 +145,13 @@ public class MappingModel {
     }
 
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+
+    private void fireMappingSelected() {
+        selectedFieldMapping = null;
+        for (Listener listener : listeners) {
+            listener.recordMappingSelected(recordMapping);
+        }
+    }
 
     private void fireMappingChanged() {
         selectedFieldMapping = null;

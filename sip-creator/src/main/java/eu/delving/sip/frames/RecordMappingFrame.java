@@ -117,6 +117,11 @@ public class RecordMappingFrame extends FrameBase {
                 String code = recordMapping.toDisplayCode(sipModel.getDataSetModel());
                 codeArea.setText(code);
             }
+
+            @Override
+            public void recordMappingSelected(RecordMapping recordMapping) {
+                recordMappingChanged(recordMapping);
+            }
         });
         removeMappingButton.addActionListener(new ActionListener() {
             @Override

@@ -131,5 +131,10 @@ public class FieldListModel extends AbstractListModel {
                 fireIntervalAdded(this, 0, getSize());
             }
         }
+
+        @Override
+        public void recordMappingSelected(RecordMapping recordMapping) {
+            recordMappingChanged(recordMapping);
+        }
     }
 }

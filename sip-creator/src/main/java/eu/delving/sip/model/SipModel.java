@@ -43,6 +43,7 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
+import org.apache.log4j.Logger;
 
 import javax.swing.ListModel;
 import java.io.File;
@@ -60,6 +61,9 @@ import java.util.prefs.Preferences;
  */
 
 public class SipModel {
+
+    private static final Logger LOG = Logger.getLogger(SipModel.class);
+
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
@@ -123,12 +127,17 @@ public class SipModel {
 
                     @Override
                     public void fieldMappingChanged() {
+                        LOG.info("FieldMapping has changed");
                         clearValidation(mappingModel.getRecordMapping());
                     }
 
                     @Override
                     public void recordMappingChanged(RecordMapping recordMapping) {
-//                        clearValidation(recordMapping); todo: not sure if we need to remove this
+                        clearValidation(recordMapping);
+                    }
+
+                    @Override
+                    public void recordMappingSelected(RecordMapping recordMapping) {
                     }
                 }
         );
@@ -179,7 +188,7 @@ public class SipModel {
             }
         }
         catch (StorageException e) {
-//            LOG.warning(String.format("Error while deleting file: %s%n", e));
+            LOG.warn(String.format("Error while deleting file: %s%n", e));
         }
     }
 
@@ -274,6 +283,7 @@ public class SipModel {
                             analysisModel.setStatistics(statistics);
                             seekFirstRecord();
                             if (latestPrefix != null) {
+                    // todo: happens in set dataset as well, these methods should be combined
                                 setMetadataPrefix(latestPrefix, false);
                             }
                         }

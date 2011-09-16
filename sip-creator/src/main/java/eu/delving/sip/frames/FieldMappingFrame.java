@@ -182,6 +182,10 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void recordMappingChanged(RecordMapping recordMapping) {
             }
+
+            @Override
+            public void recordMappingSelected(RecordMapping recordMapping) {
+            }
         });
         dictionaryCreate.addActionListener(new ActionListener() {
             @Override

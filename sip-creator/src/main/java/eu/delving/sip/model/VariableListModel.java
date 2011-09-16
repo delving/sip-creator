@@ -150,5 +150,10 @@ public class VariableListModel extends AbstractListModel {
         public void recordMappingChanged(RecordMapping recordMapping) {
             refresh();
         }
+
+        @Override
+        public void recordMappingSelected(RecordMapping recordMapping) {
+            refresh();
+        }
     }
 }

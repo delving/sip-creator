@@ -35,6 +35,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import groovy.util.Node;
+import org.apache.log4j.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
@@ -49,6 +50,8 @@ import java.util.Set;
  */
 
 public class FileValidator implements Runnable {
+
+    private static final Logger LOG = Logger.getLogger(FileValidator.class);
     private SipModel sipModel;
     private GroovyCodeResource groovyCodeResource;
     private ProgressAdapter progressAdapter;
@@ -174,9 +177,12 @@ public class FileValidator implements Runnable {
         }
         catch (MetadataParser.AbortException e) {
             aborted = true;
+            LOG.info("Validation aborted by user");
         }
         finally {
-            listener.finished(aborted ? null : valid, sipModel.getAnalysisModel().getRecordCount());
+            if (!aborted) {
+                listener.finished(aborted ? null : valid, sipModel.getAnalysisModel().getRecordCount());
+            }
             uniqueness.destroy();
             if (aborted) { // aborted, so metadataparser will not call finished()
                 progressAdapter.finished(false);

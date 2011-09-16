@@ -101,6 +101,11 @@ public class FieldMappingListModel extends AbstractListModel implements MappingM
         }
     }
 
+    @Override
+    public void recordMappingSelected(RecordMapping recordMapping) {
+        recordMappingChanged(recordMapping);
+    }
+
     public static class CellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

@@ -100,6 +100,7 @@ public class Application {
     private OAuthClient oauthClient;
     private Map<String, FrameBase> frames = new HashMap<String, FrameBase>();
     private FrameArranger frameArranger;
+    private JLabel statusLabel = new JLabel("No dataset", JLabel.CENTER);
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -116,6 +117,7 @@ public class Application {
         };
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
+        // todo: will be renamed to facts
         frames.put("status", new StatusFrame(desktop, sipModel));
         frames.put("analysis", new AnalysisFrame(desktop, sipModel));
         frames.put("create", new CreateFrame(desktop, sipModel));
@@ -167,6 +169,7 @@ public class Application {
             @Override
             public void dataSetChanged(DataSet dataSet) {
                 home.setTitle(String.format("Delving SIP Creator [%s - %s]", dataSet.getSpec(), dataSet.getDataSetFacts().get("name")));
+                statusLabel.setText(String.format("%s (step %d of %d)", dataSet.getState().name(), dataSet.getState().ordinal(), DataSetState.values().length));
             }
 
             @Override
@@ -176,9 +179,10 @@ public class Application {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                statusLabel.setText(String.format("%s (step %d of %d)", dataSet.getState().name(), dataSet.getState().ordinal(), DataSetState.values().length));
                 switch (dataSetState) {
                     case IMPORTED_ANALYZED:
-                        frames.get(1).show(); // todo: should we really be doing this?
+//                        frames.get(1).show(); // todo: should we really be doing this? | will probably break now!
                         break;
                 }
             }
@@ -192,6 +196,7 @@ public class Application {
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("States")
         ));
+        p.add(statusLabel);
         for (Action action : actions.getActions()) {
             p.add(new JButton(action));
         }
