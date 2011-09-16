@@ -33,6 +33,7 @@ public class FrameArranger {
     private void createActions() {
         actions.add(new Exploration(frames.get("analysis"), frames.get("statistics")));
         actions.add(new DeepCodeDelving(frames.get("field-mapping")));
+        actions.add(new Tweaking(frames.get("record-mapping"), frames.get("field-mapping"), frames.get("output")));
     }
 
     public List<Action> getActions() {
@@ -85,6 +86,42 @@ public class FrameArranger {
             desktop.add(fieldMapping);
             desktop.getDesktopManager().openFrame(fieldMapping);
             desktop.getDesktopManager().maximizeFrame(fieldMapping);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            arrange();
+        }
+    }
+
+    private class Tweaking extends AbstractAction {
+
+        private FrameBase recordMapping;
+        private FrameBase fieldMapping;
+        private FrameBase output;
+
+        private Tweaking(FrameBase recordMapping, FrameBase fieldMapping, FrameBase output) {
+            super("Tweaking Snippets");
+            this.recordMapping = recordMapping;
+            this.fieldMapping = fieldMapping;
+            this.output = output;
+        }
+
+        private void arrange() {
+            closeAllFrames();
+            desktop.add(recordMapping);
+            desktop.add(fieldMapping);
+            desktop.add(output);
+            desktop.getDesktopManager().openFrame(recordMapping);
+            desktop.getDesktopManager().openFrame(fieldMapping);
+            desktop.getDesktopManager().openFrame(output);
+            Dimension desktopSize = desktop.getSize();
+            desktop.getDesktopManager().setBoundsForFrame(recordMapping,
+                    0, 0, desktopSize.width / 2, desktopSize.height / 3 * 2);
+            desktop.getDesktopManager().setBoundsForFrame(fieldMapping,
+                    recordMapping.getX() + recordMapping.getWidth(), 0, desktopSize.width / 2, desktopSize.height / 3 * 2);
+            desktop.getDesktopManager().setBoundsForFrame(output,
+                    0, recordMapping.getY() + recordMapping.getHeight(), desktopSize.width, desktopSize.height / 3);
         }
 
         @Override
