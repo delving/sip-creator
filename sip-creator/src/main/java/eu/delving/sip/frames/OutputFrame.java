@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 
 /**
  * The transformation from input record to output
@@ -59,5 +60,10 @@ public class OutputFrame extends FrameBase {
         area.setEditable(false);
         p.add(scroll(area));
         return p;
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(400, 250);
     }
 }

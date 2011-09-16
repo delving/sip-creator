@@ -47,6 +47,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -331,5 +332,10 @@ public class FieldMappingFrame extends FrameBase {
                 }
             });
         }
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(400, 250);
     }
 }

@@ -38,6 +38,7 @@ import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.frames.AnalysisFrame;
 import eu.delving.sip.frames.CreateFrame;
 import eu.delving.sip.frames.FieldMappingFrame;
+import eu.delving.sip.frames.FrameArranger;
 import eu.delving.sip.frames.InputFrame;
 import eu.delving.sip.frames.OutputFrame;
 import eu.delving.sip.frames.RecordMappingFrame;
@@ -79,8 +80,8 @@ import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The main application
@@ -97,7 +98,8 @@ public class Application {
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
     private OAuthClient oauthClient;
-    private List<FrameBase> frames = new ArrayList<FrameBase>();
+    private Map<String, FrameBase> frames = new HashMap<String, FrameBase>();
+    private FrameArranger frameArranger;
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -114,14 +116,14 @@ public class Application {
         };
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
-        frames.add(new StatusFrame(desktop, sipModel));
-        frames.add(new AnalysisFrame(desktop, sipModel));
-        frames.add(new CreateFrame(desktop, sipModel));
-        frames.add(new StatisticsFrame(desktop, sipModel));
-        frames.add(new InputFrame(desktop, sipModel));
-        frames.add(new FieldMappingFrame(desktop, sipModel));
-        frames.add(new RecordMappingFrame(desktop, sipModel));
-        frames.add(new OutputFrame(desktop, sipModel));
+        frames.put("status", new StatusFrame(desktop, sipModel));
+        frames.put("analysis", new AnalysisFrame(desktop, sipModel));
+        frames.put("create", new CreateFrame(desktop, sipModel));
+        frames.put("statistics", new StatisticsFrame(desktop, sipModel));
+        frames.put("input", new InputFrame(desktop, sipModel));
+        frames.put("field-mapping", new FieldMappingFrame(desktop, sipModel));
+        frames.put("record-mapping", new RecordMappingFrame(desktop, sipModel));
+        frames.put("output", new OutputFrame(desktop, sipModel));
         desktop.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createBevelBorder(0)
@@ -131,7 +133,7 @@ public class Application {
             @Override
             public void run() {
                 int index = 0;
-                for (FrameBase frame : frames) {
+                for (FrameBase frame : frames.values()) {
                     if (index > 1) {
                         frame.show();
                     }
@@ -152,6 +154,7 @@ public class Application {
                 StorageFinder.getUser(storageDirectory),
                 new PasswordFetcher()
         );
+        frameArranger = new FrameArranger(desktop, frames);
         home.setJMenuBar(createMenuBar());
         home.addWindowListener(new WindowAdapter() {
             @Override
@@ -191,7 +194,7 @@ public class Application {
     }
 
     private void putFrameStates() {
-        for (FrameBase frame : frames) {
+        for (FrameBase frame : frames.values()) {
             frame.putState();
         }
     }
@@ -199,6 +202,7 @@ public class Application {
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
         bar.add(dataSetMenu);
+        bar.add(createViewMenu());
         bar.add(createFrameMenu());
         return bar;
     }
@@ -206,9 +210,17 @@ public class Application {
     private JMenu createFrameMenu() {
         JMenu menu = new JMenu("Frames");
         int index = 1;
-        for (FrameBase frame : frames) {
+        for (FrameBase frame : frames.values()) {
             frame.setAccelerator(index++);
             menu.add(frame.getAction());
+        }
+        return menu;
+    }
+
+    private JMenu createViewMenu() {
+        JMenu menu = new JMenu("View");
+        for (Action action : frameArranger.getActions()) {
+            menu.add(action);
         }
         return menu;
     }
@@ -403,7 +415,7 @@ public class Application {
                 try {
                     Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
-                    for (FrameBase frame : application.frames) {
+                    for (FrameBase frame : application.frames.values()) {
                         if (frame.wasVisible()) {
                             frame.show();
                         }

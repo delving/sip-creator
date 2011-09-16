@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
@@ -195,5 +196,8 @@ public class StatusFrame extends FrameBase {
         statusLabel.setText(String.format("%d elements processed", count));
     }
 
-
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(400, 250);
+    }
 }

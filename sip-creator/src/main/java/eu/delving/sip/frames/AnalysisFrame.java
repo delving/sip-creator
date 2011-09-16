@@ -50,6 +50,7 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -258,5 +259,10 @@ public class AnalysisFrame extends FrameBase {
                 expandEmptyNodes(childNode);
             }
         }
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(270, 300);
     }
 }

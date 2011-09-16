@@ -196,4 +196,9 @@ public class StatisticsFrame extends FrameBase {
             return "   " + list.get(i);
         }
     }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(400, 250);
+    }
 }

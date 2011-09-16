@@ -150,4 +150,9 @@ public class RecordMappingFrame extends FrameBase {
             }
         });
     }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(400, 250);
+    }
 }
