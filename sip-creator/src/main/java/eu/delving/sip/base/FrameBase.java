@@ -109,8 +109,7 @@ public abstract class FrameBase extends JInternalFrame {
 
     protected abstract void refresh();
 
-    @Override
-    public void show() {
+    public void openFrame(boolean oldPosition) {
         init();
         refresh();
         Point added = addIfAbsent();
@@ -121,7 +120,7 @@ public abstract class FrameBase extends JInternalFrame {
             ((FrameBase) parent).childOpening();
         }
         super.show();
-        if (added != null) {
+        if (added != null && oldPosition) {
             setLocation(added);
             Dimension savedSize = getSavedSize();
             if (savedSize != null) {
@@ -142,7 +141,7 @@ public abstract class FrameBase extends JInternalFrame {
         }
         else {
             moveToFront();
-            ensureOnScreen();
+//            ensureOnScreen();
             try {
                 setSelected(true);
             }
@@ -183,7 +182,7 @@ public abstract class FrameBase extends JInternalFrame {
                 closeFrame();
             }
             else {
-                show();
+                openFrame(true);
             }
         }
     }

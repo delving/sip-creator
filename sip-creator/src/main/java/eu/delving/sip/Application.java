@@ -24,26 +24,20 @@ package eu.delving.sip;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.sip.base.ClientException;
 import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.DataSetActions;
+import eu.delving.sip.base.DownloadAction;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FeedbackImpl;
-import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.ImportAction;
 import eu.delving.sip.base.OAuthClient;
+import eu.delving.sip.base.UploadAction;
+import eu.delving.sip.base.ValidateAction;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.files.StorageFinder;
 import eu.delving.sip.files.StorageImpl;
-import eu.delving.sip.frames.AnalysisFrame;
-import eu.delving.sip.frames.CreateFrame;
-import eu.delving.sip.frames.FieldMappingFrame;
-import eu.delving.sip.frames.FrameArranger;
-import eu.delving.sip.frames.InputFrame;
-import eu.delving.sip.frames.OutputFrame;
-import eu.delving.sip.frames.RecordMappingFrame;
-import eu.delving.sip.frames.StatisticsFrame;
-import eu.delving.sip.frames.StatusFrame;
+import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
@@ -58,7 +52,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -80,8 +73,6 @@ import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The main application
@@ -92,13 +83,12 @@ import java.util.Map;
 public class Application {
     private FeedbackImpl notifier = new FeedbackImpl();
     private SipModel sipModel;
-    private DataSetActions actions;
+    private Action [] actions;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
     private OAuthClient oauthClient;
-    private Map<String, FrameBase> frames = new HashMap<String, FrameBase>();
-    private FrameArranger frameArranger;
+    private AllFrames allFrames;
     private JLabel statusLabel = new JLabel("No dataset", JLabel.CENTER);
 
     private Application(final File storageDirectory) throws StorageException {
@@ -116,34 +106,18 @@ public class Application {
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         // todo: will be renamed to facts
-        frames.put("status", new StatusFrame(desktop, sipModel));
-        frames.put("analysis", new AnalysisFrame(desktop, sipModel));
-        frames.put("create", new CreateFrame(desktop, sipModel));
-        frames.put("statistics", new StatisticsFrame(desktop, sipModel));
-        frames.put("input", new InputFrame(desktop, sipModel));
-        frames.put("field-mapping", new FieldMappingFrame(desktop, sipModel));
-        frames.put("record-mapping", new RecordMappingFrame(desktop, sipModel));
-        frames.put("output", new OutputFrame(desktop, sipModel));
+        allFrames = new AllFrames(desktop, sipModel);
         desktop.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createBevelBorder(0)
         ));
         home.getContentPane().add(desktop, BorderLayout.CENTER);
-        actions = new DataSetActions(desktop, sipModel, cultureHubClient, new Runnable() {
-            @Override
-            public void run() {
-                int index = 0;
-                for (FrameBase frame : frames.values()) {
-                    if (index > 1) {
-                        frame.show();
-                    }
-                    else {
-                        frame.closeFrame();
-                    }
-                    index++;
-                }
-            }
-        });
+        actions = new Action[] {
+                new DownloadAction(desktop, sipModel, cultureHubClient),
+                new ImportAction(desktop, sipModel),
+                new ValidateAction(desktop, sipModel),
+                new UploadAction(desktop, sipModel, cultureHubClient)
+        };
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -155,12 +129,11 @@ public class Application {
                 StorageFinder.getUser(storageDirectory),
                 new PasswordFetcher()
         );
-        frameArranger = new FrameArranger(desktop, frames);
         home.setJMenuBar(createMenuBar());
         home.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
-                putFrameStates();
+                allFrames.putState();
                 System.exit(0);
             }
         });
@@ -190,42 +163,18 @@ public class Application {
                 BorderFactory.createTitledBorder("States")
         ));
         p.add(statusLabel);
-        for (Action action : actions.getActions()) {
+        for (Action action : actions) {
             p.add(new JButton(action));
         }
         return p;
     }
 
-    private void putFrameStates() {
-        for (FrameBase frame : frames.values()) {
-            frame.putState();
-        }
-    }
-
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
         bar.add(dataSetMenu);
-        bar.add(createViewMenu());
-        bar.add(createFrameMenu());
+        bar.add(allFrames.getViewMenu());
+        bar.add(allFrames.getFrameMenu());
         return bar;
-    }
-
-    private JMenu createFrameMenu() {
-        JMenu menu = new JMenu("Frames");
-        int index = 1;
-        for (FrameBase frame : frames.values()) {
-            frame.setAccelerator(index++);
-            menu.add(frame.getAction());
-        }
-        return menu;
-    }
-
-    private JMenu createViewMenu() {
-        JMenu menu = new JMenu("View");
-        for (Action action : frameArranger.getActions()) {
-            menu.add(action);
-        }
-        return menu;
     }
 
     private class CultureHubClientContext implements CultureHubClient.Context {
@@ -354,7 +303,7 @@ public class Application {
                     @Override
                     public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
                         if (method.getName().equals("handleQuitRequestWith")) {
-                            putFrameStates();
+                            allFrames.putState();
                             Method performQuitMethod = objects[1].getClass().getDeclaredMethod("performQuit");
                             performQuitMethod.invoke(objects[1]);
                         }
@@ -386,11 +335,7 @@ public class Application {
                 try {
                     Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
-                    for (FrameBase frame : application.frames.values()) {
-                        if (frame.wasVisible()) {
-                            frame.show();
-                        }
-                    }
+                    application.allFrames.restore();
                 }
                 catch (StorageException e) {
                     JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
