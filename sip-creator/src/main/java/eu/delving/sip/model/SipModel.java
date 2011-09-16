@@ -25,9 +25,9 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.FieldDefinition;
-import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.MappingModelAdapter;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
@@ -115,15 +115,7 @@ public class SipModel {
         mappingModel.addListener(fieldCompileModel);
         mappingModel.addListener(new MappingSaveTimer(this));
         mappingModel.addListener(
-                new MappingModel.Listener() {
-
-                    @Override
-                    public void factChanged() {
-                    }
-
-                    @Override
-                    public void select(FieldMapping fieldMapping) {
-                    }
+                new MappingModelAdapter() {
 
                     @Override
                     public void fieldMappingChanged() {
@@ -134,10 +126,6 @@ public class SipModel {
                     @Override
                     public void recordMappingChanged(RecordMapping recordMapping) {
                         clearValidation(recordMapping);
-                    }
-
-                    @Override
-                    public void recordMappingSelected(RecordMapping recordMapping) {
                     }
                 }
         );
@@ -283,7 +271,7 @@ public class SipModel {
                             analysisModel.setStatistics(statistics);
                             seekFirstRecord();
                             if (latestPrefix != null) {
-                    // todo: happens in set dataset as well, these methods should be combined
+                                // todo: happens in set dataset as well, these methods should be combined
                                 setMetadataPrefix(latestPrefix, false);
                             }
                         }

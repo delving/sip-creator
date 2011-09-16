@@ -22,7 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.MappingModelAdapter;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -99,18 +99,7 @@ public class RecordMappingFrame extends FrameBase {
     }
 
     private void wireUp() {
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
-            @Override
-            public void factChanged() {
-            }
-
-            @Override
-            public void select(FieldMapping fieldMapping) {
-            }
-
-            @Override
-            public void fieldMappingChanged() {
-            }
+        sipModel.getMappingModel().addListener(new MappingModelAdapter() {
 
             @Override
             public void recordMappingChanged(RecordMapping recordMapping) {

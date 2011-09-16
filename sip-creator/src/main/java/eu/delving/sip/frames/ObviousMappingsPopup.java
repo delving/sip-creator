@@ -23,7 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.MappingModelAdapter;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -60,19 +60,7 @@ public class ObviousMappingsPopup extends FrameBase {
         obviousMappingsList = new JList(obviousListModel);
         obviousMappingsList.setCellRenderer(new FieldMappingListModel.CellRenderer());
         obviousMappingsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
-            @Override
-            public void factChanged() {
-            }
-
-            @Override
-            public void select(FieldMapping fieldMapping) {
-            }
-
-            @Override
-            public void fieldMappingChanged() {
-            }
-
+        sipModel.getMappingModel().addListener(new MappingModelAdapter() {
             @Override
             public void recordMappingChanged(RecordMapping recordMapping) {
                 obviousListModel.refresh();

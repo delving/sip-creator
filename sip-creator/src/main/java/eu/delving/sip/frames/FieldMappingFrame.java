@@ -24,8 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.MappingModelAdapter;
 import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -165,26 +164,11 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private void wireUp() {
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
-            @Override
-            public void factChanged() {
-            }
+        sipModel.getMappingModel().addListener(new MappingModelAdapter() {
 
             @Override
             public void select(FieldMapping fieldMapping) {
                 setFieldMapping(fieldMapping);
-            }
-
-            @Override
-            public void fieldMappingChanged() {
-            }
-
-            @Override
-            public void recordMappingChanged(RecordMapping recordMapping) {
-            }
-
-            @Override
-            public void recordMappingSelected(RecordMapping recordMapping) {
             }
         });
         dictionaryCreate.addActionListener(new ActionListener() {
