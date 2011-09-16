@@ -170,10 +170,15 @@ public class Application {
             }
 
             @Override
+            public void dataSetRemoved() {
+                home.setTitle("Delving SIP Creator");
+            }
+
+            @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 switch (dataSetState) {
                     case IMPORTED_ANALYZED:
-                        frames.get(1).show();
+                        frames.get(1).show(); // todo: should we really be doing this?
                         break;
                 }
             }

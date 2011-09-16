@@ -40,6 +40,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,6 +50,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.Writer;
 import java.security.DigestOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -66,6 +68,7 @@ import static eu.delving.sip.files.DataSetState.IMPORTED;
 import static eu.delving.sip.files.DataSetState.IMPORTED_ANALYZED;
 import static eu.delving.sip.files.DataSetState.IMPORTED_HINTS_SET;
 import static eu.delving.sip.files.DataSetState.MAPPED;
+import static eu.delving.sip.files.DataSetState.PHANTOM;
 import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.DataSetState.VALIDATED;
 
@@ -97,9 +100,9 @@ public class StorageImpl extends StorageBase implements Storage {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
         if (list != null) {
-            for (File file : list) {
-                if (file.isDirectory()) {
-                    map.put(file.getName(), new DataSetImpl(file));
+            for (File directory : list) {
+                if (directory.isDirectory() && !phantomFile(directory).exists()) {
+                    map.put(directory.getName(), new DataSetImpl(directory));
                 }
             }
         }
@@ -110,9 +113,15 @@ public class StorageImpl extends StorageBase implements Storage {
     public DataSet createDataSet(String spec) throws StorageException {
         File directory = new File(home, spec);
         if (directory.exists()) {
-            throw new StorageException(String.format("Data set directory %s already exists", directory.getAbsolutePath()));
+            File phantomFile = phantomFile(directory);
+            if (phantomFile.exists()) {
+                delete(phantomFile);
+            }
+            else {
+                throw new StorageException(String.format("Data set directory %s already exists", directory.getAbsolutePath()));
+            }
         }
-        if (!directory.mkdirs()) {
+        else if (!directory.mkdirs()) {
             throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }
         return new DataSetImpl(directory);
@@ -187,9 +196,9 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public DataSetState getState() {
-//            if (phantomFile(here).exists()) {
-//                return PHANTOM;
-//            }
+            if (phantomFile(here).exists()) {
+                return PHANTOM;
+            }
             File imported = importedFile(here);
             File source = sourceFile(here);
             if (imported.exists()) {
@@ -584,7 +593,18 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void remove() throws StorageException {
-            delete(here);
+            File phantomFile = phantomFile(here);
+            try {
+                Writer out = new FileWriter(phantomFile);
+                for (File file : getUploadFiles()) {
+                    out.write(file.getName());
+                    out.write('\n');
+                }
+                out.close();
+            }
+            catch (IOException e) {
+                throw new StorageException(String.format("Unable to create phantom file %s to mark data set deleted", phantomFile.getAbsolutePath()), e);
+            }
         }
 
         private InputStream zipIn(File file) throws StorageException {

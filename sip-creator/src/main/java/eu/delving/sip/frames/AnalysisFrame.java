@@ -56,6 +56,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static eu.delving.sip.files.DataSetState.PHANTOM;
+
 /**
  * The structure of the input data, tree, variables and statistics.
  * From here mappings are made.
@@ -83,6 +85,12 @@ public class AnalysisFrame extends FrameBase {
             public void dataSetChanged(DataSet dataSet) {
                 dataSetStateChanged(dataSet, dataSet.getState());
                 dataSetState = dataSet.getState();
+            }
+
+            @Override
+            public void dataSetRemoved() {
+                dataSetState = PHANTOM;
+                convertButton.setEnabled(false);
             }
 
             @Override

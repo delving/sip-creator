@@ -107,6 +107,11 @@ public class CreateFrame extends FrameBase {
             }
 
             @Override
+            public void dataSetRemoved() {
+                variablesList.clearSelection();
+            }
+
+            @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 // todo: implement
             }

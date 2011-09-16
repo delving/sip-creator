@@ -55,6 +55,11 @@ public class DataSetActions {
             }
 
             @Override
+            public void dataSetRemoved() {
+                mapAction.setEnabled(false);
+            }
+
+            @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 mapAction.setEnabled(dataSetState.ordinal() >= DataSetState.ANALYZED.ordinal());
             }

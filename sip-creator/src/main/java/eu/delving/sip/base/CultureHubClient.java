@@ -46,10 +46,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
@@ -61,6 +65,7 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class CultureHubClient {
     private static final int BLOCK_SIZE = 4096;
+    private static final long MINIMUM_PROGRESS_SIZE = 1024*1024;
     private Logger log = Logger.getLogger(getClass());
     private Context context;
     private HttpClient httpClient = new DefaultHttpClient();
@@ -79,29 +84,9 @@ public class CultureHubClient {
 
     }
 
-    public interface ListReceiveListener {
-
-        /**
-         * Successfully received lists from server.
-         *
-         * @param entries The entry list.
-         */
-        void listReceived(List<DataSetEntry> entries);
-
-        /**
-         * Error fetching list.
-         *
-         * @param e What went wrong?
-         */
-        void failed(Exception e);
-    }
-
-    public interface UnlockListener {
-        void unlockComplete(boolean successful);
-    }
-
     public enum Code {
         OK(SC_OK),
+        NOT_FOUND(SC_NOT_FOUND),
         UNAUTHORIZED(SC_UNAUTHORIZED),
         SYSTEM_ERROR(SC_INTERNAL_SERVER_ERROR),
         UNKNOWN_RESPONSE(-1);
@@ -127,8 +112,19 @@ public class CultureHubClient {
         this.context = context;
     }
 
+    public interface ListReceiveListener {
+
+        void listReceived(List<DataSetEntry> entries);
+
+        void failed(Exception e);
+    }
+
     public void fetchDataSetList(ListReceiveListener listReceiveListener) {
         Exec.work(new ListFetcher(listReceiveListener));
+    }
+
+    public interface UnlockListener {
+        void unlockComplete(boolean successful);
     }
 
     public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
@@ -139,8 +135,20 @@ public class CultureHubClient {
         Exec.work(new DataSetDownloader(dataSet, progressListener));
     }
 
-    public void uploadFiles(DataSet dataSet, ProgressListener progressListener) throws StorageException {
-        Exec.work(new FileUploader(dataSet, progressListener));
+    public interface UploadListener {
+        void uploadRefused(File file);
+
+        void uploadStarted(File file);
+
+        void uploadEnded(File file);
+
+        ProgressListener getProgressListener();
+
+        void finished();
+    }
+
+    public void uploadFiles(DataSet dataSet, UploadListener uploadListener) throws StorageException {
+        Exec.work(new FileUploader(dataSet, uploadListener));
     }
 
     private class ListFetcher implements Runnable {
@@ -175,6 +183,7 @@ public class CultureHubClient {
                         notifyUser("Authorization failure, please try again");
                         log.error("Authorization failure, please try again");
                         break;
+                    case NOT_FOUND:
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
                         log.warn("Unable to fetch data set list. HTTP response " + response.getStatusLine().getReasonPhrase());
@@ -211,10 +220,9 @@ public class CultureHubClient {
 
         @Override
         public void run() {
-            HttpEntity entity = null;
             try {
                 String url = String.format(
-                        "%s/%s/unlock?accessKey=%s",
+                        "%s/unlock/%s?accessKey=%s",
                         context.getServerUrl(),
                         dataSet.getSpec(),
                         context.getAccessToken()
@@ -222,17 +230,20 @@ public class CultureHubClient {
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
-                entity = response.getEntity();
+                response.getEntity().consumeContent();
                 switch (Code.from(response)) {
                     case OK:
-                        String reply = EntityUtils.toString(entity);
-                        log.info("Unlock reply: " + reply);
-                        unlockListener.unlockComplete("Ok".equals(reply));
+                        unlockListener.unlockComplete(true);
                         break;
                     case UNAUTHORIZED:
                         context.invalidateTokens();
                         notifyUser("Authorization failure, please try again");
                         log.error("Authorization failure, please try again");
+                        break;
+                    case NOT_FOUND:
+                        notifyUser("Unlocking failure");
+                        log.error("Unlocking failure");
+                        unlockListener.unlockComplete(false);
                         break;
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
@@ -245,16 +256,6 @@ public class CultureHubClient {
                 log.error("Unable to unlock dataset", e);
                 context.tellUser(String.format("Error unlocking dataset server:<br><br>%s", e.getMessage()));
                 unlockListener.unlockComplete(false);
-            }
-            finally {
-                if (null != entity) {
-                    try {
-                        entity.consumeContent();
-                    }
-                    catch (IOException e) {
-                        log.warn(String.format("Error consuming entity: %s", e.getMessage()));
-                    }
-                }
             }
         }
     }
@@ -328,12 +329,12 @@ public class CultureHubClient {
     public class FileUploader implements Runnable {
         private DataSet dataSet;
         private List<File> uploadFiles;
-        private ProgressListener progressListener;
+        private UploadListener uploadListener;
 
-        public FileUploader(DataSet dataSet, ProgressListener progressListener) throws StorageException {
+        public FileUploader(DataSet dataSet, UploadListener uploadListener) throws StorageException {
             this.dataSet = dataSet;
             this.uploadFiles = dataSet.getUploadFiles();
-            this.progressListener = progressListener;
+            this.uploadListener = uploadListener;
         }
 
         @Override
@@ -347,16 +348,17 @@ public class CultureHubClient {
                     case OK:
                         HttpEntity entity = response.getEntity();
                         String listString = EntityUtils.toString(entity);
+                        Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
                         entity.consumeContent();
-                        List<File> filteredUploadFiles = new ArrayList<File>();
-                        for (String fileName : listString.split("\n")) {
-                            for (File file : uploadFiles) {
-                                if (file.getName().equals(fileName)) {
-                                    filteredUploadFiles.add(file);
-                                }
+                        Iterator<File> walk = uploadFiles.iterator();
+                        while (walk.hasNext()) {
+                            File file = walk.next();
+                            if (!requestedFiles.contains(file.getName())) {
+                                log.info(String.format("Hub does not want %s", file.getName()));
+                                uploadListener.uploadRefused(file);
+                                walk.remove();
                             }
                         }
-                        uploadFiles = filteredUploadFiles;
                         break;
                     case UNAUTHORIZED:
                         context.invalidateTokens();
@@ -369,7 +371,7 @@ public class CultureHubClient {
                 for (File file : uploadFiles) {
                     log.info("Uploading " + file);
                     post = new HttpPost(createFileRequestUrl(file));
-                    post.setEntity(new FileEntity(file, progressListener));
+                    post.setEntity(new FileEntity(file, uploadListener));
                     response = httpClient.execute(post);
                     response.getEntity().consumeContent();
                     switch (Code.from(response)) {
@@ -384,6 +386,7 @@ public class CultureHubClient {
                             throw new IOException(String.format("Unable to upload file %s, response: %s", file.getName(), Code.from(response)));
                     }
                 }
+                uploadListener.finished();
             }
             catch (IOException e) {
                 log.error("Error while connecting", e);
@@ -449,17 +452,16 @@ public class CultureHubClient {
 
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {
         private final File file;
-        private final ProgressListener progressListener;
+        private final UploadListener uploadListener;
         private long bytesSent;
         private int blocksReported;
         private boolean abort = false;
 
-        public FileEntity(File file, ProgressListener progressListener) {
+        public FileEntity(File file, UploadListener uploadListener) {
             this.file = file;
-            this.progressListener = progressListener;
+            this.uploadListener = uploadListener;
             setChunked(true);
             setContentType(deriveContentType(file));
-            progressListener.prepareFor((int) (getContentLength() / BLOCK_SIZE));
         }
 
         public boolean isRepeatable() {
@@ -475,6 +477,13 @@ public class CultureHubClient {
         }
 
         public void writeTo(OutputStream outputStream) throws IOException {
+            ProgressListener progress = getContentLength() < MINIMUM_PROGRESS_SIZE ? null : uploadListener.getProgressListener();
+            if (progress == null) {
+                uploadListener.uploadStarted(file);
+            }
+            else {
+                progress.prepareFor((int) (getContentLength() / BLOCK_SIZE));
+            }
             InputStream inputStream = new FileInputStream(this.file);
             try {
                 byte[] buffer = new byte[BLOCK_SIZE];
@@ -485,7 +494,7 @@ public class CultureHubClient {
                     int blocks = (int) (bytesSent / BLOCK_SIZE);
                     if (blocks > blocksReported) {
                         blocksReported = blocks;
-                        if (!progressListener.setProgress(blocksReported)) {
+                        if (progress != null && !progress.setProgress(blocksReported)) {
                             abort = true;
                         }
                     }
@@ -494,7 +503,12 @@ public class CultureHubClient {
             }
             finally {
                 inputStream.close();
-                progressListener.finished(!abort);
+                if (progress == null) {
+                    uploadListener.uploadEnded(file);
+                }
+                else {
+                    progress.finished(!abort);
+                }
             }
         }
 

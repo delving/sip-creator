@@ -63,6 +63,11 @@ public class StatusFrame extends FrameBase {
             }
 
             @Override
+            public void dataSetRemoved() {
+                statusLabel.setText("<html><b>No dataset</b>");
+            }
+
+            @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 showStatus(dataSetState);
             }

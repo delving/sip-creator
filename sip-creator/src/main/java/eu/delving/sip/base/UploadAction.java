@@ -21,6 +21,7 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
@@ -30,6 +31,7 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JList;
@@ -43,6 +45,7 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  * Upload files, after having seen the validation report
@@ -56,6 +59,7 @@ public class UploadAction extends AbstractAction {
     private CultureHubClient cultureHubClient;
     private ReportFilePopup reportFilePopup;
     private RealUploadAction realUploadAction = new RealUploadAction();
+    private JCheckBox releaseBox = new JCheckBox("Release Lock");
 
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Upload");
@@ -70,8 +74,13 @@ public class UploadAction extends AbstractAction {
             }
 
             @Override
+            public void dataSetRemoved() {
+                setActionEnabled(false);
+            }
+
+            @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                setEnabled(dataSetState == DataSetState.VALIDATED);
+                setActionEnabled(dataSetState == DataSetState.VALIDATED);
             }
         });
     }
@@ -100,9 +109,9 @@ public class UploadAction extends AbstractAction {
     }
 
 
-
     private void setActionEnabled(boolean enabled) {
         setEnabled(enabled);
+        realUploadAction.setEnabled(enabled);
     }
 
     private class ReportFilePopup extends JInternalFrame {
@@ -118,17 +127,6 @@ public class UploadAction extends AbstractAction {
                     true, // maximizable
                     false // iconifiable
             );
-            sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
-                @Override
-                public void dataSetChanged(DataSet dataSet) {
-                    dataSetStateChanged(dataSet, dataSet.getState());
-                }
-
-                @Override
-                public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                    setActionEnabled(dataSetState == DataSetState.VALIDATED);
-                }
-            });
             buildContent(getContentPane());
             setSize(600, 400);
         }
@@ -151,6 +149,7 @@ public class UploadAction extends AbstractAction {
             });
             JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             p.add(cancel);
+            p.add(releaseBox);
             p.add(new JButton(realUploadAction));
             return p;
         }
@@ -164,38 +163,97 @@ public class UploadAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            reportFilePopup.setVisible(false);
             if (!sipModel.hasDataSet()) {
                 JOptionPane.showInternalMessageDialog(parent, "Data set and mapping must be selected");
                 return;
             }
-            setEnabled(false);
-            String message = String.format(
-                    "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
-                    sipModel.getDataSetModel().getDataSet().getSpec()
-            );
-            ProgressMonitor progressMonitor = new ProgressMonitor(
-                    SwingUtilities.getRoot(parent),
-                    "<html><h2>Uploading</h2>",
-                    message,
-                    0, 100
-            );
             try {
-                cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new ProgressAdapter(progressMonitor) {
+                setEnabled(false);
+                cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new CultureHubClient.UploadListener() {
                     @Override
-                    public void swingFinished(boolean success) {
-                        setEnabled(true);
+                    public void uploadRefused(File file) {
+                        System.out.printf("Hub refused %s\n", file.getName());
+                        // todo: implement
                     }
+
+                    @Override
+                    public void uploadStarted(File file) {
+                        System.out.printf("Upload of %s started\n", file.getName());
+                        // todo: implement
+                    }
+
+                    @Override
+                    public void uploadEnded(File file) {
+                        System.out.printf("Upload of %s complete\n", file.getName());
+                        // todo: implement
+                    }
+
+                    @Override
+                    public ProgressListener getProgressListener() {
+                        String message = String.format(
+                                "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
+                                sipModel.getDataSetModel().getDataSet().getSpec()
+                        );
+                        ProgressMonitor progressMonitor = new ProgressMonitor(
+                                SwingUtilities.getRoot(parent),
+                                "<html><h2>Uploading</h2>",
+                                message,
+                                0, 100
+                        );
+                        return new ProgressAdapter(progressMonitor) {
+                            @Override
+                            public void swingFinished(boolean success) {
+//                        setEnabled(true);
+                                // todo: implement
+                            }
+                        };
+                    }
+
+                    @Override
+                    public void finished() {
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (releaseBox.isSelected()) {
+                                    cultureHubClient.unlockDataSet(sipModel.getDataSetModel().getDataSet(), new CultureHubClient.UnlockListener() {
+                                        @Override
+                                        public void unlockComplete(boolean successful) {
+                                            if (successful) {
+                                                try {
+                                                    sipModel.getDataSetModel().getDataSet().remove();
+                                                    sipModel.getDataSetModel().setDataSet(null);
+                                                }
+                                                catch (StorageException e) {
+                                                    sipModel.getUserNotifier().tellUser("Unable to remove data set", e);
+                                                }
+                                            }
+                                            else {
+                                                sipModel.getUserNotifier().tellUser("Unable to unlock the data set");
+                                            }
+                                            Exec.swing(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    reportFilePopup.setVisible(false);
+                                                    setActionEnabled(true);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                                else {
+                                    reportFilePopup.setVisible(false);
+                                    setActionEnabled(true);
+                                }
+                            }
+                        });
+                    }
+
                 });
             }
             catch (StorageException e) {
-                JOptionPane.showInternalMessageDialog(parent, "<html>Problem uploading files<br>" + e.getMessage());
-            }
-            finally {
-                setEnabled(true);
+                sipModel.getUserNotifier().tellUser("Unable to complete uploading", e);
             }
         }
+
     }
-
-
 }

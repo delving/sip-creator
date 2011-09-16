@@ -57,6 +57,11 @@ public class DataSetMenu extends JMenu {
             }
 
             @Override
+            public void dataSetRemoved() {
+                refresh();
+            }
+
+            @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 refresh();
             }

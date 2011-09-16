@@ -89,26 +89,45 @@ public class DataSetModel implements MetadataModel {
     public void setDataSet(final DataSet dataSet) throws StorageException {
         this.dataSet = dataSet;
         this.factDefinitions.clear();
-        this.factDefinitions.addAll(dataSet.getFactDefinitions());
         this.recordDefinitions.clear();
-        for (RecordDefinition recordDefinition : dataSet.getRecordDefinitions(factDefinitions)) {
-            recordDefinitions.put(recordDefinition.prefix, recordDefinition);
-        }
-        this.dataSetState = dataSet.getState();
-        if (SwingUtilities.isEventDispatchThread()) {
-            for (Listener listener : listeners) {
-                listener.dataSetChanged(dataSet);
+        if (dataSet != null) {
+            this.factDefinitions.addAll(dataSet.getFactDefinitions());
+            for (RecordDefinition recordDefinition : dataSet.getRecordDefinitions(factDefinitions)) {
+                recordDefinitions.put(recordDefinition.prefix, recordDefinition);
+            }
+            this.dataSetState = dataSet.getState();
+            if (SwingUtilities.isEventDispatchThread()) {
+                for (Listener listener : listeners) {
+                    listener.dataSetChanged(dataSet);
+                }
+            }
+            else {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Listener listener : listeners) {
+                            listener.dataSetChanged(dataSet);
+                        }
+                    }
+                });
             }
         }
         else {
-            Exec.swing(new Runnable() {
-                @Override
-                public void run() {
-                    for (Listener listener : listeners) {
-                        listener.dataSetChanged(dataSet);
-                    }
+            if (SwingUtilities.isEventDispatchThread()) {
+                for (Listener listener : listeners) {
+                    listener.dataSetRemoved();
                 }
-            });
+            }
+            else {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Listener listener : listeners) {
+                            listener.dataSetRemoved();
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -151,7 +170,10 @@ public class DataSetModel implements MetadataModel {
     }
 
     public interface Listener {
+
         void dataSetChanged(DataSet dataSet);
+
+        void dataSetRemoved();
 
         void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState);
     }

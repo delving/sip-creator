@@ -56,19 +56,22 @@ public class ValidateAction extends AbstractAction {
         super("Validate");
         this.sipModel = sipModel;
         this.parent = parent;
-        this.sipModel.getDataSetModel().addListener(
-                new DataSetModel.Listener() {
-                    @Override
-                    public void dataSetChanged(DataSet dataSet) {
-                        setEnabled(dataSet.getState().ordinal() >= DataSetState.MAPPED.ordinal());
-                    }
+        this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void dataSetChanged(DataSet dataSet) {
+                setEnabled(dataSet.getState().ordinal() >= DataSetState.MAPPED.ordinal());
+            }
 
-                    @Override
-                    public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                        setEnabled(dataSetState.ordinal() >= DataSetState.MAPPED.ordinal());
-                    }
-                }
-        );
+            @Override
+            public void dataSetRemoved() {
+                setEnabled(false);
+            }
+
+            @Override
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                setEnabled(dataSetState.ordinal() >= DataSetState.MAPPED.ordinal());
+            }
+        });
     }
 
     @Override
