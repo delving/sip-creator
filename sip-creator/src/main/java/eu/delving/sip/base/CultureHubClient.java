@@ -29,6 +29,7 @@ import eu.delving.metadata.Hasher;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.Feedback;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -80,8 +81,7 @@ public class CultureHubClient {
 
         void dataSetCreated(DataSet dataSet);
 
-        void tellUser(String message);
-
+        Feedback getNotifier();
     }
 
     public enum Code {
@@ -140,7 +140,7 @@ public class CultureHubClient {
 
         void uploadStarted(File file);
 
-        void uploadEnded(File file);
+        void uploadFinished(File file);
 
         ProgressListener getProgressListener();
 
@@ -187,13 +187,13 @@ public class CultureHubClient {
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
                         log.warn("Unable to fetch data set list. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.tellUser(String.format("Error fetching list from server:<br><br>%s", response.getStatusLine().getReasonPhrase()));
+                        context.getNotifier().alert(String.format("Error fetching list from server:<br><br>%s", response.getStatusLine().getReasonPhrase()));
                         break;
                 }
             }
             catch (Exception e) {
                 log.error("Unable to fetch list", e);
-                context.tellUser(String.format("Error fetching list from server:<br><br>%s", e.getMessage()));
+                context.getNotifier().alert(String.format("Error fetching list from server:<br><br>%s", e.getMessage()));
                 listReceiveListener.failed(e);
             }
             finally {
@@ -248,13 +248,13 @@ public class CultureHubClient {
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
                         log.warn("Unable to unlock dataset. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.tellUser(String.format("Error unlocking dataset:<br><br>%s", response.getStatusLine().getReasonPhrase()));
+                        context.getNotifier().alert(String.format("Error unlocking dataset:<br><br>%s", response.getStatusLine().getReasonPhrase()));
                         break;
                 }
             }
             catch (Exception e) {
                 log.error("Unable to unlock dataset", e);
-                context.tellUser(String.format("Error unlocking dataset server:<br><br>%s", e.getMessage()));
+                context.getNotifier().alert(String.format("Error unlocking dataset server:<br><br>%s", e.getMessage()));
                 unlockListener.unlockComplete(false);
             }
         }
@@ -296,13 +296,13 @@ public class CultureHubClient {
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
                         log.warn("Unable to download source. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.tellUser("Unable to download data set"); // todo: tell them why
+                        context.getNotifier().alert("Unable to download data set"); // todo: tell them why
                         break;
                 }
             }
             catch (Exception e) {
                 log.warn("Unable to download data set", e);
-                context.tellUser("Unable to download data set"); // todo: tell them why
+                context.getNotifier().alert("Unable to download data set"); // todo: tell them why
             }
             finally {
                 if (entity != null) {
@@ -318,7 +318,7 @@ public class CultureHubClient {
                         dataSet.remove();
                     }
                     catch (StorageException e1) {
-                        context.tellUser("Unable to remove local data set");
+                        context.getNotifier().alert("Unable to remove local data set");
                     }
                 }
                 progressListener.finished(success);
@@ -447,7 +447,7 @@ public class CultureHubClient {
 
     private void notifyUser(final String message) {
         log.warn("Problem communicating with CultureHub: " + message);
-        context.tellUser("<html>Sorry, there was a problem communicating with Repository<br>" + message);
+        context.getNotifier().alert("<html>Sorry, there was a problem communicating with Repository<br>" + message);
     }
 
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {
@@ -477,11 +477,9 @@ public class CultureHubClient {
         }
 
         public void writeTo(OutputStream outputStream) throws IOException {
+            uploadListener.uploadStarted(file);
             ProgressListener progress = getContentLength() < MINIMUM_PROGRESS_SIZE ? null : uploadListener.getProgressListener();
-            if (progress == null) {
-                uploadListener.uploadStarted(file);
-            }
-            else {
+            if (progress != null) {
                 progress.prepareFor((int) (getContentLength() / BLOCK_SIZE));
             }
             InputStream inputStream = new FileInputStream(this.file);
@@ -503,12 +501,10 @@ public class CultureHubClient {
             }
             finally {
                 inputStream.close();
-                if (progress == null) {
-                    uploadListener.uploadEnded(file);
-                }
-                else {
+                if (progress != null) {
                     progress.finished(!abort);
                 }
+                uploadListener.uploadFinished(file);
             }
         }
 

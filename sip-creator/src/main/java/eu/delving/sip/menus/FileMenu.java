@@ -21,14 +21,13 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.base.ProgressAdapter;
+import eu.delving.sip.ProgressListener;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
-import javax.swing.ProgressMonitor;
 import javax.swing.filechooser.FileFilter;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -107,13 +106,14 @@ public class FileMenu extends JMenu {
         );
         if (doImport == JOptionPane.YES_OPTION) {
             FileMenu.this.setEnabled(false);
-            ProgressMonitor progressMonitor = new ProgressMonitor(parent, "Importing", "Storing data for " + spec, 0, 100);
-            sipModel.importSource(file, new ProgressAdapter(progressMonitor) {
+            ProgressListener listener = sipModel.getFeedback().progressListener(parent, "Importing", "Storing data for " + spec);
+            listener.onFinished(new ProgressListener.End() {
                 @Override
-                public void swingFinished(boolean success) {
+                public void finished(boolean success) {
                     FileMenu.this.setEnabled(true);
                 }
             });
+            sipModel.importSource(file, listener);
             return true;
         }
         return false;

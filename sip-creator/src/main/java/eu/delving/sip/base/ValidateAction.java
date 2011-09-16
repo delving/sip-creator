@@ -22,6 +22,7 @@
 package eu.delving.sip.base;
 
 import eu.delving.metadata.ValidationException;
+import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -34,8 +35,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -81,21 +80,10 @@ public class ValidateAction extends AbstractAction {
                 sipModel.getDataSetModel().getDataSet().getSpec(),
                 sipModel.getMappingModel().getRecordMapping().getPrefix()
         );
-        ProgressMonitor progressMonitor = new ProgressMonitor(
-                SwingUtilities.getRoot(parent),
-                "<html><h2>Validating</h2>",
-                message,
-                0, 100
-        );
+        ProgressListener progressListener = sipModel.getFeedback().progressListener(parent, "Validating", message);
         sipModel.validateFile(
-                new ProgressAdapter(progressMonitor) {
-                    @Override
-                    public void swingFinished(boolean success) {
-                        setEnabled(true);
-                    }
-                },
+                progressListener,
                 new SipModel.ValidationListener() {
-
                     @Override
                     public void failed(ValidationException validationException) {
                         final JCheckBox allowInvalidCheckBox = new JCheckBox("Allow invalid records");

@@ -54,7 +54,7 @@ public class FileValidator implements Runnable {
     private static final Logger LOG = Logger.getLogger(FileValidator.class);
     private SipModel sipModel;
     private GroovyCodeResource groovyCodeResource;
-    private ProgressAdapter progressAdapter;
+    private ProgressListener progressListener;
     private Listener listener;
     private volatile boolean aborted = false;
     private boolean allowInvalid;
@@ -78,7 +78,14 @@ public class FileValidator implements Runnable {
         this.sipModel = sipModel;
         this.allowInvalid = allowInvalidRecords;
         this.groovyCodeResource = groovyCodeResource;
-        this.progressAdapter = new ProgressAdapter(progressListener);
+        this.progressListener = progressListener;
+        this.progressListener.onFinished(new ProgressListener.End() {
+
+            @Override
+            public void finished(boolean success) {
+                if (!success) abort();
+            }
+        });
         this.listener = listener;
     }
 
@@ -104,7 +111,7 @@ public class FileValidator implements Runnable {
                     sipModel.getDataSetModel().getDataSet().sourceInput(),
                     sipModel.getAnalysisModel().getRecordCount()
             );
-            parser.setProgressListener(progressAdapter);
+            parser.setProgressListener(progressListener);
             PrintWriter out = dataSet.reportWriter(recordMapping);
             try {
                 MetadataRecord record;
@@ -138,7 +145,7 @@ public class FileValidator implements Runnable {
                         out.println("=========");
                     }
                     catch (Exception e) {
-                        sipModel.getUserNotifier().tellUser("Problem writing output", e);
+                        sipModel.getFeedback().alert("Problem writing output", e);
                         out.println("Unexpected exception!");
                         e.printStackTrace(out);
                         abort();
@@ -150,7 +157,7 @@ public class FileValidator implements Runnable {
                     for (String line : repeated) {
                         out.println(line);
                     }
-                    sipModel.getUserNotifier().tellUser("Identifier should be unique, but there were %d repeated values");
+                    sipModel.getFeedback().alert("Identifier should be unique, but there were %d repeated values");
                 }
                 out.println();
                 if (aborted) {
@@ -165,7 +172,7 @@ public class FileValidator implements Runnable {
                 }
             }
             catch (IOException e) {
-                sipModel.getUserNotifier().tellUser("Unable to write discarded record", e);
+                sipModel.getFeedback().alert("Unable to write discarded record", e);
                 abort();
             }
         }
@@ -185,46 +192,12 @@ public class FileValidator implements Runnable {
             }
             uniqueness.destroy();
             if (aborted) { // aborted, so metadataparser will not call finished()
-                progressAdapter.finished(false);
+                progressListener.finished(false);
             }
         }
     }
 
     private void abort() {
         aborted = true;
-    }
-
-//    private void write(Node outputNode) {
-//        StringWriter writer = new StringWriter();
-//        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
-//        xmlNodePrinter.print(outputNode);
-//    }
-
-    // just so we receive the cancel signal
-    private class ProgressAdapter implements ProgressListener {
-        private ProgressListener progressListener;
-
-        private ProgressAdapter(ProgressListener progressListener) {
-            this.progressListener = progressListener;
-        }
-
-        @Override
-        public void prepareFor(int total) {
-            progressListener.prepareFor(total);
-        }
-
-        @Override
-        public boolean setProgress(int progress) {
-            boolean proceed = progressListener.setProgress(progress);
-            if (!proceed) {
-                abort();
-            }
-            return !aborted && proceed;
-        }
-
-        @Override
-        public void finished(boolean success) {
-            progressListener.finished(success);
-        }
     }
 }

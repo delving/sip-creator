@@ -80,7 +80,7 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
             }
         }
         catch (StorageException e) {
-            sipModel.getUserNotifier().tellUser("Validation Report", e);
+            sipModel.getFeedback().alert("Validation Report", e);
         }
     }
 

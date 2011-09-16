@@ -67,7 +67,7 @@ public class TemplateMenu extends JMenu {
 //            }
 //        }
 //        catch (StorageException e) {
-//            sipModel.getUserNotifier().tellUser("Unable to load template", e);
+//            sipModel.getFeedback().tellUser("Unable to load template", e);
 //        }
     }
 
@@ -132,7 +132,7 @@ public class TemplateMenu extends JMenu {
 //                sipModel.getStorage().deleteTemplate(name);
 //            }
 //            catch (StorageException e) {
-//                sipModel.getUserNotifier().tellUser("Unable to delete template", e);
+//                sipModel.getFeedback().tellUser("Unable to delete template", e);
 //            }
             refresh();
         }

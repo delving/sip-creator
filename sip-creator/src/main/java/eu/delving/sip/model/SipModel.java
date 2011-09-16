@@ -67,7 +67,7 @@ public class SipModel {
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
-    private UserNotifier userNotifier;
+    private Feedback feedback;
     private FieldListModel fieldListModel;
     private CompileModel recordCompileModel;
     private CompileModel fieldCompileModel;
@@ -100,10 +100,10 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, UserNotifier userNotifier) throws StorageException {
+    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback) throws StorageException {
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
-        this.userNotifier = userNotifier;
+        this.feedback = feedback;
         fieldListModel = new FieldListModel(dataSetModel);
         recordCompileModel = new CompileModel(CompileModel.Type.RECORD, dataSetModel, groovyCodeResource);
         fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, dataSetModel, groovyCodeResource);
@@ -153,7 +153,7 @@ public class SipModel {
                     dataSet.deleteConverted();
                 }
                 catch (StorageException e) {
-                    SipModel.this.userNotifier.tellUser("Unable to delete converted source file", e);
+                    feedback.alert("Unable to delete converted source file", e);
                 }
             }
         });
@@ -216,8 +216,8 @@ public class SipModel {
         return reportFileModel;
     }
 
-    public UserNotifier getUserNotifier() {
-        return userNotifier;
+    public Feedback getFeedback() {
+        return feedback;
     }
 
     public ListModel getUnmappedFieldListModel() {
@@ -278,7 +278,7 @@ public class SipModel {
                     });
                 }
                 catch (StorageException e) {
-                    userNotifier.tellUser(String.format("Unable to switch to data set %s", dataSet.getSpec()), e);
+                    feedback.alert(String.format("Unable to switch to data set %s", dataSet.getSpec()), e);
                 }
             }
         });
@@ -298,7 +298,7 @@ public class SipModel {
                     recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
                 }
                 catch (StorageException e) {
-                    userNotifier.tellUser("Unable to select Metadata Prefix " + metadataPrefix, e);
+                    feedback.alert("Unable to select Metadata Prefix " + metadataPrefix, e);
                 }
             }
         });
@@ -317,13 +317,13 @@ public class SipModel {
 //            storage.setTemplate(name, mappingModel.getRecordMapping());
 //        }
 //        catch (StorageException e) {
-//            userNotifier.tellUser("Unable to save template", e);
+//            feedback.tellUser("Unable to save template", e);
 //        }
 //    }
 //
 //    public void applyTemplate(RecordMapping template) {
 //        if (!mappingModel.getRecordMapping().getFieldMappings().isEmpty()) {
-//            userNotifier.tellUser("Record must be empty to use a template.");
+//            feedback.tellUser("Record must be empty to use a template.");
 //        }
 //        else {
 //            try {
@@ -332,7 +332,7 @@ public class SipModel {
 //                seekFirstRecord();
 //            }
 //            catch (Exception e) {
-//                userNotifier.tellUser("Unable to load template", e);
+//                feedback.tellUser("Unable to load template", e);
 //            }
 //        }
 //    }
@@ -345,7 +345,7 @@ public class SipModel {
                     dataSetModel.getDataSet().externalToImported(file, progressListener);
                 }
                 catch (StorageException e) {
-                    userNotifier.tellUser("Couldn't create Data Set from " + file.getAbsolutePath(), e);
+                    feedback.alert("Couldn't create Data Set from " + file.getAbsolutePath(), e);
                 }
             }
         });
@@ -366,7 +366,7 @@ public class SipModel {
                     listener.finished(true);
                 }
                 catch (StorageException e) {
-                    userNotifier.tellUser("Problem storing statistics", e);
+                    feedback.alert("Problem storing statistics", e);
                     listener.finished(false);
                 }
             }
@@ -374,7 +374,7 @@ public class SipModel {
             @Override
             public void failure(Exception exception) {
                 listener.finished(false);
-                userNotifier.tellUser("Analysis failed", exception);
+                feedback.alert("Analysis failed", exception);
             }
 
             @Override
@@ -393,7 +393,7 @@ public class SipModel {
                     dataSetModel.getDataSet().setStatistics(analysisModel.convertStatistics());
                 }
                 catch (StorageException e) {
-                    userNotifier.tellUser("Conversion failed", e);
+                    feedback.alert("Conversion failed", e);
                 }
             }
         });
@@ -408,7 +408,7 @@ public class SipModel {
                 new FileValidator.Listener() {
                     @Override
                     public void invalidInput(final MappingException exception) {
-                        userNotifier.tellUser("Problem validating " + exception.getMetadataRecord().toString(), exception);
+                        feedback.alert("Problem validating " + exception.getMetadataRecord().toString(), exception);
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
@@ -434,7 +434,7 @@ public class SipModel {
                             dataSetModel.getDataSet().setValidation(getMappingModel().getRecordMapping().getPrefix(), valid, recordCount);
                         }
                         catch (StorageException e) {
-                            userNotifier.tellUser("Unable to store validation results", e);
+                            feedback.alert("Unable to store validation results", e);
                         }
                         reportFileModel.kick();
                     }
@@ -510,7 +510,7 @@ public class SipModel {
                 }
             }
             catch (Exception e) {
-                userNotifier.tellUser("Unable to fetch the next record", e);
+                feedback.alert("Unable to fetch the next record", e);
                 metadataParser = null;
             }
         }

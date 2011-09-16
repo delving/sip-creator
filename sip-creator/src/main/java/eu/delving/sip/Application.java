@@ -22,11 +22,11 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.metadata.ValidationException;
 import eu.delving.sip.base.ClientException;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.DataSetActions;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FeedbackImpl;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.OAuthClient;
 import eu.delving.sip.files.DataSet;
@@ -46,8 +46,8 @@ import eu.delving.sip.frames.StatisticsFrame;
 import eu.delving.sip.frames.StatusFrame;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
+import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.UserNotifier;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.Action;
@@ -90,8 +90,7 @@ import java.util.Map;
  */
 
 public class Application {
-    private ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
-    private PopupExceptionHandler exceptionHandler;
+    private FeedbackImpl notifier = new FeedbackImpl();
     private SipModel sipModel;
     private DataSetActions actions;
     private JFrame home;
@@ -105,8 +104,7 @@ public class Application {
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
-        exceptionHandler = new PopupExceptionHandler();
-        sipModel = new SipModel(storage, groovyCodeResource, this.exceptionHandler);
+        sipModel = new SipModel(storage, groovyCodeResource, notifier);
         home = new JFrame("Delving SIP Creator");
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -149,6 +147,7 @@ public class Application {
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
         home.setIconImage(logo.getImage());
         dataSetMenu = new DataSetMenu(sipModel);
         oauthClient = new OAuthClient(
@@ -179,12 +178,6 @@ public class Application {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                statusLabel.setText(String.format("%s (step %d of %d)", dataSet.getState().name(), dataSet.getState().ordinal(), DataSetState.values().length));
-                switch (dataSetState) {
-                    case IMPORTED_ANALYZED:
-//                        frames.get(1).show(); // todo: should we really be doing this? | will probably break now!
-                        break;
-                }
             }
         });
         osxExtra();
@@ -270,8 +263,8 @@ public class Application {
         }
 
         @Override
-        public void tellUser(String message) {
-            exceptionHandler.tellUser(message);
+        public Feedback getNotifier() {
+            return notifier;
         }
     }
 
@@ -340,38 +333,6 @@ public class Application {
             password.setLength(0);
             password.append(new String(passwordField.getPassword()));
             dialog.setVisible(false);
-        }
-    }
-
-    private class PopupExceptionHandler implements UserNotifier {
-
-        @Override
-        public void tellUser(final String message, final Exception exception) {
-            Exec.swing(new Runnable() {
-                @Override
-                public void run() {
-                    String html;
-                    if (exception != null) {
-                        html = String.format("<html><h3>%s</h3><p>%s</p></html>", message, exception.getMessage().replaceAll("<", "&lt;"));
-                        if (exception instanceof ValidationException) {
-                            StringBuilder problemHtml = new StringBuilder(String.format("<html><h3>%s</h3><pre>", message));
-                            problemHtml.append(exception.getMessage().replaceAll("<", "&lt;"));
-                            problemHtml.append("</pre></html>");
-                            html = problemHtml.toString();
-                        }
-                        exception.printStackTrace();
-                    }
-                    else {
-                        html = String.format("<html><h3>%s</h3></html>", message);
-                    }
-                    JOptionPane.showMessageDialog(null, html);
-                }
-            });
-        }
-
-        @Override
-        public void tellUser(String message) {
-            tellUser(message, null);
         }
     }
 

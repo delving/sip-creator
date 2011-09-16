@@ -21,13 +21,13 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.ProgressListener;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.ProgressMonitor;
 import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -96,13 +96,14 @@ public class ImportAction extends AbstractAction {
         );
         if (doImport == JOptionPane.YES_OPTION) {
             setEnabled(false);
-            ProgressMonitor progressMonitor = new ProgressMonitor(parent, "Importing", "Storing data for " + spec, 0, 100);
-            sipModel.importSource(file, new ProgressAdapter(progressMonitor) {
+            ProgressListener listener = sipModel.getFeedback().progressListener(parent, "Importing", "Storing data for "+spec);
+            listener.onFinished(new ProgressListener.End() {
                 @Override
-                public void swingFinished(boolean success) {
+                public void finished(boolean success) {
                     setEnabled(true);
                 }
             });
+            sipModel.importSource(file, listener);
             return true;
         }
         return false;

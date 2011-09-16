@@ -21,6 +21,7 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
@@ -37,7 +38,6 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
-import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -149,24 +149,20 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
             Entry entry = (Entry) list.getSelectedValue();
             if (entry == null) return;
             String message = String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", entry.getSpec());
-            ProgressMonitor progressMonitor = new ProgressMonitor(
-                    SwingUtilities.getRoot(parent),
-                    "<html><h2>Download</h2>",
-                    message,
-                    0, 100
-            );
+            ProgressListener listener = sipModel.getFeedback().progressListener(parent, "Download", message);
+            listener.onFinished(new ProgressListener.End() {
+                @Override
+                public void finished(boolean success) {
+                    setEnabled(true);
+                    dialog.setVisible(false);
+                }
+            });
             try {
                 DataSet dataSet = sipModel.getStorage().createDataSet(entry.getSpec());
-                cultureHubClient.downloadDataSet(dataSet, new ProgressAdapter(progressMonitor) {
-                    @Override
-                    public void swingFinished(boolean success) {
-                        setEnabled(true);
-                        dialog.setVisible(false);
-                    }
-                });
+                cultureHubClient.downloadDataSet(dataSet, listener);
             }
             catch (StorageException e) {
-                sipModel.getUserNotifier().tellUser("Unable to create data set called " + entry.getSpec(), e);
+                sipModel.getFeedback().alert("Unable to create data set called " + entry.getSpec(), e);
             }
         }
     }

@@ -28,6 +28,7 @@ package eu.delving.sip;
  */
 
 public interface ProgressListener {
+
     long PATIENCE = 250;
 
     void prepareFor(int total);
@@ -35,4 +36,10 @@ public interface ProgressListener {
     boolean setProgress(int progress);
 
     void finished(boolean success);
+
+    void onFinished(End end);
+
+    public interface End {
+        void finished(boolean success);
+    }
 }

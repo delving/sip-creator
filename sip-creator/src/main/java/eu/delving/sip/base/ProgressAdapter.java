@@ -31,9 +31,10 @@ import javax.swing.ProgressMonitor;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public abstract class ProgressAdapter implements ProgressListener {
+public class ProgressAdapter implements ProgressListener {
     private long lastProgress;
     private ProgressMonitor progressMonitor;
+    private End end;
 
     public ProgressAdapter(ProgressMonitor progressMonitor) {
         this.progressMonitor = progressMonitor;
@@ -67,7 +68,7 @@ public abstract class ProgressAdapter implements ProgressListener {
                 @Override
                 public void run() {
                     progressMonitor.close();
-                    swingFinished(false);
+                    if (end != null) end.finished(false);
                 }
             });
         }
@@ -80,10 +81,13 @@ public abstract class ProgressAdapter implements ProgressListener {
             @Override
             public void run() {
                 progressMonitor.close();
-                swingFinished(success);
+                if (end != null) end.finished(success);
             }
         });
     }
 
-    public abstract void swingFinished(boolean success);
+    @Override
+    public void onFinished(End end) {
+        this.end = end;
+    }
 }

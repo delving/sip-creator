@@ -21,13 +21,23 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.sip.ProgressListener;
+
+import java.awt.Component;
+
 /**
  * Handle exceptions that happen under the hood
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public interface UserNotifier {
-    void tellUser(String message);
-    void tellUser(String message, Exception exception);
+public interface Feedback {
+
+    void say(String message);
+
+    void alert(String message);
+
+    void alert(String message, Exception exception);
+
+    ProgressListener progressListener(Component parent, String title, String message);
 }

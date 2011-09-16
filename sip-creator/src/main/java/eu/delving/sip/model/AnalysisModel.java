@@ -206,7 +206,7 @@ public class AnalysisModel {
                 sipModel.getDataSetModel().getDataSet().setHints(hintsModel.getFacts());
             }
             catch (StorageException e) {
-                sipModel.getUserNotifier().tellUser("Unable to save analysis hints", e);
+                sipModel.getFeedback().alert("Unable to save analysis hints", e);
             }
         }
     }
@@ -229,7 +229,7 @@ public class AnalysisModel {
                 sipModel.getDataSetModel().getDataSet().setHints(hintsModel.getFacts());
             }
             catch (StorageException e) {
-                sipModel.getUserNotifier().tellUser("Unable to save analysis hints", e);
+                sipModel.getFeedback().alert("Unable to save analysis hints", e);
             }
         }
 

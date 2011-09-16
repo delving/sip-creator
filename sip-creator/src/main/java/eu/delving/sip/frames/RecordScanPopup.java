@@ -172,12 +172,13 @@ public class RecordScanPopup extends FrameBase {
                     currentPredicate.render(),
                     0, 100
             );
-            progressListener = new ProgressAdapter(progressMonitor) {
+            progressListener = new ProgressAdapter(progressMonitor);
+            progressListener.onFinished(new ProgressListener.End() {
                 @Override
-                public void swingFinished(boolean success) {
+                public void finished(boolean success) {
                     for (JTextField field : fields) field.setEnabled(true);
                 }
-            };
+            });
         }
         sipModel.seekRecord(currentPredicate, progressListener);
     }

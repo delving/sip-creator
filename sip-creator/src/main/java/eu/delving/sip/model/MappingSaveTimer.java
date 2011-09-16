@@ -61,7 +61,7 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
             }
         }
         catch (StorageException e) {
-            sipModel.getUserNotifier().tellUser("Unable to save mapping", e);
+            sipModel.getFeedback().alert("Unable to save mapping", e);
         }
     }
 

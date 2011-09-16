@@ -38,8 +38,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -172,20 +170,17 @@ public class UploadAction extends AbstractAction {
                 cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new CultureHubClient.UploadListener() {
                     @Override
                     public void uploadRefused(File file) {
-                        System.out.printf("Hub refused %s\n", file.getName());
-                        // todo: implement
+                        sipModel.getFeedback().say(String.format("Hub already has %s", file.getName()));
                     }
 
                     @Override
                     public void uploadStarted(File file) {
-                        System.out.printf("Upload of %s started\n", file.getName());
-                        // todo: implement
+                        sipModel.getFeedback().say(String.format("Upload of %s started", file.getName()));
                     }
 
                     @Override
-                    public void uploadEnded(File file) {
-                        System.out.printf("Upload of %s complete\n", file.getName());
-                        // todo: implement
+                    public void uploadFinished(File file) {
+                        sipModel.getFeedback().say(String.format("%s uploaded", file.getName()));
                     }
 
                     @Override
@@ -194,19 +189,7 @@ public class UploadAction extends AbstractAction {
                                 "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
                                 sipModel.getDataSetModel().getDataSet().getSpec()
                         );
-                        ProgressMonitor progressMonitor = new ProgressMonitor(
-                                SwingUtilities.getRoot(parent),
-                                "<html><h2>Uploading</h2>",
-                                message,
-                                0, 100
-                        );
-                        return new ProgressAdapter(progressMonitor) {
-                            @Override
-                            public void swingFinished(boolean success) {
-//                        setEnabled(true);
-                                // todo: implement
-                            }
-                        };
+                        return sipModel.getFeedback().progressListener(parent, "Uploading", message);
                     }
 
                     @Override
@@ -224,11 +207,11 @@ public class UploadAction extends AbstractAction {
                                                     sipModel.getDataSetModel().setDataSet(null);
                                                 }
                                                 catch (StorageException e) {
-                                                    sipModel.getUserNotifier().tellUser("Unable to remove data set", e);
+                                                    sipModel.getFeedback().alert("Unable to remove data set", e);
                                                 }
                                             }
                                             else {
-                                                sipModel.getUserNotifier().tellUser("Unable to unlock the data set");
+                                                sipModel.getFeedback().alert("Unable to unlock the data set");
                                             }
                                             Exec.swing(new Runnable() {
                                                 @Override
@@ -251,7 +234,7 @@ public class UploadAction extends AbstractAction {
                 });
             }
             catch (StorageException e) {
-                sipModel.getUserNotifier().tellUser("Unable to complete uploading", e);
+                sipModel.getFeedback().alert("Unable to complete uploading", e);
             }
         }
 

@@ -24,8 +24,8 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.Path;
+import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -37,8 +37,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -158,18 +156,14 @@ public class AnalysisFrame extends FrameBase {
                         "<html><h3>Converting source data of '%s' to standard form</h3>",
                         sipModel.getDataSetModel().getDataSet().getSpec()
                 );
-                ProgressMonitor progressMonitor = new ProgressMonitor(
-                        SwingUtilities.getRoot(parent),
-                        "<html><h2>converting</h2>",
-                        message,
-                        0, 100
-                );
-                sipModel.convertSource(new ProgressAdapter(progressMonitor) {
+                ProgressListener listener = sipModel.getFeedback().progressListener(parent, "Converting", message);
+                listener.onFinished(new ProgressListener.End() {
                     @Override
-                    public void swingFinished(boolean success) {
+                    public void finished(boolean success) {
                         convertButton.setEnabled(true);
                     }
                 });
+                sipModel.convertSource(listener);
             }
         });
     }
