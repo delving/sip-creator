@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDesktopPane;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,11 @@ public class FrameArranger {
             desktop.add(statisticsFrame);
             desktop.getDesktopManager().openFrame(analysisFrame);
             desktop.getDesktopManager().openFrame(statisticsFrame);
+            Dimension desktopSize = desktop.getSize();
+            desktop.getDesktopManager().setBoundsForFrame(analysisFrame,
+                    0, 0, desktopSize.width / 3, desktopSize.height);
+            desktop.getDesktopManager().setBoundsForFrame(statisticsFrame,
+                    analysisFrame.getX() + analysisFrame.getWidth(), 0, desktopSize.width / 3 * 2, desktopSize.height);
         }
 
         @Override
