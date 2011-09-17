@@ -85,15 +85,16 @@ public class AllFrames {
                         block(recordMapping, 1, 0),
                         block(output, 2, 0)
                 ),
+                view("Clear"),
                 view("Show and tell",
-                        block(status, 0, 0),
                         block(analysis, 0, 0),
                         block(create, 0, 0),
                         block(statistics, 0, 0),
                         block(input, 0, 0),
                         block(recordMapping, 0, 0),
                         block(fieldMapping, 0, 0),
-                        block(output, 0, 0)
+                        block(output, 0, 0),
+                        block(status, 0, 0)
                 )
         };
     }

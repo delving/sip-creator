@@ -62,6 +62,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -101,6 +102,17 @@ public class Application {
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.drawImage(backgroundIcon.getImage(), 0, 0, desktop);
+                g.setColor(Color.BLACK);
+                drawText(g, 4, 4);
+                g.setColor(Color.WHITE);
+                drawText(g, 0, 0);
+            }
+
+            private void drawText(Graphics g, int x, int y) {
+                g.setFont(new Font("Serif", Font.BOLD, 120));
+                g.drawString("Delving", 490 + x, 400 + y);
+                g.setFont(new Font("Serif", Font.BOLD, 90));
+                g.drawString("SIP-Creator", 530 + x, 500 + y);
             }
         };
         desktop.setBackground(new Color(190, 190, 200));
