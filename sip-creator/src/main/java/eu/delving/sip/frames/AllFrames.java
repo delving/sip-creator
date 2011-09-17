@@ -171,23 +171,30 @@ public class AllFrames {
 
     private Action[] getActions() {
         return new Action[]{
-                action("Exploration",
-                        block(analysis, 0, 0),
-                        block(statistics, 1, 0)
+                action("First contact",
+                        block(status, 0, 0),
+                        block(analysis, 1, 0, 2, 1),
+                        block(statistics, 3, 0, 2, 1)
                 ),
-                action("Click Mapping",
+                action("Quick mapping",
                         block(create, 0, 0),
                         block(statistics, 1, 0),
-                        block(output, 2, 0)
+                        block(recordMapping, 2, 0)
                 ),
-                action("Snippet Tweaking",
+                action("Code tweaking",
                         block(recordMapping, 0, 0),
-                        block(fieldMapping, 1, 0)
+                        block(fieldMapping, 1, 0, 3, 1),
+                        block(input, 4, 0)
                 ),
-                action("Deep Delving",
+                action("Deep code delving",
                         block(fieldMapping, 0, 0)
                 ),
-                action("Showoff",
+                action("Big picture",
+                        block(input, 0, 0),
+                        block(recordMapping, 1, 0),
+                        block(output, 2, 0)
+                ),
+                action("Show and tell",
                         block(status, 0, 0),
                         block(analysis, 0, 0),
                         block(create, 0, 0),
