@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 
@@ -39,6 +40,12 @@ import java.awt.event.ActionEvent;
  */
 
 public class AllFrames {
+    private static Insets INSETS = new Insets(
+            2, // top
+            10, // left
+            14, // bottom
+            10 // right
+    );
     private FrameBase[] frames;
     private StatusFrame status;
     private AnalysisFrame analysis;
@@ -116,10 +123,10 @@ public class AllFrames {
 
         void positionIn(int rows, int cols) {
             Dimension all = desktop.getSize();
-            int wx = all.width / cols;
-            int hx = all.height / rows;
-            Point loc = new Point(x * wx, 10 + y * hx);
-            Dimension size = new Dimension(w * wx, h * hx);
+            int wx = all.width / cols - (all.width % 2);
+            int hx = all.height / rows - (all.height % 2);
+            Point loc = new Point(x * wx - INSETS.left, y * hx - INSETS.top);
+            Dimension size = new Dimension(w * wx + INSETS.left + INSETS.right, h * hx + INSETS.top + INSETS.bottom);
             System.out.printf("%d, %d, %d, %d\n", loc.x, loc.y, size.width, size.height);
             frame.setLocation(loc);
             frame.setSize(size);

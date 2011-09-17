@@ -105,12 +105,7 @@ public class Application {
         };
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
-        // todo: will be renamed to facts
         allFrames = new AllFrames(desktop, sipModel);
-        desktop.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createBevelBorder(0),
-                BorderFactory.createBevelBorder(0)
-        ));
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         actions = new Action[] {
                 new DownloadAction(desktop, sipModel, cultureHubClient),

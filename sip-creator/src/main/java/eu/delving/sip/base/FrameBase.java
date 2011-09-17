@@ -415,13 +415,11 @@ public abstract class FrameBase extends JInternalFrame {
     }
 
     private Dimension getSavedSize() {
-        Dimension size = new Dimension(getSavedInt("width"), getSavedInt("height"));
-        return size.width > 100 && size.height > 100 ? size : null;
+        return new Dimension(getSavedInt("width"), getSavedInt("height"));
     }
 
     private Point getSavedLocation() {
-        Point location = new Point(getSavedInt("x"), getSavedInt("y"));
-        return location.x >= 0 && location.y >= 0 ? location : null;
+        return new Point(getSavedInt("x"), getSavedInt("y"));
     }
 
     private int getSavedInt(String name) {
