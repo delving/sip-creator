@@ -28,10 +28,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
+import javax.swing.KeyStroke;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Hold on to all the frames and manage their arrangemenbt
@@ -40,34 +42,59 @@ import java.awt.event.ActionEvent;
  */
 
 public class AllFrames {
-    private static Insets INSETS = new Insets(
-            2, // top
-            10, // left
-            14, // bottom
-            10 // right
-    );
+    private static Insets INSETS = new Insets(2, /* top */ 10, /* left */ 14, /* bottom */ 10 /* right */);
     private FrameBase[] frames;
-    private StatusFrame status;
-    private AnalysisFrame analysis;
-    private CreateFrame create;
-    private StatisticsFrame statistics;
-    private InputFrame input;
-    private FieldMappingFrame fieldMapping;
-    private RecordMappingFrame recordMapping;
-    private OutputFrame output;
+    private Action[] views;
     private JDesktopPane desktop;
+    private int viewIndex = 1;
 
     public AllFrames(JDesktopPane desktop, SipModel sipModel) {
         this.desktop = desktop;
+        FrameBase status, analysis, create, statistics, input, fieldMapping, recordMapping, output;
         this.frames = new FrameBase[]{
-                this.status = new StatusFrame(desktop, sipModel),
-                this.analysis = new AnalysisFrame(desktop, sipModel),
-                this.create = new CreateFrame(desktop, sipModel),
-                this.statistics = new StatisticsFrame(desktop, sipModel),
-                this.input = new InputFrame(desktop, sipModel),
-                this.fieldMapping = new FieldMappingFrame(desktop, sipModel),
-                this.recordMapping = new RecordMappingFrame(desktop, sipModel),
-                this.output = new OutputFrame(desktop, sipModel)
+                status = new StatusFrame(desktop, sipModel),
+                analysis = new AnalysisFrame(desktop, sipModel),
+                create = new CreateFrame(desktop, sipModel),
+                statistics = new StatisticsFrame(desktop, sipModel),
+                input = new InputFrame(desktop, sipModel),
+                fieldMapping = new FieldMappingFrame(desktop, sipModel),
+                recordMapping = new RecordMappingFrame(desktop, sipModel),
+                output = new OutputFrame(desktop, sipModel)
+        };
+        this.views = new Action[]{
+                view("First contact",
+                        block(status, 0, 0),
+                        block(analysis, 1, 0, 2, 1),
+                        block(statistics, 3, 0, 2, 1)
+                ),
+                view("Quick mapping",
+                        block(create, 0, 0),
+                        block(statistics, 1, 0),
+                        block(recordMapping, 2, 0)
+                ),
+                view("Code tweaking",
+                        block(recordMapping, 0, 0),
+                        block(fieldMapping, 1, 0, 3, 1),
+                        block(input, 4, 0)
+                ),
+                view("Deep code delving",
+                        block(fieldMapping, 0, 0)
+                ),
+                view("Big picture",
+                        block(input, 0, 0),
+                        block(recordMapping, 1, 0),
+                        block(output, 2, 0)
+                ),
+                view("Show and tell",
+                        block(status, 0, 0),
+                        block(analysis, 0, 0),
+                        block(create, 0, 0),
+                        block(statistics, 0, 0),
+                        block(input, 0, 0),
+                        block(recordMapping, 0, 0),
+                        block(fieldMapping, 0, 0),
+                        block(output, 0, 0)
+                )
         };
     }
 
@@ -91,14 +118,14 @@ public class AllFrames {
 
     public JMenu getViewMenu() {
         JMenu menu = new JMenu("View");
-        for (Action action : getActions()) {
+        for (Action action : views) {
             menu.add(action);
         }
         return menu;
     }
 
-    private Arrangement action(String name, Block... blocks) {
-        return new Arrangement(name, blocks);
+    private Arrangement view(String name, Block... blocks) {
+        return new Arrangement(name, viewIndex++, blocks);
     }
 
     private Block block(FrameBase frame, int x, int y) {
@@ -127,7 +154,6 @@ public class AllFrames {
             int hx = all.height / rows - (all.height % 2);
             Point loc = new Point(x * wx - INSETS.left, y * hx - INSETS.top);
             Dimension size = new Dimension(w * wx + INSETS.left + INSETS.right, h * hx + INSETS.top + INSETS.bottom);
-            System.out.printf("%d, %d, %d, %d\n", loc.x, loc.y, size.width, size.height);
             frame.setLocation(loc);
             frame.setSize(size);
         }
@@ -144,8 +170,12 @@ public class AllFrames {
     private class Arrangement extends AbstractAction {
         Block[] blocks;
 
-        Arrangement(String name, Block[] blocks) {
+        Arrangement(String name, int viewIndex, Block[] blocks) {
             super(name);
+            putValue(
+                    Action.ACCELERATOR_KEY,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, KeyEvent.ALT_MASK)
+            );
             this.blocks = blocks;
         }
 
@@ -167,43 +197,5 @@ public class AllFrames {
                 block.frame.openFrame(false);
             }
         }
-    }
-
-    private Action[] getActions() {
-        return new Action[]{
-                action("First contact",
-                        block(status, 0, 0),
-                        block(analysis, 1, 0, 2, 1),
-                        block(statistics, 3, 0, 2, 1)
-                ),
-                action("Quick mapping",
-                        block(create, 0, 0),
-                        block(statistics, 1, 0),
-                        block(recordMapping, 2, 0)
-                ),
-                action("Code tweaking",
-                        block(recordMapping, 0, 0),
-                        block(fieldMapping, 1, 0, 3, 1),
-                        block(input, 4, 0)
-                ),
-                action("Deep code delving",
-                        block(fieldMapping, 0, 0)
-                ),
-                action("Big picture",
-                        block(input, 0, 0),
-                        block(recordMapping, 1, 0),
-                        block(output, 2, 0)
-                ),
-                action("Show and tell",
-                        block(status, 0, 0),
-                        block(analysis, 0, 0),
-                        block(create, 0, 0),
-                        block(statistics, 0, 0),
-                        block(input, 0, 0),
-                        block(recordMapping, 0, 0),
-                        block(fieldMapping, 0, 0),
-                        block(output, 0, 0)
-                )
-        };
     }
 }

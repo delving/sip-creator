@@ -83,7 +83,7 @@ import java.lang.reflect.Proxy;
 public class Application {
     private FeedbackImpl notifier = new FeedbackImpl();
     private SipModel sipModel;
-    private Action [] actions;
+    private Action[] actions;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
@@ -107,7 +107,7 @@ public class Application {
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         allFrames = new AllFrames(desktop, sipModel);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
-        actions = new Action[] {
+        actions = new Action[]{
                 new DownloadAction(desktop, sipModel, cultureHubClient),
                 new ImportAction(desktop, sipModel),
                 new ValidateAction(desktop, sipModel),
@@ -154,7 +154,14 @@ public class Application {
 
     private JPanel createStatePanel() {
         JPanel p = new JPanel(new GridLayout(1, 0, 3, 3));
-        p.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        p.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createBevelBorder(0),
+                BorderFactory.createEmptyBorder(6, 6, 6, 6)
+        ));
+        statusLabel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createBevelBorder(0),
+                BorderFactory.createEmptyBorder(2, 2, 2, 2)
+        ));
         statusLabel.setBackground(Color.white);
         statusLabel.setOpaque(true);
         p.add(statusLabel);
