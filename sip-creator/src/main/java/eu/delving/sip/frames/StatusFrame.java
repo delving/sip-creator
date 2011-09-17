@@ -97,15 +97,15 @@ public class StatusFrame extends FrameBase {
             case IMPORTED:
                 performAnalysis();
                 return "imported - analyze";
-            case IMPORTED_ANALYZED:
+            case ANALYZED_IMPORT:
                 return "imported - choose record root and unique element";
-            case IMPORTED_HINTS_SET:
+            case DELIMITED:
                 return "imported - ready for conversion to source";
             case SOURCED:
                 return "sourced";
-            case ANALYZED:
+            case ANALYZED_SOURCE:
                 return "analyzed";
-            case MAPPED:
+            case MAPPING:
                 return "mapping exists, not validated";
             case VALIDATED:
                 return "validated, ready for upload!";

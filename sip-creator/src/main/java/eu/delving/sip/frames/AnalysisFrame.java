@@ -97,7 +97,7 @@ public class AnalysisFrame extends FrameBase {
 // todo: when the analysis was done on the source format, we don't want these enabled!
 //                selectUniqueElementButton.setEnabled(??);
 //                selectRecordRootButton.setEnabled(??);
-                convertButton.setEnabled(dataSetState.ordinal() >= DataSetState.IMPORTED_HINTS_SET.ordinal() && adjustable());
+                convertButton.setEnabled(dataSetState.ordinal() >= DataSetState.DELIMITED.ordinal() && adjustable());
             }
         });
     }

@@ -58,7 +58,7 @@ public class ValidateAction extends AbstractAction {
         this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {
-                setEnabled(dataSet.getState().ordinal() >= DataSetState.MAPPED.ordinal());
+                setEnabled(dataSet.getState().ordinal() >= DataSetState.MAPPING.ordinal());
             }
 
             @Override
@@ -68,7 +68,7 @@ public class ValidateAction extends AbstractAction {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                setEnabled(dataSetState.ordinal() >= DataSetState.MAPPED.ordinal());
+                setEnabled(dataSetState.ordinal() >= DataSetState.MAPPING.ordinal());
             }
         });
     }

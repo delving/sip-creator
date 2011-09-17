@@ -49,11 +49,11 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-import static eu.delving.sip.files.DataSetState.ANALYZED;
+import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
+import static eu.delving.sip.files.DataSetState.DELIMITED;
 import static eu.delving.sip.files.DataSetState.EMPTY;
 import static eu.delving.sip.files.DataSetState.IMPORTED;
-import static eu.delving.sip.files.DataSetState.IMPORTED_HINTS_SET;
-import static eu.delving.sip.files.DataSetState.MAPPED;
+import static eu.delving.sip.files.DataSetState.MAPPING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -115,7 +115,7 @@ public class TestStorage {
         assertFalse("Zero variables!", variables.isEmpty());
         dataSet().setHints(mock.hints(recordCount));
         assertEquals("Should be imported, stats and hints", 3, mock.files().length);
-        assertEquals(IMPORTED_HINTS_SET, dataSet().getState());
+        assertEquals(DELIMITED, dataSet().getState());
         Statistics statistics = dataSet().getLatestStatistics();
         assertFalse("Should be analysis format", statistics.isSourceFormat());
         int statsSize = statistics.size();
@@ -126,7 +126,7 @@ public class TestStorage {
         statistics.convertToSourcePaths(StorageBase.getRecordRoot(dataSet().getHints()), StorageBase.getUniqueElement(dataSet().getHints()));
         dataSet().setStatistics(statistics);
         assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
-        assertEquals(ANALYZED, dataSet().getState());
+        assertEquals(ANALYZED_SOURCE, dataSet().getState());
         statistics = dataSet().getLatestStatistics();
         assertTrue("Should be less items in analysis", statistics.size() < statsSize);
         assertTrue("Should be source format", statistics.isSourceFormat());
@@ -141,7 +141,7 @@ public class TestStorage {
         assertEquals("Should be two files", 6, mock.files().length);
         recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.getMetadataModel());
         assertEquals("Should have held fact", "value", recordMapping.getFact("/some/path"));
-        assertEquals(MAPPED, dataSet().getState());
+        assertEquals(MAPPING, dataSet().getState());
         assertEquals("Should be hints and source", 2, dataSet().getUploadFiles().size());
         dataSet().setValidation(mock.getMetadataPrefix(), new BitSet(), recordCount);
         assertEquals("Should be four files", 4, dataSet().getUploadFiles().size());
@@ -183,7 +183,7 @@ public class TestStorage {
                     analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
                     Path recordRoot = null;
                     switch (dataSet().getState()) {
-                        case IMPORTED_ANALYZED:
+                        case ANALYZED_IMPORT:
                             recordRoot = new Path("/adlibXML/recordList/record");
                             break;
                         case SOURCED: // todo: not analyzed?

@@ -28,13 +28,26 @@ package eu.delving.sip.files;
  */
 
 public enum DataSetState {
-    EMPTY,
-    IMPORTED,
-    IMPORTED_ANALYZED,
-    IMPORTED_HINTS_SET,
-    SOURCED,
-    ANALYZED,
-    MAPPED,
-    VALIDATED,
-    PHANTOM
+    EMPTY("No imported or source data"),
+    IMPORTED("Import file to be analyzed"),
+    ANALYZED_IMPORT("Imported file analyzed"),
+    DELIMITED("Record root and unique element set"),
+    SOURCED("Source data available"),
+    ANALYZED_SOURCE("Source data analyzed"),
+    MAPPING("Mapping created - not validated"),
+    VALIDATED("Mapping validated - ready for upload"),
+    PHANTOM("Nonexistent");
+
+    private String description;
+    DataSetState(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String toHtml() {
+        return String.format("<html><strong>&quot;%s&quot;</strong><br><font size=-1><i>%s</i></font>", toString(), description);
+    }
 }

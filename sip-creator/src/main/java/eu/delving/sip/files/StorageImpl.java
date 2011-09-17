@@ -62,12 +62,12 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static eu.delving.sip.files.DataSetState.ANALYZED;
+import static eu.delving.sip.files.DataSetState.ANALYZED_IMPORT;
+import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
+import static eu.delving.sip.files.DataSetState.DELIMITED;
 import static eu.delving.sip.files.DataSetState.EMPTY;
 import static eu.delving.sip.files.DataSetState.IMPORTED;
-import static eu.delving.sip.files.DataSetState.IMPORTED_ANALYZED;
-import static eu.delving.sip.files.DataSetState.IMPORTED_HINTS_SET;
-import static eu.delving.sip.files.DataSetState.MAPPED;
+import static eu.delving.sip.files.DataSetState.MAPPING;
 import static eu.delving.sip.files.DataSetState.PHANTOM;
 import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.DataSetState.VALIDATED;
@@ -224,7 +224,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         private DataSetState stateImportReadiness() {
             if (statisticsFile(here, false).exists()) {
-                return allHintsSet(getHints()) ? IMPORTED_HINTS_SET : IMPORTED_ANALYZED;
+                return allHintsSet(getHints()) ? DELIMITED : ANALYZED_IMPORT;
             }
             else {
                 return IMPORTED;
@@ -235,10 +235,10 @@ public class StorageImpl extends StorageBase implements Storage {
             if (statisticsFile(here, true).exists()) {
                 File mapping = latestMappingFileOrNull(here);
                 if (mapping != null) {
-                    return validationFile(here, mapping).exists() ? VALIDATED : MAPPED;
+                    return validationFile(here, mapping).exists() ? VALIDATED : MAPPING;
                 }
                 else {
-                    return ANALYZED;
+                    return ANALYZED_SOURCE;
                 }
             }
             else {

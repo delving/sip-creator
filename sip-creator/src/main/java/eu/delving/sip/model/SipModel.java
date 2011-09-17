@@ -486,7 +486,7 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                if (!analysisModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED.ordinal()) {
+                if (!analysisModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
                     return;
                 }
                 if (metadataParser == null) {

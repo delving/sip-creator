@@ -136,7 +136,7 @@ public class Application {
             @Override
             public void dataSetChanged(DataSet dataSet) {
                 home.setTitle(String.format("Delving SIP Creator [%s - %s]", dataSet.getSpec(), dataSet.getDataSetFacts().get("name")));
-                statusLabel.setText(String.format("%s (step %d of %d)", dataSet.getState().name(), dataSet.getState().ordinal(), DataSetState.values().length));
+                dataSetStateChanged(dataSet, dataSet.getState());
             }
 
             @Override
@@ -146,17 +146,17 @@ public class Application {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                statusLabel.setText(dataSetState.toHtml());
             }
         });
         osxExtra();
     }
 
     private JPanel createStatePanel() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
-        p.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createTitledBorder("States")
-        ));
+        JPanel p = new JPanel(new GridLayout(1, 0, 3, 3));
+        p.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        statusLabel.setBackground(Color.white);
+        statusLabel.setOpaque(true);
         p.add(statusLabel);
         for (Action action : actions) {
             p.add(new JButton(action));
