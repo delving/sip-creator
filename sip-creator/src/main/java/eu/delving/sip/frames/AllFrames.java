@@ -175,7 +175,7 @@ public class AllFrames {
             super(name);
             putValue(
                     Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, KeyEvent.ALT_MASK)
+                    KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, KeyEvent.CTRL_MASK)
             );
             this.blocks = blocks;
         }
