@@ -109,6 +109,31 @@ public abstract class FrameBase extends JInternalFrame {
 
     protected abstract void refresh();
 
+    public void init() {
+        if (!initialized) {
+            JPanel content = (JPanel) getContentPane();
+            content.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+            buildContent(content);
+            initialized = true;
+        }
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    private class PopupAction extends AbstractAction {
+
+        public PopupAction(String title) {
+            super(title);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            openFrame(true);
+        }
+    }
+
     public void openFrame(boolean oldPosition) {
         init();
         refresh();
@@ -141,7 +166,6 @@ public abstract class FrameBase extends JInternalFrame {
         }
         else {
             moveToFront();
-//            ensureOnScreen();
             try {
                 setSelected(true);
             }
@@ -154,36 +178,6 @@ public abstract class FrameBase extends JInternalFrame {
         }
         catch (PropertyVetoException e) {
             e.printStackTrace();  // nobody should be vetoing this
-        }
-    }
-
-    public void init() {
-        if (!initialized) {
-            JPanel content = (JPanel) getContentPane();
-            content.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
-            buildContent(content);
-            initialized = true;
-        }
-    }
-
-    public Action getAction() {
-        return action;
-    }
-
-    private class PopupAction extends AbstractAction {
-
-        public PopupAction(String title) {
-            super(title);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            if (isVisible()) {
-                closeFrame();
-            }
-            else {
-                openFrame(true);
-            }
         }
     }
 
@@ -225,33 +219,6 @@ public abstract class FrameBase extends JInternalFrame {
         }
         else {
             return null;
-        }
-    }
-
-    private void ensureOnScreen() {
-        boolean move = false;
-        Point loc = getLocation();
-        Dimension desk = desktopPane.getSize();
-        Dimension size = getSize();
-        Point far = new Point(loc.x + size.width, loc.y + size.height);
-        if (loc.x < 0) {
-            loc.x = 0;
-            move = true;
-        }
-        else if (far.x > desk.width) {
-            loc.x -= far.x - desk.width;
-            move = true;
-        }
-        if (loc.y < 0) {
-            loc.y = 0;
-            move = true;
-        }
-        else if (far.y > desk.height) {
-            loc.y -= far.y - desk.height;
-            move = true;
-        }
-        if (move) {
-            setLocation(loc);
         }
     }
 
