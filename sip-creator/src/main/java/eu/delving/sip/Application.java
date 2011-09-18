@@ -26,11 +26,11 @@ import eu.delving.sip.base.ClientException;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.DownloadAction;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FeedbackImpl;
 import eu.delving.sip.base.ImportAction;
 import eu.delving.sip.base.OAuthClient;
 import eu.delving.sip.base.UploadAction;
 import eu.delving.sip.base.ValidateAction;
+import eu.delving.sip.base.VisualFeedback;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
@@ -82,7 +82,6 @@ import java.lang.reflect.Proxy;
  */
 
 public class Application {
-    private FeedbackImpl notifier = new FeedbackImpl();
     private SipModel sipModel;
     private Action[] actions;
     private JFrame home;
@@ -90,13 +89,12 @@ public class Application {
     private DataSetMenu dataSetMenu;
     private OAuthClient oauthClient;
     private AllFrames allFrames;
+    private VisualFeedback feedback;
     private JLabel statusLabel = new JLabel("No dataset", JLabel.CENTER);
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
-        sipModel = new SipModel(storage, groovyCodeResource, notifier);
-        home = new JFrame("Delving SIP Creator");
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
             public void paintComponent(Graphics g) {
@@ -115,6 +113,10 @@ public class Application {
                 g.drawString("SIP-Creator", 530 + x, 500 + y);
             }
         };
+        feedback = new VisualFeedback(desktop);
+        sipModel = new SipModel(storage, groovyCodeResource, feedback);
+        feedback.setSipModel(sipModel);
+        home = new JFrame("Delving SIP Creator");
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         allFrames = new AllFrames(desktop, sipModel);
@@ -162,10 +164,20 @@ public class Application {
             }
         });
         osxExtra();
+        Exec.work(new Runnable() {
+            @Override
+            public void run() {
+                feedback.say("SIP-Creator started");
+            }
+        });
     }
 
     private JPanel createStatePanel() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 3, 3));
+        JPanel bp = new JPanel(new GridLayout(2, 2, 6, 6));
+        for (Action action : actions) {
+            bp.add(new JButton(action));
+        }
+        JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
@@ -177,9 +189,8 @@ public class Application {
         statusLabel.setBackground(Color.white);
         statusLabel.setOpaque(true);
         p.add(statusLabel);
-        for (Action action : actions) {
-            p.add(new JButton(action));
-        }
+        p.add(bp);
+        p.add(feedback.getToggle());
         return p;
     }
 
@@ -227,7 +238,7 @@ public class Application {
 
         @Override
         public Feedback getNotifier() {
-            return notifier;
+            return feedback;
         }
     }
 

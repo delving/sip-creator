@@ -30,14 +30,15 @@ import javax.swing.AbstractListModel;
 import javax.swing.JDesktopPane;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Dimension;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,10 +48,40 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class FeedbackImpl implements Feedback {
+public class VisualFeedback implements Feedback {
+    private static final String FEEDBACK = "Feedback";
+    private static final String ONE_LINE = "<html><font size=-2><i>%s</i></font>";
+    private static final String TWO_LINES = "<html><font size=-2><i>%s<br>%s</i></font>";
+    private static final String THREE_LINES = "<html><font size=-2><i>%s<br>%s<br>%s</i></font>";
     private Logger log = Logger.getLogger(getClass());
+    private JToggleButton toggle = new JToggleButton(String.format(ONE_LINE, FEEDBACK));
     private LogListModel listModel = new LogListModel();
     private JList list = new JList(listModel);
+    private LogFrame logFrame;
+    private JDesktopPane desktop;
+
+    public VisualFeedback(JDesktopPane desktop) {
+        this.desktop = desktop;
+    }
+
+    public void setSipModel(SipModel sipModel) {
+        this.logFrame = new LogFrame(desktop, sipModel);
+        toggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                    logFrame.openAtPosition();
+                }
+                else {
+                    logFrame.closeFrame();
+                }
+            }
+        });
+    }
+
+    public JToggleButton getToggle() {
+        return toggle;
+    }
 
     @Override
     public void say(final String message) {
@@ -98,33 +129,30 @@ public class FeedbackImpl implements Feedback {
     }
 
     private class LogFrame extends FrameBase {
-        private Timer timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                closeFrame();
-            }
-        });
+        private final Dimension SIZE = new Dimension(600, 400);
 
-        public LogFrame(JDesktopPane desktop, SipModel sipModel, String title) {
-            super(desktop, sipModel, title, false);
+        public LogFrame(JDesktopPane desktop, SipModel sipModel) {
+            super(desktop, sipModel, "Feedback", false);
         }
-
-        public void log(final String line) {
-        }
-
         @Override
         protected void buildContent(Container content) {
             content.add(scroll(list), BorderLayout.CENTER);
-            pack();
         }
 
         @Override
         protected void refresh() {
         }
 
+        public void openAtPosition() {
+            setLocation(desktopPane.getSize().width - SIZE.width + 8, desktopPane.getSize().height - SIZE.height + 16);
+            setSize(SIZE);
+            openFrame(false);
+        }
     }
 
     private class LogListModel extends AbstractListModel {
+        private static final int CHOP = 100;
+        private static final int MAX = 1000;
         private List<String> lines = new ArrayList<String>();
 
         public void clear() {
@@ -136,7 +164,29 @@ public class FeedbackImpl implements Feedback {
         public void add(String line) {
             lines.add(line);
             fireIntervalAdded(this, getSize() - 1, getSize());
-            // todo: start reducing if it gets big
+            switch (lines.size()) {
+                case 0:
+                    toggle.setText(String.format(ONE_LINE, FEEDBACK));
+                    break;
+                case 1:
+                    toggle.setText(String.format(ONE_LINE, lines.get(0)));
+                    break;
+                case 2:
+                    toggle.setText(String.format(TWO_LINES, lines.get(0), lines.get(1)));
+                    break;
+                default:
+                    int first = lines.size() - 3;
+                    toggle.setText(String.format(THREE_LINES, lines.get(first), lines.get(first + 1), lines.get(first + 2)));
+                    break;
+            }
+            if (lines.size() > MAX) {
+                List<String> fresh = new ArrayList<String>(MAX - CHOP);
+                for (int walk = CHOP; walk < lines.size(); walk++) {
+                    fresh.add(lines.get(walk));
+                }
+                lines = fresh;
+                fireIntervalRemoved(this, 0, CHOP);
+            }
         }
 
         @Override
