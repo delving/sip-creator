@@ -67,6 +67,8 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private RecordValidator recordValidator;
     private String editedCode;
     private GroovyCodeResource groovyCodeResource;
+    private Feedback feedback;
+    private boolean enabled = true;
 
     public enum Type {
         RECORD,
@@ -82,10 +84,16 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         REGENERATED
     }
 
-    public CompileModel(Type type, DataSetModel dataSetModel, GroovyCodeResource groovyCodeResource) {
+    public CompileModel(Type type, DataSetModel dataSetModel, Feedback feedback, GroovyCodeResource groovyCodeResource) {
         this.type = type;
+        this.feedback = feedback;
         this.dataSetModel = dataSetModel;
         this.groovyCodeResource = groovyCodeResource;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        if (enabled) compileSoon();
     }
 
     @Override
@@ -137,7 +145,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     public void compileSoon() {
-        compileTimer.triggerSoon();
+        if (enabled) {
+            compileTimer.triggerSoon();
+        }
     }
 
     public void setCode(String code) {
@@ -231,6 +241,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             if (metadataRecord == null) {
                 return;
             }
+            feedback.say("Compiling Groovy for "+type);
             String mappingCode = editedCode == null ? getCompileCode() : getCompileCode(editedCode);
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, mappingCode);
             try {

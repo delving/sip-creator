@@ -47,6 +47,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 
@@ -77,6 +78,12 @@ public abstract class FrameBase extends JInternalFrame {
                 true, // maximizable
                 false // iconifiable
         );
+        try {
+            setClosed(true);
+        }
+        catch (PropertyVetoException e) {
+            throw new RuntimeException(e);
+        }
         this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title);
@@ -88,6 +95,18 @@ public abstract class FrameBase extends JInternalFrame {
         if (modal) {
             setFocusTraversalKeysEnabled(false);
         }
+        super.addPropertyChangeListener("closed", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent event) {
+                boolean opened = !((Boolean)event.getNewValue());
+                onOpen(opened);
+            }
+        });
+
+    }
+
+    // override this
+    protected void onOpen(boolean opened) {
     }
 
     public void setAccelerator(int number) {

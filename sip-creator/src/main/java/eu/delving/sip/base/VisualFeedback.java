@@ -27,6 +27,7 @@ import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
 import javax.swing.AbstractListModel;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -36,7 +37,6 @@ import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -62,6 +62,7 @@ public class VisualFeedback implements Feedback {
 
     public VisualFeedback(JDesktopPane desktop) {
         this.desktop = desktop;
+        toggle.setHorizontalAlignment(JButton.LEFT);
     }
 
     public void setSipModel(SipModel sipModel) {
@@ -85,22 +86,37 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void say(final String message) {
-        addToList(message);
+        Exec.swingAny(new Runnable() {
+            @Override
+            public void run() {
+                addToList(message);
+            }
+        });
         log.info(message);
     }
 
     @Override
-    public void alert(String message) {
-        addToList(message);
+    public void alert(final String message) {
+        Exec.swingAny(new Runnable() {
+            @Override
+            public void run() {
+                addToList(message);
+                inYourFace(message);
+            }
+        });
         log.warn(message);
-        inYourFace(message);
     }
 
     @Override
-    public void alert(String message, Exception exception) {
-        addToList(message);
+    public void alert(final String message, Exception exception) {
+        Exec.swingAny(new Runnable() {
+            @Override
+            public void run() {
+                addToList(message);
+                inYourFace(message);
+            }
+        });
         log.warn(message, exception);
-        inYourFace(message);
     }
 
     @Override
@@ -110,30 +126,21 @@ public class VisualFeedback implements Feedback {
     }
 
     private void addToList(final String message) {
-        Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                listModel.add(message);
-                list.ensureIndexIsVisible(listModel.getSize() - 1);
-            }
-        });
+        listModel.add(message);
+        list.ensureIndexIsVisible(listModel.getSize() - 1);
     }
 
     private void inYourFace(final String message) {
-        Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(null, String.format("<html><h3>%s</h3>", message));
-            }
-        });
+        JOptionPane.showMessageDialog(null, String.format("<html><h3>%s</h3>", message));
     }
 
     private class LogFrame extends FrameBase {
-        private final Dimension SIZE = new Dimension(600, 400);
+        private final int WIDTH = 500;
 
         public LogFrame(JDesktopPane desktop, SipModel sipModel) {
             super(desktop, sipModel, "Feedback", false);
         }
+
         @Override
         protected void buildContent(Container content) {
             content.add(scroll(list), BorderLayout.CENTER);
@@ -144,8 +151,8 @@ public class VisualFeedback implements Feedback {
         }
 
         public void openAtPosition() {
-            setLocation(desktopPane.getSize().width - SIZE.width + 8, desktopPane.getSize().height - SIZE.height + 16);
-            setSize(SIZE);
+            setLocation(desktopPane.getSize().width - WIDTH + 8, 16);
+            setSize(WIDTH, desktopPane.getSize().height);
             openFrame(false);
         }
     }

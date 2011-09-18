@@ -105,8 +105,8 @@ public class SipModel {
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
         fieldListModel = new FieldListModel(dataSetModel);
-        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, dataSetModel, groovyCodeResource);
-        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, dataSetModel, groovyCodeResource);
+        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, dataSetModel, feedback, groovyCodeResource);
+        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, dataSetModel, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel);
         parseListeners.add(fieldCompileModel);
         mappingModel.addListener(fieldMappingListModel);
@@ -174,6 +174,7 @@ public class SipModel {
             if (dataSetModel.hasDataSet()) {
                 dataSetModel.getDataSet().deleteValidation(recordMapping.getPrefix());
             }
+            feedback.say("Validation cleared");
         }
         catch (StorageException e) {
             LOG.warn(String.format("Error while deleting file: %s%n", e));
@@ -257,6 +258,7 @@ public class SipModel {
         Exec.work(new Runnable() {
             @Override
             public void run() {
+                feedback.say("Loading data set " + dataSet.getSpec());
                 try {
                     final Statistics statistics = dataSet.getLatestStatistics();
                     final Map<String, String> facts = dataSet.getDataSetFacts();
@@ -270,8 +272,9 @@ public class SipModel {
                             analysisModel.set(hints);
                             analysisModel.setStatistics(statistics);
                             seekFirstRecord();
+                            feedback.say("Loaded data set " + dataSet.getSpec());
                             if (latestPrefix != null) {
-                                // todo: happens in set dataset as well, these methods should be combined
+                                feedback.say("There is a recent mapping for " + dataSet.getSpec());
                                 setMetadataPrefix(latestPrefix, false);
                             }
                         }
@@ -285,6 +288,7 @@ public class SipModel {
     }
 
     public void setMetadataPrefix(final String metadataPrefix, final boolean promoteToLatest) {
+        feedback.say("Setting mapping " + metadataPrefix);
         Exec.work(new Runnable() {
             @Override
             public void run() {
@@ -296,6 +300,7 @@ public class SipModel {
                     dataSetFacts.copyToRecordMapping(recordMapping);
                     mappingModel.setRecordMapping(recordMapping);
                     recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
+                    feedback.say("Set mapping " + metadataPrefix);
                 }
                 catch (StorageException e) {
                     feedback.alert("Unable to select Metadata Prefix " + metadataPrefix, e);
@@ -338,11 +343,13 @@ public class SipModel {
 //    }
 
     public void importSource(final File file, final ProgressListener progressListener) {
+        feedback.say("Importing metadata from " + file.getAbsolutePath());
         Exec.work(new Runnable() {
             @Override
             public void run() {
                 try {
                     dataSetModel.getDataSet().externalToImported(file, progressListener);
+                    feedback.say("Finished importing metadata");
                 }
                 catch (StorageException e) {
                     feedback.alert("Couldn't create Data Set from " + file.getAbsolutePath(), e);
@@ -352,6 +359,7 @@ public class SipModel {
     }
 
     public void analyzeFields(final AnalysisListener listener) {
+        feedback.say("Analyzing import from " + dataSetModel.getDataSet().getSpec());
         Exec.work(new AnalysisParser(dataSetModel.getDataSet(), new AnalysisParser.Listener() {
             @Override
             public void success(final Statistics statistics) {
@@ -364,6 +372,7 @@ public class SipModel {
                         }
                     });
                     listener.finished(true);
+                    feedback.say("Import analyzed");
                 }
                 catch (StorageException e) {
                     feedback.alert("Problem storing statistics", e);
@@ -385,12 +394,14 @@ public class SipModel {
     }
 
     public void convertSource(final ProgressListener progressListener) {
+        feedback.say("Converting to source for " + dataSetModel.getDataSet().getSpec());
         Exec.work(new Runnable() {
             @Override
             public void run() {
                 try {
                     dataSetModel.getDataSet().importedToSource(progressListener);
                     dataSetModel.getDataSet().setStatistics(analysisModel.convertStatistics());
+                    feedback.say("Source conversion complete");
                 }
                 catch (StorageException e) {
                     feedback.alert("Conversion failed", e);
@@ -400,6 +411,7 @@ public class SipModel {
     }
 
     public void validateFile(final ProgressListener progressListener, final ValidationListener validationListener) {
+        feedback.say(String.format("Validating mapping %s for data set %s", mappingModel.getRecordMapping().getPrefix(), dataSetModel.getDataSet().getSpec()));
         Exec.work(new FileValidator(
                 this,
                 allowInvalidRecords,
@@ -437,6 +449,7 @@ public class SipModel {
                             feedback.alert("Unable to store validation results", e);
                         }
                         reportFileModel.kick();
+                        feedback.say("Validation complete, report available");
                     }
                 }
         ));

@@ -40,8 +40,15 @@ import java.awt.Dimension;
 
 public class OutputFrame extends FrameBase {
 
-    public OutputFrame(JDesktopPane desktop, SipModel sipModel) {
+    public OutputFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(desktop, sipModel, "Output", false);
+        sipModel.getRecordCompileModel().setEnabled(false);
+    }
+
+    @Override
+    protected void onOpen(boolean opened) {
+        sipModel.getFeedback().say("Output open: "+opened);
+        sipModel.getRecordCompileModel().setEnabled(opened);
     }
 
     @Override

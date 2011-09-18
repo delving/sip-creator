@@ -116,6 +116,7 @@ public class Application {
         feedback = new VisualFeedback(desktop);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
         feedback.setSipModel(sipModel);
+        feedback.say("SIP-Creator started");
         home = new JFrame("Delving SIP Creator");
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
@@ -164,12 +165,6 @@ public class Application {
             }
         });
         osxExtra();
-        Exec.work(new Runnable() {
-            @Override
-            public void run() {
-                feedback.say("SIP-Creator started");
-            }
-        });
     }
 
     private JPanel createStatePanel() {
