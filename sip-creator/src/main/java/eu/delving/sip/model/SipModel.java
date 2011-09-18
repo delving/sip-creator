@@ -258,7 +258,6 @@ public class SipModel {
         Exec.work(new Runnable() {
             @Override
             public void run() {
-                feedback.say("Loading data set " + dataSet.getSpec());
                 try {
                     final Statistics statistics = dataSet.getLatestStatistics();
                     final Map<String, String> facts = dataSet.getDataSetFacts();
@@ -288,7 +287,6 @@ public class SipModel {
     }
 
     public void setMetadataPrefix(final String metadataPrefix, final boolean promoteToLatest) {
-        feedback.say("Setting mapping " + metadataPrefix);
         Exec.work(new Runnable() {
             @Override
             public void run() {

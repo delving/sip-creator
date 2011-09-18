@@ -79,7 +79,6 @@ public class FieldMappingFrame extends FrameBase {
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setEditable(false);
         Utility.attachUrlLauncher(outputArea);
-        sipModel.getFieldCompileModel().setEnabled(false);
         wireUp();
     }
 

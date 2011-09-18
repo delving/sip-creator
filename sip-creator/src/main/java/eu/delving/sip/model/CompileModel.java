@@ -68,7 +68,8 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private String editedCode;
     private GroovyCodeResource groovyCodeResource;
     private Feedback feedback;
-    private boolean enabled = true;
+    private boolean enabled;
+    private volatile boolean compiling;
 
     public enum Type {
         RECORD("record mapping"),
@@ -164,8 +165,8 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                 editedCode = null;
                 notifyStateChange(State.PRISTINE);
             }
+            compileSoon();
         }
-        compileSoon();
     }
 
     @Override
@@ -245,12 +246,13 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             if (metadataRecord == null) {
                 return;
             }
-            feedback.say("Compiling Groovy for "+type);
+            compiling = true;
             String mappingCode = editedCode == null ? getCompileCode() : getCompileCode(editedCode);
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, mappingCode);
             try {
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
+                    feedback.say("Compiled code for "+type);
                     if (null == outputNode) {
                         return;
                     }
@@ -300,6 +302,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             catch (ValidationException e) {
                 compilationComplete(e.toString());
                 notifyStateChange(State.ERROR);
+            }
+            finally {
+                compiling = false;
             }
         }
 
@@ -357,7 +362,17 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         private Timer timer = new Timer(COMPILE_DELAY, this);
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent event) {
+            if (compiling) return;
+            if (selectedFieldMapping == null) {
+                try {
+                    outputDocument.remove(0, outputDocument.getLength() - 1);
+                    return;
+                }
+                catch (BadLocationException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             timer.stop();
             Exec.work(new CompilationRunner());
         }
