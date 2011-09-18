@@ -106,7 +106,7 @@ public class FileMenu extends JMenu {
         );
         if (doImport == JOptionPane.YES_OPTION) {
             FileMenu.this.setEnabled(false);
-            ProgressListener listener = sipModel.getFeedback().progressListener(parent, "Importing", "Storing data for " + spec);
+            ProgressListener listener = sipModel.getFeedback().progressListener("Importing", "Storing data for " + spec);
             listener.onFinished(new ProgressListener.End() {
                 @Override
                 public void finished(boolean success) {

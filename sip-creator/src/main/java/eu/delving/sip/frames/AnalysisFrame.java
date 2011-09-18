@@ -156,7 +156,7 @@ public class AnalysisFrame extends FrameBase {
                         "<html><h3>Converting source data of '%s' to standard form</h3>",
                         sipModel.getDataSetModel().getDataSet().getSpec()
                 );
-                ProgressListener listener = sipModel.getFeedback().progressListener(parent, "Converting", message);
+                ProgressListener listener = sipModel.getFeedback().progressListener("Converting", message);
                 listener.onFinished(new ProgressListener.End() {
                     @Override
                     public void finished(boolean success) {

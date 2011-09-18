@@ -361,10 +361,14 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private class CompileTimer implements ActionListener {
         private Timer timer = new Timer(COMPILE_DELAY, this);
 
+        private CompileTimer() {
+            timer.setRepeats(false);
+        }
+
         @Override
         public void actionPerformed(ActionEvent event) {
             if (compiling) return;
-            if (selectedFieldMapping == null) {
+            if (selectedFieldMapping == null && type == Type.FIELD) {
                 try {
                     outputDocument.remove(0, outputDocument.getLength() - 1);
                     return;
@@ -373,7 +377,6 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                     throw new RuntimeException(e);
                 }
             }
-            timer.stop();
             Exec.work(new CompilationRunner());
         }
 

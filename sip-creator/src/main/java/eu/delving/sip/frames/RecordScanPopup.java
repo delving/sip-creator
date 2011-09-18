@@ -24,7 +24,6 @@ package eu.delving.sip.frames;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.ProgressAdapter;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
@@ -33,9 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.ProgressMonitor;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -166,13 +163,7 @@ public class RecordScanPopup extends FrameBase {
         ProgressListener progressListener = null;
         if (currentPredicate != null) {
             for (JTextField field : fields) field.setEnabled(false);
-            final ProgressMonitor progressMonitor = new ProgressMonitor(
-                    SwingUtilities.getRoot(RecordScanPopup.this),
-                    "<html><h2>Scanning</h2>",
-                    currentPredicate.render(),
-                    0, 100
-            );
-            progressListener = new ProgressAdapter(progressMonitor);
+            progressListener = sipModel.getFeedback().progressListener("Scanning", currentPredicate.render());
             progressListener.onFinished(new ProgressListener.End() {
                 @Override
                 public void finished(boolean success) {

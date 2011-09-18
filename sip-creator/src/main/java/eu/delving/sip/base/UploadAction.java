@@ -189,7 +189,7 @@ public class UploadAction extends AbstractAction {
                                 "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
                                 sipModel.getDataSetModel().getDataSet().getSpec()
                         );
-                        return sipModel.getFeedback().progressListener(parent, "Uploading", message);
+                        return sipModel.getFeedback().progressListener("Uploading", message);
                     }
 
                     @Override

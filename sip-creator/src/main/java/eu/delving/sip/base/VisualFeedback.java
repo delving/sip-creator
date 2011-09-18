@@ -32,10 +32,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -120,9 +117,8 @@ public class VisualFeedback implements Feedback {
     }
 
     @Override
-    public ProgressListener progressListener(Component parent, String title, String message) {
-        ProgressMonitor progressMonitor = new ProgressMonitor(SwingUtilities.getRoot(parent), title, message, 0, 100);
-        return new ProgressAdapter(progressMonitor);
+    public ProgressListener progressListener(String title, String message) {
+        return new ProgressPopup(desktop, title, message);
     }
 
     private void addToList(final String message) {

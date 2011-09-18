@@ -80,7 +80,7 @@ public class ValidateAction extends AbstractAction {
                 sipModel.getDataSetModel().getDataSet().getSpec(),
                 sipModel.getMappingModel().getRecordMapping().getPrefix()
         );
-        ProgressListener progressListener = sipModel.getFeedback().progressListener(parent, "Validating", message);
+        ProgressListener progressListener = sipModel.getFeedback().progressListener("Validating", message);
         sipModel.validateFile(
                 progressListener,
                 new SipModel.ValidationListener() {

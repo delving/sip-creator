@@ -23,8 +23,6 @@ package eu.delving.sip.model;
 
 import eu.delving.sip.ProgressListener;
 
-import java.awt.Component;
-
 /**
  * Handle exceptions that happen under the hood
  *
@@ -39,5 +37,5 @@ public interface Feedback {
 
     void alert(String message, Exception exception);
 
-    ProgressListener progressListener(Component parent, String title, String message);
+    ProgressListener progressListener(String title, String message);
 }
