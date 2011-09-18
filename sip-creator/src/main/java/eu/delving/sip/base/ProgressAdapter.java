@@ -38,6 +38,7 @@ public class ProgressAdapter implements ProgressListener {
 
     public ProgressAdapter(ProgressMonitor progressMonitor) {
         this.progressMonitor = progressMonitor;
+        this.progressMonitor.setMillisToDecideToPopup(100);
     }
 
     @Override

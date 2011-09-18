@@ -75,6 +75,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import static eu.delving.sip.files.DataSetState.IMPORTED;
+
 /**
  * The main application
  *
@@ -162,6 +164,19 @@ public class Application {
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 statusLabel.setText(dataSetState.toHtml());
+                if (dataSetState == IMPORTED) {
+                    sipModel.analyzeFields(new SipModel.AnalysisListener() {
+                        @Override
+                        public void analysisProgress(final long elementCount) {
+                            Exec.swing(new Runnable() {
+                                @Override
+                                public void run() {
+                                    statusLabel.setText(String.format("Analyzed %d elements", elementCount));
+                                }
+                            });
+                        }
+                    });
+                }
             }
         });
         osxExtra();

@@ -299,6 +299,13 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
+        public void deleteValidations() throws StorageException {
+            for (File file : validationFiles(here)) {
+                delete(file);
+            }
+        }
+
+        @Override
         public OutputStream importedOutput() throws StorageException {
             return zipOut(importedFile(here));
         }
@@ -444,24 +451,27 @@ public class StorageImpl extends StorageBase implements Storage {
             boolean cancelled = false;
             try {
                 InputStream inputStream;
+                CountingInputStream countingInput;
                 if (inputFile.getName().endsWith(".xml")) {
                     inputStream = new FileInputStream(inputFile);
+                    countingInput = new CountingInputStream(inputStream);
+                    inputStream = countingInput;
                 }
                 else if (inputFile.getName().endsWith(".xml.gz")) {
-                    inputStream = new GZIPInputStream(new FileInputStream(inputFile));
+                    inputStream = new FileInputStream(inputFile);
+                    countingInput = new CountingInputStream(inputStream);
+                    inputStream = new GZIPInputStream(countingInput);
                 }
                 else {
                     throw new IllegalArgumentException("Input file should be .xml or .xml.gz, but it is " + inputFile.getName());
                 }
                 OutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(source));
                 byte[] buffer = new byte[BLOCK_SIZE];
-                long totalBytesRead = 0;
                 int bytesRead;
                 while (-1 != (bytesRead = inputStream.read(buffer))) {
                     gzipOutputStream.write(buffer, 0, bytesRead);
-                    totalBytesRead += bytesRead;
                     if (progressListener != null) {
-                        if (!progressListener.setProgress((int) (totalBytesRead / BLOCK_SIZE))) {
+                        if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
                             cancelled = true;
                             break;
                         }

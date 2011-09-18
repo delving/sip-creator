@@ -51,7 +51,7 @@ import java.util.List;
  */
 
 public class StatisticsFrame extends FrameBase {
-    private final String EMPTY = "<html><center><h2>No Statistics</h2><b>Select an item from the document structure<br>or an input variable</b><br><br>";
+    private final String EMPTY = "<html><center><h3>No Statistics</h3><b>Select an item from the document structure<br>or an input variable</b><br><br>";
     private JLabel summaryLabel = new JLabel(EMPTY, JLabel.CENTER);
     private HistogramModel histogramModel = new HistogramModel();
     private RandomSampleModel randomSampleModel = new RandomSampleModel();
@@ -99,7 +99,7 @@ public class StatisticsFrame extends FrameBase {
             summaryLabel.setText(EMPTY);
         }
         else {
-            summaryLabel.setText(String.format("<html><center><h2>%s</h2><b>%s</b><br><br>", fieldStatistics.getPath(), fieldStatistics.getSummary()));
+            summaryLabel.setText(String.format("<html><center><h3>%s</h3><b>%s</b><br><br>", fieldStatistics.getPath(), fieldStatistics.getSummary()));
         }
     }
 

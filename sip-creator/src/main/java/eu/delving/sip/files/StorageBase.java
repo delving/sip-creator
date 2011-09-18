@@ -64,6 +64,7 @@ import static eu.delving.sip.files.Storage.SOURCE_FILE_NAME;
 import static eu.delving.sip.files.Storage.SOURCE_STATS_FILE_NAME;
 import static eu.delving.sip.files.Storage.UNIQUE_ELEMENT_PATH;
 import static eu.delving.sip.files.Storage.VALIDATION_FILE_PATTERN;
+import static eu.delving.sip.files.Storage.VALIDATION_FILE_PREFIX;
 
 /**
  * This class contains helpers for the StorageImpl to lean on
@@ -181,6 +182,10 @@ public class StorageBase {
         return dir.listFiles(new NameFileFilter(name));
     }
 
+    File[] validationFiles(File dir) {
+        return dir.listFiles(new ValidationFileFilter());
+    }
+
     File reportFile(File dir, RecordMapping recordMapping) {
         return new File(dir, String.format(REPORT_FILE_PATTERN, recordMapping.getPrefix()));
     }
@@ -265,7 +270,15 @@ public class StorageBase {
         @Override
         public boolean accept(File file) {
             String name = Hasher.extractFileName(file);
-            return file.isFile() && name.startsWith(MAPPING_FILE_PREFIX) && name.endsWith(MAPPING_FILE_SUFFIX);
+            return file.isFile() && name.startsWith(MAPPING_FILE_PREFIX);
+        }
+    }
+
+    class ValidationFileFilter implements FileFilter {
+        @Override
+        public boolean accept(File file) {
+            String name = Hasher.extractFileName(file);
+            return file.isFile() && name.startsWith(VALIDATION_FILE_PREFIX);
         }
     }
 

@@ -63,7 +63,6 @@ import java.util.prefs.Preferences;
 public class SipModel {
 
     private static final Logger LOG = Logger.getLogger(SipModel.class);
-
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
@@ -82,8 +81,6 @@ public class SipModel {
     private boolean allowInvalidRecords;
 
     public interface AnalysisListener {
-        void finished(boolean success);
-
         void analysisProgress(long elementCount);
     }
 
@@ -174,7 +171,19 @@ public class SipModel {
             if (dataSetModel.hasDataSet()) {
                 dataSetModel.getDataSet().deleteValidation(recordMapping.getPrefix());
             }
-            feedback.say("Validation cleared");
+            feedback.say(String.format("Validation cleared for %s",recordMapping.getPrefix()));
+        }
+        catch (StorageException e) {
+            LOG.warn(String.format("Error while deleting file: %s%n", e));
+        }
+    }
+
+    private void clearValidations() {
+        try {
+            if (dataSetModel.hasDataSet()) {
+                dataSetModel.getDataSet().deleteValidations();
+            }
+            feedback.say("Validation cleared for all mappings");
         }
         catch (StorageException e) {
             LOG.warn(String.format("Error while deleting file: %s%n", e));
@@ -341,6 +350,7 @@ public class SipModel {
 //    }
 
     public void importSource(final File file, final ProgressListener progressListener) {
+        clearValidations();
         feedback.say("Importing metadata from " + file.getAbsolutePath());
         Exec.work(new Runnable() {
             @Override
@@ -369,18 +379,15 @@ public class SipModel {
                             analysisModel.setStatistics(statistics);
                         }
                     });
-                    listener.finished(true);
                     feedback.say("Import analyzed");
                 }
                 catch (StorageException e) {
                     feedback.alert("Problem storing statistics", e);
-                    listener.finished(false);
                 }
             }
 
             @Override
             public void failure(Exception exception) {
-                listener.finished(false);
                 feedback.alert("Analysis failed", exception);
             }
 
@@ -392,6 +399,7 @@ public class SipModel {
     }
 
     public void convertSource(final ProgressListener progressListener) {
+        clearValidations();
         feedback.say("Converting to source for " + dataSetModel.getDataSet().getSpec());
         Exec.work(new Runnable() {
             @Override

@@ -21,24 +21,18 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.FactModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDesktopPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,76 +43,22 @@ import java.util.Map;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class StatusFrame extends FrameBase {
+public class FactsFrame extends FrameBase {
     private FactsTableModel factsTableModel = new FactsTableModel();
-    private JLabel statusLabel = new JLabel();
     private JTable factsTable = new JTable(factsTableModel);
 
-    public StatusFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Status", false);
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
-            @Override
-            public void dataSetChanged(DataSet dataSet) {
-                showStatus(dataSet.getState());
-            }
-
-            @Override
-            public void dataSetRemoved() {
-                statusLabel.setText("<html><b>No dataset</b>");
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                showStatus(dataSetState);
-            }
-        });
-        statusLabel.setFont(new Font("Sans", Font.BOLD, 24));
+    public FactsFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(desktop, sipModel, "Facts", false);
         sipModel.getDataSetFacts().addListener(factsTableModel);
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.add(createStatusPanel(), BorderLayout.NORTH);
         content.add(createFactsPanel(), BorderLayout.CENTER);
     }
 
     @Override
     protected void refresh() {
-    }
-
-    private void showStatus(final DataSetState dataSetState) {
-        statusLabel.setText(String.format("<html><b>Status:</b><i>%s</i>", saveStateDescription(dataSetState)));
-    }
-
-    private String saveStateDescription(DataSetState dataSetState) {
-        switch (dataSetState) {
-            case EMPTY:
-                return "has no source yet";
-            case IMPORTED:
-                performAnalysis();
-                return "imported - analyze";
-            case ANALYZED_IMPORT:
-                return "imported - choose record root and unique element";
-            case DELIMITED:
-                return "imported - ready for conversion to source";
-            case SOURCED:
-                return "sourced";
-            case ANALYZED_SOURCE:
-                return "analyzed";
-            case MAPPING:
-                return "mapping exists, not validated";
-            case VALIDATED:
-                return "validated, ready for upload!";
-            default:
-                throw new IllegalArgumentException("Unknown data set state: " + dataSetState);
-        }
-    }
-
-    private JPanel createStatusPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Status"));
-        p.add(statusLabel);
-        return p;
     }
 
     private JPanel createFactsPanel() {
@@ -170,35 +110,6 @@ public class StatusFrame extends FrameBase {
                 fireTableRowsInserted(0, getRowCount());
             }
         }
-    }
-
-    private void performAnalysis() {
-        sipModel.analyzeFields(new SipModel.AnalysisListener() {
-
-            @Override
-            public void finished(boolean success) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        setElementsProcessed(sipModel.getAnalysisModel().getElementCount());
-                    }
-                });
-            }
-
-            @Override
-            public void analysisProgress(final long elementCount) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        setElementsProcessed(elementCount);
-                    }
-                });
-            }
-        });
-    }
-
-    private void setElementsProcessed(long count) {
-        statusLabel.setText(String.format("%d elements processed", count));
     }
 
     @Override

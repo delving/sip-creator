@@ -31,7 +31,7 @@ public enum DataSetState {
     EMPTY("No imported or source data"),
     IMPORTED("Import file to be analyzed"),
     ANALYZED_IMPORT("Imported file analyzed"),
-    DELIMITED("Record root and unique element set"),
+    DELIMITED("Record root and unique element set - ready to convert"),
     SOURCED("Source data available"),
     ANALYZED_SOURCE("Source data analyzed"),
     MAPPING("Mapping created - not validated"),

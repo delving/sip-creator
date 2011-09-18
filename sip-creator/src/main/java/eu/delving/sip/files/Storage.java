@@ -51,6 +51,7 @@ public interface Storage {
     String MAPPING_FILE_PREFIX = "mapping_";
     String MAPPING_FILE_SUFFIX = ".xml";
     String VALIDATION_FILE_PATTERN = "validation_%s.int";
+    String VALIDATION_FILE_PREFIX = "validation_";
     String REPORT_FILE_PATTERN = "report_%s.txt";
     String RECORD_DEFINITION_FILE_SUFFIX = "-record-definition.xml";
     String FACT_DEFINITION_FILE_NAME = "fact-definition-list.xml";

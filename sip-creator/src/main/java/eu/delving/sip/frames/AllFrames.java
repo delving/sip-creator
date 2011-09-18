@@ -52,7 +52,7 @@ public class AllFrames {
         this.desktop = desktop;
         FrameBase status, analysis, create, statistics, input, fieldMapping, recordMapping, output;
         this.frames = new FrameBase[]{
-                status = new StatusFrame(desktop, sipModel),
+                status = new FactsFrame(desktop, sipModel),
                 analysis = new AnalysisFrame(desktop, sipModel),
                 create = new CreateFrame(desktop, sipModel),
                 statistics = new StatisticsFrame(desktop, sipModel),
@@ -63,9 +63,9 @@ public class AllFrames {
         };
         this.views = new Action[]{
                 view("First contact",
-                        block(status, 0, 0),
-                        block(analysis, 1, 0, 2, 1),
-                        block(statistics, 3, 0, 2, 1)
+                        block(analysis, 0, 0, 1, 3),
+                        block(statistics, 1, 0, 1, 2),
+                        block(status, 1, 2)
                 ),
                 view("Quick mapping",
                         block(create, 0, 0),
