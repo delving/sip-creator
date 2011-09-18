@@ -131,7 +131,6 @@ public class VisualFeedback implements Feedback {
     }
 
     private class LogFrame extends FrameBase {
-        private final int WIDTH = 500;
 
         public LogFrame(JDesktopPane desktop, SipModel sipModel) {
             super(desktop, sipModel, "Feedback", false);
@@ -147,8 +146,9 @@ public class VisualFeedback implements Feedback {
         }
 
         public void openAtPosition() {
-            setLocation(desktopPane.getSize().width - WIDTH + 8, 16);
-            setSize(WIDTH, desktopPane.getSize().height);
+            int width = desktopPane.getSize().width * 2 / 3;
+            setLocation(desktopPane.getSize().width - width + 8, 16);
+            setSize(width, desktopPane.getSize().height);
             openFrame(false);
         }
     }
@@ -172,14 +172,14 @@ public class VisualFeedback implements Feedback {
                     toggle.setText(String.format(ONE_LINE, FEEDBACK));
                     break;
                 case 1:
-                    toggle.setText(String.format(ONE_LINE, lines.get(0)));
+                    toggle.setText(String.format(ONE_LINE, shortEnough(lines.get(0))));
                     break;
                 case 2:
-                    toggle.setText(String.format(TWO_LINES, lines.get(0), lines.get(1)));
+                    toggle.setText(String.format(TWO_LINES, shortEnough(lines.get(0)), shortEnough(lines.get(1))));
                     break;
                 default:
                     int first = lines.size() - 3;
-                    toggle.setText(String.format(THREE_LINES, lines.get(first), lines.get(first + 1), lines.get(first + 2)));
+                    toggle.setText(String.format(THREE_LINES, shortEnough(lines.get(first)), shortEnough(lines.get(first + 1)), shortEnough(lines.get(first + 2))));
                     break;
             }
             if (lines.size() > MAX) {
@@ -190,6 +190,10 @@ public class VisualFeedback implements Feedback {
                 lines = fresh;
                 fireIntervalRemoved(this, 0, CHOP);
             }
+        }
+
+        private String shortEnough(String s) {
+            return s.length() > 80 ? s.substring(0, 77) + "..." : s;
         }
 
         @Override

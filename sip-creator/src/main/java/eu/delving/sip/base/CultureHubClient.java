@@ -187,13 +187,13 @@ public class CultureHubClient {
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
                         log.warn("Unable to fetch data set list. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.getNotifier().alert(String.format("Error fetching list from server:<br><br>%s", response.getStatusLine().getReasonPhrase()));
+                        context.getNotifier().alert(String.format("Error fetching list from hub: %s", response.getStatusLine().getReasonPhrase()));
                         break;
                 }
             }
             catch (Exception e) {
                 log.error("Unable to fetch list", e);
-                context.getNotifier().alert(String.format("Error fetching list from server:<br><br>%s", e.getMessage()));
+                context.getNotifier().alert(String.format("Error fetching list from hub: %s", e.getMessage()));
                 listReceiveListener.failed(e);
             }
             finally {
@@ -248,13 +248,13 @@ public class CultureHubClient {
                     case SYSTEM_ERROR:
                     case UNKNOWN_RESPONSE:
                         log.warn("Unable to unlock dataset. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.getNotifier().alert(String.format("Error unlocking dataset:<br><br>%s", response.getStatusLine().getReasonPhrase()));
+                        context.getNotifier().alert(String.format("Error unlocking dataset: %s", response.getStatusLine().getReasonPhrase()));
                         break;
                 }
             }
             catch (Exception e) {
                 log.error("Unable to unlock dataset", e);
-                context.getNotifier().alert(String.format("Error unlocking dataset server:<br><br>%s", e.getMessage()));
+                context.getNotifier().alert(String.format("Error unlocking dataset server: %s", e.getMessage()));
                 unlockListener.unlockComplete(false);
             }
         }
@@ -386,7 +386,6 @@ public class CultureHubClient {
                             throw new IOException(String.format("Unable to upload file %s, response: %s", file.getName(), Code.from(response)));
                     }
                 }
-                uploadListener.finished();
             }
             catch (IOException e) {
                 log.error("Error while connecting", e);
@@ -395,6 +394,9 @@ public class CultureHubClient {
             catch (ClientException e) {
                 log.error("Error ");
                 notifyUser(e.getMessage());
+            }
+            finally {
+                uploadListener.finished();
             }
         }
 
@@ -447,7 +449,7 @@ public class CultureHubClient {
 
     private void notifyUser(final String message) {
         log.warn("Problem communicating with CultureHub: " + message);
-        context.getNotifier().alert("<html>Sorry, there was a problem communicating with Repository<br>" + message);
+        context.getNotifier().alert("Problem communicating with hub: " + message);
     }
 
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {

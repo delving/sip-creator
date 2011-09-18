@@ -166,7 +166,7 @@ public class UploadAction extends AbstractAction {
                 return;
             }
             try {
-                setEnabled(false);
+                setActionEnabled(false);
                 cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new CultureHubClient.UploadListener() {
                     @Override
                     public void uploadRefused(File file) {
@@ -175,12 +175,12 @@ public class UploadAction extends AbstractAction {
 
                     @Override
                     public void uploadStarted(File file) {
-                        sipModel.getFeedback().say(String.format("Upload of %s started", file.getName()));
+                        sipModel.getFeedback().say(String.format("Uploading %s...", file.getName()));
                     }
 
                     @Override
                     public void uploadFinished(File file) {
-                        sipModel.getFeedback().say(String.format("%s uploaded", file.getName()));
+                        sipModel.getFeedback().say(String.format("Uploaded %s", file.getName()));
                     }
 
                     @Override
@@ -235,6 +235,7 @@ public class UploadAction extends AbstractAction {
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to complete uploading", e);
+                setActionEnabled(true);
             }
         }
 
