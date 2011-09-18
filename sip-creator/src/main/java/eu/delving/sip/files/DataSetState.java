@@ -48,6 +48,6 @@ public enum DataSetState {
     }
 
     public String toHtml() {
-        return String.format("<html><strong>&quot;%s&quot;</strong><br><font size=-2><i>%s</i></font>", toString(), description);
+        return String.format("<html><center><strong>&quot;%s&quot;</strong><br><font size=-2><i>%s</i></font></center>", toString(), description);
     }
 }

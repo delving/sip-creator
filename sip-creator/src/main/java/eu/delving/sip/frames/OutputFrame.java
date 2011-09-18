@@ -47,7 +47,6 @@ public class OutputFrame extends FrameBase {
 
     @Override
     protected void onOpen(boolean opened) {
-        sipModel.getFeedback().say("Output open: "+opened);
         sipModel.getRecordCompileModel().setEnabled(opened);
     }
 

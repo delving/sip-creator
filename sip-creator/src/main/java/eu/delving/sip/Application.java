@@ -181,8 +181,6 @@ public class Application {
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
-        statusLabel.setBackground(Color.white);
-        statusLabel.setOpaque(true);
         p.add(statusLabel);
         p.add(bp);
         p.add(feedback.getToggle());
