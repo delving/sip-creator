@@ -71,8 +71,12 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private boolean enabled = true;
 
     public enum Type {
-        RECORD,
-        FIELD
+        RECORD("record mapping"),
+        FIELD("field mapping");
+
+        String s;
+        Type(String s) {this.s = s;}
+        public String toString() {return s;}
     }
 
     public enum State {

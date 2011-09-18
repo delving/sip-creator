@@ -168,7 +168,7 @@ public class Application {
     }
 
     private JPanel createStatePanel() {
-        JPanel bp = new JPanel(new GridLayout(2, 2, 6, 6));
+        JPanel bp = new JPanel(new GridLayout(2, 2));
         for (Action action : actions) {
             bp.add(new JButton(action));
         }
