@@ -362,7 +362,7 @@ public class Application {
     }
 
     public static void main(String[] args) throws StorageException {
-        final File storageDirectory = StorageFinder.getStorageDirectory();
+        final File storageDirectory = StorageFinder.getStorageDirectory(args);
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {

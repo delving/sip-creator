@@ -161,4 +161,14 @@ public class Utility {
             }
         }
     }
+
+    public static URL getCodebase() {
+        try {
+            BasicService bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
+            return bs.getCodeBase();
+        }
+        catch (UnavailableServiceException ue) {
+            return null;
+        }
+    }
 }

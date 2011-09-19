@@ -21,10 +21,13 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.sip.base.Utility;
+
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import java.io.File;
 import java.io.FileFilter;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +42,7 @@ public class StorageFinder {
     private static final Pattern HPU_HUMAN = Pattern.compile("([A-Za-z0-9.]+):([0-9]+)/([A-Za-z0-9]+)");
     private static final Pattern HPU_DIRECTORY = Pattern.compile("([A-Za-z0-9_]+)__([0-9]+)___([A-Za-z0-9]+)");
 
-    public static File getStorageDirectory() {
+    public static File getStorageDirectory(String [] args) {
         if (!WORKSPACE_DIR.exists()) {
             if (!WORKSPACE_DIR.mkdirs()) {
                 throw new RuntimeException(String.format("Unable to create %s", WORKSPACE_DIR.getAbsolutePath()));
@@ -56,7 +59,7 @@ public class StorageFinder {
         });
         switch (files.length) {
             case 0:
-                return createHostPortDirectory();
+                return createHostPortDirectory(args);
             case 1:
                 return files[0];
             default:
@@ -111,8 +114,15 @@ public class StorageFinder {
         }
     }
 
-    private static File createHostPortDirectory() {
-        while (true) {
+    private static File createHostPortDirectory(String [] args) {
+        if (args.length > 0) {
+            String user = args[0];
+            URL codebase = Utility.getCodebase();
+            String host = codebase.getHost();
+            int port = codebase.getPort();
+            return createDirectory(host, String.valueOf(port), user);
+        }
+        else while (true) {
             String answer = JOptionPane.showInputDialog(null, "<html>Please enter host:port/user for your Culture Hub connection");
             Matcher matcher = HPU_HUMAN.matcher(answer);
             if (matcher.matches()) {
@@ -140,9 +150,5 @@ public class StorageFinder {
             String hostPort = (String)box.getSelectedItem();
             return createDirectory(hostPort);
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Storage directory: " + getStorageDirectory().getAbsolutePath());
     }
 }
