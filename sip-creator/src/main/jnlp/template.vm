@@ -5,7 +5,7 @@
         <vendor>Delving</vendor>
         <description kind="one-line">SIP-Creator</description>
         <description kind="short">Submission Information Package Creator</description>
-        <icon href="code base/sip-creator.png" kind="default"/>
+        <icon href="sip-creator-logo.png" kind="default"/>
         <shortcut online="false">
             <desktop/>
         </shortcut>

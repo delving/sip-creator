@@ -133,7 +133,7 @@ public class Application {
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        ImageIcon logo = new ImageIcon(getClass().getResource("/delving-logo.png"));
+        ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
         home.setIconImage(logo.getImage());
         dataSetMenu = new DataSetMenu(sipModel);
         oauthClient = new OAuthClient(
