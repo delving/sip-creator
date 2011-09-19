@@ -22,15 +22,31 @@
 package eu.delving.sip.base;
 
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
 
 /**
  * Import a new file
@@ -42,12 +58,48 @@ public class ImportAction extends AbstractAction {
     private JDesktopPane parent;
     private SipModel sipModel;
     private final String RECENT_DIR = "recentImportDirectory";
+    private JDialog dialog;
+    private ChooseFileAction chooseFileAction = new ChooseFileAction();
+    private HarvestAction harvestAction = new HarvestAction();
     private JFileChooser chooser = new JFileChooser("XML Metadata Source File");
 
     public ImportAction(JDesktopPane parent, SipModel sipModel) {
         super("Import");
         this.parent = parent;
         this.sipModel = sipModel;
+        this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Input Source", Dialog.ModalityType.APPLICATION_MODAL);
+        prepareDialog();
+        prepareChooser(sipModel);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
+        Dimension all = parent.getSize();
+        Dimension d = dialog.getSize();
+        dialog.setLocation((all.width - d.width) / 2, (all.height - d.height) / 2);
+        dialog.setVisible(true);
+    }
+
+    private void prepareDialog() {
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                dialog.setVisible(false);
+            }
+        });
+        JPanel bp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bp.add(cancel);
+        JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
+        p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        p.add(new JButton(chooseFileAction));
+        p.add(new JButton(harvestAction));
+        dialog.getContentPane().add(p, BorderLayout.CENTER);
+        dialog.getContentPane().add(bp, BorderLayout.SOUTH);
+        dialog.pack();
+    }
+
+    private void prepareChooser(SipModel sipModel) {
         File directory = new File(sipModel.getPreferences().get(RECENT_DIR, System.getProperty("user.home")));
         chooser.setCurrentDirectory(directory);
         chooser.setFileFilter(new FileFilter() {
@@ -64,16 +116,6 @@ public class ImportAction extends AbstractAction {
         chooser.setMultiSelectionEnabled(false);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        int choiceMade = chooser.showOpenDialog(parent);
-        if (choiceMade == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
-            sipModel.getPreferences().put(RECENT_DIR, file.getAbsolutePath());
-            selectInputFile(file); // it's a boolean
-        }
-    }
-
     public boolean selectInputFile(File file) {
         if (!file.exists()) {
             return false;
@@ -85,9 +127,9 @@ public class ImportAction extends AbstractAction {
         int doImport = JOptionPane.showConfirmDialog(
                 parent,
                 String.format(
-                        "<html>Are you sure you wish to import this file<br><br>" +
+                        "<html>Import this file<br><br>" +
                                 "<pre><strong>%s</strong></pre><br>" +
-                                "as a Data Set called '<strong>%s</strong>'?<br><br>",
+                                "into data set '<strong>%s</strong>'?<br>",
                         file.getAbsolutePath(),
                         spec // todo: could snag description and things from facts, if they were hardcoded
                 ),
@@ -96,7 +138,7 @@ public class ImportAction extends AbstractAction {
         );
         if (doImport == JOptionPane.YES_OPTION) {
             setEnabled(false);
-            ProgressListener listener = sipModel.getFeedback().progressListener("Importing", "Storing data for "+spec);
+            ProgressListener listener = sipModel.getFeedback().progressListener("Importing", "Storing data for " + spec);
             listener.onFinished(new ProgressListener.End() {
                 @Override
                 public void finished(boolean success) {
@@ -109,4 +151,55 @@ public class ImportAction extends AbstractAction {
         return false;
     }
 
+    private class ChooseFileAction extends AbstractAction {
+        private ChooseFileAction() {
+            super("<html><center><br><h2>Read</h2>Import from XML dump file<br>from your computer's file system<br><br>");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            dialog.setVisible(false);
+            int choiceMade = chooser.showOpenDialog(parent);
+            if (choiceMade == JFileChooser.APPROVE_OPTION) {
+                File file = chooser.getSelectedFile();
+                sipModel.getPreferences().put(RECENT_DIR, file.getAbsolutePath());
+                selectInputFile(file); // it's a boolean
+            }
+        }
+    }
+
+    private class HarvestAction extends AbstractAction {
+        private HarvestAction() {
+            super("<html><center><br><h2>Harvest</h2>Harvest from OAI-PMH server<br>for which you have the URL<br><br>");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            dialog.setVisible(false);
+            if (!sipModel.hasDataSet()) return;
+            Map<String, String> hints = sipModel.getDataSetModel().getDataSet().getHints();
+            String url = hints.get(Storage.HARVEST_URL);
+            if (url == null) url = "";
+            String harvestUrl = JOptionPane.showInputDialog(parent, "Please enter the URL of the OAI-PMH server, without parameters", url);
+            if (harvestUrl != null) {
+                try {
+                    new URL(harvestUrl);
+                    hints.put(Storage.HARVEST_URL, harvestUrl);
+                    sipModel.getDataSetModel().getDataSet().setHints(hints);
+                    performHarvest(harvestUrl);
+                }
+                catch (MalformedURLException e) {
+                    sipModel.getFeedback().alert("Malformed URL: " + harvestUrl);
+                }
+                catch (StorageException e) {
+                    sipModel.getFeedback().alert("Unable to save URL to hints");
+                }
+            }
+        }
+
+        private void performHarvest(String harvestUrl) {
+            JOptionPane.showMessageDialog(parent, "Harvestor not yet integrated");
+            // todo: implement
+        }
+    }
 }
