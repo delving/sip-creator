@@ -529,7 +529,7 @@ public class StorageImpl extends StorageBase implements Storage {
             catch (Exception e) {
                 File source = new File(here, SOURCE_FILE_NAME);
                 delete(source);
-                throw new StorageException("Unable to convert source", e);
+                throw new StorageException("Unable to convert source: "+e.getMessage(), e);
             }
         }
 

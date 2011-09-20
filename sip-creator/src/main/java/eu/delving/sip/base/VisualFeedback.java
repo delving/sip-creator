@@ -126,7 +126,8 @@ public class VisualFeedback implements Feedback {
         list.ensureIndexIsVisible(listModel.getSize() - 1);
     }
 
-    private void inYourFace(final String message) {
+    private void inYourFace(String message) {
+        message = message.replaceAll("<", "&lt;");
         JOptionPane.showMessageDialog(null, String.format("<html><h3>%s</h3>", message));
     }
 

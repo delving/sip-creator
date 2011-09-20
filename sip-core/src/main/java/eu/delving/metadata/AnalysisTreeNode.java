@@ -100,7 +100,7 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
     public boolean setRecordRoot(Path recordRoot) {
         boolean oldValue = this.recordRoot;
         this.recordRoot = recordRoot != null && getPath().equals(recordRoot);
-        return this.recordRoot != oldValue;
+        return this.recordRoot || this.recordRoot != oldValue;
     }
 
     @Override
