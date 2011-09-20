@@ -101,7 +101,7 @@ public class SourceConverter {
                         StartElement start = event.asStartElement();
                         path.push(Tag.create(start.getName().getPrefix(), start.getName().getLocalPart()));
                         if (!recordEvents.isEmpty()) {
-                            if (path.equals(uniqueElementPath)) {
+                            if (path.equals(uniqueElementPath) && uniqueValue == null) {
                                 uniqueBuilder = new StringBuilder();
                                 uniqueValue = null;
                             }
@@ -142,7 +142,7 @@ public class SourceConverter {
                                 }
                             }
                             else {
-                                if (path.equals(uniqueElementPath)) {
+                                if (path.equals(uniqueElementPath) && uniqueBuilder != null) {
                                     uniqueValue = uniqueBuilder.toString();
                                     if (uniqueness.isRepeated(uniqueValue)) {
                                         throw new UniquenessException(uniqueElementPath, count);
