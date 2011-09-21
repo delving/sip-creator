@@ -59,7 +59,7 @@ import java.beans.VetoableChangeListener;
  */
 
 public abstract class FrameBase extends JInternalFrame {
-    public static Insets INSETS = new Insets(2, /* top */ 10, /* left */ 10, /* bottom */ 10 /* right */);
+    public static Insets INSETS = new Insets(2, /* top */ 8, /* left */ 14, /* bottom */ 10 /* right */);
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     private static final int MARGIN = 12;
     private Dimension defaultSize = DEFAULT_SIZE;
