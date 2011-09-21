@@ -99,7 +99,9 @@ public class DictionaryPopup extends FrameBase {
         setTitle(String.format("Dictionary for %s", fieldMapping.getFieldNameString()));
         mapModel.setFieldMapping(fieldMapping);
         valueModel.setFieldMapping(fieldMapping);
-        openFrame(true);
+        setLocation(parent.getLocation());
+        setSize(parent.getSize());
+        openFrame(false);
     }
 
     @Override
