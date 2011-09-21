@@ -40,6 +40,7 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -58,6 +59,7 @@ import java.beans.VetoableChangeListener;
  */
 
 public abstract class FrameBase extends JInternalFrame {
+    public static Insets INSETS = new Insets(2, /* top */ 10, /* left */ 10, /* bottom */ 10 /* right */);
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     private static final int MARGIN = 12;
     private Dimension defaultSize = DEFAULT_SIZE;
@@ -164,6 +166,7 @@ public abstract class FrameBase extends JInternalFrame {
             ((FrameBase) parent).childOpening();
         }
         super.show();
+        ensureOnScreen();
         if (added != null && oldPosition) {
             setLocation(added);
             Dimension savedSize = getSavedSize();
@@ -238,6 +241,14 @@ public abstract class FrameBase extends JInternalFrame {
         }
         else {
             return null;
+        }
+    }
+
+    private void ensureOnScreen() {
+        Point loc = getLocation();
+        if (loc.y - INSETS.top + 1 < 0) {
+            loc.y = INSETS.top - 1;
+            setLocation(loc);
         }
     }
 
@@ -401,7 +412,8 @@ public abstract class FrameBase extends JInternalFrame {
     }
 
     private Dimension getSavedSize() {
-        return new Dimension(getSavedInt("width"), getSavedInt("height"));
+        Dimension size = new Dimension(getSavedInt("width"), getSavedInt("height"));
+        return size.width > 50 && size.height > 50 ? size : null;
     }
 
     private Point getSavedLocation() {
