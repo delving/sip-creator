@@ -30,7 +30,6 @@ import eu.delving.sip.ProgressListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.BitSet;
 import java.util.List;
@@ -70,7 +69,7 @@ public interface DataSet {
 
     void deleteValidations() throws StorageException;
 
-    OutputStream importedOutput() throws StorageException;
+    File importedOutput() throws StorageException;
 
     InputStream importedInput() throws StorageException;
 

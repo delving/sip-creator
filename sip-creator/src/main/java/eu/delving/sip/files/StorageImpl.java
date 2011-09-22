@@ -306,8 +306,8 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public OutputStream importedOutput() throws StorageException {
-            return zipOut(importedFile(here));
+        public File importedOutput() throws StorageException {
+            return importedFile(here);
         }
 
         @Override
@@ -529,7 +529,7 @@ public class StorageImpl extends StorageBase implements Storage {
             catch (Exception e) {
                 File source = new File(here, SOURCE_FILE_NAME);
                 delete(source);
-                throw new StorageException("Unable to convert source: "+e.getMessage(), e);
+                throw new StorageException("Unable to convert source: " + e.getMessage(), e);
             }
         }
 

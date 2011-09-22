@@ -293,6 +293,7 @@ public class Harvestor implements Runnable {
         if (context.harvestSpec() != null && !context.harvestSpec().isEmpty()) {
             url += String.format("&set=%s", context.harvestSpec());
         }
+        log.info(String.format("Harvesting from '%s'", url));
         return doGet(url);
     }
 
@@ -325,6 +326,7 @@ public class Harvestor implements Runnable {
 
     private boolean prepareOutput() {
         try {
+            log.info(String.format("Opening output file '%s'", context.outputFile()));
             outputStream = new FileOutputStream(context.outputFile());
             out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             out.add(eventFactory.createStartDocument());

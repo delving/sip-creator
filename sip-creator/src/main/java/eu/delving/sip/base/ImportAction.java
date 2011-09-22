@@ -216,7 +216,14 @@ public class ImportAction extends AbstractAction {
 
                         @Override
                         public File outputFile() {
-                            return new File("/tmp/harvest.xml"); // todo: hardcoded
+                            try {
+                                return sipModel.getDataSetModel().getDataSet().importedOutput();
+                            }
+                            catch (StorageException e) {
+                                e.printStackTrace();
+                                sipModel.getFeedback().alert(e.getMessage());
+                            }
+                            return null;
                         }
 
                         @Override
