@@ -189,6 +189,7 @@ public class ImportAction extends AbstractAction {
             JTextField harvestUrl = new JTextField(null == url ? "" : url);
             JTextField harvestPrefix = new JTextField(null == prefix ? "" : prefix);
             JTextField harvestSpec = new JTextField(null == spec ? "" : spec);
+            harvestSpec.setEditable(false);
             Object[] fields = new Object[]{"Server", harvestUrl, "Prefix", harvestPrefix, "Spec", harvestSpec};
             if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(parent, fields, "OAI-PMH server details", JOptionPane.OK_CANCEL_OPTION)) {
                 return;
