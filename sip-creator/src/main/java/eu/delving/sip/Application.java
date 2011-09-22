@@ -61,6 +61,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -99,6 +101,8 @@ public class Application {
     private VisualFeedback feedback;
     private JLabel statusLabel = new JLabel("No dataset", JLabel.CENTER);
     private HarvestDialog harvestDialog;
+    private HarvestPool harvestPool = new HarvestPool();
+    private JToggleButton harvestToggleButton = new JToggleButton();
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -123,7 +127,6 @@ public class Application {
         };
         feedback = new VisualFeedback(desktop);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
-        final HarvestPool harvestPool = new HarvestPool();
         harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
         feedback.setSipModel(sipModel);
         feedback.say("SIP-Creator started");
@@ -153,17 +156,7 @@ public class Application {
         home.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
-                if (harvestPool.getSize() > 0) {
-                    if (JOptionPane.YES_OPTION !=
-                            JOptionPane.showConfirmDialog(null,
-                                    String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize()),
-                                    "Active harvests",
-                                    JOptionPane.YES_NO_OPTION)) {
-                        return;
-                    }
-                }
-                allFrames.putState();
-                System.exit(0);
+                quit();
             }
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
@@ -199,6 +192,21 @@ public class Application {
         osxExtra();
     }
 
+    private boolean quit() {
+        if (harvestPool.getSize() > 0) {
+            if (JOptionPane.YES_OPTION !=
+                    JOptionPane.showConfirmDialog(null,
+                            String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize()),
+                            "Active harvests",
+                            JOptionPane.YES_NO_OPTION)) {
+                return false;
+            }
+        }
+        allFrames.putState();
+        System.exit(0);
+        return true;
+    }
+
     private JPanel createStatePanel() {
         JPanel bp = new JPanel(new GridLayout(2, 2));
         for (Action action : actions) {
@@ -217,7 +225,25 @@ public class Application {
         p.add(bp);
         JPanel fp = new JPanel(new BorderLayout());
         fp.add(feedback.getToggle(), BorderLayout.CENTER);
-        JToggleButton harvestToggleButton = new JToggleButton("Harvests");
+        refreshToggleButton();
+        harvestPool.addListDataListener(
+                new ListDataListener() {
+                    @Override
+                    public void intervalAdded(ListDataEvent listDataEvent) {
+                        refreshToggleButton();
+                    }
+
+                    @Override
+                    public void intervalRemoved(ListDataEvent listDataEvent) {
+                        refreshToggleButton();
+                    }
+
+                    @Override
+                    public void contentsChanged(ListDataEvent listDataEvent) {
+                        refreshToggleButton();
+                    }
+                }
+        );
         harvestToggleButton.addItemListener(
                 new ItemListener() {
                     @Override
@@ -234,6 +260,10 @@ public class Application {
         fp.add(harvestToggleButton, BorderLayout.EAST);
         p.add(fp);
         return p;
+    }
+
+    private void refreshToggleButton() {
+        harvestToggleButton.setText(String.format("%d harvests", harvestPool.getSize()));
     }
 
     private JMenuBar createMenuBar() {
@@ -360,9 +390,10 @@ public class Application {
                     @Override
                     public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
                         if (method.getName().equals("handleQuitRequestWith")) {
-                            allFrames.putState();
-                            Method performQuitMethod = objects[1].getClass().getDeclaredMethod("performQuit");
-                            performQuitMethod.invoke(objects[1]);
+                            if (quit()) {
+                                Method performQuitMethod = objects[1].getClass().getDeclaredMethod("performQuit");
+                                performQuitMethod.invoke(objects[1]);
+                            }
                         }
                         return null;
                     }

@@ -88,6 +88,7 @@ public class Harvestor implements Runnable {
     private int recordCount;
     private boolean cancelled;
     private Listener listener;
+    private String dataSetSpec;
 
     /**
      * Subscribe to the progress of the harvestor.
@@ -138,7 +139,8 @@ public class Harvestor implements Runnable {
         String harvestSpec();
     }
 
-    public Harvestor(Context context) {
+    public Harvestor(String dataSetSpec, Context context) {
+        this.dataSetSpec = dataSetSpec;
         this.context = context;
     }
 
@@ -422,12 +424,25 @@ public class Harvestor implements Runnable {
         this.cancelled = cancelled;
     }
 
-    public String getId() {
-        return context.harvestSpec();
+    public String getDataSetSpec() {
+        return dataSetSpec;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Harvestor harvestor = (Harvestor) o;
+        return dataSetSpec.equals(harvestor.dataSetSpec);
+    }
+
+    @Override
+    public int hashCode() {
+        return dataSetSpec.hashCode();
     }
 
     @Override
     public String toString() {
-        return String.format("%s %s - %s:%s (%d records)", cancelled ? "CANCELLED!" : "", context.harvestSpec(), context.harvestUrl(), context.harvestPrefix(), getRecordCount());
+        return String.format("%s %s - %s:%s (%d records)", cancelled ? "CANCELLED!" : "", dataSetSpec, context.harvestUrl(), context.harvestPrefix(), getRecordCount());
     }
 }

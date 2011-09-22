@@ -185,11 +185,10 @@ public class ImportAction extends AbstractAction {
             Map<String, String> hints = sipModel.getDataSetModel().getDataSet().getHints();
             String url = hints.get(Storage.HARVEST_URL);
             String prefix = hints.get(Storage.HARVEST_PREFIX);
-            String spec = sipModel.getDataSetModel().getDataSet().getSpec();
+            String spec = hints.get(Storage.HARVEST_SPEC);
             JTextField harvestUrl = new JTextField(null == url ? "" : url);
             JTextField harvestPrefix = new JTextField(null == prefix ? "" : prefix);
             JTextField harvestSpec = new JTextField(null == spec ? "" : spec);
-            harvestSpec.setEditable(false);
             Object[] fields = new Object[]{"Server", harvestUrl, "Prefix", harvestPrefix, "Spec", harvestSpec};
             if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(parent, fields, "OAI-PMH server details", JOptionPane.OK_CANCEL_OPTION)) {
                 return;
@@ -199,6 +198,7 @@ public class ImportAction extends AbstractAction {
                     new URL(harvestUrl.getText());
                     hints.put(Storage.HARVEST_URL, harvestUrl.getText());
                     hints.put(Storage.HARVEST_PREFIX, harvestPrefix.getText());
+                    hints.put(Storage.HARVEST_SPEC, harvestSpec.getText());
                     sipModel.getDataSetModel().getDataSet().setHints(hints);
                     performHarvest(harvestUrl.getText(), harvestPrefix.getText(), harvestSpec.getText());
                 }
@@ -212,7 +212,8 @@ public class ImportAction extends AbstractAction {
         }
 
         private void performHarvest(final String harvestUrl, final String harvestPrefix, final String harvestSpec) {
-            harvestPool.submit(new Harvestor(
+
+            harvestPool.submit(new Harvestor(sipModel.getDataSetModel().getDataSet().getSpec(),
                     new Harvestor.Context() {
 
                         @Override

@@ -22,7 +22,7 @@ public class HarvestPool extends AbstractListModel {
 
     public void submit(final Harvestor harvestor) {
         if (tasks.contains(harvestor)) {
-            LOG.info(String.format("Harvestor for %s is already running", harvestor.getId()));
+            LOG.info(String.format("Harvestor for %s is already running", harvestor.getDataSetSpec()));
             return;
         }
         executorService.submit(harvestor);
