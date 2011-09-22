@@ -12,7 +12,6 @@ import eu.delving.sip.files.StorageImpl;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -104,15 +103,17 @@ public class MockDataSetFactory {
         }
     }
 
-    MetadataModel getMetadataModel() {
+    public MetadataModel loadMetadataModel() {
         try {
             MetadataModelImpl metadataModel = new MetadataModelImpl();
-            metadataModel.setRecordDefinitionResources(Arrays.asList("/abm-record-definition.xml"));
+            metadataModel.setFactDefinitionsFile(new File(getClass().getResource("/fact-definition-list.xml").getFile()));
+            metadataModel.setRecordDefinitionFiles(new File(getClass().getResource("/abm-record-definition.xml").getFile()));
             return metadataModel;
         }
         catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            System.exit(1);
+            return null;
         }
     }
-
 }

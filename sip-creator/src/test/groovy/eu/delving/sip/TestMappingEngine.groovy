@@ -1,5 +1,7 @@
 package eu.delving.sip
 
+import eu.delving.metadata.MetadataModel
+import eu.delving.metadata.MetadataModelImpl
 import eu.delving.metadata.ValidationException
 import org.apache.commons.io.IOUtils
 import org.junit.Before
@@ -19,7 +21,7 @@ class TestMappingEngine {
     void createMappingEngine() {
         Map<String, String> namespaces = new HashMap<String, String>()
         String mapping = IOUtils.toString(getClass().getResourceAsStream("/sample_mapping_icn.xml"), "UTF-8")
-        mappingEngine = new MappingEngine(mapping, namespaces, getClass().getClassLoader())
+        mappingEngine = new MappingEngine(mapping, namespaces, getClass().getClassLoader(), loadMetadataModel())
     }
 
     @Test
@@ -85,5 +87,18 @@ class TestMappingEngine {
 
     }
 
+    public MetadataModel loadMetadataModel() {
+        try {
+            MetadataModelImpl metadataModel = new MetadataModelImpl();
+            metadataModel.setFactDefinitionsFile(new File(getClass().getResource("/fact-definition-list.xml").getFile()));
+            metadataModel.setRecordDefinitionFiles(new File(getClass().getResource("/icn-record-definition.xml").getFile()));
+            return metadataModel;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
 
 }

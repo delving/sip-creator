@@ -30,10 +30,11 @@ import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
 import javax.swing.KeyStroke;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
+import static eu.delving.sip.base.FrameBase.INSETS;
 
 /**
  * Hold on to all the frames and manage their arrangemenbt
@@ -42,7 +43,6 @@ import java.awt.event.KeyEvent;
  */
 
 public class AllFrames {
-    private static Insets INSETS = new Insets(2, /* top */ 10, /* left */ 14, /* bottom */ 10 /* right */);
     private FrameBase[] frames;
     private Action[] views;
     private JDesktopPane desktop;
@@ -95,6 +95,15 @@ public class AllFrames {
                         block(fieldMapping, 0, 0),
                         block(output, 0, 0),
                         block(status, 0, 0)
+                ),
+                view("Decadent Display",
+                        block(create, 0, 0, 3, 3),
+                        block(statistics, 0, 3, 2, 3),
+                        block(input, 5, 0, 2, 4),
+                        block(recordMapping, 3, 0, 2, 3),
+                        block(fieldMapping, 2, 3, 3, 5),
+                        block(output, 5, 4, 2, 4),
+                        block(status, 0, 6, 2, 2)
                 )
         };
     }
