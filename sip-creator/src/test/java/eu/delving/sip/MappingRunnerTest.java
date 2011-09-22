@@ -19,11 +19,15 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.groovy;
+package eu.delving.sip;
 
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.MetadataModel;
+import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.RecordMapping;
-import eu.delving.sip.MappingEngine;
 import groovy.util.Node;
 import groovy.xml.QName;
 import org.apache.commons.io.FileUtils;
@@ -55,7 +59,7 @@ public class MappingRunnerTest {
     @Before
     public void setUp() throws Exception {
         namespaces = new TreeMap<String, String>();
-        MetadataModel metadataModel = MappingEngine.loadMetadataModel();
+        MetadataModel metadataModel = loadMetadataModel();
         RecordMapping recordMapping = RecordMapping.read(getClass().getResourceAsStream(MAPPING_FILE), metadataModel);
         LOG.info(String.format("RecordMapping has %d facts and %d fieldMappings",
                 recordMapping.getFacts().size(),
@@ -78,6 +82,20 @@ public class MappingRunnerTest {
             }
         }
         Assert.assertNotNull(rootNode.value());
+    }
+
+    public MetadataModel loadMetadataModel() {
+        try {
+            MetadataModelImpl metadataModel = new MetadataModelImpl();
+            metadataModel.setFactDefinitionsFile(new File(getClass().getResource("/fact-definition-list.xml").getFile()));
+            metadataModel.setRecordDefinitionFiles(new File(getClass().getResource("/icn-record-definition.xml").getFile()));
+            return metadataModel;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
     }
 
 }

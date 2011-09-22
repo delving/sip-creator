@@ -132,14 +132,14 @@ public class TestStorage {
         assertTrue("Should be source format", statistics.isSourceFormat());
         AnalysisTree tree = statistics.createAnalysisTree();
         assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.create(Storage.ENVELOPE_TAG)));
-        RecordMapping recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.getMetadataModel());
+        RecordMapping recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
         assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recordMapping.getPrefix());
         MappingModel mappingModel = new MappingModel();
         mappingModel.setRecordMapping(recordMapping);
         mappingModel.setFact("/some/path", "value");
         dataSet().setRecordMapping(recordMapping);
         assertEquals("Should be two files", 6, mock.files().length);
-        recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.getMetadataModel());
+        recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
         assertEquals("Should have held fact", "value", recordMapping.getFact("/some/path"));
         assertEquals(MAPPING, dataSet().getState());
         assertEquals("Should be hints and source", 2, dataSet().getUploadFiles().size());
