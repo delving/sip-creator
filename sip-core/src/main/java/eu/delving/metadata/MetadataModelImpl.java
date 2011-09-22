@@ -24,12 +24,13 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,14 +47,14 @@ public class MetadataModelImpl implements MetadataModel {
     private List<FactDefinition> factDefinitions = new ArrayList<FactDefinition>();
     private Map<String, RecordDefinition> recordDefinitions = new TreeMap<String, RecordDefinition>();
 
-    public void setRecordDefinitionResources(List<String> paths) throws IOException, MetadataException {
-        URL url = getClass().getResource("/fact-definition-list.xml");
-        FactDefinition.List definitionList = readFacts(url.openStream());
-        factDefinitions.clear();
+    public void setFactDefinitionsFile(File factDefinitionsFile) throws FileNotFoundException {
+        FactDefinition.List definitionList = readFacts(new FileInputStream(factDefinitionsFile));
         factDefinitions.addAll((definitionList.factDefinitions));
-        for (String path : paths) {
-            url = getClass().getResource(path);
-            RecordDefinition recordDefinition = readRecordDefinition(url.openStream());
+    }
+
+    public void setRecordDefinitionFiles(File... files) throws FileNotFoundException, MetadataException {
+        for (File file : files) {
+            RecordDefinition recordDefinition = readRecordDefinition(new FileInputStream(file));
             recordDefinitions.put(recordDefinition.prefix, recordDefinition);
         }
     }
@@ -78,8 +79,13 @@ public class MetadataModelImpl implements MetadataModel {
 
     private FactDefinition.List readFacts(InputStream in) {
         XStream stream = stream();
-        Reader reader = new InputStreamReader(in);
-        return (FactDefinition.List) stream.fromXML(reader);
+        try {
+            Reader reader = new InputStreamReader(in, "UTF-8");
+            return (FactDefinition.List) stream.fromXML(reader);
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private RecordDefinition readRecordDefinition(InputStream in) throws MetadataException {

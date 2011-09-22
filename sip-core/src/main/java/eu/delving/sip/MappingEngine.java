@@ -8,7 +8,6 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.ValidationException;
@@ -16,7 +15,6 @@ import groovy.util.Node;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -31,8 +29,7 @@ public class MappingEngine {
     private RecordValidator recordValidator;
     private long compileTime, parseTime, mapTime, validateTime, outputTime;
 
-    public MappingEngine(String mapping, Map<String, String> namespaces, ClassLoader classLoader) throws FileNotFoundException, MetadataException {
-        MetadataModel metadataModel = loadMetadataModel();
+    public MappingEngine(String mapping, Map<String, String> namespaces, ClassLoader classLoader, MetadataModel metadataModel) throws FileNotFoundException, MetadataException {
         RecordMapping recordMapping = RecordMapping.read(mapping, metadataModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
         long now = System.currentTimeMillis();
@@ -86,23 +83,6 @@ public class MappingEngine {
         }
         catch (XMLStreamException e) {
             throw new MappingException(null, "XML Streaming problem!", e);
-        }
-    }
-
-    public static MetadataModel loadMetadataModel() {
-        try {
-            MetadataModelImpl metadataModel = new MetadataModelImpl();
-            metadataModel.setRecordDefinitionResources(Arrays.asList(
-                    "/ese-record-definition.xml",
-                    "/icn-record-definition.xml",
-                    "/abm-record-definition.xml"
-            ));
-            return metadataModel;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-            return null;
         }
     }
 
