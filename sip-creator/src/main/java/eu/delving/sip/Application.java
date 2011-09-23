@@ -91,6 +91,8 @@ import static eu.delving.sip.files.DataSetState.IMPORTED;
  */
 
 public class Application {
+
+    public static final int CONNECTION_TIMEOUT = 60000;
     private SipModel sipModel;
     private Action[] actions;
     private JFrame home;

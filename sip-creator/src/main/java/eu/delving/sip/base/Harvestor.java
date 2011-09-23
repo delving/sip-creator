@@ -24,6 +24,7 @@ package eu.delving.sip.base;
 import com.ctc.wstx.stax.WstxInputFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.Application;
 import eu.delving.sip.xml.ValueFilter;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -77,7 +78,6 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class Harvestor implements Runnable {
 
-    private static final int CONNECTION_TIMEOUT = 30000;
     private static final Path RECORD_ROOT = new Path("/OAI-PMH/ListRecords/record");
     private static final Path ERROR = new Path("/OAI-PMH/error");
     private static final Path RESUMPTION_TOKEN = new Path("/OAI-PMH/ListRecords/resumptionToken");
@@ -149,8 +149,8 @@ public class Harvestor implements Runnable {
         this.dataSetSpec = dataSetSpec;
         this.context = context;
         HttpParams timeoutParams = new BasicHttpParams();
-        HttpConnectionParams.setSoTimeout(timeoutParams, CONNECTION_TIMEOUT);
-        HttpConnectionParams.setConnectionTimeout(timeoutParams, CONNECTION_TIMEOUT);
+        HttpConnectionParams.setSoTimeout(timeoutParams, Application.CONNECTION_TIMEOUT);
+        HttpConnectionParams.setConnectionTimeout(timeoutParams, Application.CONNECTION_TIMEOUT);
         httpClient = new DefaultHttpClient(timeoutParams);
     }
 
