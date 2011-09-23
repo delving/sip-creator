@@ -21,7 +21,6 @@ import java.awt.event.ActionEvent;
  */
 public class HarvestDialog extends FrameBase {
 
-    private static final Dimension SIZE = new Dimension(550, 300);
     private JButton cancel = new JButton(new CancelAction());
     private JList harvestList;
     private HarvestPool harvestPool;
@@ -29,7 +28,7 @@ public class HarvestDialog extends FrameBase {
     public HarvestDialog(JComponent parent, SipModel sipModel, HarvestPool harvestPool) {
         super(parent, sipModel, "Active harvests", false);
         this.harvestPool = harvestPool;
-        setSize(SIZE);
+        setClosable(false);
     }
 
     @Override
@@ -46,6 +45,8 @@ public class HarvestDialog extends FrameBase {
         setLayout(new BorderLayout());
         content.add(new JScrollPane(harvestList), BorderLayout.CENTER);
         content.add(cancel, BorderLayout.SOUTH);
+        setSize(new Dimension(desktopPane.getWidth() / 100 * 40, desktopPane.getHeight()/3));
+        setLocation(desktopPane.getWidth() - getWidth() + 8, desktopPane.getHeight() - getHeight() + 8);
     }
 
     @Override
@@ -53,8 +54,6 @@ public class HarvestDialog extends FrameBase {
     }
 
     public void openAtPosition() {
-        setLocation(desktopPane.getSize().width - getWidth() + 8, desktopPane.getSize().height - getHeight() + 8);
-        setSize(SIZE);
         openFrame(false);
     }
 

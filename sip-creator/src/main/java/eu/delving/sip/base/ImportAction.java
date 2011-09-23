@@ -186,7 +186,7 @@ public class ImportAction extends AbstractAction {
             String url = hints.get(Storage.HARVEST_URL);
             String prefix = hints.get(Storage.HARVEST_PREFIX);
             String spec = hints.get(Storage.HARVEST_SPEC);
-            JTextField harvestUrl = new JTextField(null == url ? "" : url);
+            JTextField harvestUrl = new JTextField(null == url ? "" : url, 45);
             JTextField harvestPrefix = new JTextField(null == prefix ? "" : prefix);
             JTextField harvestSpec = new JTextField(null == spec ? "" : spec);
             Object[] fields = new Object[]{"Server", harvestUrl, "Prefix", harvestPrefix, "Spec", harvestSpec};

@@ -89,6 +89,7 @@ public class Harvestor implements Runnable {
     private boolean cancelled;
     private Listener listener;
     private String dataSetSpec;
+    private File tempFile;
 
     /**
      * Subscribe to the progress of the harvestor.
@@ -328,8 +329,9 @@ public class Harvestor implements Runnable {
 
     private boolean prepareOutput() {
         try {
-            log.info(String.format("Opening output file '%s'", context.outputFile()));
-            outputStream = new FileOutputStream(context.outputFile());
+            tempFile = File.createTempFile(context.outputFile().getName(), ".tmp");
+            log.info(String.format("Opening temporary output file '%s'", tempFile));
+            outputStream = new FileOutputStream(tempFile);
             out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             out.add(eventFactory.createStartDocument());
             out.add(eventFactory.createCharacters("\n"));
@@ -348,15 +350,32 @@ public class Harvestor implements Runnable {
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+        catch (IOException e) {
+            log.error(String.format("Error creating temp file '%s'%n", tempFile));
+            listener.failed(e);
+            return false;
+        }
     }
 
     private void finishOutput(boolean cancelled) throws XMLStreamException, IOException {
+        tempFile.deleteOnExit();
         out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
         out.add(eventFactory.createCharacters("\n"));
         out.add(eventFactory.createEndDocument());
         out.flush();
         outputStream.close();
-        listener.finished(cancelled);
+        if (cancelled) {
+            listener.finished(true);
+            return;
+        }
+        String message = String.format("Copying temp file %s to %s", tempFile, context.outputFile());
+        log.info(message);
+        if (tempFile.renameTo(context.outputFile())) {
+            log.fatal(String.format("Error: %s", message));
+            listener.failed(new Exception(String.format("Error: %s", message)));
+            return;
+        }
+        listener.finished(false);
     }
 
     private class NamespaceCollector {
