@@ -26,6 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.metadata.Hasher;
+import eu.delving.sip.Application;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -38,6 +39,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -66,11 +70,10 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class CultureHubClient {
     private static final int BLOCK_SIZE = 4096;
-    private static final long MINIMUM_PROGRESS_SIZE = 1024*1024;
+    private static final long MINIMUM_PROGRESS_SIZE = 1024 * 1024;
     private Logger log = Logger.getLogger(getClass());
     private Context context;
-    private HttpClient httpClient = new DefaultHttpClient();
-
+    private HttpClient httpClient;
 
     public interface Context {
         String getServerUrl();
@@ -110,6 +113,10 @@ public class CultureHubClient {
 
     public CultureHubClient(Context context) {
         this.context = context;
+        HttpParams timeoutParams = new BasicHttpParams();
+        HttpConnectionParams.setSoTimeout(timeoutParams, Application.CONNECTION_TIMEOUT);
+        HttpConnectionParams.setConnectionTimeout(timeoutParams, Application.CONNECTION_TIMEOUT);
+        httpClient = new DefaultHttpClient(timeoutParams);
     }
 
     public interface ListReceiveListener {
@@ -199,7 +206,7 @@ public class CultureHubClient {
             finally {
                 if (null != entity) {
                     try {
-                        entity.consumeContent();
+                        EntityUtils.consume(entity);
                     }
                     catch (IOException e) {
                         log.warn(String.format("Error consuming entity: %s", e.getMessage()));
@@ -230,7 +237,7 @@ public class CultureHubClient {
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
-                response.getEntity().consumeContent();
+                EntityUtils.consume(response.getEntity());
                 switch (Code.from(response)) {
                     case OK:
                         unlockListener.unlockComplete(true);
@@ -307,7 +314,7 @@ public class CultureHubClient {
             finally {
                 if (entity != null) {
                     try {
-                        entity.consumeContent();
+                        EntityUtils.consume(entity);
                     }
                     catch (IOException e) {
                         log.error("Cannot consume entity content", e);
@@ -349,7 +356,7 @@ public class CultureHubClient {
                         HttpEntity entity = response.getEntity();
                         String listString = EntityUtils.toString(entity);
                         Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
-                        entity.consumeContent();
+                        EntityUtils.consume(entity);
                         Iterator<File> walk = uploadFiles.iterator();
                         while (walk.hasNext()) {
                             File file = walk.next();
@@ -373,7 +380,7 @@ public class CultureHubClient {
                     post = new HttpPost(createFileRequestUrl(file));
                     post.setEntity(new FileEntity(file, uploadListener));
                     response = httpClient.execute(post);
-                    response.getEntity().consumeContent();
+                    EntityUtils.consume(response.getEntity());
                     switch (Code.from(response)) {
                         case OK:
                             break;

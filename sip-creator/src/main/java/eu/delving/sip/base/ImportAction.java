@@ -25,6 +25,7 @@ import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
+import org.apache.commons.lang.StringUtils;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -34,6 +35,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import java.awt.BorderLayout;
@@ -62,11 +64,13 @@ public class ImportAction extends AbstractAction {
     private ChooseFileAction chooseFileAction = new ChooseFileAction();
     private HarvestAction harvestAction = new HarvestAction();
     private JFileChooser chooser = new JFileChooser("XML Metadata Source File");
+    private HarvestPool harvestPool;
 
-    public ImportAction(JDesktopPane parent, SipModel sipModel) {
+    public ImportAction(JDesktopPane parent, SipModel sipModel, HarvestPool harvestPool) {
         super("Import");
         this.parent = parent;
         this.sipModel = sipModel;
+        this.harvestPool = harvestPool;
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Input Source", Dialog.ModalityType.APPLICATION_MODAL);
         prepareDialog();
         prepareChooser(sipModel);
@@ -169,6 +173,7 @@ public class ImportAction extends AbstractAction {
     }
 
     private class HarvestAction extends AbstractAction {
+
         private HarvestAction() {
             super("<html><center><br><h2>Harvest</h2>Harvest from OAI-PMH server<br>for which you have the URL<br><br>");
         }
@@ -179,14 +184,23 @@ public class ImportAction extends AbstractAction {
             if (!sipModel.hasDataSet()) return;
             Map<String, String> hints = sipModel.getDataSetModel().getDataSet().getHints();
             String url = hints.get(Storage.HARVEST_URL);
-            if (url == null) url = "";
-            String harvestUrl = JOptionPane.showInputDialog(parent, "Please enter the URL of the OAI-PMH server, without parameters", url);
-            if (harvestUrl != null) {
+            String prefix = hints.get(Storage.HARVEST_PREFIX);
+            String spec = hints.get(Storage.HARVEST_SPEC);
+            JTextField harvestUrl = new JTextField(null == url ? "" : url, 45);
+            JTextField harvestPrefix = new JTextField(null == prefix ? "" : prefix);
+            JTextField harvestSpec = new JTextField(null == spec ? "" : spec);
+            Object[] fields = new Object[]{"Server", harvestUrl, "Prefix", harvestPrefix, "Spec", harvestSpec};
+            if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(parent, fields, "OAI-PMH server details", JOptionPane.OK_CANCEL_OPTION)) {
+                return;
+            }
+            if (!StringUtils.isEmpty(harvestUrl.getText())) {
                 try {
-                    new URL(harvestUrl);
-                    hints.put(Storage.HARVEST_URL, harvestUrl);
+                    new URL(harvestUrl.getText());
+                    hints.put(Storage.HARVEST_URL, harvestUrl.getText());
+                    hints.put(Storage.HARVEST_PREFIX, harvestPrefix.getText());
+                    hints.put(Storage.HARVEST_SPEC, harvestSpec.getText());
                     sipModel.getDataSetModel().getDataSet().setHints(hints);
-                    performHarvest(harvestUrl);
+                    performHarvest(harvestUrl.getText(), harvestPrefix.getText(), harvestSpec.getText());
                 }
                 catch (MalformedURLException e) {
                     sipModel.getFeedback().alert("Malformed URL: " + harvestUrl);
@@ -197,9 +211,39 @@ public class ImportAction extends AbstractAction {
             }
         }
 
-        private void performHarvest(String harvestUrl) {
-            JOptionPane.showMessageDialog(parent, "Harvestor not yet integrated");
-            // todo: implement
+        private void performHarvest(final String harvestUrl, final String harvestPrefix, final String harvestSpec) {
+
+            harvestPool.submit(new Harvestor(sipModel.getDataSetModel().getDataSet().getSpec(),
+                    new Harvestor.Context() {
+
+                        @Override
+                        public File outputFile() {
+                            try {
+                                return sipModel.getDataSetModel().getDataSet().importedOutput();
+                            }
+                            catch (StorageException e) {
+                                e.printStackTrace();
+                                sipModel.getFeedback().alert(e.getMessage());
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        public String harvestUrl() {
+                            return harvestUrl;
+                        }
+
+                        @Override
+                        public String harvestPrefix() {
+                            return harvestPrefix;
+                        }
+
+                        @Override
+                        public String harvestSpec() {
+                            return harvestSpec;
+                        }
+                    }
+            ));
         }
     }
 }
