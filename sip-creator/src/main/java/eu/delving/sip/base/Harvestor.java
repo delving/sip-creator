@@ -173,9 +173,10 @@ public class Harvestor implements Runnable {
             }
             else {
                 outputStream.close();
-                if (!context.outputFile().delete()) {
+                if (!tempFile.delete()) {
                     listener.tellUser("Unable to delete output file");
                 }
+                listener.finished(cancelled);
             }
         }
         catch (IOException e) {
@@ -441,6 +442,7 @@ public class Harvestor implements Runnable {
 
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
+        listener.progress(recordCount);
     }
 
     public String getDataSetSpec() {
