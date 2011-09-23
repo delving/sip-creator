@@ -395,6 +395,10 @@ public class Application {
                                 Method performQuitMethod = objects[1].getClass().getDeclaredMethod("performQuit");
                                 performQuitMethod.invoke(objects[1]);
                             }
+                            else {
+                                Method performQuitMethod = objects[1].getClass().getDeclaredMethod("cancelQuit");
+                                performQuitMethod.invoke(objects[1]);
+                            }
                         }
                         return null;
                     }
