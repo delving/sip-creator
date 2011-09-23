@@ -30,6 +30,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -73,6 +76,8 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
  */
 
 public class Harvestor implements Runnable {
+
+    private static final int CONNECTION_TIMEOUT = 30000;
     private static final Path RECORD_ROOT = new Path("/OAI-PMH/ListRecords/record");
     private static final Path ERROR = new Path("/OAI-PMH/error");
     private static final Path RESUMPTION_TOKEN = new Path("/OAI-PMH/ListRecords/resumptionToken");
@@ -80,7 +85,7 @@ public class Harvestor implements Runnable {
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-    private HttpClient httpClient = new DefaultHttpClient();
+    private HttpClient httpClient;
     private OutputStream outputStream;
     private XMLEventWriter out;
     private NamespaceCollector namespaceCollector = new NamespaceCollector();
@@ -143,6 +148,10 @@ public class Harvestor implements Runnable {
     public Harvestor(String dataSetSpec, Context context) {
         this.dataSetSpec = dataSetSpec;
         this.context = context;
+        HttpParams timeoutParams = new BasicHttpParams();
+        HttpConnectionParams.setSoTimeout(timeoutParams, CONNECTION_TIMEOUT);
+        HttpConnectionParams.setConnectionTimeout(timeoutParams, CONNECTION_TIMEOUT);
+        httpClient = new DefaultHttpClient(timeoutParams);
     }
 
     public int getRecordCount() {
