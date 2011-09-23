@@ -101,7 +101,7 @@ public class Application {
     private VisualFeedback feedback;
     private JLabel statusLabel = new JLabel("No dataset", JLabel.CENTER);
     private HarvestDialog harvestDialog;
-    private HarvestPool harvestPool = new HarvestPool();
+    private HarvestPool harvestPool;
     private JToggleButton harvestToggleButton = new JToggleButton();
 
     private Application(final File storageDirectory) throws StorageException {
@@ -127,6 +127,7 @@ public class Application {
         };
         feedback = new VisualFeedback(desktop);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
+        harvestPool = new HarvestPool(sipModel);
         harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
         feedback.setSipModel(sipModel);
         feedback.say("SIP-Creator started");

@@ -1,5 +1,6 @@
 package eu.delving.sip.base;
 
+import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
 import javax.swing.AbstractListModel;
@@ -19,6 +20,11 @@ public class HarvestPool extends AbstractListModel {
     private static final Logger LOG = Logger.getLogger(HarvestPool.class);
     private ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
     private List<Harvestor> tasks = new ArrayList<Harvestor>();
+    private SipModel sipModel;
+
+    public HarvestPool(SipModel sipModel) {
+        this.sipModel = sipModel;
+    }
 
     public void submit(final Harvestor harvestor) {
         if (tasks.contains(harvestor)) {
@@ -33,6 +39,7 @@ public class HarvestPool extends AbstractListModel {
                     public void finished(boolean cancelled) {
                         tasks.remove(harvestor);
                         fireIntervalRemoved(this, 0, tasks.size());
+                        sipModel.getFeedback().say(String.format("Harvestor '%s' has finished", harvestor.getDataSetSpec()));
                     }
 
                     @Override
@@ -43,10 +50,12 @@ public class HarvestPool extends AbstractListModel {
                     @Override
                     public void tellUser(String message) {
                         LOG.info(message);
+                        sipModel.getFeedback().say(String.format("Harvestor '%s' %s", harvestor.getDataSetSpec(), message));
                     }
 
                     @Override
                     public void failed(Exception exception) {
+                        sipModel.getFeedback().alert(String.format("Harvestor '%s' : %s", harvestor.getDataSetSpec(), exception.getMessage()), exception);
                         LOG.error(exception);
                         tasks.remove(harvestor);
                         fireIntervalRemoved(this, 0, tasks.size());
