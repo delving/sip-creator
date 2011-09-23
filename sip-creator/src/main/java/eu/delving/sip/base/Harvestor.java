@@ -290,7 +290,7 @@ public class Harvestor implements Runnable {
 
     private HttpEntity fetchFirstEntity() throws IOException {
         String url = String.format(
-                "%s/oai-pmh?verb=ListRecords&metadataPrefix=%s",
+                "%s?verb=ListRecords&metadataPrefix=%s",
                 context.harvestUrl(),
                 context.harvestPrefix()
         );
@@ -303,7 +303,7 @@ public class Harvestor implements Runnable {
 
     private HttpEntity fetchNextEntity(String resumptionToken) throws IOException {
         String url = String.format(
-                "%s/oai-pmh?verb=ListRecords&resumptionToken=%s",
+                "%s?verb=ListRecords&resumptionToken=%s",
                 context.harvestUrl(),
                 URLEncoder.encode(resumptionToken, "UTF-8")
         );

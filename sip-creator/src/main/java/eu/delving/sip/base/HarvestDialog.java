@@ -15,7 +15,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 /**
- * §
  * A visual representation of the HarvestPool, the details of each running harvest are visible and
  * the individual harvests are cancellable.
  */
