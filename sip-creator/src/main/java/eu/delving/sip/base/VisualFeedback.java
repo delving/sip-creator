@@ -135,6 +135,7 @@ public class VisualFeedback implements Feedback {
 
         public LogFrame(JDesktopPane desktop, SipModel sipModel) {
             super(desktop, sipModel, "Feedback", false);
+            setClosable(false);
         }
 
         @Override

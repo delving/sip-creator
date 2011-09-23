@@ -26,6 +26,8 @@ import eu.delving.sip.base.ClientException;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.DownloadAction;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.HarvestDialog;
+import eu.delving.sip.base.HarvestPool;
 import eu.delving.sip.base.ImportAction;
 import eu.delving.sip.base.OAuthClient;
 import eu.delving.sip.base.UploadAction;
@@ -56,8 +58,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -68,6 +73,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -84,6 +91,8 @@ import static eu.delving.sip.files.DataSetState.IMPORTED;
  */
 
 public class Application {
+
+    public static final int CONNECTION_TIMEOUT = 60000;
     private SipModel sipModel;
     private Action[] actions;
     private JFrame home;
@@ -93,6 +102,9 @@ public class Application {
     private AllFrames allFrames;
     private VisualFeedback feedback;
     private JLabel statusLabel = new JLabel("No dataset", JLabel.CENTER);
+    private HarvestDialog harvestDialog;
+    private HarvestPool harvestPool;
+    private JToggleButton harvestToggleButton = new JToggleButton();
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -117,6 +129,8 @@ public class Application {
         };
         feedback = new VisualFeedback(desktop);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
+        harvestPool = new HarvestPool(sipModel);
+        harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
         feedback.setSipModel(sipModel);
         feedback.say("SIP-Creator started");
         home = new JFrame("Delving SIP Creator");
@@ -126,13 +140,13 @@ public class Application {
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         actions = new Action[]{
                 new DownloadAction(desktop, sipModel, cultureHubClient),
-                new ImportAction(desktop, sipModel),
+                new ImportAction(desktop, sipModel, harvestPool),
                 new ValidateAction(desktop, sipModel),
                 new UploadAction(desktop, sipModel, cultureHubClient)
         };
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-        home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
         home.setIconImage(logo.getImage());
         dataSetMenu = new DataSetMenu(sipModel);
@@ -145,8 +159,7 @@ public class Application {
         home.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
-                allFrames.putState();
-                System.exit(0);
+                quit();
             }
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
@@ -182,6 +195,21 @@ public class Application {
         osxExtra();
     }
 
+    private boolean quit() {
+        if (harvestPool.getSize() > 0) {
+            if (JOptionPane.YES_OPTION !=
+                    JOptionPane.showConfirmDialog(null,
+                            String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize()),
+                            "Active harvests",
+                            JOptionPane.YES_NO_OPTION)) {
+                return false;
+            }
+        }
+        allFrames.putState();
+        System.exit(0);
+        return true;
+    }
+
     private JPanel createStatePanel() {
         JPanel bp = new JPanel(new GridLayout(2, 2));
         for (Action action : actions) {
@@ -198,8 +226,47 @@ public class Application {
         ));
         p.add(statusLabel);
         p.add(bp);
-        p.add(feedback.getToggle());
+        JPanel fp = new JPanel(new BorderLayout());
+        fp.add(feedback.getToggle(), BorderLayout.CENTER);
+        refreshToggleButton();
+        harvestPool.addListDataListener(
+                new ListDataListener() {
+                    @Override
+                    public void intervalAdded(ListDataEvent listDataEvent) {
+                        refreshToggleButton();
+                    }
+
+                    @Override
+                    public void intervalRemoved(ListDataEvent listDataEvent) {
+                        refreshToggleButton();
+                    }
+
+                    @Override
+                    public void contentsChanged(ListDataEvent listDataEvent) {
+                        refreshToggleButton();
+                    }
+                }
+        );
+        harvestToggleButton.addItemListener(
+                new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent itemEvent) {
+                        if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                            harvestDialog.openAtPosition();
+                        }
+                        else {
+                            harvestDialog.closeFrame();
+                        }
+                    }
+                }
+        );
+        fp.add(harvestToggleButton, BorderLayout.EAST);
+        p.add(fp);
         return p;
+    }
+
+    private void refreshToggleButton() {
+        harvestToggleButton.setText(String.format("%d harvests", harvestPool.getSize()));
     }
 
     private JMenuBar createMenuBar() {
@@ -319,16 +386,6 @@ public class Application {
     }
 
     private void osxExtra() {
-// todo: #17 replace osx specific code with this shutdown hook.¬
-//        Runtime.getRuntime().addShutdownHook(
-//                new Thread() {
-//
-//                    @Override
-//                    public void run() {
-//                        putFrameStates();
-//                    }
-//                }
-//        );
         boolean osx = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
         if (osx) {
             try {
@@ -336,9 +393,14 @@ public class Application {
                     @Override
                     public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
                         if (method.getName().equals("handleQuitRequestWith")) {
-                            allFrames.putState();
-                            Method performQuitMethod = objects[1].getClass().getDeclaredMethod("performQuit");
-                            performQuitMethod.invoke(objects[1]);
+                            if (quit()) {
+                                Method performQuitMethod = objects[1].getClass().getDeclaredMethod("performQuit");
+                                performQuitMethod.invoke(objects[1]);
+                            }
+                            else {
+                                Method performQuitMethod = objects[1].getClass().getDeclaredMethod("cancelQuit");
+                                performQuitMethod.invoke(objects[1]);
+                            }
                         }
                         return null;
                     }

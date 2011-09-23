@@ -24,12 +24,17 @@ package eu.delving.sip.base;
 import com.ctc.wstx.stax.WstxInputFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.Application;
 import eu.delving.sip.xml.ValueFilter;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import javax.xml.stream.XMLEventFactory;
@@ -72,6 +77,7 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
  */
 
 public class Harvestor implements Runnable {
+
     private static final Path RECORD_ROOT = new Path("/OAI-PMH/ListRecords/record");
     private static final Path ERROR = new Path("/OAI-PMH/error");
     private static final Path RESUMPTION_TOKEN = new Path("/OAI-PMH/ListRecords/resumptionToken");
@@ -79,12 +85,54 @@ public class Harvestor implements Runnable {
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-    private HttpClient httpClient = new DefaultHttpClient();
+    private HttpClient httpClient;
     private OutputStream outputStream;
     private XMLEventWriter out;
     private NamespaceCollector namespaceCollector = new NamespaceCollector();
     private Context context;
     private int recordCount;
+    private boolean cancelled;
+    private Listener listener;
+    private String dataSetSpec;
+    private File tempFile;
+
+    /**
+     * Subscribe to the progress of the harvestor.
+     */
+    public interface Listener {
+
+        /**
+         * The harvesting process is finished.
+         *
+         * @param cancelled True if cancelled.
+         */
+        void finished(boolean cancelled);
+
+        /**
+         * Inform about the number of processed records.
+         *
+         * @param count The record count.
+         */
+        void progress(int count);
+
+        /**
+         * Notify the user.
+         *
+         * @param message The message.
+         */
+        void tellUser(String message);
+
+        /**
+         * Error while harvesting.
+         *
+         * @param exception The thrown exception.
+         */
+        void failed(Exception exception);
+    }
+
+    public void setListener(Listener listener) {
+        this.listener = listener;
+    }
 
     public interface Context {
 
@@ -95,15 +143,19 @@ public class Harvestor implements Runnable {
         String harvestPrefix();
 
         String harvestSpec();
-
-        void progress(int recordCount);
-
-        void tellUser(String message);
-
     }
 
-    public Harvestor(Context context) {
+    public Harvestor(String dataSetSpec, Context context) {
+        this.dataSetSpec = dataSetSpec;
         this.context = context;
+        HttpParams timeoutParams = new BasicHttpParams();
+        HttpConnectionParams.setSoTimeout(timeoutParams, Application.CONNECTION_TIMEOUT);
+        HttpConnectionParams.setConnectionTimeout(timeoutParams, Application.CONNECTION_TIMEOUT);
+        httpClient = new DefaultHttpClient(timeoutParams);
+    }
+
+    public int getRecordCount() {
+        return recordCount;
     }
 
     @Override
@@ -112,34 +164,44 @@ public class Harvestor implements Runnable {
         if (!okValue(context.harvestPrefix(), "Harvest Metadata Prefix")) return;
         if (!prepareOutput()) return;
         try {
-            context.progress(recordCount);
+            listener.progress(recordCount);
             HttpEntity fetchedRecords = fetchFirstEntity();
             String resumptionToken = saveRecords(fetchedRecords, out);
-            while (resumptionToken != null && !resumptionToken.trim().isEmpty() && recordCount > 0) {
-                fetchedRecords.consumeContent();
-                context.progress(recordCount);
+            while (isValidResumptionToken(resumptionToken) && recordCount > 0 && !cancelled) {
+                EntityUtils.consume(fetchedRecords);
+                listener.progress(recordCount);
                 fetchedRecords = fetchNextEntity(resumptionToken);
                 resumptionToken = saveRecords(fetchedRecords, out);
+                if (!isValidResumptionToken(resumptionToken) && recordCount > 0) {
+                    EntityUtils.consume(fetchedRecords);
+                }
             }
             if (recordCount > 0) {
-                finishOutput();
-                context.tellUser(String.format("Harvest complete, %d records", recordCount));
+                finishOutput(cancelled);
+                listener.tellUser(cancelled ? "Cancelled!" : String.format("Harvest complete, %d records", recordCount));
             }
             else {
                 outputStream.close();
-                if (!context.outputFile().delete()) {
-                    context.tellUser("Unable to delete output file");
+                if (!tempFile.delete()) {
+                    listener.tellUser("Unable to delete output file");
                 }
+                listener.finished(cancelled);
             }
         }
         catch (IOException e) {
             log.error(String.format("Unable to complete harvest of %s because of a streaming problem", context.harvestUrl()), e);
-            context.tellUser("Unable to complete harvest");
+            listener.tellUser("Unable to complete harvest");
+            listener.failed(e);
         }
         catch (XMLStreamException e) {
             log.error(String.format("Unable to complete harvest of %s because of an xml problem", context.harvestUrl()), e);
-            context.tellUser("Unable to complete harvest");
+            listener.tellUser("Unable to complete harvest");
+            listener.failed(e);
         }
+    }
+
+    private boolean isValidResumptionToken(String resumptionToken) {
+        return resumptionToken != null && !resumptionToken.trim().isEmpty();
     }
 
     private String saveRecords(HttpEntity fetchedRecords, XMLEventWriter out) throws IOException, XMLStreamException {
@@ -203,7 +265,7 @@ public class Harvestor implements Runnable {
                         tokenBuilder = null;
                     }
                     else if (path.equals(ERROR) && errorBuilder != null) {
-                        context.tellUser(String.format("OAI-PMH Error: %s", errorBuilder));
+                        listener.failed(new Exception(String.format("OAI-PMH Error: %s", errorBuilder)));
                     }
                     path.pop();
                     break;
@@ -237,21 +299,22 @@ public class Harvestor implements Runnable {
 
     private HttpEntity fetchFirstEntity() throws IOException {
         String url = String.format(
-                "%s/oai-pmh?verb=ListRecords&metadataPrefix=%s",
+                "%s?verb=ListRecords&metadataPrefix=%s",
                 context.harvestUrl(),
                 context.harvestPrefix()
         );
         if (context.harvestSpec() != null && !context.harvestSpec().isEmpty()) {
             url += String.format("&set=%s", context.harvestSpec());
         }
+        log.info(String.format("Harvesting from '%s'", url));
         return doGet(url);
     }
 
     private HttpEntity fetchNextEntity(String resumptionToken) throws IOException {
         String url = String.format(
-                "%s/oai-pmh?verb=ListRecords&resumptionToken=%s",
+                "%s?verb=ListRecords&resumptionToken=%s",
                 context.harvestUrl(),
-                URLEncoder.encode(resumptionToken,"UTF-8")
+                URLEncoder.encode(resumptionToken, "UTF-8")
         );
         return doGet(url);
     }
@@ -276,31 +339,53 @@ public class Harvestor implements Runnable {
 
     private boolean prepareOutput() {
         try {
-            outputStream = new FileOutputStream(context.outputFile());
+            tempFile = File.createTempFile(context.outputFile().getName(), ".tmp");
+            log.info(String.format("Opening temporary output file '%s'", tempFile));
+            outputStream = new FileOutputStream(tempFile);
             out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             out.add(eventFactory.createStartDocument());
             out.add(eventFactory.createCharacters("\n"));
             return true;
         }
         catch (FileNotFoundException e) {
-            context.tellUser("Unable to create file to receive harvested data");
+            listener.tellUser("Unable to create file to receive harvested data");
+            listener.failed(e);
             return false;
         }
         catch (XMLStreamException e) {
-            context.tellUser("Unable to stream to file to receive harvested data");
+            listener.tellUser("Unable to stream to file to receive harvested data");
+            listener.failed(e);
             return false;
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+        catch (IOException e) {
+            log.error(String.format("Error creating temp file '%s'%n", tempFile));
+            listener.failed(e);
+            return false;
+        }
     }
 
-    private void finishOutput() throws XMLStreamException, IOException {
+    private void finishOutput(boolean cancelled) throws XMLStreamException, IOException {
+        tempFile.deleteOnExit();
         out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
         out.add(eventFactory.createCharacters("\n"));
         out.add(eventFactory.createEndDocument());
         out.flush();
         outputStream.close();
+        if (cancelled) {
+            listener.finished(true);
+            return;
+        }
+        String message = String.format("Copying temp file %s to %s", tempFile, context.outputFile());
+        log.info(message);
+        if (tempFile.renameTo(context.outputFile())) {
+            log.fatal(String.format("Error: %s", message));
+            listener.failed(new Exception(String.format("Error: %s", message)));
+            return;
+        }
+        listener.finished(false);
     }
 
     private class NamespaceCollector {
@@ -345,7 +430,7 @@ public class Harvestor implements Runnable {
     private boolean okValue(String string, String description) {
         boolean ok = string != null && !string.trim().isEmpty();
         if (!ok) {
-            context.tellUser("Missing value for " + description);
+            listener.tellUser("Missing value for " + description);
         }
         return ok;
     }
@@ -359,44 +444,35 @@ public class Harvestor implements Runnable {
             return true;
         }
         catch (MalformedURLException e) {
-            context.tellUser("Malformed URL: " + url);
+            listener.tellUser("Malformed URL: " + url);
             return false;
         }
     }
 
-    public static void main(String[] args) {
-        Harvestor harvestor = new Harvestor(new Context() {
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+        listener.progress(recordCount);
+    }
 
-            @Override
-            public File outputFile() {
-                return new File("/tmp/harvest.xml");
-            }
+    public String getDataSetSpec() {
+        return dataSetSpec;
+    }
 
-            @Override
-            public String harvestUrl() {
-                return "http://arno.uvt.nl/oai/tha.uvt.nl.cgi";
-            }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Harvestor harvestor = (Harvestor) o;
+        return dataSetSpec.equals(harvestor.dataSetSpec);
+    }
 
-            @Override
-            public String harvestPrefix() {
-                return "arno_tib";
-            }
+    @Override
+    public int hashCode() {
+        return dataSetSpec.hashCode();
+    }
 
-            @Override
-            public String harvestSpec() {
-                return null;
-            }
-
-            @Override
-            public void progress(int recordCount) {
-                Logger.getLogger("Harvestor.Progress").info(String.format("Harvested %d", recordCount));
-            }
-
-            @Override
-            public void tellUser(String message) {
-                Logger.getLogger("Harvestor.Main").info(message);
-            }
-        });
-        harvestor.run();
+    @Override
+    public String toString() {
+        return String.format("%s %s - %s:%s (%d records)", cancelled ? "CANCELLED!" : "", dataSetSpec, context.harvestUrl(), context.harvestPrefix(), getRecordCount());
     }
 }

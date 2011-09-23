@@ -68,10 +68,12 @@ public class OAuthClient {
         }
         catch (OAuthProblemException e) {
             password = null;
+            invalidateTokens();
             throw new ClientException(e.getMessage());
         }
         catch (OAuthSystemException e) {
             password = null;
+            invalidateTokens();
             throw new ClientException(e.getMessage());
         }
 

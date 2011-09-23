@@ -46,7 +46,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -54,38 +53,41 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Download a data set from the culture hub
+ * Fetch a data set from the culture hub
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
 public class DownloadAction extends AbstractAction implements CultureHubClient.ListReceiveListener {
     private final static Logger LOG = Logger.getRootLogger();
-    private Font font = new Font("Sans", Font.BOLD, 18);
-    private JDesktopPane parent;
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
     private JDialog dialog;
-    private Download download = new Download();
+    private FetchAction fetch = new FetchAction();
     private Cancel cancel = new Cancel();
     private DataSetListModel listModel = new DataSetListModel();
     private JList list = new JList(listModel);
 
     public DownloadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Download");
-        this.parent = parent;
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
         dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(parent), "Download", false);
         createDialog(dialog.getContentPane());
         list.setCellRenderer(new DataSetCellRenderer(sipModel.getStorage().getUsername()));
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        download.setEnabled(false);
+        fetch.setEnabled(false);
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                Entry entry = (Entry) list.getSelectedValue();
-                download.setEnabled(entry != null && entry.isDownloadable());
+                Object entryObject = list.getSelectedValue();
+                if (entryObject != null && entryObject instanceof Entry) {
+                    Entry entry = (Entry) list.getSelectedValue();
+                    fetch.setEnabled(entry != null && entry.isDownloadable());
+                }
+                else {
+                    fetch.setEnabled(false);
+                }
             }
         });
         dialog.setSize(500, 200);
@@ -96,9 +98,9 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         dialog.setVisible(true);
-        if (listModel.getSize() == 0 || !listModel.isLoading()) {
+        if (!listModel.hasEntries()) {
             LOG.info("Not loading and no data sets, will start loading");
-            listModel.setLoading(true);
+            listModel.setMessage("Loading... please wait");
             cultureHubClient.fetchDataSetList(this);
         }
     }
@@ -108,14 +110,25 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         Exec.swing(new Runnable() {
             @Override
             public void run() {
-                listModel.setEntries(entries);
+                if (entries.isEmpty()) {
+                    listModel.setMessage("No data sets available yet. Create them on the Culture Hub first.");
+                }
+                else {
+                    listModel.setEntries(entries);
+                }
             }
         });
     }
 
     @Override
     public void failed(Exception e) {
-        listModel.setLoading(false);
+        Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                listModel.setMessage("Failed to load list");
+                dialog.setVisible(false);
+            }
+        });
     }
 
     private void createDialog(Container content) {
@@ -133,21 +146,21 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
     private JPanel createButtonPanel() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         p.add(new JButton(cancel));
-        p.add(new JButton(download));
+        p.add(new JButton(fetch));
         return p;
     }
 
-    private class Download extends AbstractAction {
+    private class FetchAction extends AbstractAction {
 
-        private Download() {
-            super("Download");
+        private FetchAction() {
+            super("Fetch data set");
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            setEnabled(false);
             Entry entry = (Entry) list.getSelectedValue();
             if (entry == null) return;
+            setEnabled(false);
             String message = String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", entry.getSpec());
             ProgressListener listener = sipModel.getFeedback().progressListener("Download", message);
             listener.onFinished(new ProgressListener.End() {
@@ -198,19 +211,19 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
     }
 
     private class DataSetListModel extends AbstractListModel {
-        private boolean loading;
+        private String message;
         private List<Entry> entries = new ArrayList<Entry>();
 
-        public void setLoading(boolean isLoading) {
+        public void setMessage(String message) {
             int size = getSize();
             entries.clear();
             fireIntervalRemoved(this, 0, size);
-            loading = isLoading;
+            this.message = message;
             fireIntervalAdded(this, 0, getSize());
         }
 
         public void setEntries(List<CultureHubClient.DataSetEntry> entries) {
-            loading = false;
+            message = null;
             Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
             int size = getSize();
             this.entries.clear();
@@ -223,18 +236,18 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
             fireIntervalAdded(this, 0, getSize());
         }
 
-        public boolean isLoading() {
-            return loading;
-        }
-
         @Override
         public int getSize() {
-            return loading ? 1 : entries.size();
+            return message != null ? 1 : entries.size();
         }
 
         @Override
         public Object getElementAt(int i) {
-            return loading ? "Loading... please wait" : entries.get(i);
+            return message != null ? message : entries.get(i);
+        }
+
+        public boolean hasEntries() {
+            return !entries.isEmpty();
         }
     }
 
