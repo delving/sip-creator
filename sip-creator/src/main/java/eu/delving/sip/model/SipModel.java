@@ -170,7 +170,7 @@ public class SipModel {
         try {
             if (dataSetModel.hasDataSet() && recordMapping != null) {
                 dataSetModel.getDataSet().deleteValidation(recordMapping.getPrefix());
-                feedback.say(String.format("Validation cleared for %s",recordMapping.getPrefix()));
+                feedback.say(String.format("Validation cleared for %s", recordMapping.getPrefix()));
             }
         }
         catch (StorageException e) {
@@ -307,7 +307,7 @@ public class SipModel {
                     dataSetFacts.copyToRecordMapping(recordMapping);
                     mappingModel.setRecordMapping(recordMapping);
                     recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
-                    feedback.say("Set mapping " + metadataPrefix);
+                    feedback.say(String.format("Using '%s' mapping", metadataPrefix));
                 }
                 catch (StorageException e) {
                     feedback.alert("Unable to select Metadata Prefix " + metadataPrefix, e);
@@ -360,7 +360,7 @@ public class SipModel {
                     feedback.say("Finished importing metadata");
                 }
                 catch (StorageException e) {
-                    feedback.alert("Couldn't create Data Set from " + file.getAbsolutePath(), e);
+                    feedback.alert(String.format("Couldn't create Data Set from %s: %s", file.getAbsolutePath(), e.getMessage()), e);
                 }
             }
         });
@@ -388,7 +388,7 @@ public class SipModel {
 
             @Override
             public void failure(Exception exception) {
-                feedback.alert("Analysis failed: "+exception.getMessage(), exception);
+                feedback.alert("Analysis failed: " + exception.getMessage(), exception);
             }
 
             @Override
@@ -410,7 +410,7 @@ public class SipModel {
                     feedback.say("Source conversion complete");
                 }
                 catch (StorageException e) {
-                    feedback.alert("Conversion failed: "+e.getMessage(), e);
+                    feedback.alert("Conversion failed: " + e.getMessage(), e);
                 }
             }
         });
