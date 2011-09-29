@@ -26,6 +26,7 @@ import eu.delving.sip.base.ClientException;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.DownloadAction;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.HarvestDialog;
 import eu.delving.sip.base.HarvestPool;
 import eu.delving.sip.base.ImportAction;
@@ -53,18 +54,21 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JToggleButton;
+import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -73,6 +77,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
@@ -93,6 +99,8 @@ import static eu.delving.sip.files.DataSetState.IMPORTED;
 public class Application {
 
     public static final int CONNECTION_TIMEOUT = 60000;
+    private static final int DEFAULT_RESIZE_INTERVAL = 1000;
+    private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
     private Action[] actions;
     private JFrame home;
@@ -105,6 +113,7 @@ public class Application {
     private HarvestDialog harvestDialog;
     private HarvestPool harvestPool;
     private JToggleButton harvestToggleButton = new JToggleButton();
+    private Timer resizeTimer;
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -121,12 +130,34 @@ public class Application {
             }
 
             private void drawText(Graphics g, int x, int y) {
-                g.setFont(new Font("Serif", Font.BOLD, 120));
+                g.setFont(new Font("Arial", Font.BOLD, 120));
                 g.drawString("Delving", 490 + x, 400 + y);
-                g.setFont(new Font("Serif", Font.BOLD, 90));
+                g.setFont(new Font("Arial", Font.BOLD, 90));
                 g.drawString("SIP-Creator", 530 + x, 500 + y);
             }
         };
+        desktop.setMinimumSize(new Dimension(MINIMUM_DESKTOP_SIZE));
+        resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL,
+                new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        resizeTimer.stop();
+                        for (JInternalFrame frame : desktop.getAllFrames()) {
+                            if (frame instanceof FrameBase) {
+                                ((FrameBase) frame).ensureOnScreen();
+                            }
+                        }
+                    }
+                });
+        desktop.addComponentListener(
+                new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent componentEvent) {
+                        resizeTimer.restart();
+                    }
+                }
+        );
         feedback = new VisualFeedback(desktop);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
         harvestPool = new HarvestPool(sipModel);
