@@ -29,6 +29,7 @@ import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
+import eu.delving.sip.menus.UndoCoding;
 import eu.delving.sip.model.CompileModel;
 import eu.delving.sip.model.SipModel;
 
@@ -67,6 +68,7 @@ public class FieldMappingFrame extends FrameBase {
     private JButton dictionaryEdit = new JButton("Edit");
     private JButton dictionaryDelete = new JButton("Delete");
     private DictionaryPopup dictionaryPopup;
+    private UndoCoding undoCoding;
 
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Field Mapping", false);
@@ -76,6 +78,32 @@ public class FieldMappingFrame extends FrameBase {
         dictionaryPopup = new DictionaryPopup(this);
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         groovyCodeArea.setTabSize(3);
+        undoCoding = new UndoCoding(groovyCodeArea);
+        groovyCodeArea.getDocument().addUndoableEditListener(undoCoding);
+        groovyCodeArea.getDocument().addDocumentListener(
+                new DocumentListener() {
+                    @Override
+                    public void insertUpdate(DocumentEvent documentEvent) {
+                        if(0 == documentEvent.getOffset()) {
+                            undoCoding.discardAllEdits();
+                        }
+                    }
+
+                    @Override
+                    public void removeUpdate(DocumentEvent documentEvent) {
+                        if(0 == documentEvent.getOffset()) {
+                            undoCoding.discardAllEdits();
+                        }
+                    }
+
+                    @Override
+                    public void changedUpdate(DocumentEvent documentEvent) {
+                        if(0 == documentEvent.getOffset()) {
+                            undoCoding.discardAllEdits();
+                        }
+                    }
+                }
+        );
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setEditable(false);
         Utility.attachUrlLauncher(outputArea);
