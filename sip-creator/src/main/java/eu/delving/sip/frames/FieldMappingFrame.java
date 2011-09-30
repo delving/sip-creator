@@ -29,6 +29,7 @@ import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
+import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.CompileModel;
 import eu.delving.sip.model.SipModel;
 
@@ -67,15 +68,31 @@ public class FieldMappingFrame extends FrameBase {
     private JButton dictionaryEdit = new JButton("Edit");
     private JButton dictionaryDelete = new JButton("Delete");
     private DictionaryPopup dictionaryPopup;
+    private EditHistory editHistory;
 
-    public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
+    public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel, final EditHistory editHistory) {
         super(desktop, sipModel, "Field Mapping", false);
+        this.editHistory = editHistory;
         dictionaryCreate.setEnabled(false);
         dictionaryEdit.setEnabled(false);
         dictionaryDelete.setEnabled(false);
         dictionaryPopup = new DictionaryPopup(this);
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         groovyCodeArea.setTabSize(3);
+        groovyCodeArea.getDocument().addUndoableEditListener(editHistory);
+        groovyCodeArea.addFocusListener(
+                new FocusListener() {
+                    @Override
+                    public void focusGained(FocusEvent focusEvent) {
+                        editHistory.setTarget(groovyCodeArea);
+                    }
+
+                    @Override
+                    public void focusLost(FocusEvent focusEvent) {
+                        editHistory.setTarget(null);
+                    }
+                }
+        );
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setEditable(false);
         Utility.attachUrlLauncher(outputArea);
@@ -308,7 +325,10 @@ public class FieldMappingFrame extends FrameBase {
                 @Override
                 public void run() {
                     switch (state) {
-                        case PRISTINE:
+                        case ORIGINAL:
+                            editHistory.discardAllEdits();
+                            // fall through
+                        case SAVED:
                         case UNCOMPILED:
                             groovyCodeArea.setBackground(new Color(1.0f, 1.0f, 1.0f));
                             break;
