@@ -36,7 +36,10 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -122,7 +125,9 @@ public class VisualFeedback implements Feedback {
     }
 
     private void addToList(final String message) {
-        listModel.add(message);
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        String timeStamp = format.format(new Date(System.currentTimeMillis()));
+        listModel.add(String.format("%s - %s", timeStamp, message));
         list.ensureIndexIsVisible(listModel.getSize() - 1);
     }
 
