@@ -35,30 +35,39 @@ public class EditHistory extends UndoManager {
 
     private final static int SHORTCUT = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     private JMenu currentMenu = new JMenu("Edit");
-    private Map<JTextComponent, JMenu> menus = new HashMap<JTextComponent, JMenu>();
+    private Map<JTextComponent, ActionMap> componentActions = new HashMap<JTextComponent, ActionMap>();
     private JTextComponent currentTarget;
     private Action undoAction;
     private Action redoAction;
-    private ActionMap actionMap = new ActionMap();
 
     /**
      * Set the target JTextComponent for EditHistory. All actions will have effect on the target.
-     * After the menu and actions are created for the target, they will be stored in the menus map and will
+     * After the menu and actions are created for the target, they will be stored in the componentActions map and will
      * be used again if the same target has been selected.
      *
      * @param target The selected JTextComponent.
      */
     public void setTarget(final JTextComponent target) {
+        final ActionMap currentActions;
+        currentTarget = target;
+        // no target has been selected, disable the menu.
         if (null == target) {
+            currentMenu.setEnabled(false);
             return;
         }
-        if (menus.containsKey(target)) {
-            this.currentTarget = target;
-            this.currentMenu = menus.get(target);
-            refreshActions();
+        // reuse the actions for this target if possible
+        if (componentActions.containsKey(target)) {
+            currentTarget = target;
+            currentActions = componentActions.get(target);
+            createMenu(currentActions);
+            currentMenu.setEnabled(true);
             return;
         }
-        this.currentTarget = target;
+        currentActions = populate();
+        componentActions.put(target, currentActions);
+        currentMenu.setEnabled(true);
+        createMenu(currentActions);
+        // enable popup trigger
         target.addMouseListener(
                 new MouseAdapter() {
                     @Override
@@ -66,19 +75,26 @@ public class EditHistory extends UndoManager {
                         if (mouseEvent.isPopupTrigger()) {
                             refreshActions();
                             JPopupMenu popupMenu = new JPopupMenu();
-                            for (Object key : actionMap.allKeys()) {
-                                popupMenu.add(actionMap.get(key));
+                            for (Object key : currentActions.allKeys()) {
+                                popupMenu.add(currentActions.get(key));
                             }
                             popupMenu.show(target, mouseEvent.getX(), mouseEvent.getY());
                         }
                     }
                 }
         );
-        populate();
-        menus.put(target, currentMenu);
+    }
+
+    private void createMenu(ActionMap actionMap) {
+        currentMenu.removeAll();
+        for (Object key : actionMap.keys()) {
+            currentMenu.add(actionMap.get(key));
+        }
+        refreshActions();
     }
 
     public JMenu getEditMenu() {
+        currentMenu.setEnabled(false);
         return currentMenu;
     }
 
@@ -89,8 +105,11 @@ public class EditHistory extends UndoManager {
 
     /**
      * Invoked when the menu is requested for the first time.
+     *
+     * @return The map containing all actions for this target.
      */
-    private void populate() {
+    private ActionMap populate() {
+        ActionMap actionMap = new ActionMap();
         undoAction = new UndoAction(this);
         redoAction = new RedoAction(this);
         Action cutAction = fetchAction(DefaultEditorKit.cutAction, "Cut", KeyStroke.getKeyStroke(KeyEvent.VK_X, SHORTCUT));
@@ -101,13 +120,12 @@ public class EditHistory extends UndoManager {
         actionMap.put(cutAction.getValue(Action.NAME), cutAction);
         actionMap.put(copyAction.getValue(Action.NAME), copyAction);
         actionMap.put(pasteAction.getValue(Action.NAME), pasteAction);
-        for (Object key : actionMap.keys()) {
-            currentMenu.add(actionMap.get(key));
-        }
+        refreshActions();
+        return actionMap;
     }
 
     /**
-     * Find the action by DefaultEditorKit.name and decore them for the menus.
+     * Find the action by DefaultEditorKit.name and decore them for the componentActions.
      *
      * @param actionName    The name of the action.
      * @param preferredName Rename the action to this value.
