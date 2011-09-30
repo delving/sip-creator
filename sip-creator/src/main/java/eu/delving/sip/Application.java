@@ -115,6 +115,7 @@ public class Application {
     private HarvestPool harvestPool;
     private JToggleButton harvestToggleButton = new JToggleButton();
     private Timer resizeTimer;
+    private EditHistory editHistory = new EditHistory();
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
