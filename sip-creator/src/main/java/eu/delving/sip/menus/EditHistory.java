@@ -91,31 +91,28 @@ public class EditHistory extends UndoManager {
         currentMenu.add(undoAction);
         currentMenu.add(redoAction);
         currentMenu.addSeparator();
-        // fetch the built in action and decorate them for the menus
-        Action cutAction = fetchAction(DefaultEditorKit.cutAction);
-        cutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, SHORTCUT));
-        cutAction.putValue(Action.NAME, "Cut");
+        Action cutAction = fetchAction(DefaultEditorKit.cutAction, "Cut", KeyStroke.getKeyStroke(KeyEvent.VK_X, SHORTCUT));
         currentMenu.add(cutAction);
-        Action copyAction = fetchAction(DefaultEditorKit.copyAction);
-        copyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, SHORTCUT));
-        copyAction.putValue(Action.NAME, "Copy");
+        Action copyAction = fetchAction(DefaultEditorKit.copyAction, "Copy", KeyStroke.getKeyStroke(KeyEvent.VK_C, SHORTCUT));
         currentMenu.add(copyAction);
-        Action pasteAction = fetchAction(DefaultEditorKit.pasteAction);
-        pasteAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, SHORTCUT));
-        pasteAction.putValue(Action.NAME, "Paste");
+        Action pasteAction = fetchAction(DefaultEditorKit.pasteAction, "Paste", KeyStroke.getKeyStroke(KeyEvent.VK_V, SHORTCUT));
         currentMenu.add(pasteAction);
     }
 
     /**
-     * Find the action by DefaultEditorKit.name.
+     * Find the action by DefaultEditorKit.name and decore them for the menus.
      *
-     * @param actionName The name of the action.
+     * @param actionName    The name of the action.
+     * @param preferredName Rename the action to this value.
+     * @param keyStroke     Add an accelerator with this keyStroke.
      *
      * @return The action if found.
      */
-    private Action fetchAction(String actionName) {
+    private Action fetchAction(String actionName, String preferredName, KeyStroke keyStroke) {
         for (Action action : currentTarget.getActions()) {
             if (action.getValue(Action.NAME).equals(actionName)) {
+                action.putValue(Action.NAME, preferredName);
+                action.putValue(Action.ACCELERATOR_KEY, keyStroke);
                 return action;
             }
         }
