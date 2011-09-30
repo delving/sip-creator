@@ -23,7 +23,6 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
@@ -31,7 +30,6 @@ import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
-import eu.delving.metadata.ValidationException;
 import eu.delving.sip.base.Exec;
 import groovy.util.Node;
 
@@ -248,9 +246,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                 return;
             }
             compiling = true;
-            String mappingCode = editedCode == null ? getCompileCode() : getCompileCode(editedCode);
-            MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, mappingCode);
             try {
+                String mappingCode = editedCode == null ? getCompileCode() : getCompileCode(editedCode);
+                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, mappingCode);
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
                     feedback.say("Compiled code for "+type);
@@ -276,7 +274,15 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                                 notifyStateChange(State.SAVED);
                             }
                             else {
-                                notifyStateChange(State.EDITED);
+                                if (selectedFieldMapping != null) {
+                                    selectedFieldMapping.setCode(editedCode);
+                                    notifyStateChange(State.COMMITTED);
+                                    editedCode = null;
+                                    notifyStateChange(State.SAVED);
+                                }
+                                else {
+                                    notifyStateChange(State.EDITED);
+                                }
                             }
                         }
                     }
@@ -296,12 +302,8 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                     }
                 }
             }
-            catch (MappingException e) {
+            catch (Exception e) {
                 compilationComplete(e.getMessage());
-                notifyStateChange(State.ERROR);
-            }
-            catch (ValidationException e) {
-                compilationComplete(e.toString());
                 notifyStateChange(State.ERROR);
             }
             finally {
