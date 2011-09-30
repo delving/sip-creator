@@ -79,8 +79,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     public enum State {
+        ORIGINAL,
         UNCOMPILED,
-        PRISTINE,
+        SAVED,
         EDITED,
         ERROR,
         COMMITTED,
@@ -113,7 +114,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         }
         else {
             selectedFieldMapping = fieldMapping;
-            notifyStateChange(State.PRISTINE);
+            notifyStateChange(State.ORIGINAL);
         }
         Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
         compileSoon();
@@ -134,7 +135,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         this.recordMapping = recordMapping;
         this.editedCode = null;
         Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
-        notifyStateChange(State.PRISTINE);
+        notifyStateChange(State.ORIGINAL);
         compileSoon();
     }
 
@@ -161,7 +162,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             }
             else {
                 editedCode = null;
-                notifyStateChange(State.PRISTINE);
+                notifyStateChange(State.SAVED);
             }
             compileSoon();
         }
@@ -250,25 +251,34 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, mappingCode);
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
-                    feedback.say("Compiled code for " + type);
-                    if (outputNode != null) {
-                        if (recordValidator != null) {
-                            recordValidator.validateRecord(outputNode, metadataRecord.getRecordNumber());
-                            String output = XmlNodePrinter.serialize(outputNode);
-                            compilationComplete(output);
+                    feedback.say("Compiled code for "+type);
+                    if (null == outputNode) {
+                        return;
+                    }
+                    if (recordValidator != null) {
+                        recordValidator.validateRecord(outputNode, metadataRecord.getRecordNumber());
+                        String output = XmlNodePrinter.serialize(outputNode);
+                        compilationComplete(output);
+                    }
+                    else {
+                        String output = XmlNodePrinter.serialize(outputNode);
+                        compilationComplete(output);
+                        if (editedCode == null) {
+                            notifyStateChange(State.SAVED);
                         }
                         else {
-                            String output = XmlNodePrinter.serialize(outputNode);
-                            compilationComplete(output);
-                            if (editedCode == null) {
-                                notifyStateChange(State.PRISTINE);
+                            if (selectedFieldMapping != null) {
+                                selectedFieldMapping.setCode(editedCode);
+                                notifyStateChange(State.COMMITTED);
+                                editedCode = null;
+                                notifyStateChange(State.SAVED);
                             }
                             else {
                                 if (selectedFieldMapping != null) {
                                     selectedFieldMapping.setCode(editedCode);
                                     notifyStateChange(State.COMMITTED);
                                     editedCode = null;
-                                    notifyStateChange(State.PRISTINE);
+                                    notifyStateChange(State.SAVED);
                                 }
                                 else {
                                     notifyStateChange(State.EDITED);
@@ -285,7 +295,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                             notifyStateChange(State.COMMITTED);
                             editedCode = null;
                         }
-                        notifyStateChange(State.PRISTINE);
+                        notifyStateChange(State.SAVED);
                     }
                     else {
                         notifyStateChange(State.EDITED);

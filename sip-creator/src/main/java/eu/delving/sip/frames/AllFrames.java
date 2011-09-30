@@ -22,6 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -48,7 +49,7 @@ public class AllFrames {
     private JDesktopPane desktop;
     private int viewIndex = 1;
 
-    public AllFrames(JDesktopPane desktop, SipModel sipModel) {
+    public AllFrames(JDesktopPane desktop, SipModel sipModel, EditHistory editHistory) {
         this.desktop = desktop;
         FrameBase status, analysis, create, statistics, input, fieldMapping, recordMapping, output;
         this.frames = new FrameBase[]{
@@ -57,7 +58,7 @@ public class AllFrames {
                 create = new CreateFrame(desktop, sipModel),
                 statistics = new StatisticsFrame(desktop, sipModel),
                 input = new InputFrame(desktop, sipModel),
-                fieldMapping = new FieldMappingFrame(desktop, sipModel),
+                fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory),
                 recordMapping = new RecordMappingFrame(desktop, sipModel),
                 output = new OutputFrame(desktop, sipModel)
         };
