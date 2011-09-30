@@ -33,6 +33,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import java.awt.Color;
@@ -44,6 +45,9 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -61,6 +65,7 @@ import java.beans.VetoableChangeListener;
 public abstract class FrameBase extends JInternalFrame {
     public static Insets INSETS = new Insets(2, /* top */ 8, /* left */ 14, /* bottom */ 10 /* right */);
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
+    private static final int DEFAULT_MOVE_INTERVAL = 1000;
     private static final int MARGIN = 12;
     private Dimension defaultSize = DEFAULT_SIZE;
     protected JDesktopPane desktopPane;
@@ -71,8 +76,9 @@ public abstract class FrameBase extends JInternalFrame {
     protected PopupAction action;
     private boolean modal;
     private boolean initialized;
+    private Timer positionTimer;
 
-    public FrameBase(JComponent parent, SipModel sipModel, String title, boolean modal) {
+    public FrameBase(final JComponent parent, SipModel sipModel, String title, boolean modal) {
         super(
                 title,
                 true, // resizable
@@ -91,6 +97,15 @@ public abstract class FrameBase extends JInternalFrame {
         this.action = new PopupAction(title);
         this.modal = modal;
         this.desktopPane = parent instanceof FrameBase ? ((FrameBase) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
+        positionTimer = new Timer(DEFAULT_MOVE_INTERVAL,
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        positionTimer.stop();
+                        ensureOnScreen();
+                    }
+                }
+        );
         setGlassPane(new ModalityInternalGlassPane(this));
         addFrameListener();
         addFrameVetoListener();
@@ -100,11 +115,18 @@ public abstract class FrameBase extends JInternalFrame {
         super.addPropertyChangeListener("closed", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
-                boolean opened = !((Boolean)event.getNewValue());
+                boolean opened = !((Boolean) event.getNewValue());
                 onOpen(opened);
             }
         });
-
+        addComponentListener(
+                new ComponentAdapter() {
+                    @Override
+                    public void componentMoved(ComponentEvent componentEvent) {
+                        positionTimer.restart();
+                    }
+                }
+        );
     }
 
     // override this
@@ -244,10 +266,24 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
-    private void ensureOnScreen() {
+    /**
+     * When a frame, or more precisely it's title bar, ends up outside the visible area of the desktop,
+     * the user will not be able to move the frame again. This method will keep track of the positioning
+     * of the frame and will move it back to the visible area when needed.
+     */
+    public void ensureOnScreen() {
         Point loc = getLocation();
+        Dimension desktopSize = desktopPane.getSize();
         if (loc.y - INSETS.top + 1 < 0) {
             loc.y = INSETS.top - 1;
+            setLocation(loc);
+        }
+        if (loc.y + INSETS.bottom + 1 >= desktopSize.height) {
+            loc.y = desktopSize.height - getHeight() + INSETS.bottom + 1;
+            setLocation(loc);
+        }
+        if (loc.x + INSETS.right + 1 >= desktopSize.width) {
+            loc.x = desktopSize.width - getWidth() + INSETS.right + 1;
             setLocation(loc);
         }
     }
