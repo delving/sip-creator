@@ -89,7 +89,7 @@ public class FieldMappingFrame extends FrameBase {
 
                     @Override
                     public void focusLost(FocusEvent focusEvent) {
-//                        editHistory.setTarget(null);
+                        editHistory.setTarget(null);
                     }
                 }
         );
