@@ -54,11 +54,21 @@ public class HarvestPool extends AbstractListModel {
                     }
 
                     @Override
-                    public void failed(Exception exception) {
-                        sipModel.getFeedback().alert(String.format("Harvestor '%s' : %s", harvestor.getDataSetSpec(), exception.getMessage()), exception);
+                    public void failed(String message, Exception exception) {
+                        if (null == exception) {
+                            sipModel.getFeedback().alert(String.format("Harvestor '%s': %s", harvestor.getDataSetSpec(), message));
+                        }
+                        else {
+                            sipModel.getFeedback().alert(String.format("Harvestor '%s': %s", harvestor.getDataSetSpec(), message), exception);
+                        }
                         LOG.error(exception);
                         tasks.remove(harvestor);
                         fireIntervalRemoved(this, 0, tasks.size());
+                    }
+
+                    @Override
+                    public void failed(String message) {
+                        failed(message, null);
                     }
                 }
         );
