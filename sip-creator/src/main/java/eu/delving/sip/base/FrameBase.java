@@ -101,11 +101,11 @@ public abstract class FrameBase extends JInternalFrame {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        positionTimer.stop();
                         ensureOnScreen();
                     }
                 }
         );
+        positionTimer.setRepeats(false);
         setGlassPane(new ModalityInternalGlassPane(this));
         addFrameListener();
         addFrameVetoListener();
