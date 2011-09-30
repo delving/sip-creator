@@ -41,6 +41,7 @@ import eu.delving.sip.files.StorageFinder;
 import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.menus.DataSetMenu;
+import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
@@ -105,6 +106,7 @@ public class Application {
     private HarvestDialog harvestDialog;
     private HarvestPool harvestPool;
     private JToggleButton harvestToggleButton = new JToggleButton();
+    private EditHistory editHistory = new EditHistory();
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -136,7 +138,7 @@ public class Application {
         home = new JFrame("Delving SIP Creator");
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
-        allFrames = new AllFrames(desktop, sipModel);
+        allFrames = new AllFrames(desktop, sipModel, editHistory);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         actions = new Action[]{
                 new DownloadAction(desktop, sipModel, cultureHubClient),
@@ -272,6 +274,7 @@ public class Application {
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
         bar.add(dataSetMenu);
+        bar.add(editHistory.getEditMenu());
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
         return bar;

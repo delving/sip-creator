@@ -81,8 +81,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     public enum State {
+        ORIGINAL,
         UNCOMPILED,
-        PRISTINE,
+        SAVED,
         EDITED,
         ERROR,
         COMMITTED,
@@ -115,7 +116,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         }
         else {
             selectedFieldMapping = fieldMapping;
-            notifyStateChange(State.PRISTINE);
+            notifyStateChange(State.ORIGINAL);
         }
         Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
         compileSoon();
@@ -136,7 +137,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         this.recordMapping = recordMapping;
         this.editedCode = null;
         Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
-        notifyStateChange(State.PRISTINE);
+        notifyStateChange(State.ORIGINAL);
         compileSoon();
     }
 
@@ -163,7 +164,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             }
             else {
                 editedCode = null;
-                notifyStateChange(State.PRISTINE);
+                notifyStateChange(State.SAVED);
             }
             compileSoon();
         }
@@ -265,14 +266,14 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                         String output = XmlNodePrinter.serialize(outputNode);
                         compilationComplete(output);
                         if (editedCode == null) {
-                            notifyStateChange(State.PRISTINE);
+                            notifyStateChange(State.SAVED);
                         }
                         else {
                             if (selectedFieldMapping != null) {
                                 selectedFieldMapping.setCode(editedCode);
                                 notifyStateChange(State.COMMITTED);
                                 editedCode = null;
-                                notifyStateChange(State.PRISTINE);
+                                notifyStateChange(State.SAVED);
                             }
                             else {
                                 notifyStateChange(State.EDITED);
@@ -288,7 +289,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                             notifyStateChange(State.COMMITTED);
                             editedCode = null;
                         }
-                        notifyStateChange(State.PRISTINE);
+                        notifyStateChange(State.SAVED);
                     }
                     else {
                         notifyStateChange(State.EDITED);
