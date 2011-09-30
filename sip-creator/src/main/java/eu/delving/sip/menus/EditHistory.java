@@ -2,7 +2,9 @@ package eu.delving.sip.menus;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.JMenu;
+import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
@@ -28,7 +30,6 @@ import java.util.Map;
  * </ul>
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
- *         todo: after popupMenu is triggered, the Edit menu is disappearing, however, the actions are still accessible.
  */
 public class EditHistory extends UndoManager {
 
@@ -38,6 +39,7 @@ public class EditHistory extends UndoManager {
     private JTextComponent currentTarget;
     private Action undoAction;
     private Action redoAction;
+    private ActionMap actionMap = new ActionMap();
 
     /**
      * Set the target JTextComponent for EditHistory. All actions will have effect on the target.
@@ -63,8 +65,11 @@ public class EditHistory extends UndoManager {
                     public void mousePressed(MouseEvent mouseEvent) {
                         if (mouseEvent.isPopupTrigger()) {
                             refreshActions();
-                            // todo: this is killing the Edit menu in the JMenuBar, why? Try ActionMap
-                            currentMenu.getPopupMenu().show(target, mouseEvent.getX(), mouseEvent.getY());
+                            JPopupMenu popupMenu = new JPopupMenu();
+                            for (Object key : actionMap.allKeys()) {
+                                popupMenu.add(actionMap.get(key));
+                            }
+                            popupMenu.show(target, mouseEvent.getX(), mouseEvent.getY());
                         }
                     }
                 }
@@ -88,15 +93,17 @@ public class EditHistory extends UndoManager {
     private void populate() {
         undoAction = new UndoAction(this);
         redoAction = new RedoAction(this);
-        currentMenu.add(undoAction);
-        currentMenu.add(redoAction);
-        currentMenu.addSeparator();
         Action cutAction = fetchAction(DefaultEditorKit.cutAction, "Cut", KeyStroke.getKeyStroke(KeyEvent.VK_X, SHORTCUT));
-        currentMenu.add(cutAction);
         Action copyAction = fetchAction(DefaultEditorKit.copyAction, "Copy", KeyStroke.getKeyStroke(KeyEvent.VK_C, SHORTCUT));
-        currentMenu.add(copyAction);
         Action pasteAction = fetchAction(DefaultEditorKit.pasteAction, "Paste", KeyStroke.getKeyStroke(KeyEvent.VK_V, SHORTCUT));
-        currentMenu.add(pasteAction);
+        actionMap.put(undoAction.getValue(Action.NAME), undoAction);
+        actionMap.put(redoAction.getValue(Action.NAME), redoAction);
+        actionMap.put(cutAction.getValue(Action.NAME), cutAction);
+        actionMap.put(copyAction.getValue(Action.NAME), copyAction);
+        actionMap.put(pasteAction.getValue(Action.NAME), pasteAction);
+        for (Object key : actionMap.keys()) {
+            currentMenu.add(actionMap.get(key));
+        }
     }
 
     /**
