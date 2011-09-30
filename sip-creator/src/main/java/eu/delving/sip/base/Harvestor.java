@@ -58,7 +58,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -126,17 +125,9 @@ public class Harvestor implements Runnable {
         /**
          * Error while harvesting.
          *
-         * @param message   The description of the error.
          * @param exception The thrown exception.
          */
-        void failed(String message, Exception exception);
-
-        /**
-         * Error while harvesting.
-         *
-         * @param message The description of the error.
-         */
-        void failed(String message);
+        void failed(Exception exception);
     }
 
     public void setListener(Listener listener) {
@@ -197,17 +188,15 @@ public class Harvestor implements Runnable {
                 listener.finished(cancelled);
             }
         }
-        catch (UnknownHostException e) {
-            listener.failed(String.format("Error opening '%s' : %s", context.harvestUrl(), e.getMessage()), e);
-        }
         catch (IOException e) {
             log.error(String.format("Unable to complete harvest of %s because of a streaming problem", context.harvestUrl()), e);
             listener.tellUser("Unable to complete harvest");
-            listener.failed("Streaming problem", e);
+            listener.failed(e);
         }
         catch (XMLStreamException e) {
             log.error(String.format("Unable to complete harvest of %s because of an xml problem", context.harvestUrl()), e);
-            listener.failed("Invalid data received", e);
+            listener.tellUser("Unable to complete harvest");
+            listener.failed(e);
         }
     }
 
@@ -276,7 +265,7 @@ public class Harvestor implements Runnable {
                         tokenBuilder = null;
                     }
                     else if (path.equals(ERROR) && errorBuilder != null) {
-                        listener.failed(String.format("OAI-PMH Error: %s", errorBuilder), null);
+                        listener.failed(new Exception(String.format("OAI-PMH Error: %s", errorBuilder)));
                     }
                     path.pop();
                     break;
@@ -360,12 +349,12 @@ public class Harvestor implements Runnable {
         }
         catch (FileNotFoundException e) {
             listener.tellUser("Unable to create file to receive harvested data");
-            listener.failed("Can't create temp file", e);
+            listener.failed(e);
             return false;
         }
         catch (XMLStreamException e) {
             listener.tellUser("Unable to stream to file to receive harvested data");
-            listener.failed("XML Stream error", e);
+            listener.failed(e);
             return false;
         }
         catch (UnsupportedEncodingException e) {
@@ -373,7 +362,7 @@ public class Harvestor implements Runnable {
         }
         catch (IOException e) {
             log.error(String.format("Error creating temp file '%s'%n", tempFile));
-            listener.failed("Error creating temp file", e);
+            listener.failed(e);
             return false;
         }
     }
@@ -393,7 +382,7 @@ public class Harvestor implements Runnable {
         log.info(message);
         if (tempFile.renameTo(context.outputFile())) {
             log.fatal(String.format("Error: %s", message));
-            listener.failed(String.format("Can't rename file from %s to %s", tempFile, context.outputFile()));
+            listener.failed(new Exception(String.format("Error: %s", message)));
             return;
         }
         listener.finished(false);

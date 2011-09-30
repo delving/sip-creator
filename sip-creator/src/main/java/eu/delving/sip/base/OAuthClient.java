@@ -129,7 +129,7 @@ public class OAuthClient {
             catch (IOException e) {
                 password = null;
                 log.error("OAuth Client problem", e);
-                throw new OAuthSystemException(String.format("Can't connect to server : %s", e.getMessage()), e);
+                throw new OAuthSystemException("Can't connect to server", e);
             }
         }
     });
