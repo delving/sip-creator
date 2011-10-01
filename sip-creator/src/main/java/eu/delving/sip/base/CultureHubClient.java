@@ -337,6 +337,9 @@ public class CultureHubClient {
         private DataSet dataSet;
         private List<File> uploadFiles;
         private UploadListener uploadListener;
+        private HttpPost post;
+        private HttpResponse response;
+        private HttpEntity entity;
 
         public FileUploader(DataSet dataSet, UploadListener uploadListener) throws StorageException {
             this.dataSet = dataSet;
@@ -347,16 +350,15 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                HttpPost post = new HttpPost(createListRequestUrl());
+                post = new HttpPost(createListRequestUrl());
                 post.setEntity(createListEntity());
                 post.setHeader("Accept", "text/plain");
-                HttpResponse response = httpClient.execute(post);
+                response = httpClient.execute(post);
+                entity = response.getEntity();
                 switch (Code.from(response)) {
                     case OK:
-                        HttpEntity entity = response.getEntity();
                         String listString = EntityUtils.toString(entity);
                         Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
-                        EntityUtils.consume(entity);
                         Iterator<File> walk = uploadFiles.iterator();
                         while (walk.hasNext()) {
                             File file = walk.next();
@@ -375,12 +377,16 @@ public class CultureHubClient {
                     case UNKNOWN_RESPONSE:
                         throw new IOException("Unable to fetch file list, response: " + Code.from(response));
                 }
+                EntityUtils.consume(entity);
+                entity = null;
                 for (File file : uploadFiles) {
                     log.info("Uploading " + file);
                     post = new HttpPost(createFileRequestUrl(file));
                     post.setEntity(new FileEntity(file, uploadListener));
                     response = httpClient.execute(post);
-                    EntityUtils.consume(response.getEntity());
+                    entity = response.getEntity();
+                    EntityUtils.consume(entity);
+                    entity = null;
                     switch (Code.from(response)) {
                         case OK:
                             break;
@@ -403,6 +409,14 @@ public class CultureHubClient {
                 notifyUser(e.getMessage());
             }
             finally {
+                if (entity != null) {
+                    try {
+                        EntityUtils.consume(entity);
+                    }
+                    catch (IOException e) {
+                        log.error("Cannot consume entity", e);
+                    }
+                }
                 uploadListener.finished();
             }
         }
