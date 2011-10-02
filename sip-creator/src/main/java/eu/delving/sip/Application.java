@@ -98,8 +98,6 @@ import static eu.delving.sip.files.DataSetState.IMPORTED;
  */
 
 public class Application {
-
-    public static final int CONNECTION_TIMEOUT = 60000;
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;

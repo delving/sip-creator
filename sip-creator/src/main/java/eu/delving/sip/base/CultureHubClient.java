@@ -26,7 +26,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.metadata.Hasher;
-import eu.delving.sip.Application;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -69,6 +68,7 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
  */
 
 public class CultureHubClient {
+    private static final int CONNECTION_TIMEOUT = 1000*60*30;
     private static final int BLOCK_SIZE = 4096;
     private static final long MINIMUM_PROGRESS_SIZE = 1024 * 1024;
     private Logger log = Logger.getLogger(getClass());
@@ -114,8 +114,8 @@ public class CultureHubClient {
     public CultureHubClient(Context context) {
         this.context = context;
         HttpParams timeoutParams = new BasicHttpParams();
-        HttpConnectionParams.setSoTimeout(timeoutParams, Application.CONNECTION_TIMEOUT);
-        HttpConnectionParams.setConnectionTimeout(timeoutParams, Application.CONNECTION_TIMEOUT);
+        HttpConnectionParams.setSoTimeout(timeoutParams, CONNECTION_TIMEOUT);
+        HttpConnectionParams.setConnectionTimeout(timeoutParams, CONNECTION_TIMEOUT);
         httpClient = new DefaultHttpClient(timeoutParams);
     }
 
