@@ -200,6 +200,10 @@ public class CultureHubClient {
                     context.invalidateTokens();
                 }
             }
+            catch (OAuthProblemException e) {
+                reportOAuthProblem(e);
+                listReceiveListener.failed(e);
+            }
             catch (Exception e) {
                 log.error("Unable to fetch list", e);
                 context.getNotifier().alert(String.format("Error fetching list from hub: %s", e.getMessage()));
@@ -250,6 +254,9 @@ public class CultureHubClient {
                     Code.from(response).notifyUser(context);
                 }
             }
+            catch (OAuthProblemException e) {
+                reportOAuthProblem(e);
+            }
             catch (Exception e) {
                 log.error("Unable to unlock dataset", e);
                 context.getNotifier().alert(String.format("Error unlocking dataset server: %s", e.getMessage()));
@@ -291,6 +298,9 @@ public class CultureHubClient {
                     context.invalidateTokens();
                     Code.from(response).notifyUser(context);
                 }
+            }
+            catch (OAuthProblemException e) {
+                reportOAuthProblem(e);
             }
             catch (Exception e) {
                 log.warn("Unable to download data set", e);
@@ -377,15 +387,7 @@ public class CultureHubClient {
                 }
             }
             catch (OAuthProblemException e) {
-                OAuthClient.Problem problem = OAuthClient.getProblem(e);
-                switch (problem) {
-                    case INVALID_GRANT:
-                        context.getNotifier().alert(String.format("Invalid password for user %s", context.getUser()));
-                        break;
-                    default:
-                        context.getNotifier().alert("Authorization problem: " + problem);
-                        break;
-                }
+                reportOAuthProblem(e);
             }
             catch (Exception e) {
                 log.error("Error while connecting", e);
@@ -429,6 +431,18 @@ public class CultureHubClient {
                     file.getName(),
                     context.getAccessToken()
             );
+        }
+    }
+
+    private void reportOAuthProblem(OAuthProblemException e) {
+        OAuthClient.Problem problem = OAuthClient.getProblem(e);
+        switch (problem) {
+            case INVALID_GRANT:
+                context.getNotifier().alert(String.format("Invalid password for user %s", context.getUser()));
+                break;
+            default:
+                context.getNotifier().alert("Authorization problem: " + problem);
+                break;
         }
     }
 
