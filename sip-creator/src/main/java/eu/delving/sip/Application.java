@@ -22,7 +22,6 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.sip.base.ClientException;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.DownloadAction;
 import eu.delving.sip.base.Exec;
@@ -46,6 +45,8 @@ import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
+import org.apache.amber.oauth2.common.exception.OAuthProblemException;
+import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.Action;
@@ -98,8 +99,6 @@ import static eu.delving.sip.files.DataSetState.IMPORTED;
  */
 
 public class Application {
-
-    public static final int CONNECTION_TIMEOUT = 60000;
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
@@ -225,43 +224,6 @@ public class Application {
                 }
             }
         });
-        osxExtra();
-    }
-
-    private boolean quit() {
-        if (harvestPool.getSize() > 0) {
-            if (JOptionPane.YES_OPTION !=
-                    JOptionPane.showConfirmDialog(null,
-                            String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize()),
-                            "Active harvests",
-                            JOptionPane.YES_NO_OPTION)) {
-                return false;
-            }
-        }
-        allFrames.putState();
-        System.exit(0);
-        return true;
-    }
-
-    private JPanel createStatePanel() {
-        JPanel bp = new JPanel(new GridLayout(2, 2));
-        for (Action action : actions) {
-            bp.add(new JButton(action));
-        }
-        JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
-        p.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createBevelBorder(0),
-                BorderFactory.createEmptyBorder(6, 6, 6, 6)
-        ));
-        statusLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createBevelBorder(0),
-                BorderFactory.createEmptyBorder(2, 2, 2, 2)
-        ));
-        p.add(statusLabel);
-        p.add(bp);
-        JPanel fp = new JPanel(new BorderLayout());
-        fp.add(feedback.getToggle(), BorderLayout.CENTER);
-        refreshToggleButton();
         harvestPool.addListDataListener(
                 new ListDataListener() {
                     @Override
@@ -293,8 +255,47 @@ public class Application {
                     }
                 }
         );
-        fp.add(harvestToggleButton, BorderLayout.EAST);
-        p.add(fp);
+        osxExtra();
+    }
+
+    private boolean quit() {
+        if (harvestPool.getSize() > 0) {
+            if (JOptionPane.YES_OPTION !=
+                    JOptionPane.showConfirmDialog(null,
+                            String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize()),
+                            "Active harvests",
+                            JOptionPane.YES_NO_OPTION)) {
+                return false;
+            }
+        }
+        allFrames.putState();
+        System.exit(0);
+        return true;
+    }
+
+    private JPanel createStatePanel() {
+        JPanel buttons = new JPanel(new GridLayout(2, 2));
+        for (Action action : actions) {
+            buttons.add(new JButton(action));
+        }
+        statusLabel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createBevelBorder(0),
+                BorderFactory.createEmptyBorder(2, 2, 2, 2)
+        ));
+        refreshToggleButton();
+        JPanel left = new JPanel(new BorderLayout(6, 6));
+        left.add(statusLabel,BorderLayout.CENTER);
+        left.add(buttons,BorderLayout.EAST);
+        JPanel right = new JPanel(new BorderLayout(6, 6));
+        right.add(feedback.getToggle(),BorderLayout.CENTER);
+        right.add(harvestToggleButton ,BorderLayout.EAST);
+        JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
+        p.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createBevelBorder(0),
+                BorderFactory.createEmptyBorder(6, 6, 6, 6)
+        ));
+        p.add(left);
+        p.add(right);
         return p;
     }
 
@@ -320,12 +321,17 @@ public class Application {
         }
 
         @Override
+        public String getUser() {
+            return StorageFinder.getUser(storageDirectory);
+        }
+
+        @Override
         public String getServerUrl() {
             return String.format("http://%s/dataset/sip-creator", StorageFinder.getHostPortUser(storageDirectory));
         }
 
         @Override
-        public String getAccessToken() throws ClientException {
+        public String getAccessToken() throws OAuthSystemException, OAuthProblemException {
             return oauthClient.getToken();
         }
 

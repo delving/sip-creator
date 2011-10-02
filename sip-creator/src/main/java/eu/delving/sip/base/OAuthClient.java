@@ -46,7 +46,7 @@ public class OAuthClient {
         this.passwordRequest = passwordRequest;
     }
 
-    public String getToken() throws ClientException {
+    public String getToken() throws OAuthSystemException, OAuthProblemException {
         try {
             if (System.currentTimeMillis() - requestTimeStamp > expirationSeconds * 1000) {
                 accessToken = null;
@@ -69,12 +69,12 @@ public class OAuthClient {
         catch (OAuthProblemException e) {
             password = null;
             invalidateTokens();
-            throw new ClientException(e.getMessage());
+            throw e;
         }
         catch (OAuthSystemException e) {
             password = null;
             invalidateTokens();
-            throw new ClientException(e.getMessage());
+            throw e;
         }
 
     }
@@ -83,23 +83,23 @@ public class OAuthClient {
         accessToken = refreshToken = null;
     }
 
-    private void requestWithPassword() throws OAuthSystemException, OAuthProblemException, ClientException {
+    private void requestWithPassword() throws OAuthSystemException, OAuthProblemException {
         OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
                 .setGrantType(GrantType.PASSWORD).setUsername(username).setPassword(password)
                 .buildQueryMessage();
         acceptResponse(OAUTH_CLIENT.accessToken(request));
     }
 
-    private void requestWithRefreshToken() throws OAuthSystemException, OAuthProblemException, ClientException {
+    private void requestWithRefreshToken() throws OAuthSystemException, OAuthProblemException {
         OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
                 .setGrantType(GrantType.REFRESH_TOKEN).setRefreshToken(refreshToken)
                 .buildQueryMessage();
         acceptResponse(OAUTH_CLIENT.accessToken(request));
     }
 
-    private void acceptResponse(OAuthJSONAccessTokenResponse response) throws ClientException {
+    private void acceptResponse(OAuthJSONAccessTokenResponse response) {
         if (null == response) {
-            throw new ClientException("Response is null");
+            throw new RuntimeException("Response is null!");
         }
         requestTimeStamp = System.currentTimeMillis();
         accessToken = response.getAccessToken();
@@ -133,4 +133,37 @@ public class OAuthClient {
             }
         }
     });
+
+    public static Problem getProblem(OAuthProblemException ex) {
+        String error = ex.getError();
+        for (Problem p : Problem.values()) {
+            if (p.string.equals(error)) {
+                return p;
+            }
+        }
+        return Problem.UNKNOWN;
+    }
+
+    public enum Problem {
+        INVALID_REQUEST("invalid_request"),
+        INVALID_CLIENT("invalid_client"),
+        UNAUTHORIZED_CLIENT("unauthorized_client"),
+        REDIRECT_URI_MISMATCH("redirect_uri_mismatch"),
+        ACCESS_DENIED("access_denied"),
+        UNSUPPORTED_RESPONSE_TYPE("unsupported_response_type"),
+        INVALID_GRANT("invalid_grant"),
+        UNSUPPORTED_GRANT_TYPE("unsupported_grant_type"),
+        INVALID_SCOPE("invalid_scope"),
+        EXPIRED_TOKEN("expired_token"),
+        INSUFFICIENT_SCOPE("insufficient_scope"),
+        INVALID_TOKEN("invalid_token"),
+        UNKNOWN("???");
+
+        private String string;
+
+        Problem(String string) {
+            this.string = string;
+        }
+    }
+
 }

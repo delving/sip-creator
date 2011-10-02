@@ -53,6 +53,7 @@ public class VisualFeedback implements Feedback {
     private static final String ONE_LINE = "<html><font size=-2><i>%s</i></font>";
     private static final String TWO_LINES = "<html><font size=-2><i>%s<br>%s</i></font>";
     private static final String THREE_LINES = "<html><font size=-2><i>%s<br>%s<br>%s</i></font>";
+    private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("hh:mm:ss");
     private Logger log = Logger.getLogger(getClass());
     private JToggleButton toggle = new JToggleButton(String.format(ONE_LINE, FEEDBACK));
     private LogListModel listModel = new LogListModel();
@@ -125,9 +126,7 @@ public class VisualFeedback implements Feedback {
     }
 
     private void addToList(final String message) {
-        DateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        String timeStamp = format.format(new Date(System.currentTimeMillis()));
-        listModel.add(String.format("%s - %s", timeStamp, message));
+        listModel.add(String.format("%s - %s", TIMESTAMP_FORMAT.format(new Date()), message));
         list.ensureIndexIsVisible(listModel.getSize() - 1);
     }
 
