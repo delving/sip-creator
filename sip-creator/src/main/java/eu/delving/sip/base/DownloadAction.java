@@ -90,7 +90,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
                 }
             }
         });
-        dialog.setSize(500, 200);
+        dialog.setSize(500, 600);
         Dimension world = Toolkit.getDefaultToolkit().getScreenSize();
         dialog.setLocation((world.width - dialog.getSize().width) / 2, (world.height - dialog.getSize().height) / 2);
     }

@@ -22,6 +22,7 @@
 package eu.delving.metadata;
 
 import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.GroovyList;
 import eu.delving.groovy.GroovyNode;
 import groovy.lang.Binding;
 import groovy.lang.GString;
@@ -62,6 +63,7 @@ public class RecordValidator {
 
     public interface ValidationReference {
         boolean allowOption(Node node);
+
         boolean isUnique(String string);
     }
 
@@ -105,14 +107,14 @@ public class RecordValidator {
             nodeToPath(node.parent(), path);
         }
         if (node.name() instanceof String) {
-            path.push(Tag.create((String)node.name()));
+            path.push(Tag.create((String) node.name()));
         }
         else if (node.name() instanceof QName) {
             QName q = (QName) node.name();
             path.push(Tag.create(q.getPrefix(), q.getLocalPart()));
         }
         else {
-            throw new IllegalStateException("Node name type is not recognized: "+node.name().getClass());
+            throw new IllegalStateException("Node name type is not recognized: " + node.name().getClass());
         }
     }
 
@@ -131,7 +133,7 @@ public class RecordValidator {
             Node current = null;
             Iterator walk = list.iterator();
             while (walk.hasNext()) {
-                Node next = (Node)walk.next();
+                Node next = (Node) walk.next();
                 if (current != null && current.name().equals(next.name()) && current.value().equals(next.value())) {
                     walk.remove();
                 }
@@ -172,7 +174,7 @@ public class RecordValidator {
 
     private static String valueToString(Object object) {
         if (object instanceof String) {
-            return (String)object;
+            return (String) object;
         }
         else if (object instanceof GString) {
             return object.toString();
@@ -183,8 +185,20 @@ public class RecordValidator {
         else if (object instanceof Node) {
             return valueToString(((Node) object).value());
         }
+        else if (object instanceof GroovyList) {
+            GroovyList list = (GroovyList) object;
+            if (list.isEmpty()) {
+                return "";
+            }
+            else if (list.size() == 1) {
+                return valueToString(((GroovyList) object).get(0));
+            }
+            else {
+                throw new IllegalStateException("Could not deal with Groovy list of size " + list.size());
+            }
+        }
         else {
-            throw new IllegalStateException("Could not deal with class "+object.getClass());
+            throw new IllegalStateException("Could not deal with class " + object.getClass());
         }
     }
 }
