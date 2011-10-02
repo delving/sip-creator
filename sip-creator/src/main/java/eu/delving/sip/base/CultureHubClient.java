@@ -30,6 +30,8 @@ import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
+import org.apache.amber.oauth2.common.exception.OAuthProblemException;
+import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -68,7 +70,7 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
  */
 
 public class CultureHubClient {
-    private static final int CONNECTION_TIMEOUT = 1000*60*30;
+    private static final int CONNECTION_TIMEOUT = 1000 * 60 * 30;
     private static final int BLOCK_SIZE = 4096;
     private static final long MINIMUM_PROGRESS_SIZE = 1024 * 1024;
     private Logger log = Logger.getLogger(getClass());
@@ -76,9 +78,11 @@ public class CultureHubClient {
     private HttpClient httpClient;
 
     public interface Context {
+        String getUser();
+
         String getServerUrl();
 
-        String getAccessToken() throws ClientException;
+        String getAccessToken() throws OAuthSystemException, OAuthProblemException;
 
         void invalidateTokens();
 
@@ -88,16 +92,22 @@ public class CultureHubClient {
     }
 
     public enum Code {
-        OK(SC_OK),
-        NOT_FOUND(SC_NOT_FOUND),
-        UNAUTHORIZED(SC_UNAUTHORIZED),
-        SYSTEM_ERROR(SC_INTERNAL_SERVER_ERROR),
-        UNKNOWN_RESPONSE(-1);
+        OK(SC_OK, "All is well"),
+        NOT_FOUND(SC_NOT_FOUND, "Resource not found"),
+        UNAUTHORIZED(SC_UNAUTHORIZED, "Not authorized"),
+        SYSTEM_ERROR(SC_INTERNAL_SERVER_ERROR, "Server system error"),
+        UNKNOWN_RESPONSE(-1, "Unknown response");
 
         private int httpCode;
+        private String say;
 
-        Code(int httpCode) {
+        Code(int httpCode, String say) {
             this.httpCode = httpCode;
+            this.say = say;
+        }
+
+        void notifyUser(Context context) {
+            context.getNotifier().alert("Problem communicating with hub: " + say);
         }
 
         static Code from(HttpResponse httpResponse) {
@@ -178,24 +188,16 @@ public class CultureHubClient {
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
-                switch (Code.from(response)) {
-                    case OK:
-                        entity = response.getEntity();
-                        DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
-                        log.info("list received:\n" + dataSetList);
-                        listReceiveListener.listReceived(dataSetList.list);
-                        break;
-                    case UNAUTHORIZED:
-                        context.invalidateTokens();
-                        notifyUser("Authorization failure, please try again");
-                        log.error("Authorization failure, please try again");
-                        break;
-                    case NOT_FOUND:
-                    case SYSTEM_ERROR:
-                    case UNKNOWN_RESPONSE:
-                        log.warn("Unable to fetch data set list. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.getNotifier().alert(String.format("Error fetching list from hub: %s", response.getStatusLine().getReasonPhrase()));
-                        break;
+                Code code = Code.from(response);
+                if (code == Code.OK) {
+                    entity = response.getEntity();
+                    DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
+                    log.info("list received:\n" + dataSetList);
+                    listReceiveListener.listReceived(dataSetList.list);
+                }
+                else {
+                    code.notifyUser(context);
+                    context.invalidateTokens();
                 }
             }
             catch (Exception e) {
@@ -238,25 +240,14 @@ public class CultureHubClient {
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
                 EntityUtils.consume(response.getEntity());
-                switch (Code.from(response)) {
-                    case OK:
-                        unlockListener.unlockComplete(true);
-                        break;
-                    case UNAUTHORIZED:
-                        context.invalidateTokens();
-                        notifyUser("Authorization failure, please try again");
-                        log.error("Authorization failure, please try again");
-                        break;
-                    case NOT_FOUND:
-                        notifyUser("Unlocking failure");
-                        log.error("Unlocking failure");
-                        unlockListener.unlockComplete(false);
-                        break;
-                    case SYSTEM_ERROR:
-                    case UNKNOWN_RESPONSE:
-                        log.warn("Unable to unlock dataset. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.getNotifier().alert(String.format("Error unlocking dataset: %s", response.getStatusLine().getReasonPhrase()));
-                        break;
+                Code code = Code.from(response);
+                if (code == Code.OK) {
+                    unlockListener.unlockComplete(true);
+                }
+                else {
+                    unlockListener.unlockComplete(false);
+                    context.invalidateTokens();
+                    Code.from(response).notifyUser(context);
                 }
             }
             catch (Exception e) {
@@ -290,21 +281,15 @@ public class CultureHubClient {
                 get.setHeader("Accept", "application/zip");
                 HttpResponse response = httpClient.execute(get);
                 entity = response.getEntity();
-                switch (Code.from(response)) {
-                    case OK:
-                        dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
-                        success = true;
-                        context.dataSetCreated(dataSet);
-                        break;
-                    case UNAUTHORIZED:
-                        context.invalidateTokens();
-                        notifyUser("Authorization failure, please try again");
-                        break;
-                    case SYSTEM_ERROR:
-                    case UNKNOWN_RESPONSE:
-                        log.warn("Unable to download source. HTTP response " + response.getStatusLine().getReasonPhrase());
-                        context.getNotifier().alert("Unable to download data set"); // todo: tell them why
-                        break;
+                Code code = Code.from(response);
+                if (code == Code.OK) {
+                    dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                    success = true;
+                    context.dataSetCreated(dataSet);
+                }
+                else {
+                    context.invalidateTokens();
+                    Code.from(response).notifyUser(context);
                 }
             }
             catch (Exception e) {
@@ -355,58 +340,56 @@ public class CultureHubClient {
                 post.setHeader("Accept", "text/plain");
                 response = httpClient.execute(post);
                 entity = response.getEntity();
-                switch (Code.from(response)) {
-                    case OK:
-                        String listString = EntityUtils.toString(entity);
-                        Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
-                        Iterator<File> walk = uploadFiles.iterator();
-                        while (walk.hasNext()) {
-                            File file = walk.next();
-                            if (!requestedFiles.contains(file.getName())) {
-                                log.info(String.format("Hub does not want %s", file.getName()));
-                                uploadListener.uploadRefused(file);
-                                walk.remove();
-                            }
+                Code code = Code.from(response);
+                if (code == Code.OK) {
+                    String listString = EntityUtils.toString(entity);
+                    Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
+                    Iterator<File> walk = uploadFiles.iterator();
+                    while (walk.hasNext()) {
+                        File file = walk.next();
+                        if (!requestedFiles.contains(file.getName())) {
+                            log.info(String.format("Hub does not want %s", file.getName()));
+                            uploadListener.uploadRefused(file);
+                            walk.remove();
                         }
-                        break;
-                    case UNAUTHORIZED:
-                        context.invalidateTokens();
-                        notifyUser("Authorization failure, please try again");
-                        break;
-                    case SYSTEM_ERROR:
-                    case UNKNOWN_RESPONSE:
-                        throw new IOException("Unable to fetch file list, response: " + Code.from(response));
-                }
-                EntityUtils.consume(entity);
-                entity = null;
-                for (File file : uploadFiles) {
-                    log.info("Uploading " + file);
-                    post = new HttpPost(createFileRequestUrl(file));
-                    post.setEntity(new FileEntity(file, uploadListener));
-                    response = httpClient.execute(post);
-                    entity = response.getEntity();
+                    }
                     EntityUtils.consume(entity);
                     entity = null;
-                    switch (Code.from(response)) {
-                        case OK:
-                            break;
-                        case UNAUTHORIZED:
+                    for (File file : uploadFiles) {
+                        log.info("Uploading " + file);
+                        post = new HttpPost(createFileRequestUrl(file));
+                        post.setEntity(new FileEntity(file, uploadListener));
+                        response = httpClient.execute(post);
+                        entity = response.getEntity();
+                        EntityUtils.consume(entity);
+                        entity = null;
+                        code = Code.from(response);
+                        if (code != Code.OK) {
                             context.invalidateTokens();
-                            notifyUser("Authorization failure, please try again");
-                            break;
-                        case SYSTEM_ERROR:
-                        case UNKNOWN_RESPONSE:
-                            throw new IOException(String.format("Unable to upload file %s, response: %s", file.getName(), Code.from(response)));
+                            Code.from(response).notifyUser(context);
+                            return;
+                        }
                     }
                 }
+                else {
+                    context.invalidateTokens();
+                    code.notifyUser(context);
+                }
             }
-            catch (IOException e) {
+            catch (OAuthProblemException e) {
+                OAuthClient.Problem problem = OAuthClient.getProblem(e);
+                switch (problem) {
+                    case INVALID_GRANT:
+                        context.getNotifier().alert(String.format("Invalid password for user %s", context.getUser()));
+                        break;
+                    default:
+                        context.getNotifier().alert("Authorization problem: " + problem);
+                        break;
+                }
+            }
+            catch (Exception e) {
                 log.error("Error while connecting", e);
-                notifyUser(e.getMessage());
-            }
-            catch (ClientException e) {
-                log.error("Error ");
-                notifyUser(e.getMessage());
+                context.getNotifier().alert("Authorization system problem: " + e.getMessage());
             }
             finally {
                 if (entity != null) {
@@ -429,7 +412,7 @@ public class CultureHubClient {
             return new StringEntity(fileList.toString());
         }
 
-        private String createListRequestUrl() throws ClientException {
+        private String createListRequestUrl() throws OAuthSystemException, OAuthProblemException {
             return String.format(
                     "%s/submit/%s?accessKey=%s",
                     context.getServerUrl(),
@@ -438,7 +421,7 @@ public class CultureHubClient {
             );
         }
 
-        private String createFileRequestUrl(File file) throws ClientException {
+        private String createFileRequestUrl(File file) throws OAuthSystemException, OAuthProblemException {
             return String.format(
                     "%s/submit/%s/%s?accessKey=%s",
                     context.getServerUrl(),
@@ -468,10 +451,10 @@ public class CultureHubClient {
         }
     }
 
-    private void notifyUser(final String message) {
-        log.warn("Problem communicating with CultureHub: " + message);
-        context.getNotifier().alert("Problem communicating with hub: " + message);
-    }
+//    private void notifyUser(final String message) {
+//        log.warn("Problem communicating with CultureHub: " + message);
+//        context.getNotifier().alert("Problem communicating with hub: " + message);
+//    }
 
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {
         private final File file;

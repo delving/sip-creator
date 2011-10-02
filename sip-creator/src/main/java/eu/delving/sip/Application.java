@@ -22,7 +22,6 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.sip.base.ClientException;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.DownloadAction;
 import eu.delving.sip.base.Exec;
@@ -46,6 +45,8 @@ import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
+import org.apache.amber.oauth2.common.exception.OAuthProblemException;
+import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.Action;
@@ -318,12 +319,17 @@ public class Application {
         }
 
         @Override
+        public String getUser() {
+            return StorageFinder.getUser(storageDirectory);
+        }
+
+        @Override
         public String getServerUrl() {
             return String.format("http://%s/dataset/sip-creator", StorageFinder.getHostPortUser(storageDirectory));
         }
 
         @Override
-        public String getAccessToken() throws ClientException {
+        public String getAccessToken() throws OAuthSystemException, OAuthProblemException {
             return oauthClient.getToken();
         }
 
