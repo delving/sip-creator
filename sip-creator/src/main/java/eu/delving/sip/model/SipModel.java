@@ -392,6 +392,11 @@ public class SipModel {
             }
 
             @Override
+            public void failure(String message, Exception exception) {
+                feedback.alert(message, exception);
+            }
+
+            @Override
             public void progress(long elementCount) {
                 listener.analysisProgress(elementCount);
             }

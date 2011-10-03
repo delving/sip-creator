@@ -75,6 +75,10 @@ public interface DataSet {
 
     InputStream sourceInput() throws StorageException;
 
+    File renameInvalidSource() throws StorageException;
+
+    File renameInvalidImport() throws StorageException;
+
     Statistics getLatestStatistics();
 
     Statistics getStatistics(boolean sourceFormat);

@@ -146,7 +146,7 @@ public class TestStorage {
         dataSet().setValidation(mock.getMetadataPrefix(), new BitSet(), recordCount);
         assertEquals("Should be four files", 4, dataSet().getUploadFiles().size());
         for (File u : dataSet().getUploadFiles()) {
-            log.info("upload this: "+u.getName());
+            log.info("upload this: " + u.getName());
         }
     }
 
@@ -154,7 +154,7 @@ public class TestStorage {
     public void validation() throws StorageException, IOException {
         int bits = 100;
         BitSet valid = new BitSet(bits);
-        for (int walk=0; walk<bits; walk++) {
+        for (int walk = 0; walk < bits; walk++) {
             if ((walk % 25) > 0) {
                 valid.set(walk);
             }
@@ -165,12 +165,12 @@ public class TestStorage {
         DataInputStream dis = new DataInputStream(new FileInputStream(mock.files()[0]));
         int size = dis.readInt();
         BitSet invalid = new BitSet(bits);
-        for (int walk=0; walk<size; walk++) {
+        for (int walk = 0; walk < size; walk++) {
             int index = dis.readInt();
             invalid.set(index);
         }
         invalid.xor(valid);
-        assertEquals("Should not be any clear bits in the first "+bits, bits, invalid.nextClearBit(0));
+        assertEquals("Should not be any clear bits in the first " + bits, bits, invalid.nextClearBit(0));
     }
 
     private void analyze() {
@@ -203,6 +203,11 @@ public class TestStorage {
             @Override
             public void failure(Exception exception) {
                 throw new RuntimeException("Should not have failed", exception);
+            }
+
+            @Override
+            public void failure(String message, Exception exception) {
+                throw new RuntimeException(message, exception);
             }
 
             @Override
