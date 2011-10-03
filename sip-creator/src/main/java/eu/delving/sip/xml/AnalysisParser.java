@@ -26,12 +26,14 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
+import eu.delving.sip.files.StorageException;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +41,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Analyze xml input and compile statistics.
+ * Analyze xml input and compile statistics. When analysis fails, the .error will be appended to the filename
+ * of the erroneous file.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  * @author Serkan Demirel <serkan@blackbuilt.nl>
@@ -57,6 +60,8 @@ public class AnalysisParser implements Runnable {
         void success(Statistics statistics);
 
         void failure(Exception exception);
+
+        void failure(String message, Exception exception);
 
         void progress(long elementCount);
     }
@@ -129,7 +134,21 @@ public class AnalysisParser implements Runnable {
             listener.success(new Statistics(fieldStatisticsList, sourceFormat));
         }
         catch (Exception e) {
-            listener.failure(e);
+            try {
+                File renamedTo = null;
+                switch (dataSet.getState()) {
+                    case IMPORTED:
+                        renamedTo = dataSet.renameInvalidImport();
+                        break;
+                    case SOURCED:
+                        renamedTo = dataSet.renameInvalidSource();
+                        break;
+                }
+                listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
+            }
+            catch (StorageException se) {
+                listener.failure("Error renaming file", e);
+            }
         }
     }
 

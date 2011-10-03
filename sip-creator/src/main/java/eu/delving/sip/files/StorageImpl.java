@@ -321,6 +321,26 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
+        public File renameInvalidSource() throws StorageException {
+            File sourceFile = sourceFile(here);
+            File renamedFile = new File(here, String.format("%s.error", sourceFile.getName()));
+            if (!sourceFile.renameTo(renamedFile)) {
+                throw new StorageException("Error renaming file");
+            }
+            return renamedFile;
+        }
+
+        @Override
+        public File renameInvalidImport() throws StorageException {
+            File importFile = importedFile(here);
+            File renamedFile = new File(here, String.format("%s.error", importFile.getName()));
+            if (!importFile.renameTo(renamedFile)) {
+                throw new StorageException("Error renaming file");
+            }
+            return renamedFile;
+        }
+
+        @Override
         public Statistics getLatestStatistics() {
             File analysis = statisticsFile(here, false);
             File source = statisticsFile(here, true);
