@@ -322,9 +322,9 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public File renameInvalidSource() throws StorageException {
-            File sourcedFile = sourceFile(here);
-            File renamedFile = new File(here, String.format("%s%s", sourcedFile.getName(), ".error"));
-            if (!sourcedFile.renameTo(renamedFile)) {
+            File sourceFile = sourceFile(here);
+            File renamedFile = new File(here, String.format("%s.error", sourceFile.getName()));
+            if (!sourceFile.renameTo(renamedFile)) {
                 throw new StorageException("Error renaming file");
             }
             return renamedFile;
@@ -333,7 +333,7 @@ public class StorageImpl extends StorageBase implements Storage {
         @Override
         public File renameInvalidImport() throws StorageException {
             File importFile = importedFile(here);
-            File renamedFile = new File(here, String.format("%s%s", importFile.getName(), ".error"));
+            File renamedFile = new File(here, String.format("%s.error", importFile.getName()));
             if (!importFile.renameTo(renamedFile)) {
                 throw new StorageException("Error renaming file");
             }
