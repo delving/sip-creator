@@ -58,6 +58,16 @@ public enum MetadataNamespace {
             "http://www.icn.nl/",
             "http://www.icn.nl/schemas/ICN-V3.2.xsd"
     ),
+    TIB(
+            "tib",
+            "http://www.thuisinbrabant.nl/",
+            "http://www.thuisinbrabant.nl/schemas/TIB-1.0.xsd"
+    ),
+    DELVING(
+            "delving",
+            "http://www.delving.eu/",
+            "http://www.delving.eu/schemas/DELVING-V1.0.xsd"
+    ),
     ABM(
             "abm",
             "http://abmu.org/abm",
