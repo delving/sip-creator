@@ -103,7 +103,9 @@ public class AnalysisModel {
         if (statistics == null) {
             throw new IllegalStateException("No statistics");
         }
-        statistics.convertToSourcePaths(getRecordRoot(), getUniqueElement());
+        statistics.convertToSourcePaths(getRecordRoot());
+        analysisTree = statistics.createAnalysisTree();
+        analysisTreeModel.setRoot(analysisTree.getRoot());
         setHints(Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
         return statistics;
     }
@@ -196,19 +198,6 @@ public class AnalysisModel {
         void recordRootSet(Path recordRootPath);
 
         void uniqueElementSet(Path uniqueElementPath);
-    }
-
-    private class HintSaver implements Runnable {
-
-        @Override
-        public void run() {
-            try {
-                sipModel.getDataSetModel().getDataSet().setHints(hintsModel.getFacts());
-            }
-            catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to save analysis hints", e);
-            }
-        }
     }
 
     private class HintSaveTimer implements FactModel.Listener, ActionListener, Runnable {
