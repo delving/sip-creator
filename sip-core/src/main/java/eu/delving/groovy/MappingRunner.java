@@ -21,7 +21,9 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.MetadataNamespace;
+import eu.delving.metadata.NamespaceDefinition;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecordMapping;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.GroovySystem;
@@ -50,15 +52,19 @@ import java.util.regex.Pattern;
 public class MappingRunner {
     private Script script;
     private GroovyShell groovyShell;
+    private RecordMapping recordMapping;
     private String code;
-    private GroovyCodeResource groovyCodeResource;
     private int counter = 0;
 
-    public MappingRunner(GroovyCodeResource groovyCodeResource, String code) {
-        this.groovyCodeResource = groovyCodeResource;
+    public MappingRunner(GroovyCodeResource groovyCodeResource, RecordMapping recordMapping, Path selectedPath, String editedCode) {
         this.groovyShell = groovyCodeResource.getCategoryShell();
-        this.code = code;
+        this.recordMapping = recordMapping;
+        this.code = recordMapping.toCompileCode(selectedPath, editedCode);
         script = groovyCodeResource.createMappingScript(code);
+    }
+
+    public MappingRunner(GroovyCodeResource groovyCodeResource, RecordMapping recordMapping) {
+        this(groovyCodeResource, recordMapping, null, null);
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
@@ -95,8 +101,8 @@ public class MappingRunner {
             NodeBuilder builder = NodeBuilder.newInstance();
             NamespaceBuilder xmlns = new NamespaceBuilder(builder);
             binding.setVariable("output", builder);
-            for (MetadataNamespace ns : MetadataNamespace.values()) {
-                binding.setVariable(ns.getPrefix(), xmlns.namespace(ns.getUri(), ns.getPrefix()));
+            for (NamespaceDefinition ns : recordMapping.getRecordDefinition().namespaces) {
+                binding.setVariable(ns.prefix, xmlns.namespace(ns.uri, ns.prefix));
             }
             binding.setVariable("input", metadataRecord.getRootNode());
             script.setBinding(binding);

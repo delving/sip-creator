@@ -22,8 +22,11 @@
 package eu.delving.sip.base;
 
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
 
@@ -72,8 +75,25 @@ public class ImportAction extends AbstractAction {
         this.sipModel = sipModel;
         this.harvestPool = harvestPool;
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Input Source", Dialog.ModalityType.APPLICATION_MODAL);
+        setEnabled(false);
         prepareDialog();
         prepareChooser(sipModel);
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void dataSetChanged(DataSet dataSet) {
+                setEnabled(true);
+            }
+
+            @Override
+            public void dataSetRemoved() {
+                setEnabled(false);
+            }
+
+            @Override
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                setEnabled(true);
+            }
+        });
     }
 
     @Override
