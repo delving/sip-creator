@@ -65,6 +65,12 @@ public class Path implements Comparable<Path>, Serializable {
         }
     }
 
+    public Path extend(Tag tag) {
+        Path extended = new Path(this);
+        extended.push(tag);
+        return extended;
+    }
+
     public void push(Tag tag) {
         stack.push(tag);
         string = null;

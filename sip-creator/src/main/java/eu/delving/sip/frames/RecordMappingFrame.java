@@ -103,7 +103,7 @@ public class RecordMappingFrame extends FrameBase {
 
             @Override
             public void recordMappingChanged(RecordMapping recordMapping) {
-                String code = recordMapping.toDisplayCode(sipModel.getDataSetModel());
+                String code = recordMapping.toDisplayCode();
                 codeArea.setText(code);
             }
 

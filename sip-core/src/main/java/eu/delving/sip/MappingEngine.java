@@ -33,7 +33,7 @@ public class MappingEngine {
         RecordMapping recordMapping = RecordMapping.read(mapping, metadataModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
         long now = System.currentTimeMillis();
-        mappingRunner = new MappingRunner(groovyCodeResource, recordMapping.toCompileCode(metadataModel));
+        mappingRunner = new MappingRunner(groovyCodeResource, recordMapping);
         compileTime += System.currentTimeMillis() - now;
         metadataRecordFactory = new MetadataRecordFactory(namespaces);
         recordValidator = new RecordValidator(groovyCodeResource, metadataModel.getRecordDefinition(recordMapping.getPrefix()));
