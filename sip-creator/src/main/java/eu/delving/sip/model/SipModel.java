@@ -36,6 +36,7 @@ import eu.delving.metadata.ValidationException;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -411,6 +412,12 @@ public class SipModel {
                 try {
                     dataSetModel.getDataSet().importedToSource(progressListener);
                     dataSetModel.getDataSet().setStatistics(analysisModel.convertStatistics());
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            seekFirstRecord();
+                        }
+                    });
                     feedback.say("Source conversion complete");
                 }
                 catch (StorageException e) {
@@ -509,7 +516,7 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                if (!analysisModel.hasRecordRoot()) {
+                if (!analysisModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
                     return;
                 }
                 if (metadataParser == null) {
