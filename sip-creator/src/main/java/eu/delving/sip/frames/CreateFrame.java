@@ -35,6 +35,7 @@ import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -43,6 +44,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -55,6 +57,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,9 +70,8 @@ import java.util.List;
 
 public class CreateFrame extends FrameBase {
 
-    private final static String SELECT_CAPTION = "<html><table cellpadding=10><tr><td>Select from the input fields or fill in a constant and select an output field.</td><td></table></html>";
-    private final static String CREATE_CAPTION = "<html><h3>Create Mapping</h3></html>";
-
+    private final static String SELECT_CAPTION = "<html><center>Select from the input fields<br>or fill in a constant and select an output field.</html>";
+    private final static String CREATE_CAPTION = "<html><b>Create Mapping</b> (Click here or press &lt;space>)</html>";
     private JButton createObviousMappingButton = new JButton("Create obvious mappings");
     private JTextField constantField = new JTextField("?");
     private JList variablesList;
@@ -91,7 +93,9 @@ public class CreateFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.add(createPanel(), BorderLayout.CENTER);
-        content.add(new JButton(createMappingAction), BorderLayout.SOUTH);
+        JButton button = new JButton(createMappingAction);
+        button.setPreferredSize(new Dimension(50, 80));
+        content.add(button, BorderLayout.SOUTH);
     }
 
     @Override
@@ -143,6 +147,8 @@ public class CreateFrame extends FrameBase {
                 }
             }
         });
+        getActionMap().put(createMappingAction.getValue(Action.NAME), createMappingAction);
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(' '), createMappingAction.getValue(Action.NAME));
     }
 
     private JComponent createPanel() {
@@ -156,14 +162,12 @@ public class CreateFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Unmapped Output Fields"));
         p.add(scroll(targetFieldList), BorderLayout.CENTER);
-        targetFieldList.addListSelectionListener(
-                new ListSelectionListener() {
-                    @Override
-                    public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                        enableCreateMapping();
-                    }
-                }
-        );
+        targetFieldList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                enableCreateMapping();
+            }
+        });
         return p;
     }
 
@@ -186,14 +190,12 @@ public class CreateFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Input Field Source"));
         p.add(scroll(variablesList), BorderLayout.CENTER);
-        variablesList.addListSelectionListener(
-                new ListSelectionListener() {
-                    @Override
-                    public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                        enableCreateMapping();
-                    }
-                }
-        );
+        variablesList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                enableCreateMapping();
+            }
+        });
         return p;
     }
 
@@ -216,24 +218,22 @@ public class CreateFrame extends FrameBase {
     private JPanel createConstantFieldPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Constant Source"));
-        constantField.getDocument().addDocumentListener(
-                new DocumentListener() {
-                    @Override
-                    public void insertUpdate(DocumentEvent documentEvent) {
-                        enableCreateMapping();
-                    }
+        constantField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                enableCreateMapping();
+            }
 
-                    @Override
-                    public void removeUpdate(DocumentEvent documentEvent) {
-                        insertUpdate(documentEvent);
-                    }
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                insertUpdate(documentEvent);
+            }
 
-                    @Override
-                    public void changedUpdate(DocumentEvent documentEvent) {
-                        insertUpdate(documentEvent);
-                    }
-                }
-        );
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                insertUpdate(documentEvent);
+            }
+        });
         p.add(constantField);
         return p;
     }
@@ -251,14 +251,12 @@ public class CreateFrame extends FrameBase {
                 CodeGenerator generator = new CodeGenerator();
                 final FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
                 generator.generateCodeFor(fieldMapping, createSelectedVariableList(), getConstantFieldValue());
-                Exec.work(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                sipModel.getMappingModel().addMapping(fieldMapping);
-                            }
-                        }
-                );
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getMappingModel().addMapping(fieldMapping);
+                    }
+                });
             }
             clear();
         }
