@@ -65,6 +65,7 @@ public class UploadAction extends AbstractAction {
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
         this.reportFilePopup = new ReportFilePopup();
+        setActionEnabled(false);
         this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {
@@ -167,6 +168,7 @@ public class UploadAction extends AbstractAction {
             }
             try {
                 setActionEnabled(false);
+                reportFilePopup.setVisible(false);
                 cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new CultureHubClient.UploadListener() {
                     @Override
                     public void uploadRefused(File file) {

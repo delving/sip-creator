@@ -51,7 +51,7 @@ public class AnalysisModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
     private Statistics statistics;
-    private AnalysisTree analysisTree = AnalysisTree.create("Select a Data Set from the File menu");
+    private AnalysisTree analysisTree = AnalysisTree.create("Select a data set from the File menu, or download one");
     private DefaultTreeModel analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
     private VariableListModel variableListModel = new VariableListModel();
 
