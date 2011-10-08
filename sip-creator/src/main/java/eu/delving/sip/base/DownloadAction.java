@@ -100,7 +100,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         dialog.setVisible(true);
         if (!listModel.hasEntries()) {
             LOG.info("Not loading and no data sets, will start loading");
-            listModel.setMessage("Loading... please wait");
+            listModel.setMessage("Loading list of data sets... just a moment");
             cultureHubClient.fetchDataSetList(this);
         }
     }
