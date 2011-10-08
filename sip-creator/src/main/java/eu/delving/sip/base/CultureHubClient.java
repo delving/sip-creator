@@ -356,6 +356,7 @@ public class CultureHubClient {
                                 walk.remove();
                             }
                         }
+                        EntityUtils.consume(listResponse.getEntity());
                         for (File file : uploadFiles) {
                             log.info("Uploading " + file);
                             HttpPost upload = new HttpPost(createFileRequestUrl(file));
