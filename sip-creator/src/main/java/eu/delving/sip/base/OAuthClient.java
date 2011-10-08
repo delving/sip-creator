@@ -8,10 +8,11 @@ import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.amber.oauth2.common.message.types.GrantType;
 import org.apache.amber.oauth2.common.utils.OAuthUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -30,17 +31,18 @@ public class OAuthClient {
     private String hostPort;
     private String username;
     private PasswordRequest passwordRequest;
-    private String password;
     private String accessToken;
     private String refreshToken;
     private long requestTimeStamp;
     private int expirationSeconds;
+    private HttpClient httpClient;
 
     public interface PasswordRequest {
         String getPassword();
     }
 
-    public OAuthClient(String hostPort, String username, PasswordRequest passwordRequest) {
+    public OAuthClient(HttpClient httpClient, String hostPort, String username, PasswordRequest passwordRequest) {
+        this.httpClient = httpClient;
         this.hostPort = hostPort;
         this.username = username;
         this.passwordRequest = passwordRequest;
@@ -53,26 +55,22 @@ public class OAuthClient {
             }
             if (accessToken == null) {
                 if (refreshToken != null) {
-                    requestWithRefreshToken();
-                }
-                if (accessToken == null) {
-                    if (password == null) {
-                        password = passwordRequest.getPassword();
-                        if (password != null) {
-                            requestWithPassword();
-                        }
+                    if (!requestWithRefreshToken()) {
+                        refreshToken = null;
+                        throw OAuthProblemException.error(Problem.EXPIRED_TOKEN.string, "Refresh token failed");
                     }
+                }
+                else if (!requestWithPassword(passwordRequest.getPassword())) {
+                    throw OAuthProblemException.error(Problem.INVALID_GRANT.string, "Password failed");
                 }
             }
             return accessToken;
         }
         catch (OAuthProblemException e) {
-            password = null;
             invalidateTokens();
             throw e;
         }
         catch (OAuthSystemException e) {
-            password = null;
             invalidateTokens();
             throw e;
         }
@@ -83,18 +81,21 @@ public class OAuthClient {
         accessToken = refreshToken = null;
     }
 
-    private void requestWithPassword() throws OAuthSystemException, OAuthProblemException {
+    private boolean requestWithPassword(String password) throws OAuthSystemException, OAuthProblemException {
+        if (password == null) return false;
         OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
                 .setGrantType(GrantType.PASSWORD).setUsername(username).setPassword(password)
                 .buildQueryMessage();
         acceptResponse(OAUTH_CLIENT.accessToken(request));
+        return accessToken != null;
     }
 
-    private void requestWithRefreshToken() throws OAuthSystemException, OAuthProblemException {
+    private boolean requestWithRefreshToken() throws OAuthSystemException, OAuthProblemException {
         OAuthClientRequest request = OAuthClientRequest.tokenLocation(getTokenUrl())
                 .setGrantType(GrantType.REFRESH_TOKEN).setRefreshToken(refreshToken)
                 .buildQueryMessage();
         acceptResponse(OAUTH_CLIENT.accessToken(request));
+        return accessToken != null;
     }
 
     private void acceptResponse(OAuthJSONAccessTokenResponse response) {
@@ -115,19 +116,22 @@ public class OAuthClient {
         @Override
         public <T extends OAuthClientResponse> T execute(OAuthClientRequest request, Map<String, String> headers, String requestMethod, Class<T> responseClass) throws OAuthSystemException, OAuthProblemException {
             try {
-                HttpClient httpClient = new DefaultHttpClient();
                 HttpGet get = new HttpGet(request.getLocationUri());
                 HttpResponse httpResponse = httpClient.execute(get);
-                String responseBody = OAuthUtils.saveStreamAsString(httpResponse.getEntity().getContent());
+                HttpEntity entity = httpResponse.getEntity();
+                if (entity == null) {
+                    throw new OAuthSystemException(String.format("Received null entity"));
+                }
+                String responseBody = OAuthUtils.saveStreamAsString(entity.getContent());
+                EntityUtils.consume(entity);
                 return OAuthClientResponseFactory.createCustomResponse(
                         responseBody,
-                        httpResponse.getEntity().getContentType().getValue(),
+                        entity.getContentType().getValue(),
                         httpResponse.getStatusLine().getStatusCode(),
                         responseClass
                 );
             }
             catch (IOException e) {
-                password = null;
                 log.error("OAuth Client problem", e);
                 throw new OAuthSystemException(String.format("Can't connect to server : %s", e.getMessage()), e);
             }

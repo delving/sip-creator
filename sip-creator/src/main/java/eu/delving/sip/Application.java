@@ -138,27 +138,23 @@ public class Application {
             }
         };
         desktop.setMinimumSize(new Dimension(MINIMUM_DESKTOP_SIZE));
-        resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL,
-                new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        resizeTimer.stop();
-                        for (JInternalFrame frame : desktop.getAllFrames()) {
-                            if (frame instanceof FrameBase) {
-                                ((FrameBase) frame).ensureOnScreen();
-                            }
-                        }
-                    }
-                });
-        desktop.addComponentListener(
-                new ComponentAdapter() {
-                    @Override
-                    public void componentResized(ComponentEvent componentEvent) {
-                        resizeTimer.restart();
+        resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                resizeTimer.stop();
+                for (JInternalFrame frame : desktop.getAllFrames()) {
+                    if (frame instanceof FrameBase) {
+                        ((FrameBase) frame).ensureOnScreen();
                     }
                 }
-        );
+            }
+        });
+        desktop.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent componentEvent) {
+                resizeTimer.restart();
+            }
+        });
         feedback = new VisualFeedback(desktop);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
         harvestPool = new HarvestPool(sipModel);
@@ -183,6 +179,7 @@ public class Application {
         home.setIconImage(logo.getImage());
         dataSetMenu = new DataSetMenu(sipModel);
         oauthClient = new OAuthClient(
+                cultureHubClient.getHttpClient(),
                 StorageFinder.getHostPort(storageDirectory),
                 StorageFinder.getUser(storageDirectory),
                 new PasswordFetcher()
@@ -224,37 +221,33 @@ public class Application {
                 }
             }
         });
-        harvestPool.addListDataListener(
-                new ListDataListener() {
-                    @Override
-                    public void intervalAdded(ListDataEvent listDataEvent) {
-                        refreshToggleButton();
-                    }
+        harvestPool.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent listDataEvent) {
+                refreshToggleButton();
+            }
 
-                    @Override
-                    public void intervalRemoved(ListDataEvent listDataEvent) {
-                        refreshToggleButton();
-                    }
+            @Override
+            public void intervalRemoved(ListDataEvent listDataEvent) {
+                refreshToggleButton();
+            }
 
-                    @Override
-                    public void contentsChanged(ListDataEvent listDataEvent) {
-                        refreshToggleButton();
-                    }
+            @Override
+            public void contentsChanged(ListDataEvent listDataEvent) {
+                refreshToggleButton();
+            }
+        });
+        harvestToggleButton.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                    harvestDialog.openAtPosition();
                 }
-        );
-        harvestToggleButton.addItemListener(
-                new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent itemEvent) {
-                        if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                            harvestDialog.openAtPosition();
-                        }
-                        else {
-                            harvestDialog.closeFrame();
-                        }
-                    }
+                else {
+                    harvestDialog.closeFrame();
                 }
-        );
+            }
+        });
         osxExtra();
     }
 
@@ -284,11 +277,11 @@ public class Application {
         ));
         refreshToggleButton();
         JPanel left = new JPanel(new BorderLayout(6, 6));
-        left.add(statusLabel,BorderLayout.CENTER);
-        left.add(buttons,BorderLayout.EAST);
+        left.add(statusLabel, BorderLayout.CENTER);
+        left.add(buttons, BorderLayout.EAST);
         JPanel right = new JPanel(new BorderLayout(6, 6));
-        right.add(feedback.getToggle(),BorderLayout.CENTER);
-        right.add(harvestToggleButton ,BorderLayout.EAST);
+        right.add(feedback.getToggle(), BorderLayout.CENTER);
+        right.add(harvestToggleButton, BorderLayout.EAST);
         JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
@@ -368,24 +361,22 @@ public class Application {
             // We disable the submit button by default and if the content != empty
             ok.addActionListener(this);
             ok.setEnabled(false);
-            passwordField.getDocument().addDocumentListener(
-                    new DocumentListener() {
-                        @Override
-                        public void insertUpdate(DocumentEvent documentEvent) {
-                            ok.setEnabled(!StringUtils.isWhitespace(new String(passwordField.getPassword())));
-                        }
+            passwordField.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent documentEvent) {
+                    ok.setEnabled(!StringUtils.isWhitespace(new String(passwordField.getPassword())));
+                }
 
-                        @Override
-                        public void removeUpdate(DocumentEvent documentEvent) {
-                            insertUpdate(documentEvent);
-                        }
+                @Override
+                public void removeUpdate(DocumentEvent documentEvent) {
+                    insertUpdate(documentEvent);
+                }
 
-                        @Override
-                        public void changedUpdate(DocumentEvent documentEvent) {
-                            insertUpdate(documentEvent);
-                        }
-                    }
-            );
+                @Override
+                public void changedUpdate(DocumentEvent documentEvent) {
+                    insertUpdate(documentEvent);
+                }
+            });
             JLabel labelA = new JLabel("Password: ");
             labelA.setLabelFor(passwordField);
             passwordField.addActionListener(this);

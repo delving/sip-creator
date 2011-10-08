@@ -129,6 +129,10 @@ public class CultureHubClient {
         httpClient = new DefaultHttpClient(timeoutParams);
     }
 
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
+
     public interface ListReceiveListener {
 
         void listReceived(List<DataSetEntry> entries);
@@ -177,7 +181,6 @@ public class CultureHubClient {
 
         @Override
         public void run() {
-            HttpEntity entity = null;
             try {
                 String url = String.format(
                         "%s/list?accessKey=%s",
@@ -189,15 +192,21 @@ public class CultureHubClient {
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
                 Code code = Code.from(response);
-                if (code == Code.OK) {
-                    entity = response.getEntity();
-                    DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
-                    log.info("list received:\n" + dataSetList);
-                    listReceiveListener.listReceived(dataSetList.list);
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    if (code == Code.OK) {
+                        DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
+                        EntityUtils.consume(entity);
+                        log.info("list received:\n" + dataSetList);
+                        listReceiveListener.listReceived(dataSetList.list);
+                    }
+                    else {
+                        code.notifyUser(context);
+                        context.invalidateTokens();
+                    }
                 }
                 else {
-                    code.notifyUser(context);
-                    context.invalidateTokens();
+                    throw new IOException("Response was empty");
                 }
             }
             catch (OAuthProblemException e) {
@@ -208,16 +217,6 @@ public class CultureHubClient {
                 log.error("Unable to fetch list", e);
                 context.getNotifier().alert(String.format("Error fetching list from hub: %s", e.getMessage()));
                 listReceiveListener.failed(e);
-            }
-            finally {
-                if (null != entity) {
-                    try {
-                        EntityUtils.consume(entity);
-                    }
-                    catch (IOException e) {
-                        log.warn(String.format("Error consuming entity: %s", e.getMessage()));
-                    }
-                }
             }
         }
     }
@@ -277,7 +276,6 @@ public class CultureHubClient {
         @Override
         public void run() {
             boolean success = false;
-            HttpEntity entity = null;
             try {
                 HttpGet get = new HttpGet(String.format(
                         "%s/fetch/%s-sip.zip?accessKey=%s",
@@ -287,16 +285,21 @@ public class CultureHubClient {
                 ));
                 get.setHeader("Accept", "application/zip");
                 HttpResponse response = httpClient.execute(get);
-                entity = response.getEntity();
-                Code code = Code.from(response);
-                if (code == Code.OK) {
-                    dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
-                    success = true;
-                    context.dataSetCreated(dataSet);
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    Code code = Code.from(response);
+                    if (code == Code.OK) {
+                        dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                        success = true;
+                        context.dataSetCreated(dataSet);
+                    }
+                    else {
+                        context.invalidateTokens();
+                        Code.from(response).notifyUser(context);
+                    }
                 }
                 else {
-                    context.invalidateTokens();
-                    Code.from(response).notifyUser(context);
+                    throw new IOException("Empty entity");
                 }
             }
             catch (OAuthProblemException e) {
@@ -307,14 +310,6 @@ public class CultureHubClient {
                 context.getNotifier().alert("Unable to download data set"); // todo: tell them why
             }
             finally {
-                if (entity != null) {
-                    try {
-                        EntityUtils.consume(entity);
-                    }
-                    catch (IOException e) {
-                        log.error("Cannot consume entity content", e);
-                    }
-                }
                 if (!success) {
                     try {
                         dataSet.remove();
@@ -332,9 +327,6 @@ public class CultureHubClient {
         private DataSet dataSet;
         private List<File> uploadFiles;
         private UploadListener uploadListener;
-        private HttpPost post;
-        private HttpResponse response;
-        private HttpEntity entity;
 
         public FileUploader(DataSet dataSet, UploadListener uploadListener) throws StorageException {
             this.dataSet = dataSet;
@@ -345,45 +337,46 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                post = new HttpPost(createListRequestUrl());
-                post.setEntity(createListEntity());
-                post.setHeader("Accept", "text/plain");
-                response = httpClient.execute(post);
-                entity = response.getEntity();
-                Code code = Code.from(response);
-                if (code == Code.OK) {
-                    String listString = EntityUtils.toString(entity);
-                    Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
-                    Iterator<File> walk = uploadFiles.iterator();
-                    while (walk.hasNext()) {
-                        File file = walk.next();
-                        if (!requestedFiles.contains(file.getName())) {
-                            log.info(String.format("Hub does not want %s", file.getName()));
-                            uploadListener.uploadRefused(file);
-                            walk.remove();
+                HttpPost listRequest = new HttpPost(createListRequestUrl());
+                listRequest.setEntity(createListEntity());
+                listRequest.setHeader("Accept", "text/plain");
+                HttpResponse listResponse = httpClient.execute(listRequest);
+                HttpEntity listEntity = listResponse.getEntity();
+                if (listEntity != null) {
+                    Code code = Code.from(listResponse);
+                    if (code == Code.OK) {
+                        String listString = EntityUtils.toString(listEntity);
+                        Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
+                        Iterator<File> walk = uploadFiles.iterator();
+                        while (walk.hasNext()) {
+                            File file = walk.next();
+                            if (!requestedFiles.contains(file.getName())) {
+                                log.info(String.format("Hub does not want %s", file.getName()));
+                                uploadListener.uploadRefused(file);
+                                walk.remove();
+                            }
+                        }
+                        for (File file : uploadFiles) {
+                            log.info("Uploading " + file);
+                            HttpPost upload = new HttpPost(createFileRequestUrl(file));
+                            upload.setEntity(new FileEntity(file, uploadListener));
+                            HttpResponse uploadResponse = httpClient.execute(upload);
+                            EntityUtils.consume(uploadResponse.getEntity());
+                            code = Code.from(uploadResponse);
+                            if (code != Code.OK) {
+                                context.invalidateTokens();
+                                Code.from(uploadResponse).notifyUser(context);
+                                return;
+                            }
                         }
                     }
-                    EntityUtils.consume(entity);
-                    entity = null;
-                    for (File file : uploadFiles) {
-                        log.info("Uploading " + file);
-                        post = new HttpPost(createFileRequestUrl(file));
-                        post.setEntity(new FileEntity(file, uploadListener));
-                        response = httpClient.execute(post);
-                        entity = response.getEntity();
-                        EntityUtils.consume(entity);
-                        entity = null;
-                        code = Code.from(response);
-                        if (code != Code.OK) {
-                            context.invalidateTokens();
-                            Code.from(response).notifyUser(context);
-                            return;
-                        }
+                    else {
+                        context.invalidateTokens();
+                        code.notifyUser(context);
                     }
                 }
                 else {
-                    context.invalidateTokens();
-                    code.notifyUser(context);
+                    throw new IOException("Empty entity");
                 }
             }
             catch (OAuthProblemException e) {
@@ -394,14 +387,6 @@ public class CultureHubClient {
                 context.getNotifier().alert("Authorization system problem: " + e.getMessage());
             }
             finally {
-                if (entity != null) {
-                    try {
-                        EntityUtils.consume(entity);
-                    }
-                    catch (IOException e) {
-                        log.error("Cannot consume entity", e);
-                    }
-                }
                 uploadListener.finished();
             }
         }
@@ -437,6 +422,9 @@ public class CultureHubClient {
     private void reportOAuthProblem(OAuthProblemException e) {
         OAuthClient.Problem problem = OAuthClient.getProblem(e);
         switch (problem) {
+            case EXPIRED_TOKEN:
+                context.getNotifier().alert(String.format("Expired token for user %s, please try again", context.getUser()));
+                break;
             case INVALID_GRANT:
                 context.getNotifier().alert(String.format("Invalid password for user %s", context.getUser()));
                 break;
