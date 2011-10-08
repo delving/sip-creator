@@ -28,6 +28,7 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.Path;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.sip.base.Exec;
@@ -54,7 +55,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CompileModel implements SipModel.ParseListener, MappingModel.Listener {
     public final static int COMPILE_DELAY = 500;
-    private DataSetModel dataSetModel;
     private RecordMapping recordMapping;
     private FieldMapping selectedFieldMapping;
     private MetadataRecord metadataRecord;
@@ -88,10 +88,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         REGENERATED
     }
 
-    public CompileModel(Type type, DataSetModel dataSetModel, Feedback feedback, GroovyCodeResource groovyCodeResource) {
+    public CompileModel(Type type, Feedback feedback, GroovyCodeResource groovyCodeResource) {
         this.type = type;
         this.feedback = feedback;
-        this.dataSetModel = dataSetModel;
         this.groovyCodeResource = groovyCodeResource;
     }
 
@@ -190,15 +189,22 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
 
     // === privates
 
-    private String getSelectedPath() {
-        return selectedFieldMapping == null ? null : selectedFieldMapping.getDefinition().path.toString();
+    private Path getSelectedPath() {
+        switch (type) {
+            case RECORD:
+                return null;
+            case FIELD:
+                return selectedFieldMapping == null ? null : selectedFieldMapping.getDefinition().path;
+            default:
+                throw new RuntimeException();
+        }
     }
 
     private String getDisplayCode() {
         switch (type) {
             case RECORD:
                 if (recordMapping != null) {
-                    return recordMapping.toDisplayCode(dataSetModel);
+                    return recordMapping.toDisplayCode();
                 }
                 else {
                     return "// no mapping";
@@ -208,33 +214,10 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                     return "// no code";
                 }
                 else {
-                    return recordMapping.toDisplayCode(dataSetModel, getSelectedPath());
+                    return recordMapping.toDisplayCode(getSelectedPath());
                 }
             default:
                 throw new RuntimeException();
-        }
-    }
-
-    private String getCompileCode() {
-        switch (type) {
-            case RECORD:
-                return recordMapping != null ? recordMapping.toCompileCode(dataSetModel) : "";
-            case FIELD:
-                return selectedFieldMapping != null ? recordMapping.toCompileCode(dataSetModel, getSelectedPath()) : "";
-            default:
-                throw new RuntimeException();
-        }
-    }
-
-    private String getCompileCode(String editedCode) {
-        if (type == Type.RECORD) {
-            throw new RuntimeException();
-        }
-        if (selectedFieldMapping == null) {
-            return "print 'nothing selected'";
-        }
-        else {
-            return recordMapping.toCompileCode(dataSetModel, getSelectedPath(), editedCode);
         }
     }
 
@@ -247,8 +230,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             }
             compiling = true;
             try {
-                String mappingCode = editedCode == null ? getCompileCode() : getCompileCode(editedCode);
-                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, mappingCode);
+                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recordMapping, getSelectedPath(), editedCode);
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
                     feedback.say("Compiled code for "+type);

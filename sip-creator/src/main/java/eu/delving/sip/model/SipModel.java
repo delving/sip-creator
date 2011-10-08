@@ -102,8 +102,8 @@ public class SipModel {
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
         fieldListModel = new FieldListModel(dataSetModel);
-        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, dataSetModel, feedback, groovyCodeResource);
-        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, dataSetModel, feedback, groovyCodeResource);
+        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, feedback, groovyCodeResource);
+        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel);
         parseListeners.add(fieldCompileModel);
         mappingModel.addListener(fieldMappingListModel);
@@ -412,6 +412,12 @@ public class SipModel {
                 try {
                     dataSetModel.getDataSet().importedToSource(progressListener);
                     dataSetModel.getDataSet().setStatistics(analysisModel.convertStatistics());
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            seekFirstRecord();
+                        }
+                    });
                     feedback.say("Source conversion complete");
                 }
                 catch (StorageException e) {

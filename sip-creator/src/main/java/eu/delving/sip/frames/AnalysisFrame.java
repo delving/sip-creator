@@ -148,6 +148,7 @@ public class AnalysisFrame extends FrameBase {
                 sipModel.getAnalysisModel().setUniqueElement(node.getPath());
             }
         });
+        convertButton.setEnabled(false);
         convertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

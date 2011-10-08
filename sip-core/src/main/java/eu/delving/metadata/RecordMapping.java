@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.apache.log4j.Logger;
 
 import java.io.InputStream;
@@ -69,8 +70,31 @@ public class RecordMapping {
     @XStreamAlias("field-mappings")
     Map<String, FieldMapping> fieldMappings = new HashMap<String, FieldMapping>();
 
+    @XStreamOmitField
+    private RecordDefinition recordDefinition;
+
     public RecordMapping(String prefix) {
         this.prefix = prefix;
+    }
+
+    public void setRecordDefinition(RecordDefinition recordDefinition) {
+        this.recordDefinition = recordDefinition;
+        Set<String> notFound = new TreeSet<String>();
+        for (Map.Entry<String, FieldMapping> entry : fieldMappings.entrySet()) {
+            Path path = new Path(entry.getKey());
+            FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(path);
+            if (fieldDefinition == null) {
+                notFound.add(entry.getKey());
+            }
+            entry.getValue().fieldDefinition = fieldDefinition;
+        }
+        for (String key : notFound) {
+            fieldMappings.remove(key);
+        }
+    }
+
+    public RecordDefinition getRecordDefinition() {
+        return recordDefinition;
     }
 
     public String getPrefix() {
@@ -104,21 +128,6 @@ public class RecordMapping {
         return new TreeSet<FieldMapping>(fieldMappings.values());
     }
 
-    public void apply(RecordDefinition recordDefinition) throws MetadataException {
-        Set<String> notFound = new TreeSet<String>();
-        for (Map.Entry<String, FieldMapping> entry : fieldMappings.entrySet()) {
-            Path path = new Path(entry.getKey());
-            FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(path);
-            if (fieldDefinition == null) {
-                notFound.add(entry.getKey());
-            }
-            entry.getValue().fieldDefinition = fieldDefinition;
-        }
-        for (String key : notFound) {
-            fieldMappings.remove(key);
-        }
-    }
-
     public void applyTemplate(RecordMapping template) {
         if (!fieldMappings.isEmpty()) {
             throw new RuntimeException("Field mappings must be empty to apply template");
@@ -132,24 +141,24 @@ public class RecordMapping {
         return fieldMappings.get(path);
     }
 
-    public String toDisplayCode(MetadataModel metadataModel) {
-        return toCode(metadataModel, null, false, null);
+    public String toDisplayCode() {
+        return toCode(null, false, null);
     }
 
-    public String toCompileCode(MetadataModel metadataModel) {
-        return toCode(metadataModel, null, true, null);
+    public String toCompileCode() {
+        return toCode(null, true, null);
     }
 
-    public String toDisplayCode(MetadataModel metadataModel, String selectedPath) {
-        return toCode(metadataModel, selectedPath, false, null);
+    public String toDisplayCode(Path selectedPath) {
+        return toCode(selectedPath, false, null);
     }
 
-    public String toCompileCode(MetadataModel metadataModel, String selectedPath) {
-        return toCode(metadataModel, selectedPath, true, null);
+    public String toCompileCode(Path selectedPath) {
+        return toCode(selectedPath, true, null);
     }
 
-    public String toCompileCode(MetadataModel metadataModel, String selectedPath, String editedCode) {
-        return toCode(metadataModel, selectedPath, true, editedCode);
+    public String toCompileCode(Path selectedPath, String editedCode) {
+        return toCode(selectedPath, true, editedCode);
     }
 
     public String toString() {
@@ -158,7 +167,7 @@ public class RecordMapping {
 
     // === private
 
-    private String toCode(MetadataModel metadataModel, String selectedPath, boolean forCompile, String editedCode) {
+    private String toCode(Path selectedPath, boolean forCompile, String editedCode) {
         final StringBuilder stringBuilder = new StringBuilder();
         Out out = new Out() {
             int indentLevel;
@@ -234,7 +243,6 @@ public class RecordMapping {
             }
             out.line("// Builder to create the record\n");
         }
-        RecordDefinition recordDefinition = metadataModel.getRecordDefinition(getPrefix());
         if (editedCode == null) {
             if (forCompile) {
                 out.line("use (MappingCategory) {");
@@ -243,7 +251,7 @@ public class RecordMapping {
                 out.indent(1);
             }
             Set<String> usedPaths = new TreeSet<String>();
-            toCode("", recordDefinition.root, out, usedPaths, selectedPath, forCompile);
+            toCode(new Path(), recordDefinition.root, out, usedPaths, selectedPath, forCompile);
             if (forCompile) {
                 out.indent(-1);
                 out.line("}");
@@ -274,8 +282,8 @@ public class RecordMapping {
         return stringBuilder.toString();
     }
 
-    private void toCode(String path, ElementDefinition element, Out out, Set<String> usedPaths, String selectedPath, boolean forCompile) {
-        if (selectedPath != null && !selectedPath.startsWith(path)) {
+    private void toCode(Path path, ElementDefinition element, Out out, Set<String> usedPaths, Path selectedPath, boolean forCompile) {
+        if (selectedPath != null && !selectedPath.toString().startsWith(path.toString())) {
             return;
         }
         if (forCompile) {
@@ -284,12 +292,12 @@ public class RecordMapping {
         }
         if (element.elements != null) {
             for (ElementDefinition subNode : element.elements) {
-                toCode(path + "/" + element.getTag(), subNode, out, usedPaths, selectedPath, forCompile);
+                toCode(path.extend(element.getTag()), subNode, out, usedPaths, selectedPath, forCompile);
             }
         }
         if (element.fields != null) {
             for (FieldDefinition fieldDefinition : element.fields) {
-                toCode(path + "/" + element.getTag(), fieldDefinition, out, usedPaths, selectedPath);
+                toCode(path.extend(element.getTag()), fieldDefinition, out, usedPaths, selectedPath);
             }
         }
         if (forCompile) {
@@ -298,14 +306,14 @@ public class RecordMapping {
         }
     }
 
-    private void toCode(String path, FieldDefinition field, Out out, Set<String> usedPaths, String selectedPath) {
-        String fieldPath = path + "/" + field.getTag();
+    private void toCode(Path path, FieldDefinition field, Out out, Set<String> usedPaths, Path selectedPath) {
+        Path fieldPath = path.extend(field.getTag());
         if (selectedPath != null && !selectedPath.equals(fieldPath)) {
             return;
         }
-        FieldMapping fieldMapping = fieldMappings.get(fieldPath);
+        FieldMapping fieldMapping = fieldMappings.get(fieldPath.toString());
         if (fieldMapping != null) {
-            usedPaths.add(fieldPath);
+            usedPaths.add(fieldPath.toString());
             if (fieldMapping.code != null) {
                 for (String line : fieldMapping.code) {
                     if (codeIndent(line) < 0) {
@@ -360,7 +368,7 @@ public class RecordMapping {
             Reader isReader = new InputStreamReader(is, "UTF-8");
             RecordMapping recordMapping = (RecordMapping) stream().fromXML(isReader);
             RecordDefinition recordDefinition = metadataModel.getRecordDefinition(recordMapping.prefix);
-            recordMapping.apply(recordDefinition);
+            recordMapping.setRecordDefinition(recordDefinition);
             return recordMapping;
         }
         catch (UnsupportedEncodingException e) {
@@ -371,7 +379,7 @@ public class RecordMapping {
     public static RecordMapping read(String string, MetadataModel metadataModel) throws MetadataException {
         RecordMapping recordMapping = (RecordMapping) stream().fromXML(string);
         RecordDefinition recordDefinition = metadataModel.getRecordDefinition(recordMapping.prefix);
-        recordMapping.apply(recordDefinition);
+        recordMapping.setRecordDefinition(recordDefinition);
         return recordMapping;
     }
 

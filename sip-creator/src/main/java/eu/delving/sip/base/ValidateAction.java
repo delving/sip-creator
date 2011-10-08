@@ -55,6 +55,7 @@ public class ValidateAction extends AbstractAction {
         super("Validate");
         this.sipModel = sipModel;
         this.parent = parent;
+        setEnabled(false);
         this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {

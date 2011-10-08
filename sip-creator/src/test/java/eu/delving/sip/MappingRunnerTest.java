@@ -64,7 +64,7 @@ public class MappingRunnerTest {
         LOG.info(String.format("RecordMapping has %d facts and %d fieldMappings",
                 recordMapping.getFacts().size(),
                 recordMapping.getFieldMappings().size()));
-        mappingRunner = new MappingRunner(new GroovyCodeResource(getClass().getClassLoader()), recordMapping.toCompileCode(metadataModel));
+        mappingRunner = new MappingRunner(new GroovyCodeResource(getClass().getClassLoader()), recordMapping);
     }
 
     @Test
