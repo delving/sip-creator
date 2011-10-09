@@ -91,6 +91,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import static eu.delving.sip.files.DataSetState.IMPORTED;
+import static eu.delving.sip.files.DataSetState.SOURCED;
 
 /**
  * The main application
@@ -206,7 +207,7 @@ public class Application {
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 statusLabel.setText(dataSetState.toHtml());
-                if (dataSetState == IMPORTED) {
+                if (dataSetState == IMPORTED || dataSetState == SOURCED) {
                     sipModel.analyzeFields(new SipModel.AnalysisListener() {
                         @Override
                         public void analysisProgress(final long elementCount) {
@@ -340,6 +341,8 @@ public class Application {
                 public void run() {
                     dataSetMenu.setPreference(dataSet);
                     sipModel.setDataSet(dataSet);
+
+                    // todo: reboot the tree
                 }
             });
         }
