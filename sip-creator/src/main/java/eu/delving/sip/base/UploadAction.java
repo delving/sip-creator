@@ -57,7 +57,7 @@ public class UploadAction extends AbstractAction {
     private CultureHubClient cultureHubClient;
     private ReportFilePopup reportFilePopup;
     private RealUploadAction realUploadAction = new RealUploadAction();
-    private JCheckBox releaseBox = new JCheckBox("Release Lock");
+    private JCheckBox releaseBox = new JCheckBox("Release lock and delete local dataset");
 
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Upload");
@@ -109,7 +109,6 @@ public class UploadAction extends AbstractAction {
 
 
     private void setActionEnabled(boolean enabled) {
-        setEnabled(enabled);
         realUploadAction.setEnabled(enabled);
     }
 
@@ -199,13 +198,18 @@ public class UploadAction extends AbstractAction {
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
-                                if (releaseBox.isSelected()) {
-                                    cultureHubClient.unlockDataSet(sipModel.getDataSetModel().getDataSet(), new CultureHubClient.UnlockListener() {
+                                if (!releaseBox.isSelected()) {
+                                    disappear();
+                                }
+                                else {
+                                    final DataSet dataSet = sipModel.getDataSetModel().getDataSet();
+                                    cultureHubClient.unlockDataSet(dataSet, new CultureHubClient.UnlockListener() {
                                         @Override
                                         public void unlockComplete(boolean successful) {
                                             if (successful) {
+                                                sipModel.getFeedback().say(String.format("Unlocked %s and removed it locally", dataSet));
                                                 try {
-                                                    sipModel.getDataSetModel().getDataSet().remove();
+                                                    dataSet.remove();
                                                     sipModel.getDataSetModel().setDataSet(null);
                                                 }
                                                 catch (StorageException e) {
@@ -218,16 +222,11 @@ public class UploadAction extends AbstractAction {
                                             Exec.swing(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    reportFilePopup.setVisible(false);
-                                                    setActionEnabled(true);
+                                                    disappear();
                                                 }
                                             });
                                         }
                                     });
-                                }
-                                else {
-                                    reportFilePopup.setVisible(false);
-                                    setActionEnabled(true);
                                 }
                             }
                         });
@@ -239,6 +238,11 @@ public class UploadAction extends AbstractAction {
                 sipModel.getFeedback().alert("Unable to complete uploading", e);
                 setActionEnabled(true);
             }
+        }
+
+        private void disappear() {
+            reportFilePopup.setVisible(false);
+            setActionEnabled(true);
         }
 
     }
