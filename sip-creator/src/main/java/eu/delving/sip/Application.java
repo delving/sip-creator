@@ -340,9 +340,7 @@ public class Application {
                 @Override
                 public void run() {
                     dataSetMenu.setPreference(dataSet);
-                    sipModel.setDataSet(dataSet);
-
-                    // todo: reboot the tree
+                    sipModel.setDataSet(dataSet, true);
                 }
             });
         }
