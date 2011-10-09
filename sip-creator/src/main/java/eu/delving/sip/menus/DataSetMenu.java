@@ -23,6 +23,7 @@ package eu.delving.sip.menus;
 
 import eu.delving.metadata.FactDefinition;
 import eu.delving.metadata.RecordDefinition;
+import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
@@ -70,10 +71,12 @@ public class DataSetMenu extends JMenu {
         if (!selectedSpec.isEmpty()) {
             final DataSet dataSet = sipModel.getStorage().getDataSets().get(selectedSpec);
             if (dataSet != null) {
-                sipModel.setDataSet(dataSet);
+                sipModel.setDataSet(dataSet, true);
             }
         }
-        refresh();
+        else {
+            refresh();
+        }
     }
 
     public void setPreference(DataSet dataSet) {
@@ -84,27 +87,40 @@ public class DataSetMenu extends JMenu {
         removeAll();
         ButtonGroup bg = new ButtonGroup();
         try {
+            DataSet last = null;
+            boolean selected = false;
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 List<FactDefinition> factDefinitions = dataSet.getFactDefinitions();
                 for (RecordDefinition recordDefinition : dataSet.getRecordDefinitions(factDefinitions)) {
-                    String prefix = recordDefinition.prefix;
-                    final DataSetItem item = new DataSetItem(dataSet, prefix);
+                    final DataSetItem item = new DataSetItem(dataSet, recordDefinition.prefix);
                     bg.add(item);
                     add(item);
                     item.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
-                            sipModel.setDataSet(item.getDataSet());
-                            // todo: happens in set dataset as well, these methods should be combined
+                            sipModel.setDataSet(item.getDataSet(), false);
                             sipModel.setMetadataPrefix(item.getPrefix(), true);
                             setPreference(item.getDataSet());
                         }
                     });
                     if (sipModel.hasDataSet()) {
-                        if (dataSet.getSpec().equals(sipModel.getDataSetModel().getDataSet().getSpec())) {
+                        DataSet existing = sipModel.getDataSetModel().getDataSet();
+                        RecordMapping mapping = sipModel.getMappingModel().getRecordMapping();
+                        String prefix = mapping == null ? null : mapping.getPrefix();
+                        if (dataSet.getSpec().equals(existing.getSpec()) && recordDefinition.prefix.equals(prefix)) {
                             item.setSelected(true);
+                            selected = true;
                         }
                     }
+                    last = dataSet;
+                }
+            }
+            if (!selected) {
+                if (sipModel.hasDataSet()) {
+                    sipModel.setMetadataPrefix(sipModel.getDataSetModel().getDataSet().getLatestPrefix(), true);
+                }
+                else if (last != null) {
+                    sipModel.setDataSet(last, true);
                 }
             }
         }

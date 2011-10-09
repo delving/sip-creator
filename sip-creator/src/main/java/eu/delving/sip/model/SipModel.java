@@ -263,7 +263,7 @@ public class SipModel {
         return fieldMappingListModel;
     }
 
-    public void setDataSet(final DataSet dataSet) {
+    public void setDataSet(final DataSet dataSet, final boolean useLatestPrefix) {
         Exec.work(new Runnable() {
             @Override
             public void run() {
@@ -271,8 +271,13 @@ public class SipModel {
                     final Statistics statistics = dataSet.getLatestStatistics();
                     final Map<String, String> facts = dataSet.getDataSetFacts();
                     final Map<String, String> hints = dataSet.getHints();
-                    final String latestPrefix = dataSet.getLatestPrefix();
                     dataSetModel.setDataSet(dataSet);
+                    if (useLatestPrefix) {
+                        String latestPrefix = dataSet.getLatestPrefix();
+                        if (latestPrefix != null) {
+                            setPrefix(false, latestPrefix);
+                        }
+                    }
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
@@ -281,10 +286,6 @@ public class SipModel {
                             analysisModel.setStatistics(statistics);
                             seekFirstRecord();
                             feedback.say("Loaded data set " + dataSet.getSpec());
-                            if (latestPrefix != null) {
-                                feedback.say("There is a recent mapping for " + dataSet.getSpec());
-                                setMetadataPrefix(latestPrefix, false);
-                            }
                         }
                     });
                 }
@@ -299,21 +300,25 @@ public class SipModel {
         Exec.work(new Runnable() {
             @Override
             public void run() {
-                try {
-                    final RecordMapping recordMapping = promoteToLatest ?
-                            dataSetModel.getDataSet().setLatestPrefix(metadataPrefix, dataSetModel) :
-                            dataSetModel.getDataSet().getRecordMapping(metadataPrefix, dataSetModel);
-                    dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-                    dataSetFacts.copyToRecordMapping(recordMapping);
-                    mappingModel.setRecordMapping(recordMapping);
-                    recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
-                    feedback.say(String.format("Using '%s' mapping", metadataPrefix));
-                }
-                catch (StorageException e) {
-                    feedback.alert("Unable to select Metadata Prefix " + metadataPrefix, e);
-                }
+                setPrefix(promoteToLatest, metadataPrefix);
             }
         });
+    }
+
+    private void setPrefix(boolean promoteToLatest, String metadataPrefix) {
+        try {
+            final RecordMapping recordMapping = promoteToLatest ?
+                    dataSetModel.getDataSet().setLatestPrefix(metadataPrefix, dataSetModel) :
+                    dataSetModel.getDataSet().getRecordMapping(metadataPrefix, dataSetModel);
+            dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
+            dataSetFacts.copyToRecordMapping(recordMapping);
+            mappingModel.setRecordMapping(recordMapping);
+            recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
+            feedback.say(String.format("Using '%s' mapping", metadataPrefix));
+        }
+        catch (StorageException e) {
+            feedback.alert("Unable to select Metadata Prefix " + metadataPrefix, e);
+        }
     }
 
     public RecordDefinition getRecordDefinition() {
