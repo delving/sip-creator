@@ -73,6 +73,9 @@ public class DataSetMenu extends JMenu {
             if (dataSet != null) {
                 sipModel.setDataSet(dataSet, true);
             }
+            else {
+                refresh();
+            }
         }
         else {
             refresh();
