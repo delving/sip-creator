@@ -22,6 +22,7 @@ def checkUnique(Node node) {
 }
 
 def isUrl(Object value) {
+    if (!value) return true;
     try {
         value = stringify(value);
         new URL(value.toString())
@@ -32,26 +33,28 @@ def isUrl(Object value) {
     }
 }
 
-def isOption(Object object) {
-    if (object instanceof NodeList) {
-        NodeList list = (NodeList)object
+def isOption(Object value) {
+    if (!value) return true;
+    if (value instanceof NodeList) {
+        NodeList list = (NodeList)value
         boolean option = true;
         for (nodeObject in list) {
             if (!checkOption((Node)nodeObject)) option = false;
         }
         return option;
     }
-    else if (object instanceof Node) {
-        return checkOption((Node)object)
+    else if (value instanceof Node) {
+        return checkOption((Node)value)
     }
     else {
-        throw new RuntimeException("Checking option for "+object.getClass())
+        throw new RuntimeException("Checking option for "+value.getClass())
     }
 }
 
-def isUnique(Object object) {
-    if (object instanceof NodeList) {
-        NodeList list = (NodeList)object
+def isUnique(Object value) {
+    if (!value) return true;
+    if (value instanceof NodeList) {
+        NodeList list = (NodeList)value
         if (list.size() == 1) {
             return checkUnique((Node)list[0])
         }
@@ -59,10 +62,10 @@ def isUnique(Object object) {
             return false
         }
     }
-    else if (object instanceof Node) {
-        return checkUnique((Node)object)
+    else if (value instanceof Node) {
+        return checkUnique((Node)value)
     }
     else {
-        throw new RuntimeException("Checking unique for "+object.getClass())
+        throw new RuntimeException("Checking unique for "+value.getClass())
     }
 }
