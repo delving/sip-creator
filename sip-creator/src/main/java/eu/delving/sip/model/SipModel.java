@@ -78,7 +78,6 @@ public class SipModel {
     private MappingModel mappingModel = new MappingModel();
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
-    private boolean allowInvalidRecords;
 
     public interface AnalysisListener {
         void analysisProgress(long elementCount);
@@ -240,14 +239,6 @@ public class SipModel {
 
     public CompileModel getFieldCompileModel() {
         return fieldCompileModel;
-    }
-
-    public boolean isAllowInvalidRecords() {
-        return allowInvalidRecords;
-    }
-
-    public void setAllowInvalidRecords(boolean allowInvalidRecords) {
-        this.allowInvalidRecords = allowInvalidRecords;
     }
 
     public List<FieldDefinition> getUnmappedFields() {
@@ -432,8 +423,13 @@ public class SipModel {
         });
     }
 
-    public void validateFile(final ProgressListener progressListener, final ValidationListener validationListener) {
-        feedback.say(String.format("Validating mapping %s for data set %s", mappingModel.getRecordMapping().getPrefix(), dataSetModel.getDataSet().getSpec()));
+    public void validateFile(boolean allowInvalidRecords, final ProgressListener progressListener, final ValidationListener validationListener) {
+        feedback.say(String.format(
+                "Validating mapping %s for data set %s, %s",
+                mappingModel.getRecordMapping().getPrefix(),
+                dataSetModel.getDataSet().getSpec(),
+                allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
+        ));
         Exec.work(new FileValidator(
                 this,
                 allowInvalidRecords,
