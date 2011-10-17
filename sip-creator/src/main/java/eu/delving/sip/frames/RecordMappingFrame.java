@@ -29,10 +29,13 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.FieldMappingListModel;
 import eu.delving.sip.model.SipModel;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -55,6 +58,8 @@ public class RecordMappingFrame extends FrameBase {
     private JButton removeMappingButton = new JButton("Remove Selected Mapping");
     private JList mappingList;
     private JTextArea codeArea = new JTextArea();
+    private CopyTemplate copyTemplate = new CopyTemplate();
+    private ApplyTemplate applyTemplate = new ApplyTemplate();
 
     public RecordMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Record Mapping", false);
@@ -62,7 +67,17 @@ public class RecordMappingFrame extends FrameBase {
         mappingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         mappingList.setCellRenderer(new FieldMappingListModel.CellRenderer());
         removeMappingButton.setEnabled(false);
+        setJMenuBar(createBar());
         wireUp();
+    }
+
+    private JMenuBar createBar() {
+        JMenuBar bar = new JMenuBar();
+        JMenu menu = new JMenu("Template");
+        menu.add(copyTemplate);
+        menu.add(applyTemplate);
+        bar.add(menu);
+        return bar;
     }
 
     @Override
@@ -105,11 +120,15 @@ public class RecordMappingFrame extends FrameBase {
             public void recordMappingChanged(RecordMapping recordMapping) {
                 String code = recordMapping.toDisplayCode();
                 codeArea.setText(code);
+                copyTemplate.enableFor(recordMapping);
+                applyTemplate.enableFor(recordMapping);
             }
 
             @Override
             public void recordMappingSelected(RecordMapping recordMapping) {
                 recordMappingChanged(recordMapping);
+                copyTemplate.enableFor(recordMapping);
+                applyTemplate.enableFor(recordMapping);
             }
         });
         removeMappingButton.addActionListener(new ActionListener() {
@@ -148,5 +167,51 @@ public class RecordMappingFrame extends FrameBase {
     @Override
     public Dimension getMinimumSize() {
         return new Dimension(400, 250);
+    }
+
+    private RecordMapping template;
+
+    private class CopyTemplate extends AbstractAction {
+
+        private CopyTemplate() {
+            super("Copy current record mapping to apply elsewhere");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    template = sipModel.getMappingModel().getRecordMapping();
+                }
+            });
+        }
+
+        public void enableFor(RecordMapping mapping) {
+            setEnabled(mapping != null && !mapping.getFieldMappings().isEmpty());
+        }
+    }
+
+    private class ApplyTemplate extends AbstractAction {
+
+        private ApplyTemplate() {
+            super("Apply copied template to start this record mapping");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (template != null) {
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getMappingModel().applyTemplate(template);
+                    }
+                });
+            }
+        }
+
+        public void enableFor(RecordMapping mapping) {
+            setEnabled(mapping != null && template != null && mapping.getFieldMappings().isEmpty());
+        }
     }
 }

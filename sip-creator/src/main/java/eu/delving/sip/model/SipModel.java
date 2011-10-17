@@ -320,31 +320,6 @@ public class SipModel {
         return dataSetModel.getRecordDefinition(recordMapping.getPrefix());
     }
 
-//    public void saveAsTemplate(final String name) {
-//        try {
-//            storage.setTemplate(name, mappingModel.getRecordMapping());
-//        }
-//        catch (StorageException e) {
-//            feedback.tellUser("Unable to save template", e);
-//        }
-//    }
-//
-//    public void applyTemplate(RecordMapping template) {
-//        if (!mappingModel.getRecordMapping().getFieldMappings().isEmpty()) {
-//            feedback.tellUser("Record must be empty to use a template.");
-//        }
-//        else {
-//            try {
-//                template.apply(getRecordDefinition());
-//                mappingModel.applyTemplate(template);
-//                seekFirstRecord();
-//            }
-//            catch (Exception e) {
-//                feedback.tellUser("Unable to load template", e);
-//            }
-//        }
-//    }
-
     public void importSource(final File file, final ProgressListener progressListener) {
         clearValidations();
         feedback.say("Importing metadata from " + file.getAbsolutePath());
