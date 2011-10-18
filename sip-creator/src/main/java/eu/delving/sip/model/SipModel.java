@@ -78,7 +78,6 @@ public class SipModel {
     private MappingModel mappingModel = new MappingModel();
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
-    private boolean allowInvalidRecords;
 
     public interface AnalysisListener {
         void analysisProgress(long elementCount);
@@ -242,14 +241,6 @@ public class SipModel {
         return fieldCompileModel;
     }
 
-    public boolean isAllowInvalidRecords() {
-        return allowInvalidRecords;
-    }
-
-    public void setAllowInvalidRecords(boolean allowInvalidRecords) {
-        this.allowInvalidRecords = allowInvalidRecords;
-    }
-
     public List<FieldDefinition> getUnmappedFields() {
         List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
         ListModel listModel = getUnmappedFieldListModel();
@@ -329,31 +320,6 @@ public class SipModel {
         return dataSetModel.getRecordDefinition(recordMapping.getPrefix());
     }
 
-//    public void saveAsTemplate(final String name) {
-//        try {
-//            storage.setTemplate(name, mappingModel.getRecordMapping());
-//        }
-//        catch (StorageException e) {
-//            feedback.tellUser("Unable to save template", e);
-//        }
-//    }
-//
-//    public void applyTemplate(RecordMapping template) {
-//        if (!mappingModel.getRecordMapping().getFieldMappings().isEmpty()) {
-//            feedback.tellUser("Record must be empty to use a template.");
-//        }
-//        else {
-//            try {
-//                template.apply(getRecordDefinition());
-//                mappingModel.applyTemplate(template);
-//                seekFirstRecord();
-//            }
-//            catch (Exception e) {
-//                feedback.tellUser("Unable to load template", e);
-//            }
-//        }
-//    }
-
     public void importSource(final File file, final ProgressListener progressListener) {
         clearValidations();
         feedback.say("Importing metadata from " + file.getAbsolutePath());
@@ -432,8 +398,13 @@ public class SipModel {
         });
     }
 
-    public void validateFile(final ProgressListener progressListener, final ValidationListener validationListener) {
-        feedback.say(String.format("Validating mapping %s for data set %s", mappingModel.getRecordMapping().getPrefix(), dataSetModel.getDataSet().getSpec()));
+    public void validateFile(boolean allowInvalidRecords, final ProgressListener progressListener, final ValidationListener validationListener) {
+        feedback.say(String.format(
+                "Validating mapping %s for data set %s, %s",
+                mappingModel.getRecordMapping().getPrefix(),
+                dataSetModel.getDataSet().getSpec(),
+                allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
+        ));
         Exec.work(new FileValidator(
                 this,
                 allowInvalidRecords,
