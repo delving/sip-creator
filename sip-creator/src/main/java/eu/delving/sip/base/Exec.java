@@ -58,4 +58,10 @@ public class Exec {
         }
         executor.execute(runnable);
     }
+
+    public static void checkSwing() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            throw new RuntimeException("Must be Swing thread");
+        }
+    }
 }

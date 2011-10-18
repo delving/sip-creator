@@ -21,10 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.MappingModelAdapter;
-import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.FieldMappingListModel;
@@ -60,17 +57,6 @@ public class ObviousMappingsPopup extends FrameBase {
         obviousMappingsList = new JList(obviousListModel);
         obviousMappingsList.setCellRenderer(new FieldMappingListModel.CellRenderer());
         obviousMappingsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        sipModel.getMappingModel().addListener(new MappingModelAdapter() {
-            @Override
-            public void recordMappingChanged(RecordMapping recordMapping) {
-                obviousListModel.refresh();
-            }
-
-            @Override
-            public void recordMappingSelected(RecordMapping recordMapping) {
-                obviousListModel.refresh();
-            }
-        });
         setDefaultSize(400, 400);
     }
 
@@ -82,7 +68,6 @@ public class ObviousMappingsPopup extends FrameBase {
 
     @Override
     protected void refresh() {
-        obviousListModel.refresh();
     }
 
     private JComponent createCenter() {
@@ -93,7 +78,11 @@ public class ObviousMappingsPopup extends FrameBase {
     }
 
     private JComponent createSouth() {
+        JPanel bp = new JPanel(new GridLayout(1, 0));
+        bp.add(new JButton(new SelectAllAction()));
+        bp.add(new JButton(new SelectNoneAction()));
         JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(bp);
         p.add(new JButton(new CreateMappingsAction()));
         p.add(createFinishedPanel());
         return p;
@@ -105,6 +94,34 @@ public class ObviousMappingsPopup extends FrameBase {
         return panel;
     }
 
+    public void setObviousMappings(List<FieldMapping> obvious) {
+        obviousListModel.setList(obvious);
+    }
+
+    private class SelectAllAction extends AbstractAction {
+
+        private SelectAllAction() {
+            super("All");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            obviousMappingsList.getSelectionModel().setSelectionInterval(0, obviousListModel.getSize() - 1);
+        }
+    }
+
+    private class SelectNoneAction extends AbstractAction {
+
+        private SelectNoneAction() {
+            super("None");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            obviousMappingsList.getSelectionModel().clearSelection();
+        }
+    }
+
     private class CreateMappingsAction extends AbstractAction {
         private CreateMappingsAction() {
             super("Create Selected Mappings");
@@ -112,11 +129,16 @@ public class ObviousMappingsPopup extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            for (Object fm : obviousMappingsList.getSelectedValues()) {
-                FieldMapping fieldMapping = (FieldMapping) fm;
-                sipModel.getMappingModel().addMapping(fieldMapping);
-            }
-            obviousListModel.refresh();
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    List<FieldMapping> additions = new ArrayList<FieldMapping>();
+                    for (Object fm : obviousMappingsList.getSelectedValues()) {
+                        additions.add((FieldMapping) fm);
+                    }
+                    sipModel.getMappingModel().addMappings(additions);
+                }
+            });
         }
     }
 
@@ -135,33 +157,6 @@ public class ObviousMappingsPopup extends FrameBase {
     private class ObviousListModel extends AbstractListModel {
         private List<FieldMapping> obvious = new ArrayList<FieldMapping>();
 
-        public void refresh() {
-            CodeGenerator codeGenerator = new CodeGenerator();
-            List<FieldMapping> fresh = codeGenerator.createObviousMappings(
-                    sipModel.getUnmappedFields(),
-                    sipModel.getAnalysisModel().getVariables(),
-                    sipModel.getDataSetModel().getFactDefinitions()
-            );
-            if (!obvious.isEmpty()) {
-                int size = obvious.size();
-                obvious.clear();
-                fireIntervalRemoved(this, 0, size);
-            }
-            if (!fresh.isEmpty()) {
-                obvious.addAll(fresh);
-                fireIntervalAdded(this, 0, getSize());
-            }
-            else {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        closeFrame();
-                    }
-                });
-            }
-            ObviousMappingsPopup.this.getAction().setEnabled(!fresh.isEmpty());
-        }
-
         @Override
         public int getSize() {
             return obvious.size();
@@ -170,6 +165,22 @@ public class ObviousMappingsPopup extends FrameBase {
         @Override
         public Object getElementAt(int i) {
             return obvious.get(i);
+        }
+
+        public void setList(List<FieldMapping> fresh) {
+            if (!obvious.isEmpty()) {
+                int wasSize = getSize();
+                obvious.clear();
+                fireIntervalRemoved(this, 0, wasSize);
+            }
+            obvious.addAll(fresh);
+            if (obvious.isEmpty()) {
+                closeFrame();
+            }
+            else {
+                fireIntervalAdded(this, 0, getSize());
+            }
+            ObviousMappingsPopup.this.getAction().setEnabled(!obvious.isEmpty());
         }
     }
 

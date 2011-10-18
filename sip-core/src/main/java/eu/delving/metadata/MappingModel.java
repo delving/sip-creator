@@ -76,6 +76,15 @@ public class MappingModel {
         }
     }
 
+    public void addMappings(List<FieldMapping> mappings) {
+        if (recordMapping == null) return;
+        for (FieldMapping fieldMapping : mappings) {
+            String path = fieldMapping.getDefinition().path.toString();
+            recordMapping.fieldMappings.put(path, fieldMapping);
+        }
+        fireMappingChanged();
+    }
+
     public void addMapping(FieldMapping fieldMapping) {
         if (recordMapping == null) return;
         String path = fieldMapping.getDefinition().path.toString();
@@ -130,7 +139,7 @@ public class MappingModel {
          *
          * @param recordMapping The record mapping.
          */
-        void recordMappingChanged(@Deprecated RecordMapping recordMapping);
+        void recordMappingChanged(RecordMapping recordMapping);
 
         /**
          * A new data set has been loaded and its record mapping is set.

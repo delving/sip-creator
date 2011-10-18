@@ -24,6 +24,8 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldDefinition;
 import eu.delving.metadata.FieldMapping;
+import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.SourceVariable;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -54,7 +56,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
@@ -71,7 +72,6 @@ public class CreateFrame extends FrameBase {
 
     private final static String SELECT_CAPTION = "<html><center>Select from the input fields<br>or fill in a constant and select an output field.</html>";
     private final static String CREATE_CAPTION = "<html><b>Create Mapping</b> (Click here or press &lt;space>)</html>";
-    private JButton createObviousMappingButton = new JButton("Create obvious mappings");
     private JTextField constantField = new JTextField("?");
     private JList variablesList;
     private JList targetFieldList;
@@ -119,10 +119,27 @@ public class CreateFrame extends FrameBase {
                 // todo: implement
             }
         });
-        createObviousMappingButton.addActionListener(new ActionListener() {
+        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-//                obviousMappingDialog.setVisible(true);
+            public void factChanged() {
+            }
+
+            @Override
+            public void select(FieldMapping fieldMapping) {
+            }
+
+            @Override
+            public void fieldMappingChanged() {
+            }
+
+            @Override
+            public void recordMappingChanged(RecordMapping recordMapping) {
+                Exec.swing(new ObviousMappingsChecker());
+            }
+
+            @Override
+            public void recordMappingSelected(RecordMapping recordMapping) {
+                Exec.swing(new ObviousMappingsChecker());
             }
         });
         constantField.addFocusListener(new FocusListener() {
@@ -278,28 +295,17 @@ public class CreateFrame extends FrameBase {
         }
     }
 
-
-    private void prepareCreateMappingButtons() {
-        Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                CodeGenerator codeGenerator = new CodeGenerator();
-                List<FieldMapping> obvious = codeGenerator.createObviousMappings(
-                        sipModel.getUnmappedFields(),
-                        sipModel.getAnalysisModel().getVariables(),
-                        sipModel.getDataSetModel().getFactDefinitions()
-                );
-                if (obvious.isEmpty()) {
-                    if (obviousMappingsPopup.isVisible()) {
-                        obviousMappingsPopup.closeFrame();
-                    }
-                    createObviousMappingButton.setEnabled(false);
-                }
-                else {
-                    createObviousMappingButton.setEnabled(true);
-                }
-            }
-        });
+    private class ObviousMappingsChecker implements Runnable {
+        @Override
+        public void run() {
+            CodeGenerator codeGenerator = new CodeGenerator();
+            List<FieldMapping> obvious = codeGenerator.createObviousMappings(
+                    sipModel.getUnmappedFields(),
+                    sipModel.getAnalysisModel().getVariables(),
+                    sipModel.getDataSetModel().getFactDefinitions()
+            );
+            obviousMappingsPopup.setObviousMappings(obvious);
+        }
     }
 
     @Override
