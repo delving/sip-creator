@@ -27,14 +27,18 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
-import org.apache.log4j.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.JCheckBox;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,21 +49,21 @@ import java.awt.event.ActionListener;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 public class ValidateAction extends AbstractAction {
-
-    private static final Logger LOG = Logger.getLogger(ValidateAction.class);
-
     private SipModel sipModel;
+    private JDialog dialog;
     private JDesktopPane parent;
+    private InvestigateRecordAction investigateRecordAction = new InvestigateRecordAction();
+    private AllowInvalidRecordsAction allowInvalidRecordsAction = new AllowInvalidRecordsAction();
 
     public ValidateAction(JDesktopPane parent, SipModel sipModel) {
         super("Validate");
-        this.sipModel = sipModel;
         this.parent = parent;
+        this.sipModel = sipModel;
         setEnabled(false);
         this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {
-                setEnabled(dataSet.getState().ordinal() >= DataSetState.MAPPING.ordinal());
+                enableAccordingTo(dataSet.getState());
             }
 
             @Override
@@ -69,13 +73,42 @@ public class ValidateAction extends AbstractAction {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                setEnabled(dataSetState.ordinal() >= DataSetState.MAPPING.ordinal());
+                enableAccordingTo(dataSetState);
             }
         });
+        this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Invalid Record", Dialog.ModalityType.APPLICATION_MODAL);
+        prepareDialog();
+    }
+
+    private void enableAccordingTo(DataSetState dataSetState) {
+        setEnabled(dataSetState.ordinal() >= DataSetState.MAPPING.ordinal());
+    }
+
+    private void prepareDialog() {
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                dialog.setVisible(false);
+            }
+        });
+        JPanel bp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bp.add(cancel);
+        JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
+        p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        p.add(new JButton(investigateRecordAction));
+        p.add(new JButton(allowInvalidRecordsAction));
+        dialog.getContentPane().add(p, BorderLayout.CENTER);
+        dialog.getContentPane().add(bp, BorderLayout.SOUTH);
+        dialog.pack();
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
+        performValidation(false);
+    }
+
+    private void performValidation(boolean allowInvalidRecords) {
         String message = String.format(
                 "<html><h3>Transforming the raw data of '%s' into '%s' format and validating</h3>",
                 sipModel.getDataSetModel().getDataSet().getSpec(),
@@ -83,29 +116,42 @@ public class ValidateAction extends AbstractAction {
         );
         ProgressListener progressListener = sipModel.getFeedback().progressListener("Validating", message);
         sipModel.validateFile(
+                allowInvalidRecords,
                 progressListener,
                 new SipModel.ValidationListener() {
                     @Override
                     public void failed(ValidationException validationException) {
-                        final JCheckBox allowInvalidCheckBox = new JCheckBox("Allow invalid records");
-                        JPanel pane = new JPanel(new GridLayout(2, 0));
-                        pane.add(new JLabel(String.format("Error in record #%d, do you want to fix this problem?",
-                                validationException.getRecordNumber())
-                        ));
-                        validationException.printStackTrace();
-                        pane.add(allowInvalidCheckBox);
-                        allowInvalidCheckBox.setSelected(sipModel.isAllowInvalidRecords());
-                        allowInvalidCheckBox.addActionListener(
-                                new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent actionEvent) {
-                                        sipModel.setAllowInvalidRecords(allowInvalidCheckBox.isSelected());
-                                    }
-                                }
-                        );
-                        JOptionPane.showMessageDialog(parent, pane, "title", JOptionPane.YES_NO_OPTION);
+                        Dimension all = parent.getSize();
+                        Dimension d = dialog.getSize();
+                        dialog.setLocation((all.width - d.width) / 2, (all.height - d.height) / 2);
+                        dialog.setVisible(true);
                     }
                 }
         );
+    }
+
+    private class InvestigateRecordAction extends AbstractAction {
+
+        private InvestigateRecordAction() {
+            super("<html><center><br><h2>Investigate</h2>Fix the mapping, with<br>the invalid record in view<br><br>");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            dialog.setVisible(false);
+        }
+    }
+
+    private class AllowInvalidRecordsAction extends AbstractAction {
+
+        private AllowInvalidRecordsAction() {
+            super("<html><center><br><h2>Accept - Redo</h2>Run the validation again<br>accepting invalid records<br><br>");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            dialog.setVisible(false);
+            performValidation(true);
+        }
     }
 }
