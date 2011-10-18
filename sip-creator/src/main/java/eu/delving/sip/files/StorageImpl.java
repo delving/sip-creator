@@ -143,7 +143,7 @@ public class StorageImpl extends StorageBase implements Storage {
         @Override
         public String getLatestPrefix() {
             File latestMapping = latestMappingFileOrNull(here);
-            return latestMapping != null ? mappingPrefix(latestMapping) : null;
+            return latestMapping != null ? extractName(latestMapping, FileType.MAPPING) : null;
         }
 
         @Override
@@ -324,9 +324,7 @@ public class StorageImpl extends StorageBase implements Storage {
         public File renameInvalidSource() throws StorageException {
             File sourceFile = sourceFile(here);
             File renamedFile = new File(here, String.format("%s.error", sourceFile.getName()));
-            if (!sourceFile.renameTo(renamedFile)) {
-                throw new StorageException("Error renaming file");
-            }
+            rename(sourceFile, renamedFile);
             return renamedFile;
         }
 
@@ -334,9 +332,7 @@ public class StorageImpl extends StorageBase implements Storage {
         public File renameInvalidImport() throws StorageException {
             File importFile = importedFile(here);
             File renamedFile = new File(here, String.format("%s.error", importFile.getName()));
-            if (!importFile.renameTo(renamedFile)) {
-                throw new StorageException("Error renaming file");
-            }
+            rename(importFile, renamedFile);
             return renamedFile;
         }
 
@@ -412,7 +408,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void setRecordMapping(RecordMapping recordMapping) throws StorageException {
-            File file = new File(here, String.format(MAPPING_FILE_PATTERN, recordMapping.getPrefix()));
+            File file = new File(here, String.format(FileType.MAPPING.getPattern(), recordMapping.getPrefix()));
             try {
                 FileOutputStream out = new FileOutputStream(file);
                 RecordMapping.write(recordMapping, out);
@@ -425,7 +421,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException {
-            File file = new File(here, String.format(VALIDATION_FILE_PATTERN, metadataPrefix));
+            File file = new File(here, String.format(FileType.VALIDATION.getPattern(), metadataPrefix));
             try {
                 DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
                 int invalidCount = recordCount - validation.cardinality();
@@ -442,7 +438,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public PrintWriter reportWriter(RecordMapping recordMapping) throws StorageException {
-            File file = new File(here, String.format(REPORT_FILE_PATTERN, recordMapping.getPrefix()));
+            File file = new File(here, String.format(FileType.REPORT.getPattern(), recordMapping.getPrefix()));
             try {
                 return new PrintWriter(file);
             }
@@ -466,7 +462,7 @@ public class StorageImpl extends StorageBase implements Storage {
         public void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException {
             int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
             if (progressListener != null) progressListener.prepareFor(fileBlocks);
-            File source = new File(here, IMPORTED_FILE_NAME);
+            File source = new File(here, FileType.IMPORTED.getName());
             Hasher hasher = new Hasher();
             boolean cancelled = false;
             try {
@@ -511,14 +507,12 @@ public class StorageImpl extends StorageBase implements Storage {
                 delete(source);
             }
             else {
-                File hashedSource = new File(here, hasher.prefixFileName(IMPORTED_FILE_NAME));
+                File hashedSource = new File(here, hasher.prefixFileName(FileType.IMPORTED.getName()));
                 if (hashedSource.exists()) {
                     delete(source);
                     throw new StorageException("This import was identical to the previous one. Discarded.");
                 }
-                if (!source.renameTo(hashedSource)) {
-                    throw new StorageException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
-                }
+                rename(source, hashedSource);
             }
         }
 
@@ -538,16 +532,17 @@ public class StorageImpl extends StorageBase implements Storage {
                 SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement);
                 converter.setProgressListener(progressListener);
                 Hasher hasher = new Hasher();
-                DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, SOURCE_FILE_NAME)));
+                DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, FileType.SOURCE.getName())));
                 converter.parse(importedInput(), digestOut);
-                File source = new File(here, SOURCE_FILE_NAME);
-                File hashedSource = new File(here, hasher.prefixFileName(SOURCE_FILE_NAME));
-                if (!source.renameTo(hashedSource)) {
-                    throw new StorageException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
-                }
+                File source = new File(here, FileType.SOURCE.getName());
+                File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
+                rename(source, hashedSource);
+            }
+            catch (StorageException e) {
+                throw e;
             }
             catch (Exception e) {
-                File source = new File(here, SOURCE_FILE_NAME);
+                File source = new File(here, FileType.SOURCE.getName());
                 delete(source);
                 throw new StorageException("Unable to convert source: " + e.getMessage(), e);
             }
@@ -582,12 +577,13 @@ public class StorageImpl extends StorageBase implements Storage {
             if (progressListener != null) progressListener.prepareFor((int) (streamLength / BLOCK_SIZE));
             CountingInputStream counting = new CountingInputStream(inputStream);
             ZipInputStream zipInputStream = new ZipInputStream(counting);
+            String unzippedName = FileType.SOURCE.getName().substring(0, FileType.SOURCE.getName().length() - ".gz".length());
             try {
                 while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                     String fileName = zipEntry.getName();
-                    if (fileName.equals(UNZIPPED_SOURCE_FILE_NAME)) {
+                    if (fileName.equals(unzippedName)) {
                         Hasher hasher = new Hasher();
-                        File source = new File(here, SOURCE_FILE_NAME);
+                        File source = new File(here, FileType.SOURCE.getName());
                         GZIPOutputStream outputStream = new GZIPOutputStream(new FileOutputStream(source));
                         while (!cancelled && -1 != (bytesRead = zipInputStream.read(buffer))) {
                             outputStream.write(buffer, 0, bytesRead);
@@ -601,10 +597,8 @@ public class StorageImpl extends StorageBase implements Storage {
                         }
                         if (progressListener != null) progressListener.finished(!cancelled);
                         outputStream.close();
-                        File hashedSource = new File(here, hasher.prefixFileName(SOURCE_FILE_NAME));
-                        if (!source.renameTo(hashedSource)) {
-                            throw new StorageException(String.format("Unable to rename %s to %s", source.getAbsolutePath(), hashedSource.getAbsolutePath()));
-                        }
+                        File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
+                        FileUtils.moveFile(source, hashedSource);
                     }
                     else {
                         File file = new File(here, fileName);
@@ -631,6 +625,15 @@ public class StorageImpl extends StorageBase implements Storage {
             }
             catch (IOException e) {
                 throw new StorageException(String.format("Unable to create phantom file %s to mark data set deleted", phantomFile.getAbsolutePath()), e);
+            }
+        }
+
+        private void rename(File from, File to) throws StorageException {
+            try {
+                FileUtils.moveFile(from, to);
+            }
+            catch (IOException e) {
+                throw new StorageException("rename", e);
             }
         }
 

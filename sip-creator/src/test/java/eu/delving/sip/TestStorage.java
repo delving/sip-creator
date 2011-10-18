@@ -107,47 +107,70 @@ public class TestStorage {
     }
 
     @Test
-    public void cycle() throws IOException, StorageException {
+    public void cycle() throws IOException, StorageException, InterruptedException {
         dataSet().externalToImported(MockInput.sampleFile(), null);
         assertEquals(IMPORTED, dataSet().getState());
         analyze();
         assertEquals("Should be imported and stats", 2, mock.files().length);
         assertFalse("Zero variables!", variables.isEmpty());
+
         dataSet().setHints(mock.hints(recordCount));
         assertEquals("Should be imported, stats and hints", 3, mock.files().length);
         assertEquals(DELIMITED, dataSet().getState());
+
         Statistics statistics = dataSet().getLatestStatistics();
         assertFalse("Should be analysis format", statistics.isSourceFormat());
         int statsSize = statistics.size();
         int recordCount = Integer.parseInt(dataSet().getHints().get(Storage.RECORD_COUNT));
         assertTrue("Zero records!", recordCount > 0);
+
         dataSet().importedToSource(null);
         assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
+
         statistics.convertToSourcePaths(StorageBase.getRecordRoot(dataSet().getHints()));
         dataSet().setStatistics(statistics);
         assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
+
         statistics = dataSet().getLatestStatistics();
         assertTrue("Should be less items in analysis", statistics.size() < statsSize);
         assertTrue("Should be source format", statistics.isSourceFormat());
         AnalysisTree tree = statistics.createAnalysisTree();
         assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.create(Storage.ENVELOPE_TAG)));
+
         RecordMapping recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
         assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recordMapping.getPrefix());
         MappingModel mappingModel = new MappingModel();
         mappingModel.setRecordMapping(recordMapping);
         mappingModel.setFact("/some/path", "value");
         dataSet().setRecordMapping(recordMapping);
-        assertEquals("Should be two files", 6, mock.files().length);
+        showUploadFiles("start");
         recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
         assertEquals("Should have held fact", "value", recordMapping.getFact("/some/path"));
         assertEquals(MAPPING, dataSet().getState());
+        assertEquals(6, mock.files().length); // mapping file added
+
         assertEquals("Should be hints and source", 2, dataSet().getUploadFiles().size());
         dataSet().setValidation(mock.getMetadataPrefix(), new BitSet(), recordCount);
-        assertEquals("Should be four files", 4, dataSet().getUploadFiles().size());
-        for (File u : dataSet().getUploadFiles()) {
-            log.info("upload this: " + u.getName());
+        assertEquals(7, mock.files().length);
+        for (int walk = 0; walk < Storage.FileType.MAPPING.getHistorySize() + 5; walk++) {
+            dataSet().getUploadFiles();
+//            showUploadFiles("iteration before " + walk);
+            mappingModel.setFact("/some/path", "value" + walk);
+            dataSet().setRecordMapping(mappingModel.getRecordMapping());
+            dataSet().getUploadFiles();
+//            showUploadFiles("iteration after " + walk);
+            if (walk < Storage.FileType.MAPPING.getHistorySize() - 1) {
+                assertEquals(8 + walk, mock.files().length);
+            }
+            else {
+                assertEquals(6 + Storage.FileType.MAPPING.getHistorySize(), mock.files().length);
+            }
         }
+        showUploadFiles("after many settings of record mappings");
+        assertEquals(6 + Storage.FileType.MAPPING.getHistorySize(), mock.files().length);
+        assertEquals(4, dataSet().getUploadFiles().size());
+        showUploadFiles("finally");
     }
 
     @Test
@@ -171,6 +194,17 @@ public class TestStorage {
         }
         invalid.xor(valid);
         assertEquals("Should not be any clear bits in the first " + bits, bits, invalid.nextClearBit(0));
+    }
+
+    private void showUploadFiles(String message) throws StorageException {
+        log.info("Upload: " + message);
+        for (File u : dataSet().getUploadFiles()) {
+            log.info("upload this: " + u.getName());
+        }
+        int index = 1;
+        for (File f : mock.files()) {
+            log.info((index++) + " " + f.getName());
+        }
     }
 
     private void analyze() {

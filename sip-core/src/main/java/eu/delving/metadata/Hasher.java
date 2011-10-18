@@ -21,6 +21,8 @@
 
 package eu.delving.metadata;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -75,9 +77,7 @@ public class Hasher {
             Hasher hasher = new Hasher();
             hasher.update(file);
             File hashedFile = new File(file.getParentFile(), hasher.prefixFileName(file.getName()));
-            if (!file.renameTo(hashedFile)) {
-                throw new IOException(String.format("Unable to rename %s to %s", file.getAbsolutePath(), hashedFile.getAbsolutePath())) ;
-            }
+            FileUtils.moveFile(file, hashedFile);
             return hashedFile;
         }
     }
