@@ -133,7 +133,7 @@ public class ValidateAction extends AbstractAction {
     private class InvestigateRecordAction extends AbstractAction {
 
         private InvestigateRecordAction() {
-            super("<html><center><br><h2>Investigate</h2>Fix the mapping, focusing<br>on this record<br><br>");
+            super("<html><center><br><h2>Investigate</h2>Fix the mapping, with<br>the invalid record in view<br><br>");
         }
 
         @Override
