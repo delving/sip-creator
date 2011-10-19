@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import javax.xml.namespace.QName;
 import java.io.Serializable;
 
 /**
@@ -38,6 +39,10 @@ public class Tag implements Comparable<Tag>, Serializable {
 
     @XStreamAsAttribute
     private String localName;
+
+    public static Tag create(QName qname) {
+        return create(qname.getPrefix(), qname.getLocalPart());
+    }
 
     public static Tag create(String prefix, String localName) {
         return new Tag(prefix, localName);

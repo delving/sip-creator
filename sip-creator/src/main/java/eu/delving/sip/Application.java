@@ -208,6 +208,7 @@ public class Application {
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 statusLabel.setText(dataSetState.toHtml());
                 if (dataSetState == IMPORTED || dataSetState == SOURCED) {
+                    feedback.say("Analysis triggered");
                     sipModel.analyzeFields(new SipModel.AnalysisListener() {
                         @Override
                         public void analysisProgress(final long elementCount) {

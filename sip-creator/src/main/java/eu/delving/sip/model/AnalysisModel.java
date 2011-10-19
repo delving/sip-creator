@@ -99,17 +99,17 @@ public class AnalysisModel {
         }
     }
 
-    public Statistics convertStatistics() {
-        if (statistics == null) {
-            throw new IllegalStateException("No statistics");
-        }
-        statistics.convertToSourcePaths(getRecordRoot());
-        analysisTree = statistics.createAnalysisTree();
-        analysisTreeModel.setRoot(analysisTree.getRoot());
-        setHints(Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
-        return statistics;
-    }
-
+//    public Statistics convertStatistics() {
+//        if (statistics == null) {
+//            throw new IllegalStateException("No statistics");
+//        }
+//        statistics.convertToSourcePaths(getRecordRoot());
+//        analysisTree = statistics.createAnalysisTree();
+//        analysisTreeModel.setRoot(analysisTree.getRoot());
+//        setHints(Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
+//        return statistics;
+//    }
+//
     public void set(Map<String, String> hints) {
         hintsModel.set(hints);
     }

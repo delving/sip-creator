@@ -44,7 +44,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -101,25 +100,23 @@ public class SourceConverter {
                         break;
                     case XMLEvent.START_ELEMENT:
                         StartElement start = event.asStartElement();
-                        path.push(Tag.create(start.getName().getPrefix(), start.getName().getLocalPart()));
+                        path.push(Tag.create(start.getName()));
                         if (!recordEvents.isEmpty()) {
                             if (path.equals(uniqueElementPath) && uniqueValue == null) {
                                 uniqueBuilder = new StringBuilder();
                                 uniqueValue = null;
                             }
+                            recordEvents.add(eventFactory.createStartElement(start.getName(), null, null));
                             Iterator attrWalk = start.getAttributes();
                             while (attrWalk.hasNext()) {
                                 Attribute attr = (Attribute) attrWalk.next();
-                                path.push(Tag.create(attr.getName().getPrefix(), '@' + attr.getName().getLocalPart()));
+                                path.push(Tag.create(attr.getName()));
+                                addAttributeAsElement(recordEvents, attr);
                                 if (path.equals(uniqueElementPath) && uniqueValue == null) {
                                     uniqueValue = attr.getValue();
-                                    recordEvents.add(eventFactory.createStartElement("", "", Storage.UNIQUE_TAG, null, null));
-                                    recordEvents.add(eventFactory.createCharacters(uniqueValue));
-                                    recordEvents.add(eventFactory.createEndElement("", "", RECORD_TAG));
                                 }
                                 path.pop();
                             }
-                            recordEvents.add(event);
                         }
                         else if (path.equals(recordRootPath)) {
                             if (namespaceCollector != null) {
@@ -132,12 +129,10 @@ public class SourceConverter {
                             Iterator attrWalk = start.getAttributes();
                             while (attrWalk.hasNext()) {
                                 Attribute attr = (Attribute) attrWalk.next();
-                                path.push(Tag.create(attr.getName().getPrefix(), '@' + attr.getName().getLocalPart()));
+                                path.push(Tag.create(attr.getName()));
+                                addAttributeAsElement(recordEvents, attr);
                                 if (path.equals(uniqueElementPath) && uniqueValue == null) {
                                     uniqueValue = attr.getValue();
-                                    recordEvents.add(eventFactory.createStartElement("", "", Storage.UNIQUE_TAG, null, null));
-                                    recordEvents.add(eventFactory.createCharacters(uniqueValue));
-                                    recordEvents.add(eventFactory.createEndElement("", "", RECORD_TAG));
                                 }
                                 path.pop();
                             }
@@ -154,9 +149,12 @@ public class SourceConverter {
                                     throw new IOException("Record has no unique value"); // todo: maybe discard it, but then record the loss
                                 }
                                 else {
-                                    Iterator attributes = Arrays.asList(eventFactory.createAttribute("id", uniqueValue)).iterator();
+                                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, null, null));
+                                    recordEvents.add(eventFactory.createStartElement("", "", Storage.UNIQUE_TAG, null, null));
+                                    recordEvents.add(eventFactory.createCharacters(uniqueValue));
+                                    recordEvents.add(eventFactory.createEndElement("", "", Storage.UNIQUE_TAG, null));
+                                    recordEvents.add(eventFactory.createCharacters("\n"));
                                     uniqueValue = null;
-                                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, attributes, null));
                                     for (XMLEvent saved : recordEvents) {
                                         out.add(saved);
                                     }
@@ -215,6 +213,12 @@ public class SourceConverter {
         }
     }
 
+    private void addAttributeAsElement(List<XMLEvent> recordEvents, Attribute attr) {
+        recordEvents.add(eventFactory.createStartElement(attr.getName(), null, null));
+        recordEvents.add(eventFactory.createCharacters(attr.getValue()));
+        recordEvents.add(eventFactory.createEndElement(attr.getName(), null));
+        recordEvents.add(eventFactory.createCharacters("\n"));
+    }
 
     private class NamespaceCollector {
         private Map<String, Namespace> map = new TreeMap<String, Namespace>();

@@ -99,5 +99,5 @@ public interface Storage {
     String HARVEST_PREFIX = "harvestPrefix";
     String HARVEST_SPEC = "harvestSpec";
     Path RECORD_ROOT = new Path(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
-    Path UNIQUE_ELEMENT = new Path(String.format("/%s/%s/@id", ENVELOPE_TAG, RECORD_TAG));
+    Path UNIQUE_ELEMENT = new Path(String.format("/%s/%s/%s", ENVELOPE_TAG, RECORD_TAG, UNIQUE_TAG));
 }
