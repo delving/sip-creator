@@ -39,22 +39,55 @@ public interface Storage {
 
     DataSet createDataSet(String spec) throws StorageException;
 
-    String IMPORTED_FILE_NAME = "imported.xml.gz";
-    String SOURCE_FILE_NAME = "source.xml.gz";
-    String UNZIPPED_SOURCE_FILE_NAME = "records.xml";
-    String ANALYSIS_STATS_FILE_NAME = "analysis_stats.ser";
-    String SOURCE_STATS_FILE_NAME = "source_stats.ser";
-    String FACTS_FILE_NAME = "dataset_facts.txt";
-    String HINTS_FILE_NAME = "hints.txt";
-    String PHANTOM_FILE_NAME = "phantom.txt";
-    String MAPPING_FILE_PATTERN = "mapping_%s.xml";
-    String MAPPING_FILE_PREFIX = "mapping_";
-    String MAPPING_FILE_SUFFIX = ".xml";
-    String VALIDATION_FILE_PATTERN = "validation_%s.int";
-    String VALIDATION_FILE_PREFIX = "validation_";
-    String REPORT_FILE_PATTERN = "report_%s.txt";
-    String RECORD_DEFINITION_FILE_SUFFIX = "-record-definition.xml";
-    String FACT_DEFINITION_FILE_NAME = "fact-definition-list.xml";
+    enum FileType {
+        IMPORTED("imported.xml.gz"),
+        SOURCE("source.xml.gz", null, null, null, 2),
+        ANALYSIS_STATS("analysis_stats.ser"),
+        SOURCE_STATS("source_stats.ser"),
+        FACTS("dataset_facts.txt"),
+        HINTS("hints.txt"),
+        MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
+        VALIDATION(null, "validation_", null, "validation_%s.int", 1),
+        REPORT(null, null, null, "report_%s.txt", 1),
+        RECORD_DEFINITION(null, null, "-record-definition.xml", null, 1),
+        FACT_DEFINITION("fact-definition-list.xml"),
+        PHANTOM("phantom.txt");
+
+        private String name, prefix, suffix, pattern;
+        private int historySize = 1;
+
+        FileType(String name, String prefix, String suffix, String pattern, int historySize) {
+            this.name = name;
+            this.prefix = prefix;
+            this.suffix = suffix;
+            this.pattern = pattern;
+            this.historySize = historySize;
+        }
+
+        FileType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public String getSuffix() {
+            return suffix;
+        }
+
+        public String getPattern() {
+            return pattern;
+        }
+
+        public int getHistorySize() {
+            return historySize;
+        }
+    }
 
     String ENVELOPE_TAG = "delving-sip-source";
     String RECORD_TAG = "input";

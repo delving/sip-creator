@@ -25,6 +25,7 @@ import com.ctc.wstx.stax.WstxInputFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.xml.ValueFilter;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -390,11 +391,7 @@ public class Harvestor implements Runnable {
         }
         String message = String.format("Copying temp file %s to %s", tempFile, context.outputFile());
         log.info(message);
-        if (tempFile.renameTo(context.outputFile())) {
-            log.fatal(String.format("Error: %s", message));
-            listener.failed(String.format("Can't rename file from %s to %s", tempFile, context.outputFile()));
-            return;
-        }
+        FileUtils.moveFile(tempFile, context.outputFile());
         listener.finished(false);
     }
 
