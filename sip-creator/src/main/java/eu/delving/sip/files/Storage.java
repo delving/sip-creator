@@ -90,6 +90,7 @@ public interface Storage {
     }
 
     String ENVELOPE_TAG = "delving-sip-source";
+    String UNIQUE_TAG = "delving-unique-id";
     String RECORD_TAG = "input";
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";

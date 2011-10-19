@@ -263,12 +263,6 @@ public class SipModel {
                     final Map<String, String> facts = dataSet.getDataSetFacts();
                     final Map<String, String> hints = dataSet.getHints();
                     dataSetModel.setDataSet(dataSet);
-                    if (useLatestPrefix) {
-                        String latestPrefix = dataSet.getLatestPrefix();
-                        if (latestPrefix != null) {
-                            setPrefix(false, latestPrefix);
-                        }
-                    }
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
@@ -277,6 +271,17 @@ public class SipModel {
                             analysisModel.setStatistics(statistics);
                             seekFirstRecord();
                             feedback.say("Loaded data set " + dataSet.getSpec());
+                            if (useLatestPrefix) {
+                                Exec.work(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        String latestPrefix = dataSet.getLatestPrefix();
+                                        if (latestPrefix != null) {
+                                            setPrefix(false, latestPrefix);
+                                        }
+                                    }
+                                });
+                            }
                         }
                     });
                 }
