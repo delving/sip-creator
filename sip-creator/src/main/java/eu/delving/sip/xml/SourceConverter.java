@@ -26,6 +26,7 @@ import eu.delving.metadata.Tag;
 import eu.delving.metadata.Uniqueness;
 import eu.delving.metadata.UniquenessException;
 import eu.delving.sip.ProgressListener;
+import eu.delving.sip.files.Storage;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
@@ -112,6 +113,9 @@ public class SourceConverter {
                                 path.push(Tag.create(attr.getName().getPrefix(), '@' + attr.getName().getLocalPart()));
                                 if (path.equals(uniqueElementPath) && uniqueValue == null) {
                                     uniqueValue = attr.getValue();
+                                    recordEvents.add(eventFactory.createStartElement("", "", Storage.UNIQUE_TAG, null, null));
+                                    recordEvents.add(eventFactory.createCharacters(uniqueValue));
+                                    recordEvents.add(eventFactory.createEndElement("", "", RECORD_TAG));
                                 }
                                 path.pop();
                             }
@@ -131,6 +135,9 @@ public class SourceConverter {
                                 path.push(Tag.create(attr.getName().getPrefix(), '@' + attr.getName().getLocalPart()));
                                 if (path.equals(uniqueElementPath) && uniqueValue == null) {
                                     uniqueValue = attr.getValue();
+                                    recordEvents.add(eventFactory.createStartElement("", "", Storage.UNIQUE_TAG, null, null));
+                                    recordEvents.add(eventFactory.createCharacters(uniqueValue));
+                                    recordEvents.add(eventFactory.createEndElement("", "", RECORD_TAG));
                                 }
                                 path.pop();
                             }
