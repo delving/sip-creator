@@ -48,23 +48,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static eu.delving.sip.files.Storage.ANALYSIS_STATS_FILE_NAME;
-import static eu.delving.sip.files.Storage.FACTS_FILE_NAME;
-import static eu.delving.sip.files.Storage.FACT_DEFINITION_FILE_NAME;
-import static eu.delving.sip.files.Storage.HINTS_FILE_NAME;
-import static eu.delving.sip.files.Storage.IMPORTED_FILE_NAME;
-import static eu.delving.sip.files.Storage.MAPPING_FILE_PREFIX;
-import static eu.delving.sip.files.Storage.MAPPING_FILE_SUFFIX;
-import static eu.delving.sip.files.Storage.PHANTOM_FILE_NAME;
+import static eu.delving.sip.files.Storage.FileType.ANALYSIS_STATS;
+import static eu.delving.sip.files.Storage.FileType.FACTS;
+import static eu.delving.sip.files.Storage.FileType.HINTS;
+import static eu.delving.sip.files.Storage.FileType.IMPORTED;
+import static eu.delving.sip.files.Storage.FileType.MAPPING;
+import static eu.delving.sip.files.Storage.FileType.PHANTOM;
+import static eu.delving.sip.files.Storage.FileType.REPORT;
+import static eu.delving.sip.files.Storage.FileType.SOURCE;
+import static eu.delving.sip.files.Storage.FileType.SOURCE_STATS;
+import static eu.delving.sip.files.Storage.FileType.VALIDATION;
 import static eu.delving.sip.files.Storage.RECORD_COUNT;
-import static eu.delving.sip.files.Storage.RECORD_DEFINITION_FILE_SUFFIX;
 import static eu.delving.sip.files.Storage.RECORD_ROOT_PATH;
-import static eu.delving.sip.files.Storage.REPORT_FILE_PATTERN;
-import static eu.delving.sip.files.Storage.SOURCE_FILE_NAME;
-import static eu.delving.sip.files.Storage.SOURCE_STATS_FILE_NAME;
 import static eu.delving.sip.files.Storage.UNIQUE_ELEMENT_PATH;
-import static eu.delving.sip.files.Storage.VALIDATION_FILE_PATTERN;
-import static eu.delving.sip.files.Storage.VALIDATION_FILE_PREFIX;
 
 /**
  * This class contains helpers for the StorageImpl to lean on
@@ -74,9 +70,8 @@ import static eu.delving.sip.files.Storage.VALIDATION_FILE_PREFIX;
 
 public class StorageBase {
     public static final int BLOCK_SIZE = 4096;
-    public static final int MAX_HASH_HISTORY = 5;
 
-    public static Path getRecordRoot(Map<String,String> hints) throws StorageException {
+    public static Path getRecordRoot(Map<String, String> hints) throws StorageException {
         String recordRoot = hints.get(RECORD_ROOT_PATH);
         if (recordRoot == null) {
             throw new StorageException("Must have record root path");
@@ -84,7 +79,7 @@ public class StorageBase {
         return new Path(recordRoot);
     }
 
-    public static int getRecordCount(Map<String,String> hints) throws StorageException {
+    public static int getRecordCount(Map<String, String> hints) throws StorageException {
         String recordCount = hints.get(RECORD_COUNT);
         int count = 0;
         try {
@@ -97,7 +92,7 @@ public class StorageBase {
         return count;
     }
 
-    public static Path getUniqueElement(Map<String,String> hints) throws StorageException {
+    public static Path getUniqueElement(Map<String, String> hints) throws StorageException {
         String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
         if (uniqueElement == null) {
             throw new StorageException("Must have unique element path");
@@ -148,105 +143,115 @@ public class StorageBase {
     }
 
     File factsFile(File dir) {
-        return findOrCreate(dir, FACTS_FILE_NAME, new NameFileFilter(FACTS_FILE_NAME));
+        return findOrCreate(dir, FACTS);
     }
 
     File hintsFile(File dir) {
-        return findOrCreate(dir, HINTS_FILE_NAME, new NameFileFilter(HINTS_FILE_NAME));
+        return findOrCreate(dir, HINTS);
     }
 
     File importedFile(File dir) {
-        return findOrCreate(dir, IMPORTED_FILE_NAME, new NameFileFilter(IMPORTED_FILE_NAME));
+        return findOrCreate(dir, IMPORTED);
     }
 
     File sourceFile(File dir) {
-        return findOrCreate(dir, SOURCE_FILE_NAME, new NameFileFilter(SOURCE_FILE_NAME));
+        return findOrCreate(dir, SOURCE);
     }
 
     File previousSourceOrNull(File dir) {
-        return findOrNull(dir, 1, new NameFileFilter(SOURCE_FILE_NAME));
+        return findOrNull(dir, 1, new NameFileFilter(SOURCE.getName()), SOURCE);
     }
 
     File latestMappingFileOrNull(File dir) {
-        return findOrNull(dir, 0, new MappingFileFilter());
+        return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
     }
 
     File validationFile(File dir, File mappingFile) {
-        String prefix = mappingPrefix(mappingFile);
-        String name = String.format(VALIDATION_FILE_PATTERN, prefix);
-        return findOrCreate(dir, name, new NameFileFilter(name));
+        String prefix = extractName(mappingFile, MAPPING);
+        String name = String.format(VALIDATION.getPattern(), prefix);
+        return findOrCreate(dir, name, new NameFileFilter(name), VALIDATION);
     }
 
     File[] validationFiles(File dir, String prefix) {
-        String name = String.format(VALIDATION_FILE_PATTERN, prefix);
+        String name = String.format(VALIDATION.getPattern(), prefix);
         return dir.listFiles(new NameFileFilter(name));
     }
 
     File[] validationFiles(File dir) {
-        return dir.listFiles(new ValidationFileFilter());
+        return dir.listFiles(new PrefixFileFilter(VALIDATION));
     }
 
     File reportFile(File dir, RecordMapping recordMapping) {
-        return new File(dir, String.format(REPORT_FILE_PATTERN, recordMapping.getPrefix()));
+        return new File(dir, String.format(REPORT.getPattern(), recordMapping.getPrefix()));
     }
 
     File statisticsFile(File dir, boolean sourceFormat) {
-        return new File(dir, sourceFormat ? SOURCE_STATS_FILE_NAME : ANALYSIS_STATS_FILE_NAME);
+        String name = sourceFormat ? SOURCE_STATS.getName() : ANALYSIS_STATS.getName();
+        return new File(dir, name);
     }
 
     File phantomFile(File dir) {
-        return new File(dir, PHANTOM_FILE_NAME);
+        return new File(dir, PHANTOM.getName());
     }
 
-    private File findOrCreate(File directory, String name, FileFilter fileFilter) {
-        File file = findOrNull(directory, 0, fileFilter);
+    private File findOrCreate(File directory, Storage.FileType fileType) {
+        String filter = fileType.getPattern() != null ? fileType.getPattern() : fileType.getName();
+        File file = findOrNull(directory, 0, new NameFileFilter(filter), fileType);
+        if (file == null) {
+            file = new File(directory, fileType.getName());
+        }
+        return file;
+    }
+
+    private File findOrCreate(File directory, String name, FileFilter fileFilter, Storage.FileType fileType) {
+        File file = findOrNull(directory, 0, fileFilter, fileType);
         if (file == null) {
             file = new File(directory, name);
         }
         return file;
     }
 
-    private File findOrNull(File directory, int which, FileFilter fileFilter) {
+    private File findOrNull(File directory, int which, FileFilter fileFilter, Storage.FileType fileType) {
         File[] files = directory.listFiles(fileFilter);
-        return getRecent(files, which);
+        return getRecent(files, which, fileType);
     }
 
     File factDefinitionFile(File dir) {
-        return new File(dir, FACT_DEFINITION_FILE_NAME);
+        return new File(dir, Storage.FileType.FACT_DEFINITION.getName());
     }
 
     List<File> findRecordDefinitionFiles(File dir) {
-        File [] files = dir.listFiles(new RecordDefinitionFileFilter());
+        File[] files = dir.listFiles(new SuffixFileFilter(Storage.FileType.RECORD_DEFINITION));
         return Arrays.asList(files);
     }
 
     File findLatestMappingFile(File dir, String metadataPrefix) {
-        return findLatestFile(dir, metadataPrefix, new MappingFileFilter());
+        return findLatestFile(dir, metadataPrefix, MAPPING);
     }
 
-    File findLatestFile(File dir, String metadataPrefix, FileFilter fileFilter) {
+    File findLatestFile(File dir, String metadataPrefix, Storage.FileType fileType) {
         File mappingFile = null;
-        for (File file : findLatestFiles(dir, fileFilter)) {
-            String prefix = mappingPrefix(file);
+        for (File file : findLatestFiles(dir, fileType)) {
+            String prefix = extractName(file, MAPPING);
             if (prefix.equals(metadataPrefix)) {
                 mappingFile = file;
             }
         }
         if (mappingFile == null) {
-            mappingFile = new File(dir, String.format(Storage.MAPPING_FILE_PATTERN, metadataPrefix));
+            mappingFile = new File(dir, String.format(MAPPING.getPattern(), metadataPrefix));
         }
         return mappingFile;
     }
 
     Collection<File> findLatestMappingFiles(File dir) {
-        return findLatestFiles(dir, new MappingFileFilter());
+        return findLatestFiles(dir, MAPPING);
     }
 
-    Collection<File> findLatestFiles(File dir, FileFilter fileFilter) {
-        File[] files = dir.listFiles(fileFilter);
+    Collection<File> findLatestFiles(File dir, Storage.FileType fileType) {
+        File[] files = dir.listFiles(new PrefixFileFilter(fileType));
         Map<String, List<File>> map = new TreeMap<String, List<File>>();
         for (File file : files) {
-            String prefix = mappingPrefix(file);
+            String prefix = extractName(file, fileType);
             if (prefix == null) continue;
             List<File> list = map.get(prefix);
             if (list == null) {
@@ -260,46 +265,51 @@ public class StorageBase {
                 latestFiles.add(entry.getValue().get(0));
             }
             else {
-                latestFiles.add(getRecent(entry.getValue().toArray(new File[entry.getValue().size()]), 0));
+                latestFiles.add(getRecent(entry.getValue().toArray(new File[entry.getValue().size()]), 0, fileType));
             }
         }
         return latestFiles;
     }
 
-    class MappingFileFilter implements FileFilter {
+    class PrefixFileFilter implements FileFilter {
+        private Storage.FileType fileType;
+
+        PrefixFileFilter(Storage.FileType fileType) {
+            this.fileType = fileType;
+        }
+
         @Override
         public boolean accept(File file) {
             String name = Hasher.extractFileName(file);
-            return file.isFile() && name.startsWith(MAPPING_FILE_PREFIX);
+            return file.isFile() && name.startsWith(fileType.getPrefix());
         }
     }
 
-    class ValidationFileFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            String name = Hasher.extractFileName(file);
-            return file.isFile() && name.startsWith(VALIDATION_FILE_PREFIX);
-        }
-    }
+    class SuffixFileFilter implements FileFilter {
+        private Storage.FileType fileType;
 
-    class RecordDefinitionFileFilter implements FileFilter {
+        SuffixFileFilter(Storage.FileType fileType) {
+            this.fileType = fileType;
+        }
+
         @Override
         public boolean accept(File file) {
             String name = file.getName();
-            return file.isFile() && name.endsWith(RECORD_DEFINITION_FILE_SUFFIX);
+            return file.isFile() && name.endsWith(fileType.getSuffix());
         }
     }
 
-    String mappingPrefix(File file) {
+    String extractName(File file, Storage.FileType fileType) {
         String name = Hasher.extractFileName(file);
-        if (name.startsWith(MAPPING_FILE_PREFIX) && name.endsWith(MAPPING_FILE_SUFFIX)) {
-            name = name.substring(MAPPING_FILE_PREFIX.length());
-            name = name.substring(0, name.length() - MAPPING_FILE_SUFFIX.length());
+        if (name.startsWith(fileType.getPrefix()) && name.endsWith(fileType.getSuffix())) {
+            name = name.substring(fileType.getPrefix().length());
+            name = name.substring(0, name.length() - fileType.getSuffix().length());
             return name;
         }
         else {
             return null;
         }
+
     }
 
     static void delete(File file) throws StorageException {
@@ -315,8 +325,9 @@ public class StorageBase {
         }
     }
 
-    File getRecent(File[] files, int which) {
-        if (files == null || files.length <= which || which > MAX_HASH_HISTORY) {
+    File getRecent(File[] files, int which, Storage.FileType fileType) {
+        int maxHistory = fileType.getHistorySize();
+        if (files == null || files.length <= which || which > maxHistory) {
             return null;
         }
         Arrays.sort(files, new Comparator<File>() {
@@ -330,13 +341,23 @@ public class StorageBase {
                 else if (lastA < lastB) {
                     return 1;
                 }
-                else {
-                    return 0;
+                else { // lastModified is only accurate to seconds (ends in 000) and we want the unhashed one at the top
+                    int nameA = a.getName().length();
+                    int nameB = b.getName().length();
+                    if (nameA > nameB) {
+                        return 1;
+                    }
+                    else if (nameB < nameA) {
+                        return -1;
+                    }
+                    else {
+                        return 0;
+                    }
                 }
             }
         });
-        if (files.length > MAX_HASH_HISTORY) { // todo: vary this per file type
-            for (int walk = MAX_HASH_HISTORY; walk < files.length; walk++) {
+        if (files.length > maxHistory) {
+            for (int walk = maxHistory; walk < files.length; walk++) {
                 //noinspection ResultOfMethodCallIgnored
                 files[walk].delete();
             }
@@ -368,7 +389,6 @@ public class StorageBase {
             throw new RuntimeException(e);
         }
     }
-
 
 
     static XStream recordStream() {
