@@ -33,6 +33,7 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -105,6 +106,15 @@ public class SourceConverter {
                                 uniqueBuilder = new StringBuilder();
                                 uniqueValue = null;
                             }
+                            Iterator attrWalk = start.getAttributes();
+                            while (attrWalk.hasNext()) {
+                                Attribute attr = (Attribute) attrWalk.next();
+                                path.push(Tag.create(attr.getName().getPrefix(), '@' + attr.getName().getLocalPart()));
+                                if (path.equals(uniqueElementPath) && uniqueValue == null) {
+                                    uniqueValue = attr.getValue();
+                                }
+                                path.pop();
+                            }
                             recordEvents.add(event);
                         }
                         else if (path.equals(recordRootPath)) {
@@ -115,6 +125,15 @@ public class SourceConverter {
                                 namespaceCollector = null;
                             }
                             recordEvents.add(eventFactory.createCharacters("\n")); // flag that record has started
+                            Iterator attrWalk = start.getAttributes();
+                            while (attrWalk.hasNext()) {
+                                Attribute attr = (Attribute) attrWalk.next();
+                                path.push(Tag.create(attr.getName().getPrefix(), '@' + attr.getName().getLocalPart()));
+                                if (path.equals(uniqueElementPath) && uniqueValue == null) {
+                                    uniqueValue = attr.getValue();
+                                }
+                                path.pop();
+                            }
                             if (progressListener != null) progressListener.setProgress(count);
                         }
                         else if (namespaceCollector != null) {
