@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
+import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 import static eu.delving.sip.files.DataSetState.DELIMITED;
 import static eu.delving.sip.files.DataSetState.EMPTY;
 import static eu.delving.sip.files.DataSetState.IMPORTED;
@@ -125,11 +126,9 @@ public class TestStorage {
         dataSet().importedToSource(null);
         assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
 
-//        todo analyze again, this time source
-//        statistics.convertToSourcePaths(StorageBase.getRecordRoot(dataSet().getHints()));
-//        dataSet().setStatistics(statistics);
-//        assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
-//        assertEquals(ANALYZED_SOURCE, dataSet().getState());
+        analyze();
+        assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
+        assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
         statistics = dataSet().getLatestStatistics();
         assertTrue("Should be less items in analysis", statistics.size() < statsSize);
@@ -219,7 +218,7 @@ public class TestStorage {
                         case ANALYZED_IMPORT:
                             recordRoot = new Path("/adlibXML/recordList/record");
                             break;
-                        case SOURCED: // todo: not analyzed?
+                        case ANALYZED_SOURCE:
                             recordRoot = Storage.RECORD_ROOT;
                             break;
                         default:
