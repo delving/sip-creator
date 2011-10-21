@@ -229,7 +229,7 @@ public class Harvestor implements Runnable {
             switch (event.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     StartElement start = event.asStartElement();
-                    path.push(Tag.create(start.getName().getPrefix(), start.getName().getLocalPart()));
+                    path.push(Tag.element(start.getName()));
                     if (!recordEvents.isEmpty()) {
                         recordEvents.add(event);
                     }

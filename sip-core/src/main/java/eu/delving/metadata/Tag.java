@@ -21,9 +21,6 @@
 
 package eu.delving.metadata;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import javax.xml.namespace.QName;
 import java.io.Serializable;
 
@@ -31,39 +28,58 @@ import java.io.Serializable;
  * @author Gerald de Jong, Delving BV, <geralddejong@gmail.com>
  */
 
-@XStreamAlias("tag")
 public class Tag implements Comparable<Tag>, Serializable {
-
-    @XStreamAsAttribute
+    private boolean attribute;
     private String prefix;
-
-    @XStreamAsAttribute
     private String localName;
 
-    public static Tag create(QName qname) {
-        return create(qname.getPrefix(), qname.getLocalPart());
+    public static Tag element(QName qname) {
+        return element(qname.getPrefix(), qname.getLocalPart());
     }
 
-    public static Tag create(String prefix, String localName) {
-        return new Tag(prefix, localName);
+    public static Tag attribute(QName qname) {
+        return attribute(qname.getPrefix(), qname.getLocalPart());
     }
 
-    public static Tag create(String tagString) {
+    public static Tag element(String prefix, String localName) {
+        return new Tag(false, prefix, localName);
+    }
+
+    public static Tag attribute(String prefix, String localName) {
+        return new Tag(true, prefix, localName);
+    }
+
+    public static Tag element(String tagString) {
         int colon = tagString.indexOf(':');
         if (colon < 0) {
-            return create(null, tagString);
+            return element(null, tagString);
         }
         else {
-            return create(tagString.substring(0, colon), tagString.substring(colon+1));
+            return element(tagString.substring(0, colon), tagString.substring(colon + 1));
         }
     }
 
-    private Tag(String prefix, String localName) {
+    public static Tag attribute(String tagString) {
+        int colon = tagString.indexOf(':');
+        if (colon < 0) {
+            return attribute(null, tagString);
+        }
+        else {
+            return attribute(tagString.substring(0, colon), tagString.substring(colon + 1));
+        }
+    }
+
+    private Tag(boolean attribute, String prefix, String localName) {
         if (prefix != null && prefix.isEmpty()) {
             prefix = null;
         }
+        this.attribute = attribute;
         this.prefix = prefix;
         this.localName = localName;
+    }
+
+    public boolean isAttribute() {
+        return attribute;
     }
 
     public String getPrefix() {
@@ -80,6 +96,12 @@ public class Tag implements Comparable<Tag>, Serializable {
             return 1;
         }
         if (prefix != null && tag.prefix == null) {
+            return -1;
+        }
+        if (!attribute && tag.attribute) {
+            return 1;
+        }
+        if (attribute && !tag.attribute) {
             return -1;
         }
         if (prefix != null && tag.prefix != null) {
@@ -106,12 +128,21 @@ public class Tag implements Comparable<Tag>, Serializable {
         return result;
     }
 
-    public String toString() {
-        if (prefix != null) {
-            return prefix+":"+localName;
+    public String toPathElement() {
+        if (attribute) {
+            return "@" + (prefix != null ? prefix + ":" + localName : localName);
         }
         else {
-            return localName;
+            return "/" + (prefix != null ? prefix + ":" + localName : localName);
+        }
+    }
+
+    public String toString() {
+        if (attribute) {
+            return "@" + (prefix != null ? prefix + ":" + localName : localName);
+        }
+        else {
+            return prefix != null ? prefix + ":" + localName : localName;
         }
     }
 }

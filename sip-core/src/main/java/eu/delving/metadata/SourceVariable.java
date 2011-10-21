@@ -21,6 +21,9 @@
 
 package eu.delving.metadata;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * Hold a variable for later use
  *
@@ -30,11 +33,21 @@ package eu.delving.metadata;
 public class SourceVariable implements Comparable<SourceVariable> {
     private AnalysisTree.Node node;
     private String variableName;
+    private Set<String> attributeNames = new TreeSet<String>();
     private int mappingCount;
 
     public SourceVariable(AnalysisTree.Node node) {
         this.node = node;
         this.variableName = node.getVariableName();
+        for (AnalysisTree.Node child : node.getChildNodes()) {
+            if (child.getTag().isAttribute()) {
+                attributeNames.add(child.getTag().toString());
+            }
+        }
+    }
+
+    public Set<String> getAttributeNames() {
+        return attributeNames;
     }
 
     public void checkIfMapped(String variableName) {
@@ -53,6 +66,9 @@ public class SourceVariable implements Comparable<SourceVariable> {
 
     public String toString() {
         StringBuilder out = new StringBuilder(variableName);
+        if (!attributeNames.isEmpty()) {
+            out.append(attributeNames);
+        }
         switch (mappingCount) {
             case 0:
                 break;

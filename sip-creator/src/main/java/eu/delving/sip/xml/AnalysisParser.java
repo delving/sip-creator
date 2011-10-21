@@ -103,11 +103,11 @@ public class AnalysisParser implements Runnable {
                                 listener.progress(count);
                             }
                         }
-                        path.push(Tag.create(input.getName().getPrefix(), input.getName().getLocalPart()));
+                        path.push(Tag.element(input.getName()));
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                 QName attributeName = input.getAttributeName(walk);
-                                path.push(Tag.create(attributeName.getPrefix(), '@' + attributeName.getLocalPart()));
+                                path.push(Tag.attribute(attributeName));
                                 recordValue(input.getAttributeValue(walk));
                                 path.pop();
                             }

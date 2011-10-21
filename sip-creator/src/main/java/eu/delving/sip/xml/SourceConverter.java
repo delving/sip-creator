@@ -100,11 +100,10 @@ public class SourceConverter {
                         break;
                     case XMLEvent.START_ELEMENT:
                         StartElement start = event.asStartElement();
-                        path.push(Tag.create(start.getName()));
+                        path.push(Tag.element(start.getName()));
                         if (!eventBuffer.isEmpty()) {
                             if (unique == null && path.equals(uniqueElementPath)) uniqueBuilder = new StringBuilder();
-                            eventBuffer.add(eventFactory.createStartElement(start.getName(), null, null));
-                            handleAttributes(start);
+                            eventBuffer.add(start); // includes attributes
                         }
                         else if (path.equals(recordRootPath)) {
                             if (namespaceCollector != null) {
@@ -114,7 +113,7 @@ public class SourceConverter {
                                 namespaceCollector = null;
                             }
                             eventBuffer.add(eventFactory.createCharacters("\n")); // nonempty: flag that record has started
-                            handleAttributes(start);
+                            handleRecordAttributes(start);
                             if (progressListener != null) progressListener.setProgress(recordCount);
                         }
                         else if (namespaceCollector != null) {
@@ -204,14 +203,14 @@ public class SourceConverter {
         uniqueBuilder = null;
     }
 
-    private void handleAttributes(StartElement start) {
+    private void handleRecordAttributes(StartElement start) {
         Iterator attrWalk = start.getAttributes();
         if (attrWalk.hasNext()) eventBuffer.add(eventFactory.createCharacters("\n"));
-        while (attrWalk.hasNext()) handlAttribute((Attribute) attrWalk.next());
+        while (attrWalk.hasNext()) handleRecordAttribute((Attribute) attrWalk.next());
     }
 
-    private void handlAttribute(Attribute attr) {
-        path.push(Tag.create(attr.getName()));
+    private void handleRecordAttribute(Attribute attr) {
+        path.push(Tag.element(attr.getName()));
         addAttributeAsElement(attr);
         if (path.equals(uniqueElementPath) && unique == null) unique = attr.getValue();
         path.pop();

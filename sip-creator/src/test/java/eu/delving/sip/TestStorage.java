@@ -134,7 +134,7 @@ public class TestStorage {
         assertTrue("Should be less items in analysis", statistics.size() < statsSize);
         assertTrue("Should be source format", statistics.isSourceFormat());
         AnalysisTree tree = statistics.createAnalysisTree();
-        assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.create(Storage.ENVELOPE_TAG)));
+        assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.element(Storage.ENVELOPE_TAG)));
 
         RecordMapping recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
         assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recordMapping.getPrefix());

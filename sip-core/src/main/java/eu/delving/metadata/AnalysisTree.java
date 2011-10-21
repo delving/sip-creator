@@ -86,13 +86,13 @@ public class AnalysisTree implements Serializable {
     }
 
     public static AnalysisTree create(String rootTag) {
-        return new AnalysisTree(new AnalysisTreeNode(Tag.create(rootTag)));
+        return new AnalysisTree(new AnalysisTreeNode(Tag.element(rootTag)));
     }
 
     public static AnalysisTree create(List<FieldStatistics> fieldStatisticsList) {
         AnalysisTreeNode root = createSubtree(fieldStatisticsList, new Path(), null);
         if (root == null) {
-            root = new AnalysisTreeNode(Tag.create("No statistics"));
+            root = new AnalysisTreeNode(Tag.element("No statistics"));
         }
         return new AnalysisTree(root);
     }
@@ -140,17 +140,11 @@ public class AnalysisTree implements Serializable {
     }
 
     private static void getVariables(AnalysisTreeNode node, boolean withinRecord, List<Node> variables) {
-        if (node.isLeaf()) {
-            if (withinRecord) {
-                if (!node.getTag().getLocalName().startsWith("@")) {
-                    variables.add(node);
-                }
-            }
+        if (withinRecord && node.hasStatistics() && !node.getTag().isAttribute()) {
+            variables.add(node);
         }
-        else {
-            for (AnalysisTreeNode child : node.getChildren()) {
-                getVariables(child, withinRecord || node.isRecordRoot(), variables);
-            }
+        for (AnalysisTreeNode child : node.getChildren()) {
+            getVariables(child, withinRecord || node.isRecordRoot(), variables);
         }
     }
 
