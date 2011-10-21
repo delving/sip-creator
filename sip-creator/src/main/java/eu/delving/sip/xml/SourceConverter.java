@@ -70,7 +70,6 @@ public class SourceConverter {
     private Path path = new Path();
     private StringBuilder uniqueBuilder;
     private String unique;
-    private StringBuilder contentBuilder;
     private List<XMLEvent> eventBuffer = new ArrayList<XMLEvent>();
     private boolean finished = false;
     private NamespaceCollector namespaceCollector = new NamespaceCollector();
@@ -137,7 +136,6 @@ public class SourceConverter {
                                     }
                                     uniqueBuilder = null;
                                 }
-                                addWrappedContent();
                                 eventBuffer.add(event);
                                 eventBuffer.add(eventFactory.createCharacters("\n"));
                             }
@@ -157,13 +155,7 @@ public class SourceConverter {
                             String string = ValueFilter.filter(event.asCharacters().getData());
                             if (!string.isEmpty()) {
                                 if (uniqueBuilder != null) uniqueBuilder.append(string);
-                                if (contentBuilder != null) {
-                                    if (contentBuilder.length() > 0) contentBuilder.append(' ');
-                                    contentBuilder.append(string);
-                                }
-                                else {
-                                    eventBuffer.add(eventFactory.createCharacters(string));
-                                }
+                                eventBuffer.add(eventFactory.createCharacters(string));
                             }
                         }
                         break;
@@ -174,18 +166,6 @@ public class SourceConverter {
             if (progressListener != null) progressListener.finished(finished);
             inputStream.close();
             outputStream.close();
-        }
-    }
-
-    private void addWrappedContent() {
-        if (contentBuilder != null) { // the value has been accumulated instead of output immediately, so wrap it
-            if (contentBuilder.length() > 0) {
-                eventBuffer.add(eventFactory.createStartElement("", "", Storage.CONTENT_TAG, null, null));
-                eventBuffer.add(eventFactory.createCharacters(contentBuilder.toString()));
-                eventBuffer.add(eventFactory.createEndElement("", "", Storage.CONTENT_TAG, null));
-                eventBuffer.add(eventFactory.createCharacters("\n"));
-            }
-            contentBuilder = null;
         }
     }
 
@@ -221,7 +201,6 @@ public class SourceConverter {
         eventBuffer.add(eventFactory.createCharacters(attr.getValue()));
         eventBuffer.add(eventFactory.createEndElement(attr.getName(), null));
         eventBuffer.add(eventFactory.createCharacters("\n"));
-        if (contentBuilder == null) contentBuilder = new StringBuilder();
     }
 
     private class NamespaceCollector {
