@@ -98,7 +98,16 @@ public class AllFrames {
                         block(recordMapping, 1, 0),
                         block(output, 2, 0)
                 ),
-                view("Show and tell",
+                view("Decadent Display",
+                        block(create, 0, 0, 3, 3),
+                        block(statistics, 0, 3, 2, 3),
+                        block(input, 5, 0, 2, 4),
+                        block(recordMapping, 3, 0, 2, 3),
+                        block(fieldMapping, 2, 3, 3, 5),
+                        block(output, 5, 4, 2, 4),
+                        block(status, 0, 6, 2, 2)
+                ),
+                view("Projector",
                         block(analysis, 0, 0),
                         block(create, 0, 0),
                         block(statistics, 0, 0),
@@ -108,20 +117,22 @@ public class AllFrames {
                         block(output, 0, 0),
                         block(status, 0, 0)
                 ),
-                view("Decadent Display",
-                        block(create, 0, 0, 3, 3),
-                        block(statistics, 0, 3, 2, 3),
-                        block(input, 5, 0, 2, 4),
-                        block(recordMapping, 3, 0, 2, 3),
-                        block(fieldMapping, 2, 3, 3, 5),
-                        block(output, 5, 4, 2, 4),
-                        block(status, 0, 6, 2, 2)
-                )
         };
     }
 
     public void putState() {
         for (FrameBase frame : frames) frame.putState();
+    }
+
+    public void select(int viewNumber) {
+        if (viewNumber < 0) {
+            for (FrameBase frame : frames) {
+                frame.closeFrame();
+            }
+        }
+        else {
+            views[viewNumber].actionPerformed(null);
+        }
     }
 
     public void restore() {
