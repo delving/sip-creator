@@ -174,6 +174,7 @@ public class Application {
                 new UploadAction(desktop, sipModel, cultureHubClient)
         };
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
+        home.getContentPane().add(allFrames.getButtonPanel(), BorderLayout.WEST);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));

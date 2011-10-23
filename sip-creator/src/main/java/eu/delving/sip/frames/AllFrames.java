@@ -27,11 +27,22 @@ import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -44,8 +55,9 @@ import static eu.delving.sip.base.FrameBase.INSETS;
  */
 
 public class AllFrames {
+    private Dimension ICON_SIZE = new Dimension(80, 50);
     private FrameBase[] frames;
-    private Action[] views;
+    private Arrangement[] views;
     private JDesktopPane desktop;
     private int viewIndex = 1;
 
@@ -62,7 +74,7 @@ public class AllFrames {
                 recordMapping = new RecordMappingFrame(desktop, sipModel),
                 output = new OutputFrame(desktop, sipModel)
         };
-        this.views = new Action[]{
+        this.views = new Arrangement[]{
                 view("First contact",
                         block(analysis, 0, 0, 1, 3),
                         block(statistics, 1, 0, 1, 2),
@@ -78,7 +90,7 @@ public class AllFrames {
                         block(fieldMapping, 1, 0, 3, 1),
                         block(input, 4, 0)
                 ),
-                view("Deep code delving",
+                view("Deep delving",
                         block(fieldMapping, 0, 0)
                 ),
                 view("Big picture",
@@ -86,7 +98,6 @@ public class AllFrames {
                         block(recordMapping, 1, 0),
                         block(output, 2, 0)
                 ),
-                view("Clear"),
                 view("Show and tell",
                         block(analysis, 0, 0),
                         block(create, 0, 0),
@@ -135,6 +146,22 @@ public class AllFrames {
         return menu;
     }
 
+    public JPanel getButtonPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBorder(BorderFactory.createTitledBorder("Views"));
+        for (Arrangement a : views) {
+            JButton b = new JButton(a);
+            b.setHorizontalTextPosition(JButton.CENTER);
+            b.setVerticalTextPosition(JButton.BOTTOM);
+            b.setFont(new Font("Sans", Font.ITALIC, 10));
+            p.add(b);
+            p.add(Box.createVerticalStrut(5));
+        }
+        p.add(Box.createVerticalGlue());
+        return p;
+    }
+
     private Arrangement view(String name, Block... blocks) {
         return new Arrangement(name, viewIndex++, blocks);
     }
@@ -145,6 +172,11 @@ public class AllFrames {
 
     private Block block(FrameBase frame, int x, int y, int w, int h) {
         return new Block(frame, x, y, w, h);
+    }
+
+    private class Situation {
+        Point location;
+        Dimension size;
     }
 
     private class Block {
@@ -159,14 +191,13 @@ public class AllFrames {
             this.h = h;
         }
 
-        void positionIn(int rows, int cols) {
-            Dimension all = desktop.getSize();
+        Situation situate(Dimension all, int rows, int cols, boolean useInsets) {
             int wx = all.width / cols - (all.width % 2);
             int hx = all.height / rows - (all.height % 2);
-            Point loc = new Point(x * wx - INSETS.left, y * hx - INSETS.top);
-            Dimension size = new Dimension(w * wx + INSETS.left + INSETS.right, h * hx + INSETS.top + INSETS.bottom);
-            frame.setLocation(loc);
-            frame.setSize(size);
+            Situation situation = new Situation();
+            situation.location = useInsets ? new Point(x * wx - INSETS.left, y * hx - INSETS.top) : new Point(x * wx, y * hx);
+            situation.size = useInsets ? new Dimension(w * wx + INSETS.left + INSETS.right, h * hx + INSETS.top + INSETS.bottom) : new Dimension(w * wx, h * hx);
+            return situation;
         }
 
         int rows(int max) {
@@ -185,9 +216,10 @@ public class AllFrames {
             super(name);
             putValue(
                     Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, KeyEvent.CTRL_MASK)
+                    KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
             );
             this.blocks = blocks;
+            putValue(Action.SMALL_ICON, new ViewIcon(this));
         }
 
         @Override
@@ -202,11 +234,49 @@ public class AllFrames {
                 frame.closeFrame();
             }
             for (Block block : blocks) {
-                block.positionIn(rows, cols);
+                Situation situation = block.situate(desktop.getSize(), rows, cols, true);
+                block.frame.setLocation(situation.location);
+                block.frame.setSize(situation.size);
             }
             for (Block block : blocks) {
                 block.frame.openFrame(false);
             }
         }
+
     }
+
+    private class ViewIcon implements Icon {
+
+        private Arrangement a;
+
+        private ViewIcon(Arrangement a) {
+            this.a = a;
+        }
+
+        @Override
+        public void paintIcon(Component component, Graphics graphics, int x, int y) {
+            Graphics2D g = (Graphics2D) graphics;
+            int rows = 0;
+            int cols = 0;
+            for (Block block : a.blocks) {
+                rows = block.rows(rows);
+                cols = block.cols(cols);
+            }
+            for (Block block : a.blocks) {
+                Situation situation = block.situate(ICON_SIZE, rows, cols, false);
+                g.drawRect(x + situation.location.x + 1, y + situation.location.y + 1, situation.size.width, situation.size.height);
+            }
+        }
+
+        @Override
+        public int getIconWidth() {
+            return ICON_SIZE.width + 4;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return ICON_SIZE.height + 4;
+        }
+    }
+
 }
