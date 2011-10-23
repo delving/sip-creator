@@ -359,7 +359,7 @@ public class Application {
         }
 
         @Override
-        public Feedback getNotifier() {
+        public Feedback getFeedback() {
             return feedback;
         }
     }
