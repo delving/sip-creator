@@ -254,7 +254,7 @@ public class AnalysisFrame extends FrameBase {
         }
 
         private void expandEmptyNodes(AnalysisTree.Node node) {
-            if (node.couldBeRecordRoot()) {
+            if (!node.isLeaf()) {
                 TreePath path = node.getTreePath();
                 statisticsJTree.expandPath(path);
             }

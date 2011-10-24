@@ -23,13 +23,11 @@ package eu.delving.sip.files;
 
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.Path;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -58,27 +56,6 @@ public class Statistics implements Serializable {
 
     public AnalysisTree createAnalysisTree() {
         return AnalysisTree.create(fieldStatisticsList);
-    }
-
-    public void convertToSourcePaths(Path recordRoot) {
-        if (sourceFormat) throw new IllegalStateException("Statistics already in source format");
-        Iterator<FieldStatistics> walk = fieldStatisticsList.iterator();
-        String underRoot = new Path(recordRoot).pop().toString();
-        while (walk.hasNext()) {
-            FieldStatistics stats = walk.next();
-            String pathString = stats.getPath().toString();
-            if (pathString.startsWith(recordRoot.toString())) {
-                String fixed = Storage.RECORD_ROOT.toString() + pathString.substring(recordRoot.toString().length());
-                stats.setPath(new Path(fixed));
-            }
-            else if (pathString.equals(underRoot)) {
-                stats.setPath(new Path(Storage.ENVELOPE_TAG));
-            }
-            else {
-                walk.remove();
-            }
-        }
-        sourceFormat = true;
     }
 
     public int size() {

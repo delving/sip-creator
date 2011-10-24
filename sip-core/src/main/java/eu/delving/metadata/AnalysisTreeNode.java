@@ -68,6 +68,10 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
         return children;
     }
 
+    public boolean hasStatistics() {
+        return fieldStatistics != null;
+    }
+
     @Override
     public FieldStatistics getStatistics() {
         return fieldStatistics;
@@ -143,6 +147,7 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
 
     @Override
     public String getVariableName() {
+        if (tag.isAttribute()) throw new RuntimeException("Should never ask an attribute for its variable name");
         List<AnalysisTreeNode> path = new ArrayList<AnalysisTreeNode>();
         AnalysisTreeNode node = this;
         while (node != null && !node.isRecordRoot()) {
@@ -196,13 +201,12 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
 
     @Override
     public boolean getAllowsChildren() {
-        return fieldStatistics != null && !fieldStatistics.hasValues();
-//        return !children.isEmpty();
+        return !children.isEmpty();
     }
 
     @Override
     public boolean isLeaf() {
-        return fieldStatistics != null && fieldStatistics.hasValues();
+        return children.isEmpty();
     }
 
     @Override
