@@ -193,14 +193,15 @@ public class CultureHubClient {
                 if (entity != null) {
                     if (code == Code.OK) {
                         DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
-                        EntityUtils.consume(entity);
                         say("List received");
                         listReceiveListener.listReceived(dataSetList.list);
                     }
                     else {
                         code.notifyUser(context);
+                        listReceiveListener.failed(new Exception("Not OK, but "+code));
                         context.invalidateTokens();
                     }
+                    EntityUtils.consume(entity);
                 }
                 else {
                     throw new IOException("Response was empty");

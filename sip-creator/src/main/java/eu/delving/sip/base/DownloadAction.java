@@ -119,6 +119,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
 
     @Override
     public void failed(Exception e) {
+        LOG.warn("Fetching list failed", e);
         Exec.swing(new Runnable() {
             @Override
             public void run() {
