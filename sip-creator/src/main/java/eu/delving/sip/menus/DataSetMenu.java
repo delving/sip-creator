@@ -22,12 +22,12 @@
 package eu.delving.sip.menus;
 
 import eu.delving.metadata.FactDefinition;
+import eu.delving.metadata.FieldMapping;
+import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
-import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;
@@ -50,20 +50,25 @@ public class DataSetMenu extends JMenu {
     public DataSetMenu(SipModel sipModel) {
         super("Data Sets");
         this.sipModel = sipModel;
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
-
+        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet) {
-                refresh();
+            public void factChanged() {
             }
 
             @Override
-            public void dataSetRemoved() {
-                refresh();
+            public void select(FieldMapping fieldMapping) {
             }
 
             @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+            public void fieldMappingChanged() {
+            }
+
+            @Override
+            public void recordMappingChanged(RecordMapping recordMapping) {
+            }
+
+            @Override
+            public void recordMappingSelected(RecordMapping recordMapping) {
                 refresh();
             }
         });
