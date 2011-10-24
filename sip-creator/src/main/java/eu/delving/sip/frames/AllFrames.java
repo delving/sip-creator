@@ -55,7 +55,8 @@ import static eu.delving.sip.base.FrameBase.INSETS;
  */
 
 public class AllFrames {
-    private Dimension ICON_SIZE = new Dimension(80, 50);
+    private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
+    private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
     private FrameBase[] frames;
     private Arrangement[] views;
     private JDesktopPane desktop;
@@ -230,7 +231,8 @@ public class AllFrames {
                     KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
             );
             this.blocks = blocks;
-            putValue(Action.SMALL_ICON, new ViewIcon(this));
+            putValue(Action.SMALL_ICON, new ViewIcon(this, SMALL_ICON_SIZE));
+            putValue(Action.LARGE_ICON_KEY, new ViewIcon(this, LARGE_ICON_SIZE));
         }
 
         @Override
@@ -257,11 +259,12 @@ public class AllFrames {
     }
 
     private class ViewIcon implements Icon {
-
         private Arrangement a;
+        private Dimension size;
 
-        private ViewIcon(Arrangement a) {
+        private ViewIcon(Arrangement a, Dimension size) {
             this.a = a;
+            this.size = size;
         }
 
         @Override
@@ -274,19 +277,19 @@ public class AllFrames {
                 cols = block.cols(cols);
             }
             for (Block block : a.blocks) {
-                Situation situation = block.situate(ICON_SIZE, rows, cols, false);
+                Situation situation = block.situate(size, rows, cols, false);
                 g.drawRect(x + situation.location.x + 1, y + situation.location.y + 1, situation.size.width, situation.size.height);
             }
         }
 
         @Override
         public int getIconWidth() {
-            return ICON_SIZE.width + 4;
+            return size.width + 4;
         }
 
         @Override
         public int getIconHeight() {
-            return ICON_SIZE.height + 4;
+            return size.height + 4;
         }
     }
 
