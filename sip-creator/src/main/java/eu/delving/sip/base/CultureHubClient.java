@@ -88,7 +88,7 @@ public class CultureHubClient {
 
         void dataSetCreated(DataSet dataSet);
 
-        Feedback getNotifier();
+        Feedback getFeedback();
     }
 
     public enum Code {
@@ -107,7 +107,7 @@ public class CultureHubClient {
         }
 
         void notifyUser(Context context) {
-            context.getNotifier().alert("Problem communicating with hub: " + say);
+            context.getFeedback().alert("Problem communicating with hub: " + say);
         }
 
         static Code from(HttpResponse httpResponse) {
@@ -188,6 +188,7 @@ public class CultureHubClient {
                         context.getAccessToken()
                 );
                 log.info("requesting list: " + url);
+                say("Requesting data set list from culture hub");
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
@@ -197,7 +198,7 @@ public class CultureHubClient {
                     if (code == Code.OK) {
                         DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
                         EntityUtils.consume(entity);
-                        log.info("list received:\n" + dataSetList);
+                        say("List received");
                         listReceiveListener.listReceived(dataSetList.list);
                     }
                     else {
@@ -215,7 +216,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.error("Unable to fetch list", e);
-                context.getNotifier().alert(String.format("Error fetching list from hub: %s", e.getMessage()));
+                context.getFeedback().alert(String.format("Error fetching list from hub: %s", e.getMessage()));
                 listReceiveListener.failed(e);
             }
         }
@@ -241,6 +242,7 @@ public class CultureHubClient {
                 );
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
+                say("Unlocking data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 EntityUtils.consume(response.getEntity());
                 Code code = Code.from(response);
@@ -258,7 +260,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.error("Unable to unlock dataset", e);
-                context.getNotifier().alert(String.format("Error unlocking dataset server: %s", e.getMessage()));
+                context.getFeedback().alert(String.format("Error unlocking dataset server: %s", e.getMessage()));
                 unlockListener.unlockComplete(false);
             }
         }
@@ -284,6 +286,7 @@ public class CultureHubClient {
                         context.getAccessToken()
                 ));
                 get.setHeader("Accept", "application/zip");
+                say("Downloading SIP for data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
@@ -292,6 +295,7 @@ public class CultureHubClient {
                         dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
                         success = true;
                         context.dataSetCreated(dataSet);
+                        say(String.format("Local data set %s created in workspace", dataSet.getSpec()));
                     }
                     else {
                         context.invalidateTokens();
@@ -307,7 +311,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.warn("Unable to download data set", e);
-                context.getNotifier().alert("Unable to download data set"); // todo: tell them why
+                context.getFeedback().alert("Unable to download data set"); // todo: tell them why
             }
             finally {
                 if (!success) {
@@ -315,7 +319,7 @@ public class CultureHubClient {
                         dataSet.remove();
                     }
                     catch (StorageException e1) {
-                        context.getNotifier().alert("Unable to remove local data set");
+                        context.getFeedback().alert("Unable to remove local data set");
                     }
                 }
                 progressListener.finished(success);
@@ -385,7 +389,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.error("Error while connecting", e);
-                context.getNotifier().alert("Authorization system problem: " + e.getMessage());
+                context.getFeedback().alert("Authorization system problem: " + e.getMessage());
             }
             finally {
                 uploadListener.finished();
@@ -424,13 +428,13 @@ public class CultureHubClient {
         OAuthClient.Problem problem = OAuthClient.getProblem(e);
         switch (problem) {
             case EXPIRED_TOKEN:
-                context.getNotifier().alert(String.format("Expired token for user %s, please try again", context.getUser()));
+                context.getFeedback().alert(String.format("Expired token for user %s, please try again", context.getUser()));
                 break;
             case INVALID_GRANT:
-                context.getNotifier().alert(String.format("Invalid password for user %s", context.getUser()));
+                context.getFeedback().alert(String.format("Invalid password for user %s", context.getUser()));
                 break;
             default:
-                context.getNotifier().alert("Authorization problem: " + problem);
+                context.getFeedback().alert("Authorization problem: " + problem);
                 break;
         }
     }
@@ -454,10 +458,9 @@ public class CultureHubClient {
         }
     }
 
-//    private void notifyUser(final String message) {
-//        log.warn("Problem communicating with CultureHub: " + message);
-//        context.getNotifier().alert("Problem communicating with hub: " + message);
-//    }
+    private void say(String message) {
+        context.getFeedback().say(message);
+    }
 
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {
         private final File file;

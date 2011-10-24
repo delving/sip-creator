@@ -90,9 +90,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import static eu.delving.sip.files.DataSetState.IMPORTED;
-import static eu.delving.sip.files.DataSetState.SOURCED;
-
 /**
  * The main application
  *
@@ -174,6 +171,7 @@ public class Application {
                 new UploadAction(desktop, sipModel, cultureHubClient)
         };
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
+        home.getContentPane().add(allFrames.getButtonPanel(), BorderLayout.WEST);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
@@ -207,19 +205,19 @@ public class Application {
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 statusLabel.setText(dataSetState.toHtml());
-                if (dataSetState == IMPORTED || dataSetState == SOURCED) {
-                    feedback.say("Analysis triggered");
-                    sipModel.analyzeFields(new SipModel.AnalysisListener() {
-                        @Override
-                        public void analysisProgress(final long elementCount) {
-                            Exec.swing(new Runnable() {
-                                @Override
-                                public void run() {
-                                    statusLabel.setText(String.format("Analyzed %d elements", elementCount));
-                                }
-                            });
-                        }
-                    });
+                switch (dataSetState) {
+                    case EMPTY:
+                        allFrames.select(-1);
+                        break;
+                    case IMPORTED:
+                        performAnalysis();
+                        break;
+                    case ANALYZED_IMPORT:
+                        allFrames.select(0);
+                        break;
+                    case SOURCED:
+                        performAnalysis();
+                        break;
                 }
             }
         });
@@ -251,6 +249,20 @@ public class Application {
             }
         });
         osxExtra();
+    }
+
+    private void performAnalysis() {
+        sipModel.analyzeFields(new SipModel.AnalysisListener() {
+            @Override
+            public void analysisProgress(final long elementCount) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        statusLabel.setText(String.format("Analyzed %d elements", elementCount));
+                    }
+                });
+            }
+        });
     }
 
     private boolean quit() {
@@ -347,7 +359,7 @@ public class Application {
         }
 
         @Override
-        public Feedback getNotifier() {
+        public Feedback getFeedback() {
             return feedback;
         }
     }

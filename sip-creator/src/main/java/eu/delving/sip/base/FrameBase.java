@@ -43,7 +43,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -136,7 +135,7 @@ public abstract class FrameBase extends JInternalFrame {
     public void setAccelerator(int number) {
         action.putValue(
                 Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_0 + number, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+                KeyStroke.getKeyStroke(KeyEvent.VK_0 + number, KeyEvent.CTRL_MASK)
         );
     }
 
