@@ -182,11 +182,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                String url = String.format(
-                        "%s/list?accessKey=%s",
-                        context.getServerUrl(),
-                        context.getAccessToken()
-                );
+                String url = createListRequest();
                 log.info("requesting list: " + url);
                 say("Requesting data set list from culture hub");
                 HttpGet get = new HttpGet(url);
@@ -220,6 +216,13 @@ public class CultureHubClient {
                 listReceiveListener.failed(e);
             }
         }
+
+        private String createListRequest() throws OAuthSystemException, OAuthProblemException {
+            return String.format(
+                    "%s/list?accessKey=%s",
+                    context.getServerUrl(), context.getAccessToken()
+            );
+        }
     }
 
     private class Unlocker implements Runnable {
@@ -234,14 +237,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                String url = String.format(
-                        "%s/unlock/%s?accessKey=%s",
-                        context.getServerUrl(),
-                        dataSet.getSpec(),
-                        context.getAccessToken()
-                );
-                HttpGet get = new HttpGet(url);
-                get.setHeader("Accept", "text/xml");
+                HttpGet get = createUnlockRequest();
                 say("Unlocking data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 EntityUtils.consume(response.getEntity());
@@ -264,6 +260,16 @@ public class CultureHubClient {
                 unlockListener.unlockComplete(false);
             }
         }
+
+        private HttpGet createUnlockRequest() throws OAuthSystemException, OAuthProblemException {
+            String url = String.format(
+                    "%s/unlock/%s?accessKey=%s",
+                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
+            );
+            HttpGet get = new HttpGet(url);
+            get.setHeader("Accept", "text/xml");
+            return get;
+        }
     }
 
     private class DataSetDownloader implements Runnable {
@@ -279,13 +285,7 @@ public class CultureHubClient {
         public void run() {
             boolean success = false;
             try {
-                HttpGet get = new HttpGet(String.format(
-                        "%s/fetch/%s-sip.zip?accessKey=%s",
-                        context.getServerUrl(),
-                        dataSet.getSpec(),
-                        context.getAccessToken()
-                ));
-                get.setHeader("Accept", "application/zip");
+                HttpGet get = createDownloadRequest();
                 say("Downloading SIP for data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 HttpEntity entity = response.getEntity();
@@ -293,6 +293,7 @@ public class CultureHubClient {
                     Code code = Code.from(response);
                     if (code == Code.OK) {
                         dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                        EntityUtils.consume(entity);
                         success = true;
                         context.dataSetCreated(dataSet);
                         say(String.format("Local data set %s created in workspace", dataSet.getSpec()));
@@ -325,6 +326,15 @@ public class CultureHubClient {
                 progressListener.finished(success);
             }
         }
+
+        private HttpGet createDownloadRequest() throws OAuthSystemException, OAuthProblemException {
+            HttpGet get = new HttpGet(String.format(
+                    "%s/fetch/%s-sip.zip?accessKey=%s",
+                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
+            ));
+            get.setHeader("Accept", "application/zip");
+            return get;
+        }
     }
 
     public class FileUploader implements Runnable {
@@ -341,9 +351,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                HttpPost listRequest = new HttpPost(createListRequestUrl());
-                listRequest.setEntity(createListEntity());
-                listRequest.setHeader("Accept", "text/plain");
+                HttpPost listRequest = createSubmitRequest();
                 HttpResponse listResponse = httpClient.execute(listRequest);
                 HttpEntity listEntity = listResponse.getEntity();
                 if (listEntity != null) {
@@ -362,9 +370,8 @@ public class CultureHubClient {
                         }
                         EntityUtils.consume(listResponse.getEntity());
                         for (File file : uploadFiles) {
+                            HttpPost upload = createUploadRequest(file);
                             log.info("Uploading " + file);
-                            HttpPost upload = new HttpPost(createFileRequestUrl(file));
-                            upload.setEntity(new FileEntity(file, uploadListener));
                             HttpResponse uploadResponse = httpClient.execute(upload);
                             EntityUtils.consume(uploadResponse.getEntity());
                             code = Code.from(uploadResponse);
@@ -396,6 +403,17 @@ public class CultureHubClient {
             }
         }
 
+        private HttpPost createSubmitRequest() throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
+            String url = String.format(
+                    "%s/submit/%s?accessKey=%s",
+                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
+            );
+            HttpPost post = new HttpPost(url);
+            post.setEntity(createListEntity());
+            post.setHeader("Accept", "text/plain");
+            return post;
+        }
+
         private HttpEntity createListEntity() throws UnsupportedEncodingException {
             StringBuilder fileList = new StringBuilder();
             for (File file : uploadFiles) {
@@ -404,24 +422,16 @@ public class CultureHubClient {
             return new StringEntity(fileList.toString());
         }
 
-        private String createListRequestUrl() throws OAuthSystemException, OAuthProblemException {
-            return String.format(
-                    "%s/submit/%s?accessKey=%s",
-                    context.getServerUrl(),
-                    dataSet.getSpec(),
-                    context.getAccessToken()
+        private HttpPost createUploadRequest(File file) throws OAuthSystemException, OAuthProblemException {
+            String url = String.format(
+                    "%s/submit/%s/%s?accessKey=%s",
+                    context.getServerUrl(), dataSet.getSpec(), file.getName(), context.getAccessToken()
             );
+            HttpPost upload = new HttpPost(url);
+            upload.setEntity(new FileEntity(file, uploadListener));
+            return upload;
         }
 
-        private String createFileRequestUrl(File file) throws OAuthSystemException, OAuthProblemException {
-            return String.format(
-                    "%s/submit/%s/%s?accessKey=%s",
-                    context.getServerUrl(),
-                    dataSet.getSpec(),
-                    file.getName(),
-                    context.getAccessToken()
-            );
-        }
     }
 
     private void reportOAuthProblem(OAuthProblemException e) {
