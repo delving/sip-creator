@@ -44,7 +44,16 @@ public class Path implements Comparable<Path>, Serializable {
                 pathString = "/" + pathString;
             }
             for (String part : pathString.substring(1).split("/")) {
-                stack.push(Tag.create(part));
+                int at = part.indexOf("@");
+                if (at > 0) {
+                    String element = part.substring(0, at);
+                    String attribute = part.substring(at + 1);
+                    stack.push(Tag.element(element));
+                    stack.push(Tag.attribute(attribute));
+                }
+                else {
+                    stack.push(Tag.element(part));
+                }
             }
         }
     }
@@ -84,6 +93,7 @@ public class Path implements Comparable<Path>, Serializable {
 
     @Override
     public boolean equals(Object path) {
+        if (path == null || !(path instanceof Path)) return false;
         return toString().equals(path.toString());
     }
 
@@ -121,8 +131,7 @@ public class Path implements Comparable<Path>, Serializable {
         if (string == null) {
             StringBuilder builder = new StringBuilder(150);
             for (Tag tag : stack) {
-                builder.append('/');
-                builder.append(tag);
+                builder.append(tag.toPathElement());
             }
             string = builder.toString();
         }

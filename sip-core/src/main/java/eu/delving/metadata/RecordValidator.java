@@ -107,11 +107,11 @@ public class RecordValidator {
             nodeToPath(node.parent(), path);
         }
         if (node.name() instanceof String) {
-            path.push(Tag.create((String) node.name()));
+            path.push(Tag.element((String) node.name()));
         }
         else if (node.name() instanceof QName) {
             QName q = (QName) node.name();
-            path.push(Tag.create(q.getPrefix(), q.getLocalPart()));
+            path.push(Tag.element(q.getPrefix(), q.getLocalPart()));
         }
         else {
             throw new IllegalStateException("Node name type is not recognized: " + node.name().getClass());

@@ -387,7 +387,6 @@ public class SipModel {
             public void run() {
                 try {
                     dataSetModel.getDataSet().importedToSource(progressListener);
-                    dataSetModel.getDataSet().setStatistics(analysisModel.convertStatistics());
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
