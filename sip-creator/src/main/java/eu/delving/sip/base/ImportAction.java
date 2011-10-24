@@ -31,7 +31,9 @@ import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
@@ -70,7 +72,8 @@ public class ImportAction extends AbstractAction {
     private HarvestPool harvestPool;
 
     public ImportAction(JDesktopPane parent, SipModel sipModel, HarvestPool harvestPool) {
-        super("Import");
+        super("Import new data into this data set");
+        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/import-icon.png")));
         this.parent = parent;
         this.sipModel = sipModel;
         this.harvestPool = harvestPool;

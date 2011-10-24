@@ -29,7 +29,9 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDesktopPane;
@@ -60,7 +62,8 @@ public class UploadAction extends AbstractAction {
     private JCheckBox releaseBox = new JCheckBox("Release lock and delete local dataset");
 
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
-        super("Upload");
+        super("Upload this data set");
+        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/upload-icon.png")));
         this.parent = parent;
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
