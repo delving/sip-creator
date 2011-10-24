@@ -77,7 +77,12 @@ public class Hasher {
             Hasher hasher = new Hasher();
             hasher.update(file);
             File hashedFile = new File(file.getParentFile(), hasher.prefixFileName(file.getName()));
-            FileUtils.moveFile(file, hashedFile);
+            if (hashedFile.exists()) {
+                FileUtils.deleteQuietly(file);
+            }
+            else {
+                FileUtils.moveFile(file, hashedFile);
+            }
             return hashedFile;
         }
     }
@@ -101,6 +106,7 @@ public class Hasher {
     public DigestOutputStream createDigestOutputStream(OutputStream outputStream) {
         return new DigestOutputStream(outputStream, messageDigest);
     }
+
     public void update(byte[] buffer, int bytes) {
         messageDigest.update(buffer, 0, bytes);
     }
@@ -123,7 +129,7 @@ public class Hasher {
         }
     }
 
-    public byte [] getHash(String value) {
+    public byte[] getHash(String value) {
         try {
             return messageDigest.digest(value.getBytes("UTF-8"));
         }
