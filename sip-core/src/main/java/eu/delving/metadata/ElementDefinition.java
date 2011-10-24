@@ -59,7 +59,7 @@ public class ElementDefinition {
 
     public Tag getTag() {
         if (tag == null) {
-            tag = Tag.create(prefix, localName);
+            tag = Tag.element(prefix, localName);
         }
         return tag;
     }

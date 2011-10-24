@@ -84,7 +84,7 @@ public class MetadataParser {
                 case XMLEvent.START_DOCUMENT:
                     break;
                 case XMLEvent.START_ELEMENT:
-                    path.push(Tag.create(input.getName().getPrefix(), input.getName().getLocalPart()));
+                    path.push(Tag.element(input.getName()));
                     if (node == null && path.equals(Storage.RECORD_ROOT)) {
                         node = new GroovyNode(null, "input");
                     }

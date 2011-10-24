@@ -73,7 +73,7 @@ public class CodeGenerator {
             fieldMapping.createDictionary(sourceVariable.getNode().getStatistics().getHistogramValues());
         }
         else {
-            eachBlock(fieldMapping, sourceVariable.getNode().getVariableName());
+            eachBlock(fieldMapping, sourceVariable);
         }
     }
 
@@ -114,7 +114,7 @@ public class CodeGenerator {
                 for (FieldDefinition definition : unmappedFieldDefinitions) {
                     if (definition.identifierField) {
                         FieldMapping fieldMapping = new FieldMapping(definition);
-                        eachBlock(fieldMapping, variable.getNode().getVariableName());
+                        eachBlock(fieldMapping, variable);
                         return fieldMapping;
                     }
                 }
@@ -123,7 +123,7 @@ public class CodeGenerator {
         return null;  //To change body of created methods use File | Settings | File Templates.
     }
 
-    private FieldMapping createObviousMappingFromFact(FieldDefinition fieldDefinition, List<FactDefinition>  factDefinitions) {
+    private FieldMapping createObviousMappingFromFact(FieldDefinition fieldDefinition, List<FactDefinition> factDefinitions) {
         FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
         for (FactDefinition factDefinition : factDefinitions) {
             if (factDefinition.name.equals(fieldDefinition.factName)) {
@@ -139,14 +139,23 @@ public class CodeGenerator {
             String variableName = variable.getVariableName();
             String fieldName = fieldDefinition.getFieldNameString();
             if (variableName.endsWith(fieldName)) {
-                eachBlock(fieldMapping, variable.getNode().getVariableName());
+                eachBlock(fieldMapping, variable);
             }
         }
         return fieldMapping.code == null ? null : fieldMapping;
     }
 
-    private void eachBlock(FieldMapping fieldMapping, String source) {
-        fieldMapping.addCodeLine(String.format("%s * {", fieldMapping.getDefinition().addOptionalConverter(source)));
+    private void eachBlock(FieldMapping fieldMapping, SourceVariable sourceVariable) {
+        fieldMapping.addCodeLine(String.format("%s * {", fieldMapping.getDefinition().addOptionalConverter(sourceVariable.getVariableName())));
+        for (String attribute : sourceVariable.getAttributeNames()) {
+            attributeComment(fieldMapping, attribute);
+        }
+        line(fieldMapping, "it");
+        fieldMapping.addCodeLine("}");
+    }
+
+    private void eachBlock(FieldMapping fieldMapping, String expression) {
+        fieldMapping.addCodeLine(String.format("%s * {", fieldMapping.getDefinition().addOptionalConverter(expression)));
         line(fieldMapping, "it");
         fieldMapping.addCodeLine("}");
     }
@@ -177,6 +186,10 @@ public class CodeGenerator {
                         parameter
                 )
         );
+    }
+
+    private void attributeComment(FieldMapping fieldMapping, String attributeName) {
+        fieldMapping.addCodeLine(String.format("// attribute available: it.'%s'",attributeName));
     }
 
 }

@@ -90,7 +90,7 @@ public interface Storage {
     }
 
     String ENVELOPE_TAG = "delving-sip-source";
-    String UNIQUE_TAG = "delving-unique-id";
+    String UNIQUE_TAG = "_id";
     String RECORD_TAG = "input";
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";
@@ -99,5 +99,5 @@ public interface Storage {
     String HARVEST_PREFIX = "harvestPrefix";
     String HARVEST_SPEC = "harvestSpec";
     Path RECORD_ROOT = new Path(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
-    Path UNIQUE_ELEMENT = new Path(String.format("/%s/%s/@id", ENVELOPE_TAG, RECORD_TAG));
+    Path UNIQUE_ELEMENT = new Path(String.format("/%s/%s/%s", ENVELOPE_TAG, RECORD_TAG, UNIQUE_TAG));
 }

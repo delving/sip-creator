@@ -30,7 +30,6 @@ import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageBase;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.AnalysisParser;
 import org.apache.log4j.Logger;
@@ -127,8 +126,7 @@ public class TestStorage {
         dataSet().importedToSource(null);
         assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
 
-        statistics.convertToSourcePaths(StorageBase.getRecordRoot(dataSet().getHints()));
-        dataSet().setStatistics(statistics);
+        analyze();
         assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
@@ -136,7 +134,7 @@ public class TestStorage {
         assertTrue("Should be less items in analysis", statistics.size() < statsSize);
         assertTrue("Should be source format", statistics.isSourceFormat());
         AnalysisTree tree = statistics.createAnalysisTree();
-        assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.create(Storage.ENVELOPE_TAG)));
+        assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.element(Storage.ENVELOPE_TAG)));
 
         RecordMapping recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
         assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recordMapping.getPrefix());
@@ -220,7 +218,7 @@ public class TestStorage {
                         case ANALYZED_IMPORT:
                             recordRoot = new Path("/adlibXML/recordList/record");
                             break;
-                        case SOURCED: // todo: not analyzed?
+                        case ANALYZED_SOURCE:
                             recordRoot = Storage.RECORD_ROOT;
                             break;
                         default:
