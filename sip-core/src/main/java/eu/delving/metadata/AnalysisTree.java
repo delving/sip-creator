@@ -26,9 +26,9 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A tree representing the statistics gathered
@@ -86,13 +86,13 @@ public class AnalysisTree implements Serializable {
     }
 
     public static AnalysisTree create(String rootTag) {
-        return new AnalysisTree(new AnalysisTreeNode(Tag.create(rootTag)));
+        return new AnalysisTree(new AnalysisTreeNode(Tag.element(rootTag)));
     }
 
     public static AnalysisTree create(List<FieldStatistics> fieldStatisticsList) {
         AnalysisTreeNode root = createSubtree(fieldStatisticsList, new Path(), null);
         if (root == null) {
-            root = new AnalysisTreeNode(Tag.create("No statistics"));
+            root = new AnalysisTreeNode(Tag.element("No statistics"));
         }
         return new AnalysisTree(root);
     }
@@ -140,22 +140,16 @@ public class AnalysisTree implements Serializable {
     }
 
     private static void getVariables(AnalysisTreeNode node, boolean withinRecord, List<Node> variables) {
-        if (node.isLeaf()) {
-            if (withinRecord) {
-                if (!node.getTag().getLocalName().startsWith("@")) {
-                    variables.add(node);
-                }
-            }
+        if (withinRecord && node.hasStatistics() && !node.getTag().isAttribute()) {
+            variables.add(node);
         }
-        else {
-            for (AnalysisTreeNode child : node.getChildren()) {
-                getVariables(child, withinRecord || node.isRecordRoot(), variables);
-            }
+        for (AnalysisTreeNode child : node.getChildren()) {
+            getVariables(child, withinRecord || node.isRecordRoot(), variables);
         }
     }
 
     private static AnalysisTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, AnalysisTreeNode parent) {
-        Map<Tag, List<FieldStatistics>> statisticsMap = new HashMap<Tag, List<FieldStatistics>>();
+        Map<Tag, List<FieldStatistics>> statisticsMap = new TreeMap<Tag, List<FieldStatistics>>();
         for (FieldStatistics fieldStatistics : fieldStatisticsList) {
             Path subPath = new Path(fieldStatistics.getPath(), path.size());
             if (subPath.equals(path) && fieldStatistics.getPath().size() == path.size() + 1) {
