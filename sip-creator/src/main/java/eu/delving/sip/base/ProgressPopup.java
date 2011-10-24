@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -52,9 +53,16 @@ public class ProgressPopup implements ProgressListener {
     private long lastProgress;
     private volatile boolean cancel;
     private End end;
+    private Timer showTimer = new Timer(500, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            dialog.setVisible(true);
+        }
+    });
 
     public ProgressPopup(Component parent, String title, String message) {
         JProgressBar bar = new JProgressBar(boundedRangeModel);
+        this.showTimer.setRepeats(false);
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), title, Dialog.ModalityType.APPLICATION_MODAL);
         JButton cancelButton = new JButton("Cancel");
         JPanel bp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -82,7 +90,7 @@ public class ProgressPopup implements ProgressListener {
             @Override
             public void run() {
                 boundedRangeModel.setMaximum(total);
-                dialog.setVisible(true);
+                showTimer.start();
             }
         });
     }
@@ -112,10 +120,13 @@ public class ProgressPopup implements ProgressListener {
 
     @Override
     public void finished(final boolean success) {
+        showTimer.stop();
         Exec.swing(new Runnable() {
             @Override
             public void run() {
-                dialog.setVisible(false);
+                if (dialog.isVisible()) {
+                    dialog.setVisible(false);
+                }
                 if (end != null) end.finished(success);
             }
         });
