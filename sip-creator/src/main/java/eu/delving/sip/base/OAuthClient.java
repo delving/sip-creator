@@ -78,7 +78,12 @@ public class OAuthClient {
     }
 
     public void invalidateTokens() {
-        accessToken = refreshToken = null;
+        if (accessToken != null) {
+            accessToken = null;
+        }
+        else {
+            refreshToken = null;
+        }
     }
 
     private boolean requestWithPassword(String password) throws OAuthSystemException, OAuthProblemException {
