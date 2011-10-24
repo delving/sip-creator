@@ -22,6 +22,7 @@
 package eu.delving.sip.base;
 
 import javax.swing.SwingUtilities;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,10 +53,26 @@ public class Exec {
         SwingUtilities.invokeLater(runnable);
     }
 
+    public static void swingWait(Runnable runnable) {
+        try {
+            SwingUtilities.invokeAndWait(runnable);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void work(Runnable runnable) {
         if (!SwingUtilities.isEventDispatchThread()) {
             throw new RuntimeException("Call to Worker thread must be made from Swing");
         }
+        executor.execute(runnable);
+    }
+
+    public static void workLater(Runnable runnable) {
         executor.execute(runnable);
     }
 
