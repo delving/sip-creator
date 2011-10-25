@@ -56,7 +56,7 @@ public class ProgressPopup implements ProgressListener {
     private Timer showTimer = new Timer(500, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            dialog.setVisible(true);
+            if (!cancel) dialog.setVisible(true);
         }
     });
 
@@ -71,6 +71,8 @@ public class ProgressPopup implements ProgressListener {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 cancel = true;
+                showTimer.stop();
+                dialog.setVisible(false);
             }
         });
         JPanel p = new JPanel(new GridLayout(0, 1));
@@ -120,10 +122,10 @@ public class ProgressPopup implements ProgressListener {
 
     @Override
     public void finished(final boolean success) {
-        showTimer.stop();
         Exec.swing(new Runnable() {
             @Override
             public void run() {
+                showTimer.stop();
                 if (dialog.isVisible()) {
                     dialog.setVisible(false);
                 }

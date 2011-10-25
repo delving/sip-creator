@@ -180,8 +180,8 @@ public class UploadAction extends AbstractAction {
                     }
 
                     @Override
-                    public void uploadFinished(File file) {
-                        sipModel.getFeedback().say(String.format("Uploaded %s", file.getName()));
+                    public void uploadFinished(File file, boolean aborted) {
+                        sipModel.getFeedback().say(String.format(aborted ? "Aborted upload of %s" : "Uploaded %s", file.getName()));
                     }
 
                     @Override
