@@ -108,11 +108,13 @@ public class FileValidator implements Runnable {
                     sipModel.getDataSetModel().getDataSet().sourceInput(),
                     sipModel.getAnalysisModel().getRecordCount()
             );
-            parser.setProgressListener(progressListener);
+            progressListener.prepareFor(sipModel.getAnalysisModel().getRecordCount());
             PrintWriter out = dataSet.reportWriter(recordMapping);
+            int count = 0;
             try {
                 MetadataRecord record;
                 while ((record = parser.nextRecord()) != null && !aborted) {
+                    progressListener.setProgress(count++);
                     try {
                         Node outputNode = mappingRunner.runMapping(record);
                         recordValidator.validateRecord(outputNode, record.getRecordNumber());
@@ -124,6 +126,7 @@ public class FileValidator implements Runnable {
                         out.println(record.toString());
                         e.printStackTrace(out);
                         out.println("========");
+                        progressListener.finished(false);
                         listener.invalidInput(e);
                         abort();
                     }
@@ -132,6 +135,7 @@ public class FileValidator implements Runnable {
                         out.println(record.toString());
                         out.println("=========");
                         if (!allowInvalid) {
+                            progressListener.finished(false);
                             listener.invalidOutput(e);
                             abort();
                         }
@@ -142,6 +146,7 @@ public class FileValidator implements Runnable {
                         out.println("=========");
                     }
                     catch (Exception e) {
+                        progressListener.finished(false);
                         sipModel.getFeedback().alert("Problem writing output", e);
                         out.println("Unexpected exception!");
                         e.printStackTrace(out);
@@ -167,6 +172,7 @@ public class FileValidator implements Runnable {
                     out.println("Total Records: " + (validCount + invalidCount));
                     out.close();
                 }
+                progressListener.finished(true);
             }
             catch (IOException e) {
                 sipModel.getFeedback().alert("Unable to write discarded record", e);
@@ -188,9 +194,7 @@ public class FileValidator implements Runnable {
                 listener.finished(aborted ? null : valid, sipModel.getAnalysisModel().getRecordCount());
             }
             uniqueness.destroy();
-            if (aborted) { // aborted, so metadataparser will not call finished()
-                progressListener.finished(false);
-            }
+            progressListener.finished(!aborted);
         }
     }
 
