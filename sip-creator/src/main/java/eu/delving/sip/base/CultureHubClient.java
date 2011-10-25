@@ -161,7 +161,7 @@ public class CultureHubClient {
 
         void uploadStarted(File file);
 
-        void uploadFinished(File file);
+        void uploadFinished(File file, boolean aborted);
 
         ProgressListener getProgressListener();
 
@@ -422,11 +422,12 @@ public class CultureHubClient {
                             }
                             for (File file : uploadFiles) {
                                 HttpPost upload = createUploadRequest(file);
+                                FileEntity fileEntity = (FileEntity)upload.getEntity();
                                 log.info("Uploading " + file);
                                 HttpResponse uploadResponse = httpClient.execute(upload);
                                 EntityUtils.consume(uploadResponse.getEntity());
                                 code = Code.from(uploadResponse);
-                                if (code != Code.OK) {
+                                if (code != Code.OK && !fileEntity.abort) {
                                     context.invalidateTokens();
                                     Code.from(uploadResponse).notifyUser(context);
                                     return;
@@ -583,7 +584,7 @@ public class CultureHubClient {
                 if (progress != null) {
                     progress.finished(!abort);
                 }
-                uploadListener.uploadFinished(file);
+                uploadListener.uploadFinished(file, abort);
             }
         }
 
