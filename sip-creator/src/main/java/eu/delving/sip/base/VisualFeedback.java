@@ -98,7 +98,8 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void alert(final String message) {
-        Exec.swingAny(new Runnable() {
+        log.warn(message);
+        Exec.swingWait(new Runnable() {
             @Override
             public void run() {
                 addToList(message);
@@ -110,14 +111,14 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void alert(final String message, Exception exception) {
-        Exec.swingAny(new Runnable() {
+        log.warn(message, exception);
+        Exec.swingWait(new Runnable() {
             @Override
             public void run() {
                 addToList(message);
                 inYourFace(message);
             }
         });
-        log.warn(message, exception);
     }
 
     @Override
