@@ -101,11 +101,8 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         dialog.setVisible(true);
-        if (!listModel.hasEntries()) {
-            LOG.info("Not loading and no data sets, will start loading");
-            listModel.setMessage("Loading list of data sets... just a moment");
-            cultureHubClient.fetchDataSetList(this);
-        }
+        listModel.setMessage("Loading list of data sets... just a moment");
+        cultureHubClient.fetchDataSetList(this);
     }
 
     @Override
@@ -125,6 +122,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
 
     @Override
     public void failed(Exception e) {
+        LOG.warn("Fetching list failed", e);
         Exec.swing(new Runnable() {
             @Override
             public void run() {

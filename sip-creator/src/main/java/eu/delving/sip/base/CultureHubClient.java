@@ -141,7 +141,7 @@ public class CultureHubClient {
     }
 
     public void fetchDataSetList(ListReceiveListener listReceiveListener) {
-        Exec.work(new ListFetcher(listReceiveListener));
+        Exec.work(new ListFetcher(1, listReceiveListener));
     }
 
     public interface UnlockListener {
@@ -149,11 +149,11 @@ public class CultureHubClient {
     }
 
     public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
-        Exec.work(new Unlocker(dataSet, unlockListener));
+        Exec.work(new Unlocker(1, dataSet, unlockListener));
     }
 
     public void downloadDataSet(DataSet dataSet, ProgressListener progressListener) {
-        Exec.work(new DataSetDownloader(dataSet, progressListener));
+        Exec.work(new DataSetDownloader(1, dataSet, progressListener));
     }
 
     public interface UploadListener {
@@ -169,24 +169,45 @@ public class CultureHubClient {
     }
 
     public void uploadFiles(DataSet dataSet, UploadListener uploadListener) throws StorageException {
-        Exec.work(new FileUploader(dataSet, uploadListener));
+        Exec.work(new FileUploader(1, dataSet, uploadListener));
     }
 
-    private class ListFetcher implements Runnable {
+    private abstract class Attempt implements Runnable {
+        protected int attempt;
+
+        protected Attempt(int attempt) {
+            this.attempt = attempt;
+        }
+
+        private boolean shouldRetry() {
+            return attempt <= 3;
+        }
+
+        protected boolean reactToUnauthorized(Runnable retry) {
+            if (shouldRetry()) {
+                context.getFeedback().alert("Authorization failed, retrying...");
+                context.invalidateTokens();
+                Exec.workLater(retry);
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+    private class ListFetcher extends Attempt {
         private ListReceiveListener listReceiveListener;
 
-        public ListFetcher(ListReceiveListener listReceiveListener) {
+        public ListFetcher(int attempt, ListReceiveListener listReceiveListener) {
+            super(attempt);
             this.listReceiveListener = listReceiveListener;
         }
 
         @Override
         public void run() {
             try {
-                String url = String.format(
-                        "%s/list?accessKey=%s",
-                        context.getServerUrl(),
-                        context.getAccessToken()
-                );
+                String url = createListRequest();
                 log.info("requesting list: " + url);
                 say("Requesting data set list from culture hub");
                 HttpGet get = new HttpGet(url);
@@ -195,16 +216,24 @@ public class CultureHubClient {
                 Code code = Code.from(response);
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
-                    if (code == Code.OK) {
-                        DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
-                        EntityUtils.consume(entity);
-                        say("List received");
-                        listReceiveListener.listReceived(dataSetList.list);
+                    switch (code) {
+                        case OK:
+                            DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
+                            say("List received");
+                            listReceiveListener.listReceived(dataSetList.list);
+                            break;
+                        case UNAUTHORIZED:
+                            if (!reactToUnauthorized(new ListFetcher(attempt + 1, listReceiveListener))) {
+                                listReceiveListener.failed(new Exception("Unable to fetch list"));
+                            }
+                            break;
+                        default:
+                            code.notifyUser(context);
+                            listReceiveListener.failed(new Exception("Response was " + code));
+                            context.invalidateTokens();
+                            break;
                     }
-                    else {
-                        code.notifyUser(context);
-                        context.invalidateTokens();
-                    }
+                    EntityUtils.consume(entity);
                 }
                 else {
                     throw new IOException("Response was empty");
@@ -220,13 +249,21 @@ public class CultureHubClient {
                 listReceiveListener.failed(e);
             }
         }
+
+        private String createListRequest() throws OAuthSystemException, OAuthProblemException {
+            return String.format(
+                    "%s/list?accessKey=%s",
+                    context.getServerUrl(), context.getAccessToken()
+            );
+        }
     }
 
-    private class Unlocker implements Runnable {
+    private class Unlocker extends Attempt {
         private DataSet dataSet;
         private UnlockListener unlockListener;
 
-        public Unlocker(DataSet dataSet, UnlockListener unlockListener) {
+        public Unlocker(int attempt, DataSet dataSet, UnlockListener unlockListener) {
+            super(attempt);
             this.dataSet = dataSet;
             this.unlockListener = unlockListener;
         }
@@ -234,29 +271,30 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                String url = String.format(
-                        "%s/unlock/%s?accessKey=%s",
-                        context.getServerUrl(),
-                        dataSet.getSpec(),
-                        context.getAccessToken()
-                );
-                HttpGet get = new HttpGet(url);
-                get.setHeader("Accept", "text/xml");
+                HttpGet get = createUnlockRequest();
                 say("Unlocking data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 EntityUtils.consume(response.getEntity());
                 Code code = Code.from(response);
-                if (code == Code.OK) {
-                    unlockListener.unlockComplete(true);
-                }
-                else {
-                    unlockListener.unlockComplete(false);
-                    context.invalidateTokens();
-                    Code.from(response).notifyUser(context);
+                switch (code) {
+                    case OK:
+                        unlockListener.unlockComplete(true);
+                        break;
+                    case UNAUTHORIZED:
+                        if (!reactToUnauthorized(new Unlocker(attempt + 1, dataSet, unlockListener))) {
+                            unlockListener.unlockComplete(false);
+                        }
+                        break;
+                    default:
+                        unlockListener.unlockComplete(false);
+                        context.invalidateTokens();
+                        Code.from(response).notifyUser(context);
+                        break;
                 }
             }
             catch (OAuthProblemException e) {
                 reportOAuthProblem(e);
+                unlockListener.unlockComplete(false);
             }
             catch (Exception e) {
                 log.error("Unable to unlock dataset", e);
@@ -264,13 +302,24 @@ public class CultureHubClient {
                 unlockListener.unlockComplete(false);
             }
         }
+
+        private HttpGet createUnlockRequest() throws OAuthSystemException, OAuthProblemException {
+            String url = String.format(
+                    "%s/unlock/%s?accessKey=%s",
+                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
+            );
+            HttpGet get = new HttpGet(url);
+            get.setHeader("Accept", "text/xml");
+            return get;
+        }
     }
 
-    private class DataSetDownloader implements Runnable {
+    private class DataSetDownloader extends Attempt {
         private DataSet dataSet;
         private ProgressListener progressListener;
 
-        private DataSetDownloader(DataSet dataSet, ProgressListener progressListener) {
+        private DataSetDownloader(int attempt, DataSet dataSet, ProgressListener progressListener) {
+            super(attempt);
             this.dataSet = dataSet;
             this.progressListener = progressListener;
         }
@@ -279,27 +328,29 @@ public class CultureHubClient {
         public void run() {
             boolean success = false;
             try {
-                HttpGet get = new HttpGet(String.format(
-                        "%s/fetch/%s-sip.zip?accessKey=%s",
-                        context.getServerUrl(),
-                        dataSet.getSpec(),
-                        context.getAccessToken()
-                ));
-                get.setHeader("Accept", "application/zip");
+                HttpGet get = createDownloadRequest();
                 say("Downloading SIP for data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     Code code = Code.from(response);
-                    if (code == Code.OK) {
-                        dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
-                        success = true;
-                        context.dataSetCreated(dataSet);
-                        say(String.format("Local data set %s created in workspace", dataSet.getSpec()));
-                    }
-                    else {
-                        context.invalidateTokens();
-                        Code.from(response).notifyUser(context);
+                    switch (code) {
+                        case OK:
+                            dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                            EntityUtils.consume(entity);
+                            success = true;
+                            context.dataSetCreated(dataSet);
+                            say(String.format("Local data set %s created in workspace", dataSet.getSpec()));
+                            break;
+                        case UNAUTHORIZED:
+                            if (!reactToUnauthorized(new DataSetDownloader(attempt + 1, dataSet, progressListener))) {
+                                success = false;
+                            }
+                            break;
+                        default:
+                            context.invalidateTokens();
+                            Code.from(response).notifyUser(context);
+                            break;
                     }
                 }
                 else {
@@ -325,14 +376,24 @@ public class CultureHubClient {
                 progressListener.finished(success);
             }
         }
+
+        private HttpGet createDownloadRequest() throws OAuthSystemException, OAuthProblemException {
+            HttpGet get = new HttpGet(String.format(
+                    "%s/fetch/%s-sip.zip?accessKey=%s",
+                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
+            ));
+            get.setHeader("Accept", "application/zip");
+            return get;
+        }
     }
 
-    public class FileUploader implements Runnable {
+    public class FileUploader extends Attempt {
         private DataSet dataSet;
         private List<File> uploadFiles;
         private UploadListener uploadListener;
 
-        public FileUploader(DataSet dataSet, UploadListener uploadListener) throws StorageException {
+        public FileUploader(int attempt, DataSet dataSet, UploadListener uploadListener) throws StorageException {
+            super(attempt);
             this.dataSet = dataSet;
             this.uploadFiles = dataSet.getUploadFiles();
             this.uploadListener = uploadListener;
@@ -341,44 +402,48 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                HttpPost listRequest = new HttpPost(createListRequestUrl());
-                listRequest.setEntity(createListEntity());
-                listRequest.setHeader("Accept", "text/plain");
+                HttpPost listRequest = createSubmitRequest();
                 HttpResponse listResponse = httpClient.execute(listRequest);
                 HttpEntity listEntity = listResponse.getEntity();
                 if (listEntity != null) {
                     Code code = Code.from(listResponse);
-                    if (code == Code.OK) {
-                        String listString = EntityUtils.toString(listEntity);
-                        Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
-                        Iterator<File> walk = uploadFiles.iterator();
-                        while (walk.hasNext()) {
-                            File file = walk.next();
-                            if (!requestedFiles.contains(file.getName())) {
-                                log.info(String.format("Hub does not want %s", file.getName()));
-                                uploadListener.uploadRefused(file);
-                                walk.remove();
+                    switch (code) {
+                        case OK:
+                            String listString = EntityUtils.toString(listEntity);
+                            Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
+                            Iterator<File> walk = uploadFiles.iterator();
+                            while (walk.hasNext()) {
+                                File file = walk.next();
+                                if (!requestedFiles.contains(file.getName())) {
+                                    log.info(String.format("Hub does not want %s", file.getName()));
+                                    uploadListener.uploadRefused(file);
+                                    walk.remove();
+                                }
                             }
-                        }
-                        EntityUtils.consume(listResponse.getEntity());
-                        for (File file : uploadFiles) {
-                            log.info("Uploading " + file);
-                            HttpPost upload = new HttpPost(createFileRequestUrl(file));
-                            upload.setEntity(new FileEntity(file, uploadListener));
-                            HttpResponse uploadResponse = httpClient.execute(upload);
-                            EntityUtils.consume(uploadResponse.getEntity());
-                            code = Code.from(uploadResponse);
-                            if (code != Code.OK) {
-                                context.invalidateTokens();
-                                Code.from(uploadResponse).notifyUser(context);
-                                return;
+                            for (File file : uploadFiles) {
+                                HttpPost upload = createUploadRequest(file);
+                                log.info("Uploading " + file);
+                                HttpResponse uploadResponse = httpClient.execute(upload);
+                                EntityUtils.consume(uploadResponse.getEntity());
+                                code = Code.from(uploadResponse);
+                                if (code != Code.OK) {
+                                    context.invalidateTokens();
+                                    Code.from(uploadResponse).notifyUser(context);
+                                    return;
+                                }
                             }
-                        }
+                            break;
+                        case UNAUTHORIZED:
+                            if (!reactToUnauthorized(new FileUploader(attempt + 1, dataSet, uploadListener))) {
+                                context.getFeedback().alert("Unable to complete upload");
+                            }
+                            break;
+                        default:
+                            context.invalidateTokens();
+                            code.notifyUser(context);
+                            break;
                     }
-                    else {
-                        context.invalidateTokens();
-                        code.notifyUser(context);
-                    }
+                    EntityUtils.consume(listResponse.getEntity());
                 }
                 else {
                     throw new IOException("Empty entity");
@@ -396,6 +461,17 @@ public class CultureHubClient {
             }
         }
 
+        private HttpPost createSubmitRequest() throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
+            String url = String.format(
+                    "%s/submit/%s?accessKey=%s",
+                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
+            );
+            HttpPost post = new HttpPost(url);
+            post.setEntity(createListEntity());
+            post.setHeader("Accept", "text/plain");
+            return post;
+        }
+
         private HttpEntity createListEntity() throws UnsupportedEncodingException {
             StringBuilder fileList = new StringBuilder();
             for (File file : uploadFiles) {
@@ -404,23 +480,14 @@ public class CultureHubClient {
             return new StringEntity(fileList.toString());
         }
 
-        private String createListRequestUrl() throws OAuthSystemException, OAuthProblemException {
-            return String.format(
-                    "%s/submit/%s?accessKey=%s",
-                    context.getServerUrl(),
-                    dataSet.getSpec(),
-                    context.getAccessToken()
-            );
-        }
-
-        private String createFileRequestUrl(File file) throws OAuthSystemException, OAuthProblemException {
-            return String.format(
+        private HttpPost createUploadRequest(File file) throws OAuthSystemException, OAuthProblemException {
+            String url = String.format(
                     "%s/submit/%s/%s?accessKey=%s",
-                    context.getServerUrl(),
-                    dataSet.getSpec(),
-                    file.getName(),
-                    context.getAccessToken()
+                    context.getServerUrl(), dataSet.getSpec(), file.getName(), context.getAccessToken()
             );
+            HttpPost upload = new HttpPost(url);
+            upload.setEntity(new FileEntity(file, uploadListener));
+            return upload;
         }
     }
 
