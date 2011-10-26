@@ -106,7 +106,6 @@ public class VisualFeedback implements Feedback {
                 inYourFace(message);
             }
         });
-        log.warn(message);
     }
 
     @Override
@@ -132,7 +131,7 @@ public class VisualFeedback implements Feedback {
     }
 
     private void inYourFace(String message) {
-        message = message.replaceAll("<", "&lt;");
+        message = message.replaceAll("<", "&lt;").replaceAll("&", "&amp;");
         JOptionPane.showMessageDialog(null, String.format("<html><h3>%s</h3>", message));
     }
 

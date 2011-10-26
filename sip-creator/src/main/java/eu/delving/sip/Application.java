@@ -30,6 +30,7 @@ import eu.delving.sip.base.HarvestDialog;
 import eu.delving.sip.base.HarvestPool;
 import eu.delving.sip.base.ImportAction;
 import eu.delving.sip.base.OAuthClient;
+import eu.delving.sip.base.ReleaseAction;
 import eu.delving.sip.base.UploadAction;
 import eu.delving.sip.base.ValidateAction;
 import eu.delving.sip.base.VisualFeedback;
@@ -58,6 +59,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -100,7 +102,7 @@ public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
-    private Action[] actions;
+    private Action downloadAction, importAction, uploadAction, deleteAction, validateAction;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
@@ -164,12 +166,11 @@ public class Application {
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         allFrames = new AllFrames(desktop, sipModel, editHistory);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
-        actions = new Action[]{
-                new DownloadAction(desktop, sipModel, cultureHubClient),
-                new ImportAction(desktop, sipModel, harvestPool),
-                new ValidateAction(desktop, sipModel),
-                new UploadAction(desktop, sipModel, cultureHubClient)
-        };
+        downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
+        importAction = new ImportAction(desktop, sipModel, harvestPool);
+        validateAction = new ValidateAction(desktop, sipModel);
+        uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
+        deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getButtonPanel(), BorderLayout.WEST);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
@@ -281,18 +282,14 @@ public class Application {
     }
 
     private JPanel createStatePanel() {
-        JPanel buttons = new JPanel(new GridLayout(2, 2));
-        for (Action action : actions) {
-            buttons.add(new JButton(action));
-        }
         statusLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
         refreshToggleButton();
-        JPanel left = new JPanel(new BorderLayout(6, 6));
-        left.add(statusLabel, BorderLayout.CENTER);
-        left.add(buttons, BorderLayout.EAST);
+        JPanel left = new JPanel(new GridLayout(1, 0, 6, 6));
+        left.add(statusLabel);
+        left.add(new JButton(validateAction));
         JPanel right = new JPanel(new BorderLayout(6, 6));
         right.add(feedback.getToggle(), BorderLayout.CENTER);
         right.add(harvestToggleButton, BorderLayout.EAST);
@@ -312,11 +309,21 @@ public class Application {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
+        bar.add(createFileMenu());
         bar.add(dataSetMenu);
         bar.add(editHistory.getEditMenu());
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
         return bar;
+    }
+
+    private JMenu createFileMenu() {
+        JMenu menu = new JMenu("File");
+        menu.add(downloadAction);
+        menu.add(importAction);
+        menu.add(uploadAction);
+        menu.add(deleteAction);
+        return menu;
     }
 
     private class CultureHubClientContext implements CultureHubClient.Context {

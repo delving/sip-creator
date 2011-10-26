@@ -108,11 +108,13 @@ public class FileValidator implements Runnable {
                     sipModel.getDataSetModel().getDataSet().sourceInput(),
                     sipModel.getAnalysisModel().getRecordCount()
             );
-            parser.setProgressListener(progressListener);
+            progressListener.prepareFor(sipModel.getAnalysisModel().getRecordCount());
             PrintWriter out = dataSet.reportWriter(recordMapping);
+            int count = 0;
             try {
                 MetadataRecord record;
                 while ((record = parser.nextRecord()) != null && !aborted) {
+                    if (!progressListener.setProgress(count++)) abort();
                     try {
                         Node outputNode = mappingRunner.runMapping(record);
                         recordValidator.validateRecord(outputNode, record.getRecordNumber());
@@ -188,9 +190,7 @@ public class FileValidator implements Runnable {
                 listener.finished(aborted ? null : valid, sipModel.getAnalysisModel().getRecordCount());
             }
             uniqueness.destroy();
-            if (aborted) { // aborted, so metadataparser will not call finished()
-                progressListener.finished(false);
-            }
+            progressListener.finished(!aborted);
         }
     }
 
