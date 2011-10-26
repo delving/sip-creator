@@ -29,20 +29,24 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
 /**
@@ -57,10 +61,14 @@ public class UploadAction extends AbstractAction {
     private CultureHubClient cultureHubClient;
     private ReportFilePopup reportFilePopup;
     private RealUploadAction realUploadAction = new RealUploadAction();
-    private JCheckBox releaseBox = new JCheckBox("Release lock and delete local dataset");
 
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
-        super("Upload");
+        super("Upload this data set");
+        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/upload-icon.png")));
+        putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
         this.parent = parent;
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
@@ -147,7 +155,6 @@ public class UploadAction extends AbstractAction {
             });
             JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             p.add(cancel);
-            p.add(releaseBox);
             p.add(new JButton(realUploadAction));
             return p;
         }
@@ -180,8 +187,8 @@ public class UploadAction extends AbstractAction {
                     }
 
                     @Override
-                    public void uploadFinished(File file) {
-                        sipModel.getFeedback().say(String.format("Uploaded %s", file.getName()));
+                    public void uploadFinished(File file, boolean aborted) {
+                        sipModel.getFeedback().say(String.format(aborted ? "Aborted upload of %s" : "Uploaded %s", file.getName()));
                     }
 
                     @Override
@@ -198,40 +205,10 @@ public class UploadAction extends AbstractAction {
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
-                                if (!releaseBox.isSelected()) {
-                                    disappear();
-                                }
-                                else {
-                                    final DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-                                    cultureHubClient.unlockDataSet(dataSet, new CultureHubClient.UnlockListener() {
-                                        @Override
-                                        public void unlockComplete(boolean successful) {
-                                            if (successful) {
-                                                sipModel.getFeedback().say(String.format("Unlocked %s and removed it locally", dataSet));
-                                                try {
-                                                    dataSet.remove();
-                                                    sipModel.getDataSetModel().setDataSet(null);
-                                                }
-                                                catch (StorageException e) {
-                                                    sipModel.getFeedback().alert("Unable to remove data set", e);
-                                                }
-                                            }
-                                            else {
-                                                sipModel.getFeedback().alert("Unable to unlock the data set");
-                                            }
-                                            Exec.swing(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    disappear();
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
+                                disappear();
                             }
                         });
                     }
-
                 });
             }
             catch (StorageException e) {

@@ -31,7 +31,9 @@ import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
@@ -39,6 +41,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import java.awt.BorderLayout;
@@ -46,8 +49,10 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -70,7 +75,12 @@ public class ImportAction extends AbstractAction {
     private HarvestPool harvestPool;
 
     public ImportAction(JDesktopPane parent, SipModel sipModel, HarvestPool harvestPool) {
-        super("Import");
+        super("Import new data into this data set");
+        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/import-icon.png")));
+        putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
         this.parent = parent;
         this.sipModel = sipModel;
         this.harvestPool = harvestPool;
