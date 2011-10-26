@@ -38,12 +38,15 @@ import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
 /**
@@ -62,6 +65,10 @@ public class UploadAction extends AbstractAction {
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Upload this data set");
         putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/upload-icon.png")));
+        putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
         this.parent = parent;
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;

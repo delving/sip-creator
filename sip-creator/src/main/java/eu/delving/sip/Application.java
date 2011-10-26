@@ -23,7 +23,6 @@ package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.DeleteAction;
 import eu.delving.sip.base.DownloadAction;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -31,6 +30,7 @@ import eu.delving.sip.base.HarvestDialog;
 import eu.delving.sip.base.HarvestPool;
 import eu.delving.sip.base.ImportAction;
 import eu.delving.sip.base.OAuthClient;
+import eu.delving.sip.base.ReleaseAction;
 import eu.delving.sip.base.UploadAction;
 import eu.delving.sip.base.ValidateAction;
 import eu.delving.sip.base.VisualFeedback;
@@ -170,7 +170,7 @@ public class Application {
         importAction = new ImportAction(desktop, sipModel, harvestPool);
         validateAction = new ValidateAction(desktop, sipModel);
         uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
-        deleteAction = new DeleteAction(desktop, sipModel, cultureHubClient);
+        deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getButtonPanel(), BorderLayout.WEST);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());

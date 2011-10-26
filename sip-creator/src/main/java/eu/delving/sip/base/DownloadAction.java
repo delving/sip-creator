@@ -39,6 +39,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -50,6 +51,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +74,11 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
 
     public DownloadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Download another data set");
-        putValue(Action.SMALL_ICON , new ImageIcon(getClass().getResource("/download-icon.png")));
+        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/download-icon.png")));
+        putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
         dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(parent), "Download", false);

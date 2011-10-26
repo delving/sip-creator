@@ -30,7 +30,10 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Delete local copy and unlock on the hub
@@ -38,14 +41,18 @@ import java.awt.event.ActionEvent;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class DeleteAction extends AbstractAction {
+public class ReleaseAction extends AbstractAction {
     private JDesktopPane parent;
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
 
-    public DeleteAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
-        super("Delete local copy and unlock this data set");
-        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/delete-icon.png")));
+    public ReleaseAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
+        super("Releaase this data set for others to access");
+        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/release-icon.png")));
+        putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
         this.parent = parent;
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
@@ -59,7 +66,9 @@ public class DeleteAction extends AbstractAction {
                 String.format("<html>Are you sure that you want to delete your local copy of<br>" +
                         "this dataset %s, and unlock it so that someone else can access it?",
                         dataSet.getSpec()
-                )
+                ),
+                "Release",
+                JOptionPane.OK_CANCEL_OPTION
         );
         if (answer == JOptionPane.OK_OPTION) {
             unlockDataSet(dataSet);
