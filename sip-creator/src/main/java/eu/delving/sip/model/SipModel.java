@@ -417,7 +417,7 @@ public class SipModel {
                 new FileValidator.Listener() {
                     @Override
                     public void invalidInput(final MappingException exception) {
-                        feedback.alert("Problem validating " + exception.getMetadataRecord().toString(), exception);
+                        feedback.alert(String.format("Problem validating record number %d", exception.getMetadataRecord().getRecordNumber()), exception);
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
@@ -507,16 +507,21 @@ public class SipModel {
                 }
                 metadataParser.setProgressListener(progressListener);
                 MetadataRecord metadataRecord;
-                while ((metadataRecord = metadataParser.nextRecord()) != null) {
-                    if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
-                        for (ParseListener parseListener : parseListeners) {
-                            parseListener.updatedRecord(metadataRecord);
+                try {
+                    while ((metadataRecord = metadataParser.nextRecord()) != null) {
+                        if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
+                            for (ParseListener parseListener : parseListeners) {
+                                parseListener.updatedRecord(metadataRecord);
+                            }
+                            if (progressListener != null) {
+                                progressListener.finished(true);
+                            }
+                            break;
                         }
-                        if (progressListener != null) {
-                            progressListener.finished(true);
-                        }
-                        break;
                     }
+                }
+                catch (MetadataParser.AbortException e) {
+                    // do nothing
                 }
             }
             catch (Exception e) {
