@@ -56,7 +56,7 @@ public class ValidateAction extends AbstractAction {
     private AllowInvalidRecordsAction allowInvalidRecordsAction = new AllowInvalidRecordsAction();
 
     public ValidateAction(JDesktopPane parent, SipModel sipModel) {
-        super("Validate");
+        super("Map and validate all records");
         this.parent = parent;
         this.sipModel = sipModel;
         setEnabled(false);

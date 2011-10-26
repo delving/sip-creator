@@ -33,7 +33,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JList;
@@ -59,7 +58,6 @@ public class UploadAction extends AbstractAction {
     private CultureHubClient cultureHubClient;
     private ReportFilePopup reportFilePopup;
     private RealUploadAction realUploadAction = new RealUploadAction();
-    private JCheckBox releaseBox = new JCheckBox("Release lock and delete local dataset");
 
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Upload this data set");
@@ -150,7 +148,6 @@ public class UploadAction extends AbstractAction {
             });
             JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             p.add(cancel);
-            p.add(releaseBox);
             p.add(new JButton(realUploadAction));
             return p;
         }
@@ -201,40 +198,10 @@ public class UploadAction extends AbstractAction {
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
-                                if (!releaseBox.isSelected()) {
-                                    disappear();
-                                }
-                                else {
-                                    final DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-                                    cultureHubClient.unlockDataSet(dataSet, new CultureHubClient.UnlockListener() {
-                                        @Override
-                                        public void unlockComplete(boolean successful) {
-                                            if (successful) {
-                                                sipModel.getFeedback().say(String.format("Unlocked %s and removed it locally", dataSet));
-                                                try {
-                                                    dataSet.remove();
-                                                    sipModel.getDataSetModel().setDataSet(null);
-                                                }
-                                                catch (StorageException e) {
-                                                    sipModel.getFeedback().alert("Unable to remove data set", e);
-                                                }
-                                            }
-                                            else {
-                                                sipModel.getFeedback().alert("Unable to unlock the data set");
-                                            }
-                                            Exec.swing(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    disappear();
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
+                                disappear();
                             }
                         });
                     }
-
                 });
             }
             catch (StorageException e) {

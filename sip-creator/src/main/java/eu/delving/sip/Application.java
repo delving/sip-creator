@@ -23,6 +23,7 @@ package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.DeleteAction;
 import eu.delving.sip.base.DownloadAction;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -101,7 +102,7 @@ public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
-    private Action downloadAction, importAction, uploadAction, validateAction;
+    private Action downloadAction, importAction, uploadAction, deleteAction, validateAction;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
@@ -169,6 +170,7 @@ public class Application {
         importAction = new ImportAction(desktop, sipModel, harvestPool);
         validateAction = new ValidateAction(desktop, sipModel);
         uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
+        deleteAction = new DeleteAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getButtonPanel(), BorderLayout.WEST);
         home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
@@ -285,9 +287,9 @@ public class Application {
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
         refreshToggleButton();
-        JPanel left = new JPanel(new BorderLayout(6, 6));
-        left.add(statusLabel, BorderLayout.CENTER);
-        left.add(new JButton(validateAction), BorderLayout.EAST);
+        JPanel left = new JPanel(new GridLayout(1, 0, 6, 6));
+        left.add(statusLabel);
+        left.add(new JButton(validateAction));
         JPanel right = new JPanel(new BorderLayout(6, 6));
         right.add(feedback.getToggle(), BorderLayout.CENTER);
         right.add(harvestToggleButton, BorderLayout.EAST);
@@ -320,6 +322,7 @@ public class Application {
         menu.add(downloadAction);
         menu.add(importAction);
         menu.add(uploadAction);
+        menu.add(deleteAction);
         return menu;
     }
 
