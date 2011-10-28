@@ -27,7 +27,9 @@ import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;
@@ -47,7 +49,7 @@ public class DataSetMenu extends JMenu {
     private final String SELECTED = "datasetSelected";
     private SipModel sipModel;
 
-    public DataSetMenu(SipModel sipModel) {
+    public DataSetMenu(final SipModel sipModel) {
         super("Data Sets");
         this.sipModel = sipModel;
         sipModel.getMappingModel().addListener(new MappingModel.Listener() {
@@ -70,6 +72,20 @@ public class DataSetMenu extends JMenu {
             @Override
             public void recordMappingSelected(RecordMapping recordMapping) {
                 refresh();
+            }
+        });
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void dataSetChanged(DataSet dataSet) {
+            }
+
+            @Override
+            public void dataSetRemoved() {
+                refresh();
+            }
+
+            @Override
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
             }
         });
         String selectedSpec = sipModel.getPreferences().get(SELECTED, "");
