@@ -152,6 +152,7 @@ public class DataSetMenu extends JMenu {
                 }
                 else if (last != null) {
                     sipModel.setDataSet(last, true);
+                    setPreference(last);
                 }
             }
             if (bg.getButtonCount() == 0) {
