@@ -165,7 +165,7 @@ public class CultureHubClient {
 
         ProgressListener getProgressListener();
 
-        void finished();
+        void finished(boolean success);
     }
 
     public void uploadFiles(DataSet dataSet, UploadListener uploadListener) throws StorageException {
@@ -449,16 +449,16 @@ public class CultureHubClient {
                 else {
                     throw new IOException("Empty entity");
                 }
+                uploadListener.finished(true);
             }
             catch (OAuthProblemException e) {
                 reportOAuthProblem(e);
+                uploadListener.finished(false);
             }
             catch (Exception e) {
                 log.error("Error while connecting", e);
                 context.getFeedback().alert("Authorization system problem: " + e.getMessage());
-            }
-            finally {
-                uploadListener.finished();
+                uploadListener.finished(false);
             }
         }
 

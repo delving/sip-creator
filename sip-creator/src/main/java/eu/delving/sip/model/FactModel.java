@@ -35,7 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 
 public class FactModel {
-    private Map<String, String> facts = new TreeMap<String,String>();
+    private Map<String, String> facts = new TreeMap<String, String>();
 
     public String get(String key) {
         return facts.get(key);
@@ -45,8 +45,9 @@ public class FactModel {
         return facts;
     }
 
-    public void set(Map<String,String> newMap) {
-        facts = newMap;
+    public void set(Map<String, String> newMap) {
+        facts.clear();
+        if (newMap != null) facts.putAll(newMap);
         fireAllUpdated();
     }
 
@@ -57,10 +58,8 @@ public class FactModel {
 
     public boolean copyToRecordMapping(RecordMapping recordMapping) {
         boolean changed = false;
-        for (Map.Entry<String,String> entry : facts.entrySet()) {
-            if (recordMapping.setFact(entry.getKey(), entry.getValue())) {
-                changed = true;
-            }
+        for (Map.Entry<String, String> entry : facts.entrySet()) {
+            if (recordMapping.setFact(entry.getKey(), entry.getValue())) changed = true;
         }
         return changed;
     }
@@ -86,6 +85,7 @@ public class FactModel {
 
     public interface Listener {
         void factUpdated(String name, String value);
-        void allFactsUpdated(Map<String,String> map);
+
+        void allFactsUpdated(Map<String, String> map);
     }
 }

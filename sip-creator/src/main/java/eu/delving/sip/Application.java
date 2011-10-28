@@ -201,6 +201,15 @@ public class Application {
             @Override
             public void dataSetRemoved() {
                 home.setTitle("Delving SIP Creator");
+                sipModel.seekFirstRecord();
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getMappingModel().setRecordMapping(null);
+                        sipModel.getAnalysisModel().setStatistics(null);
+                        sipModel.getDataSetFacts().set(null);
+                    }
+                });
             }
 
             @Override

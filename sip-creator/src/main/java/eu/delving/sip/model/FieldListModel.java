@@ -89,7 +89,7 @@ public class FieldListModel extends AbstractListModel {
 
         @Override
         public Object getElementAt(int index) {
-            return unmappedFields.get(index);
+            return index >= unmappedFields.size() ? null : unmappedFields.get(index);
         }
 
         @Override

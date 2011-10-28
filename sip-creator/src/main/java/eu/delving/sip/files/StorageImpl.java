@@ -577,7 +577,9 @@ public class StorageImpl extends StorageBase implements Storage {
             if (progressListener != null) progressListener.prepareFor((int) (streamLength / BLOCK_SIZE));
             CountingInputStream counting = new CountingInputStream(inputStream);
             ZipInputStream zipInputStream = new ZipInputStream(counting);
-            String unzippedName = FileType.SOURCE.getName().substring(0, FileType.SOURCE.getName().length() - ".gz".length());
+// todo: this is the way it should be
+//            String unzippedName = FileType.SOURCE.getName().substring(0, FileType.SOURCE.getName().length() - ".gz".length());
+            String unzippedName = "records.xml";
             try {
                 while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                     String fileName = zipEntry.getName();
@@ -598,7 +600,9 @@ public class StorageImpl extends StorageBase implements Storage {
                         if (progressListener != null) progressListener.finished(!cancelled);
                         outputStream.close();
                         File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
-                        FileUtils.moveFile(source, hashedSource);
+                        if (!hashedSource.exists()) {
+                            FileUtils.moveFile(source, hashedSource);
+                        }
                     }
                     else {
                         File file = new File(here, fileName);

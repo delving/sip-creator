@@ -26,6 +26,7 @@ import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
@@ -34,6 +35,7 @@ import eu.delving.sip.model.SipModel;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -71,7 +73,12 @@ public class DataSetMenu extends JMenu {
 
             @Override
             public void recordMappingSelected(RecordMapping recordMapping) {
-                refresh();
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
             }
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
@@ -146,6 +153,11 @@ public class DataSetMenu extends JMenu {
                 else if (last != null) {
                     sipModel.setDataSet(last, true);
                 }
+            }
+            if (bg.getButtonCount() == 0) {
+                JMenuItem empty = new JMenuItem("No data sets available");
+                empty.setEnabled(false);
+                add(empty);
             }
         }
         catch (StorageException e) {
