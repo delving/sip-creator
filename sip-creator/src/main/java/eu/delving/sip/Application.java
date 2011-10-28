@@ -54,6 +54,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -383,8 +384,10 @@ public class Application {
 
     private class PasswordFetcher implements OAuthClient.PasswordRequest, ActionListener {
 
+        private static final String PASSWORD = "Password";
         private JDialog dialog = new JDialog(home, "Culture Hub", true);
         private JPasswordField passwordField = new JPasswordField(15);
+        private JCheckBox savePassword = new JCheckBox("Save password");
         private StringBuilder password = new StringBuilder();
         private JButton ok = new JButton("Ok");
 
@@ -392,6 +395,8 @@ public class Application {
             // We disable the submit button by default and if the content != empty
             ok.addActionListener(this);
             ok.setEnabled(false);
+            String savedPassword = sipModel.getPreferences().get(PASSWORD, "");
+            savePassword.setSelected(!savedPassword.isEmpty());
             passwordField.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent documentEvent) {
@@ -408,6 +413,7 @@ public class Application {
                     insertUpdate(documentEvent);
                 }
             });
+            passwordField.setText(savedPassword);
             JLabel labelA = new JLabel("Password: ");
             labelA.setLabelFor(passwordField);
             passwordField.addActionListener(this);
@@ -419,10 +425,11 @@ public class Application {
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             buttonPanel.add(ok);
 
-            JPanel wrap = new JPanel(new BorderLayout(5, 5));
+            JPanel wrap = new JPanel(new GridLayout(0, 1, 5, 5));
             wrap.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            wrap.add(fieldPanel, BorderLayout.CENTER);
-            wrap.add(buttonPanel, BorderLayout.SOUTH);
+            wrap.add(fieldPanel);
+            wrap.add(savePassword);
+            wrap.add(buttonPanel);
 
             dialog.getContentPane().add(wrap, BorderLayout.CENTER);
             dialog.pack();
@@ -430,7 +437,6 @@ public class Application {
 
         @Override
         public String getPassword() {
-            passwordField.setText(null);
             dialog.setLocation(
                     (Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getSize().width) / 2,
                     (Toolkit.getDefaultToolkit().getScreenSize().height - dialog.getSize().height) / 2
@@ -443,6 +449,7 @@ public class Application {
         public void actionPerformed(ActionEvent actionEvent) {
             password.setLength(0);
             password.append(new String(passwordField.getPassword()));
+            sipModel.getPreferences().put(PASSWORD, savePassword.isSelected() ? password.toString() : "");
             dialog.setVisible(false);
         }
     }
