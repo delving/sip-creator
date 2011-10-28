@@ -208,6 +208,7 @@ public class Application {
                         sipModel.getMappingModel().setRecordMapping(null);
                         sipModel.getAnalysisModel().setStatistics(null);
                         sipModel.getDataSetFacts().set(null);
+                        sipModel.getRecordCompileModel().updatedRecord(null);
                     }
                 });
             }
