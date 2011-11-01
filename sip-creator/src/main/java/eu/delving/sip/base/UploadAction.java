@@ -94,9 +94,14 @@ public class UploadAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        addIfAbsent();
-        reportFilePopup.setVisible(true);
-        reportFilePopup.upload.requestFocusInWindow();
+        if (realUploadAction.isEnabled()) {
+            addIfAbsent();
+            reportFilePopup.setVisible(true);
+            reportFilePopup.upload.requestFocusInWindow();
+        }
+        else {
+            JOptionPane.showMessageDialog(parent, "Upload not permitted until data set is validated");
+        }
     }
 
     private void addIfAbsent() {
