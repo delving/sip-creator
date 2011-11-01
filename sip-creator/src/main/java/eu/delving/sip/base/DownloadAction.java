@@ -54,6 +54,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -213,7 +214,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         }
     }
 
-    private class Entry {
+    private class Entry implements Comparable<Entry> {
         CultureHubClient.DataSetEntry dataSetEntry;
         DataSet dataSet;
 
@@ -228,6 +229,15 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
 
         public boolean isDownloadable() {
             return dataSet == null && dataSetEntry.lockedBy == null;
+        }
+
+        @Override
+        public int compareTo(Entry entry) {
+            return dataSetEntry.spec.compareTo(entry.dataSetEntry.spec);
+        }
+
+        public String toString() {
+            return dataSetEntry.spec;
         }
     }
 
@@ -254,6 +264,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
                     this.entries.add(new Entry(incoming, dataSets.get(incoming.spec)));
                 }
             }
+            Collections.sort(this.entries);
             fireIntervalAdded(this, 0, getSize());
         }
 
