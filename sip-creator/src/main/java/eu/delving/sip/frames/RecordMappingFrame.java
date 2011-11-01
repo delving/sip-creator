@@ -118,17 +118,22 @@ public class RecordMappingFrame extends FrameBase {
 
             @Override
             public void recordMappingChanged(RecordMapping recordMapping) {
-                String code = recordMapping.toDisplayCode();
-                codeArea.setText(code);
-                copyTemplate.enableFor(recordMapping);
-                applyTemplate.enableFor(recordMapping);
+                if (recordMapping != null) {
+                    String code = recordMapping.toDisplayCode();
+                    codeArea.setText(code);
+                    copyTemplate.enableFor(recordMapping);
+                    applyTemplate.enableFor(recordMapping);
+                }
+                else {
+                    codeArea.setText("// no code");
+                    copyTemplate.setEnabled(false);
+                    applyTemplate.setEnabled(false);
+                }
             }
 
             @Override
             public void recordMappingSelected(RecordMapping recordMapping) {
                 recordMappingChanged(recordMapping);
-                copyTemplate.enableFor(recordMapping);
-                applyTemplate.enableFor(recordMapping);
             }
         });
         removeMappingButton.addActionListener(new ActionListener() {

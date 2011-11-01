@@ -477,9 +477,7 @@ public class SipModel {
     }
 
     public void seekRecord(ScanPredicate scanPredicate, ProgressListener progressListener) {
-        if (analysisModel.hasRecordRoot()) {
-            Exec.work(new RecordScanner(scanPredicate, progressListener));
-        }
+        Exec.work(new RecordScanner(scanPredicate, progressListener));
     }
 
     // === privates
@@ -496,7 +494,10 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                if (!analysisModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
+                if (!hasDataSet() || !analysisModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
+                    for (ParseListener parseListener : parseListeners) {
+                        parseListener.updatedRecord(null);
+                    }
                     return;
                 }
                 if (metadataParser == null) {

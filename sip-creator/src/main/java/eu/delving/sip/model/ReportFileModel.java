@@ -67,16 +67,18 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
             });
         }
         try {
-            final List<String> freshLines = sipModel.getDataSetModel().getDataSet().getReport(recordMapping);
-            if (freshLines != null) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        lines = freshLines;
-                        fireIntervalAdded(ReportFileModel.this, 0, getSize());
-                    }
-                });
+            if (recordMapping != null) {
+                final List<String> freshLines = sipModel.getDataSetModel().getDataSet().getReport(recordMapping);
+                if (freshLines != null) {
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            lines = freshLines;
+                            fireIntervalAdded(ReportFileModel.this, 0, getSize());
+                        }
+                    });
 
+                }
             }
         }
         catch (StorageException e) {

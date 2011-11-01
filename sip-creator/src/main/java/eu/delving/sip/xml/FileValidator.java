@@ -186,7 +186,11 @@ public class FileValidator implements Runnable {
             LOG.info("Validation aborted by user");
         }
         finally {
-            if (!aborted) {
+            if (aborted) {
+                sipModel.getFeedback().say("Validation canceled");
+            }
+            else {
+                sipModel.getFeedback().say("Finished validating");
                 listener.finished(aborted ? null : valid, sipModel.getAnalysisModel().getRecordCount());
             }
             uniqueness.destroy();

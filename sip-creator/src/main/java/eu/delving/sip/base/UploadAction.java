@@ -94,8 +94,14 @@ public class UploadAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        addIfAbsent();
-        reportFilePopup.setVisible(true);
+        if (realUploadAction.isEnabled()) {
+            addIfAbsent();
+            reportFilePopup.setVisible(true);
+            reportFilePopup.upload.requestFocusInWindow();
+        }
+        else {
+            JOptionPane.showMessageDialog(parent, "Upload not permitted until data set is validated");
+        }
     }
 
     private void addIfAbsent() {
@@ -124,6 +130,7 @@ public class UploadAction extends AbstractAction {
 
         private ListModel reportFileModel = sipModel.getReportFileModel();
         private JList list = new JList(reportFileModel);
+        private JButton upload;
 
         public ReportFilePopup() {
             super(
@@ -155,7 +162,8 @@ public class UploadAction extends AbstractAction {
             });
             JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             p.add(cancel);
-            p.add(new JButton(realUploadAction));
+            p.add(upload = new JButton(realUploadAction));
+            getRootPane().setDefaultButton(upload);
             return p;
         }
     }
@@ -201,11 +209,14 @@ public class UploadAction extends AbstractAction {
                     }
 
                     @Override
-                    public void finished() {
+                    public void finished(final boolean success) {
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
                                 disappear();
+                                if (success) {
+                                    JOptionPane.showMessageDialog(parent, "Upload complete");
+                                }
                             }
                         });
                     }

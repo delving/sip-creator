@@ -40,6 +40,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provide a popped-up progress bar
@@ -52,7 +54,7 @@ public class ProgressPopup implements ProgressListener {
     private JDialog dialog;
     private long lastProgress;
     private volatile boolean cancel;
-    private End end;
+    private List<End> ends = new ArrayList<End>();
     private Timer showTimer = new Timer(500, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -108,15 +110,6 @@ public class ProgressPopup implements ProgressListener {
             });
             lastProgress = System.currentTimeMillis();
         }
-        if (cancel) {
-            Exec.swing(new Runnable() {
-                @Override
-                public void run() {
-                    dialog.setVisible(false);
-                    if (end != null) end.finished(false);
-                }
-            });
-        }
         return !cancel;
     }
 
@@ -129,13 +122,13 @@ public class ProgressPopup implements ProgressListener {
                 if (dialog.isVisible()) {
                     dialog.setVisible(false);
                 }
-                if (end != null) end.finished(success);
+                for (End end : ends) end.finished(success);
             }
         });
     }
 
     @Override
     public void onFinished(End end) {
-        this.end = end;
+        this.ends.add(end);
     }
 }
