@@ -337,7 +337,6 @@ public class CultureHubClient {
                     switch (code) {
                         case OK:
                             dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
-                            EntityUtils.consume(entity);
                             success = true;
                             context.dataSetCreated(dataSet);
                             say(String.format("Local data set %s created in workspace", dataSet.getSpec()));
@@ -352,6 +351,7 @@ public class CultureHubClient {
                             Code.from(response).notifyUser(context);
                             break;
                     }
+                    EntityUtils.consume(entity);
                 }
                 else {
                     throw new IOException("Empty entity");
