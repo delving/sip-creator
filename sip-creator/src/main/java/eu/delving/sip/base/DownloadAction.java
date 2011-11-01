@@ -34,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -152,8 +153,21 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
 
     private JPanel createButtonPanel() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        p.add(new JButton(cancel));
-        p.add(new JButton(fetch));
+        final JButton cancelButton = new JButton(cancel);
+        JButton fetchButton = new JButton(fetch);
+        p.add(cancelButton);
+        p.add(fetchButton);
+        fetchButton.registerKeyboardAction(
+                fetchButton.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
+                JComponent.WHEN_FOCUSED
+        );
+        fetchButton.registerKeyboardAction(
+                fetchButton.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
+                JComponent.WHEN_FOCUSED
+        );
+        dialog.getRootPane().setDefaultButton(fetchButton);
         return p;
     }
 

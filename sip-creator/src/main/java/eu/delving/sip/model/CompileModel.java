@@ -173,6 +173,9 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         if (metadataRecord != null) {
             compileSoon();
         }
+        else {
+            Exec.swing(new DocumentSetter(outputDocument, ""));
+        }
     }
 
     public Document getCodeDocument() {
@@ -210,7 +213,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                     return "// no mapping";
                 }
             case FIELD:
-                if (selectedFieldMapping == null) {
+                if (selectedFieldMapping == null || recordMapping == null) {
                     return "// no code";
                 }
                 else {

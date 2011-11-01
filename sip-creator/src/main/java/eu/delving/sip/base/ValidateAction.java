@@ -125,6 +125,13 @@ public class ValidateAction extends AbstractAction {
                 sipModel.getMappingModel().getRecordMapping().getPrefix()
         );
         ProgressListener progressListener = sipModel.getFeedback().progressListener("Validating", message);
+        progressListener.onFinished(new ProgressListener.End() {
+            @Override
+            public void finished(boolean success) {
+                setEnabled(true);
+            }
+        });
+        setEnabled(false);
         sipModel.validateFile(
                 allowInvalidRecords,
                 progressListener,
