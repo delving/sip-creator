@@ -598,7 +598,10 @@ public class StorageImpl extends StorageBase implements Storage {
                         if (progressListener != null) progressListener.finished(!cancelled);
                         outputStream.close();
                         File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
-                        if (!hashedSource.exists()) {
+                        if (hashedSource.exists()) {
+                            FileUtils.deleteQuietly(source); // already got it
+                        }
+                        else {
                             FileUtils.moveFile(source, hashedSource);
                         }
                     }

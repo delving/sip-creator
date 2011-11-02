@@ -122,7 +122,12 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public ProgressListener progressListener(String title, String message) {
-        return new ProgressPopup(desktop, title, message);
+        return new ProgressPopup(desktop, title, null, message);
+    }
+
+    @Override
+    public ProgressListener progressListener(String title, String initialMessage, String message) {
+        return new ProgressPopup(desktop, title, initialMessage, message);
     }
 
     private void addToList(final String message) {
