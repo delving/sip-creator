@@ -151,6 +151,7 @@ public class AllFrames {
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {
+                dataSetStateChanged(dataSet, dataSet.getState());
             }
 
             @Override
@@ -161,21 +162,46 @@ public class AllFrames {
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 switch (dataSetState) {
                     case EMPTY:
-                        select(null);
+                        select(View.CLEAR);
                         break;
                     case IMPORTED:
                     case ANALYZED_IMPORT:
-                        select(View.FIRST_CONTACT);
-                        break;
-                    case DELIMITED:
+                        switch (current) {
+                            case CLEAR:
+                            case QUICK_MAPPING:
+                            case CODE_TWEAKING:
+                            case DEEP_DELVING:
+                            case BIG_PICTURE:
+                            case DECADENT_DISPLAY:
+                                select(View.FIRST_CONTACT);
+                                break;
+                            case FIRST_CONTACT:
+                            case PROJECTOR:
+                                break;
+                            default:
+                                throw new RuntimeException();
+                        }
                         break;
                     case SOURCED:
-                        break;
+                    case DELIMITED:
                     case ANALYZED_SOURCE:
-                        break;
                     case MAPPING:
-                        break;
                     case VALIDATED:
+                        switch (current) {
+                            case CLEAR:
+                            case FIRST_CONTACT:
+                                select(View.QUICK_MAPPING);
+                                break;
+                            case QUICK_MAPPING:
+                            case CODE_TWEAKING:
+                            case DEEP_DELVING:
+                            case BIG_PICTURE:
+                            case DECADENT_DISPLAY:
+                            case PROJECTOR:
+                                break;
+                            default:
+                                throw new RuntimeException();
+                        }
                         break;
                 }
             }
@@ -230,6 +256,7 @@ public class AllFrames {
         for (Arrangement arrangement : views) {
             if (arrangement.view == view) {
                 arrangement.actionPerformed(null);
+                sipModel.getFeedback().say(String.format("Selecting view %s", view.getName()));
                 return;
             }
         }
