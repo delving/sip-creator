@@ -160,7 +160,7 @@ public class VisualFeedback implements Feedback {
             int width = desktopPane.getSize().width * 2 / 3;
             setLocation(desktopPane.getSize().width - width + 8, 16);
             setSize(width, desktopPane.getSize().height);
-            openFrame(false);
+            openFrame();
         }
     }
 

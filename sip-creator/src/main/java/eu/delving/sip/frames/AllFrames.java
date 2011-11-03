@@ -21,8 +21,12 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.menus.EditHistory;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
@@ -55,15 +59,40 @@ import static eu.delving.sip.base.FrameBase.INSETS;
  */
 
 public class AllFrames {
+    private final String VIEW_PREF = "currentView";
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
     private FrameBase[] frames;
     private Arrangement[] views;
     private JDesktopPane desktop;
     private int viewIndex = 1;
+    private View current = View.CLEAR;
+    private SipModel sipModel;
 
-    public AllFrames(JDesktopPane desktop, SipModel sipModel, EditHistory editHistory) {
+    private enum View {
+        CLEAR("Clear"),
+        FIRST_CONTACT("First contact"),
+        QUICK_MAPPING("Quick mapping"),
+        CODE_TWEAKING("Code tweaking"),
+        DEEP_DELVING("Deep delving"),
+        BIG_PICTURE("Big Picture"),
+        DECADENT_DISPLAY("Decadant Display"),
+        PROJECTOR("Projector");
+
+        private String name;
+
+        View(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    public AllFrames(JDesktopPane desktop, final SipModel sipModel, EditHistory editHistory) {
         this.desktop = desktop;
+        this.sipModel = sipModel;
         FrameBase status, analysis, create, statistics, input, fieldMapping, recordMapping, output;
         this.frames = new FrameBase[]{
                 status = new FactsFrame(desktop, sipModel),
@@ -76,30 +105,30 @@ public class AllFrames {
                 output = new OutputFrame(desktop, sipModel)
         };
         this.views = new Arrangement[]{
-                view("First contact",
+                view(View.FIRST_CONTACT,
                         block(analysis, 0, 0, 1, 3),
                         block(statistics, 1, 0, 1, 2),
                         block(status, 1, 2)
                 ),
-                view("Quick mapping",
+                view(View.QUICK_MAPPING,
                         block(create, 0, 0),
                         block(statistics, 1, 0),
                         block(recordMapping, 2, 0)
                 ),
-                view("Code tweaking",
+                view(View.CODE_TWEAKING,
                         block(recordMapping, 0, 0),
                         block(fieldMapping, 1, 0, 3, 1),
                         block(input, 4, 0)
                 ),
-                view("Deep delving",
+                view(View.DEEP_DELVING,
                         block(fieldMapping, 0, 0)
                 ),
-                view("Big picture",
+                view(View.BIG_PICTURE,
                         block(input, 0, 0),
                         block(recordMapping, 1, 0),
                         block(output, 2, 0)
                 ),
-                view("Decadent Display",
+                view(View.DECADENT_DISPLAY,
                         block(create, 0, 0, 3, 3),
                         block(statistics, 0, 3, 2, 3),
                         block(input, 5, 0, 2, 4),
@@ -108,7 +137,7 @@ public class AllFrames {
                         block(output, 5, 4, 2, 4),
                         block(status, 0, 6, 2, 2)
                 ),
-                view("Projector",
+                view(View.PROJECTOR,
                         block(analysis, 0, 0),
                         block(create, 0, 0),
                         block(statistics, 0, 0),
@@ -119,25 +148,47 @@ public class AllFrames {
                         block(status, 0, 0)
                 ),
         };
-    }
-
-    public void putState() {
-        for (FrameBase frame : frames) frame.putState();
-    }
-
-    public void select(int viewNumber) {
-        if (viewNumber < 0) {
-            for (FrameBase frame : frames) {
-                frame.closeFrame();
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void dataSetChanged(DataSet dataSet) {
             }
-        }
-        else {
-            views[viewNumber].actionPerformed(null);
-        }
+
+            @Override
+            public void dataSetRemoved() {
+            }
+
+            @Override
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                switch (dataSetState) {
+                    case EMPTY:
+                        select(null);
+                        break;
+                    case IMPORTED:
+                    case ANALYZED_IMPORT:
+                        select(View.FIRST_CONTACT);
+                        break;
+                    case DELIMITED:
+                        break;
+                    case SOURCED:
+                        break;
+                    case ANALYZED_SOURCE:
+                        break;
+                    case MAPPING:
+                        break;
+                    case VALIDATED:
+                        break;
+                }
+            }
+        });
     }
 
     public void restore() {
-        for (FrameBase frame : frames) if (frame.wasVisible()) frame.openFrame(true);
+        Exec.swingLater(new Runnable() {
+            @Override
+            public void run() {
+                select(View.valueOf(sipModel.getPreferences().get(VIEW_PREF, View.CLEAR.toString())));
+            }
+        });
     }
 
     public JMenu getFrameMenu() {
@@ -174,8 +225,22 @@ public class AllFrames {
         return p;
     }
 
-    private Arrangement view(String name, Block... blocks) {
-        return new Arrangement(name, viewIndex++, blocks);
+    private void select(View view) {
+        if (current == view) return;
+        for (Arrangement arrangement : views) {
+            if (arrangement.view == view) {
+                arrangement.actionPerformed(null);
+                return;
+            }
+        }
+        for (FrameBase frame : frames) {
+            frame.closeFrame();
+        }
+        current = View.CLEAR;
+    }
+
+    private Arrangement view(View view, Block... blocks) {
+        return new Arrangement(view, viewIndex++, blocks);
     }
 
     private Block block(FrameBase frame, int x, int y) {
@@ -222,10 +287,12 @@ public class AllFrames {
     }
 
     private class Arrangement extends AbstractAction {
+        View view;
         Block[] blocks;
 
-        Arrangement(String name, int viewIndex, Block[] blocks) {
-            super(name);
+        Arrangement(View view, int viewIndex, Block[] blocks) {
+            super(view.getName());
+            this.view = view;
             putValue(
                     Action.ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -252,8 +319,9 @@ public class AllFrames {
                 block.frame.setSize(situation.size);
             }
             for (Block block : blocks) {
-                block.frame.openFrame(false);
+                block.frame.openFrame();
             }
+            sipModel.getPreferences().put(VIEW_PREF, (current = view).toString());
         }
 
     }

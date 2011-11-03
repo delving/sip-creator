@@ -53,7 +53,7 @@ public class HarvestDialog extends FrameBase {
     }
 
     public void openAtPosition() {
-        openFrame(false);
+        openFrame();
     }
 
     private class CancelAction extends AbstractAction {
