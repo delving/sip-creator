@@ -51,19 +51,22 @@ import java.util.List;
 
 public class ProgressPopup implements ProgressListener {
     private BoundedRangeModel boundedRangeModel = new DefaultBoundedRangeModel();
+    private JProgressBar bar = new JProgressBar(boundedRangeModel);
+    private JLabel messageLabel = new JLabel();
+    private String message;
     private JDialog dialog;
     private long lastProgress;
     private volatile boolean cancel;
     private List<End> ends = new ArrayList<End>();
-    private Timer showTimer = new Timer(500, new ActionListener() {
+    private Timer showTimer = new Timer(200, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             if (!cancel) dialog.setVisible(true);
         }
     });
 
-    public ProgressPopup(Component parent, String title, String message) {
-        JProgressBar bar = new JProgressBar(boundedRangeModel);
+    public ProgressPopup(Component parent, String title, String initialMessage, String message) {
+        this.message = message;
         this.showTimer.setRepeats(false);
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), title, Dialog.ModalityType.APPLICATION_MODAL);
         JButton cancelButton = new JButton("Cancel");
@@ -79,13 +82,21 @@ public class ProgressPopup implements ProgressListener {
         });
         JPanel p = new JPanel(new GridLayout(0, 1));
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        p.add(new JLabel(message));
+        p.add(messageLabel);
         p.add(bar);
         p.add(bp);
         this.dialog.getContentPane().add(p);
         Dimension all = parent.getSize();
         this.dialog.setLocation(all.width / 4, 100);
         this.dialog.setSize(all.width / 2, 150);
+        if (initialMessage != null) {
+            messageLabel.setText(initialMessage);
+            bar.setIndeterminate(true);
+            showTimer.start();
+        }
+        else {
+            messageLabel.setText(message);
+        }
     }
 
     @Override
@@ -94,7 +105,12 @@ public class ProgressPopup implements ProgressListener {
             @Override
             public void run() {
                 boundedRangeModel.setMaximum(total);
-                showTimer.start();
+                if (bar.isIndeterminate()) {
+                    messageLabel.setText(message);
+                }
+                else {
+                    showTimer.start();
+                }
             }
         });
     }

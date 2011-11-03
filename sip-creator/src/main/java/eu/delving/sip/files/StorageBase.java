@@ -53,7 +53,6 @@ import static eu.delving.sip.files.Storage.FileType.FACTS;
 import static eu.delving.sip.files.Storage.FileType.HINTS;
 import static eu.delving.sip.files.Storage.FileType.IMPORTED;
 import static eu.delving.sip.files.Storage.FileType.MAPPING;
-import static eu.delving.sip.files.Storage.FileType.PHANTOM;
 import static eu.delving.sip.files.Storage.FileType.REPORT;
 import static eu.delving.sip.files.Storage.FileType.SOURCE;
 import static eu.delving.sip.files.Storage.FileType.SOURCE_STATS;
@@ -188,10 +187,6 @@ public class StorageBase {
     File statisticsFile(File dir, boolean sourceFormat) {
         String name = sourceFormat ? SOURCE_STATS.getName() : ANALYSIS_STATS.getName();
         return new File(dir, name);
-    }
-
-    File phantomFile(File dir) {
-        return new File(dir, PHANTOM.getName());
     }
 
     private File findOrCreate(File directory, Storage.FileType fileType) {
