@@ -54,6 +54,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -182,8 +183,9 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
             Entry entry = (Entry) list.getSelectedValue();
             if (entry == null) return;
             setEnabled(false);
+            String initialMessage = String.format("<html><h3>Culture hub is preparing '%s' for download.</h3>.", entry.getSpec());
             String message = String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", entry.getSpec());
-            ProgressListener listener = sipModel.getFeedback().progressListener("Download", message);
+            ProgressListener listener = sipModel.getFeedback().progressListener("Download", initialMessage, message);
             listener.onFinished(new ProgressListener.End() {
                 @Override
                 public void finished(boolean success) {
@@ -213,7 +215,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         }
     }
 
-    private class Entry {
+    private class Entry implements Comparable<Entry> {
         CultureHubClient.DataSetEntry dataSetEntry;
         DataSet dataSet;
 
@@ -228,6 +230,15 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
 
         public boolean isDownloadable() {
             return dataSet == null && dataSetEntry.lockedBy == null;
+        }
+
+        @Override
+        public int compareTo(Entry entry) {
+            return dataSetEntry.spec.compareTo(entry.dataSetEntry.spec);
+        }
+
+        public String toString() {
+            return dataSetEntry.spec;
         }
     }
 
@@ -254,6 +265,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
                     this.entries.add(new Entry(incoming, dataSets.get(incoming.spec)));
                 }
             }
+            Collections.sort(this.entries);
             fireIntervalAdded(this, 0, getSize());
         }
 

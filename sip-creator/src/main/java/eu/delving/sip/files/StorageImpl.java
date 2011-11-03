@@ -38,9 +38,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,10 +50,11 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serializable;
-import java.io.Writer;
 import java.security.DigestOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -68,7 +69,6 @@ import static eu.delving.sip.files.DataSetState.DELIMITED;
 import static eu.delving.sip.files.DataSetState.EMPTY;
 import static eu.delving.sip.files.DataSetState.IMPORTED;
 import static eu.delving.sip.files.DataSetState.MAPPING;
-import static eu.delving.sip.files.DataSetState.PHANTOM;
 import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.DataSetState.VALIDATED;
 
@@ -99,12 +99,12 @@ public class StorageImpl extends StorageBase implements Storage {
     public Map<String, DataSet> getDataSets() {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
-        if (list != null) {
-            for (File directory : list) {
-                if (directory.isDirectory() && !phantomFile(directory).exists()) {
-                    map.put(directory.getName(), new DataSetImpl(directory));
-                }
-            }
+        for (File directory : list) {
+            if (!directory.isDirectory()) continue;
+            boolean hasFiles = false;
+            for (File sub : directory.listFiles()) if (sub.isFile()) hasFiles = true;
+            if (!hasFiles) continue;
+            map.put(directory.getName(), new DataSetImpl(directory));
         }
         return map;
     }
@@ -112,16 +112,7 @@ public class StorageImpl extends StorageBase implements Storage {
     @Override
     public DataSet createDataSet(String spec) throws StorageException {
         File directory = new File(home, spec);
-        if (directory.exists()) {
-            File phantomFile = phantomFile(directory);
-            if (phantomFile.exists()) {
-                delete(phantomFile);
-            }
-            else {
-                throw new StorageException(String.format("Data set directory %s already exists", directory.getAbsolutePath()));
-            }
-        }
-        else if (!directory.mkdirs()) {
+        if (!directory.exists() && !directory.mkdirs()) {
             throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }
         return new DataSetImpl(directory);
@@ -196,9 +187,6 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public DataSetState getState() {
-            if (phantomFile(here).exists()) {
-                return PHANTOM;
-            }
             File imported = importedFile(here);
             File source = sourceFile(here);
             if (imported.exists()) {
@@ -324,7 +312,12 @@ public class StorageImpl extends StorageBase implements Storage {
         public File renameInvalidSource() throws StorageException {
             File sourceFile = sourceFile(here);
             File renamedFile = new File(here, String.format("%s.error", sourceFile.getName()));
-            rename(sourceFile, renamedFile);
+            try {
+                FileUtils.moveFile(sourceFile, renamedFile);
+            }
+            catch (IOException e) {
+                throw new StorageException("Unable to rename source file to error", e);
+            }
             return renamedFile;
         }
 
@@ -332,7 +325,12 @@ public class StorageImpl extends StorageBase implements Storage {
         public File renameInvalidImport() throws StorageException {
             File importFile = importedFile(here);
             File renamedFile = new File(here, String.format("%s.error", importFile.getName()));
-            rename(importFile, renamedFile);
+            try {
+                FileUtils.moveFile(importFile, renamedFile);
+            }
+            catch (IOException e) {
+                throw new StorageException("Unable to rename import file to error", e);
+            }
             return renamedFile;
         }
 
@@ -512,7 +510,6 @@ public class StorageImpl extends StorageBase implements Storage {
                     delete(source);
                     throw new StorageException("This import was identical to the previous one. Discarded.");
                 }
-                rename(source, hashedSource);
             }
         }
 
@@ -536,7 +533,11 @@ public class StorageImpl extends StorageBase implements Storage {
                 converter.parse(importedInput(), digestOut);
                 File source = new File(here, FileType.SOURCE.getName());
                 File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
-                rename(source, hashedSource);
+                if (hashedSource.exists()) {
+                    FileUtils.deleteQuietly(hashedSource);
+                }
+                FileUtils.moveFile(source, hashedSource);
+                FileUtils.deleteQuietly(statisticsFile(here, true));
             }
             catch (StorageException e) {
                 throw e;
@@ -598,7 +599,10 @@ public class StorageImpl extends StorageBase implements Storage {
                         if (progressListener != null) progressListener.finished(!cancelled);
                         outputStream.close();
                         File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
-                        if (!hashedSource.exists()) {
+                        if (hashedSource.exists()) {
+                            FileUtils.deleteQuietly(source); // already got it
+                        }
+                        else {
                             FileUtils.moveFile(source, hashedSource);
                         }
                     }
@@ -619,23 +623,20 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void remove() throws StorageException {
-            File phantomFile = phantomFile(here);
+            String now = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+            File saveDirectory = new File(here, now);
             try {
-                Writer out = new FileWriter(phantomFile);
-                out.write("This file marks a dataset as absent");
-                out.close();
+                for (File file : here.listFiles(new FileFilter() {
+                    @Override
+                    public boolean accept(File file) {
+                        return file.isFile();
+                    }
+                })) {
+                    FileUtils.moveFileToDirectory(file, saveDirectory, true);
+                }
             }
             catch (IOException e) {
-                throw new StorageException(String.format("Unable to create phantom file %s to mark data set deleted", phantomFile.getAbsolutePath()), e);
-            }
-        }
-
-        private void rename(File from, File to) throws StorageException {
-            try {
-                FileUtils.moveFile(from, to);
-            }
-            catch (IOException e) {
-                throw new StorageException("rename", e);
+                throw new StorageException(String.format("Unable to save files in %s to directory %s", here.getName(), now), e);
             }
         }
 

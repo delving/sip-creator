@@ -172,11 +172,11 @@ public abstract class FrameBase extends JInternalFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            openFrame(true);
+            openFrame();
         }
     }
 
-    public void openFrame(boolean oldPosition) {
+    public void openFrame() {
         init();
         refresh();
         Point added = addIfAbsent();
@@ -188,16 +188,10 @@ public abstract class FrameBase extends JInternalFrame {
         }
         super.show();
         ensureOnScreen();
-        if (added != null && oldPosition) {
-            setLocation(added);
-            Dimension savedSize = getSavedSize();
-            if (savedSize != null) {
-                setSize(savedSize);
-            }
-            else {
-                setSize(defaultSize); // after show
-            }
-        }
+//        if (added != null && oldPosition) {
+//            setLocation(added);
+//            setSize(defaultSize); // after show
+//        }
         if (hasChildFrame()) {
             childFrame.moveToFront();
             try {
@@ -249,15 +243,9 @@ public abstract class FrameBase extends JInternalFrame {
                 return max;
             }
             else {
-                Point savedLocation = getSavedLocation();
-                if (savedLocation != null) {
-                    return savedLocation;
-                }
-                else {
-                    max.x += 25;
-                    max.y += 25;
-                    return max;
-                }
+                max.x += 25;
+                max.y += 25;
+                return max;
             }
         }
         else {
@@ -440,40 +428,6 @@ public abstract class FrameBase extends JInternalFrame {
             g.setColor(new Color(255, 255, 255, 100));
             g.fillRect(0, 0, getWidth(), getHeight());
         }
-    }
-
-    public boolean wasVisible() {
-        return getSavedInt("visible") == 1;
-    }
-
-    private Dimension getSavedSize() {
-        Dimension size = new Dimension(getSavedInt("width"), getSavedInt("height"));
-        return size.width > 50 && size.height > 50 ? size : null;
-    }
-
-    private Point getSavedLocation() {
-        return new Point(getSavedInt("x"), getSavedInt("y"));
-    }
-
-    private int getSavedInt(String name) {
-        return sipModel.getPreferences().getInt(String.format("%s:%s", title, name), -1);
-    }
-
-    public void putState() {
-        if (isVisible()) {
-            putSavedInt("x", getLocation().x);
-            putSavedInt("y", getLocation().y);
-            putSavedInt("width", getSize().width);
-            putSavedInt("height", getSize().height);
-            putSavedInt("visible", 1);
-        }
-        else {
-            putSavedInt("visible", 0);
-        }
-    }
-
-    private void putSavedInt(String name, int value) {
-        sipModel.getPreferences().putInt(String.format("%s:%s", title, name), value);
     }
 
     public static JScrollPane scroll(JComponent content) {

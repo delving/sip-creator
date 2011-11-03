@@ -101,7 +101,7 @@ public class DictionaryPopup extends FrameBase {
         valueModel.setFieldMapping(fieldMapping);
         setLocation(parent.getLocation());
         setSize(parent.getSize());
-        openFrame(false);
+        openFrame();
     }
 
     @Override

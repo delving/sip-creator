@@ -89,9 +89,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 /**
  * The main application
@@ -218,14 +215,8 @@ public class Application {
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
                 statusLabel.setText(dataSetState.toHtml());
                 switch (dataSetState) {
-                    case EMPTY:
-                        allFrames.select(-1);
-                        break;
                     case IMPORTED:
                         performAnalysis();
-                        break;
-                    case ANALYZED_IMPORT:
-                        allFrames.select(0);
                         break;
                     case SOURCED:
                         performAnalysis();
@@ -260,7 +251,6 @@ public class Application {
                 }
             }
         });
-        osxExtra();
     }
 
     private void performAnalysis() {
@@ -287,7 +277,6 @@ public class Application {
                 return false;
             }
         }
-        allFrames.putState();
         System.exit(0);
         return true;
     }
@@ -311,6 +300,7 @@ public class Application {
         ));
         p.add(left);
         p.add(right);
+//        p.setPreferredSize(new Dimension(100, 100));
         return p;
     }
 
@@ -451,44 +441,6 @@ public class Application {
             password.append(new String(passwordField.getPassword()));
             sipModel.getPreferences().put(PASSWORD, savePassword.isSelected() ? password.toString() : "");
             dialog.setVisible(false);
-        }
-    }
-
-    private void osxExtra() {
-        boolean osx = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
-        if (osx) {
-            try {
-                InvocationHandler handler = new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
-                        if (method.getName().equals("handleQuitRequestWith")) {
-                            if (quit()) {
-                                Method performQuitMethod = objects[1].getClass().getDeclaredMethod("performQuit");
-                                performQuitMethod.invoke(objects[1]);
-                            }
-                            else {
-                                Method performQuitMethod = objects[1].getClass().getDeclaredMethod("cancelQuit");
-                                performQuitMethod.invoke(objects[1]);
-                            }
-                        }
-                        return null;
-                    }
-                };
-                Class quitHandlerInterface = Class.forName("com.apple.eawt.QuitHandler");
-                Object quitHandlerProxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{quitHandlerInterface}, handler);
-                Class applicationClass = Class.forName("com.apple.eawt.Application");
-                Method getApplication = applicationClass.getDeclaredMethod("getApplication");
-                Object applicationInstance = getApplication.invoke(null);
-                Method setQuitHandlerMethod = applicationClass.getDeclaredMethod("setQuitHandler", quitHandlerInterface);
-                setQuitHandlerMethod.invoke(applicationInstance, quitHandlerProxy);
-            }
-            catch (ClassNotFoundException cnfe) {
-                System.err.println("This version of Mac OS X does not support the Apple EAWT.  ApplicationEvent handling has been disabled (" + cnfe + ")");
-            }
-            catch (Exception ex) {  // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
-                System.err.println("Mac OS X Adapter could not talk to EAWT:");
-                ex.printStackTrace();
-            }
         }
     }
 
