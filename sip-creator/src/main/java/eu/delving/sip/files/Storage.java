@@ -50,8 +50,7 @@ public interface Storage {
         VALIDATION(null, "validation_", null, "validation_%s.int", 1),
         REPORT(null, null, null, "report_%s.txt", 1),
         RECORD_DEFINITION(null, null, "-record-definition.xml", null, 1),
-        FACT_DEFINITION("fact-definition-list.xml"),
-        PHANTOM("phantom.txt");
+        FACT_DEFINITION("fact-definition-list.xml");
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;
