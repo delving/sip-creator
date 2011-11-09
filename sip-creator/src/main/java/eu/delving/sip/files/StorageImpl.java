@@ -22,55 +22,23 @@
 package eu.delving.sip.files;
 
 import com.thoughtworks.xstream.XStream;
-import eu.delving.metadata.FactDefinition;
-import eu.delving.metadata.Hasher;
-import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.*;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.xml.SourceConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Serializable;
+import java.io.*;
 import java.security.DigestOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static eu.delving.sip.files.DataSetState.ANALYZED_IMPORT;
-import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
-import static eu.delving.sip.files.DataSetState.DELIMITED;
-import static eu.delving.sip.files.DataSetState.EMPTY;
-import static eu.delving.sip.files.DataSetState.IMPORTED;
-import static eu.delving.sip.files.DataSetState.MAPPING;
-import static eu.delving.sip.files.DataSetState.SOURCED;
-import static eu.delving.sip.files.DataSetState.VALIDATED;
+import static eu.delving.sip.files.DataSetState.*;
 
 /**
  * This is an implementation of the Storage interface
@@ -110,8 +78,8 @@ public class StorageImpl extends StorageBase implements Storage {
     }
 
     @Override
-    public DataSet createDataSet(String spec) throws StorageException {
-        File directory = new File(home, spec);
+    public DataSet createDataSet(String spec, String organization) throws StorageException {
+        File directory = createDataSetDirectory(home, spec, organization);
         if (!directory.exists() && !directory.mkdirs()) {
             throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }
@@ -128,7 +96,12 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public String getSpec() {
-            return here.getName();
+            return getSpecFromDirectory(here);
+        }
+
+        @Override
+        public String getOrganization() {
+            return getOrganizationFromDirectory(here);
         }
 
         @Override

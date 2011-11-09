@@ -37,7 +37,7 @@ public interface Storage {
 
     Map<String, DataSet> getDataSets();
 
-    DataSet createDataSet(String spec) throws StorageException;
+    DataSet createDataSet(String spec, String organization) throws StorageException;
 
     enum FileType {
         IMPORTED("imported.xml.gz"),

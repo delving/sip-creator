@@ -29,24 +29,8 @@ import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JMenu;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -166,6 +150,8 @@ public class AllFrames {
                         break;
                     case IMPORTED:
                     case ANALYZED_IMPORT:
+                    case SOURCED:
+                    case DELIMITED:
                         switch (current) {
                             case CLEAR:
                             case QUICK_MAPPING:
@@ -182,8 +168,6 @@ public class AllFrames {
                                 throw new RuntimeException();
                         }
                         break;
-                    case SOURCED:
-                    case DELIMITED:
                     case ANALYZED_SOURCE:
                     case MAPPING:
                     case VALIDATED:

@@ -46,22 +46,10 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.io.*;
+import java.util.*;
 
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.http.HttpStatus.*;
 
 /**
  * Connect to the culture hub using HTTP
@@ -249,13 +237,6 @@ public class CultureHubClient {
                 listReceiveListener.failed(e);
             }
         }
-
-        private String createListRequest() throws OAuthSystemException, OAuthProblemException {
-            return String.format(
-                    "%s/list?accessKey=%s",
-                    context.getServerUrl(), context.getAccessToken()
-            );
-        }
     }
 
     private class Unlocker extends Attempt {
@@ -271,7 +252,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                HttpGet get = createUnlockRequest();
+                HttpGet get = createUnlockRequest(dataSet);
                 say("Unlocking data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 EntityUtils.consume(response.getEntity());
@@ -302,16 +283,6 @@ public class CultureHubClient {
                 unlockListener.unlockComplete(false);
             }
         }
-
-        private HttpGet createUnlockRequest() throws OAuthSystemException, OAuthProblemException {
-            String url = String.format(
-                    "%s/unlock/%s?accessKey=%s",
-                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
-            );
-            HttpGet get = new HttpGet(url);
-            get.setHeader("Accept", "text/xml");
-            return get;
-        }
     }
 
     private class DataSetDownloader extends Attempt {
@@ -328,7 +299,7 @@ public class CultureHubClient {
         public void run() {
             boolean success = false;
             try {
-                HttpGet get = createDownloadRequest();
+                HttpGet get = createDownloadRequest(dataSet);
                 say("Downloading SIP for data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 HttpEntity entity = response.getEntity();
@@ -376,15 +347,6 @@ public class CultureHubClient {
                 progressListener.finished(success);
             }
         }
-
-        private HttpGet createDownloadRequest() throws OAuthSystemException, OAuthProblemException {
-            HttpGet get = new HttpGet(String.format(
-                    "%s/fetch/%s-sip.zip?accessKey=%s",
-                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
-            ));
-            get.setHeader("Accept", "application/zip");
-            return get;
-        }
     }
 
     public class FileUploader extends Attempt {
@@ -402,7 +364,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                HttpPost listRequest = createSubmitRequest();
+                HttpPost listRequest = createSubmitRequest(dataSet, uploadFiles);
                 HttpResponse listResponse = httpClient.execute(listRequest);
                 HttpEntity listEntity = listResponse.getEntity();
                 if (listEntity != null) {
@@ -421,7 +383,7 @@ public class CultureHubClient {
                                 }
                             }
                             for (File file : uploadFiles) {
-                                HttpPost upload = createUploadRequest(file);
+                                HttpPost upload = createUploadRequest(dataSet, file, uploadListener);
                                 FileEntity fileEntity = (FileEntity)upload.getEntity();
                                 log.info("Uploading " + file);
                                 HttpResponse uploadResponse = httpClient.execute(upload);
@@ -460,35 +422,6 @@ public class CultureHubClient {
                 context.getFeedback().alert("Authorization system problem: " + e.getMessage());
                 uploadListener.finished(false);
             }
-        }
-
-        private HttpPost createSubmitRequest() throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
-            String url = String.format(
-                    "%s/submit/%s?accessKey=%s",
-                    context.getServerUrl(), dataSet.getSpec(), context.getAccessToken()
-            );
-            HttpPost post = new HttpPost(url);
-            post.setEntity(createListEntity());
-            post.setHeader("Accept", "text/plain");
-            return post;
-        }
-
-        private HttpEntity createListEntity() throws UnsupportedEncodingException {
-            StringBuilder fileList = new StringBuilder();
-            for (File file : uploadFiles) {
-                fileList.append(file.getName()).append("\n");
-            }
-            return new StringEntity(fileList.toString());
-        }
-
-        private HttpPost createUploadRequest(File file) throws OAuthSystemException, OAuthProblemException {
-            String url = String.format(
-                    "%s/submit/%s/%s?accessKey=%s",
-                    context.getServerUrl(), dataSet.getSpec(), file.getName(), context.getAccessToken()
-            );
-            HttpPost upload = new HttpPost(url);
-            upload.setEntity(new FileEntity(file, uploadListener));
-            return upload;
         }
     }
 
@@ -603,6 +536,83 @@ public class CultureHubClient {
         return stream;
     }
 
+
+    private String createListRequest() throws OAuthSystemException, OAuthProblemException {
+        return String.format(
+                "%s/list?accessKey=%s",
+                context.getServerUrl(), context.getAccessToken()
+        );
+    }
+
+    private HttpGet createDownloadRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
+        HttpGet get = new HttpGet(String.format(
+                "%s/fetch/%s/%s-sip.zip?accessKey=%s",
+                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
+        ));
+        get.setHeader("Accept", "application/zip");
+        return get;
+    }
+
+    private HttpPost createSubmitRequest(DataSet dataSet, List<File> uploadFiles) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
+        String url = String.format(
+                "%s/submit/%s/%s?accessKey=%s",
+                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
+        );
+        HttpPost post = new HttpPost(url);
+        post.setEntity(createListEntity(uploadFiles));
+        post.setHeader("Accept", "text/plain");
+        return post;
+    }
+
+    private HttpEntity createListEntity(List<File> uploadFiles) throws UnsupportedEncodingException {
+        StringBuilder fileList = new StringBuilder();
+        for (File file : uploadFiles) fileList.append(file.getName()).append("\n");
+        return new StringEntity(fileList.toString());
+    }
+
+    private HttpPost createUploadRequest(DataSet dataSet, File file, UploadListener uploadListener) throws OAuthSystemException, OAuthProblemException {
+        String url = String.format(
+                "%s/submit/%s/%s/%s?accessKey=%s",
+                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), file.getName(), context.getAccessToken()
+        );
+        HttpPost upload = new HttpPost(url);
+        upload.setEntity(new FileEntity(file, uploadListener));
+        return upload;
+    }
+
+
+    private HttpGet createUnlockRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
+        String url = String.format(
+                "%s/unlock/%s/%s?accessKey=%s",
+                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
+        );
+        HttpGet get = new HttpGet(url);
+        get.setHeader("Accept", "text/xml");
+        return get;
+    }
+
+    /*
+        <data-set-list>
+            <data-set>
+                <spec>{ds.spec}</spec>
+                <name>{ds.details.name}</name>
+                <orgId>{connectedOrg.get.orgId}</orgId>
+                <createdBy>
+                    <username>{creator.userName}</username>
+                    <fullname>{creator.fullname}</fullname>
+                    <email>{creator.email}</email>
+                </createdBy>{if (lockedBy != None) {
+                <lockedBy>
+                    <username>{lockedBy.get.userName}</username>
+                    <fullname>{lockedBy.get.fullname}</fullname>
+                    <email>{lockedBy.get.email}</email>
+                </lockedBy>}}
+                <state>{ds.state.toString}</state>
+                <recordCount>{ds.details.total_records}</recordCount>
+            </data-set>
+        </data-set-list>
+    */
+
     @XStreamAlias("data-set-list")
     public static class DataSetList {
         @XStreamImplicit
@@ -629,10 +639,12 @@ public class CultureHubClient {
     public static class DataSetEntry {
         public String spec;
         public String name;
+        public String orgId;
         public String state;
         public int recordCount;
         public Ownership ownership;
         public LockedBy lockedBy;
+        public CreatedBy createdBy;
 
         public String toString() {
             return "data-set spec=" + spec;
@@ -648,6 +660,13 @@ public class CultureHubClient {
 
     @XStreamAlias("lockedBy")
     public static class LockedBy {
+        public String username;
+        public String fullname;
+        public String email;
+    }
+
+    @XStreamAlias("createdBy")
+    public static class CreatedBy {
         public String username;
         public String fullname;
         public String email;

@@ -141,6 +141,11 @@ public class OAuthClient {
                 throw new OAuthSystemException(String.format("Can't connect to server : %s", e.getMessage()), e);
             }
         }
+
+        @Override
+        public void shutdown() {
+            // todo: not sure what is to be done here
+        }
     });
 
     public static Problem getProblem(OAuthProblemException ex) {
