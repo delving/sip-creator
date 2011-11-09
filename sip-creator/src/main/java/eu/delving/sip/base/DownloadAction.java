@@ -98,7 +98,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         Exec.swing(new Runnable() {
             @Override
             public void run() {
-                if (entries.isEmpty()) {
+                if (entries == null || entries.isEmpty()) {
                     listModel.setMessage("No data sets available yet. Create them on the Culture Hub first.");
                 }
                 else {
