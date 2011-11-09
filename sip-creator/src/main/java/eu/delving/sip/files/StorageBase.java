@@ -23,43 +23,14 @@ package eu.delving.sip.files;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import eu.delving.metadata.ElementDefinition;
-import eu.delving.metadata.FactDefinition;
-import eu.delving.metadata.FieldDefinition;
-import eu.delving.metadata.Hasher;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.*;
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 
-import static eu.delving.sip.files.Storage.FileType.ANALYSIS_STATS;
-import static eu.delving.sip.files.Storage.FileType.FACTS;
-import static eu.delving.sip.files.Storage.FileType.HINTS;
-import static eu.delving.sip.files.Storage.FileType.IMPORTED;
-import static eu.delving.sip.files.Storage.FileType.MAPPING;
-import static eu.delving.sip.files.Storage.FileType.REPORT;
-import static eu.delving.sip.files.Storage.FileType.SOURCE;
-import static eu.delving.sip.files.Storage.FileType.SOURCE_STATS;
-import static eu.delving.sip.files.Storage.FileType.VALIDATION;
-import static eu.delving.sip.files.Storage.RECORD_COUNT;
-import static eu.delving.sip.files.Storage.RECORD_ROOT_PATH;
-import static eu.delving.sip.files.Storage.UNIQUE_ELEMENT_PATH;
+import static eu.delving.sip.files.Storage.FileType.*;
+import static eu.delving.sip.files.Storage.*;
 
 /**
  * This class contains helpers for the StorageImpl to lean on
@@ -70,11 +41,25 @@ import static eu.delving.sip.files.Storage.UNIQUE_ELEMENT_PATH;
 public class StorageBase {
     public static final int BLOCK_SIZE = 4096;
 
+    public static File createDataSetDirectory(File home, String spec, String organization) {
+        return new File(home, String.format("%s_%s", spec, organization));
+    }
+
+    public static String getSpecFromDirectory(File directory) {
+        int underscore = directory.getName().indexOf("_");
+        if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
+        return directory.getName().substring(0, underscore);
+    }
+
+    public static String getOrganizationFromDirectory(File directory) {
+        int underscore = directory.getName().indexOf("_");
+        if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
+        return directory.getName().substring(underscore + 1);
+    }
+
     public static Path getRecordRoot(Map<String, String> hints) throws StorageException {
         String recordRoot = hints.get(RECORD_ROOT_PATH);
-        if (recordRoot == null) {
-            throw new StorageException("Must have record root path");
-        }
+        if (recordRoot == null) throw new StorageException("Must have record root path");
         return new Path(recordRoot);
     }
 
@@ -85,17 +70,13 @@ public class StorageBase {
             count = Integer.parseInt(recordCount);
         }
         catch (Exception e) { /* nothing */ }
-        if (count == 0) {
-            throw new StorageException("Must have nonzero record count");
-        }
+        if (count == 0) throw new StorageException("Must have nonzero record count");
         return count;
     }
 
     public static Path getUniqueElement(Map<String, String> hints) throws StorageException {
         String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
-        if (uniqueElement == null) {
-            throw new StorageException("Must have unique element path");
-        }
+        if (uniqueElement == null) throw new StorageException("Must have unique element path");
         return new Path(uniqueElement);
     }
 

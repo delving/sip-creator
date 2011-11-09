@@ -27,30 +27,10 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -194,7 +174,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
                 }
             });
             try {
-                DataSet dataSet = sipModel.getStorage().createDataSet(entry.getSpec());
+                DataSet dataSet = sipModel.getStorage().createDataSet(entry.getSpec(), entry.getOrganization());
                 cultureHubClient.downloadDataSet(dataSet, listener);
             }
             catch (StorageException e) {
@@ -222,6 +202,10 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         private Entry(CultureHubClient.DataSetEntry dataSetEntry, DataSet dataSet) {
             this.dataSetEntry = dataSetEntry;
             this.dataSet = dataSet;
+        }
+
+        public String getOrganization() {
+            return dataSetEntry.orgId;
         }
 
         public String getSpec() {

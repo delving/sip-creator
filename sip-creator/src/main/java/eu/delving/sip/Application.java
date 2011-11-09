@@ -22,24 +22,8 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.DownloadAction;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.HarvestDialog;
-import eu.delving.sip.base.HarvestPool;
-import eu.delving.sip.base.ImportAction;
-import eu.delving.sip.base.OAuthClient;
-import eu.delving.sip.base.ReleaseAction;
-import eu.delving.sip.base.UploadAction;
-import eu.delving.sip.base.ValidateAction;
-import eu.delving.sip.base.VisualFeedback;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
-import eu.delving.sip.files.StorageFinder;
-import eu.delving.sip.files.StorageImpl;
+import eu.delving.sip.base.*;
+import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.EditHistory;
@@ -50,44 +34,13 @@ import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.lang.StringUtils;
 
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDesktopPane;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JToggleButton;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 
 /**
@@ -342,7 +295,7 @@ public class Application {
 
         @Override
         public String getServerUrl() {
-            return String.format("http://%s/dataset/sip-creator", StorageFinder.getHostPortUser(storageDirectory));
+            return String.format("http://%s/api/sip-creator", StorageFinder.getHostPort(storageDirectory));
         }
 
         @Override
