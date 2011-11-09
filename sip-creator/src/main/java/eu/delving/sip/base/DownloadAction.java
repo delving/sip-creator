@@ -98,7 +98,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         Exec.swing(new Runnable() {
             @Override
             public void run() {
-                if (entries.isEmpty()) {
+                if (entries == null || entries.isEmpty()) {
                     listModel.setMessage("No data sets available yet. Create them on the Culture Hub first.");
                 }
                 else {
@@ -246,7 +246,8 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
             fireIntervalRemoved(this, 0, size);
             if (entries != null) {
                 for (CultureHubClient.DataSetEntry incoming : entries) {
-                    this.entries.add(new Entry(incoming, dataSets.get(incoming.spec)));
+                    String key = incoming.spec + "_" + incoming.orgId;
+                    this.entries.add(new Entry(incoming, dataSets.get(key)));
                 }
             }
             Collections.sort(this.entries);
