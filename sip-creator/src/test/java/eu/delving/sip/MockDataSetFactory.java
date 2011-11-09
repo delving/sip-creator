@@ -4,11 +4,7 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.MetadataModel;
 import eu.delving.metadata.MetadataModelImpl;
 import eu.delving.metadata.Path;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.Statistics;
-import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
-import eu.delving.sip.files.StorageImpl;
+import eu.delving.sip.files.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,6 +19,7 @@ import java.util.TreeMap;
  */
 
 public class MockDataSetFactory {
+    public static final String ORG = "orgy";
     public static final String SPEC = "spek";
     private String metadataPrefix = "abm";
     private File root;
@@ -45,9 +42,9 @@ public class MockDataSetFactory {
         if (!root.mkdirs()) {
             throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
         }
-        specDirectory = new File(root, SPEC);
+        specDirectory = new File(root, SPEC + "_" + ORG);
         storage = new StorageImpl(root);
-        dataSet = storage.createDataSet(SPEC);
+        dataSet = storage.createDataSet(SPEC, ORG);
     }
 
     public Storage getStorage() {
@@ -62,16 +59,16 @@ public class MockDataSetFactory {
         return dataSet;
     }
 
-    public File [] files() {
+    public File[] files() {
         return specDirectory.listFiles();
     }
 
-    public File [] directories() {
+    public File[] directories() {
         return root.listFiles();
     }
 
-    public Map<String,String> hints(int recordCount) {
-        Map<String,String> hints = new TreeMap<String,String>();
+    public Map<String, String> hints(int recordCount) {
+        Map<String, String> hints = new TreeMap<String, String>();
         hints.put(Storage.RECORD_ROOT_PATH, "/adlibXML/recordList/record");
         hints.put(Storage.RECORD_COUNT, String.valueOf(recordCount));
         hints.put(Storage.UNIQUE_ELEMENT_PATH, "/adlibXML/recordList/record/priref");
