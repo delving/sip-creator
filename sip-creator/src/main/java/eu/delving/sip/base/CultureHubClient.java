@@ -644,6 +644,7 @@ public class CultureHubClient {
         public int recordCount;
         public Ownership ownership;
         public LockedBy lockedBy;
+        public CreatedBy createdBy;
 
         public String toString() {
             return "data-set spec=" + spec;
@@ -659,6 +660,13 @@ public class CultureHubClient {
 
     @XStreamAlias("lockedBy")
     public static class LockedBy {
+        public String username;
+        public String fullname;
+        public String email;
+    }
+
+    @XStreamAlias("createdBy")
+    public static class CreatedBy {
         public String username;
         public String fullname;
         public String email;
