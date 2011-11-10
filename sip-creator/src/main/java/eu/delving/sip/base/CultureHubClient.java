@@ -49,6 +49,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import static org.apache.http.HttpStatus.*;
@@ -116,15 +117,25 @@ public class CultureHubClient {
         HttpParams httpParams = new BasicHttpParams();
         HttpConnectionParams.setSoTimeout(httpParams, CONNECTION_TIMEOUT);
         HttpConnectionParams.setConnectionTimeout(httpParams, CONNECTION_TIMEOUT);
-        if ("true".equals(System.getProperty("proxySet", "false"))) { // These system properties are set by JavaWebStart
-            String host = System.getProperty("proxyHost", "nohostconfigured");
-            int port = Integer.parseInt(System.getProperty("proxyPort", "80"));
-            context.getFeedback().say(String.format("An HTTP Proxy is configured at %s:%d", host, port));
-            HttpHost proxy = new HttpHost(host, port);
-            ConnRouteParams.setDefaultProxy(httpParams, proxy);
+        boolean proxyDetected = false;
+        try {
+            List<Proxy> proxies = ProxySelector.getDefault().select(new URI(context.getServerUrl()));
+            for (Proxy proxy : proxies) {
+                if (proxy.type() != Proxy.Type.HTTP) continue;
+                InetSocketAddress addr = (InetSocketAddress)proxy.address();
+                String host = addr.getHostName();
+                int port = addr.getPort();
+                context.getFeedback().say(String.format("An HTTP Proxy is detected. %s:%d", host, port));
+                HttpHost httpHost = new HttpHost(host, port);
+                ConnRouteParams.setDefaultProxy(httpParams, httpHost);
+                proxyDetected = true;
+            }
         }
-        else {
-            context.getFeedback().say("No HTTP Proxy is configured");
+        catch (URISyntaxException e) {
+            throw new RuntimeException("Bad address: "+context.getServerUrl(), e);
+        }
+        if (!proxyDetected) {
+            context.getFeedback().say("No HTTP Proxy detected");
         }
         httpClient = new DefaultHttpClient(httpParams);
     }
