@@ -33,10 +33,12 @@ import eu.delving.sip.model.Feedback;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -111,10 +113,20 @@ public class CultureHubClient {
 
     public CultureHubClient(Context context) {
         this.context = context;
-        HttpParams timeoutParams = new BasicHttpParams();
-        HttpConnectionParams.setSoTimeout(timeoutParams, CONNECTION_TIMEOUT);
-        HttpConnectionParams.setConnectionTimeout(timeoutParams, CONNECTION_TIMEOUT);
-        httpClient = new DefaultHttpClient(timeoutParams);
+        HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setSoTimeout(httpParams, CONNECTION_TIMEOUT);
+        HttpConnectionParams.setConnectionTimeout(httpParams, CONNECTION_TIMEOUT);
+        if ("true".equals(System.getProperty("proxySet", "false"))) { // These system properties are set by JavaWebStart
+            String host = System.getProperty("proxyHost", "nohostconfigured");
+            int port = Integer.parseInt(System.getProperty("proxyPort", "80"));
+            context.getFeedback().say(String.format("An HTTP Proxy is configured at %s:%d", host, port));
+            HttpHost proxy = new HttpHost(host, port);
+            ConnRouteParams.setDefaultProxy(httpParams, proxy);
+        }
+        else {
+            context.getFeedback().say("No HTTP Proxy is configured");
+        }
+        httpClient = new DefaultHttpClient(httpParams);
     }
 
     public HttpClient getHttpClient() {
@@ -384,7 +396,7 @@ public class CultureHubClient {
                             }
                             for (File file : uploadFiles) {
                                 HttpPost upload = createUploadRequest(dataSet, file, uploadListener);
-                                FileEntity fileEntity = (FileEntity)upload.getEntity();
+                                FileEntity fileEntity = (FileEntity) upload.getEntity();
                                 log.info("Uploading " + file);
                                 HttpResponse uploadResponse = httpClient.execute(upload);
                                 EntityUtils.consume(uploadResponse.getEntity());
