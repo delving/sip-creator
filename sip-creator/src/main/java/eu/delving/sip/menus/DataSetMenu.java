@@ -21,11 +21,7 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.metadata.FactDefinition;
-import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
@@ -33,10 +29,7 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -84,6 +77,7 @@ public class DataSetMenu extends JMenu {
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {
+                refresh();
             }
 
             @Override
@@ -148,7 +142,8 @@ public class DataSetMenu extends JMenu {
             }
             if (!selected) {
                 if (sipModel.hasDataSet()) {
-                    sipModel.setMetadataPrefix(sipModel.getDataSetModel().getDataSet().getLatestPrefix(), true);
+                    String latestPrefix = sipModel.getDataSetModel().getDataSet().getLatestPrefix();
+                    if (latestPrefix != null) sipModel.setMetadataPrefix(latestPrefix, true);
                 }
                 else if (last != null) {
                     sipModel.setDataSet(last, true);
