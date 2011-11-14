@@ -99,6 +99,11 @@ public class AllFrames {
                         block(statistics, 1, 0),
                         block(recordMapping, 2, 0)
                 ),
+                view(View.BIG_PICTURE,
+                        block(input, 0, 0),
+                        block(recordMapping, 1, 0),
+                        block(output, 2, 0)
+                ),
                 view(View.CODE_TWEAKING,
                         block(recordMapping, 0, 0),
                         block(fieldMapping, 1, 0, 3, 1),
@@ -106,11 +111,6 @@ public class AllFrames {
                 ),
                 view(View.DEEP_DELVING,
                         block(fieldMapping, 0, 0)
-                ),
-                view(View.BIG_PICTURE,
-                        block(input, 0, 0),
-                        block(recordMapping, 1, 0),
-                        block(output, 2, 0)
                 ),
                 view(View.DECADENT_DISPLAY,
                         block(create, 0, 0, 3, 3),
