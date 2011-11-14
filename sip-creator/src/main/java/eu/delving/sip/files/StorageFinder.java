@@ -68,7 +68,12 @@ public class StorageFinder {
 
     public static String getHostPort(File file) {
         Matcher matcher = getDirectoryMatcher(file);
-        return String.format("%s:%s", getHostName(matcher), matcher.group(2));
+        if ("80".equals(matcher.group(2))) {
+            return getHostName(matcher);
+        }
+        else {
+            return String.format("%s:%s", getHostName(matcher), matcher.group(2));
+        }
     }
 
     public static String getUser(File file) {
