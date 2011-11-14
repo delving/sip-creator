@@ -23,8 +23,7 @@ package eu.delving.sip.files;
 
 import eu.delving.sip.base.Utility;
 
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
@@ -120,6 +119,7 @@ public class StorageFinder {
             URL codebase = Utility.getCodebase();
             String host = codebase.getHost();
             int port = codebase.getPort();
+            if (port < 0) port = 80;
             return createDirectory(host, String.valueOf(port), user);
         }
         else while (true) {
