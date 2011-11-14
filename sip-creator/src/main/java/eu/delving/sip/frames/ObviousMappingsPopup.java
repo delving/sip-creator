@@ -26,18 +26,8 @@ import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.FieldMappingListModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +54,7 @@ public class ObviousMappingsPopup extends FrameBase {
     protected void buildContent(Container content) {
         content.add(createCenter(), BorderLayout.CENTER);
         content.add(createSouth(), BorderLayout.SOUTH);
+        setSize(400, 400);
     }
 
     @Override
