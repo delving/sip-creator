@@ -27,18 +27,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.apache.log4j.Logger;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.io.*;
+import java.util.*;
 
 /**
  * A groovy mapping based on a model.
@@ -73,8 +63,9 @@ public class RecordMapping {
     @XStreamOmitField
     private RecordDefinition recordDefinition;
 
-    public RecordMapping(String prefix) {
+    public RecordMapping(String prefix, RecordDefinition recordDefinition) {
         this.prefix = prefix;
+        this.recordDefinition = recordDefinition;
     }
 
     public void setRecordDefinition(RecordDefinition recordDefinition) {

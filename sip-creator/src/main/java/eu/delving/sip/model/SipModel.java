@@ -24,28 +24,16 @@ package eu.delving.sip.model;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.metadata.FieldDefinition;
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.MappingModelAdapter;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.RecordMapping;
-import eu.delving.metadata.RecordValidator;
-import eu.delving.metadata.ValidationException;
+import eu.delving.metadata.*;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.Statistics;
-import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.*;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
 import org.apache.log4j.Logger;
 
-import javax.swing.ListModel;
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -278,6 +266,9 @@ public class SipModel {
                                         String latestPrefix = dataSet.getLatestPrefix();
                                         if (latestPrefix != null) {
                                             setPrefix(false, latestPrefix);
+                                        }
+                                        else {
+                                            mappingModel.setRecordMapping(null);
                                         }
                                     }
                                 });
