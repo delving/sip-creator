@@ -57,9 +57,9 @@ public class AllFrames {
         CLEAR("Clear"),
         FIRST_CONTACT("First contact"),
         QUICK_MAPPING("Quick mapping"),
+        BIG_PICTURE("Big Picture"),
         CODE_TWEAKING("Code tweaking"),
         DEEP_DELVING("Deep delving"),
-        BIG_PICTURE("Big Picture"),
         DECADENT_DISPLAY("Decadant Display"),
         PROJECTOR("Projector");
 
