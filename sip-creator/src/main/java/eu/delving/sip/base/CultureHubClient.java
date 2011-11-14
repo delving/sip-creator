@@ -415,6 +415,7 @@ public class CultureHubClient {
                                 if (code != Code.OK && !fileEntity.abort) {
                                     context.invalidateTokens();
                                     Code.from(uploadResponse).notifyUser(context);
+                                    uploadListener.finished(false);
                                     return;
                                 }
                             }
@@ -515,9 +516,7 @@ public class CultureHubClient {
         public void writeTo(OutputStream outputStream) throws IOException {
             uploadListener.uploadStarted(file);
             ProgressListener progress = getContentLength() < MINIMUM_PROGRESS_SIZE ? null : uploadListener.getProgressListener();
-            if (progress != null) {
-                progress.prepareFor((int) (getContentLength() / BLOCK_SIZE));
-            }
+            if (progress != null) progress.prepareFor((int) (getContentLength() / BLOCK_SIZE));
             InputStream inputStream = new FileInputStream(this.file);
             try {
                 byte[] buffer = new byte[BLOCK_SIZE];
@@ -528,19 +527,14 @@ public class CultureHubClient {
                     int blocks = (int) (bytesSent / BLOCK_SIZE);
                     if (blocks > blocksReported) {
                         blocksReported = blocks;
-                        if (progress != null && !progress.setProgress(blocksReported)) {
-                            abort = true;
-                        }
+                        if (progress != null && !progress.setProgress(blocksReported)) abort = true;
                     }
                 }
                 outputStream.flush();
             }
             finally {
                 inputStream.close();
-                if (progress != null) {
-                    progress.finished(!abort);
-                }
-                uploadListener.uploadFinished(file, abort);
+                if (progress != null) progress.finished(!abort);
             }
         }
 
