@@ -165,10 +165,10 @@ public class DownloadAction extends AbstractAction {
             @Override
             public void failed(Exception e) {
                 LOG.warn("Fetching list failed", e);
+                sipModel.getFeedback().alert("Failed to receive data set list");
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
-                        sipModel.getFeedback().alert("Failed to receive data set list");
                         downloadDialog.setVisible(false);
                     }
                 });
