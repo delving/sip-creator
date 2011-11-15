@@ -131,6 +131,7 @@ public class AllFrames {
                         block(output, 0, 0),
                         block(status, 0, 0)
                 ),
+                view(View.CLEAR)
         };
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
