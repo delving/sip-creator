@@ -75,10 +75,10 @@ public class Application {
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.drawImage(backgroundIcon.getImage(), 0, 0, desktop);
-                g.setColor(Color.BLACK);
-                drawText(g, 4, 4);
-                g.setColor(Color.WHITE);
-                drawText(g, 0, 0);
+                //g.setColor(Color.BLACK);
+                //drawText(g, 4, 4);
+                //g.setColor(Color.WHITE);
+                //drawText(g, 0, 0);
             }
 
             private void drawText(Graphics g, int x, int y) {
@@ -313,8 +313,7 @@ public class Application {
             Exec.swing(new Runnable() {
                 @Override
                 public void run() {
-                    dataSetMenu.setPreference(dataSet);
-                    sipModel.setDataSet(dataSet, true);
+                    dataSetMenu.refreshAndChoose(dataSet);
                 }
             });
         }

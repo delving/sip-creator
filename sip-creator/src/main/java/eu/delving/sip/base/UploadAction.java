@@ -28,22 +28,8 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.ListModel;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -214,9 +200,8 @@ public class UploadAction extends AbstractAction {
                             @Override
                             public void run() {
                                 disappear();
-                                if (success) {
-                                    JOptionPane.showMessageDialog(parent, "Upload complete");
-                                }
+                                JOptionPane.showMessageDialog(parent, success ? "Upload complete" : "Upload failed");
+                                setActionEnabled(true);
                             }
                         });
                     }

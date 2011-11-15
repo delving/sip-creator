@@ -121,7 +121,7 @@ public class StorageImpl extends StorageBase implements Storage {
                 recordMapping = getRecordMapping(prefix, metadataModel);
             }
             else {
-                recordMapping = new RecordMapping(prefix);
+                recordMapping = new RecordMapping(prefix, metadataModel.getRecordDefinition(prefix));
                 setRecordMapping(recordMapping);
             }
             return recordMapping;
@@ -373,7 +373,7 @@ public class StorageImpl extends StorageBase implements Storage {
                 }
             }
             else {
-                return new RecordMapping(prefix);
+                return new RecordMapping(prefix, metadataModel.getRecordDefinition(prefix));
             }
         }
 
