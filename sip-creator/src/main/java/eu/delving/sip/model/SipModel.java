@@ -73,7 +73,7 @@ public class SipModel {
 
     public interface ValidationListener {
 
-        void failed(ValidationException validationException);
+        void failed(int recordNumber, Exception exception);
     }
 
     public interface ParseListener {
@@ -203,6 +203,10 @@ public class SipModel {
 
     public boolean hasDataSet() {
         return dataSetModel.hasDataSet();
+    }
+
+    public boolean hasPrefix() {
+        return mappingModel.getRecordMapping() != null;
     }
 
     public AnalysisModel getAnalysisModel() {
@@ -408,24 +412,12 @@ public class SipModel {
                 new FileValidator.Listener() {
                     @Override
                     public void invalidInput(final MappingException exception) {
-                        feedback.alert(String.format("Problem validating record number %d", exception.getMetadataRecord().getRecordNumber()), exception);
-                        Exec.swing(new Runnable() {
-                            @Override
-                            public void run() {
-                                seekRecordNumber(exception.getMetadataRecord().getRecordNumber(), progressListener);
-                            }
-                        });
+                        validationListener.failed(exception.getMetadataRecord().getRecordNumber(), exception);
                     }
 
                     @Override
                     public void invalidOutput(final ValidationException exception) {
-                        validationListener.failed(exception);
-                        Exec.swing(new Runnable() {
-                            @Override
-                            public void run() {
-                                seekRecordNumber(exception.getRecordNumber(), progressListener);
-                            }
-                        });
+                        validationListener.failed(exception.getRecordNumber(), exception);
                     }
 
                     @Override

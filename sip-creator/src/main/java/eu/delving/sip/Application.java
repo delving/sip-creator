@@ -313,8 +313,7 @@ public class Application {
             Exec.swing(new Runnable() {
                 @Override
                 public void run() {
-                    dataSetMenu.setPreference(dataSet);
-                    sipModel.setDataSet(dataSet, true);
+                    dataSetMenu.refreshAndChoose(dataSet);
                 }
             });
         }
