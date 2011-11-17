@@ -21,11 +21,7 @@
 
 package eu.delving.sip.xml;
 
-import eu.delving.groovy.DiscardRecordException;
-import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingException;
-import eu.delving.groovy.MappingRunner;
-import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.*;
 import eu.delving.metadata.RecordMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.Uniqueness;
@@ -79,13 +75,6 @@ public class FileValidator implements Runnable {
         this.allowInvalid = allowInvalidRecords;
         this.groovyCodeResource = groovyCodeResource;
         this.progressListener = progressListener;
-        this.progressListener.onFinished(new ProgressListener.End() {
-
-            @Override
-            public void finished(boolean success) {
-                if (!success) abort();
-            }
-        });
         this.listener = listener;
     }
 
@@ -126,16 +115,16 @@ public class FileValidator implements Runnable {
                         out.println(record.toString());
                         e.printStackTrace(out);
                         out.println("========");
-                        listener.invalidInput(e);
                         abort();
+                        listener.invalidInput(e);
                     }
                     catch (ValidationException e) {
                         invalidCount++;
                         out.println(record.toString());
                         out.println("=========");
                         if (!allowInvalid) {
-                            listener.invalidOutput(e);
                             abort();
+                            listener.invalidOutput(e);
                         }
                     }
                     catch (DiscardRecordException e) {
@@ -144,10 +133,10 @@ public class FileValidator implements Runnable {
                         out.println("=========");
                     }
                     catch (Exception e) {
+                        abort();
                         sipModel.getFeedback().alert("Problem writing output", e);
                         out.println("Unexpected exception!");
                         e.printStackTrace(out);
-                        abort();
                     }
                 }
                 Set<String> repeated = uniqueness.getRepeated();
@@ -171,8 +160,8 @@ public class FileValidator implements Runnable {
                 }
             }
             catch (IOException e) {
-                sipModel.getFeedback().alert("Unable to write discarded record", e);
                 abort();
+                sipModel.getFeedback().alert("Unable to write discarded record", e);
             }
         }
         catch (XMLStreamException e) {
@@ -194,11 +183,12 @@ public class FileValidator implements Runnable {
                 listener.finished(aborted ? null : valid, sipModel.getAnalysisModel().getRecordCount());
             }
             uniqueness.destroy();
-            progressListener.finished(!aborted);
+            if (!aborted) progressListener.finished(true);
         }
     }
 
     private void abort() {
         aborted = true;
+        progressListener.finished(false);
     }
 }

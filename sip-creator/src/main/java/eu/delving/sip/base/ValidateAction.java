@@ -21,29 +21,14 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.metadata.ValidationException;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -137,11 +122,17 @@ public class ValidateAction extends AbstractAction {
                 progressListener,
                 new SipModel.ValidationListener() {
                     @Override
-                    public void failed(ValidationException validationException) {
-                        Dimension all = parent.getSize();
-                        Dimension d = dialog.getSize();
-                        dialog.setLocation((all.width - d.width) / 2, (all.height - d.height) / 2);
-                        dialog.setVisible(true);
+                    public void failed(final int recordNumber, Exception exception) {
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                investigateRecordAction.setRecordNumber(recordNumber);
+                                Dimension all = parent.getSize();
+                                Dimension d = dialog.getSize();
+                                dialog.setLocation((all.width - d.width) / 2, (all.height - d.height) / 2);
+                                dialog.setVisible(true);
+                            }
+                        });
                     }
                 }
         );
@@ -149,13 +140,27 @@ public class ValidateAction extends AbstractAction {
 
     private class InvestigateRecordAction extends AbstractAction {
 
+        private int recordNumber;
+
         private InvestigateRecordAction() {
             super("<html><center><br><h2>Investigate</h2>Fix the mapping, with<br>the invalid record in view<br><br>");
         }
 
+        private void setRecordNumber(int recordNumber) {
+            this.recordNumber = recordNumber;
+            putValue(Action.NAME, String.format("<html><center><br><h2>Investigate</h2>Fix the mapping, with<br>invalid record %d in view<br><br>", recordNumber));
+        }
+
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            dialog.setVisible(false);
+            ProgressListener progressListener = sipModel.getFeedback().progressListener("Scanning", String.format("<html><h3>Scanning for record %d</h3></html>", recordNumber));
+            progressListener.onFinished(new ProgressListener.End() {
+                @Override
+                public void finished(boolean success) {
+                    dialog.setVisible(false);
+                }
+            });
+            sipModel.seekRecordNumber(recordNumber, progressListener);
         }
     }
 

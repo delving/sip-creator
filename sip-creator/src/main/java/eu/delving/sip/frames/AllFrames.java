@@ -57,9 +57,9 @@ public class AllFrames {
         CLEAR("Clear"),
         FIRST_CONTACT("First contact"),
         QUICK_MAPPING("Quick mapping"),
+        BIG_PICTURE("Big Picture"),
         CODE_TWEAKING("Code tweaking"),
         DEEP_DELVING("Deep delving"),
-        BIG_PICTURE("Big Picture"),
         DECADENT_DISPLAY("Decadant Display"),
         PROJECTOR("Projector");
 
@@ -99,6 +99,11 @@ public class AllFrames {
                         block(statistics, 1, 0),
                         block(recordMapping, 2, 0)
                 ),
+                view(View.BIG_PICTURE,
+                        block(input, 0, 0),
+                        block(recordMapping, 1, 0),
+                        block(output, 2, 0)
+                ),
                 view(View.CODE_TWEAKING,
                         block(recordMapping, 0, 0),
                         block(fieldMapping, 1, 0, 3, 1),
@@ -106,11 +111,6 @@ public class AllFrames {
                 ),
                 view(View.DEEP_DELVING,
                         block(fieldMapping, 0, 0)
-                ),
-                view(View.BIG_PICTURE,
-                        block(input, 0, 0),
-                        block(recordMapping, 1, 0),
-                        block(output, 2, 0)
                 ),
                 view(View.DECADENT_DISPLAY,
                         block(create, 0, 0, 3, 3),
@@ -131,6 +131,7 @@ public class AllFrames {
                         block(output, 0, 0),
                         block(status, 0, 0)
                 ),
+                view(View.CLEAR)
         };
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override

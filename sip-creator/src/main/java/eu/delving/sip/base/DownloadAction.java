@@ -33,10 +33,14 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
 /**
  * Fetch a data set from the culture hub
@@ -44,11 +48,11 @@ import java.util.Map;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class DownloadAction extends AbstractAction implements CultureHubClient.ListReceiveListener {
+public class DownloadAction extends AbstractAction {
     private final static Logger LOG = Logger.getRootLogger();
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
-    private JDialog dialog;
+    private DownloadDialog downloadDialog;
     private FetchAction fetch = new FetchAction();
     private Cancel cancel = new Cancel();
     private DataSetListModel listModel = new DataSetListModel();
@@ -63,8 +67,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
         );
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
-        dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(parent), "Download", false);
-        createDialog(dialog.getContentPane());
+        downloadDialog = new DownloadDialog((JFrame) SwingUtilities.getWindowAncestor(parent));
         list.setCellRenderer(new DataSetCellRenderer(sipModel.getStorage().getUsername()));
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fetch.setEnabled(false);
@@ -81,75 +84,97 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
                 }
             }
         });
-        dialog.setSize(500, 600);
-        Dimension world = Toolkit.getDefaultToolkit().getScreenSize();
-        dialog.setLocation((world.width - dialog.getSize().width) / 2, (world.height - dialog.getSize().height) / 2);
+    }
+
+    private class DownloadDialog extends JDialog {
+        DownloadDialog(JFrame frame) {
+            super(frame, "Download", false);
+            addContent(getContentPane());
+            setSize(500, 600);
+            Dimension world = Toolkit.getDefaultToolkit().getScreenSize();
+            setLocation((world.width - getSize().width) / 2, (world.height - getSize().height) / 2);
+            getRootPane().getActionMap().put(cancel.getValue(Action.NAME), cancel);
+            getRootPane().getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ESCAPE"), cancel.getValue(Action.NAME));
+        }
+
+        private void addContent(Container content) {
+            content.add(createListPanel(), BorderLayout.CENTER);
+            content.add(createButtonPanel(), BorderLayout.SOUTH);
+        }
+
+        private JPanel createListPanel() {
+            JPanel p = new JPanel(new BorderLayout());
+            p.setBorder(BorderFactory.createTitledBorder("Data sets"));
+            p.add(FrameBase.scroll(list), BorderLayout.CENTER);
+            return p;
+        }
+
+        private JPanel createButtonPanel() {
+            JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            final JButton cancelButton = new JButton(cancel);
+            JButton fetchButton = new JButton(fetch);
+            p.add(cancelButton);
+            p.add(fetchButton);
+            fetchButton.registerKeyboardAction(
+                    fetchButton.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)),
+                    KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
+                    JComponent.WHEN_FOCUSED
+            );
+            fetchButton.registerKeyboardAction(
+                    fetchButton.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
+                    KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
+                    JComponent.WHEN_FOCUSED
+            );
+            getRootPane().setDefaultButton(fetchButton);
+            addWindowFocusListener(new WindowFocusListener() {
+                @Override
+                public void windowGainedFocus(WindowEvent windowEvent) {
+                    cancelButton.requestFocus();
+                }
+
+                @Override
+                public void windowLostFocus(WindowEvent windowEvent) {
+                }
+            });
+            return p;
+        }
+
+
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        dialog.setVisible(true);
         listModel.setMessage("Loading list of data sets... just a moment");
-        cultureHubClient.fetchDataSetList(this);
-    }
-
-    @Override
-    public void listReceived(final List<CultureHubClient.DataSetEntry> entries) {
-        Exec.swing(new Runnable() {
+        cultureHubClient.fetchDataSetList(new CultureHubClient.ListReceiveListener() {
             @Override
-            public void run() {
-                if (entries == null || entries.isEmpty()) {
-                    listModel.setMessage("No data sets available yet. Create them on the Culture Hub first.");
-                }
-                else {
-                    listModel.setEntries(entries);
-                }
+            public void listReceived(final List<CultureHubClient.DataSetEntry> entries) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (entries == null || entries.isEmpty()) {
+                            listModel.setMessage("No data sets available yet. Create them on the Culture Hub first.");
+                        }
+                        else {
+                            listModel.setEntries(entries);
+                        }
+                        downloadDialog.setVisible(true);
+                    }
+                });
             }
-        });
-    }
 
-    @Override
-    public void failed(Exception e) {
-        LOG.warn("Fetching list failed", e);
-        Exec.swing(new Runnable() {
             @Override
-            public void run() {
-                listModel.setMessage("Failed to load list");
-                dialog.setVisible(false);
+            public void failed(Exception e) {
+                LOG.warn("Fetching list failed", e);
+                sipModel.getFeedback().alert("Failed to receive data set list");
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        downloadDialog.setVisible(false);
+                    }
+                });
             }
+
         });
-    }
-
-    private void createDialog(Container content) {
-        content.add(createListPanel(), BorderLayout.CENTER);
-        content.add(createButtonPanel(), BorderLayout.SOUTH);
-    }
-
-    private JPanel createListPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Data sets"));
-        p.add(FrameBase.scroll(list), BorderLayout.CENTER);
-        return p;
-    }
-
-    private JPanel createButtonPanel() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        final JButton cancelButton = new JButton(cancel);
-        JButton fetchButton = new JButton(fetch);
-        p.add(cancelButton);
-        p.add(fetchButton);
-        fetchButton.registerKeyboardAction(
-                fetchButton.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
-                JComponent.WHEN_FOCUSED
-        );
-        fetchButton.registerKeyboardAction(
-                fetchButton.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
-                JComponent.WHEN_FOCUSED
-        );
-        dialog.getRootPane().setDefaultButton(fetchButton);
-        return p;
     }
 
     private class FetchAction extends AbstractAction {
@@ -170,7 +195,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
                 @Override
                 public void finished(boolean success) {
                     setEnabled(true);
-                    dialog.setVisible(false);
+                    downloadDialog.setVisible(false);
                 }
             });
             try {
@@ -191,7 +216,7 @@ public class DownloadAction extends AbstractAction implements CultureHubClient.L
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            dialog.setVisible(false);
+            downloadDialog.setVisible(false);
         }
     }
 

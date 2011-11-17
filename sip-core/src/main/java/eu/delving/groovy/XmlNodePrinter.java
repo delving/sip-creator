@@ -29,7 +29,6 @@ public class XmlNodePrinter {
     protected final IndentPrinter out;
     private String quote;
     private boolean namespaceAware = true;
-    private boolean preserveWhitespace = false;
     private boolean showNamespaceUri = false;
 
     public XmlNodePrinter(Writer out) {
@@ -84,25 +83,6 @@ public class XmlNodePrinter {
     }
 
     /**
-     * Check if whitespace preservation is enabled.
-     * Defaults to <code>false</code>.
-     *
-     * @return true if whitespaces are honoured when printing simple text nodes
-     */
-    public boolean isPreserveWhitespace() {
-        return preserveWhitespace;
-    }
-
-    /**
-     * Enable and/or disable preservation of whitespace.
-     *
-     * @param preserveWhitespace the new desired value
-     */
-    public void setPreserveWhitespace(boolean preserveWhitespace) {
-        this.preserveWhitespace = preserveWhitespace;
-    }
-
-    /**
      * Get Quote to use when printing attributes.
      *
      * @return the quote character
@@ -151,28 +131,21 @@ public class XmlNodePrinter {
          */
         Object value = node.value();
         if (value instanceof List) {
-            printName(node, ctx, true, isListOfSimple((List) value));
+            printName(node, ctx, true, false);
             printLineEnd();
             printList((List) value, ctx);
-            printName(node, ctx, false, isListOfSimple((List) value));
+            printName(node, ctx, false, false);
             printLineEnd();
             out.flush();
             return;
         }
 
         // treat as simple type - probably a String
-        printName(node, ctx, true, preserveWhitespace);
+        printName(node, ctx, true, true);
         printSimpleItemWithIndent(value);
-        printName(node, ctx, false, preserveWhitespace);
+        printName(node, ctx, false, true);
         printLineEnd();
         out.flush();
-    }
-
-    private boolean isListOfSimple(List value) {
-        for (Object p : value) {
-            if (p instanceof Node) return false;
-        }
-        return preserveWhitespace;
     }
 
     protected void printLineBegin() {
@@ -213,7 +186,7 @@ public class XmlNodePrinter {
         printEscaped(InvokerHelper.toString(value));
     }
 
-    protected void printName(Node node, NamespaceContext ctx, boolean begin, boolean preserve) {
+    protected void printName(Node node, NamespaceContext ctx, boolean begin, boolean sameLine) {
         if (node == null) {
             throw new NullPointerException("Node must not be null.");
         }
@@ -221,7 +194,7 @@ public class XmlNodePrinter {
         if (name == null) {
             throw new NullPointerException("Name must not be null.");
         }
-        if (begin) printLineBegin();
+        if (begin || !sameLine) printLineBegin();
         out.print("<");
         if (!begin) {
             out.print("/");
@@ -244,7 +217,8 @@ public class XmlNodePrinter {
         if (namespaceAware) {
             if (object instanceof Node) {
                 printNamespace(((Node) object).name(), ctx);
-            } else if (object instanceof QName) {
+            }
+            else if (object instanceof QName) {
                 QName qname = (QName) object;
                 String namespaceUri = qname.getNamespaceURI();
                 if (namespaceUri != null) {
@@ -279,7 +253,8 @@ public class XmlNodePrinter {
             out.print(quote);
             if (value instanceof String) {
                 printEscaped((String) value);
-            } else {
+            }
+            else {
                 printEscaped(InvokerHelper.toString(value));
             }
             out.print(quote);
@@ -297,13 +272,15 @@ public class XmlNodePrinter {
     private String getName(Object object) {
         if (object instanceof String) {
             return (String) object;
-        } else if (object instanceof QName) {
+        }
+        else if (object instanceof QName) {
             QName qname = (QName) object;
             if (!namespaceAware) {
                 return qname.getLocalPart();
             }
             return qname.getQualifiedName();
-        } else if (object instanceof Node) {
+        }
+        else if (object instanceof Node) {
             Object name = ((Node) object).name();
             return getName(name);
         }
@@ -311,9 +288,9 @@ public class XmlNodePrinter {
     }
 
     private void printSimpleItemWithIndent(Object value) {
-        if (!preserveWhitespace) out.incrementIndent();
+        out.incrementIndent();
         printSimpleItem(value);
-        if (!preserveWhitespace) out.decrementIndent();
+        out.decrementIndent();
     }
 
     // For ' and " we only escape if needed. As far as XML is concerned,

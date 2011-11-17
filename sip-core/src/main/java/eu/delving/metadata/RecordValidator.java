@@ -22,7 +22,6 @@
 package eu.delving.metadata;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.GroovyList;
 import eu.delving.groovy.GroovyNode;
 import groovy.lang.Binding;
 import groovy.lang.GString;
@@ -32,12 +31,7 @@ import groovy.util.NodeList;
 import groovy.xml.QName;
 import org.apache.log4j.Logger;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Parse, filter, validate a record
@@ -165,10 +159,11 @@ public class RecordValidator {
             QName nameA = (QName) nodeA.name();
             QName nameB = (QName) nodeB.name();
             int comp = nameA.toString().compareTo(nameB.toString());
-            if (comp != 0) {
-                return comp;
-            }
-            return valueToString(nodeA.value()).compareTo(valueToString(nodeB.value()));
+            if (comp != 0) return comp;
+            String valueA = valueToString(nodeA.value());
+            String valueB = valueToString(nodeB.value());
+            if (valueA == null || valueB == null) return 0;
+            return ((String)nodeA.value()).compareTo((String)nodeB.value());
         }
     };
 
@@ -185,20 +180,8 @@ public class RecordValidator {
         else if (object instanceof Node) {
             return valueToString(((Node) object).value());
         }
-        else if (object instanceof GroovyList) {
-            GroovyList list = (GroovyList) object;
-            if (list.isEmpty()) {
-                return "";
-            }
-            else if (list.size() == 1) {
-                return valueToString(((GroovyList) object).get(0));
-            }
-            else {
-                throw new IllegalStateException("Could not deal with Groovy list of size " + list.size());
-            }
-        }
         else {
-            throw new IllegalStateException("Could not deal with class " + object.getClass());
+            return null;
         }
     }
 }

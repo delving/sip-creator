@@ -16,7 +16,7 @@ public class MappingCategory {
             }
             else if (a.size() == 1) {
                 if (a[0] instanceof GroovyList) {
-                    return (GroovyList)a[0]
+                    return (GroovyList) a[0]
                 }
                 else if (a instanceof List) {
                     return toList(a[0])
@@ -26,11 +26,11 @@ public class MappingCategory {
                 }
             }
             else {
-                throw new RuntimeException("List")
+                throw new RuntimeException("Unable to interpret list of ${a.size()} entries")
             }
         }
         else if (a instanceof GroovyNode) {
-            return toList(((GroovyNode)a).value())
+            return toList(((GroovyNode) a).value())
         }
         else {
             return new GroovyList(a)
