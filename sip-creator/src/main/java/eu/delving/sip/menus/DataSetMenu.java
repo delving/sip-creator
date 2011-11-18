@@ -23,6 +23,7 @@ package eu.delving.sip.menus;
 
 import eu.delving.metadata.FactDefinition;
 import eu.delving.metadata.RecordDefinition;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
@@ -50,15 +51,24 @@ public class DataSetMenu extends JMenu {
     }
 
     public void refreshAndChoose(DataSet dataSet) {
-        String latestPrefix = dataSet.getLatestPrefix();
-        if (latestPrefix != null) {
-            setPreference(dataSet, latestPrefix);
+        if (dataSet != null) {
+            setPreference(dataSet, null);
+        }
+        else {
+            clearPreference();
         }
         refresh();
     }
 
+    private void clearPreference() {
+        sipModel.getPreferences().put(SELECTED_SPEC, "");
+        sipModel.getPreferences().put(SELECTED_PREFIX, "");
+    }
+
     private void setPreference(DataSet dataSet, String prefix) {
         sipModel.getPreferences().put(SELECTED_SPEC, dataSet.getSpec());
+        if (prefix == null) prefix = dataSet.getLatestPrefix();
+        if (prefix == null) prefix = "";
         sipModel.getPreferences().put(SELECTED_PREFIX, prefix);
     }
 
@@ -66,7 +76,8 @@ public class DataSetMenu extends JMenu {
         removeAll();
         ButtonGroup bg = new ButtonGroup();
         try {
-            DataSetItem last = null, preferred = null;
+            DataSetItem last = null;
+            boolean somethingSelected = false;
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 List<FactDefinition> factDefinitions = dataSet.getFactDefinitions();
                 for (RecordDefinition recordDefinition : dataSet.getRecordDefinitions(factDefinitions)) {
@@ -81,15 +92,26 @@ public class DataSetMenu extends JMenu {
                             setPreference(item.getDataSet(), item.getPrefix());
                         }
                     });
-                    if (item.isPreferred()) preferred = item;
+                    if (item.isPreferred()) {
+                        Exec.swingLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                item.doClick();
+                            }
+                        });
+                        somethingSelected = true;
+                    }
                     last = item;
                 }
             }
-            if (preferred != null) {
-                preferred.doClick();
-            }
-            else if (last != null) {
-                last.doClick();
+            if (!somethingSelected && last != null) {
+                final DataSetItem clicker = last;
+                Exec.swingLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        clicker.doClick();
+                    }
+                });
             }
             if (bg.getButtonCount() == 0) {
                 JMenuItem empty = new JMenuItem("No data sets available");

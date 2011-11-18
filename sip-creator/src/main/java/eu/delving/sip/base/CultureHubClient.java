@@ -122,7 +122,7 @@ public class CultureHubClient {
             List<Proxy> proxies = ProxySelector.getDefault().select(new URI(context.getServerUrl()));
             for (Proxy proxy : proxies) {
                 if (proxy.type() != Proxy.Type.HTTP) continue;
-                InetSocketAddress addr = (InetSocketAddress)proxy.address();
+                InetSocketAddress addr = (InetSocketAddress) proxy.address();
                 String host = addr.getHostName();
                 int port = addr.getPort();
                 context.getFeedback().say(String.format("An HTTP Proxy is detected. %s:%d", host, port));
@@ -132,7 +132,7 @@ public class CultureHubClient {
             }
         }
         catch (URISyntaxException e) {
-            throw new RuntimeException("Bad address: "+context.getServerUrl(), e);
+            throw new RuntimeException("Bad address: " + context.getServerUrl(), e);
         }
         if (!proxyDetected) {
             context.getFeedback().say("No HTTP Proxy detected");
@@ -324,6 +324,7 @@ public class CultureHubClient {
             try {
                 HttpGet get = createDownloadRequest(dataSet);
                 say("Downloading SIP for data set " + dataSet.getSpec());
+                progressListener.prepareFor(-1);
                 HttpResponse response = httpClient.execute(get);
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
@@ -406,17 +407,23 @@ public class CultureHubClient {
                                 }
                             }
                             for (File file : uploadFiles) {
-                                HttpPost upload = createUploadRequest(dataSet, file, uploadListener);
+                                ProgressListener progressListener = file.length() < MINIMUM_PROGRESS_SIZE ? null : uploadListener.getProgressListener();
+                                HttpPost upload = createUploadRequest(dataSet, file, uploadListener, progressListener);
                                 FileEntity fileEntity = (FileEntity) upload.getEntity();
                                 log.info("Uploading " + file);
-                                HttpResponse uploadResponse = httpClient.execute(upload);
-                                EntityUtils.consume(uploadResponse.getEntity());
-                                code = Code.from(uploadResponse);
-                                if (code != Code.OK && !fileEntity.abort) {
-                                    context.invalidateTokens();
-                                    Code.from(uploadResponse).notifyUser(context);
-                                    uploadListener.finished(false);
-                                    return;
+                                try {
+                                    HttpResponse uploadResponse = httpClient.execute(upload);
+                                    EntityUtils.consume(uploadResponse.getEntity());
+                                    code = Code.from(uploadResponse);
+                                    if (code != Code.OK && !fileEntity.abort) {
+                                        context.invalidateTokens();
+                                        Code.from(uploadResponse).notifyUser(context);
+                                        uploadListener.finished(false);
+                                        return;
+                                    }
+                                }
+                                finally {
+                                    if (progressListener != null) progressListener.finished(!fileEntity.abort);
                                 }
                             }
                             break;
@@ -490,13 +497,15 @@ public class CultureHubClient {
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {
         private final File file;
         private final UploadListener uploadListener;
+        private final ProgressListener progressListener;
         private long bytesSent;
         private int blocksReported;
         private boolean abort = false;
 
-        public FileEntity(File file, UploadListener uploadListener) {
+        public FileEntity(File file, UploadListener uploadListener, ProgressListener progressListener) {
             this.file = file;
             this.uploadListener = uploadListener;
+            this.progressListener = progressListener;
             setChunked(true);
             setContentType(deriveContentType(file));
         }
@@ -515,8 +524,7 @@ public class CultureHubClient {
 
         public void writeTo(OutputStream outputStream) throws IOException {
             uploadListener.uploadStarted(file);
-            ProgressListener progress = getContentLength() < MINIMUM_PROGRESS_SIZE ? null : uploadListener.getProgressListener();
-            if (progress != null) progress.prepareFor((int) (getContentLength() / BLOCK_SIZE));
+            if (progressListener != null) progressListener.prepareFor((int) (getContentLength() / BLOCK_SIZE));
             InputStream inputStream = new FileInputStream(this.file);
             try {
                 byte[] buffer = new byte[BLOCK_SIZE];
@@ -527,14 +535,14 @@ public class CultureHubClient {
                     int blocks = (int) (bytesSent / BLOCK_SIZE);
                     if (blocks > blocksReported) {
                         blocksReported = blocks;
-                        if (progress != null && !progress.setProgress(blocksReported)) abort = true;
+                        if (progressListener != null && !progressListener.setProgress(blocksReported)) abort = true;
                     }
                 }
                 outputStream.flush();
+                if (progressListener != null) progressListener.prepareFor(-1);
             }
             finally {
                 inputStream.close();
-                if (progress != null) progress.finished(!abort);
             }
         }
 
@@ -587,13 +595,13 @@ public class CultureHubClient {
         return new StringEntity(fileList.toString());
     }
 
-    private HttpPost createUploadRequest(DataSet dataSet, File file, UploadListener uploadListener) throws OAuthSystemException, OAuthProblemException {
+    private HttpPost createUploadRequest(DataSet dataSet, File file, UploadListener uploadListener, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
         String url = String.format(
                 "%s/submit/%s/%s/%s?accessKey=%s",
                 context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), file.getName(), context.getAccessToken()
         );
         HttpPost upload = new HttpPost(url);
-        upload.setEntity(new FileEntity(file, uploadListener));
+        upload.setEntity(new FileEntity(file, uploadListener, progressListener));
         return upload;
     }
 

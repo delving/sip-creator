@@ -104,12 +104,12 @@ public class ValidateAction extends AbstractAction {
     }
 
     private void performValidation(boolean allowInvalidRecords) {
-        String message = String.format(
+        ProgressListener progressListener = sipModel.getFeedback().progressListener("Validating");
+        progressListener.setProgressMessage(String.format(
                 "<html><h3>Transforming the raw data of '%s' into '%s' format and validating</h3>",
                 sipModel.getDataSetModel().getDataSet().getSpec(),
                 sipModel.getMappingModel().getRecordMapping().getPrefix()
-        );
-        ProgressListener progressListener = sipModel.getFeedback().progressListener("Validating", message);
+        ));
         progressListener.onFinished(new ProgressListener.End() {
             @Override
             public void finished(boolean success) {
@@ -153,7 +153,8 @@ public class ValidateAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            ProgressListener progressListener = sipModel.getFeedback().progressListener("Scanning", String.format("<html><h3>Scanning for record %d</h3></html>", recordNumber));
+            ProgressListener progressListener = sipModel.getFeedback().progressListener("Scanning");
+            progressListener.setProgressMessage(String.format("<html><h3>Scanning for record %d</h3></html>", recordNumber));
             progressListener.onFinished(new ProgressListener.End() {
                 @Override
                 public void finished(boolean success) {

@@ -31,13 +31,7 @@ import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -45,12 +39,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -153,11 +142,11 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 convertButton.setEnabled(false);
-                String message = String.format(
+                ProgressListener listener = sipModel.getFeedback().progressListener("Converting");
+                listener.setProgressMessage(String.format(
                         "<html><h3>Converting source data of '%s' to standard form</h3>",
                         sipModel.getDataSetModel().getDataSet().getSpec()
-                );
-                ProgressListener listener = sipModel.getFeedback().progressListener("Converting", message);
+                ));
                 listener.onFinished(new ProgressListener.End() {
                     @Override
                     public void finished(boolean success) {
