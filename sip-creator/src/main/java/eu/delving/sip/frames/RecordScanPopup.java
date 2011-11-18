@@ -123,6 +123,8 @@ public class RecordScanPopup extends FrameBase {
         Utility.makeCompactGrid(p, p.getComponentCount() / 3, 3, 5, 5, 5, 5);
         content.add(p, BorderLayout.CENTER);
         content.add(createCancel(), BorderLayout.SOUTH);
+        setSize(500, 240);
+        setLocation(parent.getLocation().x + 10, parent.getLocation().y + 10);
     }
 
     @Override
