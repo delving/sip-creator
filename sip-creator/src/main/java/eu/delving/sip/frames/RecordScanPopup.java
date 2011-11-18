@@ -27,15 +27,8 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -163,7 +156,8 @@ public class RecordScanPopup extends FrameBase {
         ProgressListener progressListener = null;
         if (currentPredicate != null) {
             for (JTextField field : fields) field.setEnabled(false);
-            progressListener = sipModel.getFeedback().progressListener("Scanning", currentPredicate.render());
+            progressListener = sipModel.getFeedback().progressListener("Scanning");
+            progressListener.setProgressMessage(currentPredicate.render());
             progressListener.onFinished(new ProgressListener.End() {
                 @Override
                 public void finished(boolean success) {

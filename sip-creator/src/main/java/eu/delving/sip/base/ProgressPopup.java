@@ -23,21 +23,8 @@ package eu.delving.sip.base;
 
 import eu.delving.sip.ProgressListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoundedRangeModel;
-import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -51,9 +38,9 @@ import java.util.List;
 
 public class ProgressPopup implements ProgressListener {
     private BoundedRangeModel boundedRangeModel = new DefaultBoundedRangeModel();
-    private JProgressBar bar = new JProgressBar(boundedRangeModel);
-    private JLabel messageLabel = new JLabel();
-    private String message;
+    private JProgressBar progressBar = new JProgressBar(boundedRangeModel);
+    private JLabel messageLabel = new JLabel("<html>Progress</html>");
+    private String progressMessage, indeterminateMessage;
     private JDialog dialog;
     private long lastProgress;
     private volatile boolean cancel;
@@ -65,8 +52,7 @@ public class ProgressPopup implements ProgressListener {
         }
     });
 
-    public ProgressPopup(Component parent, String title, String initialMessage, String message) {
-        this.message = message;
+    public ProgressPopup(Component parent, String title) {
         this.showTimer.setRepeats(false);
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), title, Dialog.ModalityType.APPLICATION_MODAL);
         JButton cancelButton = new JButton("Cancel");
@@ -83,20 +69,22 @@ public class ProgressPopup implements ProgressListener {
         JPanel p = new JPanel(new GridLayout(0, 1));
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         p.add(messageLabel);
-        p.add(bar);
+        p.add(progressBar);
         p.add(bp);
         this.dialog.getContentPane().add(p);
         Dimension all = parent.getSize();
         this.dialog.setLocation(all.width / 4, 100);
         this.dialog.setSize(all.width / 2, 150);
-        if (initialMessage != null) {
-            messageLabel.setText(initialMessage);
-            bar.setIndeterminate(true);
-            showTimer.start();
-        }
-        else {
-            messageLabel.setText(message);
-        }
+    }
+
+    @Override
+    public void setProgressMessage(String message) {
+        this.progressMessage = message;
+    }
+
+    @Override
+    public void setIndeterminateMessage(String message) {
+        this.indeterminateMessage = message;
     }
 
     @Override
@@ -104,13 +92,17 @@ public class ProgressPopup implements ProgressListener {
         Exec.swing(new Runnable() {
             @Override
             public void run() {
-                boundedRangeModel.setMaximum(total);
-                if (bar.isIndeterminate()) {
-                    messageLabel.setText(message);
+                if (total < 0) {
+                    boundedRangeModel.setMaximum(100);
+                    progressBar.setIndeterminate(true);
+                    messageLabel.setText(indeterminateMessage);
                 }
                 else {
-                    showTimer.start();
+                    boundedRangeModel.setMaximum(total);
+                    progressBar.setIndeterminate(false);
+                    messageLabel.setText(progressMessage);
                 }
+                showTimer.start();
             }
         });
     }

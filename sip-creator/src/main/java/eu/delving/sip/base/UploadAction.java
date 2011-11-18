@@ -187,11 +187,16 @@ public class UploadAction extends AbstractAction {
 
                     @Override
                     public ProgressListener getProgressListener() {
-                        String message = String.format(
+                        ProgressListener listener = sipModel.getFeedback().progressListener("Uploading");
+                        listener.setProgressMessage(String.format(
                                 "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
                                 sipModel.getDataSetModel().getDataSet().getSpec()
-                        );
-                        return sipModel.getFeedback().progressListener("Uploading", message);
+                        ));
+                        listener.setIndeterminateMessage(String.format(
+                                "<html><h3>Culture hub is processing '%s' metadata</h3>",
+                                sipModel.getDataSetModel().getDataSet().getSpec()
+                        ));
+                        return listener;
                     }
 
                     @Override

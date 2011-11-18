@@ -37,7 +37,5 @@ public interface Feedback {
 
     void alert(String message, Exception exception);
 
-    ProgressListener progressListener(String title, String message);
-
-    ProgressListener progressListener(String title, String initialMessage, String message);
+    ProgressListener progressListener(String title);
 }

@@ -31,6 +31,10 @@ public interface ProgressListener {
 
     long PATIENCE = 250;
 
+    void setProgressMessage(String message);
+
+    void setIndeterminateMessage(String message);
+
     void prepareFor(int total);
 
     boolean setProgress(int progress);
