@@ -30,26 +30,9 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.awt.BorderLayout;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -172,7 +155,8 @@ public class ImportAction extends AbstractAction {
         );
         if (doImport == JOptionPane.YES_OPTION) {
             setEnabled(false);
-            ProgressListener listener = sipModel.getFeedback().progressListener("Importing", "Storing data for " + spec);
+            ProgressListener listener = sipModel.getFeedback().progressListener("Importing");
+            listener.setProgressMessage(String.format("Storing data for %s", spec));
             listener.onFinished(new ProgressListener.End() {
                 @Override
                 public void finished(boolean success) {

@@ -26,14 +26,8 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
-import javax.swing.AbstractListModel;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JToggleButton;
-import java.awt.BorderLayout;
-import java.awt.Container;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DateFormat;
@@ -121,13 +115,8 @@ public class VisualFeedback implements Feedback {
     }
 
     @Override
-    public ProgressListener progressListener(String title, String message) {
-        return new ProgressPopup(desktop, title, null, message);
-    }
-
-    @Override
-    public ProgressListener progressListener(String title, String initialMessage, String message) {
-        return new ProgressPopup(desktop, title, initialMessage, message);
+    public ProgressListener progressListener(String title) {
+        return new ProgressPopup(desktop, title);
     }
 
     private void addToList(final String message) {

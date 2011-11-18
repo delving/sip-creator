@@ -188,9 +188,9 @@ public class DownloadAction extends AbstractAction {
             Entry entry = (Entry) list.getSelectedValue();
             if (entry == null) return;
             setEnabled(false);
-            String initialMessage = String.format("<html><h3>Culture hub is preparing '%s' for download.</h3>.", entry.getSpec());
-            String message = String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", entry.getSpec());
-            ProgressListener listener = sipModel.getFeedback().progressListener("Download", initialMessage, message);
+            ProgressListener listener = sipModel.getFeedback().progressListener("Download");
+            listener.setProgressMessage(String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", entry.getSpec()));
+            listener.setIndeterminateMessage(String.format("<html><h3>Culture hub is preparing '%s' for download.</h3>.", entry.getSpec()));
             listener.onFinished(new ProgressListener.End() {
                 @Override
                 public void finished(boolean success) {

@@ -153,6 +153,7 @@ public class Application {
             public void dataSetRemoved() {
                 home.setTitle("Delving SIP Creator");
                 sipModel.seekFirstRecord();
+                dataSetMenu.refreshAndChoose(null);
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
