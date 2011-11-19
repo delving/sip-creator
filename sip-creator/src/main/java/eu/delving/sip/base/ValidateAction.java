@@ -44,11 +44,13 @@ public class ValidateAction extends AbstractAction {
     private JDesktopPane parent;
     private InvestigateRecordAction investigateRecordAction = new InvestigateRecordAction();
     private AllowInvalidRecordsAction allowInvalidRecordsAction = new AllowInvalidRecordsAction();
+    private Runnable investigate;
 
-    public ValidateAction(JDesktopPane parent, SipModel sipModel) {
+    public ValidateAction(JDesktopPane parent, SipModel sipModel, Runnable investigate) {
         super("<html><b>Map and validate all records</b>");
         this.parent = parent;
         this.sipModel = sipModel;
+        this.investigate = investigate;
         setEnabled(false);
         putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/validate-icon.png")));
         putValue(
@@ -162,6 +164,7 @@ public class ValidateAction extends AbstractAction {
                 }
             });
             sipModel.seekRecordNumber(recordNumber, progressListener);
+            investigate.run();
         }
     }
 

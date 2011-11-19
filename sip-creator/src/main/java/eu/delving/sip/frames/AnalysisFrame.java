@@ -24,7 +24,6 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.Path;
-import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
@@ -43,7 +42,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static eu.delving.sip.files.DataSetState.PHANTOM;
+import static eu.delving.sip.files.DataSetState.ABSENT;
 
 /**
  * The structure of the input data, tree, variables and statistics.
@@ -55,7 +54,6 @@ import static eu.delving.sip.files.DataSetState.PHANTOM;
 public class AnalysisFrame extends FrameBase {
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
-    private JButton convertButton = new JButton("Convert!");
     private JTree statisticsJTree;
     private DataSetState dataSetState;
 
@@ -76,8 +74,7 @@ public class AnalysisFrame extends FrameBase {
 
             @Override
             public void dataSetRemoved() {
-                dataSetState = PHANTOM;
-                convertButton.setEnabled(false);
+                dataSetState = ABSENT;
             }
 
             @Override
@@ -86,7 +83,6 @@ public class AnalysisFrame extends FrameBase {
 // todo: when the analysis was done on the source format, we don't want these enabled!
 //                selectUniqueElementButton.setEnabled(??);
 //                selectRecordRootButton.setEnabled(??);
-                convertButton.setEnabled(dataSetState.ordinal() >= DataSetState.DELIMITED.ordinal() && adjustable());
             }
         });
     }
@@ -137,25 +133,6 @@ public class AnalysisFrame extends FrameBase {
                 sipModel.getAnalysisModel().setUniqueElement(node.getPath());
             }
         });
-        convertButton.setEnabled(false);
-        convertButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                convertButton.setEnabled(false);
-                ProgressListener listener = sipModel.getFeedback().progressListener("Converting");
-                listener.setProgressMessage(String.format(
-                        "<html><h3>Converting source data of '%s' to standard form</h3>",
-                        sipModel.getDataSetModel().getDataSet().getSpec()
-                ));
-                listener.onFinished(new ProgressListener.End() {
-                    @Override
-                    public void finished(boolean success) {
-                        convertButton.setEnabled(true);
-                    }
-                });
-                sipModel.convertSource(listener);
-            }
-        });
     }
 
     private boolean adjustable() {
@@ -166,10 +143,7 @@ public class AnalysisFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
         p.add(scroll(statisticsJTree), BorderLayout.CENTER);
-        JPanel south = new JPanel(new GridLayout(0, 1));
-        south.add(createSelectButtonPanel());
-        south.add(convertButton);
-        p.add(south, BorderLayout.SOUTH);
+        p.add(createSelectButtonPanel(), BorderLayout.SOUTH);
         return p;
     }
 
