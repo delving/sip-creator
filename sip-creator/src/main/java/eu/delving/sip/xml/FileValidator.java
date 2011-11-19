@@ -177,6 +177,7 @@ public class FileValidator implements Runnable {
         finally {
             if (aborted) {
                 sipModel.getFeedback().say("Validation canceled");
+                listener.finished(null, 0);
             }
             else {
                 sipModel.getFeedback().say("Finished validating");

@@ -60,9 +60,9 @@ public class Application {
     private OAuthClient oauthClient;
     private AllFrames allFrames;
     private VisualFeedback feedback;
-    private JLabel statusLabel = new JLabel("No dataset", JLabel.CENTER);
     private HarvestDialog harvestDialog;
     private HarvestPool harvestPool;
+    private DataSetStateButton dataSetStateButton = new DataSetStateButton();
     private JToggleButton harvestToggleButton = new JToggleButton();
     private Timer resizeTimer;
     private EditHistory editHistory = new EditHistory();
@@ -119,7 +119,7 @@ public class Application {
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new ImportAction(desktop, sipModel, harvestPool);
-        validateAction = new ValidateAction(desktop, sipModel);
+        validateAction = new ValidateAction(desktop, sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
         deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
@@ -145,7 +145,7 @@ public class Application {
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {
-                home.setTitle(String.format("Delving SIP Creator [%s - %s]", dataSet.getSpec(), dataSet.getDataSetFacts().get("name")));
+                home.setTitle(String.format("Delving SIP Creator [%s]", dataSet.getSpec()));
                 dataSetStateChanged(dataSet, dataSet.getState());
             }
 
@@ -167,15 +167,7 @@ public class Application {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                statusLabel.setText(dataSetState.toHtml());
-                switch (dataSetState) {
-                    case IMPORTED:
-                        performAnalysis();
-                        break;
-                    case SOURCED:
-                        performAnalysis();
-                        break;
-                }
+                dataSetStateButton.setState(dataSetState);
             }
         });
         harvestPool.addListDataListener(new ListDataListener() {
@@ -207,20 +199,6 @@ public class Application {
         });
     }
 
-    private void performAnalysis() {
-        sipModel.analyzeFields(new SipModel.AnalysisListener() {
-            @Override
-            public void analysisProgress(final long elementCount) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        statusLabel.setText(String.format("Analyzed %d elements", elementCount));
-                    }
-                });
-            }
-        });
-    }
-
     private boolean quit() {
         if (harvestPool.getSize() > 0) {
             if (JOptionPane.YES_OPTION !=
@@ -236,14 +214,7 @@ public class Application {
     }
 
     private JPanel createStatePanel() {
-        statusLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createBevelBorder(0),
-                BorderFactory.createEmptyBorder(2, 2, 2, 2)
-        ));
         refreshToggleButton();
-        JPanel left = new JPanel(new GridLayout(1, 0, 6, 6));
-        left.add(statusLabel);
-        left.add(new JButton(validateAction));
         JPanel right = new JPanel(new BorderLayout(6, 6));
         right.add(feedback.getToggle(), BorderLayout.CENTER);
         right.add(harvestToggleButton, BorderLayout.EAST);
@@ -252,7 +223,7 @@ public class Application {
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
         ));
-        p.add(left);
+        p.add(dataSetStateButton);
         p.add(right);
 //        p.setPreferredSize(new Dimension(100, 100));
         return p;
@@ -276,9 +247,90 @@ public class Application {
         JMenu menu = new JMenu("File");
         menu.add(downloadAction);
         menu.add(importAction);
+        menu.add(validateAction);
         menu.add(uploadAction);
         menu.add(deleteAction);
         return menu;
+    }
+
+    private class DataSetStateButton extends JButton implements ActionListener {
+        private Runnable work;
+        private Action action;
+
+        private DataSetStateButton() {
+            super("Status");
+            addActionListener(this);
+        }
+
+        public void setState(DataSetState state) {
+            setText(state.toHtml());
+            work = null;
+            action = null;
+            switch (state) {
+                case ABSENT:
+                    work = allFrames.prepareForNothing();
+                    break;
+                case EMPTY:
+                    action = importAction;
+                    break;
+                case IMPORTED:
+                    work = new AnalysisPerformer();
+                    break;
+                case ANALYZED_IMPORT:
+                    work = allFrames.prepareForDelimiting();
+                    break;
+                case DELIMITED:
+                    work = new ConvertPerformer();
+                    break;
+                case SOURCED:
+                    work = new AnalysisPerformer();
+                    break;
+                case ANALYZED_SOURCE:
+                    work = allFrames.prepareForMapping(desktop);
+                    break;
+                case MAPPING:
+                    action = validateAction;
+                    break;
+                case VALIDATED:
+                    action = uploadAction;
+                    break;
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (work != null) work.run();
+            if (action != null) action.actionPerformed(null);
+        }
+    }
+
+    private class AnalysisPerformer implements Runnable {
+        @Override
+        public void run() {
+            sipModel.analyzeFields(new SipModel.AnalysisListener() {
+                @Override
+                public void analysisProgress(final long elementCount) {
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            dataSetStateButton.setText(String.format("Analyzed %d elements", elementCount));
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    private class ConvertPerformer implements Runnable {
+        @Override
+        public void run() {
+            ProgressListener listener = sipModel.getFeedback().progressListener("Converting");
+            listener.setProgressMessage(String.format(
+                    "<html><h3>Converting source data of '%s' to standard form</h3>",
+                    sipModel.getDataSetModel().getDataSet().getSpec()
+            ));
+            sipModel.convertSource(listener);
+        }
     }
 
     private class CultureHubClientContext implements CultureHubClient.Context {
@@ -404,7 +456,6 @@ public class Application {
                 try {
                     Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
-                    application.allFrames.restore();
                 }
                 catch (StorageException e) {
                     JOptionPane.showMessageDialog(null, "Unable to create the storage directory");

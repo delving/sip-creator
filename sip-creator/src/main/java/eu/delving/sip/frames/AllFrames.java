@@ -23,10 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.menus.EditHistory;
-import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -35,7 +32,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import static eu.delving.sip.base.FrameBase.INSETS;
-import static eu.delving.sip.files.DataSetState.*;
 import static eu.delving.sip.frames.AllFrames.View.*;
 
 /**
@@ -75,12 +71,6 @@ public class AllFrames {
             return name;
         }
     }
-
-    private final AutomaticTransition [] TRANSITIONS = {
-            trans(null, EMPTY, CLEAR),
-            trans(CLEAR, IMPORTED, FIRST_CONTACT),
-            trans(FIRST_CONTACT, SOURCED, QUICK_MAPPING),
-    };
 
     public AllFrames(JDesktopPane desktop, final SipModel sipModel, EditHistory editHistory) {
         this.desktop = desktop;
@@ -141,21 +131,42 @@ public class AllFrames {
                 ),
                 view(CLEAR)
         };
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
-            @Override
-            public void dataSetChanged(DataSet dataSet) {
-                dataSetStateChanged(dataSet, dataSet.getState());
-            }
+    }
 
+    public Runnable prepareForNothing() {
+        return new Runnable() {
             @Override
-            public void dataSetRemoved() {
+            public void run() {
+                select(View.CLEAR);
             }
+        };
+    }
 
+    public Runnable prepareForMapping(final JComponent component) {
+        return new Runnable() {
             @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                for (AutomaticTransition trans : TRANSITIONS) trans.attempt(current, dataSetState);
+            public void run() {
+                select(component.getSize().width > 1600 ? DECADENT_DISPLAY : QUICK_MAPPING);
             }
-        });
+        };
+    }
+
+    public Runnable prepareForInvestigation(final JComponent component) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                select(component.getSize().width > 1600 ? DECADENT_DISPLAY : BIG_PICTURE);
+            }
+        };
+    }
+
+    public Runnable prepareForDelimiting() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                select(View.FIRST_CONTACT);
+            }
+        };
     }
 
     public void restore() {
@@ -337,26 +348,4 @@ public class AllFrames {
             return size.height + 4;
         }
     }
-
-    private AutomaticTransition trans(View from, DataSetState to, View view) {
-        return new AutomaticTransition(from, to, view);
-    }
-
-    private class AutomaticTransition {
-        private DataSetState state;
-        private View to, from;
-
-        private AutomaticTransition(View from, DataSetState state, View to) {
-            this.from = from;
-            this.state = state;
-            this.to = to;
-        }
-
-        void attempt(View from, DataSetState state) {
-            if ((this.from == null || this.from == from) && this.state == state) {
-                select(this.to);
-            }
-        }
-    }
-
 }

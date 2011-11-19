@@ -66,6 +66,7 @@ public class SipModel {
     private MappingModel mappingModel = new MappingModel();
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
+    private volatile boolean converting, validating, analyzing, importing;
 
     public interface AnalysisListener {
         void analysisProgress(long elementCount);
@@ -321,118 +322,150 @@ public class SipModel {
     }
 
     public void importSource(final File file, final ProgressListener progressListener) {
-        clearValidations();
-        feedback.say("Importing metadata from " + file.getAbsolutePath());
-        Exec.work(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    dataSetModel.getDataSet().externalToImported(file, progressListener);
-                    feedback.say("Finished importing metadata");
+        if (importing) {
+            feedback.say("Busy importing");
+        }
+        else {
+            importing = true;
+            clearValidations();
+            feedback.say("Importing metadata from " + file.getAbsolutePath());
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        dataSetModel.getDataSet().externalToImported(file, progressListener);
+                        feedback.say("Finished importing metadata");
+                        importing = false;
+                    }
+                    catch (StorageException e) {
+                        feedback.alert(String.format("Couldn't create Data Set from %s: %s", file.getAbsolutePath(), e.getMessage()), e);
+                    }
                 }
-                catch (StorageException e) {
-                    feedback.alert(String.format("Couldn't create Data Set from %s: %s", file.getAbsolutePath(), e.getMessage()), e);
-                }
-            }
-        });
+            });
+        }
     }
 
     public void analyzeFields(final AnalysisListener listener) {
-        feedback.say("Analyzing import from " + dataSetModel.getDataSet().getSpec());
-        Exec.work(new AnalysisParser(dataSetModel.getDataSet(), new AnalysisParser.Listener() {
-            @Override
-            public void success(final Statistics statistics) {
-                try {
-                    dataSetModel.getDataSet().setStatistics(statistics);
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            analysisModel.setStatistics(statistics);
-                        }
-                    });
-                    feedback.say("Import analyzed");
+        if (analyzing) {
+            feedback.say("Busy analyzing");
+        }
+        else {
+            analyzing = true;
+            feedback.say("Analyzing import from " + dataSetModel.getDataSet().getSpec());
+            Exec.work(new AnalysisParser(dataSetModel.getDataSet(), new AnalysisParser.Listener() {
+                @Override
+                public void success(final Statistics statistics) {
+                    analyzing = false;
+                    try {
+                        dataSetModel.getDataSet().setStatistics(statistics);
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                analysisModel.setStatistics(statistics);
+                            }
+                        });
+                        feedback.say("Import analyzed");
+                    }
+                    catch (StorageException e) {
+                        feedback.alert("Problem storing statistics", e);
+                    }
                 }
-                catch (StorageException e) {
-                    feedback.alert("Problem storing statistics", e);
+
+                @Override
+                public void failure(Exception exception) {
+                    analyzing = false;
+                    feedback.alert("Analysis failed: " + exception.getMessage(), exception);
                 }
-            }
 
-            @Override
-            public void failure(Exception exception) {
-                feedback.alert("Analysis failed: " + exception.getMessage(), exception);
-            }
+                @Override
+                public void failure(String message, Exception exception) {
+                    analyzing = false;
+                    feedback.alert(message, exception);
+                }
 
-            @Override
-            public void failure(String message, Exception exception) {
-                feedback.alert(message, exception);
-            }
-
-            @Override
-            public void progress(long elementCount) {
-                listener.analysisProgress(elementCount);
-            }
-        }));
+                @Override
+                public void progress(long elementCount) {
+                    listener.analysisProgress(elementCount);
+                }
+            }));
+        }
     }
 
     public void convertSource(final ProgressListener progressListener) {
         clearValidations();
-        feedback.say("Converting to source for " + dataSetModel.getDataSet().getSpec());
-        Exec.work(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    dataSetModel.getDataSet().importedToSource(progressListener);
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            seekFirstRecord();
-                        }
-                    });
-                    feedback.say("Source conversion complete");
+        if (converting) {
+            feedback.say("Busy converting to source for " + dataSetModel.getDataSet().getSpec());
+        }
+        else {
+            converting = true;
+            feedback.say("Converting to source for " + dataSetModel.getDataSet().getSpec());
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        dataSetModel.getDataSet().importedToSource(progressListener);
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                seekFirstRecord();
+                            }
+                        });
+                        feedback.say("Source conversion complete");
+                    }
+                    catch (StorageException e) {
+                        feedback.alert("Conversion failed: " + e.getMessage(), e);
+                    }
+                    finally {
+                        converting = false;
+                    }
                 }
-                catch (StorageException e) {
-                    feedback.alert("Conversion failed: " + e.getMessage(), e);
-                }
-            }
-        });
+            });
+        }
     }
 
     public void validateFile(boolean allowInvalidRecords, final ProgressListener progressListener, final ValidationListener validationListener) {
-        feedback.say(String.format(
-                "Validating mapping %s for data set %s, %s",
-                mappingModel.getRecordMapping().getPrefix(),
-                dataSetModel.getDataSet().getSpec(),
-                allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
-        ));
-        Exec.work(new FileValidator(
-                this,
-                allowInvalidRecords,
-                groovyCodeResource,
-                progressListener,
-                new FileValidator.Listener() {
-                    @Override
-                    public void invalidInput(final MappingException exception) {
-                        validationListener.failed(exception.getMetadataRecord().getRecordNumber(), exception);
-                    }
-
-                    @Override
-                    public void invalidOutput(final ValidationException exception) {
-                        validationListener.failed(exception.getRecordNumber(), exception);
-                    }
-
-                    @Override
-                    public void finished(final BitSet valid, int recordCount) {
-                        try {
-                            dataSetModel.getDataSet().setValidation(getMappingModel().getRecordMapping().getPrefix(), valid, recordCount);
+        if (validating) {
+            feedback.say("Busy validating");
+        }
+        else {
+            validating = true;
+            feedback.say(String.format(
+                    "Validating mapping %s for data set %s, %s",
+                    mappingModel.getRecordMapping().getPrefix(),
+                    dataSetModel.getDataSet().getSpec(),
+                    allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
+            ));
+            Exec.work(new FileValidator(
+                    this,
+                    allowInvalidRecords,
+                    groovyCodeResource,
+                    progressListener,
+                    new FileValidator.Listener() {
+                        @Override
+                        public void invalidInput(final MappingException exception) {
+                            validationListener.failed(exception.getMetadataRecord().getRecordNumber(), exception);
                         }
-                        catch (StorageException e) {
-                            feedback.alert("Unable to store validation results", e);
+
+                        @Override
+                        public void invalidOutput(final ValidationException exception) {
+                            validationListener.failed(exception.getRecordNumber(), exception);
                         }
-                        reportFileModel.kick();
-                        feedback.say("Validation complete, report available");
+
+                        @Override
+                        public void finished(final BitSet valid, int recordCount) {
+                            try {
+                                dataSetModel.getDataSet().setValidation(getMappingModel().getRecordMapping().getPrefix(), valid, recordCount);
+                            }
+                            catch (StorageException e) {
+                                feedback.alert("Unable to store validation results", e);
+                            }
+                            reportFileModel.kick();
+                            feedback.say("Validation complete, report available");
+                            validating = false;
+                        }
                     }
-                }
-        ));
+            ));
+        }
     }
 
     public void seekFresh() {
