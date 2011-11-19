@@ -35,6 +35,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import static eu.delving.sip.base.FrameBase.INSETS;
+import static eu.delving.sip.files.DataSetState.*;
+import static eu.delving.sip.frames.AllFrames.View.*;
 
 /**
  * Hold on to all the frames and manage their arrangemenbt
@@ -50,10 +52,10 @@ public class AllFrames {
     private Arrangement[] views;
     private JDesktopPane desktop;
     private int viewIndex = 1;
-    private View current = View.CLEAR;
+    private View current = CLEAR;
     private SipModel sipModel;
 
-    private enum View {
+    public enum View {
         CLEAR("Clear"),
         FIRST_CONTACT("First contact"),
         QUICK_MAPPING("Quick mapping"),
@@ -74,6 +76,12 @@ public class AllFrames {
         }
     }
 
+    private final AutomaticTransition [] TRANSITIONS = {
+            trans(null, EMPTY, CLEAR),
+            trans(CLEAR, IMPORTED, FIRST_CONTACT),
+            trans(FIRST_CONTACT, SOURCED, QUICK_MAPPING),
+    };
+
     public AllFrames(JDesktopPane desktop, final SipModel sipModel, EditHistory editHistory) {
         this.desktop = desktop;
         this.sipModel = sipModel;
@@ -89,30 +97,30 @@ public class AllFrames {
                 output = new OutputFrame(desktop, sipModel)
         };
         this.views = new Arrangement[]{
-                view(View.FIRST_CONTACT,
+                view(FIRST_CONTACT,
                         block(analysis, 0, 0, 1, 3),
                         block(statistics, 1, 0, 1, 2),
                         block(status, 1, 2)
                 ),
-                view(View.QUICK_MAPPING,
+                view(QUICK_MAPPING,
                         block(create, 0, 0),
                         block(statistics, 1, 0),
                         block(recordMapping, 2, 0)
                 ),
-                view(View.BIG_PICTURE,
+                view(BIG_PICTURE,
                         block(input, 0, 0),
                         block(recordMapping, 1, 0),
                         block(output, 2, 0)
                 ),
-                view(View.CODE_TWEAKING,
+                view(CODE_TWEAKING,
                         block(recordMapping, 0, 0),
                         block(fieldMapping, 1, 0, 3, 1),
                         block(input, 4, 0)
                 ),
-                view(View.DEEP_DELVING,
+                view(DEEP_DELVING,
                         block(fieldMapping, 0, 0)
                 ),
-                view(View.DECADENT_DISPLAY,
+                view(DECADENT_DISPLAY,
                         block(create, 0, 0, 3, 3),
                         block(statistics, 0, 3, 2, 3),
                         block(input, 5, 0, 2, 4),
@@ -121,7 +129,7 @@ public class AllFrames {
                         block(output, 5, 4, 2, 4),
                         block(status, 0, 6, 2, 2)
                 ),
-                view(View.PROJECTOR,
+                view(PROJECTOR,
                         block(analysis, 0, 0),
                         block(create, 0, 0),
                         block(statistics, 0, 0),
@@ -131,7 +139,7 @@ public class AllFrames {
                         block(output, 0, 0),
                         block(status, 0, 0)
                 ),
-                view(View.CLEAR)
+                view(CLEAR)
         };
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
@@ -145,50 +153,7 @@ public class AllFrames {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                switch (dataSetState) {
-                    case EMPTY:
-                        select(View.CLEAR);
-                        break;
-                    case IMPORTED:
-                    case ANALYZED_IMPORT:
-                    case SOURCED:
-                    case DELIMITED:
-                        switch (current) {
-                            case CLEAR:
-                            case QUICK_MAPPING:
-                            case CODE_TWEAKING:
-                            case DEEP_DELVING:
-                            case BIG_PICTURE:
-                            case DECADENT_DISPLAY:
-                                select(View.FIRST_CONTACT);
-                                break;
-                            case FIRST_CONTACT:
-                            case PROJECTOR:
-                                break;
-                            default:
-                                throw new RuntimeException();
-                        }
-                        break;
-                    case ANALYZED_SOURCE:
-                    case MAPPING:
-                    case VALIDATED:
-                        switch (current) {
-                            case CLEAR:
-                            case FIRST_CONTACT:
-                                select(View.QUICK_MAPPING);
-                                break;
-                            case QUICK_MAPPING:
-                            case CODE_TWEAKING:
-                            case DEEP_DELVING:
-                            case BIG_PICTURE:
-                            case DECADENT_DISPLAY:
-                            case PROJECTOR:
-                                break;
-                            default:
-                                throw new RuntimeException();
-                        }
-                        break;
-                }
+                for (AutomaticTransition trans : TRANSITIONS) trans.attempt(current, dataSetState);
             }
         });
     }
@@ -197,7 +162,7 @@ public class AllFrames {
         Exec.swingLater(new Runnable() {
             @Override
             public void run() {
-                select(View.valueOf(sipModel.getPreferences().get(VIEW_PREF, View.CLEAR.toString())));
+                select(View.valueOf(sipModel.getPreferences().get(VIEW_PREF, CLEAR.toString())));
             }
         });
     }
@@ -248,7 +213,7 @@ public class AllFrames {
         for (FrameBase frame : frames) {
             frame.closeFrame();
         }
-        current = View.CLEAR;
+        current = CLEAR;
     }
 
     private Arrangement view(View view, Block... blocks) {
@@ -370,6 +335,27 @@ public class AllFrames {
         @Override
         public int getIconHeight() {
             return size.height + 4;
+        }
+    }
+
+    private AutomaticTransition trans(View from, DataSetState to, View view) {
+        return new AutomaticTransition(from, to, view);
+    }
+
+    private class AutomaticTransition {
+        private DataSetState state;
+        private View to, from;
+
+        private AutomaticTransition(View from, DataSetState state, View to) {
+            this.from = from;
+            this.state = state;
+            this.to = to;
+        }
+
+        void attempt(View from, DataSetState state) {
+            if ((this.from == null || this.from == from) && this.state == state) {
+                select(this.to);
+            }
         }
     }
 
