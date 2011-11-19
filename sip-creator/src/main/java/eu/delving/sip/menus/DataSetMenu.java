@@ -119,8 +119,13 @@ public class DataSetMenu extends JMenu {
                 add(empty);
             }
         }
-        catch (StorageException e) {
-            sipModel.getFeedback().alert("Problem loading data set list", e);
+        catch (final StorageException e) {
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    sipModel.getFeedback().alert("Problem loading data set list", e);
+                }
+            });
         }
     }
 

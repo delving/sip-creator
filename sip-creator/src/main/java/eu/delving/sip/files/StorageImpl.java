@@ -392,18 +392,23 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException {
-            File file = new File(here, String.format(FileType.VALIDATION.getPattern(), metadataPrefix));
-            try {
-                DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
-                int invalidCount = recordCount - validation.cardinality();
-                out.writeInt(invalidCount);
-                for (int index = validation.nextClearBit(0); index >= 0 && index < recordCount; index = validation.nextClearBit(index + 1)) {
-                    out.writeInt(index);
-                }
-                out.close();
+            if (validation == null) {
+                deleteValidation(metadataPrefix);
             }
-            catch (IOException e) {
-                throw new StorageException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
+            else {
+                File file = new File(here, String.format(FileType.VALIDATION.getPattern(), metadataPrefix));
+                try {
+                    DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
+                    int invalidCount = recordCount - validation.cardinality();
+                    out.writeInt(invalidCount);
+                    for (int index = validation.nextClearBit(0); index >= 0 && index < recordCount; index = validation.nextClearBit(index + 1)) {
+                        out.writeInt(index);
+                    }
+                    out.close();
+                }
+                catch (IOException e) {
+                    throw new StorageException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
+                }
             }
         }
 
