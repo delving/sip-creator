@@ -52,15 +52,6 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     @XStreamAsAttribute
     public String fieldType;
 
-    @XStreamAsAttribute
-    public String facetPrefix;
-
-    @XStreamAsAttribute
-    public String facetName;
-
-    @XStreamAsAttribute
-    public String searchField;
-
     public boolean identifierField;
 
     public Converter converter;
