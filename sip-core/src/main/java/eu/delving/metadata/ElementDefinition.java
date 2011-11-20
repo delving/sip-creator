@@ -80,25 +80,20 @@ public class ElementDefinition {
         path.pop();
     }
 
-    public FieldDefinition getFieldDefinition(Path path) {
+    public void addFieldDefinitions(Map<Path, FieldDefinition> fieldDefinitions) {
         if (fields != null) {
             for (FieldDefinition fieldDefinition : fields) {
-                if (path.equals(fieldDefinition.path)) {
-                    return fieldDefinition;
-                }
+                fieldDefinitions.put(fieldDefinition.path, fieldDefinition);
             }
         }
         if (elements != null) {
             for (ElementDefinition elementDefinition : elements) {
-                if (path.equals(elementDefinition.path)) {
-                    return elementDefinition.getFieldDefinition(path);
-                }
+                elementDefinition.addFieldDefinitions(fieldDefinitions);
             }
         }
-        return null;
     }
 
-    public void setFactDefinitions(List<FactDefinition>  factDefinitions) throws MetadataException {
+    public void setFactDefinitions(List<FactDefinition> factDefinitions) throws MetadataException {
         if (fields != null) {
             for (FieldDefinition fieldDefinition : fields) {
                 if (fieldDefinition.factName != null) {
@@ -124,9 +119,7 @@ public class ElementDefinition {
     public void getMappableFields(List<FieldDefinition> fieldDefinitions) {
         if (this.fields != null) {
             for (FieldDefinition fieldDefinition : this.fields) {
-                if (!fieldDefinition.systemField) {
-                    fieldDefinitions.add(fieldDefinition);
-                }
+                fieldDefinitions.add(fieldDefinition);
             }
         }
         if (elements != null) {
@@ -145,59 +138,6 @@ public class ElementDefinition {
         if (elements != null) {
             for (ElementDefinition elementDefinition : elements) {
                 elementDefinition.getFieldNames(fieldNames);
-            }
-        }
-    }
-
-    public void getFacetMap(Map<String, String> facetMap) {
-        if (fields != null) {
-            for (FieldDefinition fieldDefinition : fields) {
-                if (fieldDefinition.facetPrefix != null) {
-                    facetMap.put(fieldDefinition.getFacetName(), fieldDefinition.facetPrefix);
-                }
-            }
-        }
-        if (elements != null) {
-            for (ElementDefinition elementDefinition : elements) {
-                elementDefinition.getFacetMap(facetMap);
-            }
-        }
-    }
-
-    public void getFacetFieldStrings(List<String> facetFieldStrings) {
-        if (fields != null) {
-            for (FieldDefinition fieldDefinition : fields) {
-                if (fieldDefinition.facetPrefix != null) {
-                    if (fieldDefinition.facetName != null) {
-                        facetFieldStrings.add(String.format("{!ex=%s}%s", fieldDefinition.facetPrefix, fieldDefinition.facetName.toUpperCase()));
-                    }
-                    else {
-                        facetFieldStrings.add(String.format("{!ex=%s}%s", fieldDefinition.facetPrefix, fieldDefinition.getFacetName()));
-                    }
-                }
-            }
-        }
-        if (elements != null) {
-            for (ElementDefinition elementDefinition : elements) {
-                elementDefinition.getFacetFieldStrings(facetFieldStrings);
-            }
-        }
-    }
-
-    public void getFieldStrings(List<String> fieldStrings) {
-        if (fields != null) {
-            for (FieldDefinition fieldDefinition : fields) {
-                if (fieldDefinition.facetPrefix != null) {
-                    fieldStrings.add(fieldDefinition.getFacetName());
-                }
-                else {
-                    fieldStrings.add(fieldDefinition.getFieldNameString());
-                }
-            }
-        }
-        if (elements != null) {
-            for (ElementDefinition elementDefinition : elements) {
-                elementDefinition.getFieldStrings(fieldStrings);
             }
         }
     }

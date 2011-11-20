@@ -23,6 +23,7 @@ package eu.delving.metadata;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +50,13 @@ public class RecordDefinition {
 
     public String validation;
 
+    @XStreamOmitField
+    public Map<Path, FieldDefinition> fieldDefinitions = new TreeMap<Path, FieldDefinition>();
+
     public void initialize(List<FactDefinition> factDefinitions) throws MetadataException {
         root.setPaths(new Path());
         root.setFactDefinitions(factDefinitions);
+        root.addFieldDefinitions(fieldDefinitions);
     }
 
     public List<FieldDefinition> getMappableFields() {
@@ -61,31 +66,7 @@ public class RecordDefinition {
     }
 
     public FieldDefinition getFieldDefinition(Path path) {
-        return root.getFieldDefinition(path);
-    }
-
-    public List<String> getFieldNameList() {
-        List<String> fieldNames = new ArrayList<String>();
-        root.getFieldNames(fieldNames);
-        return fieldNames;
-    }
-
-    public Map<String, String> getFacetMap() {
-        Map<String, String> facetMap = new TreeMap<String, String>();
-        root.getFacetMap(facetMap);
-        return facetMap;
-    }
-
-    public String[] getFacetFieldStrings() {
-        List<String> facetFieldStrings = new ArrayList<String>();
-        root.getFacetFieldStrings(facetFieldStrings);
-        return facetFieldStrings.toArray(new String[facetFieldStrings.size()]);
-    }
-
-    public String[] getFieldStrings() {
-        List<String> fieldStrings = new ArrayList<String>();
-        root.getFieldStrings(fieldStrings);
-        return fieldStrings.toArray(new String[fieldStrings.size()]);
+        return fieldDefinitions.get(path);
     }
 
     public String toString() {

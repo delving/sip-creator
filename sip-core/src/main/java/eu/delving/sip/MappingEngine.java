@@ -1,16 +1,7 @@
 package eu.delving.sip;
 
-import eu.delving.groovy.DiscardRecordException;
-import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingException;
-import eu.delving.groovy.MappingRunner;
-import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.MetadataRecordFactory;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.RecordMapping;
-import eu.delving.metadata.RecordValidator;
-import eu.delving.metadata.ValidationException;
+import eu.delving.groovy.*;
+import eu.delving.metadata.*;
 import groovy.util.Node;
 
 import javax.xml.stream.XMLStreamException;
@@ -74,7 +65,7 @@ public class MappingEngine {
             recordValidator.validateRecord(record, recordNumber);
             validateTime += System.currentTimeMillis() - now;
             now = System.currentTimeMillis();
-            IndexDocument indexDocument = IndexDocument.fromNode(record);
+            IndexDocument indexDocument = IndexDocument.fromNode(record, mappingRunner.getRecordDefinition());
             outputTime += System.currentTimeMillis() - now;
             return indexDocument;
         }
