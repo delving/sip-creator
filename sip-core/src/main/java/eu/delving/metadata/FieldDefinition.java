@@ -52,6 +52,7 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     @XStreamAsAttribute
     public String fieldType;
 
+    @XStreamAsAttribute
     public boolean identifierField;
 
     public Converter converter;

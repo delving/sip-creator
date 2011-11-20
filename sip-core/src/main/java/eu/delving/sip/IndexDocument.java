@@ -31,21 +31,28 @@ public class IndexDocument {
             if (node.value() instanceof Node) {
                 throw new RuntimeException("Expected a text value");
             }
-            doc.put(mungePath(node, recordDefinition), node.text());
+            QName qname = (QName) node.name();
+            FieldDefinition fieldDefinition = getFieldDefinition(qname, recordDefinition);
+            doc.put(mungePath(qname, fieldDefinition), node.text());
+            if (fieldDefinition != null && fieldDefinition.identifierField) {
+                doc.put("id", node.text());
+            }
         }
         return doc;
     }
 
-    private static String mungePath(Node node, RecordDefinition recordDefinition) {
-        QName qname = (QName) node.name();
-        Path path = new Path().extend(Tag.element("record")).extend(Tag.element(qname.getPrefix(), qname.getLocalPart()));
-        FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(path);
+    private static String mungePath(QName qname, FieldDefinition fieldDefinition) {
         if (fieldDefinition == null || fieldDefinition.fieldType == null) {
             return String.format("%s_%s_text", qname.getPrefix(), qname.getLocalPart());
         }
         else {
             return String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldDefinition.fieldType);
         }
+    }
+
+    private static FieldDefinition getFieldDefinition(QName qname, RecordDefinition recordDefinition) {
+        Path path = new Path().extend(Tag.element("record")).extend(Tag.element(qname.getPrefix(), qname.getLocalPart()));
+        return recordDefinition.getFieldDefinition(path);
     }
 
     private IndexDocument() {
