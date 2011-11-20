@@ -23,12 +23,9 @@ package eu.delving.groovy;
 
 import eu.delving.metadata.NamespaceDefinition;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.RecordDefinition;
 import eu.delving.metadata.RecordMapping;
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.lang.GroovySystem;
-import groovy.lang.MissingPropertyException;
-import groovy.lang.Script;
+import groovy.lang.*;
 import groovy.util.Node;
 import groovy.util.NodeBuilder;
 import groovy.xml.NamespaceBuilder;
@@ -65,6 +62,10 @@ public class MappingRunner {
 
     public MappingRunner(GroovyCodeResource groovyCodeResource, RecordMapping recordMapping) {
         this(groovyCodeResource, recordMapping, null, null);
+    }
+
+    public RecordDefinition getRecordDefinition() {
+        return recordMapping.getRecordDefinition();
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
