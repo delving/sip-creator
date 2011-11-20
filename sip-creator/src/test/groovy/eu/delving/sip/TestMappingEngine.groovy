@@ -83,6 +83,8 @@ class TestMappingEngine {
                 dc_identifier_gumby -> 10000
                 dc_title_text -> Vier wandlusters
                 dc_type_text -> wandluster
+                delving_creator -> Anoniem
+                delving_hubId -> Princessehof/8A12A315082A345F1A9D3AD14B214CD36D310CF8
                 europeana_collectionTitle_text -> Princessehof
                 europeana_country_text -> netherlands
                 europeana_dataProvider_text -> Princessehof

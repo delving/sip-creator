@@ -32,10 +32,14 @@ public class IndexDocument {
                 throw new RuntimeException("Expected a text value");
             }
             QName qname = (QName) node.name();
-            FieldDefinition fieldDefinition = getFieldDefinition(qname, recordDefinition);
-            doc.put(mungePath(qname, fieldDefinition), node.text());
-            if (fieldDefinition != null && fieldDefinition.identifierField) {
-                doc.put("id", node.text());
+            FieldDefinition definition = getFieldDefinition(qname, recordDefinition);
+            String fieldType = definition == null ? null : definition.fieldType;
+            String value = node.text();
+            if (fieldType == null) fieldType = "text";
+            doc.put(String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldType), value);
+            if (definition != null) {
+                if (definition.identifierField) doc.put("id", value);
+                if (definition.summaryField != null) doc.put(definition.summaryField.tag, value);
             }
         }
         return doc;

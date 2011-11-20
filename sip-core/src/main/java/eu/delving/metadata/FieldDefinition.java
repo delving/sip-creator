@@ -55,6 +55,9 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     @XStreamAsAttribute
     public boolean identifierField;
 
+    @XStreamAsAttribute
+    public SummaryField summaryField;
+
     public Converter converter;
 
     public List<String> options;

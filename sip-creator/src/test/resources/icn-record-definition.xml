@@ -71,7 +71,7 @@
         <field prefix="icn" localName="physicalState"/>
         <field prefix="dc" localName="contributor"/>
         <field prefix="dc" localName="coverage"/>
-        <field prefix="dc" localName="creator"/>
+        <field prefix="dc" localName="creator" summaryField="CREATOR"/>
         <field prefix="dc" localName="date"/>
         <field prefix="dc" localName="description"/>
         <field prefix="dc" localName="format"/>
@@ -120,7 +120,7 @@
         <field prefix="europeana" localName="source"/> <!-- to be deleted is unused -->
         <field prefix="europeana" localName="type" fieldType="string" factName="type"/>
         <field prefix="europeana" localName="unstored" fieldType="text"/>
-        <field prefix="europeana" localName="uri" identifierField="true">
+        <field prefix="europeana" localName="uri" identifierField="true" summaryField="HUB_ID">
             <converter call=".toId(spec)"/>
         </field>
         <field prefix="europeana" localName="userTag"/>
@@ -132,7 +132,7 @@
     <views>
         <view name="full">
             <view-field name="dc_title" prefix="dc" localName="title"/>
-            <view-field name="dc_creator" prefix="dc" localName="creator"/>
+            <view-field name="dc_creator" prefix="dc" localName="creator" summaryField="CREATOR"/>
             <view-field name="icn_creatorYearOfBirth" prefix="icn" localName="creatorYearOfBirth"/>
             <view-field name="dc_date">
                 <field-ref prefix="dc" localName="date"/>
