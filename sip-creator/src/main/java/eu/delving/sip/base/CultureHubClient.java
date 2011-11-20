@@ -506,7 +506,6 @@ public class CultureHubClient {
             this.file = file;
             this.uploadListener = uploadListener;
             this.progressListener = progressListener;
-            setChunked(true);
             setContentType(deriveContentType(file));
         }
 
@@ -514,14 +513,17 @@ public class CultureHubClient {
             return true;
         }
 
+        @Override
         public long getContentLength() {
             return this.file.length();
         }
 
+        @Override
         public InputStream getContent() throws IOException {
             return new FileInputStream(this.file);
         }
 
+        @Override
         public void writeTo(OutputStream outputStream) throws IOException {
             uploadListener.uploadStarted(file);
             if (progressListener != null) progressListener.prepareFor((int) (getContentLength() / BLOCK_SIZE));
@@ -546,10 +548,12 @@ public class CultureHubClient {
             }
         }
 
+        @Override
         public boolean isStreaming() {
-            return false;
+            return true;
         }
 
+        @Override
         public Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
@@ -601,7 +605,8 @@ public class CultureHubClient {
                 context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), file.getName(), context.getAccessToken()
         );
         HttpPost upload = new HttpPost(url);
-        upload.setEntity(new FileEntity(file, uploadListener, progressListener));
+        FileEntity fileEntity = new FileEntity(file, uploadListener, progressListener);
+        upload.setEntity(fileEntity);
         return upload;
     }
 
