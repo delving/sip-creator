@@ -65,26 +65,51 @@ class TestMappingEngine {
                 <association.subject>bestuurders (Utrecht)</association.subject>
                 <priref>6389</priref>
                 """
-            IndexDocument doc;
-            for (int x: 1..10) {
-              Long now = System.currentTimeMillis();
-//              record.replace("6389", new Random().toString())
-              IndexDocument oldDoc = doc;
-              doc = mappingEngine.executeMapping(record)
-              if(doc != null && oldDoc != null && !doc.toString().equals(oldDoc.toString())) {
-                throw new Exception("WRONG");
-              }
-              Long total = System.currentTimeMillis() - now;
-//              println "mapping time: " + total
-//              println mappingEngine
-            }
+            IndexDocument doc = mappingEngine.executeMapping(record);
             println "VALID!\n ${doc}"
-            println 'After 10 runs:\n' + mappingEngine
+            compareLines(doc.toString(),
+               """IndexDocument {
+                dc_creator_text -> Anoniem
+                dc_date_text -> 1780 - 1799
+                dc_format_text ->
+                    2x
+                    54
+                    57
+                    65
+                    77
+                    cm
+                    hoogte
+                    lengte
+                dc_identifier_gumby -> 10000
+                dc_title_text -> Vier wandlusters
+                dc_type_text -> wandluster
+                europeana_collectionTitle_text -> Princessehof
+                europeana_country_text -> netherlands
+                europeana_dataProvider_text -> Princessehof
+                europeana_isShownAt_string -> http://fries-museum.delving.org/portal/object/Princessehof/8A12A315082A345F1A9D3AD14B214CD36D310CF8.html
+                europeana_isShownBy_string -> http://fries-museum.delving.org/images/PH/o108.jpg.jpg
+                europeana_language_string -> nl
+                europeana_object_text -> http://fries-museum.delving.org/images/PH/o108.jpg.jpg
+                europeana_provider_text -> Princessehof
+                europeana_rights_text -> http://creativecommons.org/licenses/by-nc/3.0/de/
+                europeana_type_string -> IMAGE
+                europeana_uri_text -> Princessehof/8A12A315082A345F1A9D3AD14B214CD36D310CF8
+                icn_acquisitionMeans_text -> onbekend: schilder
+                icn_acquisitionYear_text -> 1947
+                icn_collectionType_text -> all
+               }
+            """
+            );
         }
         catch (ValidationException e) {
             println "The failed assertion:\n${e.message}\n${doc}"
         }
+    }
 
+    static boolean compareLines(String received, String expected) {
+        def r = received.split(" *\n[\t ]*")
+        def e = expected.split(" *\n[\t ]*")
+        assert r == e
     }
 
     public MetadataModel loadMetadataModel() {

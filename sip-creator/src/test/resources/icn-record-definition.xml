@@ -85,7 +85,7 @@
         <field prefix="dc" localName="date" facetName="dcdate" facetPrefix="dcd" searchField="when,date"/> <!--removed extract year it doesn't belong here -->
         <field prefix="dc" localName="description" searchField="description"/>
         <field prefix="dc" localName="format"/>
-        <field prefix="dc" localName="identifier" searchField="identifier"/>
+        <field prefix="dc" localName="identifier" searchField="identifier" fieldType="gumby"/>
         <field prefix="dc" localName="language"/>
         <field prefix="dc" localName="publisher"/>
         <field prefix="dc" localName="relation" searchField="relation"/>

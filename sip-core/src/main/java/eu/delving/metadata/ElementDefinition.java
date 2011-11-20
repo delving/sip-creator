@@ -80,22 +80,17 @@ public class ElementDefinition {
         path.pop();
     }
 
-    public FieldDefinition getFieldDefinition(Path path) {
+    public void addFieldDefinitions(Map<Path, FieldDefinition> fieldDefinitions) {
         if (fields != null) {
             for (FieldDefinition fieldDefinition : fields) {
-                if (path.equals(fieldDefinition.path)) {
-                    return fieldDefinition;
-                }
+                fieldDefinitions.put(fieldDefinition.path, fieldDefinition);
             }
         }
         if (elements != null) {
             for (ElementDefinition elementDefinition : elements) {
-                if (path.equals(elementDefinition.path)) {
-                    return elementDefinition.getFieldDefinition(path);
-                }
+                elementDefinition.addFieldDefinitions(fieldDefinitions);
             }
         }
-        return null;
     }
 
     public void setFactDefinitions(List<FactDefinition>  factDefinitions) throws MetadataException {

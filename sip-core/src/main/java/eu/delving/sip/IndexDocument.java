@@ -1,5 +1,9 @@
 package eu.delving.sip;
 
+import eu.delving.metadata.FieldDefinition;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecordDefinition;
+import eu.delving.metadata.Tag;
 import groovy.util.Node;
 import groovy.xml.QName;
 
@@ -18,22 +22,30 @@ import java.util.TreeMap;
 public class IndexDocument {
     private Map<String, List<Value>> map = new TreeMap<String, List<Value>>();
 
-    public static IndexDocument fromNode(Node node) {
+    public static IndexDocument fromNode(Node inputNode, RecordDefinition recordDefinition) {
         IndexDocument doc = new IndexDocument();
-        List traversal = node.depthFirst();
+        List traversal = inputNode.depthFirst();
         for (Object nodeObject : traversal) {
-            Node n = (Node) nodeObject;
-            if (n.value() instanceof List) {
-                continue;
+            Node node = (Node) nodeObject;
+            if (node.value() instanceof List) continue; // not a field
+            if (node.value() instanceof Node) {
+                throw new RuntimeException("Expected a text value");
             }
-            doc.put(mungePath(n), n.text()); // todo: probably have to check for List and Node in here
+            doc.put(mungePath(node, recordDefinition), node.text());
         }
         return doc;
     }
 
-    private static String mungePath(Node node) {
+    private static String mungePath(Node node, RecordDefinition recordDefinition) {
         QName qname = (QName) node.name();
-        return String.format("%s_%s", qname.getPrefix(), qname.getLocalPart());
+        Path path = new Path().extend(Tag.element("record")).extend(Tag.element(qname.getPrefix(), qname.getLocalPart()));
+        FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(path);
+        if (fieldDefinition == null || fieldDefinition.fieldType == null) {
+            return String.format("%s_%s_text", qname.getPrefix(), qname.getLocalPart());
+        }
+        else {
+            return String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldDefinition.fieldType);
+        }
     }
 
     private IndexDocument() {
