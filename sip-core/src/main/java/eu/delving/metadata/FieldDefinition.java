@@ -47,9 +47,6 @@ public class FieldDefinition implements Comparable<FieldDefinition> {
     public String factName;
 
     @XStreamAsAttribute
-    public boolean systemField;
-
-    @XStreamAsAttribute
     public String fieldType;
 
     @XStreamAsAttribute

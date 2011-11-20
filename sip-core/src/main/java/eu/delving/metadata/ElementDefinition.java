@@ -93,7 +93,7 @@ public class ElementDefinition {
         }
     }
 
-    public void setFactDefinitions(List<FactDefinition>  factDefinitions) throws MetadataException {
+    public void setFactDefinitions(List<FactDefinition> factDefinitions) throws MetadataException {
         if (fields != null) {
             for (FieldDefinition fieldDefinition : fields) {
                 if (fieldDefinition.factName != null) {
@@ -119,9 +119,7 @@ public class ElementDefinition {
     public void getMappableFields(List<FieldDefinition> fieldDefinitions) {
         if (this.fields != null) {
             for (FieldDefinition fieldDefinition : this.fields) {
-                if (!fieldDefinition.systemField) {
-                    fieldDefinitions.add(fieldDefinition);
-                }
+                fieldDefinitions.add(fieldDefinition);
             }
         }
         if (elements != null) {
