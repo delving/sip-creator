@@ -99,7 +99,6 @@ class TestMappingEngine {
                 icn_acquisitionMeans_text -> onbekend: schilder
                 icn_acquisitionYear_text -> 1947
                 icn_collectionType_text -> all
-                id -> Princessehof/8A12A315082A345F1A9D3AD14B214CD36D310CF8
                }
             """
             );
