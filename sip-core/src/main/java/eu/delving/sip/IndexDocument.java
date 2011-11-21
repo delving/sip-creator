@@ -38,7 +38,6 @@ public class IndexDocument {
             if (fieldType == null) fieldType = "text";
             doc.put(String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldType), value);
             if (definition != null) {
-                if (definition.identifierField) doc.put("id", value);
                 if (definition.summaryField != null) doc.put(definition.summaryField.tag, value);
             }
         }
