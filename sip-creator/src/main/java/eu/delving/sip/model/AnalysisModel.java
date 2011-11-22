@@ -30,8 +30,7 @@ import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.ListModel;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import java.awt.event.ActionEvent;
@@ -79,14 +78,14 @@ public class AnalysisModel {
             analysisTree = AnalysisTree.create("Analysis not yet performed");
         }
         analysisTreeModel.setRoot(analysisTree.getRoot());
-        setHints(recordRoot, uniqueElement);
+        setDelimiters(recordRoot, uniqueElement);
         selectStatistics(null);
     }
 
-    // todo: think of a better name
-    private void setHints(Path recordRoot, Path uniqueElement) {
+    private void setDelimiters(Path recordRoot, Path uniqueElement) {
         if (recordRoot != null) {
-            AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+            int recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+            hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
             List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
             analysisTree.getVariables(variables);
             variableListModel.setVariableList(variables);
