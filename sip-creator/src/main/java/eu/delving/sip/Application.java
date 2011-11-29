@@ -30,6 +30,7 @@ import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.xml.AnalysisParser;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.lang.StringUtils;
@@ -152,15 +153,20 @@ public class Application {
             @Override
             public void dataSetRemoved() {
                 home.setTitle("Delving SIP Creator");
-                sipModel.seekFirstRecord();
-                dataSetMenu.refreshAndChoose(null);
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
+                        sipModel.seekReset();
                         sipModel.getMappingModel().setRecordMapping(null);
                         sipModel.getAnalysisModel().setStatistics(null);
                         sipModel.getDataSetFacts().set(null);
                         sipModel.getRecordCompileModel().updatedRecord(null);
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                dataSetMenu.refreshAndChoose(null);
+                            }
+                        });
                     }
                 });
             }
@@ -307,15 +313,23 @@ public class Application {
     private class AnalysisPerformer implements Runnable {
         @Override
         public void run() {
+            final ProgressListener progress = sipModel.getFeedback().progressListener("Analyzing");
+            progress.setProgressMessage(String.format(
+                    "<html><h3>Analyzing data of '%s'</h3>",
+                    sipModel.getDataSetModel().getDataSet().getSpec()
+            ))  ;
+            progress.prepareFor(100);
             sipModel.analyzeFields(new SipModel.AnalysisListener() {
                 @Override
-                public void analysisProgress(final long elementCount) {
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            dataSetStateButton.setText(String.format("Analyzed %d elements", elementCount));
-                        }
-                    });
+                public boolean analysisProgress(final long elementCount) {
+                    int value = (int)(elementCount / AnalysisParser.ELEMENT_STEP);
+                    progress.setProgressString(String.format("%d elements", elementCount));
+                    return progress.setProgress(value % 100);
+                }
+
+                @Override
+                public void analysisComplete() {
+                    progress.finished(true);
                 }
             });
         }

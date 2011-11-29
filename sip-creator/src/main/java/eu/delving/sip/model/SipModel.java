@@ -69,7 +69,8 @@ public class SipModel {
     private volatile boolean converting, validating, analyzing, importing;
 
     public interface AnalysisListener {
-        void analysisProgress(long elementCount);
+        boolean analysisProgress(long elementCount);
+        void analysisComplete();
     }
 
     public interface ValidationListener {
@@ -351,7 +352,7 @@ public class SipModel {
         }
         else {
             analyzing = true;
-            feedback.say("Analyzing import from " + dataSetModel.getDataSet().getSpec());
+            feedback.say("Analyzing data from " + dataSetModel.getDataSet().getSpec());
             Exec.work(new AnalysisParser(dataSetModel.getDataSet(), new AnalysisParser.Listener() {
                 @Override
                 public void success(final Statistics statistics) {
@@ -362,6 +363,12 @@ public class SipModel {
                             @Override
                             public void run() {
                                 analysisModel.setStatistics(statistics);
+                                if (statistics.isSourceFormat()) {
+                                    seekFirstRecord();
+                                }
+                                else {
+                                    seekReset();
+                                }
                             }
                         });
                         feedback.say("Import analyzed");
@@ -369,23 +376,29 @@ public class SipModel {
                     catch (StorageException e) {
                         feedback.alert("Problem storing statistics", e);
                     }
-                }
-
-                @Override
-                public void failure(Exception exception) {
-                    analyzing = false;
-                    feedback.alert("Analysis failed: " + exception.getMessage(), exception);
+                    finally {
+                        listener.analysisComplete();
+                    }
                 }
 
                 @Override
                 public void failure(String message, Exception exception) {
                     analyzing = false;
-                    feedback.alert(message, exception);
+                    listener.analysisComplete();
+                    if (message == null) {
+                        message = "Analysis failed";
+                    }
+                    if (exception != null) {
+                        feedback.alert(message, exception);
+                    }
+                    else {
+                        feedback.say("Analysis aborted");
+                    }
                 }
 
                 @Override
-                public void progress(long elementCount) {
-                    listener.analysisProgress(elementCount);
+                public boolean progress(long elementCount) {
+                    return listener.analysisProgress(elementCount);
                 }
             }));
         }
@@ -468,7 +481,7 @@ public class SipModel {
         }
     }
 
-    public void seekFresh() {
+    public void seekReset() {
         if (metadataParser != null) {
             metadataParser.close();
             metadataParser = null;
@@ -480,7 +493,7 @@ public class SipModel {
     }
 
     public void seekRecordNumber(final int recordNumber, ProgressListener progressListener) {
-        seekFresh();
+        seekReset();
         seekRecord(
                 new ScanPredicate() {
                     @Override

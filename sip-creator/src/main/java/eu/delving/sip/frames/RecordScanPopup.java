@@ -154,7 +154,7 @@ public class RecordScanPopup extends FrameBase {
     }
 
     public void scan(boolean next) {
-        if (!next) sipModel.seekFresh();
+        if (!next) sipModel.seekReset();
         ProgressListener progressListener = null;
         if (currentPredicate != null) {
             for (JTextField field : fields) field.setEnabled(false);
