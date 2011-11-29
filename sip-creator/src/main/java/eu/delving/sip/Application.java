@@ -152,11 +152,11 @@ public class Application {
             @Override
             public void dataSetRemoved() {
                 home.setTitle("Delving SIP Creator");
-                sipModel.seekFirstRecord();
                 dataSetMenu.refreshAndChoose(null);
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
+                        sipModel.seekReset();
                         sipModel.getMappingModel().setRecordMapping(null);
                         sipModel.getAnalysisModel().setStatistics(null);
                         sipModel.getDataSetFacts().set(null);

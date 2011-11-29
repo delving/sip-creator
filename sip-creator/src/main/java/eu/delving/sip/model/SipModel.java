@@ -351,7 +351,7 @@ public class SipModel {
         }
         else {
             analyzing = true;
-            feedback.say("Analyzing import from " + dataSetModel.getDataSet().getSpec());
+            feedback.say("Analyzing data from " + dataSetModel.getDataSet().getSpec());
             Exec.work(new AnalysisParser(dataSetModel.getDataSet(), new AnalysisParser.Listener() {
                 @Override
                 public void success(final Statistics statistics) {
@@ -362,6 +362,12 @@ public class SipModel {
                             @Override
                             public void run() {
                                 analysisModel.setStatistics(statistics);
+                                if (statistics.isSourceFormat()) {
+                                    seekFirstRecord();
+                                }
+                                else {
+                                    seekReset();
+                                }
                             }
                         });
                         feedback.say("Import analyzed");
@@ -468,7 +474,7 @@ public class SipModel {
         }
     }
 
-    public void seekFresh() {
+    public void seekReset() {
         if (metadataParser != null) {
             metadataParser.close();
             metadataParser = null;
@@ -480,7 +486,7 @@ public class SipModel {
     }
 
     public void seekRecordNumber(final int recordNumber, ProgressListener progressListener) {
-        seekFresh();
+        seekReset();
         seekRecord(
                 new ScanPredicate() {
                     @Override

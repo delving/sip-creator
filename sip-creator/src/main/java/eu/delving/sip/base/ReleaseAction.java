@@ -25,13 +25,8 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -47,7 +42,7 @@ public class ReleaseAction extends AbstractAction {
     private CultureHubClient cultureHubClient;
 
     public ReleaseAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
-        super("Releaase this data set for others to access");
+        super("Release this data set for others to access");
         putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/release-icon.png")));
         putValue(
                 Action.ACCELERATOR_KEY,
@@ -82,8 +77,9 @@ public class ReleaseAction extends AbstractAction {
                 if (successful) {
                     sipModel.getFeedback().say(String.format("Unlocked %s and removed it locally", dataSet));
                     try {
-                        dataSet.remove();
+                        sipModel.seekReset(); // release the file handle
                         sipModel.getDataSetModel().setDataSet(null);
+                        dataSet.remove();
                     }
                     catch (StorageException e) {
                         sipModel.getFeedback().alert("Unable to remove data set", e);
