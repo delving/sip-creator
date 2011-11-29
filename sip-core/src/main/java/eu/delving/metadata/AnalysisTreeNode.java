@@ -24,12 +24,7 @@ package eu.delving.metadata;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * A node of the analysis tree
@@ -222,6 +217,9 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
     public String toString() {
         if (tag == null) {
             return "?";
+        }
+        else if (fieldStatistics != null) {
+            return String.format("%s (%d)", tag.toString(), fieldStatistics.getTotal());
         }
         else {
             return tag.toString();

@@ -49,7 +49,7 @@ import java.util.Map;
  */
 
 public class AnalysisParser implements Runnable {
-    private static final int ELEMENT_STEP = 10000;
+    public static final int ELEMENT_STEP = 10000;
     private Path path = new Path();
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
     private Listener listener;
@@ -59,11 +59,9 @@ public class AnalysisParser implements Runnable {
 
         void success(Statistics statistics);
 
-        void failure(Exception exception);
-
         void failure(String message, Exception exception);
 
-        void progress(long elementCount);
+        boolean progress(long elementCount);
     }
 
     public AnalysisParser(DataSet dataSet, Listener listener) {
@@ -95,12 +93,15 @@ public class AnalysisParser implements Runnable {
             XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
             StringBuilder text = new StringBuilder();
             long count = 0;
-            while (true) {
+            boolean running = true;
+            while (running) {
                 switch (input.getEventType()) {
                     case XMLEvent.START_ELEMENT:
                         if (++count % ELEMENT_STEP == 0) {
                             if (null != listener) {
-                                listener.progress(count);
+                                if (!listener.progress(count)) {
+                                    running = false;
+                                }
                             }
                         }
                         path.push(Tag.element(input.getName()));
@@ -130,8 +131,14 @@ public class AnalysisParser implements Runnable {
                 }
                 input.next();
             }
-            List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
-            listener.success(new Statistics(fieldStatisticsList, sourceFormat));
+            input.close();
+            if (running) {
+                List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
+                listener.success(new Statistics(fieldStatisticsList, sourceFormat));
+            }
+            else {
+                listener.failure(null, null);
+            }
         }
         catch (Exception e) {
             try {

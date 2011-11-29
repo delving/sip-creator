@@ -88,8 +88,19 @@ public class ProgressPopup implements ProgressListener {
     }
 
     @Override
-    public void prepareFor(final int total) {
+    public void setProgressString(final String message) {
         Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                if (!progressBar.isStringPainted()) progressBar.setStringPainted(true);
+                progressBar.setString(message);
+            }
+        });
+    }
+
+    @Override
+    public void prepareFor(final int total) {
+        Exec.swingAny(new Runnable() {
             @Override
             public void run() {
                 if (total < 0) {
