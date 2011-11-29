@@ -35,6 +35,8 @@ public interface ProgressListener {
 
     void setIndeterminateMessage(String message);
 
+    void setProgressString(String message);
+
     void prepareFor(int total);
 
     boolean setProgress(int progress);

@@ -21,12 +21,7 @@
 
 package eu.delving.sip;
 
-import eu.delving.metadata.AnalysisTree;
-import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordMapping;
-import eu.delving.metadata.Tag;
+import eu.delving.metadata.*;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
@@ -39,23 +34,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.swing.tree.DefaultTreeModel;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
-import static eu.delving.sip.files.DataSetState.DELIMITED;
-import static eu.delving.sip.files.DataSetState.EMPTY;
-import static eu.delving.sip.files.DataSetState.IMPORTED;
-import static eu.delving.sip.files.DataSetState.MAPPING;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static eu.delving.sip.files.DataSetState.*;
+import static org.junit.Assert.*;
 
 /**
  * Make sure the storage is working
@@ -233,17 +218,13 @@ public class TestStorage {
             }
 
             @Override
-            public void failure(Exception exception) {
-                throw new RuntimeException("Should not have failed", exception);
-            }
-
-            @Override
             public void failure(String message, Exception exception) {
                 throw new RuntimeException(message, exception);
             }
 
             @Override
-            public void progress(long elementCount) {
+            public boolean progress(long elementCount) {
+                return true;
             }
         });
         parser.run();

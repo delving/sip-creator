@@ -69,7 +69,8 @@ public class SipModel {
     private volatile boolean converting, validating, analyzing, importing;
 
     public interface AnalysisListener {
-        void analysisProgress(long elementCount);
+        boolean analysisProgress(long elementCount);
+        void analysisComplete();
     }
 
     public interface ValidationListener {
@@ -375,23 +376,29 @@ public class SipModel {
                     catch (StorageException e) {
                         feedback.alert("Problem storing statistics", e);
                     }
-                }
-
-                @Override
-                public void failure(Exception exception) {
-                    analyzing = false;
-                    feedback.alert("Analysis failed: " + exception.getMessage(), exception);
+                    finally {
+                        listener.analysisComplete();
+                    }
                 }
 
                 @Override
                 public void failure(String message, Exception exception) {
                     analyzing = false;
-                    feedback.alert(message, exception);
+                    listener.analysisComplete();
+                    if (message == null) {
+                        message = "Analysis failed";
+                    }
+                    if (exception != null) {
+                        feedback.alert(message, exception);
+                    }
+                    else {
+                        feedback.say("Analysis aborted");
+                    }
                 }
 
                 @Override
-                public void progress(long elementCount) {
-                    listener.analysisProgress(elementCount);
+                public boolean progress(long elementCount) {
+                    return listener.analysisProgress(elementCount);
                 }
             }));
         }
