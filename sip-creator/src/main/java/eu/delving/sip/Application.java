@@ -153,7 +153,6 @@ public class Application {
             @Override
             public void dataSetRemoved() {
                 home.setTitle("Delving SIP Creator");
-                dataSetMenu.refreshAndChoose(null);
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
@@ -162,6 +161,12 @@ public class Application {
                         sipModel.getAnalysisModel().setStatistics(null);
                         sipModel.getDataSetFacts().set(null);
                         sipModel.getRecordCompileModel().updatedRecord(null);
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                dataSetMenu.refreshAndChoose(null);
+                            }
+                        });
                     }
                 });
             }
