@@ -21,14 +21,13 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecordMapping;
-import eu.delving.metadata.SourceVariable;
+import eu.delving.sip.base.AnalysisTree;
+import eu.delving.sip.base.SourceVariable;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ListModel;
+import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.util.ArrayList;

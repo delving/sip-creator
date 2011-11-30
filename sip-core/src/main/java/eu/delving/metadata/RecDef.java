@@ -245,9 +245,6 @@ public class RecDef {
 
         @XStreamOmitField
         public Doc doc;
-
-        @XStreamOmitField
-        public AnalysisTree.Node node;
     }
 
     @XStreamAlias("elem")
@@ -276,8 +273,6 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Opt> options;
-
-        public AnalysisTree.Node node;
 
         public Elem findElem(Tag tag) {
             if (this.tag.equals(tag)) return this;

@@ -22,6 +22,7 @@
 package eu.delving.sip;
 
 import eu.delving.metadata.*;
+import eu.delving.sip.base.AnalysisTree;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;

@@ -19,16 +19,23 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.sip.base;
+
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.Tag;
 
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.*;
+import java.util.List;
 
 /**
  * A node of the analysis tree
@@ -251,4 +258,26 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
             return tag.toString();
         }
     }
+
+    public static class Renderer extends DefaultTreeCellRenderer {
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            if (value instanceof AnalysisTree.Node) {
+                AnalysisTree.Node node = (AnalysisTree.Node) value;
+                if (node.getTag().isAttribute()) {
+                    setIcon(Utility.ATTRIBUTE_ICON);
+                }
+                else if (node.getChildNodes().iterator().hasNext()) {
+                    setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                }
+                else {
+                    setIcon(Utility.VALUE_ELEMENT_ICON);
+                }
+            }
+            return component;
+        }
+    }
+
 }

@@ -21,7 +21,12 @@
 
 package eu.delving.sip.xml;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.Histogram;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RandomSample;
+import eu.delving.metadata.RecDef;
+import eu.delving.sip.base.AnalysisTree;
+import eu.delving.sip.base.AnalysisTreeNode;
 import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.model.BookmarksTreeModel;
@@ -50,11 +55,11 @@ import java.util.ArrayList;
 public class RecDefViewer extends JFrame {
     private static final DataFlavor FLAVOR = new DataFlavor(AnalysisTreeNode.class, "node");
     private static final int MARGIN = 10;
-    private static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Icon.class.getResource("/bookmark-expanded-icon.png"));
-    private static final Icon BOOKMARK_ICON = new ImageIcon(Icon.class.getResource("/bookmark-icon.png"));
-    private static final Icon VALUE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/value-element-icon.png"));
-    private static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/composite-element-icon.png"));
-    private static final Icon ATTRIBUTE_ICON = new ImageIcon(Icon.class.getResource("/attribute-icon.png"));
+    private static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-expanded-icon.png"));
+    private static final Icon BOOKMARK_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-icon.png"));
+    private static final Icon VALUE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/value-element-icon.png"));
+    private static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/composite-element-icon.png"));
+    private static final Icon ATTRIBUTE_ICON = new ImageIcon(Icon.class.getResource("/icons/attribute-icon.png"));
     private HtmlPanel recDefPanel = new HtmlPanel("Details");
     private HtmlPanel bookmarkPanel = new HtmlPanel("Details");
     private HistogramModel histogramModel = new HistogramModel();
@@ -65,14 +70,14 @@ public class RecDefViewer extends JFrame {
     public RecDefViewer(RecDef recDef) {
         super("RecDef Viewer");
         recDefTree = new JTree(new DefaultTreeModel(RecDefNode.create(recDef)));
-        recDefTree.setCellRenderer(new RecDefRenderer());
+        recDefTree.setCellRenderer(new RecDefNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
         recDefTree.collapseRow(0);
         recDefTree.setDropMode(DropMode.ON);
         recDefTree.setTransferHandler(new Xfer());
         analysisTree = new JTree();
-        analysisTree.setCellRenderer(new AnalysisTreeRenderer());
+        analysisTree.setCellRenderer(new AnalysisTreeNode.Renderer());
         analysisTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         analysisTree.getSelectionModel().addTreeSelectionListener(new AnalysisSelection());
         analysisTree.setDragEnabled(true);
@@ -406,47 +411,7 @@ public class RecDefViewer extends JFrame {
         }
     }
 
-    private class AnalysisTreeRenderer extends DefaultTreeCellRenderer {
-
-        @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            if (value instanceof AnalysisTree.Node) {
-                AnalysisTree.Node node = (AnalysisTree.Node) value;
-                if (node.getTag().isAttribute()) {
-                    setIcon(ATTRIBUTE_ICON);
-                }
-                else if (node.getChildNodes().iterator().hasNext()) {
-                    setIcon(COMPOSITE_ELEMENT_ICON);
-                }
-                else {
-                    setIcon(VALUE_ELEMENT_ICON);
-                }
-            }
-            return component;
-        }
-    }
-
-    private class RecDefRenderer extends DefaultTreeCellRenderer {
-
-        @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            RecDefNode node = (RecDefNode) value;
-            if (node.isAttr()) {
-                setIcon(ATTRIBUTE_ICON);
-            }
-            else if (node.hasChildElements()) {
-                setIcon(COMPOSITE_ELEMENT_ICON);
-            }
-            else {
-                setIcon(VALUE_ELEMENT_ICON);
-            }
-            return component;
-        }
-    }
-
-    private class BookmarkRenderer extends DefaultTreeCellRenderer {
+    private static class BookmarkRenderer extends DefaultTreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {

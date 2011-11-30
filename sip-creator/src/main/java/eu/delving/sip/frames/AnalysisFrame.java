@@ -21,9 +21,9 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.AnalysisTree;
-import eu.delving.metadata.AnalysisTreeNode;
 import eu.delving.metadata.Path;
+import eu.delving.sip.base.AnalysisTree;
+import eu.delving.sip.base.AnalysisTreeNode;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
@@ -35,7 +35,6 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
@@ -61,7 +60,7 @@ public class AnalysisFrame extends FrameBase {
         super(desktop, sipModel, "Analysis", false);
         statisticsJTree = new JTree(sipModel.getAnalysisModel().getAnalysisTreeModel());
         statisticsJTree.getModel().addTreeModelListener(new Expander());
-        statisticsJTree.setCellRenderer(new AnalysisTreeCellRenderer());
+        statisticsJTree.setCellRenderer(new AnalysisTreeNode.Renderer());
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
         setDefaultSize(400, 800);
@@ -154,40 +153,6 @@ public class AnalysisFrame extends FrameBase {
         selectUniqueElementButton.setEnabled(false);
         bp.add(selectUniqueElementButton);
         return bp;
-    }
-
-    private class AnalysisTreeCellRenderer extends DefaultTreeCellRenderer {
-        private Font normalFont, thickFont;
-
-        @Override
-        public Component getTreeCellRendererComponent(JTree jTree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            JLabel label = (JLabel) super.getTreeCellRendererComponent(jTree, value, selected, expanded, leaf, row, hasFocus);
-            AnalysisTree.Node node = (AnalysisTree.Node) value;
-            label.setFont(getNormalFont());
-            if (node.isRecordRoot()) {
-                label.setFont(getThickFont());
-                label.setText(String.format("%s : Record Root", node));
-            }
-            if (node.isUniqueElement()) {
-                label.setFont(getThickFont());
-                label.setText(String.format("%s : Unique Element", node));
-            }
-            return label;
-        }
-
-        private Font getNormalFont() {
-            if (normalFont == null) {
-                normalFont = super.getFont();
-            }
-            return normalFont;
-        }
-
-        private Font getThickFont() {
-            if (thickFont == null) {
-                thickFont = new Font(getNormalFont().getFontName(), Font.BOLD, getNormalFont().getSize());
-            }
-            return thickFont;
-        }
     }
 
     private class Expander implements TreeModelListener {

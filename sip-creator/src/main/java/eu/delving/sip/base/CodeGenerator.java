@@ -19,7 +19,11 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.sip.base;
+
+import eu.delving.metadata.FactDefinition;
+import eu.delving.metadata.FieldDefinition;
+import eu.delving.metadata.FieldMapping;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -21,34 +21,17 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.AnalysisTree;
-import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModelAdapter;
-import eu.delving.metadata.SourceVariable;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.*;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.CompileModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;

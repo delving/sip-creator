@@ -21,8 +21,8 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.FieldStatistics;
+import eu.delving.sip.base.AnalysisTree;
 
 import java.io.Serializable;
 import java.util.ArrayList;

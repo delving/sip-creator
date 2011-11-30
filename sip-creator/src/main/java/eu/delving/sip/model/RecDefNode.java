@@ -21,14 +21,17 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.AnalysisTree;
+import eu.delving.sip.base.Utility;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -178,16 +181,17 @@ public class RecDefNode implements TreeNode {
     }
 
     public void setNode(AnalysisTree.Node node) {
-        if (isAttr()) {
-            attr.node = node;
-        }
-        else {
-            elem.node = node;
-        }
+//        if (isAttr()) {
+//            attr.node = node;
+//        }
+//        else {
+//            elem.node = node;
+//        }
     }
 
     public AnalysisTree.Node getNode() {
-        return isAttr()? attr.node : elem.node;
+//        return isAttr()? attr.node : elem.node;
+        return null;
     }
 
     public static class RecDefPath extends TreePath {
@@ -209,4 +213,25 @@ public class RecDefNode implements TreeNode {
             return path;
         }
     }
+
+    public static class Renderer extends DefaultTreeCellRenderer {
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            RecDefNode node = (RecDefNode) value;
+            if (node.isAttr()) {
+                setIcon(Utility.ATTRIBUTE_ICON);
+            }
+            else if (node.hasChildElements()) {
+                setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+            }
+            else {
+                setIcon(Utility.VALUE_ELEMENT_ICON);
+            }
+            return component;
+        }
+    }
+
+
 }

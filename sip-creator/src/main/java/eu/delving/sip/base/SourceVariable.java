@@ -19,7 +19,9 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.sip.base;
+
+import eu.delving.metadata.FieldStatistics;
 
 import java.util.Set;
 import java.util.TreeSet;

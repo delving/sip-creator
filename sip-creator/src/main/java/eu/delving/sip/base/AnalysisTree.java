@@ -19,7 +19,11 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.sip.base;
+
+import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.Tag;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
