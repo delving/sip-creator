@@ -19,10 +19,11 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.xml;
+package eu.delving.sip.model;
 
 import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDef;
 import eu.delving.metadata.Tag;
 
 import javax.swing.*;
@@ -189,7 +190,7 @@ public class RecDefNode implements TreeNode {
         return isAttr()? attr.node : elem.node;
     }
 
-    static class RecDefPath extends TreePath {
+    public static class RecDefPath extends TreePath {
 
         RecDefPath(RecDefNode elemNode) {
             super(elemNode);

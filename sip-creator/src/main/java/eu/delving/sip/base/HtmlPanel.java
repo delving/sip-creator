@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.xml;
+package eu.delving.sip.base;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;

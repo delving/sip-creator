@@ -1,4 +1,6 @@
-package eu.delving.sip.xml;
+package eu.delving.sip.model;
+
+import eu.delving.metadata.RecDef;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -6,14 +8,15 @@ import javax.swing.tree.TreePath;
 import java.util.List;
 
 /**
-* todo: javadoc
+* The tree of bookmarks
 *
 * @author Gerald de Jong <geralddejong@gmail.com>
 */
-class BookmarksTreeModel implements TreeModel {
+
+public class BookmarksTreeModel implements TreeModel {
     private List<RecDef.Category> bookmarks;
 
-    BookmarksTreeModel(List<RecDef.Category> bookmarks) {
+    public BookmarksTreeModel(List<RecDef.Category> bookmarks) {
         this.bookmarks = bookmarks;
     }
 

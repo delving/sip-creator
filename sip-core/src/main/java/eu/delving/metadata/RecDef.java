@@ -19,15 +19,12 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.xml;
+package eu.delving.metadata;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import eu.delving.metadata.AnalysisTree;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.Tag;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

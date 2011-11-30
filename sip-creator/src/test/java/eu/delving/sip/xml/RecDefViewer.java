@@ -22,7 +22,10 @@
 package eu.delving.sip.xml;
 
 import eu.delving.metadata.*;
+import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.files.Statistics;
+import eu.delving.sip.model.BookmarksTreeModel;
+import eu.delving.sip.model.RecDefNode;
 import org.apache.commons.io.IOUtils;
 
 import javax.swing.*;

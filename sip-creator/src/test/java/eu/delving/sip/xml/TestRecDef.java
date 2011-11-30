@@ -1,5 +1,6 @@
 package eu.delving.sip.xml;
 
+import eu.delving.metadata.RecDef;
 import org.junit.Test;
 
 import java.io.File;
