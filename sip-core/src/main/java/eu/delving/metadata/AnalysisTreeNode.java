@@ -153,7 +153,7 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
         StringBuilder out = new StringBuilder("input.");
         Iterator<AnalysisTreeNode> nodeWalk = path.iterator();
         while (nodeWalk.hasNext()) {
-            String nodeName = nodeWalk.next().toString();
+            String nodeName = nodeWalk.next().tag.toString();
             out.append(SourceVariable.Filter.tagToVariable(nodeName));
             if (nodeWalk.hasNext()) {
                 out.append('.');
