@@ -146,8 +146,8 @@ public class AnalysisModel {
         return analysisTreeModel;
     }
 
-    public ListModel getVariablesListWithCountsModel() {
-        return variableListModel.getWithCounts(sipModel.getMappingModel());
+    public ListModel getVariablesListModel() {
+        return variableListModel;
     }
 
     public List<SourceVariable> getVariables() {

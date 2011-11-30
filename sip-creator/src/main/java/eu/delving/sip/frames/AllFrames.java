@@ -75,11 +75,12 @@ public class AllFrames {
     public AllFrames(JDesktopPane desktop, final SipModel sipModel, EditHistory editHistory) {
         this.desktop = desktop;
         this.sipModel = sipModel;
-        FrameBase status, analysis, create, statistics, input, fieldMapping, recordMapping, output;
+        FrameBase status, analysis, create, recDef, statistics, input, fieldMapping, recordMapping, output;
         this.frames = new FrameBase[]{
                 status = new FactsFrame(desktop, sipModel),
                 analysis = new AnalysisFrame(desktop, sipModel),
                 create = new CreateFrame(desktop, sipModel),
+                recDef = new RecDefFrame(desktop, sipModel),
                 statistics = new StatisticsFrame(desktop, sipModel),
                 input = new InputFrame(desktop, sipModel),
                 fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory),
@@ -93,9 +94,9 @@ public class AllFrames {
                         block(status, 1, 2)
                 ),
                 view(QUICK_MAPPING,
-                        block(create, 0, 0),
+                        block(analysis, 0, 0),
                         block(statistics, 1, 0),
-                        block(recordMapping, 2, 0)
+                        block(recDef, 2, 0)
                 ),
                 view(BIG_PICTURE,
                         block(input, 0, 0),

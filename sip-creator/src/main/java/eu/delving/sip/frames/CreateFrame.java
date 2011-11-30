@@ -59,7 +59,7 @@ public class CreateFrame extends FrameBase {
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Create", false);
         createMappingAction.setEnabled(false);
-        variablesList = new JList(sipModel.getAnalysisModel().getVariablesListWithCountsModel());
+        variablesList = new JList(sipModel.getAnalysisModel().getVariablesListModel());
         wireUp();
     }
 
@@ -136,7 +136,7 @@ public class CreateFrame extends FrameBase {
 
     private JPanel createVariableListPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Input Field Source"));
+        p.setBorder(BorderFactory.createTitledBorder("Variables"));
         p.add(scroll(variablesList), BorderLayout.CENTER);
         variablesList.addListSelectionListener(new ListSelectionListener() {
             @Override
