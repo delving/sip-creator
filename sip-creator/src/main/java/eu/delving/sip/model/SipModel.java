@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,6 @@ public class SipModel {
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private Feedback feedback;
-    private FieldListModel fieldListModel;
     private CompileModel recordCompileModel;
     private CompileModel fieldCompileModel;
     private MetadataParser metadataParser;
@@ -90,7 +88,6 @@ public class SipModel {
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
-        fieldListModel = new FieldListModel(dataSetModel);
         recordCompileModel = new CompileModel(CompileModel.Type.RECORD, feedback, groovyCodeResource);
         fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel);
@@ -223,25 +220,12 @@ public class SipModel {
         return feedback;
     }
 
-    public ListModel getUnmappedFieldListModel() {
-        return fieldListModel.getUnmapped(getMappingModel());
-    }
-
     public CompileModel getRecordCompileModel() {
         return recordCompileModel;
     }
 
     public CompileModel getFieldCompileModel() {
         return fieldCompileModel;
-    }
-
-    public List<FieldDefinition> getUnmappedFields() {
-        List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
-        ListModel listModel = getUnmappedFieldListModel();
-        for (int walkField = 0; walkField < listModel.getSize(); walkField++) {
-            fields.add((FieldDefinition) listModel.getElementAt(walkField));
-        }
-        return fields;
     }
 
     public ListModel getFieldMappingListModel() {

@@ -21,18 +21,11 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.FieldDefinition;
-import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.RecordMapping;
-import eu.delving.sip.base.CodeGenerator;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.SourceVariable;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
-import eu.delving.sip.model.FieldListModel;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
 
@@ -61,18 +54,12 @@ public class CreateFrame extends FrameBase {
     private final static String CREATE_CAPTION = "<html><b>Create Mapping</b> (Click here or press &lt;space>)</html>";
     private JTextField constantField = new JTextField("?");
     private JList variablesList;
-    private JList targetFieldList;
-    private ObviousMappingsPopup obviousMappingsPopup;
     private final CreateMappingAction createMappingAction = new CreateMappingAction();
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Create", false);
         createMappingAction.setEnabled(false);
-        obviousMappingsPopup = new ObviousMappingsPopup(this);
         variablesList = new JList(sipModel.getAnalysisModel().getVariablesListWithCountsModel());
-        targetFieldList = new JList(sipModel.getUnmappedFieldListModel());
-        targetFieldList.setCellRenderer(new FieldListModel.CellRenderer());
-        targetFieldList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         wireUp();
     }
 
@@ -106,29 +93,6 @@ public class CreateFrame extends FrameBase {
                 // todo: implement
             }
         });
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
-            @Override
-            public void factChanged() {
-            }
-
-            @Override
-            public void select(FieldMapping fieldMapping) {
-            }
-
-            @Override
-            public void fieldMappingChanged() {
-            }
-
-            @Override
-            public void recordMappingChanged(RecordMapping recordMapping) {
-                Exec.swing(new ObviousMappingsChecker());
-            }
-
-            @Override
-            public void recordMappingSelected(RecordMapping recordMapping) {
-                Exec.swing(new ObviousMappingsChecker());
-            }
-        });
         constantField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -155,30 +119,11 @@ public class CreateFrame extends FrameBase {
     }
 
     private JComponent createPanel() {
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createVariableMappingPanel(), createTargetPanel());
-        split.setDividerLocation(0.5);
-        split.setResizeWeight(0.5);
-        return split;
-    }
-
-    private JPanel createTargetPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Unmapped Output Fields"));
-        p.add(scroll(targetFieldList), BorderLayout.CENTER);
-        targetFieldList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                enableCreateMapping();
-            }
-        });
-        return p;
+        return createVariableMappingPanel();
     }
 
     private JPanel createVariableMappingPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(createVariableMappingTop(), BorderLayout.CENTER);
-        p.add(new JButton(obviousMappingsPopup.getAction()), BorderLayout.SOUTH);
-        return p;
+        return createVariableMappingTop();
     }
 
     private JPanel createVariableMappingTop() {
@@ -210,10 +155,9 @@ public class CreateFrame extends FrameBase {
      * </ul>
      */
     private void enableCreateMapping() {
-        boolean target = !targetFieldList.isSelectionEmpty();
         boolean source = !variablesList.isSelectionEmpty();
         boolean constant = !constantField.getText().equals("?") && !StringUtils.isEmpty(constantField.getText());
-        boolean enabled = target && (source || constant);
+        boolean enabled = (source || constant);
         createMappingAction.putValue("Name", enabled ? CREATE_CAPTION : SELECT_CAPTION);
         createMappingAction.setEnabled(enabled);
     }
@@ -249,18 +193,19 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            FieldDefinition fieldDefinition = (FieldDefinition) targetFieldList.getSelectedValue();
-            if (fieldDefinition != null) {
-                CodeGenerator generator = new CodeGenerator();
-                final FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
-                generator.generateCodeFor(fieldMapping, createSelectedVariableList(), getConstantFieldValue());
-                Exec.work(new Runnable() {
-                    @Override
-                    public void run() {
-                        sipModel.getMappingModel().addMapping(fieldMapping);
-                    }
-                });
-            }
+            sipModel.getFeedback().alert("Under construction");
+//            FieldDefinition fieldDefinition = (FieldDefinition) targetFieldList.getSelectedValue();
+//            if (fieldDefinition != null) {
+//                CodeGenerator generator = new CodeGenerator();
+//                final FieldMapping fieldMapping = new FieldMapping(fieldDefinition);
+//                generator.generateCodeFor(fieldMapping, createSelectedVariableList(), getConstantFieldValue());
+//                Exec.work(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        sipModel.getMappingModel().addMapping(fieldMapping);
+//                    }
+//                });
+//            }
             clear();
         }
 
@@ -279,19 +224,6 @@ public class CreateFrame extends FrameBase {
                 list.add((SourceVariable) sourceVariable);
             }
             return list;
-        }
-    }
-
-    private class ObviousMappingsChecker implements Runnable {
-        @Override
-        public void run() {
-            CodeGenerator codeGenerator = new CodeGenerator();
-            List<FieldMapping> obvious = codeGenerator.createObviousMappings(
-                    sipModel.getUnmappedFields(),
-                    sipModel.getAnalysisModel().getVariables(),
-                    sipModel.getDataSetModel().getFactDefinitions()
-            );
-            obviousMappingsPopup.setObviousMappings(obvious);
         }
     }
 
