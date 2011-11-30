@@ -86,7 +86,7 @@ public class RecDefFrame extends FrameBase {
         @Override
         public void valueChanged(TreeSelectionEvent event) {
             RecDefNode node = (RecDefNode) event.getPath().getLastPathComponent();
-//            showNode(node);
+            showNode(node);
             RecDefNode root = (RecDefNode) recDefTree.getModel().getRoot();
             root.showPath(recDefTree, node.getPath().getOurPath());
         }
