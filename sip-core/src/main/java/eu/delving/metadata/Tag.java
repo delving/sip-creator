@@ -21,6 +21,8 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+
 import javax.xml.namespace.QName;
 import java.io.Serializable;
 
@@ -67,6 +69,22 @@ public class Tag implements Comparable<Tag>, Serializable {
         else {
             return attribute(tagString.substring(0, colon), tagString.substring(colon + 1));
         }
+    }
+
+    public static Tag create(String tagString) {
+        boolean attribute = tagString.startsWith("@");
+        if (attribute) tagString = tagString.substring(1);
+        int colon = tagString.indexOf(':');
+        String prefix, localPart;
+        if (colon < 0) {
+            prefix = null;
+            localPart = tagString;
+        }
+        else {
+            prefix = tagString.substring(0, colon);
+            localPart = tagString.substring(colon + 1);
+        }
+        return attribute ? attribute(prefix, localPart) : element(prefix, localPart);
     }
 
     private Tag(boolean attribute, String prefix, String localName) {
@@ -130,7 +148,7 @@ public class Tag implements Comparable<Tag>, Serializable {
 
     public String toPathElement() {
         if (attribute) {
-            return "@" + (prefix != null ? prefix + ":" + localName : localName);
+            return "/@" + (prefix != null ? prefix + ":" + localName : localName);
         }
         else {
             return "/" + (prefix != null ? prefix + ":" + localName : localName);
@@ -145,4 +163,33 @@ public class Tag implements Comparable<Tag>, Serializable {
             return prefix != null ? prefix + ":" + localName : localName;
         }
     }
+
+    public static class Converter extends AbstractSingleValueConverter {
+
+        @Override
+        public boolean canConvert(Class type) {
+            return Tag.class.equals(type);
+        }
+
+        @Override
+        public Object fromString(String tagString) {
+            return create(tagString);
+        }
+    }
+
+    public static class AttributeConverter extends AbstractSingleValueConverter {
+
+        @Override
+        public boolean canConvert(Class type) {
+            return Tag.class.equals(type);
+        }
+
+        @Override
+        public Object fromString(String tagString) {
+            return attribute(tagString);
+        }
+    }
+
 }
+
+

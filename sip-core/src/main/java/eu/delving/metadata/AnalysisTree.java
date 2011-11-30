@@ -21,6 +21,7 @@
 
 package eu.delving.metadata;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -64,6 +65,8 @@ public class AnalysisTree implements Serializable {
         boolean couldBeUniqueElement();
 
         String getVariableName();
+
+        void showPath(JTree tree, Path path);
     }
 
     public static int setRecordRoot(DefaultTreeModel model, Path recordRoot) {

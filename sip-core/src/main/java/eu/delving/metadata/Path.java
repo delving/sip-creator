@@ -21,7 +21,10 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Stack;
 
 /**
@@ -45,11 +48,9 @@ public class Path implements Comparable<Path>, Serializable {
             }
             for (String part : pathString.substring(1).split("/")) {
                 int at = part.indexOf("@");
-                if (at > 0) {
-                    String element = part.substring(0, at);
-                    String attribute = part.substring(at + 1);
-                    stack.push(Tag.element(element));
-                    stack.push(Tag.attribute(attribute));
+                if (at > 0) throw new IllegalArgumentException("@ must be at the beginning of an attribute name");
+                if (at == 0) {
+                    stack.push(Tag.attribute(part.substring(1)));
                 }
                 else {
                     stack.push(Tag.element(part));
@@ -59,19 +60,11 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     public Path(Path path) {
-        if (path.stack != null) {
-            for (Tag name : path.stack) {
-                stack.push(name);
-            }
-        }
+        if (path.stack != null) for (Tag name : path.stack) stack.push(name);
     }
 
     public Path(Path path, int count) {
-        for (Tag name : path.stack) {
-            if (count-- > 0) {
-                stack.push(name);
-            }
-        }
+        for (Tag name : path.stack) if (count-- > 0) stack.push(name);
     }
 
     public Path extend(Tag tag) {
@@ -91,10 +84,21 @@ public class Path implements Comparable<Path>, Serializable {
         return this;
     }
 
+    public boolean isAncestorOf(Path other) {
+        Iterator<Tag> walkThis = stack.iterator();
+        Iterator<Tag> walkOther = other.stack.iterator();
+        while (walkThis.hasNext()) {
+            if (!walkOther.hasNext()) return false; // other shorter than this
+            Tag thisTag = walkThis.next();
+            Tag otherTag = walkOther.next();
+            if (!thisTag.equals(otherTag)) return false; // always equal
+        }
+        return walkOther.hasNext();
+    }
+
     @Override
     public boolean equals(Object path) {
-        if (path == null || !(path instanceof Path)) return false;
-        return toString().equals(path.toString());
+        return !(path == null || !(path instanceof Path)) && toString().equals(path.toString());
     }
 
     @Override
@@ -108,19 +112,11 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     public Tag getTag(int level) {
-        if (level < stack.size()) {
-            return stack.get(level);
-        }
-        else {
-            return null;
-        }
+        return level < stack.size() ? stack.get(level) : null;
     }
 
     public Tag peek() {
-        if (stack.isEmpty()) {
-            return null;
-        }
-        return stack.peek();
+        return stack.isEmpty() ? null : stack.peek();
     }
 
     public int size() {
@@ -136,5 +132,18 @@ public class Path implements Comparable<Path>, Serializable {
             string = builder.toString();
         }
         return string;
+    }
+
+    public static class Converter extends AbstractSingleValueConverter {
+
+        @Override
+        public boolean canConvert(Class type) {
+            return Path.class.equals(type);
+        }
+
+        @Override
+        public Object fromString(String str) {
+            return new Path(str);
+        }
     }
 }

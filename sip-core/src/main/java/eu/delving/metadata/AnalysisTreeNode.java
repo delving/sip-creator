@@ -21,8 +21,12 @@
 
 package eu.delving.metadata;
 
+import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.*;
 
@@ -37,6 +41,7 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
     private AnalysisTreeNode parent;
     private List<AnalysisTreeNode> children = new ArrayList<AnalysisTreeNode>();
     private Tag tag;
+    private Path path;
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
 
@@ -86,11 +91,13 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
 
     @Override
     public Path getPath() {
-        List<AnalysisTreeNode> list = new ArrayList<AnalysisTreeNode>();
-        compilePathList(list);
-        Path path = new Path();
-        for (AnalysisTreeNode node : list) {
-            path.push(node.getTag());
+        if (path == null) {
+            List<AnalysisTreeNode> list = new ArrayList<AnalysisTreeNode>();
+            compilePathList(list);
+            path = new Path();
+            for (AnalysisTreeNode node : list) {
+                path.push(node.getTag());
+            }
         }
         return path;
     }
@@ -160,6 +167,25 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
             }
         }
         return out.toString();
+    }
+
+    @Override
+    public void showPath(final JTree tree, final Path pathToShow) {
+        final Path here = getPath();
+        Timer timer = new Timer(30, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if ((pathToShow.equals(here) || pathToShow.isAncestorOf(here)) && !tree.isExpanded(getTreePath())) {
+                    tree.expandPath(getTreePath());
+                }
+                else if ((here.size() <= pathToShow.size() && !here.isAncestorOf(pathToShow)) && !tree.isCollapsed(getTreePath())) {
+                    tree.collapsePath(getTreePath());
+                }
+                for (AnalysisTree.Node sub : children) sub.showPath(tree, pathToShow);
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 
     private void compilePathList(List<AnalysisTreeNode> list) {

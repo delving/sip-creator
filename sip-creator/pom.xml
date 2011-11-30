@@ -147,5 +147,13 @@
             <version>1.5.0</version>
             <scope>provided</scope>
         </dependency>
+
+        <!--todo: move this dependency when it gets used for real-->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>stringtemplate</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
