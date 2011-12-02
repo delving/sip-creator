@@ -3,14 +3,7 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * This class describes how a field is mapped.
@@ -29,9 +22,6 @@ public class FieldMapping implements Comparable<FieldMapping> {
 
     @XStreamOmitField
     public FieldDefinition fieldDefinition;
-
-    @XStreamOmitField
-    public List<String> variables;
 
     public FieldMapping(FieldDefinition fieldDefinition) {
         this.fieldDefinition = fieldDefinition;
@@ -57,7 +47,6 @@ public class FieldMapping implements Comparable<FieldMapping> {
             code = new ArrayList<String>();
         }
         code.add(line.trim());
-        variables = null;
     }
 
     public void createDictionary(Set<String> domainValues) {
@@ -65,26 +54,6 @@ public class FieldMapping implements Comparable<FieldMapping> {
         for (String key : domainValues) {
             this.dictionary.put(key, "");
         }
-    }
-
-    public List<String> getVariableNames() {
-        if (variables == null) {
-            variables = new ArrayList<String>();
-            for (String line : code) {
-                Matcher matcher = VARIABLE_PATTERN.matcher(line);
-                while (matcher.find()) {
-                    String var = matcher.group(0);
-                    if (var.endsWith("(")) {
-                        var = var.substring(0, var.lastIndexOf('.'));
-                    }
-                    if(var.endsWith("'")) {
-                        var = String.format("constant value '%s'", matcher.group(2));
-                    }
-                    variables.add(var);
-                }
-            }
-        }
-        return variables;
     }
 
     public boolean codeLooksLike(String codeString) {
@@ -112,20 +81,11 @@ public class FieldMapping implements Comparable<FieldMapping> {
         for (String line : code.split("\n")) {
             this.code.add(line.trim());
         }
-        this.variables = null;
     }
 
     public String getDescription() {
-        String fieldName = fieldDefinition == null ? "?" : fieldDefinition.getFieldNameString();
-        if (getVariableNames().isEmpty()) {
-            return fieldName;
-        }
-        else {
-            return String.format("%s from %s", fieldName, getVariableNames());
-        }
+        return fieldDefinition.getFieldNameString();
     }
-
-    private static final Pattern VARIABLE_PATTERN = Pattern.compile("input(\\.\\w+)+[\\(]?|\\w.+\'(.*)\'");
 
     @Override
     public int compareTo(FieldMapping fieldMapping) {

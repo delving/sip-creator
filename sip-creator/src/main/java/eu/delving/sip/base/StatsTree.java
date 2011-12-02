@@ -25,10 +25,7 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 
-import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,84 +38,55 @@ import java.util.TreeMap;
  * @author Gerald de Jong, Delving BV, <geralddejong@gmail.com>
  */
 
-public class AnalysisTree implements Serializable {
-    private static final long serialVersionUID = -15171971879119571L;
-    private AnalysisTreeNode root;
-
-    public interface Node extends TreeNode, Comparable<Node> {
-        FieldStatistics getStatistics();
-
-        TreePath getTreePath();
-
-        Tag getTag();
-
-        Path getPath();
-
-        boolean setRecordRoot(Path recordRoot);
-
-        boolean setUniqueElement(Path uniqueElement);
-
-        boolean isRecordRoot();
-
-        boolean isUniqueElement();
-
-        Iterable<? extends Node> getChildNodes();
-
-        boolean couldBeRecordRoot();
-
-        boolean couldBeUniqueElement();
-
-        String getVariableName();
-
-        void showPath(JTree tree, Path path);
-    }
+public class StatsTree implements Serializable {
+    private StatsTreeNode root;
 
     public static int setRecordRoot(DefaultTreeModel model, Path recordRoot) {
-        AnalysisTree.Node node = (AnalysisTree.Node) model.getRoot();
-        List<AnalysisTree.Node> changedNodes = new ArrayList<AnalysisTree.Node>();
+        StatsTreeNode node = (StatsTreeNode) model.getRoot();
+        List<StatsTreeNode> changedNodes = new ArrayList<StatsTreeNode>();
         int count = setRecordRoot(node, recordRoot, changedNodes);
-        for (AnalysisTree.Node changedNode : changedNodes) {
+        for (StatsTreeNode changedNode : changedNodes) {
             model.nodeChanged(changedNode);
         }
         return count;
     }
 
     public static void setUniqueElement(DefaultTreeModel model, Path uniqueElement) {
-        AnalysisTree.Node node = (AnalysisTree.Node) model.getRoot();
-        List<AnalysisTree.Node> changedNodes = new ArrayList<AnalysisTree.Node>();
+        StatsTreeNode node = (StatsTreeNode) model.getRoot();
+        List<StatsTreeNode> changedNodes = new ArrayList<StatsTreeNode>();
         setUniqueElement(node, uniqueElement, changedNodes);
-        for (AnalysisTree.Node changedNode : changedNodes) {
+        for (StatsTreeNode changedNode : changedNodes) {
             model.nodeChanged(changedNode);
         }
     }
 
-    public static AnalysisTree create(String rootTag) {
-        return new AnalysisTree(new AnalysisTreeNode(Tag.element(rootTag)));
+    public static StatsTree create(String rootTag) {
+        return new StatsTree(new StatsTreeNode(Tag.element(rootTag)));
     }
 
-    public static AnalysisTree create(List<FieldStatistics> fieldStatisticsList) {
-        AnalysisTreeNode root = createSubtree(fieldStatisticsList, new Path(), null);
+    public static StatsTree create(List<FieldStatistics> fieldStatisticsList) {
+        StatsTreeNode root = createSubtree(fieldStatisticsList, new Path(), null);
         if (root == null) {
-            root = new AnalysisTreeNode(Tag.element("No statistics"));
+            root = new StatsTreeNode(Tag.element("No statistics"));
         }
-        return new AnalysisTree(root);
+        return new StatsTree(root);
     }
 
-    public Node getRoot() {
+    public StatsTreeNode getRoot() {
         return root;
     }
 
-    public void getVariables(List<Node> variables) {
+    public void getVariables(List<StatsTreeNode> variables) {
         getVariables(root, false, variables);
     }
 
     // ==== privates
 
-    private AnalysisTree(AnalysisTreeNode root) {
+    private StatsTree(StatsTreeNode root) {
         this.root = root;
     }
 
-    private static int setRecordRoot(AnalysisTree.Node node, Path recordRoot, List<Node> changedNodes) {
+    private static int setRecordRoot(StatsTreeNode node, Path recordRoot, List<StatsTreeNode> changedNodes) {
         if (node.setRecordRoot(recordRoot)) {
             changedNodes.add(node);
             if (node.isRecordRoot()) {
@@ -126,7 +94,7 @@ public class AnalysisTree implements Serializable {
             }
         }
         int total = 0;
-        for (AnalysisTree.Node child : node.getChildNodes()) {
+        for (StatsTreeNode child : node.getChildNodes()) {
             int subtotal = setRecordRoot(child, recordRoot, changedNodes);
             if (subtotal > 0) {
                 total = subtotal;
@@ -135,27 +103,27 @@ public class AnalysisTree implements Serializable {
         return total;
     }
 
-    private static void setUniqueElement(AnalysisTree.Node node, Path uniqueElement, List<Node> changedNodes) {
+    private static void setUniqueElement(StatsTreeNode node, Path uniqueElement, List<StatsTreeNode> changedNodes) {
         if (node.setUniqueElement(uniqueElement)) {
             changedNodes.add(node);
         }
         if (uniqueElement == null || !node.isUniqueElement()) {
-            for (AnalysisTree.Node child : node.getChildNodes()) {
+            for (StatsTreeNode child : node.getChildNodes()) {
                 setUniqueElement(child, uniqueElement, changedNodes);
             }
         }
     }
 
-    private static void getVariables(AnalysisTreeNode node, boolean withinRecord, List<Node> variables) {
+    private static void getVariables(StatsTreeNode node, boolean withinRecord, List<StatsTreeNode> variables) {
         if (withinRecord && node.hasStatistics() && !node.getTag().isAttribute()) {
             variables.add(node);
         }
-        for (AnalysisTreeNode child : node.getChildren()) {
+        for (StatsTreeNode child : node.getChildren()) {
             getVariables(child, withinRecord || node.isRecordRoot(), variables);
         }
     }
 
-    private static AnalysisTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, AnalysisTreeNode parent) {
+    private static StatsTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, StatsTreeNode parent) {
         Map<Tag, List<FieldStatistics>> statisticsMap = new TreeMap<Tag, List<FieldStatistics>>();
         for (FieldStatistics fieldStatistics : fieldStatisticsList) {
             Path subPath = new Path(fieldStatistics.getPath(), path.size());
@@ -174,7 +142,7 @@ public class AnalysisTree implements Serializable {
             return null;
         }
         Tag tag = path.peek();
-        AnalysisTreeNode node = tag == null ? null : new AnalysisTreeNode(parent, tag);
+        StatsTreeNode node = tag == null ? null : new StatsTreeNode(parent, tag);
         for (Map.Entry<Tag, List<FieldStatistics>> entry : statisticsMap.entrySet()) {
             Path childPath = new Path(path);
             childPath.push(entry.getKey());
@@ -184,7 +152,7 @@ public class AnalysisTree implements Serializable {
                     fieldStatisticsForChild = fieldStatistics;
                 }
             }
-            AnalysisTreeNode child = createSubtree(fieldStatisticsList, childPath, node);
+            StatsTreeNode child = createSubtree(fieldStatisticsList, childPath, node);
             if (child != null) {
                 if (node == null) {
                     node = child;
@@ -196,10 +164,10 @@ public class AnalysisTree implements Serializable {
             }
             else if (fieldStatisticsForChild != null) {
                 if (node == null) {
-                    node = new AnalysisTreeNode(node, fieldStatisticsForChild);
+                    node = new StatsTreeNode(node, fieldStatisticsForChild);
                 }
                 else {
-                    node.add(new AnalysisTreeNode(node, fieldStatisticsForChild));
+                    node.add(new StatsTreeNode(node, fieldStatisticsForChild));
                 }
             }
         }

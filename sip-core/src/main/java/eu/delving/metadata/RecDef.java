@@ -274,6 +274,14 @@ public class RecDef {
         @XStreamOmitField
         public List<Opt> options;
 
+        @XStreamOmitField
+        public List<Attr> attrList = new ArrayList<Attr>();
+
+        @Override
+        public String toString() {
+            return tag.toString();
+        }
+
         public Elem findElem(Tag tag) {
             if (this.tag.equals(tag)) return this;
             for (Elem sub : elemList) {
@@ -325,13 +333,6 @@ public class RecDef {
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(recDef);
-        }
-
-        @XStreamOmitField
-        public List<Attr> attrList = new ArrayList<Attr>();
-
-        public String toString() {
-            return tag.toString();
         }
 
         public void print(StringBuilder out, int level) {

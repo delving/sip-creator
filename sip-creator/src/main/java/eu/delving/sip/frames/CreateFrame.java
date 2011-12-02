@@ -59,7 +59,7 @@ public class CreateFrame extends FrameBase {
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Create", false);
         createMappingAction.setEnabled(false);
-        variablesList = new JList(sipModel.getAnalysisModel().getVariablesListModel());
+        variablesList = new JList(sipModel.getStatsModel().getVariablesListModel());
         wireUp();
     }
 
@@ -109,7 +109,7 @@ public class CreateFrame extends FrameBase {
                 if (e.getValueIsAdjusting()) return;
                 final SourceVariable sourceVariable = (SourceVariable) variablesList.getSelectedValue();
                 if (sourceVariable != null && sourceVariable.hasStatistics()) {
-                    sipModel.getAnalysisModel().selectStatistics(sourceVariable.getStatistics());
+                    sipModel.getStatsModel().selectStatistics(sourceVariable.getStatistics());
                     constantField.setText("?");
                 }
             }

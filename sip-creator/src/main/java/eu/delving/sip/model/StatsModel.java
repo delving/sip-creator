@@ -23,9 +23,10 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
-import eu.delving.sip.base.AnalysisTree;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.SourceVariable;
+import eu.delving.sip.base.StatsTree;
+import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -46,15 +47,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class AnalysisModel {
+public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
     private Statistics statistics;
-    private AnalysisTree analysisTree = AnalysisTree.create("Select a data set from the File menu, or download one");
-    private DefaultTreeModel analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
+    private StatsTree statsTree = StatsTree.create("Select a data set from the File menu, or download one");
+    private DefaultTreeModel statsTreeModel = new DefaultTreeModel(statsTree.getRoot());
     private VariableListModel variableListModel = new VariableListModel();
 
-    public AnalysisModel(SipModel sipModel) {
+    public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
         hintsModel.addListener(new HintSaveTimer());
     }
@@ -64,7 +65,7 @@ public class AnalysisModel {
         Path recordRoot = null;
         Path uniqueElement = null;
         if (statistics != null) {
-            analysisTree = statistics.createAnalysisTree();
+            statsTree = statistics.createAnalysisTree();
             if (statistics.isSourceFormat()) {
                 recordRoot = Storage.RECORD_ROOT;
                 uniqueElement = Storage.UNIQUE_ELEMENT;
@@ -75,26 +76,26 @@ public class AnalysisModel {
             }
         }
         else {
-            analysisTree = AnalysisTree.create("Analysis not yet performed");
+            statsTree = StatsTree.create("Analysis not yet performed");
         }
-        analysisTreeModel.setRoot(analysisTree.getRoot());
+        statsTreeModel.setRoot(statsTree.getRoot());
         setDelimiters(recordRoot, uniqueElement);
         selectStatistics(null);
     }
 
     private void setDelimiters(Path recordRoot, Path uniqueElement) {
         if (recordRoot != null) {
-            int recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+            int recordCount = StatsTree.setRecordRoot(statsTreeModel, recordRoot);
             hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
-            List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
-            analysisTree.getVariables(variables);
+            List<StatsTreeNode> variables = new ArrayList<StatsTreeNode>();
+            statsTree.getVariables(variables);
             variableListModel.setVariableList(variables);
         }
         else {
             variableListModel.clear();
         }
         if (uniqueElement != null) {
-            AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
+            StatsTree.setUniqueElement(statsTreeModel, uniqueElement);
         }
     }
 
@@ -107,7 +108,7 @@ public class AnalysisModel {
     }
 
     public void setRecordRoot(Path recordRoot) {
-        int recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
+        int recordCount = StatsTree.setRecordRoot(statsTreeModel, recordRoot);
         hintsModel.set(Storage.RECORD_ROOT_PATH, recordRoot.toString());
         hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         fireRecordRootSet();
@@ -127,7 +128,7 @@ public class AnalysisModel {
     }
 
     public void setUniqueElement(Path uniqueElement) {
-        AnalysisTree.setUniqueElement(analysisTreeModel, uniqueElement);
+        StatsTree.setUniqueElement(statsTreeModel, uniqueElement);
         hintsModel.set(Storage.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
         fireUniqueElementSet();
     }
@@ -142,8 +143,8 @@ public class AnalysisModel {
         }
     }
 
-    public TreeModel getAnalysisTreeModel() {
-        return analysisTreeModel;
+    public TreeModel getStatsTreeModel() {
+        return statsTreeModel;
     }
 
     public ListModel getVariablesListModel() {
@@ -151,10 +152,10 @@ public class AnalysisModel {
     }
 
     public List<SourceVariable> getVariables() {
-        List<AnalysisTree.Node> nodes = new ArrayList<AnalysisTree.Node>();
-        analysisTree.getVariables(nodes);
+        List<StatsTreeNode> nodes = new ArrayList<StatsTreeNode>();
+        statsTree.getVariables(nodes);
         List<SourceVariable> variables = new ArrayList<SourceVariable>(nodes.size());
-        for (AnalysisTree.Node node : nodes) {
+        for (StatsTreeNode node : nodes) {
             variables.add(new SourceVariable(node));
         }
         return variables;

@@ -42,18 +42,6 @@ public class RecordMapping {
     @XStreamAsAttribute
     String prefix;
 
-    @Deprecated
-    @XStreamAlias("records-normalized")
-    int recordsNormalized;
-
-    @Deprecated
-    @XStreamAlias("records-discarded")
-    int recordsDiscarded;
-
-    @Deprecated
-    @XStreamAlias("normalize-time")
-    long normalizeTime;
-
     @XStreamAlias("facts")
     Map<String, String> facts = new HashMap<String, String>();
 

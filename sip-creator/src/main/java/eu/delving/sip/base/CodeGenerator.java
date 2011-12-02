@@ -37,7 +37,7 @@ import java.util.List;
 
 public class CodeGenerator {
 
-    public static boolean isDictionaryPossible(FieldDefinition fieldDefinition, AnalysisTree.Node node) {
+    public static boolean isDictionaryPossible(FieldDefinition fieldDefinition, StatsTreeNode node) {
         return fieldDefinition.hasOptions() && node.getStatistics().getHistogramValues() != null;
     }
 

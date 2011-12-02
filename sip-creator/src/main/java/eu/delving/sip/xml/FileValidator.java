@@ -86,7 +86,7 @@ public class FileValidator implements Runnable {
         Uniqueness uniqueness = new Uniqueness();
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
         recordValidator.guardUniqueness(uniqueness);
-        BitSet valid = new BitSet(sipModel.getAnalysisModel().getRecordCount());
+        BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
         try {
             RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
             if (recordMapping == null) {
@@ -95,9 +95,9 @@ public class FileValidator implements Runnable {
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recordMapping);
             MetadataParser parser = new MetadataParser(
                     sipModel.getDataSetModel().getDataSet().sourceInput(),
-                    sipModel.getAnalysisModel().getRecordCount()
+                    sipModel.getStatsModel().getRecordCount()
             );
-            progressListener.prepareFor(sipModel.getAnalysisModel().getRecordCount());
+            progressListener.prepareFor(sipModel.getStatsModel().getRecordCount());
             PrintWriter out = dataSet.reportWriter(recordMapping);
             int count = 0;
             try {
@@ -181,7 +181,7 @@ public class FileValidator implements Runnable {
             }
             else {
                 sipModel.getFeedback().say("Finished validating");
-                listener.finished(aborted ? null : valid, sipModel.getAnalysisModel().getRecordCount());
+                listener.finished(aborted ? null : valid, sipModel.getStatsModel().getRecordCount());
             }
             uniqueness.destroy();
             if (!aborted) progressListener.finished(true);

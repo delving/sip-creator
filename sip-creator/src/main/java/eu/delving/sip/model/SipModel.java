@@ -57,7 +57,7 @@ public class SipModel {
     private CompileModel recordCompileModel;
     private CompileModel fieldCompileModel;
     private MetadataParser metadataParser;
-    private AnalysisModel analysisModel;
+    private StatsModel statsModel;
     private DataSetModel dataSetModel = new DataSetModel();
     private FactModel dataSetFacts = new FactModel();
     private FieldMappingListModel fieldMappingListModel = new FieldMappingListModel();
@@ -112,8 +112,8 @@ public class SipModel {
                     }
                 }
         );
-        analysisModel = new AnalysisModel(this);
-        analysisModel.addListener(new AnalysisModel.Listener() {
+        statsModel = new StatsModel(this);
+        statsModel.addListener(new StatsModel.Listener() {
             @Override
             public void statisticsSelected(FieldStatistics fieldStatistics) {
             }
@@ -208,8 +208,8 @@ public class SipModel {
         return mappingModel.getRecordMapping() != null;
     }
 
-    public AnalysisModel getAnalysisModel() {
-        return analysisModel;
+    public StatsModel getStatsModel() {
+        return statsModel;
     }
 
     public ListModel getReportFileModel() {
@@ -245,8 +245,8 @@ public class SipModel {
                         @Override
                         public void run() {
                             dataSetFacts.set(facts);
-                            analysisModel.set(hints);
-                            analysisModel.setStatistics(statistics);
+                            statsModel.set(hints);
+                            statsModel.setStatistics(statistics);
                             seekFirstRecord();
                             feedback.say("Loaded data set " + dataSet.getSpec());
                             if (useLatestPrefix) {
@@ -346,7 +346,7 @@ public class SipModel {
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
-                                analysisModel.setStatistics(statistics);
+                                statsModel.setStatistics(statistics);
                                 if (statistics.isSourceFormat()) {
                                     seekFirstRecord();
                                 }
@@ -507,7 +507,7 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                if (!hasDataSet() || !analysisModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
+                if (!hasDataSet() || !statsModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
                     for (ParseListener parseListener : parseListeners) {
                         parseListener.updatedRecord(null);
                     }
@@ -516,7 +516,7 @@ public class SipModel {
                 if (metadataParser == null) {
                     metadataParser = new MetadataParser(
                             dataSetModel.getDataSet().sourceInput(),
-                            analysisModel.getRecordCount()
+                            statsModel.getRecordCount()
                     );
                 }
                 metadataParser.setProgressListener(progressListener);

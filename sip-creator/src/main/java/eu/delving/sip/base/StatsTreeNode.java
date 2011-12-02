@@ -33,7 +33,6 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.util.*;
 import java.util.List;
 
@@ -43,25 +42,24 @@ import java.util.List;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
-    private static final long serialVersionUID = -8362212829296408316L;
-    private AnalysisTreeNode parent;
-    private List<AnalysisTreeNode> children = new ArrayList<AnalysisTreeNode>();
+public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
+    private StatsTreeNode parent;
+    private List<StatsTreeNode> children = new ArrayList<StatsTreeNode>();
     private Tag tag;
     private Path path;
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
 
-    AnalysisTreeNode(Tag tag) {
+    StatsTreeNode(Tag tag) {
         this.tag = tag;
     }
 
-    AnalysisTreeNode(AnalysisTreeNode parent, Tag tag) {
+    StatsTreeNode(StatsTreeNode parent, Tag tag) {
         this.parent = parent;
         this.tag = tag;
     }
 
-    AnalysisTreeNode(AnalysisTreeNode parent, FieldStatistics fieldStatistics) {
+    StatsTreeNode(StatsTreeNode parent, FieldStatistics fieldStatistics) {
         this.parent = parent;
         this.fieldStatistics = fieldStatistics;
         this.tag = fieldStatistics.getPath().peek();
@@ -71,7 +69,7 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
         this.fieldStatistics = fieldStatistics;
     }
 
-    public List<AnalysisTreeNode> getChildren() {
+    public List<StatsTreeNode> getChildren() {
         return children;
     }
 
@@ -79,74 +77,63 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
         return fieldStatistics != null;
     }
 
-    @Override
     public FieldStatistics getStatistics() {
         return fieldStatistics;
     }
 
-    @Override
     public TreePath getTreePath() {
-        List<AnalysisTreeNode> list = new ArrayList<AnalysisTreeNode>();
+        List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
         compilePathList(list);
         return new TreePath(list.toArray());
     }
 
-    @Override
     public Tag getTag() {
         return tag;
     }
 
-    @Override
     public Path getPath() {
         if (path == null) {
-            List<AnalysisTreeNode> list = new ArrayList<AnalysisTreeNode>();
+            List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
             compilePathList(list);
             path = new Path();
-            for (AnalysisTreeNode node : list) {
+            for (StatsTreeNode node : list) {
                 path.push(node.getTag());
             }
         }
         return path;
     }
 
-    @Override
     public boolean setRecordRoot(Path recordRoot) {
         boolean oldValue = this.recordRoot;
         this.recordRoot = recordRoot != null && getPath().equals(recordRoot);
         return this.recordRoot || this.recordRoot != oldValue;
     }
 
-    @Override
     public boolean setUniqueElement(Path uniqueElement) {
         boolean oldValue = this.uniqueElement;
         this.uniqueElement = uniqueElement != null && getPath().equals(uniqueElement);
         return this.uniqueElement != oldValue;
     }
 
-    @Override
     public boolean isRecordRoot() {
         return recordRoot;
     }
 
-    @Override
     public boolean isUniqueElement() {
         return uniqueElement;
     }
 
-    @Override
-    public Iterable<? extends AnalysisTree.Node> getChildNodes() {
+    public Iterable<? extends StatsTreeNode> getChildNodes() {
         return children;
     }
 
-    @Override
     public boolean couldBeRecordRoot() {
         return fieldStatistics != null && !fieldStatistics.hasValues();
     }
 
-    @Override
     public boolean couldBeUniqueElement() {
         if (couldBeRecordRoot()) return false;
-        AnalysisTreeNode walk = parent;
+        StatsTreeNode walk = parent;
         while (walk != null) { // ancestor must be record root
             if (walk.isRecordRoot()) return true;
             walk = walk.parent;
@@ -154,18 +141,17 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
         return false;
     }
 
-    @Override
     public String getVariableName() {
         if (tag.isAttribute()) throw new RuntimeException("Should never ask an attribute for its variable name");
-        List<AnalysisTreeNode> path = new ArrayList<AnalysisTreeNode>();
-        AnalysisTreeNode node = this;
+        List<StatsTreeNode> path = new ArrayList<StatsTreeNode>();
+        StatsTreeNode node = this;
         while (node != null && !node.isRecordRoot()) {
             path.add(node);
             node = node.parent;
         }
         Collections.reverse(path);
         StringBuilder out = new StringBuilder("input.");
-        Iterator<AnalysisTreeNode> nodeWalk = path.iterator();
+        Iterator<StatsTreeNode> nodeWalk = path.iterator();
         while (nodeWalk.hasNext()) {
             String nodeName = nodeWalk.next().tag.toString();
             out.append(SourceVariable.Filter.tagToVariable(nodeName));
@@ -176,7 +162,6 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
         return out.toString();
     }
 
-    @Override
     public void showPath(final JTree tree, final Path pathToShow) {
         final Path here = getPath();
         Timer timer = new Timer(30, new ActionListener() {
@@ -188,21 +173,21 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
                 else if ((here.size() <= pathToShow.size() && !here.isAncestorOf(pathToShow)) && !tree.isCollapsed(getTreePath())) {
                     tree.collapsePath(getTreePath());
                 }
-                for (AnalysisTree.Node sub : children) sub.showPath(tree, pathToShow);
+                for (StatsTreeNode sub : children) sub.showPath(tree, pathToShow);
             }
         });
         timer.setRepeats(false);
         timer.start();
     }
 
-    private void compilePathList(List<AnalysisTreeNode> list) {
+    private void compilePathList(List<StatsTreeNode> list) {
         if (parent != null) {
             parent.compilePathList(list);
         }
         list.add(this);
     }
 
-    public void add(AnalysisTreeNode child) {
+    public void add(StatsTreeNode child) {
         children.add(child);
     }
 
@@ -223,7 +208,7 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
 
     @Override
     public int getIndex(TreeNode treeNode) {
-        AnalysisTreeNode qNameNode = (AnalysisTreeNode) treeNode;
+        StatsTreeNode qNameNode = (StatsTreeNode) treeNode;
         return children.indexOf(qNameNode);
     }
 
@@ -239,11 +224,11 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
 
     @Override
     public Enumeration children() {
-        return new Vector<AnalysisTreeNode>(children).elements();
+        return new Vector<StatsTreeNode>(children).elements();
     }
 
     @Override
-    public int compareTo(AnalysisTree.Node other) {
+    public int compareTo(StatsTreeNode other) {
         return getVariableName().compareTo(other.getVariableName());
     }
 
@@ -264,8 +249,8 @@ public class AnalysisTreeNode implements AnalysisTree.Node, Serializable {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            if (value instanceof AnalysisTree.Node) {
-                AnalysisTree.Node node = (AnalysisTree.Node) value;
+            if (value instanceof StatsTreeNode) {
+                StatsTreeNode node = (StatsTreeNode) value;
                 if (node.getTag().isAttribute()) {
                     setIcon(Utility.ATTRIBUTE_ICON);
                 }

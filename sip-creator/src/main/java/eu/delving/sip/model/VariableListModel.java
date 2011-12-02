@@ -21,8 +21,8 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.sip.base.AnalysisTree;
 import eu.delving.sip.base.SourceVariable;
+import eu.delving.sip.base.StatsTreeNode;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -38,9 +38,9 @@ import java.util.List;
 public class VariableListModel extends AbstractListModel {
     private List<SourceVariable> variableList = new ArrayList<SourceVariable>();
 
-    public void setVariableList(List<AnalysisTree.Node> variableList) {
+    public void setVariableList(List<StatsTreeNode> variableList) {
         clear();
-        for (AnalysisTree.Node node : variableList) {
+        for (StatsTreeNode node : variableList) {
             this.variableList.add(new SourceVariable(node));
         }
         Collections.sort(this.variableList);

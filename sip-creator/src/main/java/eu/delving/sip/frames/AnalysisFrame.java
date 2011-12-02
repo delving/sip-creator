@@ -22,9 +22,8 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
-import eu.delving.sip.base.AnalysisTree;
-import eu.delving.sip.base.AnalysisTreeNode;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -58,9 +57,9 @@ public class AnalysisFrame extends FrameBase {
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Analysis", false);
-        statisticsJTree = new JTree(sipModel.getAnalysisModel().getAnalysisTreeModel());
+        statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel());
         statisticsJTree.getModel().addTreeModelListener(new Expander());
-        statisticsJTree.setCellRenderer(new AnalysisTreeNode.Renderer());
+        statisticsJTree.setCellRenderer(new StatsTreeNode.Renderer());
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
         setDefaultSize(400, 800);
@@ -101,15 +100,15 @@ public class AnalysisFrame extends FrameBase {
             public void valueChanged(TreeSelectionEvent event) {
                 TreePath path = event.getPath();
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
-                    final AnalysisTree.Node node = (AnalysisTree.Node) path.getLastPathComponent();
+                    final StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
-                    sipModel.getAnalysisModel().selectStatistics(node.getStatistics());
+                    sipModel.getStatsModel().selectStatistics(node.getStatistics());
                 }
                 else {
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
-                    sipModel.getAnalysisModel().selectStatistics(null);
+                    sipModel.getStatsModel().selectStatistics(null);
                 }
             }
         });
@@ -117,10 +116,10 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TreePath path = statisticsJTree.getSelectionPath();
-                AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
+                StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
                 Path recordRoot = node.getPath();
                 if (recordRoot != null) {
-                    sipModel.getAnalysisModel().setRecordRoot(recordRoot);
+                    sipModel.getStatsModel().setRecordRoot(recordRoot);
                 }
             }
         });
@@ -128,8 +127,8 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TreePath path = statisticsJTree.getSelectionPath();
-                AnalysisTreeNode node = (AnalysisTreeNode) path.getLastPathComponent();
-                sipModel.getAnalysisModel().setUniqueElement(node.getPath());
+                StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
+                sipModel.getStatsModel().setUniqueElement(node.getPath());
             }
         });
     }
@@ -174,19 +173,19 @@ public class AnalysisFrame extends FrameBase {
             Timer timer = new Timer(500, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    expandEmptyNodes((AnalysisTree.Node) statisticsJTree.getModel().getRoot());
+                    expandEmptyNodes((StatsTreeNode) statisticsJTree.getModel().getRoot());
                 }
             });
             timer.setRepeats(false);
             timer.start();
         }
 
-        private void expandEmptyNodes(AnalysisTree.Node node) {
+        private void expandEmptyNodes(StatsTreeNode node) {
             if (!node.isLeaf()) {
                 TreePath path = node.getTreePath();
                 statisticsJTree.expandPath(path);
             }
-            for (AnalysisTree.Node childNode : node.getChildNodes()) {
+            for (StatsTreeNode childNode : node.getChildNodes()) {
                 expandEmptyNodes(childNode);
             }
         }

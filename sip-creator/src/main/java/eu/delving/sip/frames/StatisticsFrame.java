@@ -26,21 +26,11 @@ import eu.delving.metadata.Histogram;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.model.AnalysisModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.StatsModel;
 
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +49,7 @@ public class StatisticsFrame extends FrameBase {
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Statistics", false);
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
-        sipModel.getAnalysisModel().addListener(new AnalysisModel.Listener() {
+        sipModel.getStatsModel().addListener(new StatsModel.Listener() {
             @Override
             public void statisticsSelected(FieldStatistics fieldStatistics) {
                 setSummary(fieldStatistics);

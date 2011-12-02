@@ -22,9 +22,10 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.HtmlPanel;
-import eu.delving.sip.model.RecDefNode;
+import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -49,15 +50,17 @@ public class RecDefFrame extends FrameBase {
     public RecDefFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Record Definition", false);
         RecDef recDef;
+        RecDefNode root;
         try {
             recDef = RecDef.read(getClass().getResource("/lido-recdef.xml").openStream());
             recDef.resolve();
+            root = RecDefNode.create(recDef);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-        recDefTree = new JTree(new DefaultTreeModel(RecDefNode.create(recDef)));
-        recDefTree.setCellRenderer(new RecDefNode.Renderer());
+        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create(root)));
+        recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
         recDefTree.setSelectionRow(0);
@@ -85,21 +88,22 @@ public class RecDefFrame extends FrameBase {
 
         @Override
         public void valueChanged(TreeSelectionEvent event) {
-            RecDefNode node = (RecDefNode) event.getPath().getLastPathComponent();
+            RecDefTreeNode node = (RecDefTreeNode) event.getPath().getLastPathComponent();
             showNode(node);
-            RecDefNode root = (RecDefNode) recDefTree.getModel().getRoot();
-            root.showPath(recDefTree, node.getPath().getOurPath());
+            RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
+            root.showPath(recDefTree, node.getRecDefPath().getTagPath());
         }
 
     }
 
-    private void showNode(RecDefNode node) {
+    private void showNode(RecDefTreeNode treeNode) {
+        RecDefNode node = treeNode.getRecDefNode();
         recDefPanel
                 .setTemplate(node.isAttr() ? "templates/recdef-attribute" : "templates/recdef-element")
                 .put("name", node.getTag())
                 .put("doc", node.getDoc())
                 .put("options", node.getOptions())
-                .put("node", node.getNode())
+                .put("node", null) // todo: node.geInputNode())??
                 .render();
     }
 

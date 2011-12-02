@@ -22,7 +22,7 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.FieldStatistics;
-import eu.delving.sip.base.AnalysisTree;
+import eu.delving.sip.base.StatsTree;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -54,8 +54,8 @@ public class Statistics implements Serializable {
         return sourceFormat;
     }
 
-    public AnalysisTree createAnalysisTree() {
-        return AnalysisTree.create(fieldStatisticsList);
+    public StatsTree createAnalysisTree() {
+        return StatsTree.create(fieldStatisticsList);
     }
 
     public int size() {

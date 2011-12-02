@@ -33,15 +33,15 @@ import java.util.TreeSet;
  */
 
 public class SourceVariable implements Comparable<SourceVariable> {
-    private AnalysisTree.Node node;
+    private StatsTreeNode node;
     private String variableName;
     private Set<String> attributeNames = new TreeSet<String>();
     private int mappingCount;
 
-    public SourceVariable(AnalysisTree.Node node) {
+    public SourceVariable(StatsTreeNode node) {
         this.node = node;
         this.variableName = node.getVariableName();
-        for (AnalysisTree.Node child : node.getChildNodes()) {
+        for (StatsTreeNode child : node.getChildNodes()) {
             if (child.getTag().isAttribute()) {
                 attributeNames.add(child.getTag().toString());
             }
@@ -58,7 +58,7 @@ public class SourceVariable implements Comparable<SourceVariable> {
         }
     }
 
-    public AnalysisTree.Node getNode() {
+    public StatsTreeNode getNode() {
         return node;
     }
 

@@ -21,16 +21,12 @@
 
 package eu.delving.sip.xml;
 
-import eu.delving.metadata.Histogram;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RandomSample;
-import eu.delving.metadata.RecDef;
-import eu.delving.sip.base.AnalysisTree;
-import eu.delving.sip.base.AnalysisTreeNode;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.HtmlPanel;
+import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.model.BookmarksTreeModel;
-import eu.delving.sip.model.RecDefNode;
+import eu.delving.sip.model.RecDefTreeNode;
 import org.apache.commons.io.IOUtils;
 
 import javax.swing.*;
@@ -53,7 +49,7 @@ import java.util.ArrayList;
  */
 
 public class RecDefViewer extends JFrame {
-    private static final DataFlavor FLAVOR = new DataFlavor(AnalysisTreeNode.class, "node");
+    private static final DataFlavor FLAVOR = new DataFlavor(StatsTreeNode.class, "node");
     private static final int MARGIN = 10;
     private static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-expanded-icon.png"));
     private static final Icon BOOKMARK_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-icon.png"));
@@ -69,15 +65,15 @@ public class RecDefViewer extends JFrame {
 
     public RecDefViewer(RecDef recDef) {
         super("RecDef Viewer");
-        recDefTree = new JTree(new DefaultTreeModel(RecDefNode.create(recDef)));
-        recDefTree.setCellRenderer(new RecDefNode.Renderer());
+        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create(RecDefNode.create(recDef))));
+        recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
         recDefTree.collapseRow(0);
         recDefTree.setDropMode(DropMode.ON);
         recDefTree.setTransferHandler(new Xfer());
         analysisTree = new JTree();
-        analysisTree.setCellRenderer(new AnalysisTreeNode.Renderer());
+        analysisTree.setCellRenderer(new StatsTreeNode.Renderer());
         analysisTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         analysisTree.getSelectionModel().addTreeSelectionListener(new AnalysisSelection());
         analysisTree.setDragEnabled(true);
@@ -215,9 +211,9 @@ public class RecDefViewer extends JFrame {
 
         @Override
         public Icon getVisualRepresentation(Transferable transferable) {
-            AnalysisTree.Node node;
+            StatsTreeNode node;
             try {
-                node = (AnalysisTree.Node) transferable.getTransferData(FLAVOR);
+                node = (StatsTreeNode) transferable.getTransferData(FLAVOR);
                 if (node.getTag().isAttribute()) {
                     return ATTRIBUTE_ICON;
                 }
@@ -270,9 +266,9 @@ public class RecDefViewer extends JFrame {
         @Override
         public boolean importData(TransferHandler.TransferSupport info) {
             if (!canImport(info)) return false;
-            AnalysisTree.Node node;
+            StatsTreeNode node;
             try {
-                node = (AnalysisTree.Node) info.getTransferable().getTransferData(FLAVOR);
+                node = (StatsTreeNode) info.getTransferable().getTransferData(FLAVOR);
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -280,9 +276,9 @@ public class RecDefViewer extends JFrame {
             }
             JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
             TreePath path = location.getPath();
-            RecDefNode target = (RecDefNode) path.getLastPathComponent();
-            target.setNode(node);
-            showNode(target);
+            RecDefTreeNode target = (RecDefTreeNode) path.getLastPathComponent();
+            target.setStatsTreeNode(node);
+            showNode(target.getRecDefNode());
             System.out.println("Dropped " + node + " into " + target);
             return true;
         }
@@ -327,10 +323,10 @@ public class RecDefViewer extends JFrame {
 
         @Override
         public void valueChanged(TreeSelectionEvent event) {
-            RecDefNode node = (RecDefNode) event.getPath().getLastPathComponent();
-            showNode(node);
-            RecDefNode root = (RecDefNode) recDefTree.getModel().getRoot();
-            root.showPath(recDefTree, node.getPath().getOurPath());
+            RecDefTreeNode node = (RecDefTreeNode) event.getPath().getLastPathComponent();
+            showNode(node.getRecDefNode());
+            RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
+            root.showPath(recDefTree, node.getRecDefPath().getTagPath());
         }
 
     }
@@ -341,7 +337,7 @@ public class RecDefViewer extends JFrame {
                 .put("name", node.getTag())
                 .put("doc", node.getDoc())
                 .put("options", node.getOptions())
-                .put("node", node.getNode())
+                .put("node", null) // todo: node.getNode())
                 .render();
     }
 
@@ -378,14 +374,14 @@ public class RecDefViewer extends JFrame {
         }
 
         private TreePath getTreePath(Path path, TreeModel model) {
-            return getTreePath(path, (RecDefNode) model.getRoot());
+            return getTreePath(path, (RecDefTreeNode) model.getRoot());
         }
 
-        private TreePath getTreePath(Path path, RecDefNode node) {
-            if (node.getOurPath().equals(path)) {
-                return node.getPath();
+        private TreePath getTreePath(Path path, RecDefTreeNode node) {
+            if (node.getRecDefPath().getTagPath().equals(path)) {
+                return node.getRecDefPath();
             }
-            for (RecDefNode sub : node.getKids()) {
+            for (RecDefTreeNode sub : node.getChildren()) {
                 TreePath subPath = getTreePath(path, sub);
                 if (subPath != null) return subPath;
             }
@@ -397,7 +393,7 @@ public class RecDefViewer extends JFrame {
 
         @Override
         public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
-            AnalysisTree.Node node = (AnalysisTree.Node) treeSelectionEvent.getPath().getLastPathComponent();
+            StatsTreeNode node = (StatsTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
             if (node.getStatistics() == null) {
                 histogramModel.setHistogram(null);
                 randomSampleModel.setRandomSample(null);
@@ -406,7 +402,7 @@ public class RecDefViewer extends JFrame {
                 histogramModel.setHistogram(node.getStatistics().getHistogram());
                 randomSampleModel.setRandomSample(node.getStatistics().getRandomSample());
             }
-            AnalysisTree.Node root = (AnalysisTree.Node) analysisModel.getRoot();
+            StatsTreeNode root = (StatsTreeNode) analysisModel.getRoot();
             root.showPath(analysisTree, node.getPath());
         }
     }

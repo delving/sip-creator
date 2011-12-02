@@ -22,7 +22,8 @@
 package eu.delving.sip;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.AnalysisTree;
+import eu.delving.sip.base.StatsTree;
+import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
@@ -53,10 +54,10 @@ public class TestStorage {
     private Logger log = Logger.getLogger(getClass());
     private MockDataSetFactory mock;
     private Storage storage;
-    private AnalysisTree analysisTree;
+    private StatsTree statsTree;
     private DefaultTreeModel analysisTreeModel;
     private int recordCount;
-    private List<AnalysisTree.Node> variables = new ArrayList<AnalysisTree.Node>();
+    private List<StatsTreeNode> variables = new ArrayList<StatsTreeNode>();
 
     @Before
     public void createStorage() throws StorageException, IOException, MetadataException {
@@ -119,7 +120,7 @@ public class TestStorage {
         statistics = dataSet().getLatestStatistics();
         assertTrue("Should be less items in analysis", statistics.size() < statsSize);
         assertTrue("Should be source format", statistics.isSourceFormat());
-        AnalysisTree tree = statistics.createAnalysisTree();
+        StatsTree tree = statistics.createAnalysisTree();
         assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.element(Storage.ENVELOPE_TAG)));
 
         RecordMapping recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
@@ -197,8 +198,8 @@ public class TestStorage {
             public void success(Statistics statistics) {
                 try {
                     dataSet().setStatistics(statistics);
-                    analysisTree = statistics.createAnalysisTree();
-                    analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
+                    statsTree = statistics.createAnalysisTree();
+                    analysisTreeModel = new DefaultTreeModel(statsTree.getRoot());
                     Path recordRoot = null;
                     switch (dataSet().getState()) {
                         case ANALYZED_IMPORT:
@@ -210,8 +211,8 @@ public class TestStorage {
                         default:
                             Assert.fail("strange state " + dataSet().getState());
                     }
-                    recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
-                    analysisTree.getVariables(variables);
+                    recordCount = StatsTree.setRecordRoot(analysisTreeModel, recordRoot);
+                    statsTree.getVariables(variables);
                 }
                 catch (StorageException e) {
                     throw new RuntimeException("Coudn't save", e);

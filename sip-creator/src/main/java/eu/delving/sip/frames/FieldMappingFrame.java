@@ -36,7 +36,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.List;
 
 /**
  * Refining the mapping interactively
@@ -132,7 +131,7 @@ public class FieldMappingFrame extends FrameBase {
 
     private void setFieldMapping(FieldMapping fieldMapping) {
         if (fieldMapping != null) {
-            AnalysisTree.Node node = getNode(fieldMapping);
+            StatsTreeNode node = getNode(fieldMapping);
             if (node != null) {
                 dictionaryCreate.setEnabled(fieldMapping.dictionary == null && CodeGenerator.isDictionaryPossible(fieldMapping.getDefinition(), node));
             }
@@ -149,23 +148,10 @@ public class FieldMappingFrame extends FrameBase {
         }
     }
 
-    private AnalysisTree.Node getNode(FieldMapping fieldMapping) {
-        SourceVariable sourceVariable = getSourceVariable(fieldMapping);
-        return sourceVariable != null ? sourceVariable.getNode() : null;
-    }
-
-    private SourceVariable getSourceVariable(FieldMapping fieldMapping) {
-        List<String> variableNames = fieldMapping.getVariableNames();
-        SourceVariable found = null;
-        if (variableNames.size() == 1) {
-            String variableName = variableNames.get(0);
-            for (SourceVariable sourceVariable : sipModel.getAnalysisModel().getVariables()) {
-                if (sourceVariable.getVariableName().equals(variableName)) {
-                    return sourceVariable;
-                }
-            }
-        }
-        return found;
+    private StatsTreeNode getNode(FieldMapping fieldMapping) {
+//        SourceVariable sourceVariable = getSourceVariable(fieldMapping);
+//        return sourceVariable != null ? sourceVariable.getNode() : null;
+        return null;
     }
 
     private void wireUp() {
@@ -181,11 +167,12 @@ public class FieldMappingFrame extends FrameBase {
             public void actionPerformed(ActionEvent actionEvent) {
                 FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedFieldMapping();
                 if (fieldMapping != null) {
-                    CodeGenerator codeGenerator = new CodeGenerator();
-                    SourceVariable sourceVariable = getSourceVariable(fieldMapping);
-                    fieldMapping.createDictionary(sourceVariable.getNode().getStatistics().getHistogramValues());
-                    codeGenerator.generateCodeFor(fieldMapping, sourceVariable, true);
-                    setFieldMapping(fieldMapping);
+                    throw new RuntimeException("implement!");
+//                    CodeGenerator codeGenerator = new CodeGenerator();
+//                    Statistics statistics = null; // todo: get them from somewhere
+//                    fieldMapping.createDictionary(statistics.getHistogramValues());
+//                    codeGenerator.generateCodeFor(fieldMapping, sourceVariable, true);
+//                    setFieldMapping(fieldMapping);
                 }
             }
         });
@@ -233,10 +220,10 @@ public class FieldMappingFrame extends FrameBase {
                     }
                     fieldMapping.dictionary = null;
                     CodeGenerator codeGenerator = new CodeGenerator();
-                    SourceVariable sourceVariable = getSourceVariable(fieldMapping);
-                    if (sourceVariable != null) {
-                        codeGenerator.generateCodeFor(fieldMapping, sourceVariable, false);
-                    }
+//                    SourceVariable sourceVariable = getSourceVariable(fieldMapping);
+//                    if (sourceVariable != null) {
+//                        codeGenerator.generateCodeFor(fieldMapping, sourceVariable, false);
+//                    }
                     setFieldMapping(fieldMapping);
                 }
             }

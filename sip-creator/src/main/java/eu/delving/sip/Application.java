@@ -158,7 +158,7 @@ public class Application {
                     public void run() {
                         sipModel.seekReset();
                         sipModel.getMappingModel().setRecordMapping(null);
-                        sipModel.getAnalysisModel().setStatistics(null);
+                        sipModel.getStatsModel().setStatistics(null);
                         sipModel.getDataSetFacts().set(null);
                         sipModel.getRecordCompileModel().updatedRecord(null);
                         Exec.swing(new Runnable() {
