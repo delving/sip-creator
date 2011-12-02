@@ -62,6 +62,7 @@ public class RecDefTreeNode implements TreeNode {
         this.parent = parent;
         this.recDefNode = recDefNode;
         if (parent != null) parent.children.add(this);
+        for (RecDefNode sub : recDefNode.getChildren()) new RecDefTreeNode(this, sub);
     }
 
     @Override

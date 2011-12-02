@@ -265,6 +265,9 @@ public class RecDef {
         @XStreamAsAttribute
         public boolean singular;
 
+        @XStreamAsAttribute
+        public SummaryField summaryField;
+
         @XStreamImplicit
         public List<Elem> elemList = new ArrayList<Elem>();
 
