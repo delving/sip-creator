@@ -35,6 +35,7 @@ public class RecDefNode {
     private RecDef.Elem elem;
     private RecDef.Attr attr;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
+    private NodeMapping nodeMapping;
 
     public static RecDefNode create(RecDef recDef) {
         return new RecDefNode(null, recDef.root);
@@ -82,6 +83,35 @@ public class RecDefNode {
 
     public List<RecDef.Opt> getOptions() {
         return isAttr() ? null : elem.options;
+    }
+
+    public RecDefNode getNode(Path path, Path soughtPath) {
+        path = path.extend(getTag());
+        if (path.equals(soughtPath)) return this;
+        for (RecDefNode sub : children) {
+            RecDefNode found = sub.getNode(path, soughtPath);
+            if (found != null) return found;
+        }
+        return null;
+    }
+
+    public void collect(Path path, List<NodeMapping> nodeMappings) {
+        path = path.extend(getTag());
+        if (nodeMapping != null) {
+            nodeMapping.inputPath = path;
+            nodeMappings.add(nodeMapping);
+        }
+        for (RecDefNode sub : children) {
+            sub.collect(path, nodeMappings);
+        }
+    }
+
+    public NodeMapping getNodeMapping() {
+        return nodeMapping;
+    }
+
+    public void setNodeMapping(NodeMapping nodeMapping) {
+        this.nodeMapping = nodeMapping;
     }
 
     public String toString() {

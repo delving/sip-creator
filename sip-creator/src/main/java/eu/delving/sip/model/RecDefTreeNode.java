@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.StatsTreeNode;
@@ -80,7 +81,7 @@ public class RecDefTreeNode implements TreeNode {
 
     @Override
     public int getIndex(TreeNode treeNode) {
-        RecDefTreeNode node = (RecDefTreeNode)treeNode;
+        RecDefTreeNode node = (RecDefTreeNode) treeNode;
         return children.indexOf(node);
     }
 
@@ -144,6 +145,7 @@ public class RecDefTreeNode implements TreeNode {
     }
 
     public void setStatsTreeNode(StatsTreeNode statsTreeNode) {
+        this.recDefNode.setNodeMapping(statsTreeNode != null ? new NodeMapping().setOutputPath(statsTreeNode.getPath()) : null);
         this.statsTreeNode = statsTreeNode;
     }
 
