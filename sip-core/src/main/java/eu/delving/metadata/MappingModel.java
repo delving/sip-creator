@@ -31,143 +31,81 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class MappingModel {
+public class MappingModel implements RecDefNode.Listener {
 
-    private RecordMapping recordMapping;
-    private FieldMapping selectedFieldMapping;
+    private RecMapping recMapping;
+    private RecDefNode selected;
 
-    public void setRecordMapping(RecordMapping recordMapping) {
-        this.recordMapping = recordMapping;
-        fireMappingSelected();
+    public void setRecMapping(RecMapping recMapping) {
+        this.recMapping = recMapping;
+        if (recMapping != null) recMapping.getRecDefTree().setListener(this);
+        fireRecMappingSet();
     }
 
-    public RecordMapping getRecordMapping() {
-        return recordMapping;
+    public RecMapping getRecMapping() {
+        return recMapping;
     }
 
-    public FieldMapping selectFieldMapping(FieldMapping fieldMapping) {
-        this.selectedFieldMapping = fieldMapping;
-        for (Listener listener : listeners) {
-            listener.select(selectedFieldMapping);
-        }
-        return selectedFieldMapping;
+    public NodeMapping selectRecDefNode(RecDefNode recDefNode) {
+        this.selected = recDefNode;
+        fireRecDefNodeSelected();
+        return selected == null ? null : selected.getNodeMapping();
     }
 
-    public FieldMapping getSelectedFieldMapping() {
-        return selectedFieldMapping;
+    public RecDefNode getSelectedRecDefNode() {
+        return selected;
     }
 
     public void setFact(String path, String value) {
-        if (recordMapping != null) {
+        if (recMapping != null) {
             boolean changed;
             if (value == null) {
-                changed = recordMapping.facts.containsKey(path);
-                recordMapping.facts.remove(path);
+                changed = recMapping.facts.containsKey(path);
+                recMapping.facts.remove(path);
             }
             else {
-                changed = recordMapping.facts.containsKey(path) && !recordMapping.facts.get(path).equals(value);
-                recordMapping.facts.put(path, value);
+                changed = recMapping.facts.containsKey(path) && !recMapping.facts.get(path).equals(value);
+                recMapping.facts.put(path, value);
             }
-            if (changed) {
-                for (Listener listener : listeners) {
-                    listener.factChanged();
-                }
-            }
+            if (changed) fireFactChanged();
         }
     }
 
-    public void addMappings(List<FieldMapping> mappings) {
-        if (recordMapping == null) return;
-        for (FieldMapping fieldMapping : mappings) {
-            String path = fieldMapping.getDefinition().path.toString();
-            recordMapping.fieldMappings.put(path, fieldMapping);
-        }
-        fireMappingChanged();
-    }
-
-    public void addMapping(FieldMapping fieldMapping) {
-        if (recordMapping == null) return;
-        String path = fieldMapping.getDefinition().path.toString();
-        recordMapping.fieldMappings.put(path, fieldMapping);
-        fireMappingChanged();
-    }
-
-    public void removeMapping(FieldMapping fieldMapping) {
-        if (recordMapping == null) return;
-        String path = fieldMapping.getDefinition().path.toString();
-        recordMapping.fieldMappings.remove(path);
-        fireMappingChanged();
-    }
-
-    public void applyTemplate(RecordMapping template) {
-        if (recordMapping.fieldMappings.isEmpty()) {
-            recordMapping.applyTemplate(template);
-            fireMappingChanged();
-        }
-    }
-
-    public void notifySelectedFieldMappingChange() {
-        for (Listener listener : listeners) {
-            listener.fieldMappingChanged();
-        }
+    @Override
+    public void nodeMappingSet(RecDefNode recDefNode) {
+        for (Listener listener : listeners) listener.nodeMappingSet(this, recDefNode);
     }
 
     // observable
 
     public interface Listener {
 
-        /**
-         * @deprecated Shouldn't happen anymore, only when data set is selected
-         */
-        @Deprecated
-        void factChanged();
+        void recMappingSet(MappingModel mappingModel);
 
-        /**
-         * Set the current field mapping.
-         *
-         * @param fieldMapping The selected field mapping.
-         */
-        void select(FieldMapping fieldMapping);
+        void factChanged(MappingModel mappingModel);
 
-        /**
-         * The code of an existing field mapping has changed.
-         */
-        void fieldMappingChanged();
+        void recDefNodeSelected(MappingModel mappingModel);
 
-        /**
-         * The record mapping has changed, could be triggered by removing or adding new field mappings.
-         *
-         * @param recordMapping The record mapping.
-         */
-        void recordMappingChanged(RecordMapping recordMapping);
+        void nodeMappingSet(MappingModel mappingModel, RecDefNode node);
 
-        /**
-         * A new data set has been loaded and its record mapping is set.
-         *
-         * @param recordMapping The selected record mapping.
-         */
-        void recordMappingSelected(RecordMapping recordMapping);
     }
+
+    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
 
-    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
-
-    private void fireMappingSelected() {
-        selectedFieldMapping = null;
-        for (Listener listener : listeners) {
-            listener.recordMappingSelected(recordMapping);
-        }
+    private void fireRecMappingSet() {
+        for (Listener listener : listeners) listener.recMappingSet(this);
     }
 
-    private void fireMappingChanged() {
-        selectedFieldMapping = null;
-        for (Listener listener : listeners) {
-            listener.recordMappingChanged(recordMapping);
-            listener.select(null);
-        }
+    private void fireFactChanged() {
+        for (Listener listener : listeners) listener.factChanged(this);
+    }
+
+    private void fireRecDefNodeSelected() {
+        for (Listener listener : listeners) listener.recDefNodeSelected(this);
     }
 
 }

@@ -59,7 +59,7 @@ public class RecDefViewer extends JFrame {
 
     public RecDefViewer(RecDef recDef) {
         super("RecDef Viewer");
-        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create(RecDefNode.create(recDef))));
+        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create(RecDefNode.create(null, recDef))));
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());

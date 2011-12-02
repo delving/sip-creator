@@ -21,13 +21,11 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JOptionPane;
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -104,12 +102,12 @@ public class TemplateMenu extends JMenu {
 
     private class ApplyTemplateAction extends AbstractAction {
         private String name;
-        private RecordMapping recordMapping;
+        private RecMapping recMapping;
 
-        private ApplyTemplateAction(String name, RecordMapping recordMapping) {
+        private ApplyTemplateAction(String name, RecMapping recMapping) {
             super(String.format("Apply the %s template", name));
             this.name = name;
-            this.recordMapping = recordMapping;
+            this.recMapping = recMapping;
         }
 
         @Override

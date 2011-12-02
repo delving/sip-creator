@@ -21,37 +21,17 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.FieldMapping;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.FrameBase;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import javax.swing.table.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -68,7 +48,7 @@ import java.util.Map;
  */
 
 public class DictionaryPopup extends FrameBase {
-    public static final String COPY_VERBATIM = "<<< empty >>>";
+    public static final RecDef.Opt COPY_VERBATIM = new RecDef.Opt().setContent("<<< empty >>>");
     public static final String ASSIGN_SELECTED = "Assign Selected";
     public static final String ASSIGN_ALL = "Assign All";
     private JCheckBox showSet = new JCheckBox("Show Assigned");
@@ -94,11 +74,11 @@ public class DictionaryPopup extends FrameBase {
         setDefaultSize(800, 600);
     }
 
-    public void editDictionary(FieldMapping fieldMapping, Runnable finishedRunnable) {
+    public void editDictionary(RecDefNode recDefNode, Runnable finishedRunnable) {
         this.finishedRunnable = finishedRunnable;
-        setTitle(String.format("Dictionary for %s", fieldMapping.getFieldNameString()));
-        mapModel.setFieldMapping(fieldMapping);
-        valueModel.setFieldMapping(fieldMapping);
+        setTitle(String.format("Dictionary for %s", recDefNode.getNodeMapping().outputPath));
+        mapModel.setRecDefNode(recDefNode);
+        valueModel.setRecDefNode(recDefNode);
         setLocation(parent.getLocation());
         setSize(parent.getSize());
         openFrame();
@@ -245,7 +225,7 @@ public class DictionaryPopup extends FrameBase {
     }
 
     private static class MapModel extends AbstractTableModel {
-        private FieldMapping fieldMapping;
+        private RecDefNode recDefNode;
         private List<String[]> rows = new ArrayList<String[]>();
         private Map<Integer, Integer> index;
         private JLabel statusLabel;
@@ -254,11 +234,11 @@ public class DictionaryPopup extends FrameBase {
             this.statusLabel = statusLabel;
         }
 
-        public void setFieldMapping(FieldMapping fieldMapping) {
-            this.fieldMapping = fieldMapping;
+        public void setRecDefNode(RecDefNode recDefNode) {
+            this.recDefNode = recDefNode;
             this.index = null;
             rows.clear();
-            for (Map.Entry<String, String> entry : fieldMapping.dictionary.entrySet()) {
+            for (Map.Entry<String, String> entry : recDefNode.getNodeMapping().dictionary.entrySet()) {
                 rows.add(new String[]{entry.getKey(), entry.getValue()});
             }
             setPattern("", false);
@@ -343,7 +323,7 @@ public class DictionaryPopup extends FrameBase {
                     mappedRow = foundRow;
                 }
             }
-            fieldMapping.dictionary.put(rows.get(mappedRow)[0], rows.get(mappedRow)[1] = (String) valueObject);
+            recDefNode.getNodeMapping().dictionary.put(rows.get(mappedRow)[0], rows.get(mappedRow)[1] = (String) valueObject);
             fireTableCellUpdated(rowIndex, columnIndex);
         }
     }
@@ -368,18 +348,18 @@ public class DictionaryPopup extends FrameBase {
     }
 
     private static class ValueModel extends AbstractListModel implements ComboBoxModel {
-        private List<String> values = new ArrayList<String>();
+        private List<RecDef.Opt> values = new ArrayList<RecDef.Opt>();
         private Object selectedItem = COPY_VERBATIM;
 
         private ValueModel() {
         }
 
-        public void setFieldMapping(FieldMapping fieldMapping) {
+        public void setRecDefNode(RecDefNode recDefNode) {
             int size = values.size();
             values.clear();
             fireIntervalRemoved(this, 0, size);
             values.add(0, COPY_VERBATIM);
-            values.addAll(fieldMapping.getDefinition().getOptions());
+            values.addAll(recDefNode.getOptions());
             fireIntervalAdded(this, 0, values.size());
         }
 

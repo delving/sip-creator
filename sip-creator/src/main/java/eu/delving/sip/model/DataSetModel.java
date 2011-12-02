@@ -22,22 +22,21 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.FactDefinition;
-import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.RecordDefinition;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.RecDefModel;
+import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -46,11 +45,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class DataSetModel implements MetadataModel {
+public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
     private DataSetState dataSetState = DataSetState.EMPTY;
     private List<FactDefinition> factDefinitions = new ArrayList<FactDefinition>();
-    private Map<String, RecordDefinition> recordDefinitions = new TreeMap<String,RecordDefinition>();
 
     public DataSetModel() {
         new StateCheckTimer();
@@ -73,15 +71,20 @@ public class DataSetModel implements MetadataModel {
     }
 
     @Override
-    public Set<String> getPrefixes() {
-        return recordDefinitions.keySet();
+    public Set<String> getPrefixes() throws MetadataException {
+        try {
+            return new TreeSet<String>(dataSet.getRecDefPrefixes());
+        }
+        catch (StorageException e) {
+            throw new MetadataException(e);
+        }
     }
 
     @Override
-    public RecordDefinition getRecordDefinition(String prefix) {
-        RecordDefinition def = recordDefinitions.get(prefix);
+    public RecDefTree createRecDef(String prefix) {
+        RecDefTree def = null;
         if (def == null) {
-            throw new RuntimeException("Expected to have a record definition for prefix "+prefix);
+            throw new RuntimeException("Expected to have a record definition for prefix " + prefix);
         }
         return def;
     }
@@ -89,12 +92,8 @@ public class DataSetModel implements MetadataModel {
     public void setDataSet(final DataSet dataSet) throws StorageException {
         this.dataSet = dataSet;
         this.factDefinitions.clear();
-        this.recordDefinitions.clear();
         if (dataSet != null) {
             this.factDefinitions.addAll(dataSet.getFactDefinitions());
-            for (RecordDefinition recordDefinition : dataSet.getRecordDefinitions(factDefinitions)) {
-                recordDefinitions.put(recordDefinition.prefix, recordDefinition);
-            }
             this.dataSetState = dataSet.getState();
             if (SwingUtilities.isEventDispatchThread()) {
                 for (Listener listener : listeners) {

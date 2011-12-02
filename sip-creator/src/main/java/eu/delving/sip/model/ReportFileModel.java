@@ -21,13 +21,13 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.AbstractListModel;
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -39,7 +39,7 @@ import java.util.List;
 public class ReportFileModel extends AbstractListModel implements MappingModel.Listener {
     private SipModel sipModel;
     private List<String> lines;
-    private RecordMapping recordMapping;
+    private RecMapping recMapping;
 
     public ReportFileModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -67,8 +67,8 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
             });
         }
         try {
-            if (recordMapping != null) {
-                final List<String> freshLines = sipModel.getDataSetModel().getDataSet().getReport(recordMapping);
+            if (recMapping != null) {
+                final List<String> freshLines = sipModel.getDataSetModel().getDataSet().getReport(recMapping);
                 if (freshLines != null) {
                     Exec.swing(new Runnable() {
                         @Override
@@ -86,30 +86,25 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
         }
     }
 
-    @Override
-    public void factChanged() {
+    public void kick() {
+        recMappingSet(sipModel.getMappingModel()); // to fire it off
     }
 
     @Override
-    public void select(FieldMapping fieldMapping) {
-    }
-
-    @Override
-    public void fieldMappingChanged() {
-    }
-
-    @Override
-    public void recordMappingChanged(RecordMapping recordMapping) {
-        this.recordMapping = recordMapping;
+    public void recMappingSet(MappingModel mappingModel) {
+        this.recMapping = mappingModel.getRecMapping();
         refresh();
     }
 
     @Override
-    public void recordMappingSelected(RecordMapping recordMapping) {
-        recordMappingChanged(recordMapping);
+    public void factChanged(MappingModel mappingModel) {
     }
 
-    public void kick() {
-        recordMappingChanged(sipModel.getMappingModel().getRecordMapping()); // to fire it off
+    @Override
+    public void recDefNodeSelected(MappingModel mappingModel) {
+    }
+
+    @Override
+    public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
     }
 }

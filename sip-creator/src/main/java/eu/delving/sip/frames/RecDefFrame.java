@@ -54,7 +54,7 @@ public class RecDefFrame extends FrameBase {
         try {
             recDef = RecDef.read(getClass().getResource("/lido-recdef.xml").openStream());
             recDef.resolve();
-            root = RecDefNode.create(recDef);
+            root = RecDefNode.create(new Ear(), recDef);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -82,6 +82,13 @@ public class RecDefFrame extends FrameBase {
         p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
         p.add(scroll(recDefTree), BorderLayout.CENTER);
         return p;
+    }
+
+    private class Ear implements RecDefNode.Listener {
+        @Override
+        public void nodeMappingSet(RecDefNode recDefNode) {
+            System.out.println("!!! NodeMapping = "+recDefNode);
+        }
     }
 
     private class RecDefSelection implements TreeSelectionListener {

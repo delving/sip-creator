@@ -22,7 +22,6 @@
 package eu.delving.sip.menus;
 
 import eu.delving.metadata.FactDefinition;
-import eu.delving.metadata.RecordDefinition;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -80,8 +79,8 @@ public class DataSetMenu extends JMenu {
             boolean somethingSelected = false;
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 List<FactDefinition> factDefinitions = dataSet.getFactDefinitions();
-                for (RecordDefinition recordDefinition : dataSet.getRecordDefinitions(factDefinitions)) {
-                    final DataSetItem item = new DataSetItem(dataSet, recordDefinition.prefix);
+                for (String prefix : dataSet.getRecDefPrefixes()) {
+                    final DataSetItem item = new DataSetItem(dataSet, prefix);
                     bg.add(item);
                     add(item);
                     item.addActionListener(new ActionListener() {

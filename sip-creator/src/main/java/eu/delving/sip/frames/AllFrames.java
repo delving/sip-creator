@@ -75,7 +75,7 @@ public class AllFrames {
     public AllFrames(JDesktopPane desktop, final SipModel sipModel, EditHistory editHistory) {
         this.desktop = desktop;
         this.sipModel = sipModel;
-        FrameBase status, analysis, create, recDef, statistics, input, fieldMapping, recordMapping, output;
+        FrameBase status, analysis, create, recDef, statistics, input, fieldMapping, output;
         this.frames = new FrameBase[]{
                 status = new FactsFrame(desktop, sipModel),
                 analysis = new AnalysisFrame(desktop, sipModel),
@@ -84,7 +84,6 @@ public class AllFrames {
                 statistics = new StatisticsFrame(desktop, sipModel),
                 input = new InputFrame(desktop, sipModel),
                 fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory),
-                recordMapping = new RecordMappingFrame(desktop, sipModel),
                 output = new OutputFrame(desktop, sipModel)
         };
         this.views = new Arrangement[]{
@@ -100,11 +99,11 @@ public class AllFrames {
                 ),
                 view(BIG_PICTURE,
                         block(input, 0, 0),
-                        block(recordMapping, 1, 0),
+//                        block(recordMapping, 1, 0),
                         block(output, 2, 0)
                 ),
                 view(CODE_TWEAKING,
-                        block(recordMapping, 0, 0),
+//                        block(recordMapping, 0, 0),
                         block(fieldMapping, 1, 0, 3, 1),
                         block(input, 4, 0)
                 ),
@@ -115,7 +114,7 @@ public class AllFrames {
                         block(create, 0, 0, 3, 3),
                         block(statistics, 0, 3, 2, 3),
                         block(input, 5, 0, 2, 4),
-                        block(recordMapping, 3, 0, 2, 3),
+//                        block(recordMapping, 3, 0, 2, 3),
                         block(fieldMapping, 2, 3, 3, 5),
                         block(output, 5, 4, 2, 4),
                         block(status, 0, 6, 2, 2)
@@ -125,7 +124,6 @@ public class AllFrames {
                         block(create, 0, 0),
                         block(statistics, 0, 0),
                         block(input, 0, 0),
-                        block(recordMapping, 0, 0),
                         block(fieldMapping, 0, 0),
                         block(output, 0, 0),
                         block(status, 0, 0)

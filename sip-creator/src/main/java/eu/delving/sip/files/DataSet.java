@@ -22,9 +22,8 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.FactDefinition;
-import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.RecDefModel;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.ProgressListener;
 
 import java.io.File;
@@ -49,11 +48,11 @@ public interface DataSet {
 
     String getLatestPrefix();
 
-    RecordMapping setLatestPrefix(String prefix, MetadataModel metadataModel) throws StorageException;
+    RecMapping setLatestPrefix(String prefix, RecDefModel recDefModel) throws StorageException;
 
     List<FactDefinition> getFactDefinitions() throws StorageException;
 
-    List<RecordDefinition> getRecordDefinitions(List<FactDefinition> factDefinitions) throws StorageException;
+    List<String> getRecDefPrefixes() throws StorageException;
 
     DataSetState getState();
 
@@ -87,15 +86,15 @@ public interface DataSet {
 
     void setStatistics(Statistics statistics) throws StorageException;
 
-    RecordMapping getRecordMapping(String prefix, MetadataModel metadataModel) throws StorageException;
+    RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException;
 
-    void setRecordMapping(RecordMapping recordMapping) throws StorageException;
+    void setRecMapping(RecMapping recMapping) throws StorageException;
 
     void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 
-    PrintWriter reportWriter(RecordMapping recordMapping) throws StorageException;
+    PrintWriter reportWriter(RecMapping recordMapping) throws StorageException;
 
-    List<String> getReport(RecordMapping recordMapping) throws StorageException;
+    List<String> getReport(RecMapping recordMapping) throws StorageException;
 
     void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException;
 

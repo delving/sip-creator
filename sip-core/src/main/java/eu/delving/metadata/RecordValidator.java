@@ -29,9 +29,11 @@ import groovy.lang.Script;
 import groovy.util.Node;
 import groovy.util.NodeList;
 import groovy.xml.QName;
-import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Parse, filter, validate a record
@@ -40,15 +42,13 @@ import java.util.*;
  */
 
 public class RecordValidator {
-    private Logger log = Logger.getLogger(getClass());
     private Uniqueness idUniqueness;
     private Script script;
-    private RecordDefinition recordDefinition;
-    private Map<Path, FieldDefinition> fieldDefinitionCache = new TreeMap<Path, FieldDefinition>();
+    private RecMapping recMapping;
 
-    public RecordValidator(GroovyCodeResource groovyCodeResource, RecordDefinition recordDefinition) {
-        this.recordDefinition = recordDefinition;
-        this.script = groovyCodeResource.createValidationScript(recordDefinition.validation);
+    public RecordValidator(GroovyCodeResource groovyCodeResource, RecMapping recMapping) {
+        this.recMapping = recMapping;
+        this.script = groovyCodeResource.createValidationScript(""); // todo: validation code?
     }
 
     public void guardUniqueness(Uniqueness uniqueness) {
@@ -69,11 +69,9 @@ public class RecordValidator {
             @Override
             public boolean allowOption(Node node) {
                 Path path = nodeToPath(node);
-                FieldDefinition definition = fieldDefinitionCache.get(path);
-                if (definition == null) {
-                    fieldDefinitionCache.put(path, definition = recordDefinition.getFieldDefinition(path));
-                }
-                return definition.allowOption(node.value().toString());
+                RecDefNode recDefNode = recMapping.getRecDefTree().getRecDefNode(path);
+                if (recDefNode == null) throw new RuntimeException();
+                return recDefNode.allowOption(node.value().toString());
             }
 
             @Override

@@ -111,27 +111,28 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public RecordMapping setLatestPrefix(String prefix, MetadataModel metadataModel) throws StorageException {
+        public RecMapping setLatestPrefix(String prefix, RecDefModel recDefModel) throws StorageException {
             File latestForPrefix = findLatestMappingFile(here, prefix);
-            RecordMapping recordMapping;
+            RecMapping recMapping;
             if (latestForPrefix.exists()) {
                 if (!latestForPrefix.setLastModified(System.currentTimeMillis())) {
                     throw new StorageException("Couldn't touch the file to give it priority");
                 }
-                recordMapping = getRecordMapping(prefix, metadataModel);
+                recMapping = getRecMapping(prefix, recDefModel);
             }
             else {
-                recordMapping = new RecordMapping(prefix, metadataModel.getRecordDefinition(prefix));
-                setRecordMapping(recordMapping);
+                recMapping = RecMapping.create(prefix, recDefModel);
+                setRecMapping(recMapping);
             }
-            return recordMapping;
+            return recMapping;
         }
 
         @Override
         public List<FactDefinition> getFactDefinitions() throws StorageException {
             try {
                 File factDefFile = factDefinitionFile(here);
-                XStream stream = recordStream();
+                XStream stream = new XStream();
+                stream.processAnnotations(FactDefinition.class);
                 Reader reader = new InputStreamReader(new FileInputStream(factDefFile), "UTF-8");
                 FactDefinition.List factDefinitions = (FactDefinition.List) stream.fromXML(reader);
                 return factDefinitions.factDefinitions;
@@ -142,20 +143,20 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public List<RecordDefinition> getRecordDefinitions(List<FactDefinition> factDefinitions) throws StorageException {
-            List<RecordDefinition> definitions = new ArrayList<RecordDefinition>();
+        public List<String> getRecDefPrefixes() throws StorageException {
+            List<String> prefixes = new ArrayList<String>();
             try {
                 List<File> recDefFile = findRecordDefinitionFiles(here);
                 for (File file : recDefFile) {
-                    RecordDefinition recordDefinition = readRecordDefinition(new FileInputStream(file), factDefinitions);
-                    recordDefinition.initialize(factDefinitions);
-                    definitions.add(recordDefinition);
+                    String fileName = file.getName();
+                    String prefix = fileName.substring(0, fileName.length() - Storage.FileType.RECORD_DEFINITION.getSuffix().length());
+                    prefixes.add(prefix);
                 }
             }
             catch (Exception e) {
                 throw new StorageException("Unable to load metadata model");
             }
-            return definitions;
+            return prefixes;
         }
 
         @Override
@@ -361,28 +362,28 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public RecordMapping getRecordMapping(String prefix, MetadataModel metadataModel) throws StorageException {
+        public RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException {
             File file = findLatestMappingFile(here, prefix);
             if (file.exists()) {
                 try {
                     FileInputStream is = new FileInputStream(file);
-                    return RecordMapping.read(is, metadataModel);
+                    return RecMapping.read(is, recDefModel);
                 }
                 catch (Exception e) {
                     throw new StorageException(String.format("Unable to read mapping from %s", file.getAbsolutePath()), e);
                 }
             }
             else {
-                return new RecordMapping(prefix, metadataModel.getRecordDefinition(prefix));
+                return RecMapping.create(prefix, recDefModel);
             }
         }
 
         @Override
-        public void setRecordMapping(RecordMapping recordMapping) throws StorageException {
-            File file = new File(here, String.format(FileType.MAPPING.getPattern(), recordMapping.getPrefix()));
+        public void setRecMapping(RecMapping recMapping) throws StorageException {
+            File file = new File(here, String.format(FileType.MAPPING.getPattern(), recMapping.getPrefix()));
             try {
                 FileOutputStream out = new FileOutputStream(file);
-                RecordMapping.write(recordMapping, out);
+                RecMapping.write(out, recMapping);
                 out.close();
             }
             catch (IOException e) {
@@ -413,8 +414,8 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public PrintWriter reportWriter(RecordMapping recordMapping) throws StorageException {
-            File file = new File(here, String.format(FileType.REPORT.getPattern(), recordMapping.getPrefix()));
+        public PrintWriter reportWriter(RecMapping recMapping) throws StorageException {
+            File file = new File(here, String.format(FileType.REPORT.getPattern(), recMapping.getPrefix()));
             try {
                 return new PrintWriter(file);
             }
@@ -424,9 +425,9 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public List<String> getReport(RecordMapping recordMapping) throws StorageException {
+        public List<String> getReport(RecMapping recMapping) throws StorageException {
             try {
-                File file = reportFile(here, recordMapping);
+                File file = reportFile(here, recMapping);
                 return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
             }
             catch (IOException e) {

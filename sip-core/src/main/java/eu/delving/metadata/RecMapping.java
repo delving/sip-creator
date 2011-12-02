@@ -28,7 +28,10 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A groovy mapping based on a model.
@@ -49,24 +52,11 @@ public class RecMapping {
     List<NodeMapping> nodeMappings;
 
     @XStreamOmitField
-    RecDefNode recDefRoot;
+    RecDefTree recDefTree;
 
-    public RecMapping(String prefix) {
+    private RecMapping(String prefix, RecDefTree recDefTree) {
         this.prefix = prefix;
-    }
-
-    public void resolve() {
-        Iterator<NodeMapping> walk = nodeMappings.iterator();
-        while (walk.hasNext()) {
-            NodeMapping nodeMapping = walk.next();
-            RecDefNode node = recDefRoot.getNode(new Path(), nodeMapping.outputPath);
-            if (node != null) {
-                node.setNodeMapping(nodeMapping);
-            }
-            else {
-                walk.remove();
-            }
-        }
+        this.recDefTree = recDefTree;
     }
 
     public String getPrefix() {
@@ -96,28 +86,53 @@ public class RecMapping {
         return facts;
     }
 
+    public RecDefTree getRecDefTree() {
+        return recDefTree;
+    }
+
     public String toString() {
         return stream().toXML(this);
     }
 
+    private void resolve() {
+        Iterator<NodeMapping> walk = nodeMappings.iterator();
+        while (walk.hasNext()) {
+            NodeMapping nodeMapping = walk.next();
+            RecDefNode node = recDefTree.getRoot().getNode(new Path(), nodeMapping.outputPath);
+            if (node != null) {
+                node.setNodeMapping(nodeMapping);
+            }
+            else {
+                walk.remove();
+            }
+        }
+    }
+
+    public static RecMapping create(String prefix, RecDefModel recDefModel) {
+        return new RecMapping(prefix, recDefModel.createRecDef(prefix));
+    }
+
     public static RecMapping read(InputStream is, RecDefModel recDefModel) throws MetadataException {
         try {
-            Reader isReader = new InputStreamReader(is, "UTF-8");
-            RecMapping recMapping = (RecMapping) stream().fromXML(isReader);
-            recMapping.recDefRoot = recDefModel.createRecDef(recMapping.prefix);
-            recMapping.resolve();
-            return recMapping;
+            Reader reader = new InputStreamReader(is, "UTF-8");
+            return read(reader, recDefModel);
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static RecMapping read(Reader reader, RecDefModel recDefModel) throws MetadataException {
+        RecMapping recMapping = (RecMapping) stream().fromXML(reader);
+        recMapping.recDefTree = recDefModel.createRecDef(recMapping.prefix);
+        recMapping.resolve();
+        return recMapping;
+    }
+
     public static void write(OutputStream os, RecMapping recMapping) {
         try {
             Writer osWriter = new OutputStreamWriter(os, "UTF-8");
-            recMapping.nodeMappings = new ArrayList<NodeMapping>();
-            recMapping.recDefRoot.collect(new Path(), recMapping.nodeMappings);
+            recMapping.nodeMappings = recMapping.getRecDefTree().getNodeMappings();
             stream().toXML(recMapping, osWriter);
         }
         catch (UnsupportedEncodingException e) {

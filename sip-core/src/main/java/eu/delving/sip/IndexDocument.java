@@ -1,9 +1,6 @@
 package eu.delving.sip;
 
-import eu.delving.metadata.FieldDefinition;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.Tag;
+import eu.delving.metadata.RecDefTree;
 import groovy.util.Node;
 import groovy.xml.QName;
 
@@ -22,7 +19,7 @@ import java.util.TreeMap;
 public class IndexDocument {
     private Map<String, List<Value>> map = new TreeMap<String, List<Value>>();
 
-    public static IndexDocument fromNode(Node inputNode, RecordDefinition recordDefinition) {
+    public static IndexDocument fromNode(Node inputNode, RecDefTree recDefTree) {
         IndexDocument doc = new IndexDocument();
         List traversal = inputNode.depthFirst();
         for (Object nodeObject : traversal) {
@@ -32,31 +29,32 @@ public class IndexDocument {
                 throw new RuntimeException("Expected a text value");
             }
             QName qname = (QName) node.name();
-            FieldDefinition definition = getFieldDefinition(qname, recordDefinition);
-            String fieldType = definition == null ? null : definition.fieldType;
-            String value = node.text();
-            if (fieldType == null) fieldType = "text";
-            doc.put(String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldType), value);
-            if (definition != null) {
-                if (definition.summaryField != null) doc.put(definition.summaryField.tag, value);
-            }
+//            FieldDefinition definition = getFieldDefinition(qname, recDefTree);
+//            String fieldType = definition == null ? null : definition.fieldType;
+//            String value = node.text();
+//            if (fieldType == null) fieldType = "text";
+//            doc.put(String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldType), value);
+//            if (definition != null) {
+//                if (definition.summaryField != null) doc.put(definition.summaryField.tag, value);
+//            }
         }
         return doc;
     }
 
-    private static String mungePath(QName qname, FieldDefinition fieldDefinition) {
-        if (fieldDefinition == null || fieldDefinition.fieldType == null) {
-            return String.format("%s_%s_text", qname.getPrefix(), qname.getLocalPart());
-        }
-        else {
-            return String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldDefinition.fieldType);
-        }
-    }
+//    private static String mungePath(QName qname, FieldDefinition fieldDefinition) {
+//        if (fieldDefinition == null || fieldDefinition.fieldType == null) {
+//            return String.format("%s_%s_text", qname.getPrefix(), qname.getLocalPart());
+//        }
+//        else {
+//            return String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldDefinition.fieldType);
+//        }
+//    }
 
-    private static FieldDefinition getFieldDefinition(QName qname, RecordDefinition recordDefinition) {
-        Path path = new Path().extend(Tag.element("record")).extend(Tag.element(qname.getPrefix(), qname.getLocalPart()));
-        return recordDefinition.getFieldDefinition(path);
-    }
+//    private static FieldDefinition getFieldDefinition(QName qname, RecDefTree recDefTree) {
+//        Path path = new Path().extend(Tag.element("record")).extend(Tag.element(qname.getPrefix(), qname.getLocalPart()));
+//        return recDefTree.getFieldDefinition(path);
+//        return null; // todo: good question
+//    }
 
     private IndexDocument() {
     }

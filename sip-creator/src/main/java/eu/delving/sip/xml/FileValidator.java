@@ -22,7 +22,7 @@
 package eu.delving.sip.xml;
 
 import eu.delving.groovy.*;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.RecMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.Uniqueness;
 import eu.delving.metadata.ValidationException;
@@ -79,26 +79,26 @@ public class FileValidator implements Runnable {
     }
 
     public void run() {
-        if (!sipModel.hasDataSet()) {
+        if (!sipModel.hasDataSet() || !sipModel.hasPrefix()) {
             throw new RuntimeException("No data set selected");
         }
         DataSet dataSet = sipModel.getDataSetModel().getDataSet();
         Uniqueness uniqueness = new Uniqueness();
-        RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getRecordDefinition());
+        RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getMappingModel().getRecMapping());
         recordValidator.guardUniqueness(uniqueness);
         BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
         try {
-            RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
-            if (recordMapping == null) {
+            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+            if (recMapping == null) {
                 return;
             }
-            MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recordMapping);
+            MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping);
             MetadataParser parser = new MetadataParser(
                     sipModel.getDataSetModel().getDataSet().sourceInput(),
                     sipModel.getStatsModel().getRecordCount()
             );
             progressListener.prepareFor(sipModel.getStatsModel().getRecordCount());
-            PrintWriter out = dataSet.reportWriter(recordMapping);
+            PrintWriter out = dataSet.reportWriter(recMapping);
             int count = 0;
             try {
                 MetadataRecord record;

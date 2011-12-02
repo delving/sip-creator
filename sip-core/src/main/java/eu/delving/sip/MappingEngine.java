@@ -6,6 +6,8 @@ import groovy.util.Node;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.FileNotFoundException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Map;
 
 /**
@@ -20,14 +22,15 @@ public class MappingEngine {
     private RecordValidator recordValidator;
     private long compileTime, parseTime, mapTime, validateTime, outputTime;
 
-    public MappingEngine(String mapping, Map<String, String> namespaces, ClassLoader classLoader, MetadataModel metadataModel) throws FileNotFoundException, MetadataException {
-        RecordMapping recordMapping = RecordMapping.read(mapping, metadataModel);
+    public MappingEngine(String mapping, Map<String, String> namespaces, ClassLoader classLoader, RecDefModel recDefModel) throws FileNotFoundException, MetadataException {
+        Reader reader = new StringReader(mapping);
+        RecMapping recMapping = RecMapping.read(reader, recDefModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
         long now = System.currentTimeMillis();
-        mappingRunner = new MappingRunner(groovyCodeResource, recordMapping);
+        mappingRunner = new MappingRunner(groovyCodeResource, recMapping);
         compileTime += System.currentTimeMillis() - now;
         metadataRecordFactory = new MetadataRecordFactory(namespaces);
-        recordValidator = new RecordValidator(groovyCodeResource, metadataModel.getRecordDefinition(recordMapping.getPrefix()));
+        recordValidator = new RecordValidator(groovyCodeResource, recMapping);
     }
 
     /**
@@ -65,7 +68,7 @@ public class MappingEngine {
             recordValidator.validateRecord(record, recordNumber);
             validateTime += System.currentTimeMillis() - now;
             now = System.currentTimeMillis();
-            IndexDocument indexDocument = IndexDocument.fromNode(record, mappingRunner.getRecordDefinition());
+            IndexDocument indexDocument = IndexDocument.fromNode(record, mappingRunner.getRecDefTree());
             outputTime += System.currentTimeMillis() - now;
             return indexDocument;
         }

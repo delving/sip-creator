@@ -21,20 +21,12 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.groovy.DiscardRecordException;
-import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingRunner;
-import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.XmlNodePrinter;
-import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordMapping;
-import eu.delving.metadata.RecordValidator;
+import eu.delving.groovy.*;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import groovy.util.Node;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
@@ -53,10 +45,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class CompileModel implements SipModel.ParseListener, MappingModel.Listener {
+public class CompileModel {
     public final static int COMPILE_DELAY = 500;
-    private RecordMapping recordMapping;
-    private FieldMapping selectedFieldMapping;
+    private RecMapping recMapping;
+    private RecDefNode selectedRecDefNode;
     private MetadataRecord metadataRecord;
     private Document codeDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
@@ -68,14 +60,22 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private Feedback feedback;
     private boolean enabled;
     private volatile boolean compiling;
+    private ParseEar parseEar = new ParseEar();
+    private MappingModelEar mappingModelEar = new MappingModelEar();
 
     public enum Type {
         RECORD("record mapping"),
         FIELD("field mapping");
 
         String s;
-        Type(String s) {this.s = s;}
-        public String toString() {return s;}
+
+        Type(String s) {
+            this.s = s;
+        }
+
+        public String toString() {
+            return s;
+        }
     }
 
     public enum State {
@@ -99,43 +99,12 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         if (enabled) compileSoon();
     }
 
-    @Override
-    public void factChanged() {
-        compileSoon();
+    public MappingModel.Listener getMappingModelEar() {
+        return mappingModelEar;
     }
 
-    @Override
-    public void select(FieldMapping fieldMapping) {
-        if (fieldMapping == selectedFieldMapping) {
-            if (null != fieldMapping) {
-                notifyStateChange(State.REGENERATED);
-            }
-        }
-        else {
-            selectedFieldMapping = fieldMapping;
-            notifyStateChange(State.ORIGINAL);
-        }
-        Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
-        compileSoon();
-    }
-
-    @Override
-    public void fieldMappingChanged() {
-        compileSoon();
-    }
-
-    @Override
-    public void recordMappingChanged(RecordMapping recordMapping) {
-        compileSoon();
-    }
-
-    @Override
-    public void recordMappingSelected(RecordMapping recordMapping) {
-        this.recordMapping = recordMapping;
-        this.editedCode = null;
-        Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
-        notifyStateChange(State.ORIGINAL);
-        compileSoon();
+    public SipModel.ParseListener getParseEar() {
+        return parseEar;
     }
 
     public void setRecordValidator(RecordValidator recordValidator) {
@@ -154,8 +123,8 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     }
 
     public void setCode(String code) {
-        if (selectedFieldMapping != null) {
-            if (!selectedFieldMapping.codeLooksLike(code)) {
+        if (selectedRecDefNode != null && selectedRecDefNode.getNodeMapping() != null) {
+            if (!selectedRecDefNode.getNodeMapping().codeLooksLike(code)) {
                 editedCode = code;
                 notifyStateChange(State.EDITED);
             }
@@ -164,17 +133,6 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                 notifyStateChange(State.SAVED);
             }
             compileSoon();
-        }
-    }
-
-    @Override
-    public void updatedRecord(MetadataRecord metadataRecord) {
-        this.metadataRecord = metadataRecord;
-        if (metadataRecord != null) {
-            compileSoon();
-        }
-        else {
-            Exec.swing(new DocumentSetter(outputDocument, ""));
         }
     }
 
@@ -197,7 +155,7 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             case RECORD:
                 return null;
             case FIELD:
-                return selectedFieldMapping == null ? null : selectedFieldMapping.getDefinition().path;
+                return selectedRecDefNode == null ? null : selectedRecDefNode.getNodeMapping().outputPath;
             default:
                 throw new RuntimeException();
         }
@@ -206,21 +164,70 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
     private String getDisplayCode() {
         switch (type) {
             case RECORD:
-                if (recordMapping != null) {
-                    return recordMapping.toDisplayCode();
+                if (recMapping != null) {
+                    return recMapping.getRecDefTree().toCode(null, null);
                 }
                 else {
                     return "// no mapping";
                 }
             case FIELD:
-                if (selectedFieldMapping == null || recordMapping == null) {
+                if (selectedRecDefNode == null || recMapping == null) {
                     return "// no code";
                 }
                 else {
-                    return recordMapping.toDisplayCode(getSelectedPath());
+                    return recMapping.getRecDefTree().toCode(selectedRecDefNode.getNodeMapping().outputPath, editedCode);
                 }
             default:
                 throw new RuntimeException();
+        }
+    }
+
+    private class ParseEar implements SipModel.ParseListener {
+
+        @Override
+        public void updatedRecord(MetadataRecord updated) {
+            metadataRecord = updated;
+            if (metadataRecord != null) {
+                compileSoon();
+            }
+            else {
+                Exec.swing(new DocumentSetter(outputDocument, ""));
+            }
+        }
+    }
+
+    private class MappingModelEar implements MappingModel.Listener {
+
+        @Override
+        public void recMappingSet(MappingModel mappingModel) {
+            compileSoon();
+        }
+
+        @Override
+        public void factChanged(MappingModel mappingModel) {
+            compileSoon();
+        }
+
+        @Override
+        public void recDefNodeSelected(MappingModel mappingModel) {
+            if (mappingModel.getSelectedRecDefNode() == selectedRecDefNode) {
+                if (selectedRecDefNode != null) notifyStateChange(State.REGENERATED);
+            }
+            else {
+                selectedRecDefNode = mappingModel.getSelectedRecDefNode();
+                notifyStateChange(State.ORIGINAL);
+            }
+            Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
+            compileSoon();
+        }
+
+        @Override
+        public void nodeMappingSet(MappingModel mappingModel, RecDefNode recDefNode) {
+            editedCode = null;
+            selectedRecDefNode = recDefNode;
+            Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
+            notifyStateChange(State.ORIGINAL);
+            compileSoon();
         }
     }
 
@@ -233,10 +240,10 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
             }
             compiling = true;
             try {
-                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recordMapping, getSelectedPath(), editedCode);
+                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedPath(), editedCode);
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
-                    feedback.say("Compiled code for "+type);
+                    feedback.say("Compiled code for " + type);
                     if (null == outputNode) {
                         return;
                     }
@@ -252,31 +259,25 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
                             notifyStateChange(State.SAVED);
                         }
                         else {
-                            if (selectedFieldMapping != null) {
-                                selectedFieldMapping.setCode(editedCode);
+                            NodeMapping nodeMapping = getSelectedNodeMapping();
+                            if (nodeMapping != null) {
+                                nodeMapping.setGroovyCode(editedCode);
                                 notifyStateChange(State.COMMITTED);
                                 editedCode = null;
                                 notifyStateChange(State.SAVED);
                             }
                             else {
-                                if (selectedFieldMapping != null) {
-                                    selectedFieldMapping.setCode(editedCode);
-                                    notifyStateChange(State.COMMITTED);
-                                    editedCode = null;
-                                    notifyStateChange(State.SAVED);
-                                }
-                                else {
-                                    notifyStateChange(State.EDITED);
-                                }
+                                notifyStateChange(State.EDITED);
                             }
                         }
                     }
                 }
                 catch (DiscardRecordException e) {
                     compilationComplete(e.getMessage());
-                    if (selectedFieldMapping != null) {
+                    NodeMapping nodeMapping = getSelectedNodeMapping();
+                    if (nodeMapping != null) {
                         if (editedCode != null) {
-                            selectedFieldMapping.setCode(editedCode);
+                            nodeMapping.setGroovyCode(editedCode);
                             notifyStateChange(State.COMMITTED);
                             editedCode = null;
                         }
@@ -356,7 +357,8 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         @Override
         public void actionPerformed(ActionEvent event) {
             if (compiling) return;
-            if (selectedFieldMapping == null && type == Type.FIELD) {
+            NodeMapping nodeMapping = getSelectedNodeMapping();
+            if (nodeMapping == null && type == Type.FIELD) {
                 try {
                     outputDocument.remove(0, outputDocument.getLength() - 1);
                     return;
@@ -371,6 +373,10 @@ public class CompileModel implements SipModel.ParseListener, MappingModel.Listen
         public void triggerSoon() {
             timer.restart();
         }
+    }
+
+    private NodeMapping getSelectedNodeMapping() {
+        return selectedRecDefNode == null ? null : selectedRecDefNode.getNodeMapping();
     }
 
     private void notifyStateChange(final State state) {

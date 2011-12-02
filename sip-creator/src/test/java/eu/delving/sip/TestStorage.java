@@ -123,15 +123,15 @@ public class TestStorage {
         StatsTree tree = statistics.createAnalysisTree();
         assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.element(Storage.ENVELOPE_TAG)));
 
-        RecordMapping recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
-        assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recordMapping.getPrefix());
+        RecMapping recMapping = dataSet().getRecMapping(mock.getMetadataPrefix(), mock.getRecDefModel());
+        assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recMapping.getPrefix());
         MappingModel mappingModel = new MappingModel();
-        mappingModel.setRecordMapping(recordMapping);
+        mappingModel.setRecMapping(recMapping);
         mappingModel.setFact("/some/path", "value");
-        dataSet().setRecordMapping(recordMapping);
+        dataSet().setRecMapping(recMapping);
         showUploadFiles("start");
-        recordMapping = dataSet().getRecordMapping(mock.getMetadataPrefix(), mock.loadMetadataModel());
-        assertEquals("Should have held fact", "value", recordMapping.getFact("/some/path"));
+        recMapping = dataSet().getRecMapping(mock.getMetadataPrefix(), mock.getRecDefModel());
+        assertEquals("Should have held fact", "value", recMapping.getFact("/some/path"));
         assertEquals(MAPPING, dataSet().getState());
         assertEquals(6, mock.files().length); // mapping file added
 
@@ -142,7 +142,7 @@ public class TestStorage {
             dataSet().getUploadFiles();
 //            showUploadFiles("iteration before " + walk);
             mappingModel.setFact("/some/path", "value" + walk);
-            dataSet().setRecordMapping(mappingModel.getRecordMapping());
+            dataSet().setRecMapping(mappingModel.getRecMapping());
             dataSet().getUploadFiles();
 //            showUploadFiles("iteration after " + walk);
             if (walk < Storage.FileType.MAPPING.getHistorySize() - 1) {

@@ -21,9 +21,13 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.FieldMapping;
-import eu.delving.metadata.MappingModelAdapter;
-import eu.delving.sip.base.*;
+import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.CompileModel;
 import eu.delving.sip.model.SipModel;
@@ -129,17 +133,18 @@ public class FieldMappingFrame extends FrameBase {
         return p;
     }
 
-    private void setFieldMapping(FieldMapping fieldMapping) {
-        if (fieldMapping != null) {
-            StatsTreeNode node = getNode(fieldMapping);
+    private void setRecDefNode(RecDefNode recDefNode) {
+        NodeMapping nodeMapping = recDefNode == null ? null : recDefNode.getNodeMapping();
+        if (recDefNode != null && nodeMapping != null) {
+            StatsTreeNode node = null; // todo: where to get it?
             if (node != null) {
-                dictionaryCreate.setEnabled(fieldMapping.dictionary == null && CodeGenerator.isDictionaryPossible(fieldMapping.getDefinition(), node));
+                dictionaryCreate.setEnabled(nodeMapping.dictionary == null);// todo && CodeGenerator.isDictionaryPossible(fieldMapping.getDefinition(), node));
             }
             else {
                 dictionaryCreate.setEnabled(false);
             }
-            dictionaryEdit.setEnabled(fieldMapping.dictionary != null);
-            dictionaryDelete.setEnabled(fieldMapping.dictionary != null);
+            dictionaryEdit.setEnabled(nodeMapping.dictionary != null);
+            dictionaryDelete.setEnabled(nodeMapping.dictionary != null);
         }
         else {
             dictionaryCreate.setEnabled(false);
@@ -148,58 +153,73 @@ public class FieldMappingFrame extends FrameBase {
         }
     }
 
-    private StatsTreeNode getNode(FieldMapping fieldMapping) {
+//    private StatsTreeNode getNode(FieldMapping fieldMapping) {
 //        SourceVariable sourceVariable = getSourceVariable(fieldMapping);
 //        return sourceVariable != null ? sourceVariable.getNode() : null;
-        return null;
-    }
+//        return null;
+//    }
 
     private void wireUp() {
-        sipModel.getMappingModel().addListener(new MappingModelAdapter() {
+        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+            @Override
+            public void recMappingSet(MappingModel mappingModel) {
+                // todo: implement
+            }
 
             @Override
-            public void select(FieldMapping fieldMapping) {
-                setFieldMapping(fieldMapping);
+            public void factChanged(MappingModel mappingModel) {
+                // todo: implement
+            }
+
+            @Override
+            public void recDefNodeSelected(MappingModel mappingModel) {
+//                setFieldMapping(fieldMapping);
+            }
+
+            @Override
+            public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
+                // todo: implement
             }
         });
         dictionaryCreate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedFieldMapping();
-                if (fieldMapping != null) {
-                    throw new RuntimeException("implement!");
+//                FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedNodeMapping();
+//                if (fieldMapping != null) {
+//                    throw new RuntimeException("implement!");
 //                    CodeGenerator codeGenerator = new CodeGenerator();
 //                    Statistics statistics = null; // todo: get them from somewhere
 //                    fieldMapping.createDictionary(statistics.getHistogramValues());
 //                    codeGenerator.generateCodeFor(fieldMapping, sourceVariable, true);
 //                    setFieldMapping(fieldMapping);
-                }
+//                }
             }
         });
         dictionaryEdit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedFieldMapping();
-                if (fieldMapping != null) {
-                    dictionaryPopup.editDictionary(fieldMapping, new Runnable() {
-                        @Override
-                        public void run() {
-                            setFieldMapping(fieldMapping);
-                        }
-                    });
-                }
+//                final FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedRecDefNode();
+//                if (fieldMapping != null) {
+//                    dictionaryPopup.editDictionary(fieldMapping, new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            setFieldMapping(fieldMapping);
+//                        }
+//                    });
+//                }
             }
         });
         dictionaryDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedFieldMapping();
-                if (fieldMapping != null) {
-                    if (fieldMapping.dictionary == null) {
+                RecDefNode recDefNode = sipModel.getMappingModel().getSelectedRecDefNode();
+                NodeMapping nodeMapping = recDefNode == null ? null : recDefNode.getNodeMapping();
+                if (recDefNode != null && nodeMapping != null) {
+                    if (nodeMapping.dictionary == null) {
                         throw new RuntimeException("No dictionary to delete!");
                     }
                     int nonemptyEntries = 0;
-                    for (String value : fieldMapping.dictionary.values()) {
+                    for (String value : nodeMapping.dictionary.values()) {
                         if (!value.trim().isEmpty()) {
                             nonemptyEntries++;
                         }
@@ -218,13 +238,12 @@ public class FieldMappingFrame extends FrameBase {
                             return;
                         }
                     }
-                    fieldMapping.dictionary = null;
-                    CodeGenerator codeGenerator = new CodeGenerator();
+                    nodeMapping.dictionary = null;
 //                    SourceVariable sourceVariable = getSourceVariable(fieldMapping);
 //                    if (sourceVariable != null) {
 //                        codeGenerator.generateCodeFor(fieldMapping, sourceVariable, false);
 //                    }
-                    setFieldMapping(fieldMapping);
+//                    setFieldMapping(fieldMapping);
                 }
             }
         });

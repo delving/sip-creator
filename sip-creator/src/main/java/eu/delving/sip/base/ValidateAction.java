@@ -110,7 +110,7 @@ public class ValidateAction extends AbstractAction {
         progressListener.setProgressMessage(String.format(
                 "<html><h3>Transforming the raw data of '%s' into '%s' format and validating</h3>",
                 sipModel.getDataSetModel().getDataSet().getSpec(),
-                sipModel.getMappingModel().getRecordMapping().getPrefix()
+                sipModel.getMappingModel().getRecMapping().getPrefix()
         ));
         progressListener.onFinished(new ProgressListener.End() {
             @Override

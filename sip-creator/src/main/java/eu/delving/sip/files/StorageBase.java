@@ -21,12 +21,14 @@
 
 package eu.delving.sip.files;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import eu.delving.metadata.*;
+import eu.delving.metadata.Hasher;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecMapping;
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.util.*;
 
 import static eu.delving.sip.files.Storage.FileType.*;
@@ -161,8 +163,8 @@ public class StorageBase {
         return dir.listFiles(new PrefixFileFilter(VALIDATION));
     }
 
-    File reportFile(File dir, RecordMapping recordMapping) {
-        return new File(dir, String.format(REPORT.getPattern(), recordMapping.getPrefix()));
+    File reportFile(File dir, RecMapping recMapping) {
+        return new File(dir, String.format(REPORT.getPattern(), recMapping.getPrefix()));
     }
 
     File statisticsFile(File dir, boolean sourceFormat) {
@@ -353,30 +355,4 @@ public class StorageBase {
             return file.isFile() && Hasher.extractFileName(file).equals(name);
         }
     }
-
-    public static RecordDefinition readRecordDefinition(InputStream in, List<FactDefinition> factDefinitions) throws MetadataException {
-        try {
-            Reader inReader = new InputStreamReader(in, "UTF-8");
-            RecordDefinition recordDefinition = (RecordDefinition) recordStream().fromXML(inReader);
-            recordDefinition.initialize(factDefinitions);
-            return recordDefinition;
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    static XStream recordStream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(new Class[]{
-                FactDefinition.List.class,
-                RecordDefinition.class,
-                ElementDefinition.class,
-                FieldDefinition.class
-        });
-        return stream;
-    }
-
-
 }

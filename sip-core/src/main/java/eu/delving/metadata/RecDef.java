@@ -201,6 +201,11 @@ public class RecDef {
         public String key;
 
         public String content;
+
+        public Opt setContent(String content) {
+            this.content = content;
+            return this;
+        }
     }
 
     @XStreamAlias("doc")

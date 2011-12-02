@@ -21,13 +21,13 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.FieldMapping;
 import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -55,9 +55,9 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
     @Override
     public void run() {
         try {
-            RecordMapping recordMapping = sipModel.getMappingModel().getRecordMapping();
-            if (recordMapping != null) {
-                sipModel.getDataSetModel().getDataSet().setRecordMapping(recordMapping);
+            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+            if (recMapping != null) {
+                sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping);
             }
         }
         catch (StorageException e) {
@@ -66,26 +66,22 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
     }
 
     @Override
-    public void factChanged() {
+    public void recMappingSet(MappingModel mappingModel) {
         timer.restart();
     }
 
     @Override
-    public void select(FieldMapping fieldMapping) {
-    }
-
-    @Override
-    public void fieldMappingChanged() {
+    public void factChanged(MappingModel mappingModel) {
         timer.restart();
     }
 
     @Override
-    public void recordMappingChanged(RecordMapping recordMapping) {
-        timer.restart();
+    public void recDefNodeSelected(MappingModel mappingModel) {
     }
 
     @Override
-    public void recordMappingSelected(RecordMapping recordMapping) {
+    public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
+        timer.restart();
     }
 }
 

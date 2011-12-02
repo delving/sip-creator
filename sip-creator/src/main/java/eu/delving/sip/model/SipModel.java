@@ -60,7 +60,6 @@ public class SipModel {
     private StatsModel statsModel;
     private DataSetModel dataSetModel = new DataSetModel();
     private FactModel dataSetFacts = new FactModel();
-    private FieldMappingListModel fieldMappingListModel = new FieldMappingListModel();
     private MappingModel mappingModel = new MappingModel();
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
@@ -90,27 +89,45 @@ public class SipModel {
         this.feedback = feedback;
         recordCompileModel = new CompileModel(CompileModel.Type.RECORD, feedback, groovyCodeResource);
         fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, feedback, groovyCodeResource);
-        parseListeners.add(recordCompileModel);
-        parseListeners.add(fieldCompileModel);
-        mappingModel.addListener(fieldMappingListModel);
+        parseListeners.add(recordCompileModel.getParseEar());
+        parseListeners.add(fieldCompileModel.getParseEar());
         mappingModel.addListener(reportFileModel);
-        mappingModel.addListener(recordCompileModel);
-        mappingModel.addListener(fieldCompileModel);
+        mappingModel.addListener(recordCompileModel.getMappingModelEar());
+        mappingModel.addListener(fieldCompileModel.getMappingModelEar());
         mappingModel.addListener(new MappingSaveTimer(this));
-        mappingModel.addListener(
-                new MappingModelAdapter() {
+        mappingModel.addListener(new MappingModel.Listener() {
+            @Override
+            public void recMappingSet(MappingModel mappingModel) {
+                clearValidation(mappingModel.getRecMapping());
+            }
 
-                    @Override
-                    public void fieldMappingChanged() {
+            @Override
+            public void factChanged(MappingModel mappingModel) {
+                // todo: implement
+            }
+
+            @Override
+            public void recDefNodeSelected(MappingModel mappingModel) {
+                // todo: implement
+            }
+
+            @Override
+            public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
                         LOG.info("FieldMapping has changed");
-                        clearValidation(mappingModel.getRecordMapping());
-                    }
-
-                    @Override
-                    public void recordMappingChanged(RecordMapping recordMapping) {
-                        clearValidation(recordMapping);
-                    }
-                }
+                        clearValidation(mappingModel.getRecMapping());
+            }
+        }
+//                new MappingModelAdapter() {
+//
+//                    @Override
+//                    public void fieldMappingChanged() {
+//                    }
+//
+//                    @Override
+//                    public void recordMappingChanged(RecordMapping recordMapping) {
+//                        clearValidation(recordMapping);
+//                    }
+//                }
         );
         statsModel = new StatsModel(this);
         statsModel.addListener(new StatsModel.Listener() {
@@ -121,13 +138,13 @@ public class SipModel {
             @Override
             public void recordRootSet(Path recordRootPath) {
                 deleteSourceFile();
-                clearValidation(mappingModel.getRecordMapping());
+                clearValidation(mappingModel.getRecMapping());
             }
 
             @Override
             public void uniqueElementSet(Path uniqueElementPath) {
                 deleteSourceFile();
-                clearValidation(mappingModel.getRecordMapping());
+                clearValidation(mappingModel.getRecMapping());
             }
 
             private void deleteSourceFile() {
@@ -146,17 +163,17 @@ public class SipModel {
                 switch (state) {
                     case COMMITTED:
                     case REGENERATED:
-                        mappingModel.notifySelectedFieldMappingChange();
+// todo                       mappingModel.notifySelectedFieldMappingChange();
                 }
             }
         });
     }
 
-    private void clearValidation(RecordMapping recordMapping) {
+    private void clearValidation(RecMapping recMapping) {
         try {
-            if (dataSetModel.hasDataSet() && recordMapping != null) {
-                dataSetModel.getDataSet().deleteValidation(recordMapping.getPrefix());
-                feedback.say(String.format("Validation cleared for %s", recordMapping.getPrefix()));
+            if (dataSetModel.hasDataSet() && recMapping != null) {
+                dataSetModel.getDataSet().deleteValidation(recMapping.getPrefix());
+                feedback.say(String.format("Validation cleared for %s", recMapping.getPrefix()));
             }
         }
         catch (StorageException e) {
@@ -205,7 +222,7 @@ public class SipModel {
     }
 
     public boolean hasPrefix() {
-        return mappingModel.getRecordMapping() != null;
+        return mappingModel.getRecMapping() != null;
     }
 
     public StatsModel getStatsModel() {
@@ -226,10 +243,6 @@ public class SipModel {
 
     public CompileModel getFieldCompileModel() {
         return fieldCompileModel;
-    }
-
-    public ListModel getFieldMappingListModel() {
-        return fieldMappingListModel;
     }
 
     public void setDataSet(final DataSet dataSet, final boolean useLatestPrefix) {
@@ -258,7 +271,7 @@ public class SipModel {
                                             setPrefix(false, latestPrefix);
                                         }
                                         else {
-                                            mappingModel.setRecordMapping(null);
+                                            mappingModel.setRecMapping(null);
                                         }
                                     }
                                 });
@@ -284,26 +297,18 @@ public class SipModel {
 
     private void setPrefix(boolean promoteToLatest, String metadataPrefix) {
         try {
-            final RecordMapping recordMapping = promoteToLatest ?
+            final RecMapping recMapping = promoteToLatest ?
                     dataSetModel.getDataSet().setLatestPrefix(metadataPrefix, dataSetModel) :
-                    dataSetModel.getDataSet().getRecordMapping(metadataPrefix, dataSetModel);
+                    dataSetModel.getDataSet().getRecMapping(metadataPrefix, dataSetModel);
             dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-            dataSetFacts.copyToRecordMapping(recordMapping);
-            mappingModel.setRecordMapping(recordMapping);
-            recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
+            dataSetFacts.copyToRecordMapping(recMapping);
+            mappingModel.setRecMapping(recMapping);
+            recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, recMapping));
             feedback.say(String.format("Using '%s' mapping", metadataPrefix));
         }
         catch (StorageException e) {
             feedback.alert("Unable to select Metadata Prefix " + metadataPrefix, e);
         }
-    }
-
-    public RecordDefinition getRecordDefinition() {
-        RecordMapping recordMapping = mappingModel.getRecordMapping();
-        if (recordMapping == null) {
-            return null;
-        }
-        return dataSetModel.getRecordDefinition(recordMapping.getPrefix());
     }
 
     public void importSource(final File file, final ProgressListener progressListener) {
@@ -428,7 +433,7 @@ public class SipModel {
             validating = true;
             feedback.say(String.format(
                     "Validating mapping %s for data set %s, %s",
-                    mappingModel.getRecordMapping().getPrefix(),
+                    mappingModel.getRecMapping().getPrefix(),
                     dataSetModel.getDataSet().getSpec(),
                     allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
             ));
@@ -451,7 +456,7 @@ public class SipModel {
                         @Override
                         public void finished(final BitSet valid, int recordCount) {
                             try {
-                                dataSetModel.getDataSet().setValidation(getMappingModel().getRecordMapping().getPrefix(), valid, recordCount);
+                                dataSetModel.getDataSet().setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
                             }
                             catch (StorageException e) {
                                 feedback.alert("Unable to store validation results", e);

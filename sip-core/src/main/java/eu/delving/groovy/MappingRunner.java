@@ -21,10 +21,10 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.NamespaceDefinition;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.RecordMapping;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.RecMapping;
 import groovy.lang.*;
 import groovy.util.Node;
 import groovy.util.NodeBuilder;
@@ -49,23 +49,23 @@ import java.util.regex.Pattern;
 public class MappingRunner {
     private Script script;
     private GroovyShell groovyShell;
-    private RecordMapping recordMapping;
+    private RecMapping recMapping;
     private String code;
     private int counter = 0;
 
-    public MappingRunner(GroovyCodeResource groovyCodeResource, RecordMapping recordMapping, Path selectedPath, String editedCode) {
+    public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, Path selectedPath, String editedCode) {
         this.groovyShell = groovyCodeResource.getCategoryShell();
-        this.recordMapping = recordMapping;
-        this.code = recordMapping.toCompileCode(selectedPath, editedCode);
+        this.recMapping = recMapping;
+        this.code = recMapping.getRecDefTree().toCode(selectedPath, editedCode);
         script = groovyCodeResource.createMappingScript(code);
     }
 
-    public MappingRunner(GroovyCodeResource groovyCodeResource, RecordMapping recordMapping) {
-        this(groovyCodeResource, recordMapping, null, null);
+    public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping) {
+        this(groovyCodeResource, recMapping, null, null);
     }
 
-    public RecordDefinition getRecordDefinition() {
-        return recordMapping.getRecordDefinition();
+    public RecDefTree getRecDefTree() {
+        return recMapping.getRecDefTree();
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
@@ -102,7 +102,7 @@ public class MappingRunner {
             NodeBuilder builder = NodeBuilder.newInstance();
             NamespaceBuilder xmlns = new NamespaceBuilder(builder);
             binding.setVariable("output", builder);
-            for (NamespaceDefinition ns : recordMapping.getRecordDefinition().namespaces) {
+            for (RecDef.Namespace ns : recMapping.getRecDefTree().getNamespaces()) {
                 binding.setVariable(ns.prefix, xmlns.namespace(ns.uri, ns.prefix));
             }
             binding.setVariable("input", metadataRecord.getRootNode());

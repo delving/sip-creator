@@ -36,19 +36,26 @@ public class RecDefNode {
     private RecDef.Attr attr;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private NodeMapping nodeMapping;
+    private Listener listener;
 
-    public static RecDefNode create(RecDef recDef) {
-        return new RecDefNode(null, recDef.root);
+    public interface Listener {
+        void nodeMappingSet(RecDefNode recDefNode);
     }
 
-    private RecDefNode(RecDefNode parent, RecDef.Elem elem) {
+    public static RecDefNode create(Listener listener, RecDef recDef) {
+        return new RecDefNode(listener, null, recDef.root);
+    }
+
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem) {
+        this.listener = listener;
         this.parent = parent;
         this.elem = elem;
-        for (RecDef.Attr sub : elem.attrList) children.add(new RecDefNode(this, sub));
-        for (RecDef.Elem sub : elem.elemList) children.add(new RecDefNode(this, sub));
+        for (RecDef.Attr sub : elem.attrList) children.add(new RecDefNode(listener, this, sub));
+        for (RecDef.Elem sub : elem.elemList) children.add(new RecDefNode(listener, this, sub));
     }
 
-    private RecDefNode(RecDefNode parent, RecDef.Attr attr) {
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Attr attr) {
+        this.listener = listener;
         this.parent = parent;
         this.attr = attr;
     }
@@ -85,6 +92,32 @@ public class RecDefNode {
         return isAttr() ? null : elem.options;
     }
 
+    public boolean allowOption(String value) {
+        List<RecDef.Opt> options = getOptions();
+        if (options != null) {
+            for (RecDef.Opt option : options) {
+                String member = option.content;
+                if (member.endsWith(":")) {
+                    int colon = value.indexOf(':');
+                    if (colon > 0) {
+                        if (member.equals(value.substring(0, colon + 1))) {
+                            return true;
+                        }
+                    }
+                    else {
+                        if (member.equals(value) || member.substring(0, member.length() - 1).equals(value)) {
+                            return true;
+                        }
+                    }
+                }
+                else if (member.equals(value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public RecDefNode getNode(Path path, Path soughtPath) {
         path = path.extend(getTag());
         if (path.equals(soughtPath)) return this;
@@ -112,6 +145,7 @@ public class RecDefNode {
 
     public void setNodeMapping(NodeMapping nodeMapping) {
         this.nodeMapping = nodeMapping;
+        listener.nodeMappingSet(this);
     }
 
     public String toString() {

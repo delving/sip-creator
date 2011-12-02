@@ -34,7 +34,7 @@ public interface RecDefModel {
 
     List<FactDefinition> getFactDefinitions();
 
-    Set<String> getPrefixes();
+    Set<String> getPrefixes() throws MetadataException;
 
-    RecDefNode createRecDef(String prefix);
+    RecDefTree createRecDef(String prefix);
 }

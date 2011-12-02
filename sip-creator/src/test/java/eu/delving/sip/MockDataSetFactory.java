@@ -1,16 +1,10 @@
 package eu.delving.sip;
 
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.MetadataModel;
-import eu.delving.metadata.MetadataModelImpl;
-import eu.delving.metadata.Path;
+import eu.delving.metadata.*;
 import eu.delving.sip.files.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Create a data set for testing
@@ -100,17 +94,22 @@ public class MockDataSetFactory {
         }
     }
 
-    public MetadataModel loadMetadataModel() {
-        try {
-            MetadataModelImpl metadataModel = new MetadataModelImpl();
-            metadataModel.setFactDefinitionsFile(new File(getClass().getResource("/fact-definition-list.xml").getFile()));
-            metadataModel.setRecordDefinitionFiles(new File(getClass().getResource("/abm-record-definition.xml").getFile()));
-            return metadataModel;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-            return null;
-        }
+    public RecDefModel getRecDefModel() {
+        return new RecDefModel() {
+            @Override
+            public List<FactDefinition> getFactDefinitions() {
+                return null;  // todo: implement
+            }
+
+            @Override
+            public Set<String> getPrefixes() throws MetadataException {
+                return null;  // todo: implement
+            }
+
+            @Override
+            public RecDefTree createRecDef(String prefix) {
+                return null;  // todo: implement
+            }
+        };
     }
 }
