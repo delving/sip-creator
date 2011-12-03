@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -40,10 +40,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class takes code, a record, and produces a record, using the code
- * as the mapping.
+ * This core class takes a RecMapping and execute the code that it can generate to
+ * transform an input to output in the form of a tree of Groovy Nodes using the
+ * normal Groovy NodeBuilder class.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * It wraps the mapping code in the MappingCategory for DSL features, and before
+ * executing the mapping it binds the input and output to the script to be run.
+ *
+ * There is a special case in which a specific selected path of the record definition
+ * is being compiled, potentially even with edited code.  In this case the whole builder
+ * is not created, but only the necessary code to render the given path.  This is for
+ * showing results while the user is adjusting the code of a single snippet, and only
+ * gives that part of the record output.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class MappingRunner {

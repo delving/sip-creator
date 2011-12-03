@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Delving BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -22,9 +22,25 @@
 package eu.delving.groovy;
 
 /**
- * Discard a record outright for some good reason
+ * Discard a record explicitly for some good reason by having the
+ * Groovy code throw this.  This is done in Groovy code by making
+ * a call on a boolean object.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * (condition).discard('condition is met, throw this record out')
+ *
+ * like
+ *
+ * (size > 3).discard("List is too large at ${size}!")
+ *
+ * <code>
+ *   From MappingCategory.groovy:
+ *
+ *   static void discard(Boolean condition, String why) {
+ *       if (condition) throw new DiscardRecordException(why)
+ *   }
+ * </code>
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class DiscardRecordException extends RuntimeException {

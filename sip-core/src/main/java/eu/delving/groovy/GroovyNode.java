@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011 EDL FOUNDATION
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -33,9 +33,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * A simpler adaptation of groovy.util.Node
+ * A variation on the Groovy Node class which is used to store XML-like data
+ * in memory.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * Trimmed down from the original and with some added or modified functions to make
+ * it easier to use these as input variables in the mapping code.
+ *
+ * The MetadataParser produces records containing structures of these nodes.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 @SuppressWarnings("unchecked")

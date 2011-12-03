@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011 EDL FOUNDATION
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -22,9 +22,10 @@
 package eu.delving.groovy;
 
 /**
- * Something identifiable went wrong during mapping
+ * Something identifiable went wrong during mapping, so we record which record
+ * was involved and why it went wrong.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class MappingException extends Exception {

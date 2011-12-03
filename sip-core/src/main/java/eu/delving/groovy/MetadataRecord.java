@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -28,9 +28,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Something to hold the groovy node and turn it into a string
+ * The MetadataParser delivers instances of this class for each record that it
+ * consumes.  The XML content is recorded in the composite tree of GroovyNode and
+ * GroovyList instances, and we also hold the record number and the total number
+ * of records.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class MetadataRecord {
@@ -59,7 +62,7 @@ public class MetadataRecord {
         return recordCount;
     }
 
-    public List<MetadataVariable> getVariables() {
+    private List<MetadataVariable> getVariables() {
         List<MetadataVariable> variables = new ArrayList<MetadataVariable>();
         getVariables(rootNode, variables);
         return variables;
@@ -127,5 +130,27 @@ public class MetadataRecord {
             out.append(variable.toString()).append('\n');
         }
         return out.toString();
+    }
+
+    private static class MetadataVariable {
+        private String name;
+        private String value;
+
+        public MetadataVariable(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public String toString() {
+            return name + "= \"" + value+"\"";
+        }
     }
 }

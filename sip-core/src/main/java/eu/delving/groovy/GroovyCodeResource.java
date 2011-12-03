@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -25,17 +25,19 @@ import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URL;
 
 /**
- * The groovy helper code that precedes the mapping snippet.
+ * This class is supposed to make it easy to build Groovy scripts from some bits of code which are
+ * stored in the resources of the project.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * For DSL aspects, the MappingCategory is automatically wrapped around the builder code
+ * which does the mapping transformation.
+ *
+ * Various helper functions are automatically added to make record validation nicer.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class GroovyCodeResource {

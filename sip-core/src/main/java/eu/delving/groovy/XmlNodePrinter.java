@@ -20,7 +20,7 @@ import java.util.Map;
  * didn't do the job as it also removes the prefix.</li>
  * <li>Indentation; linebreaks only after the closing element.</li>
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  * @see groovy.util.XmlNodePrinter
  */

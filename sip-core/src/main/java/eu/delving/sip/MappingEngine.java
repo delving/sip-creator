@@ -1,3 +1,24 @@
+/*
+ * Copyright 2011 DELVING BV
+ *
+ *  Licensed under the EUPL, Version 1.0 or? as soon they
+ *  will be approved by the European Commission - subsequent
+ *  versions of the EUPL (the "Licence");
+ *  you may not use this work except in compliance with the
+ *  Licence.
+ *  You may obtain a copy of the Licence at:
+ *
+ *  http://ec.europa.eu/idabc/eupl
+ *
+ *  Unless required by applicable law or agreed to in
+ *  writing, software distributed under the Licence is
+ *  distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ *  express or implied.
+ *  See the Licence for the specific language governing
+ *  permissions and limitations under the Licence.
+ */
+
 package eu.delving.sip;
 
 import eu.delving.groovy.*;
@@ -11,9 +32,14 @@ import java.io.StringReader;
 import java.util.Map;
 
 /**
- * Wrapping the mapping mechanism for easy access from Scala
+ * Wrap the mapping runner and associated code so that mappings can be easily carried out
+ * within the CultureHub.  It takes a string corresponding to the record and produces
+ * an IndexDocument as output, which is a multi-map containing a list of values for every key.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * todo: The IndexDocument will need to change for dealing with hierarchical records.
+ * todo: Only indexing requires flattening so probably output will have to be a tree eventually.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class MappingEngine {
