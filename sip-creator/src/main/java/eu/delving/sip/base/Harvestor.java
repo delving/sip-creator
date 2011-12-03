@@ -61,7 +61,8 @@ import static org.apache.http.HttpStatus.*;
  */
 
 public class Harvestor implements Runnable {
-    private static final int CONNECTION_TIMEOUT = 1000*60*5;
+    private static final int CONNECTION_TIMEOUT = 1000 * 60 * 5;
+    private static final int TALK_DELAY = 1000 * 15;
     private static final Path RECORD_ROOT = new Path("/OAI-PMH/ListRecords/record");
     private static final Path ERROR = new Path("/OAI-PMH/error");
     private static final Path RESUMPTION_TOKEN = new Path("/OAI-PMH/ListRecords/resumptionToken");
@@ -85,41 +86,14 @@ public class Harvestor implements Runnable {
      */
     public interface Listener {
 
-        /**
-         * The harvesting process is finished.
-         *
-         * @param cancelled True if cancelled.
-         */
         void finished(boolean cancelled);
 
-        /**
-         * Inform about the number of processed records.
-         *
-         * @param count The record count.
-         */
         void progress(int count);
 
-        /**
-         * Notify the user.
-         *
-         * @param message The message.
-         */
         void tellUser(String message);
 
-        /**
-         * Error while harvesting.
-         *
-         * @param message   The description of the error.
-         * @param exception The thrown exception.
-         */
         void failed(String message, Exception exception);
 
-        /**
-         * Error while harvesting.
-         *
-         * @param message The description of the error.
-         */
-        void failed(String message);
     }
 
     public void setListener(Listener listener) {
@@ -156,14 +130,21 @@ public class Harvestor implements Runnable {
         if (!okValue(context.harvestPrefix(), "Harvest Metadata Prefix")) return;
         if (!prepareOutput()) return;
         try {
+            listener.tellUser("Starting harvest");
             listener.progress(recordCount);
             HttpEntity fetchedRecords = fetchFirstEntity();
             String resumptionToken = saveRecords(fetchedRecords, out);
+            listener.tellUser(String.format("first resumption token \"%s\" received", resumptionToken));
+            long time = System.currentTimeMillis();
             while (isValidResumptionToken(resumptionToken) && recordCount > 0 && !cancelled) {
                 EntityUtils.consume(fetchedRecords);
                 listener.progress(recordCount);
                 fetchedRecords = fetchNextEntity(resumptionToken);
                 resumptionToken = saveRecords(fetchedRecords, out);
+                if (System.currentTimeMillis() - time > TALK_DELAY) {
+                    listener.tellUser(String.format("So far %d records", recordCount));
+                    time = System.currentTimeMillis();
+                }
                 if (!isValidResumptionToken(resumptionToken) && recordCount > 0) {
                     EntityUtils.consume(fetchedRecords);
                 }
@@ -374,7 +355,9 @@ public class Harvestor implements Runnable {
         }
         String message = String.format("Copying temp file %s to %s", tempFile, context.outputFile());
         log.info(message);
-        FileUtils.moveFile(tempFile, context.outputFile());
+        File outputFile = context.outputFile();
+        FileUtils.deleteQuietly(outputFile);
+        FileUtils.moveFile(tempFile, outputFile);
         listener.finished(false);
     }
 
