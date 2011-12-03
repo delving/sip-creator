@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -22,9 +22,9 @@
 package eu.delving.metadata;
 
 /**
- * Remove the frightening things from tags so that they can become proper variable names.
+ * Remove the frightening things from tag strings so that they can become proper Groovy variable names.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Sanitizer {

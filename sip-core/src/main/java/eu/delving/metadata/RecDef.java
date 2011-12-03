@@ -35,9 +35,28 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Record Definition
+ * This class defines the structure of a record definition, and it involves a lot of recursion.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * There is a system of references built in which parses comma-delimited lists of identifiers which
+ * are sought in the lists of common elements and attributes attrs and elems.  Any of these can
+ * be referred by a subsequent one and this makes it easy to have patterns repeated throughout
+ * the record definition, as is often the case.
+ *
+ * The main part is stored in the Elem called "root", which is a composite tree of Elem and
+ * Attr instances.
+ *
+ * Information about which values are allowed can be stored in a list of options for that element
+ * by adding entries to the option lists and identifying the path.  These option lists are placed
+ * into the appropriate places when the RecDef is resolved.
+ *
+ * The same is true for the Doc instances, which hold human-facing documentation about the meaning
+ * of the element.
+ *
+ * Bookmarks are a mechanism which provides for more easy navigation of elaborate record definitions
+ * which are hard to work with due to their size.  Each bookmark can also include its own documentation,
+ * which can instruct the mapper how to use the element to which it refers.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 @XStreamAlias("record-definition")

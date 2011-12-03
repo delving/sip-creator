@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -23,8 +23,13 @@ package eu.delving.metadata;
 
 /**
  * The fields that will be considered common to all record definitions are marked by this
+ * in the record definition.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * todo: this enum has yet to be integrated into the new RecDef, and it should be done
+ * todo: in the form of path -> enum entries so that the list of fields is easy to
+ * todo: read and modify and can point to anywhere in the RecDef.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public enum SummaryField {

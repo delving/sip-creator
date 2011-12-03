@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -28,10 +28,16 @@ import java.util.Iterator;
 import java.util.Stack;
 
 /**
- * A path consisting of a stack of instances of QName, representing the paths
- * of elements that came from the analysis process.
+ * A very frequently used class which stores a stack of Tag instances, which
+ * correspond to a QName's prefix and localPart, and which can be either
+ * for an element or an attribute.
  *
- * @author Gerald de Jong, Delving BV, <geralddejong@gmail.com>
+ * The string representation is cached for efficiency, since it is used a lot.
+ *
+ * There is a static converter class at the bottom so that these things can be
+ * used easily in XStream.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Path implements Comparable<Path>, Serializable {

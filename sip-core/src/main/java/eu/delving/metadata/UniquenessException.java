@@ -26,6 +26,7 @@ package eu.delving.metadata;
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
+
 public class UniquenessException extends Exception {
 
     private Path uniqueElementPath;

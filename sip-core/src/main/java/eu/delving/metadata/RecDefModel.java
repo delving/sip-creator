@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -25,9 +25,18 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An interface which gives access to the record definition
+ * This interface describes objects which are able to deliver all of the information
+ * about the target record definitions.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * It reveals which prefixes are available
+ * as target formats, and has a factory method for building new instances of these
+ * composite hierarchical data structures for usage in the user interface
+ * and for mapping.
+ *
+ * It also gives access to the read-only facts that apply to all mappings in
+ * a dataset.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public interface RecDefModel {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -25,9 +25,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrap all nodes of a RecDef and give them important powers
+ * The RecDefNode is the node element of a RecDefTree which stores the whole
+ * hierarchy of the record definition as an in-memory data structure that
+ * can be decorated with NodeMapping instances.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * A node here can represent either an Elem or an Attr and it knows about
+ * its parent and children.
+ *
+ * Whenever a NodeMapping is placed here or removed, a callback to a listener
+ * is invoked, and each node in the tree will have the same listener: the
+ * tree itself, which delegates to a single settable listener.  This way
+ * all changes propagate out and the user interface code can deal
+ * with node references.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class RecDefNode {

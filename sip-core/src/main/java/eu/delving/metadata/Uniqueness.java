@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -21,23 +21,22 @@
 
 package eu.delving.metadata;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Use some adjacent primes to check for uniqueness of strings based on hashCode
+ * Tackling the difficult problem of testing uniqueness of the potentially very
+ * numerous values of a field, within limited memory.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * This class has a threshold at which it gives up
+ * on storing values in an in-memory set, and writes all values to a text file.
+ *
+ * Later, when the analysis storm is over, it can be called upon to re-read the
+ * dumped values and give final judgement.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Uniqueness {

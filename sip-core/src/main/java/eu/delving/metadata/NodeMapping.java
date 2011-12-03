@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -27,9 +27,18 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.*;
 
 /**
- * This class describes how a node is mapped.
+ * This class describes how one node is transformed into another, which is part of mapping
+ * one hierarchy onto another.  It can contain a dictionary, as well as a snippet
+ * of Groovy code.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * Instances of this class are placed in the RecDefNode elements of the record definition
+ * so that that data structure can be used as a scaffolding to recursively write the code
+ * for the Groovy builder.
+ *
+ * Instances are also stored in a list in the RecMapping, and upon reading a mapping they
+ * are distributed into the local prototype instance of the record definition data structure.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 @XStreamAlias("node-mapping")

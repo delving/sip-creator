@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -28,9 +28,10 @@ import java.util.TreeSet;
 
 /**
  * Regardless of what happens, just grab some random values as a backup in case other interesting statistics
- * don't work
+ * don't work.  Trying to be clever here to collect a sample that is close to randomly plucked from a stream
+ * of values.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class RandomSample implements Serializable {

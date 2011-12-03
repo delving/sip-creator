@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -25,9 +25,15 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Maintain a map of strings and counters
+ * A tree of these is built during the gathering of statistics from an XML file
+ * being analyzed, one for each path encountered.  Some of the paths are to
+ * elements that don't have any values (just sub-elements), and these will
+ * only contain the count, and have no ValueStats available.
  *
- * @author Gerald de Jong, Beautiful Code BV, <geralddejong@gmail.com>
+ * Instances are serialized into a cache file which is read in when available,
+ * rather than re-doing the analysis.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class FieldStatistics implements Comparable<FieldStatistics>, Serializable {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -23,18 +23,18 @@ package eu.delving.metadata;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
- * Use some adjacent primes to check for uniqueness of strings based on hashCode
+ * This class maintains a map of counters in such a way that it grows to certain
+ * size and then trims itself.  This is all about keeping memory usage in check
+ * since there can be very many of these around at one time.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * There are two things that can cause a histogram to give up and effectively
+ * delete itself:  the number of values becomes outrageous or the amount of
+ * storage becomes outrageous.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Histogram implements Serializable {

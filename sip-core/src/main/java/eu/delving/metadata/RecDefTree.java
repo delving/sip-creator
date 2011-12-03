@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -25,9 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrap a recdef to contain a tree and the recdef for reference
+ * This class takes a RecDef instance and wraps itself around, ensuring
+ * event propagation by brokering the Listener that is passed to every
+ * contained RecDefNode.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * The RecDefNode composite elements of the tree are held at "root" and
+ * they contain NodeMappings from the RecMapping, so this plust the fact
+ * that the RecDef's data is always available makes this the class
+ * responsible for writing the code of the Groovy builder which will
+ * ultimately do the transformation.
+ *
+ * Code generation is done in two ways, with or without a particular
+ * path selected, so that the user interface can give people only a tiny
+ * part of the whole mapping to deal with at one time.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class RecDefTree implements RecDefNode.Listener {

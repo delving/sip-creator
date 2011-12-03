@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -27,7 +27,10 @@ import javax.xml.namespace.QName;
 import java.io.Serializable;
 
 /**
- * @author Gerald de Jong, Delving BV, <geralddejong@gmail.com>
+ * This is an extremely frequently used class which holds the prefix and localPart
+ * of an XML tag, either for an attribute or an element.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Tag implements Comparable<Tag>, Serializable {

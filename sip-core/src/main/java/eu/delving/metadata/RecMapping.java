@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -34,9 +34,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A groovy mapping based on a model.
+ * A record mapping describes how an input format is transformed into an output format in the form of a Groovy builder,
+ * which is dynamically generated.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * There are some givens, recorded in the facts, and then a set of node mappings, each identified with a path,
+ * and containing mapping information such as a dictionary or a Groovy code snippet to do more elaborate
+ * transformations.
+ *
+ * The recDefTree is an instance of the output record definition, which is not shared with any other record
+ * mappings.  It is used to generate the Groovy builder code based on its hierarchical structure, which
+ * is "decorated" with the various NodeMapping instances from this mapping.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 @XStreamAlias("rec-mapping")

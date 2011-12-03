@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -36,15 +36,25 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Parse, filter, validate a record
+ * This class validates a record which emerges from the Groovy builder code, which is
+ * in the form of a composite hierarchical structure of Groovy's Node instances.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * todo: This class is supposed to run some Groovy validation code, but the switch to
+ * todo: hierarchical has suspended that for now.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class RecordValidator {
     private Uniqueness idUniqueness;
     private Script script;
     private RecMapping recMapping;
+
+    public interface ValidationReference {
+        boolean allowOption(Node node);
+
+        boolean isUnique(String string);
+    }
 
     public RecordValidator(GroovyCodeResource groovyCodeResource, RecMapping recMapping) {
         this.recMapping = recMapping;
@@ -53,12 +63,6 @@ public class RecordValidator {
 
     public void guardUniqueness(Uniqueness uniqueness) {
         this.idUniqueness = uniqueness;
-    }
-
-    public interface ValidationReference {
-        boolean allowOption(Node node);
-
-        boolean isUnique(String string);
     }
 
     public void validateRecord(Node record, int recordNumber) throws ValidationException {

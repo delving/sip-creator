@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -25,10 +25,15 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * This class holds a record mapping model, handles loading and saving, and
- * makes it observable.
+ * This class makes a RecMapping instance observable, and also assumes that
+ * there is potentially one node in its tree of RecDefNode instances which
+ * is currently selected.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * The RecMapping informs us here of any changes happening in its nodes,
+ * and we watch all changes in the facts and notify the world when any
+ * of this changes, or when a new node is selected.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class MappingModel implements RecDefNode.Listener {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -18,6 +18,7 @@
  *  See the Licence for the specific language governing
  *  permissions and limitations under the Licence.
  */
+
 package eu.delving.sip.xml;
 
 import com.ctc.wstx.stax.WstxInputFactory;
@@ -28,12 +29,7 @@ import eu.delving.metadata.UniquenessException;
 import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.Storage;
 
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.*;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
@@ -43,11 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
 import static eu.delving.sip.files.Storage.RECORD_TAG;
@@ -56,7 +48,7 @@ import static eu.delving.sip.files.Storage.RECORD_TAG;
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
  * the recordRootPath
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class SourceConverter {

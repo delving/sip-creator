@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -27,9 +27,18 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 
 /**
- * An XStream approach for replacing the annotated beans.
+ * Facts are the givens associated with a dataset, such as where it came from,
+ * which language it is in, etc.  Some of the entries involve a choice from
+ * a number of options.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * Each fact definition describes one entry in the Facts map associated with
+ * each dataset.  Facts are read-only on the client side, and is used to
+ * define global values which can be accessed by any mapping code.
+ *
+ * The CultureHub uses facts to define the fields that appear when a
+ * user creates a dataset.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 @XStreamAlias("fact-definition")
@@ -39,20 +48,18 @@ public class FactDefinition {
     public String name;
 
     public String prompt;
-    public String toolTip;
-    public boolean automatic;
-    public String defaultValue;
+
     public java.util.List<String> options;
+
+    public String toString() {
+        return String.format("FactDefinition(%s)", name);
+    }
 
     @XStreamAlias("fact-definition-list")
     public static class List {
 
         @XStreamImplicit
         public java.util.List<FactDefinition> factDefinitions;
-
     }
 
-    public String toString() {
-        return String.format("FactDefinition(%s)", name);
-    }
 }

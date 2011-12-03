@@ -1,17 +1,35 @@
+/*
+ * Copyright 2011 DELVING BV
+ *
+ *  Licensed under the EUPL, Version 1.0 or? as soon they
+ *  will be approved by the European Commission - subsequent
+ *  versions of the EUPL (the "Licence");
+ *  you may not use this work except in compliance with the
+ *  Licence.
+ *  You may obtain a copy of the Licence at:
+ *
+ *  http://ec.europa.eu/idabc/eupl
+ *
+ *  Unless required by applicable law or agreed to in
+ *  writing, software distributed under the Licence is
+ *  distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ *  express or implied.
+ *  See the Licence for the specific language governing
+ *  permissions and limitations under the Licence.
+ */
+
 package eu.delving.metadata;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * The extra data required when uploading a zip to the repository
+ * This is a simple map and how it is stored in a file for reading.  Get returns
+ * an empty string if nothing is found.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Facts {
@@ -37,7 +55,6 @@ public class Facts {
         }
         return value;
     }
-
 
     public static Facts read(InputStream inputStream) throws MetadataException {
         try {
