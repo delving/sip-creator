@@ -165,7 +165,7 @@ public class CompileModel {
         switch (type) {
             case RECORD:
                 if (recMapping != null) {
-                    return recMapping.getRecDefTree().toCode(null, null);
+                    return recMapping.toCode(null, null);
                 }
                 else {
                     return "// no mapping";
@@ -175,7 +175,7 @@ public class CompileModel {
                     return "// no code";
                 }
                 else {
-                    return recMapping.getRecDefTree().toCode(selectedRecDefNode.getNodeMapping().outputPath, editedCode);
+                    return recMapping.toCode(selectedRecDefNode.getNodeMapping().outputPath, editedCode);
                 }
             default:
                 throw new RuntimeException();

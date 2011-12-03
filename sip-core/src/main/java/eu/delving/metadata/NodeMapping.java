@@ -183,5 +183,12 @@ public class NodeMapping {
         }
         return indent;
     }
+
+    public void toCode(RecDefTree.Out out, String editedCode) {
+        out.before();
+        // todo: either wrap the edited code or use ours
+        out.line("implement!");
+        out.after();
+    }
 }
 

@@ -28,10 +28,10 @@ import java.util.List;
  * The RecDefNode is the node element of a RecDefTree which stores the whole
  * hierarchy of the record definition as an in-memory data structure that
  * can be decorated with NodeMapping instances.
- *
+ * <p/>
  * A node here can represent either an Elem or an Attr and it knows about
  * its parent and children.
- *
+ * <p/>
  * Whenever a NodeMapping is placed here or removed, a callback to a listener
  * is invoked, and each node in the tree will have the same listener: the
  * tree itself, which delegates to a single settable listener.  This way
@@ -139,14 +139,29 @@ public class RecDefNode {
         return null;
     }
 
-    public void collect(Path path, List<NodeMapping> nodeMappings) {
+    public boolean hasNodeMappings(Path path) {
         path = path.extend(getTag());
+        boolean gotThem = nodeMapping != null;
+        if (gotThem) nodeMapping.setOutputPath(path);
+        for (RecDefNode sub : children) if (sub.hasNodeMappings(path)) gotThem = true;
+        return gotThem;
+    }
+
+    public void collectNodeMappings(List<NodeMapping> nodeMappings) {
         if (nodeMapping != null) {
-            nodeMapping.inputPath = path;
             nodeMappings.add(nodeMapping);
         }
         for (RecDefNode sub : children) {
-            sub.collect(path, nodeMappings);
+            sub.collectNodeMappings(nodeMappings);
+        }
+    }
+
+    public void collectNodesWithMappings(List<RecDefNode> nodesWithMappings) {
+        if (nodeMapping != null) {
+            nodesWithMappings.add(this);
+        }
+        for (RecDefNode sub : children) {
+            sub.collectNodesWithMappings(nodesWithMappings);
         }
     }
 
@@ -157,6 +172,26 @@ public class RecDefNode {
     public void setNodeMapping(NodeMapping nodeMapping) {
         this.nodeMapping = nodeMapping;
         listener.nodeMappingSet(this);
+    }
+
+    public String getDictionaryName() {
+        return "Dictionary"; // todo: based on path somehow
+    }
+
+    public void toCode(Path path, RecDefTree.Out out, Path selectedPath, String editedCode) {
+        if (!hasNodeMappings(path)) return;
+        path = path.extend(getTag());
+        if (path.equals(selectedPath)) {
+            if (nodeMapping == null) throw new IllegalStateException("Node mapping expected at " + selectedPath);
+            out.before();
+            nodeMapping.toCode(out, editedCode);
+            out.after();
+        }
+        else if (path.isAncestorOf(selectedPath)) {
+            out.before();
+            for (RecDefNode sub : children) sub.toCode(path, out, selectedPath, editedCode);
+            out.after();
+        }
     }
 
     public String toString() {

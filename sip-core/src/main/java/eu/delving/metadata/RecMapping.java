@@ -99,6 +99,10 @@ public class RecMapping {
         return recDefTree;
     }
 
+    public String toCode(Path selectedPath, String editedCode) {
+        return recDefTree.toCode(facts, selectedPath, editedCode);
+    }
+
     public String toString() {
         return stream().toXML(this);
     }
