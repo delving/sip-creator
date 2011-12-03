@@ -29,21 +29,17 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * An observable hole to put the current data set
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class DataSetModel implements MetadataModel {

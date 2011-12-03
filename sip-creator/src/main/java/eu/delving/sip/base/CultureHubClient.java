@@ -57,7 +57,7 @@ import static org.apache.http.HttpStatus.*;
 /**
  * Connect to the culture hub using HTTP
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class CultureHubClient {

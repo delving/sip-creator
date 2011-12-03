@@ -21,7 +21,7 @@
 
 package eu.delving.sip.base;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 /**
  * Handle execution of jobs, as well as managing whether it happens in the swing thread or not
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Exec {
