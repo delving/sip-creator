@@ -24,6 +24,9 @@ package eu.delving.metadata;
 /**
  * The fields that will be considered common to all record definitions are marked by this
  *
+ *
+ * The following summary fields cannot be said in the Record Definition TYPE, HUB_ID, VISIBILITY, OWNER.
+ *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
@@ -31,10 +34,12 @@ public enum SummaryField {
 
     CREATOR,
     TITLE,
+    DESCRIPTION,
     SNIPPET,
-    TYPE,
     THUMBNAIL,
+    TYPE("recordType"),
     HUB_ID("hubId"),
+    VISIBILITY,
     OWNER;
 
     private static final String NS = "delving_";
