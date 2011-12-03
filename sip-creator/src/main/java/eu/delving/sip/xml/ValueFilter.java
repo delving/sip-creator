@@ -24,7 +24,7 @@ package eu.delving.sip.xml;
 /**
  * Clean all whitespace from values
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class ValueFilter {

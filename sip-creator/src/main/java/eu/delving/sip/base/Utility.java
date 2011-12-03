@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -24,20 +24,17 @@ package eu.delving.sip.base;
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
-import javax.swing.JTextArea;
-import javax.swing.Spring;
-import javax.swing.SpringLayout;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
  * Help with SpringLayout forms
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Utility {

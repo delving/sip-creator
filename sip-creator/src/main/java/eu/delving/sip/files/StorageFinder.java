@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  * Licensed under the EUPL, Version 1.0 or? as soon they
  * will be approved by the European Commission - subsequent
@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  * Locate the workspace and make sure the user has chosen a storage directory
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class StorageFinder {

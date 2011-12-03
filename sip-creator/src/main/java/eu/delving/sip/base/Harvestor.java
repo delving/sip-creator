@@ -57,7 +57,7 @@ import static org.apache.http.HttpStatus.*;
 /**
  * Harvest data files from OAI-PMH targets
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Harvestor implements Runnable {

@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * An individual data set within the Storage
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public interface DataSet {
