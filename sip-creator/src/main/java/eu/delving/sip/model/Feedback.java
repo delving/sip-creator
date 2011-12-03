@@ -21,7 +21,7 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.ProgressListener;
 
 /**
  * Handle exceptions that happen under the hood

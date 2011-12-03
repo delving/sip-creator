@@ -21,8 +21,6 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.sip.ProgressListener;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;

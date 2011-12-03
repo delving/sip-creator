@@ -26,7 +26,7 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.metadata.Uniqueness;
 import eu.delving.metadata.UniquenessException;
-import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
 
 import javax.xml.stream.*;

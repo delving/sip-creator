@@ -23,7 +23,7 @@ package eu.delving.sip.files;
 
 import com.thoughtworks.xstream.XStream;
 import eu.delving.metadata.*;
-import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.xml.SourceConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

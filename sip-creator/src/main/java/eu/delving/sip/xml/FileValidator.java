@@ -26,7 +26,7 @@ import eu.delving.metadata.RecMapping;
 import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.Uniqueness;
 import eu.delving.metadata.ValidationException;
-import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;

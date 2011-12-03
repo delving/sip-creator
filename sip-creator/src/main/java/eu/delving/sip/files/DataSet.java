@@ -24,7 +24,7 @@ package eu.delving.sip.files;
 import eu.delving.metadata.FactDefinition;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
-import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.ProgressListener;
 
 import java.io.File;
 import java.io.IOException;

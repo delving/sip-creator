@@ -22,8 +22,8 @@
 package eu.delving.sip.frames;
 
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.sip.ProgressListener;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 

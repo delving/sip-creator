@@ -26,7 +26,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.metadata.Hasher;
-import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;

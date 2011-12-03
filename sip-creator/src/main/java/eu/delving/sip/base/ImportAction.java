@@ -21,7 +21,6 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.sip.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;

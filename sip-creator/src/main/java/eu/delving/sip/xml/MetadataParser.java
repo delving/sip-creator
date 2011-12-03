@@ -26,7 +26,7 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.ProgressListener;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;

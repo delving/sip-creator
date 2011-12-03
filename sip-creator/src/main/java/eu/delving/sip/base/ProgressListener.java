@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip;
+package eu.delving.sip.base;
 
 /**
  * Ties a process to a ProgressMonitor
