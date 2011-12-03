@@ -163,13 +163,8 @@ public class StorageImpl extends StorageBase implements Storage {
             File imported = importedFile(here);
             File source = sourceFile(here);
             if (imported.exists()) {
-                if (source.exists()) {
-                    if (imported.lastModified() > source.lastModified()) {
-                        return importedState(imported);
-                    }
-                    else {
-                        return postSourceState(source);
-                    }
+                if (source.exists() && source.lastModified() >= imported.lastModified()) {
+                    return postSourceState(source);
                 }
                 else {
                     return importedState(imported);
@@ -185,7 +180,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         private DataSetState importedState(File imported) {
             File statistics = statisticsFile(here, false);
-            if (statistics.exists() && statistics.lastModified() > imported.lastModified()) {
+            if (statistics.exists() && statistics.lastModified() >= imported.lastModified()) {
                 return allHintsSet(getHints()) ? DELIMITED : ANALYZED_IMPORT;
             }
             else {
@@ -195,7 +190,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         private DataSetState postSourceState(File source) {
             File statistics = statisticsFile(here, true);
-            if (statistics.exists() && statistics.lastModified() > source.lastModified()) {
+            if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = latestMappingFileOrNull(here);
                 if (mapping != null) {
                     return validationFile(here, mapping).exists() ? VALIDATED : MAPPING;

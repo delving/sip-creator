@@ -111,8 +111,9 @@ public class TestStorage {
         dataSet().importedToSource(null);
         assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
 
+        assertEquals(SOURCED, dataSet().getState());
         analyze();
-        assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
+        assertEquals("Should be imported, hints, 2 stats, and source: "+mock.files(), 5, mock.files().length);
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
         statistics = dataSet().getLatestStatistics();
@@ -195,20 +196,20 @@ public class TestStorage {
             @Override
             public void success(Statistics statistics) {
                 try {
-                    dataSet().setStatistics(statistics);
-                    analysisTree = statistics.createAnalysisTree();
-                    analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
                     Path recordRoot = null;
                     switch (dataSet().getState()) {
-                        case ANALYZED_IMPORT:
+                        case IMPORTED:
                             recordRoot = new Path("/adlibXML/recordList/record");
                             break;
-                        case ANALYZED_SOURCE:
+                        case SOURCED:
                             recordRoot = Storage.RECORD_ROOT;
                             break;
                         default:
-                            Assert.fail("strange state " + dataSet().getState());
+                            Assert.fail("Unexpected state " + dataSet().getState());
                     }
+                    dataSet().setStatistics(statistics);
+                    analysisTree = statistics.createAnalysisTree();
+                    analysisTreeModel = new DefaultTreeModel(analysisTree.getRoot());
                     recordCount = AnalysisTree.setRecordRoot(analysisTreeModel, recordRoot);
                     analysisTree.getVariables(variables);
                 }

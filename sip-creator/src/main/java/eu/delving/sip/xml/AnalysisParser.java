@@ -88,7 +88,7 @@ public class AnalysisParser implements Runnable {
                     sourceFormat = true;
                     break;
                 default:
-                    throw new IllegalStateException("Expected one of two states. See the code here.");
+                    throw new IllegalStateException("Unexpected state: "+dataSet.getState());
             }
             XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
             StringBuilder text = new StringBuilder();
@@ -145,11 +145,14 @@ public class AnalysisParser implements Runnable {
                 File renamedTo = null;
                 switch (dataSet.getState()) {
                     case IMPORTED:
+                    case DELIMITED:
                         renamedTo = dataSet.renameInvalidImport();
                         break;
                     case SOURCED:
                         renamedTo = dataSet.renameInvalidSource();
                         break;
+                    default:
+                        throw new IllegalStateException("Unexpected state "+dataSet.getState());
                 }
                 listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
             }
