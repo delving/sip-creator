@@ -1,22 +1,22 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011 DELVING BV
  *
- *  Licensed under the EUPL, Version 1.0 or? as soon they
- *  will be approved by the European Commission - subsequent
- *  versions of the EUPL (the "Licence");
- *  you may not use this work except in compliance with the
- *  Licence.
- *  You may obtain a copy of the Licence at:
+ * Licensed under the EUPL, Version 1.0 or? as soon they
+ * will be approved by the European Commission - subsequent
+ * versions of the EUPL (the "Licence");
+ * you may not use this work except in compliance with the
+ * Licence.
+ * You may obtain a copy of the Licence at:
  *
- *  http://ec.europa.eu/idabc/eupl
+ * http://ec.europa.eu/idabc/eupl
  *
- *  Unless required by applicable law or agreed to in
- *  writing, software distributed under the Licence is
- *  distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- *  express or implied.
- *  See the Licence for the specific language governing
- *  permissions and limitations under the Licence.
+ * Unless required by applicable law or agreed to in
+ * writing, software distributed under the Licence is
+ * distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied.
+ * See the Licence for the specific language governing
+ * permissions and limitations under the Licence.
  */
 
 package eu.delving.sip.xml;
@@ -44,7 +44,7 @@ import java.util.Map;
  * Analyze xml input and compile statistics. When analysis fails, the .error will be appended to the filename
  * of the erroneous file.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 
@@ -88,7 +88,7 @@ public class AnalysisParser implements Runnable {
                     sourceFormat = true;
                     break;
                 default:
-                    throw new IllegalStateException("Expected one of two states. See the code here.");
+                    throw new IllegalStateException("Unexpected state: "+dataSet.getState());
             }
             XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
             StringBuilder text = new StringBuilder();
@@ -145,11 +145,14 @@ public class AnalysisParser implements Runnable {
                 File renamedTo = null;
                 switch (dataSet.getState()) {
                     case IMPORTED:
+                    case DELIMITED:
                         renamedTo = dataSet.renameInvalidImport();
                         break;
                     case SOURCED:
                         renamedTo = dataSet.renameInvalidSource();
                         break;
+                    default:
+                        throw new IllegalStateException("Unexpected state "+dataSet.getState());
                 }
                 listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
             }

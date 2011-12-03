@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011 DELVING BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -47,7 +47,7 @@ import static org.junit.Assert.*;
 /**
  * Make sure the storage is working
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class TestStorage {
@@ -113,8 +113,9 @@ public class TestStorage {
         dataSet().importedToSource(null);
         assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
 
+        assertEquals(SOURCED, dataSet().getState());
         analyze();
-        assertEquals("Should be imported, hints, 2 stats, and source", 5, mock.files().length);
+        assertEquals("Should be imported, hints, 2 stats, and source: "+mock.files(), 5, mock.files().length);
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
         statistics = dataSet().getLatestStatistics();
@@ -197,20 +198,20 @@ public class TestStorage {
             @Override
             public void success(Statistics statistics) {
                 try {
-                    dataSet().setStatistics(statistics);
-                    statsTree = statistics.createAnalysisTree();
-                    analysisTreeModel = new DefaultTreeModel(statsTree.getRoot());
                     Path recordRoot = null;
                     switch (dataSet().getState()) {
-                        case ANALYZED_IMPORT:
+                        case IMPORTED:
                             recordRoot = new Path("/adlibXML/recordList/record");
                             break;
-                        case ANALYZED_SOURCE:
+                        case SOURCED:
                             recordRoot = Storage.RECORD_ROOT;
                             break;
                         default:
-                            Assert.fail("strange state " + dataSet().getState());
+                            Assert.fail("Unexpected state " + dataSet().getState());
                     }
+                    dataSet().setStatistics(statistics);
+                    statsTree = statistics.createAnalysisTree();
+                    analysisTreeModel = new DefaultTreeModel(statsTree.getRoot());
                     recordCount = StatsTree.setRecordRoot(analysisTreeModel, recordRoot);
                     statsTree.getVariables(variables);
                 }

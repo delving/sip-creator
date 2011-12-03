@@ -37,7 +37,7 @@ import java.io.File;
 /**
  * Upload files, after having seen the validation report
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class UploadAction extends AbstractAction {

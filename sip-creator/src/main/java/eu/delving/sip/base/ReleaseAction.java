@@ -33,7 +33,7 @@ import java.awt.event.KeyEvent;
 /**
  * Delete local copy and unlock on the hub
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class ReleaseAction extends AbstractAction {

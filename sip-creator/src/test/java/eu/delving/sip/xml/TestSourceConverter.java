@@ -36,7 +36,7 @@ import java.io.InputStream;
 /**
  * Make sure the source converter works as expected
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class TestSourceConverter {

@@ -42,7 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * An observable hole to put the current data set
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class DataSetModel implements RecDefModel {

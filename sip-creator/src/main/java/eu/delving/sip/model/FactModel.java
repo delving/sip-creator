@@ -31,7 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * An observable map, with knowledge of RecordMapping
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class FactModel {

@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Given an annotation processor, provide food for the JList to show fields
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class VariableListModel extends AbstractListModel {

@@ -37,48 +37,32 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.*;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.zip.GZIPOutputStream;
 
 import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
 import static eu.delving.sip.files.Storage.RECORD_TAG;
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.http.HttpStatus.*;
 
 /**
  * Harvest data files from OAI-PMH targets
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Harvestor implements Runnable {
-    private static final int CONNECTION_TIMEOUT = 1000*60*5;
+    private static final int CONNECTION_TIMEOUT = 1000 * 60 * 5;
+    private static final int TALK_DELAY = 1000 * 15;
     private static final Path RECORD_ROOT = new Path("/OAI-PMH/ListRecords/record");
     private static final Path ERROR = new Path("/OAI-PMH/error");
     private static final Path RESUMPTION_TOKEN = new Path("/OAI-PMH/ListRecords/resumptionToken");
@@ -102,41 +86,14 @@ public class Harvestor implements Runnable {
      */
     public interface Listener {
 
-        /**
-         * The harvesting process is finished.
-         *
-         * @param cancelled True if cancelled.
-         */
         void finished(boolean cancelled);
 
-        /**
-         * Inform about the number of processed records.
-         *
-         * @param count The record count.
-         */
         void progress(int count);
 
-        /**
-         * Notify the user.
-         *
-         * @param message The message.
-         */
         void tellUser(String message);
 
-        /**
-         * Error while harvesting.
-         *
-         * @param message   The description of the error.
-         * @param exception The thrown exception.
-         */
         void failed(String message, Exception exception);
 
-        /**
-         * Error while harvesting.
-         *
-         * @param message The description of the error.
-         */
-        void failed(String message);
     }
 
     public void setListener(Listener listener) {
@@ -173,14 +130,21 @@ public class Harvestor implements Runnable {
         if (!okValue(context.harvestPrefix(), "Harvest Metadata Prefix")) return;
         if (!prepareOutput()) return;
         try {
+            listener.tellUser("Starting harvest");
             listener.progress(recordCount);
             HttpEntity fetchedRecords = fetchFirstEntity();
             String resumptionToken = saveRecords(fetchedRecords, out);
+            listener.tellUser(String.format("first resumption token \"%s\" received", resumptionToken));
+            long time = System.currentTimeMillis();
             while (isValidResumptionToken(resumptionToken) && recordCount > 0 && !cancelled) {
                 EntityUtils.consume(fetchedRecords);
                 listener.progress(recordCount);
                 fetchedRecords = fetchNextEntity(resumptionToken);
                 resumptionToken = saveRecords(fetchedRecords, out);
+                if (System.currentTimeMillis() - time > TALK_DELAY) {
+                    listener.tellUser(String.format("So far %d records", recordCount));
+                    time = System.currentTimeMillis();
+                }
                 if (!isValidResumptionToken(resumptionToken) && recordCount > 0) {
                     EntityUtils.consume(fetchedRecords);
                 }
@@ -352,7 +316,7 @@ public class Harvestor implements Runnable {
         try {
             tempFile = File.createTempFile(context.outputFile().getName(), ".tmp");
             log.info(String.format("Opening temporary output file '%s'", tempFile));
-            outputStream = new FileOutputStream(tempFile);
+            outputStream = new GZIPOutputStream(new FileOutputStream(tempFile));
             out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             out.add(eventFactory.createStartDocument());
             out.add(eventFactory.createCharacters("\n"));
@@ -391,7 +355,9 @@ public class Harvestor implements Runnable {
         }
         String message = String.format("Copying temp file %s to %s", tempFile, context.outputFile());
         log.info(message);
-        FileUtils.moveFile(tempFile, context.outputFile());
+        File outputFile = context.outputFile();
+        FileUtils.deleteQuietly(outputFile);
+        FileUtils.moveFile(tempFile, outputFile);
         listener.finished(false);
     }
 

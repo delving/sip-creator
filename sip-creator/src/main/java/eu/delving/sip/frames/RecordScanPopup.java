@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class RecordScanPopup extends FrameBase {

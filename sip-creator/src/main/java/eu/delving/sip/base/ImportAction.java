@@ -43,7 +43,7 @@ import java.util.Map;
 /**
  * Import a new file
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class ImportAction extends AbstractAction {

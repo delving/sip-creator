@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * The menu for choosing from local data sets.
  *
- * @author Gerald de Jong, Beautiful Code BV, <geralddejong@gmail.com>
+ * @author Gerald de Jong, Beautiful Code BV, <gerald@delving.eu>
  */
 
 public class DataSetMenu extends JMenu {

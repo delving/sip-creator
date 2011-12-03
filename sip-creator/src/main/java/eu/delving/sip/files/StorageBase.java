@@ -37,7 +37,7 @@ import static eu.delving.sip.files.Storage.*;
 /**
  * This class contains helpers for the StorageImpl to lean on
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class StorageBase {

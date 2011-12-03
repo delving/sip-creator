@@ -47,7 +47,7 @@ import java.io.File;
 /**
  * The main application
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Application {

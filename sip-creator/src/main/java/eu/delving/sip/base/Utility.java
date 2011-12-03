@@ -34,7 +34,7 @@ import java.net.URL;
 /**
  * Help with SpringLayout forms
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Utility {
