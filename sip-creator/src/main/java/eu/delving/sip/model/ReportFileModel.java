@@ -27,13 +27,13 @@ import eu.delving.metadata.RecordMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.AbstractListModel;
+import javax.swing.*;
 import java.util.List;
 
 /**
  * A list model for showing the contents of the validation file
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class ReportFileModel extends AbstractListModel implements MappingModel.Listener {

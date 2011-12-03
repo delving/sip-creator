@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * This interface describes how files are maintained by the sip-creator
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public interface Storage {

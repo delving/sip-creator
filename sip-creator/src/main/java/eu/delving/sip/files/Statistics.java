@@ -34,7 +34,7 @@ import java.util.List;
  * Gather all the statistics together, identifying whether they are from imported or source.  Also convert one
  * to the other.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Statistics implements Serializable {
