@@ -50,8 +50,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
-import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
-import static eu.delving.sip.files.Storage.RECORD_TAG;
+import static eu.delving.sip.files.Storage.*;
 import static org.apache.http.HttpStatus.*;
 
 /**
@@ -200,7 +199,7 @@ public class Harvestor implements Runnable {
                     else if (path.equals(RECORD_ROOT)) {
                         if (namespaceCollector != null) {
                             namespaceCollector.gatherFrom(start);
-                            out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, namespaceCollector.iterator()));
+                            out.add(eventFactory.createStartElement("", "", HARVEST_TAG, null, namespaceCollector.iterator()));
                             out.add(eventFactory.createCharacters("\n"));
                             namespaceCollector = null;
                         }
