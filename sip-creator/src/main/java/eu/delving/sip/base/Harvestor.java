@@ -194,16 +194,13 @@ public class Harvestor implements Runnable {
                 case XMLEvent.START_ELEMENT:
                     StartElement start = event.asStartElement();
                     path.push(Tag.element(start.getName()));
+                    if (namespaceCollector != null) {
+                        namespaceCollector.gatherFrom(start);
+                    }
                     if (!recordEvents.isEmpty()) {
                         recordEvents.add(event);
                     }
                     else if (path.equals(RECORD_ROOT)) {
-                        if (namespaceCollector != null) {
-                            namespaceCollector.gatherFrom(start);
-                            out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, namespaceCollector.iterator()));
-                            out.add(eventFactory.createCharacters("\n"));
-                            namespaceCollector = null;
-                        }
                         recordEvents.add(eventFactory.createCharacters("\n")); // flag that record has started
                     }
                     else if (path.equals(RESUMPTION_TOKEN)) {
@@ -220,10 +217,13 @@ public class Harvestor implements Runnable {
                 case XMLEvent.END_ELEMENT:
                     if (!recordEvents.isEmpty()) {
                         if (path.equals(RECORD_ROOT)) {
-                            out.add(eventFactory.createStartElement("", "", RECORD_TAG, null, null));
-                            for (XMLEvent saved : recordEvents) {
-                                out.add(saved);
+                            if (namespaceCollector != null) {
+                                out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, namespaceCollector.iterator()));
+                                out.add(eventFactory.createCharacters("\n"));
+                                namespaceCollector = null;
                             }
+                            out.add(eventFactory.createStartElement("", "", RECORD_TAG, null, null));
+                            for (XMLEvent saved : recordEvents) out.add(saved);
                             out.add(eventFactory.createEndElement("", "", RECORD_TAG));
                             out.add(eventFactory.createCharacters("\n"));
                             recordEvents.clear();
@@ -374,6 +374,14 @@ public class Harvestor implements Runnable {
 
         public Iterator iterator() {
             return map.values().iterator();
+        }
+
+        public String toString() {
+            StringBuilder out = new StringBuilder();
+            for (Namespace ns : map.values()) {
+                out.append(String.format("%s : %s : %s\n", ns.getName(), ns.getPrefix(), ns.getNamespaceURI()));
+            }
+            return out.toString();
         }
     }
 
