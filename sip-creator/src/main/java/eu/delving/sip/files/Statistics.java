@@ -25,10 +25,9 @@ import eu.delving.metadata.AnalysisTree;
 import eu.delving.metadata.FieldStatistics;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Gather all the statistics together, identifying whether they are from imported or source.  Also convert one
@@ -39,19 +38,25 @@ import java.util.List;
 
 public class Statistics implements Serializable {
     private boolean sourceFormat;
-    private List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>();
+    private Map<String, String> namespaces;
+    private List<FieldStatistics> fieldStatisticsList;
 
-    public Statistics(Collection<FieldStatistics> statsList, boolean sourceFormat) {
+    public Statistics(Map<String,String> namespaces, List<FieldStatistics> fieldStatisticsList, boolean sourceFormat) {
         this.sourceFormat = sourceFormat;
-        fieldStatisticsList.addAll(statsList);
-        Collections.sort(fieldStatisticsList);
-        for (FieldStatistics fieldStatistics : fieldStatisticsList) {
+        this.namespaces = namespaces;
+        this.fieldStatisticsList = fieldStatisticsList;
+        Collections.sort(this.fieldStatisticsList);
+        for (FieldStatistics fieldStatistics : this.fieldStatisticsList) {
             fieldStatistics.finish();
         }
     }
 
     public boolean isSourceFormat() {
         return sourceFormat;
+    }
+
+    public Map<String, String> getNamespaces() {
+        return namespaces;
     }
 
     public AnalysisTree createAnalysisTree() {
@@ -69,6 +74,4 @@ public class Statistics implements Serializable {
         }
         return total;
     }
-
-
 }
