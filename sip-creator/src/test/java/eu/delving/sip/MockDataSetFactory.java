@@ -103,7 +103,9 @@ public class MockDataSetFactory {
         fieldStatistics.recordValue("booger");
         fieldStatistics.finish();
         stats.add(fieldStatistics);
-        return new Statistics(stats, false);
+        Map<String,String> namespaces = new TreeMap<String, String>();
+        // todo: add some
+        return new Statistics(namespaces, stats, false);
     }
 
     public void delete() {
