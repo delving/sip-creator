@@ -501,7 +501,8 @@ public class StorageImpl extends StorageBase implements Storage {
                 Path recordRoot = getRecordRoot(hints);
                 int recordCount = getRecordCount(hints);
                 Path uniqueElement = getUniqueElement(hints);
-                SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement);
+                Statistics statistics = getStatistics(false);
+                SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement, statistics.getNamespaces());
                 converter.setProgressListener(progressListener);
                 Hasher hasher = new Hasher();
                 DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, FileType.SOURCE.getName())));
