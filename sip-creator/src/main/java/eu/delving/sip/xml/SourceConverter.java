@@ -85,13 +85,16 @@ public class SourceConverter {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-        boolean envelope = false;
         try {
             while (!finished) {
                 XMLEvent event = in.nextEvent();
                 switch (event.getEventType()) {
                     case XMLEvent.START_DOCUMENT:
                         out.add(eventFactory.createStartDocument());
+                        out.add(eventFactory.createCharacters("\n"));
+                        List<Namespace> nslist = new ArrayList<Namespace>();
+                        for (Map.Entry<String,String> entry : namespaces.entrySet()) nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
+                        out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
                         out.add(eventFactory.createCharacters("\n"));
                         break;
                     case XMLEvent.START_ELEMENT:
@@ -102,13 +105,6 @@ public class SourceConverter {
                             eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
                         }
                         else if (path.equals(recordRootPath)) {
-                            if (!envelope) {
-                                List<Namespace> nslist = new ArrayList<Namespace>();
-                                for (Map.Entry<String,String> entry : namespaces.entrySet()) nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
-                                out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
-                                out.add(eventFactory.createCharacters("\n"));
-                                envelope = true;
-                            }
                             eventBuffer.add(eventFactory.createCharacters("\n")); // nonempty: flag that record has started
                             handleRecordAttributes(start);
                             if (progressListener != null) progressListener.setProgress(recordCount);
