@@ -175,7 +175,7 @@ public class RecDefNode {
     }
 
     public String getDictionaryName() {
-        return "Dictionary"; // todo: based on path somehow
+        return "procrastinate"; // todo: based on path somehow
     }
 
     public void toCode(Path path, RecDefTree.Out out, Path selectedPath, String editedCode) {
@@ -200,6 +200,9 @@ public class RecDefNode {
                 else {
                     out.line(String.format("%s(%s) {", getTag(), attributes));
                 }
+                if (nodeMapping != null) {
+                    nodeMapping.toCode(out, editedCode);
+                }
                 for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(path, out, selectedPath, editedCode);
                 out.line("}");
                 out.after();
@@ -209,13 +212,14 @@ public class RecDefNode {
 
     private String getAttributes() {
         StringBuilder attrs = new StringBuilder();
-        for (RecDefNode sub : children)
+        for (RecDefNode sub : children) {
             if (sub.isAttr() && sub.getNodeMapping() != null) {
                 if (attrs.length() > 0) attrs.append(", ");
-                NodeMapping mapping = sub.getNodeMapping();
-                String value = mapping.getGroovyCode(0);
-                attrs.append(sub.getTag().getLocalName()).append(":\"").append("something").append('"'); // todo: use value
+                NodeMapping subNodeMapping = sub.getNodeMapping();
+                String value = subNodeMapping.toAttributeValue();
+                attrs.append(sub.getTag().getLocalName()).append(":{ ").append(value).append(" }");
             }
+        }
         return attrs.toString();
     }
 

@@ -28,9 +28,7 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Make sure the right code is being generated
@@ -53,6 +51,11 @@ public class TestCodeGeneration {
         Assert.assertNotNull(recDefNode);
         recDefNode.setNodeMapping(new NodeMapping());
         recMapping.setFact("dogExists", "true");
+        recDefNode = recMapping.getRecDefTree().getRecDefNode(new Path("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term"));
+        recDefNode.setNodeMapping(new NodeMapping());
+        Map<String,String> dictionary = new TreeMap<String, String>();
+        dictionary.put("delving", "rulez");
+        recDefNode.getNodeMapping().dictionary = dictionary;
         String code = recMapping.toCode(null, null);
         System.out.println(code);
     }

@@ -89,6 +89,7 @@ public class RecDefTree implements RecDefNode.Listener {
     public String toCode(Map<String, String> facts, Path selectedPath, String editedCode) {
         Out out = new Out();
         out.line("// SIP-Creator Generated Mapping Code");
+        out.line("// ----------------------------------");
         out.line("// Facts:");
         for (Map.Entry<String, String> factEntry : facts.entrySet()) {
             out.line(String.format("def %s = '''%s'''",
@@ -98,6 +99,7 @@ public class RecDefTree implements RecDefNode.Listener {
         }
         out.line("// Dictionaries:");
         for (RecDefNode node : getNodesWithMappings()) generateDictionary(node, out);
+        out.line("// Builder:");
         out.line("use (MappingCategory) { output.");
         root.toCode(new Path(), out, selectedPath, editedCode);
         out.line("}");
@@ -120,25 +122,20 @@ public class RecDefTree implements RecDefNode.Listener {
         }
         out.after();
         out.line("]");
-        out.line("// lookup closure:");
-        out.line("def $s_lookup = { value =>");
+        out.line("def $s_lookup = { value =>", name);
         out.before();
-        out.line("if (value) {");
+        out.line("if (!value) { '' } else {");
         out.before();
         out.line("def v = %s_Dictionary[value.sanitize()];", name);
-        out.line("if (v) {");
+        out.line("if (!v) { '' } else {");
         out.before();
-        out.line("if (v.endsWith(':')) {");
+        out.line("if (!v.endsWith(':')) { v } else {");
         out.before();
         out.line("\"${v} ${value}\"");
         out.after();
         out.line("}");
-        out.line("else { v }");
-        out.line("}");
-        out.line("else { '' }");
         out.after();
         out.line("}");
-        out.line("else { '' }");
         out.after();
         out.line("}");
         out.after();

@@ -101,46 +101,6 @@ public class NodeMapping {
         return !walk.hasNext();
     }
 
-    public String getDictionaryCode(String name) {
-        StringBuilder out = new StringBuilder();
-        if (dictionary != null) {
-            out.append(String.format("def %s_Dictionary = [\n", name));
-            Iterator<Map.Entry<String, String>> walk = dictionary.entrySet().iterator();
-            while (walk.hasNext()) {
-                Map.Entry<String, String> entry = walk.next();
-                out.append(String.format(
-                        INDENT + "'''%s''':'''%s'''%s\n",
-                        Sanitizer.sanitizeGroovy(entry.getKey()),
-                        Sanitizer.sanitizeGroovy(entry.getValue()),
-                        walk.hasNext() ? "," : ""
-                ));
-            }
-            out.append("]\n");
-            out.append(String.format("def %s_lookup = { value -> \n" +
-                    "    if (value) {\n" +
-                    "        def v = %s_Dictionary[value.sanitize()];\n" +
-                    "        if (v) {\n" +
-                    "           if (v.endsWith(':')) {\n" +
-                    "               \"${v} ${value}\"\n" +
-                    "           }\n" +
-                    "           else {\n" +
-                    "               v\n" +
-                    "           }\n" +
-                    "        }\n" +
-                    "        else {\n" +
-                    "           ''\n" +
-                    "        }\n" +
-                    "    }\n" +
-                    "    else {\n" +
-                    "        ''\n" +
-                    "    }\n" +
-                    "}\n",
-                    name, name
-            ));
-        }
-        return out.toString();
-    }
-
     public void setGroovyCode(String groovyCode) {
         this.groovyCode = null;
         for (String line : groovyCode.split("\n")) {
@@ -148,25 +108,27 @@ public class NodeMapping {
         }
     }
 
-    public String getGroovyCode(int indent) {
-        StringBuilder out = new StringBuilder();
-        if (groovyCode != null) {
-            for (String line : groovyCode) {
-                if (codeIndent(line) < 0) {
-                    indent--;
-                }
-                for (int tab = 0; tab < indent; tab++) out.append(INDENT);
-                out.append(line);
-                if (codeIndent(line) > 0) {
-                    indent++;
-                }
+    public void toCode(RecDefTree.Out out, String editedCode) {
+        if (dictionary != null) {
+            out.before();
+            out.line("//lookup in dictionary!");
+            out.after();
+        }
+        else if (groovyCode != null) {
+            for (String codeLine : groovyCode) {
+                if (codeIndent(codeLine) < 0) out.after();
+                out.line(codeLine);
+                if (codeIndent(codeLine) > 0) out.before();
             }
         }
-        return out.toString();
+    }
+
+    public String toAttributeValue() {
+        return "AttributeValue";
     }
 
     public String toString() {
-        return getGroovyCode(0);
+        return outputPath.toString();
     }
 
     private static int codeIndent(String line) {
@@ -182,13 +144,6 @@ public class NodeMapping {
             }
         }
         return indent;
-    }
-
-    public void toCode(RecDefTree.Out out, String editedCode) {
-        out.before();
-        // todo: either wrap the edited code or use ours
-        out.line("implement!");
-        out.after();
     }
 }
 
