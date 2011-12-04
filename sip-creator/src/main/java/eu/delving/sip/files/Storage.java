@@ -88,6 +88,7 @@ public interface Storage {
         }
     }
 
+    String HARVEST_TAG = "delving-harvest";
     String ENVELOPE_TAG = "delving-sip-source";
     String UNIQUE_TAG = "_id";
     String RECORD_TAG = "input";
