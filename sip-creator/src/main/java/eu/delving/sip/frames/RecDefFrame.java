@@ -53,7 +53,6 @@ public class RecDefFrame extends FrameBase {
         RecDefNode root;
         try {
             recDef = RecDef.read(getClass().getResource("/lido-recdef.xml").openStream());
-            recDef.resolve();
             root = RecDefNode.create(new Ear(), recDef);
         }
         catch (IOException e) {

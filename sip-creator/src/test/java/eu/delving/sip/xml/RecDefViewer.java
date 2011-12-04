@@ -305,7 +305,6 @@ public class RecDefViewer extends JFrame {
 
     public static void main(String[] args) throws IOException {
         RecDef recDef = RecDef.read(RecDefViewer.class.getResource("/lido-recdef.xml").openStream());
-        recDef.resolve();
         RecDefViewer viewer = new RecDefViewer(recDef);
         viewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         viewer.setVisible(true);

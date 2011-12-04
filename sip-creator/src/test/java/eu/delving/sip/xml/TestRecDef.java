@@ -14,7 +14,6 @@ public class TestRecDef {
     @Test
     public void readIn() throws IOException {
         RecDef recDef = RecDef.read(getClass().getResource("/lido-recdef.xml").openStream());
-        recDef.resolve();
         StringBuilder out = new StringBuilder();
         recDef.print(out);
         System.out.println("gives\n" + out);

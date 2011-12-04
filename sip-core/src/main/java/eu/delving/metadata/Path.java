@@ -91,6 +91,7 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     public boolean isAncestorOf(Path other) {
+        if (other == null) return false;
         Iterator<Tag> walkThis = stack.iterator();
         Iterator<Tag> walkOther = other.stack.iterator();
         while (walkThis.hasNext()) {

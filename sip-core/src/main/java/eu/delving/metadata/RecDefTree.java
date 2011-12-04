@@ -99,9 +99,7 @@ public class RecDefTree implements RecDefNode.Listener {
         out.line("// Dictionaries:");
         for (RecDefNode node : getNodesWithMappings()) generateDictionary(node, out);
         out.line("use (MappingCategory) { output.");
-        out.before();
         root.toCode(new Path(), out, selectedPath, editedCode);
-        out.after();
         out.line("}");
         return out.toString();
     }
@@ -172,11 +170,11 @@ public class RecDefTree implements RecDefNode.Listener {
         }
 
         public void before() {
-            indentLevel--;
+            indentLevel++;
         }
 
         public void after() {
-            indentLevel++;
+            indentLevel--;
         }
 
         @Override

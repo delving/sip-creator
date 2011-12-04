@@ -68,11 +68,16 @@ public class RecDef {
     public static RecDef read(InputStream in) {
         try {
             Reader inReader = new InputStreamReader(in, "UTF-8");
-            return (RecDef) stream().fromXML(inReader);
+            RecDef recDef = (RecDef) stream().fromXML(inReader);
+            recDef.resolve();
+            return recDef;
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private RecDef() {
     }
 
     @XStreamAsAttribute
@@ -110,13 +115,6 @@ public class RecDef {
         throw new RuntimeException(String.format("No elem [%s]", tag));
     }
 
-    public void resolve() {
-        root.resolve(this);
-        for (Doc doc : docs) doc.resolve(this);
-        for (Category category : bookmarks) category.resolve(this);
-        for (OptionList optionList : options) optionList.resolve(this);
-    }
-
     public void print(StringBuilder out) {
         root.print(out, 0);
     }
@@ -128,6 +126,13 @@ public class RecDef {
         StringBuilder out = new StringBuilder();
         for (Path p : paths) out.append(p.toString()).append('\n');
         return out.toString();
+    }
+
+    private void resolve() {
+        root.resolve(this);
+        for (Doc doc : docs) doc.resolve(this);
+        for (Category category : bookmarks) category.resolve(this);
+        for (OptionList optionList : options) optionList.resolve(this);
     }
 
     private void collectPaths(Elem elem, Path path, List<Path> paths) {

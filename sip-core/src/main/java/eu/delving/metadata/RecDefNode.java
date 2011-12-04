@@ -187,11 +187,36 @@ public class RecDefNode {
             nodeMapping.toCode(out, editedCode);
             out.after();
         }
-        else if (path.isAncestorOf(selectedPath)) {
-            out.before();
-            for (RecDefNode sub : children) sub.toCode(path, out, selectedPath, editedCode);
-            out.after();
+        else if (selectedPath == null || path.isAncestorOf(selectedPath)) {
+            if (isAttr()) {
+
+            }
+            else {
+                out.before();
+                String attributes = getAttributes();
+                if (attributes.isEmpty()) {
+                    out.line(String.format("%s {", getTag()));
+                }
+                else {
+                    out.line(String.format("%s(%s) {", getTag(), attributes));
+                }
+                for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(path, out, selectedPath, editedCode);
+                out.line("}");
+                out.after();
+            }
         }
+    }
+
+    private String getAttributes() {
+        StringBuilder attrs = new StringBuilder();
+        for (RecDefNode sub : children)
+            if (sub.isAttr() && sub.getNodeMapping() != null) {
+                if (attrs.length() > 0) attrs.append(", ");
+                NodeMapping mapping = sub.getNodeMapping();
+                String value = mapping.getGroovyCode(0);
+                attrs.append(sub.getTag().getLocalName()).append(":\"").append("something").append('"'); // todo: use value
+            }
+        return attrs.toString();
     }
 
     public String toString() {
