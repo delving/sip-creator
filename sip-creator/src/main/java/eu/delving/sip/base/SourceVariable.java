@@ -22,6 +22,8 @@
 package eu.delving.sip.base;
 
 import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.Tag;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -36,11 +38,10 @@ public class SourceVariable implements Comparable<SourceVariable> {
     private StatsTreeNode node;
     private String variableName;
     private Set<String> attributeNames = new TreeSet<String>();
-    private int mappingCount;
 
     public SourceVariable(StatsTreeNode node) {
         this.node = node;
-        this.variableName = node.getVariableName();
+        this.variableName = Filter.pathToVariable(node.getPath());
         for (StatsTreeNode child : node.getChildNodes()) {
             if (child.getTag().isAttribute()) {
                 attributeNames.add(child.getTag().toString());
@@ -50,12 +51,6 @@ public class SourceVariable implements Comparable<SourceVariable> {
 
     public Set<String> getAttributeNames() {
         return attributeNames;
-    }
-
-    public void checkIfMapped(String variableName) {
-        if (this.variableName.equals(variableName)) {
-            mappingCount++;
-        }
     }
 
     public StatsTreeNode getNode() {
@@ -68,36 +63,13 @@ public class SourceVariable implements Comparable<SourceVariable> {
 
     public String toString() {
         StringBuilder out = new StringBuilder(variableName);
-        if (!attributeNames.isEmpty()) {
-            out.append(attributeNames);
-        }
-        switch (mappingCount) {
-            case 0:
-                break;
-            case 1:
-                out.append(" (mapped once)");
-                break;
-            case 2:
-                out.append(" (mapped twice)");
-                break;
-            default:
-                out.append(" (mapped ").append(mappingCount).append(" times)");
-                break;
-        }
+        if (!attributeNames.isEmpty()) out.append(attributeNames);
         return out.toString();
     }
 
     @Override
     public int compareTo(SourceVariable o) {
-        if (mappingCount > o.mappingCount) {
-            return 11;
-        }
-        else if (mappingCount < o.mappingCount) {
-            return -1;
-        }
-        else {
-            return node.compareTo(o.node);
-        }
+        return node.compareTo(o.node);
     }
 
     public boolean hasStatistics() {
@@ -136,8 +108,9 @@ public class SourceVariable implements Comparable<SourceVariable> {
                         + "."
                         + ":";
 
-        public static String tagToVariable(String s) {
-            if (s == null) return null;
+        private static String tagToVariable(Tag tag) {
+            if (tag == null) return null;
+            String s = tag.toString();
             StringBuilder sb = new StringBuilder();
             int n = s.length();
             for (int i = 0; i < n; i++) {
@@ -149,6 +122,32 @@ public class SourceVariable implements Comparable<SourceVariable> {
                 else {
                     sb.append(c);
                 }
+            }
+            return sb.toString();
+        }
+
+        private static String pathToVariable(Path path) {
+            String s = path.toString();
+            StringBuilder sb = new StringBuilder();
+            int n = s.length();
+            for (int i = 1; i < n; i++) {
+                char c = s.charAt(i);
+                if (c == '/') {
+                    sb.append(".");
+                }
+                else if (c == ':') {
+                    sb.append('_');
+                }
+                else {
+                    int pos = UNICODE.indexOf(c);
+                    if (pos > -1) {
+                        sb.append(PLAIN_ASCII.charAt(pos));
+                    }
+                    else {
+                        sb.append(c);
+                    }
+                }
+
             }
             return sb.toString();
         }

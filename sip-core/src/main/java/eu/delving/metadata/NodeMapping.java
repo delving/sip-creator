@@ -66,6 +66,11 @@ public class NodeMapping {
         this.outputPath = recDefNode.getPath();
     }
 
+    public NodeMapping setInputPath(Path inputPath) {
+        this.inputPath = inputPath;
+        return this;
+    }
+
     public void clearDictionary() {
         dictionary = null;
     }
@@ -115,7 +120,7 @@ public class NodeMapping {
     public void toCode(RecDefTree.Out out, String editedCode) {
         if (dictionary != null) {
             out.before();
-            out.line("%s_lookup(%s)", getDictionaryName(), "it"); // todo: param names won't be it everywhere
+            out.line("lookup%s(%s)", getDictionaryName(), "it"); // todo: param names won't be it everywhere
             out.after();
         }
         else if (groovyCode != null) {
@@ -130,7 +135,7 @@ public class NodeMapping {
     public void generateDictionaryCode(RecDefTree.Out out) {
         if (dictionary == null) return;
         String name = getDictionaryName();
-        out.line(String.format("def %s_Dictionary = [", name));
+        out.line(String.format("def dictionary%s = [", name));
         out.before();
         Iterator<Map.Entry<String, String>> walk = dictionary.entrySet().iterator();
         while (walk.hasNext()) {
@@ -143,22 +148,27 @@ public class NodeMapping {
         }
         out.after();
         out.line("]");
-        out.line("def $s_lookup = { value =>", name);
+        out.line("def lookup%s = { value =>", name);
         out.before();
-        out.line("if (!value) { '' } else {");
+        out.line("if (value) {");
         out.before();
-        out.line("def v = %s_Dictionary[value.sanitize()];", name);
-        out.line("if (!v) { '' } else {");
+        out.line("def v = dictionary%s[value.sanitize()];", name);
+        out.line("if (v) {");
         out.before();
-        out.line("if (!v.endsWith(':')) { v } else {");
+        out.line("if (v.endsWith(':')) {");
         out.before();
-        out.line("\"${v} ${value}\"");
+        out.line("return \"${v} ${value}\"");
+        out.after();
+        out.line("} else {");
+        out.before();
+        out.line("return v");
         out.after();
         out.line("}");
         out.after();
         out.line("}");
         out.after();
         out.line("}");
+        out.line("return ''");
         out.after();
         out.line("}");
     }
@@ -189,5 +199,6 @@ public class NodeMapping {
         }
         return indent;
     }
+
 }
 

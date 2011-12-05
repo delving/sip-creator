@@ -26,15 +26,16 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * A node of the analysis tree
@@ -141,27 +142,6 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         return false;
     }
 
-    public String getVariableName() {
-        if (tag.isAttribute()) throw new RuntimeException("Should never ask an attribute for its variable name");
-        List<StatsTreeNode> path = new ArrayList<StatsTreeNode>();
-        StatsTreeNode node = this;
-        while (node != null && !node.isRecordRoot()) {
-            path.add(node);
-            node = node.parent;
-        }
-        Collections.reverse(path);
-        StringBuilder out = new StringBuilder("input.");
-        Iterator<StatsTreeNode> nodeWalk = path.iterator();
-        while (nodeWalk.hasNext()) {
-            String nodeName = nodeWalk.next().tag.toString();
-            out.append(SourceVariable.Filter.tagToVariable(nodeName));
-            if (nodeWalk.hasNext()) {
-                out.append('.');
-            }
-        }
-        return out.toString();
-    }
-
     public void showPath(final JTree tree, final Path pathToShow) {
         final Path here = getPath();
         Timer timer = new Timer(30, new ActionListener() {
@@ -229,7 +209,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     @Override
     public int compareTo(StatsTreeNode other) {
-        return getVariableName().compareTo(other.getVariableName());
+        return getPath().compareTo(other.getPath());
     }
 
     public String toString() {
