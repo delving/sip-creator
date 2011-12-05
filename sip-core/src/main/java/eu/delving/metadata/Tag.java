@@ -47,10 +47,12 @@ public class Tag implements Comparable<Tag>, Serializable {
     }
 
     public static Tag element(String prefix, String localName) {
+        if (localName.contains(":")) return attribute(localName);
         return new Tag(false, prefix, localName);
     }
 
     public static Tag attribute(String prefix, String localName) {
+        if (localName.contains(":")) return attribute(localName);
         return new Tag(true, prefix, localName);
     }
 
@@ -94,6 +96,7 @@ public class Tag implements Comparable<Tag>, Serializable {
         if (prefix != null && prefix.isEmpty()) {
             prefix = null;
         }
+        if (localName.indexOf(':') >= 0) throw new RuntimeException("localName has a colon: " + localName);
         this.attribute = attribute;
         this.prefix = prefix;
         this.localName = localName;
@@ -101,6 +104,15 @@ public class Tag implements Comparable<Tag>, Serializable {
 
     public boolean isAttribute() {
         return attribute;
+    }
+
+    public Tag defaultPrefix(String prefix) {
+        if (this.prefix == null) {
+            return attribute ? Tag.attribute(prefix, localName) : Tag.element(prefix, localName);
+        }
+        else {
+            return this;
+        }
     }
 
     public String getPrefix() {
@@ -147,6 +159,15 @@ public class Tag implements Comparable<Tag>, Serializable {
         int result = prefix != null ? prefix.hashCode() : 0;
         result = 31 * result + (localName != null ? localName.hashCode() : 0);
         return result;
+    }
+
+    public String toBuilderCall() {
+        if (prefix != null) {
+            return String.format("'%s:%s'", prefix, localName);
+        }
+        else {
+            return localName;
+        }
     }
 
     public String toPathElement() {

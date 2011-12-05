@@ -106,12 +106,18 @@ public class RecDef {
     }
 
     public Attr attr(Tag tag) {
-        for (Attr def : attrs) if (def.tag.equals(tag)) return def;
+        for (Attr def : attrs) {
+            def.tag = def.tag.defaultPrefix(prefix);
+            if (def.tag.equals(tag)) return def;
+        }
         throw new RuntimeException(String.format("No attr [%s]", tag));
     }
 
     public Elem elem(Tag tag) {
-        for (Elem def : elems) if (def.tag.equals(tag)) return def;
+        for (Elem def : elems) {
+            def.tag = def.tag.defaultPrefix(prefix);
+            if (def.tag.equals(tag)) return def;
+        }
         throw new RuntimeException(String.format("No elem [%s]", tag));
     }
 
@@ -187,6 +193,7 @@ public class RecDef {
         public Attr attr;
 
         public void resolve(RecDef recDef) {
+            path.defaultPrefix(recDef.prefix);
             this.elem = recDef.findElem(path);
             this.attr = recDef.findAttr(path);
             if (this.attr == null && this.elem == null) throw new RuntimeException("Cannot resolve " + path);
@@ -211,6 +218,7 @@ public class RecDef {
         public List<Opt> opts;
 
         public void resolve(RecDef recDef) {
+            path.defaultPrefix(recDef.prefix);
             Elem elem = recDef.findElem(path);
             if (elem == null) throw new RuntimeException("Cannot find path " + path);
             elem.options = opts;
@@ -247,6 +255,7 @@ public class RecDef {
 
         public void resolve(RecDef recDef) {
             if (lines == null) throw new RuntimeException("Lines is null for " + tag);
+            tag = tag.defaultPrefix(recDef.prefix);
             Elem elem = recDef.root.findElem(tag);
             Attr attr = recDef.root.findAttr(tag);
             if (elem == null && attr == null) throw new RuntimeException("Cannot find tag " + tag);
@@ -356,12 +365,13 @@ public class RecDef {
 
         public void resolve(RecDef recDef) {
             if (tag == null) throw new RuntimeException("Null tag!");
+            tag = tag.defaultPrefix(recDef.prefix);
             if (attrs != null) {
-                for (String tagString : attrs.split(DELIM)) attrList.add(recDef.attr(Tag.create(tagString)));
+                for (String localName : attrs.split(DELIM)) attrList.add(recDef.attr(Tag.attribute(recDef.prefix, localName)));
                 attrs = null;
             }
             if (elems != null) {
-                for (String tagString : elems.split(DELIM)) elemList.add(recDef.elem(Tag.create(tagString)));
+                for (String localName : elems.split(DELIM)) elemList.add(recDef.elem(Tag.element(recDef.prefix, localName)));
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(recDef);

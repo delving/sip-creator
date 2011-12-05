@@ -96,6 +96,13 @@ public class Path implements Comparable<Path>, Serializable {
         return extended;
     }
 
+    public Path defaultPrefix(String prefix) {
+        for (int walk=0; walk<size(); walk++) {
+            stack.set(walk, stack.get(walk).defaultPrefix(prefix));
+        }
+        return this;
+    }
+
     public void push(Tag tag) {
         stack.push(tag);
         string = null;

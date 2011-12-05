@@ -205,11 +205,11 @@ public class RecDefNode {
         boolean activeChildren = false;
         for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeChildren = true;
         if (activeChildren) {
-            out.line("%s (", getTag());
+            out.line("%s (", getTag().toBuilderCall());
             out.before();
             for (RecDefNode sub : children)
                 if (sub.isAttr() && sub.hasNodeMappings()) {
-                    out.line("%s : {", sub.getTag().toString().substring(1));
+                    out.line("%s : {", sub.getTag().toBuilderCall());
                     out.before();
                     sub.nodeMapping.toCode(out, "edited code?"); // todo
                     afterBrace(out);
@@ -218,13 +218,13 @@ public class RecDefNode {
             out.line(") {");
         }
         else {
-            out.line("%s {", getTag());
+            out.line("%s {", getTag().toBuilderCall());
         }
         out.before();
     }
 
     private void beforeLeaf(RecDefTree.Out out) {
-        out.line("%s { ", getTag());
+        out.line("%s { ", getTag().toBuilderCall());
         out.before();
     }
 

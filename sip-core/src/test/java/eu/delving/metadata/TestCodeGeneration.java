@@ -56,9 +56,7 @@ public class TestCodeGeneration {
     public void cornucopia() {
         recMapping.setFact("dogExists", "true");
 
-        NodeMapping order = node("/lidoWrap/lido/@sortorder").setNodeMapping(mapping("/leadup/@orderofsort"));
-        order.addCodeLine("// some groovy sort");
-
+        node("/lidoWrap/lido/@sortorder").setNodeMapping(mapping("/leadup/@orderofsort"));
         node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").setNodeMapping(mapping("/leadup/record/list"));
         node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").setNodeMapping(mapping("/leadup/record/list/member/@index"));
 
@@ -79,7 +77,7 @@ public class TestCodeGeneration {
     }
 
     private static RecDefNode node(String path) {
-        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(Path.create(path));
+        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(Path.create(path).defaultPrefix("lido"));
         Assert.assertNotNull(node);
         return node;
     }
