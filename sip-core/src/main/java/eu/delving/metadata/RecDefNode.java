@@ -185,25 +185,40 @@ public class RecDefNode {
             else {
                 beforeIteration(out);
                 beforeChildren(out);
-                for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
+                childElements(out, selectedPath, editedCode);
                 afterBrace(out);
                 afterBrace(out);
             }
         }
         else {
             beforeChildren(out);
-            for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
+            childElements(out, selectedPath, editedCode);
             afterBrace(out);
         }
     }
 
+    private void childElements(RecDefTree.Out out, Path selectedPath, String editedCode) {
+        for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
+    }
+
     private void beforeChildren(RecDefTree.Out out) {
-        String attributes = getAttributes();
-        if (attributes.isEmpty()) {
-            out.line(String.format("%s {", getTag()));
+        boolean activeChildren = false;
+        for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeChildren = true;
+        if (activeChildren) {
+            out.line("%s (", getTag());
+            out.before();
+            for (RecDefNode sub : children)
+                if (sub.isAttr() && sub.hasNodeMappings()) {
+                    out.line("%s : {", sub.getTag().toString().substring(1));
+                    out.before();
+                    sub.nodeMapping.toCode(out, "edited code?"); // todo
+                    afterBrace(out);
+                }
+            out.after();
+            out.line(") {");
         }
         else {
-            out.line(String.format("%s(%s) {", getTag(), attributes));
+            out.line("%s {", getTag());
         }
         out.before();
     }
