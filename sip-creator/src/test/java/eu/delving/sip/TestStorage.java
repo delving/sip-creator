@@ -201,7 +201,7 @@ public class TestStorage {
                     Path recordRoot = null;
                     switch (dataSet().getState()) {
                         case IMPORTED:
-                            recordRoot = new Path("/adlibXML/recordList/record");
+                            recordRoot = Path.create("/adlibXML/recordList/record");
                             break;
                         case SOURCED:
                             recordRoot = Storage.RECORD_ROOT;

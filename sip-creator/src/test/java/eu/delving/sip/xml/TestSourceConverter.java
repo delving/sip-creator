@@ -68,8 +68,8 @@ public class TestSourceConverter {
             "</sub-root>",
             "</the-root>",
     };
-    private static Path ROOT = new Path("/the-root/sub-root/we-are-in-record");
-    private static Path UNIQ = new Path("/the-root/sub-root/we-are-in-record/a:unique");
+    private static Path ROOT = Path.create("/the-root/sub-root/we-are-in-record");
+    private static Path UNIQ = Path.create("/the-root/sub-root/we-are-in-record/a:unique");
     private SourceConverter converter = new SourceConverter(ROOT, 2, UNIQ);
 
     @Test

@@ -93,7 +93,7 @@ public class RecordValidator {
     }
 
     private Path nodeToPath(Node node) {
-        Path path = new Path();
+        Path path = Path.empty();
         nodeToPath(node, path);
         return path;
     }

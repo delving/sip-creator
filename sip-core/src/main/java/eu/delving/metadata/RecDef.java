@@ -121,7 +121,7 @@ public class RecDef {
 
     public String toString() {
         List<Path> paths = new ArrayList<Path>();
-        Path path = new Path();
+        Path path = Path.empty();
         collectPaths(root, path, paths);
         StringBuilder out = new StringBuilder();
         for (Path p : paths) out.append(p.toString()).append('\n');

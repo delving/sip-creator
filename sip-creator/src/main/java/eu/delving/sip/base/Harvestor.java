@@ -63,9 +63,9 @@ import static org.apache.http.HttpStatus.*;
 public class Harvestor implements Runnable {
     private static final int CONNECTION_TIMEOUT = 1000 * 60 * 5;
     private static final int TALK_DELAY = 1000 * 15;
-    private static final Path RECORD_ROOT = new Path("/OAI-PMH/ListRecords/record");
-    private static final Path ERROR = new Path("/OAI-PMH/error");
-    private static final Path RESUMPTION_TOKEN = new Path("/OAI-PMH/ListRecords/resumptionToken");
+    private static final Path RECORD_ROOT = Path.create("/OAI-PMH/ListRecords/record");
+    private static final Path ERROR = Path.create("/OAI-PMH/error");
+    private static final Path RESUMPTION_TOKEN = Path.create("/OAI-PMH/ListRecords/resumptionToken");
     private Logger log = Logger.getLogger(getClass());
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
@@ -182,7 +182,7 @@ public class Harvestor implements Runnable {
     private String saveRecords(HttpEntity fetchedRecords, XMLEventWriter out) throws IOException, XMLStreamException {
         InputStream inputStream = fetchedRecords.getContent();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
-        Path path = new Path();
+        Path path = Path.empty();
         StringBuilder tokenBuilder = null;
         StringBuilder errorBuilder = null;
         String tokenValue = null;

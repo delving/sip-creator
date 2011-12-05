@@ -28,7 +28,10 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Make sure the right code is being generated
@@ -38,29 +41,43 @@ import java.util.*;
 
 public class TestCodeGeneration {
 
-    @Test
-    public void simple() {
-        RecMapping recMapping = RecMapping.create("lido", recDefModel());
+    static final RecMapping recMapping = RecMapping.create("lido", recDefModel());
+
+    static {
         recMapping.getRecDefTree().setListener(new RecDefNode.Listener() {
             @Override
             public void nodeMappingSet(RecDefNode recDefNode) {
-                System.out.println("Mapping set: "+recDefNode);
+                System.out.println("Mapping set: " + recDefNode);
             }
         });
-        RecDefNode recDefNode = recMapping.getRecDefTree().getRecDefNode(new Path("/lidoWrap/lido/@sortorder"));
-        Assert.assertNotNull(recDefNode);
-        recDefNode.setNodeMapping(new NodeMapping());
+    }
+
+    @Test
+    public void simple() {
         recMapping.setFact("dogExists", "true");
-        recDefNode = recMapping.getRecDefTree().getRecDefNode(new Path("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term"));
-        recDefNode.setNodeMapping(new NodeMapping());
-        Map<String,String> dictionary = new TreeMap<String, String>();
-        dictionary.put("delving", "rulez");
-        recDefNode.getNodeMapping().dictionary = dictionary;
+        NodeMapping order = node("/lidoWrap/lido/@sortorder").setNodeMapping(mapping("/leadup/@orderofsort"));
+        order.addCodeLine("// some groovy sort");
+        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").setNodeMapping(mapping("/leadup/record/list"));
+        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").setNodeMapping(mapping("/leadup/record/list/@index"));
+        RecDefNode termNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
+        NodeMapping term = termNode.setNodeMapping(mapping("/leadup/record/list/member"));
+        term.dictionary = new TreeMap<String, String>();
+        term.dictionary.put("delving", "rulez");
         String code = recMapping.toCode(null, null);
         System.out.println(code);
     }
 
-    private RecDefModel recDefModel() {
+    private static NodeMapping mapping(String path) {
+        return new NodeMapping().setInputPath(Path.create(path));
+    }
+
+    private static RecDefNode node(String path) {
+        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(Path.create(path));
+        Assert.assertNotNull(node);
+        return node;
+    }
+
+    private static RecDefModel recDefModel() {
         return new RecDefModel() {
             @Override
             public List<FactDefinition> getFactDefinitions() {

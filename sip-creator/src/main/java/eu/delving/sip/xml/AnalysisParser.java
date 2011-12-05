@@ -50,7 +50,7 @@ import java.util.Map;
 
 public class AnalysisParser implements Runnable {
     public static final int ELEMENT_STEP = 10000;
-    private Path path = new Path();
+    private Path path = Path.empty();
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
     private Listener listener;
     private DataSet dataSet;
@@ -166,7 +166,7 @@ public class AnalysisParser implements Runnable {
         value = value.trim();
         FieldStatistics fieldStatistics = statisticsMap.get(path);
         if (fieldStatistics == null) {
-            Path key = new Path(path);
+            Path key = path.copy();
             statisticsMap.put(key, fieldStatistics = new FieldStatistics(key));
         }
         if (!value.isEmpty()) {

@@ -161,7 +161,7 @@ public class RecDefTreeNode implements TreeNode {
         }
 
         public Path getTagPath() {
-            Path path = new Path();
+            Path path = Path.empty();
             for (Object object : getPath()) {
                 RecDefTreeNode treeNode = (RecDefTreeNode) object;
                 path = path.extend(treeNode.getRecDefNode().getTag());

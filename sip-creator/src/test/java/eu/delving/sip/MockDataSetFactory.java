@@ -92,7 +92,7 @@ public class MockDataSetFactory {
 
     public Statistics stats() {
         List<FieldStatistics> stats = new ArrayList<FieldStatistics>();
-        FieldStatistics fieldStatistics = new FieldStatistics(new Path("/stat/path"));
+        FieldStatistics fieldStatistics = new FieldStatistics(Path.create("/stat/path"));
         fieldStatistics.recordOccurrence();
         fieldStatistics.recordValue("booger");
         fieldStatistics.finish();

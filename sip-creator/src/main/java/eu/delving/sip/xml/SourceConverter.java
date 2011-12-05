@@ -59,7 +59,7 @@ public class SourceConverter {
     private Path uniqueElementPath;
     private int recordCount, totalRecords;
     private ProgressListener progressListener;
-    private Path path = new Path();
+    private Path path = Path.empty();
     private StringBuilder uniqueBuilder;
     private String unique;
     private List<XMLEvent> eventBuffer = new ArrayList<XMLEvent>();

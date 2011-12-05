@@ -115,7 +115,7 @@ public class StatsModel {
     }
 
     public Path getRecordRoot() {
-        return new Path(hintsModel.get(Storage.RECORD_ROOT_PATH));
+        return Path.create(hintsModel.get(Storage.RECORD_ROOT_PATH));
     }
 
     public int getRecordCount() {
@@ -134,7 +134,7 @@ public class StatsModel {
     }
 
     public Path getUniqueElement() {
-        return new Path(hintsModel.get(Storage.UNIQUE_ELEMENT_PATH));
+        return Path.create(hintsModel.get(Storage.UNIQUE_ELEMENT_PATH));
     }
 
     public void selectStatistics(FieldStatistics fieldStatistics) {

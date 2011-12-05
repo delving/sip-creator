@@ -96,7 +96,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         if (path == null) {
             List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
             compilePathList(list);
-            path = new Path();
+            path = Path.empty();
             for (StatsTreeNode node : list) {
                 path.push(node.getTag());
             }

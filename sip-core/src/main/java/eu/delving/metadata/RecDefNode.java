@@ -21,6 +21,8 @@
 
 package eu.delving.metadata;
 
+import eu.delving.groovy.GroovyVariable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,9 +98,13 @@ public class RecDefNode {
         return isAttr() ? attr.tag : elem.tag;
     }
 
+    public boolean isLeaf() {
+        return isAttr() || elem.elemList.isEmpty();
+    }
+
     public Path getPath() {
         if (path == null) {
-            path = (parent == null) ? new Path().extend(getTag()) : parent.getPath().extend(getTag());
+            path = (parent == null) ? Path.empty().extend(getTag()) : parent.getPath().extend(getTag());
         }
         return path;
     }
@@ -161,44 +167,60 @@ public class RecDefNode {
         return nodeMapping;
     }
 
-    public void setNodeMapping(NodeMapping nodeMapping) {
+    public NodeMapping setNodeMapping(NodeMapping nodeMapping) {
         if ((this.nodeMapping = nodeMapping) != null) this.nodeMapping.attachTo(this);
         listener.nodeMappingSet(this);
-    }
-
-    public String getDictionaryName() {
-        return "procrastinate"; // todo: based on path somehow
+        return nodeMapping;
     }
 
     public void toCode(RecDefTree.Out out, Path selectedPath, String editedCode) {
         if (!hasNodeMappings()) return;
-        if (getPath().equals(selectedPath)) {
-            if (nodeMapping == null) throw new IllegalStateException("Node mapping expected at " + selectedPath);
-            out.before();
-            nodeMapping.toCode(out, editedCode);
-            out.after();
-        }
-        else if (selectedPath == null || getPath().isAncestorOf(selectedPath)) {
-            if (isAttr()) {
-
+        if (selectedPath != null) throw new RuntimeException("unimplemented");
+        if (nodeMapping != null) {
+            if (isLeaf()) {
+                beforeLeaf(out);
+                nodeMapping.toCode(out, editedCode);
+                afterBrace(out);
             }
             else {
-                out.before();
-                String attributes = getAttributes();
-                if (attributes.isEmpty()) {
-                    out.line(String.format("%s {", getTag()));
-                }
-                else {
-                    out.line(String.format("%s(%s) {", getTag(), attributes));
-                }
-                if (nodeMapping != null) {
-                    nodeMapping.toCode(out, editedCode);
-                }
+                beforeIteration(out);
+                beforeChildren(out);
                 for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
-                out.line("}");
-                out.after();
+                afterBrace(out);
+                afterBrace(out);
             }
         }
+        else {
+            beforeChildren(out);
+            for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
+            afterBrace(out);
+        }
+    }
+
+    private void beforeChildren(RecDefTree.Out out) {
+        String attributes = getAttributes();
+        if (attributes.isEmpty()) {
+            out.line(String.format("%s {", getTag()));
+        }
+        else {
+            out.line(String.format("%s(%s) {", getTag(), attributes));
+        }
+        out.before();
+    }
+
+    private void beforeLeaf(RecDefTree.Out out) {
+        out.line("%s { ", getTag());
+        out.before();
+    }
+
+    private void beforeIteration(RecDefTree.Out out) {
+        out.line("%s * { %s ->", nodeMapping.getVariableName(), GroovyVariable.paramName(nodeMapping.inputPath));
+        out.before();
+    }
+
+    private void afterBrace(RecDefTree.Out out) {
+        out.after();
+        out.line("}");
     }
 
     private String getAttributes() {
@@ -207,7 +229,7 @@ public class RecDefNode {
             if (sub.isAttr() && sub.getNodeMapping() != null) {
                 if (attrs.length() > 0) attrs.append(", ");
                 NodeMapping subNodeMapping = sub.getNodeMapping();
-                String value = subNodeMapping.toAttributeValue();
+                String value = subNodeMapping.getVariableName();
                 attrs.append(sub.getTag().getLocalName()).append(":{ ").append(value).append(" }");
             }
         }

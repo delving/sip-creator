@@ -51,7 +51,7 @@ public class MetadataParser {
     private InputStream inputStream;
     private XMLStreamReader2 input;
     private int recordIndex, recordCount;
-    private Path path = new Path();
+    private Path path = Path.empty();
     private Map<String, String> namespaces = new TreeMap<String, String>();
     private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;

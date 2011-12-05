@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import eu.delving.groovy.GroovyVariable;
 
 import java.util.*;
 
@@ -31,11 +32,11 @@ import java.util.*;
  * This class describes how one node is transformed into another, which is part of mapping
  * one hierarchy onto another.  It can contain a dictionary, as well as a snippet
  * of Groovy code.
- *
+ * <p/>
  * Instances of this class are placed in the RecDefNode elements of the record definition
  * so that that data structure can be used as a scaffolding to recursively write the code
  * for the Groovy builder.
- *
+ * <p/>
  * Instances are also stored in a list in the RecMapping, and upon reading a mapping they
  * are distributed into the local prototype instance of the record definition data structure.
  *
@@ -44,7 +45,6 @@ import java.util.*;
 
 @XStreamAlias("node-mapping")
 public class NodeMapping {
-    private static final String INDENT = "   ";
 
     @XStreamAsAttribute
     public Path inputPath;
@@ -86,11 +86,12 @@ public class NodeMapping {
         groovyCode.add(line.trim());
     }
 
-    public void createDictionary(Set<String> domainValues) {
-        this.dictionary = new TreeMap<String, String>();
-        for (String key : domainValues) {
-            this.dictionary.put(key, "");
-        }
+    public void setDictionaryDomain(Set<String> domainValues) {
+        if (dictionary == null) dictionary = new TreeMap<String, String>();
+        for (String key : domainValues) if (!dictionary.containsKey(key)) dictionary.put(key, "");
+        Set<String> unused = new HashSet<String>(dictionary.keySet());
+        unused.removeAll(domainValues);
+        for (String unusedKey : unused) dictionary.remove(unusedKey);
     }
 
     public boolean codeLooksLike(String codeString) {
@@ -112,16 +113,12 @@ public class NodeMapping {
 
     public void setGroovyCode(String groovyCode) {
         this.groovyCode = null;
-        for (String line : groovyCode.split("\n")) {
-            addCodeLine(line);
-        }
+        for (String line : groovyCode.split("\n")) addCodeLine(line);
     }
 
     public void toCode(RecDefTree.Out out, String editedCode) {
         if (dictionary != null) {
-            out.before();
-            out.line("lookup%s(%s)", getDictionaryName(), "it"); // todo: param names won't be it everywhere
-            out.after();
+            out.line("lookup%s(%s)", getDictionaryName(), getParamName());
         }
         else if (groovyCode != null) {
             for (String codeLine : groovyCode) {
@@ -129,6 +126,9 @@ public class NodeMapping {
                 out.line(codeLine);
                 if (codeIndent(codeLine) > 0) out.before();
             }
+        }
+        else {
+            out.line(getVariableName());
         }
     }
 
@@ -173,16 +173,35 @@ public class NodeMapping {
         out.line("}");
     }
 
-    private String getDictionaryName() {
-        return outputPath.toString().replaceAll("[@:/]", "_");
+    public String getVariableName() {
+        NodeMapping ancestor = getAncestorNodeMapping();
+        if (ancestor != null) {
+            return GroovyVariable.name(ancestor.inputPath, inputPath);
+        }
+        else {
+            return GroovyVariable.name(inputPath);
+        }
     }
 
-    public String toAttributeValue() {
-        return "AttributeValue";
+    public String getParamName() {
+        NodeMapping ancestor = getAncestorNodeMapping();
+        if (ancestor == null) throw new RuntimeException("Not sure what to do");
+        return GroovyVariable.paramName(ancestor.inputPath);
     }
 
     public String toString() {
         return outputPath.toString();
+    }
+
+    private NodeMapping getAncestorNodeMapping() {
+        for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
+            if (ancestor.getNodeMapping() != null) return ancestor.getNodeMapping();
+        }
+        return null;
+    }
+
+    private String getDictionaryName() {
+        return outputPath.toString().replaceAll("[@:/]", "_");
     }
 
     private static int codeIndent(String line) {

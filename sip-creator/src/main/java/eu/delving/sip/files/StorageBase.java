@@ -62,7 +62,7 @@ public class StorageBase {
     public static Path getRecordRoot(Map<String, String> hints) throws StorageException {
         String recordRoot = hints.get(RECORD_ROOT_PATH);
         if (recordRoot == null) throw new StorageException("Must have record root path");
-        return new Path(recordRoot);
+        return Path.create(recordRoot);
     }
 
     public static int getRecordCount(Map<String, String> hints) throws StorageException {
@@ -79,7 +79,7 @@ public class StorageBase {
     public static Path getUniqueElement(Map<String, String> hints) throws StorageException {
         String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
         if (uniqueElement == null) throw new StorageException("Must have unique element path");
-        return new Path(uniqueElement);
+        return Path.create(uniqueElement);
     }
 
     Map<String, String> readFacts(File file) throws IOException {

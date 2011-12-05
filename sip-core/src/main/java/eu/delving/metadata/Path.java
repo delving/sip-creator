@@ -44,10 +44,18 @@ public class Path implements Comparable<Path>, Serializable {
     private Stack<Tag> stack = new Stack<Tag>();
     private String string;
 
-    public Path() {
+    public static Path empty() {
+        return new Path();
     }
 
-    public Path(String pathString) {
+    public static Path create(String pathString) {
+        return new Path(pathString);
+    }
+
+    private Path() {
+    }
+
+    private Path(String pathString) {
         if (pathString != null) {
             if (!pathString.startsWith("/")) {
                 pathString = "/" + pathString;
@@ -65,12 +73,21 @@ public class Path implements Comparable<Path>, Serializable {
         }
     }
 
-    public Path(Path path) {
+    private Path(Path path) {
         if (path.stack != null) for (Tag name : path.stack) stack.push(name);
     }
 
-    public Path(Path path, int count) {
-        for (Tag name : path.stack) if (count-- > 0) stack.push(name);
+    private Path(Path path, int count) {
+        if (count >= 0) {
+            for (Tag name : path.stack) if (count-- > 0) stack.push(name);
+        }
+        else {
+            for (Tag name : path.stack) if (count++ >= 0) stack.push(name);
+        }
+    }
+
+    public Path copy() {
+        return new Path(this);
     }
 
     public Path extend(Tag tag) {
@@ -84,10 +101,10 @@ public class Path implements Comparable<Path>, Serializable {
         string = null;
     }
 
-    public Path pop() {
-        stack.pop();
+    public Tag pop() {
+        Tag tag = stack.pop();
         string = null;
-        return this;
+        return tag;
     }
 
     public boolean isAncestorOf(Path other) {
@@ -101,6 +118,15 @@ public class Path implements Comparable<Path>, Serializable {
             if (!thisTag.equals(otherTag)) return false; // always equal
         }
         return walkOther.hasNext();
+    }
+
+    public Path chop(int index) {
+        return new Path(this, index);
+    }
+
+    public Path minusAncestor(Path ancestor) {
+        if (!ancestor.isAncestorOf(this)) throw new IllegalArgumentException(String.format("%s is not an ancestor of %s", ancestor, this));
+        return chop(-ancestor.size());
     }
 
     @Override
@@ -124,6 +150,10 @@ public class Path implements Comparable<Path>, Serializable {
 
     public Tag peek() {
         return stack.isEmpty() ? null : stack.peek();
+    }
+
+    public boolean isEmpty() {
+        return stack.isEmpty();
     }
 
     public int size() {

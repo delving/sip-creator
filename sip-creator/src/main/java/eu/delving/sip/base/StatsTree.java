@@ -65,7 +65,7 @@ public class StatsTree implements Serializable {
     }
 
     public static StatsTree create(List<FieldStatistics> fieldStatisticsList) {
-        StatsTreeNode root = createSubtree(fieldStatisticsList, new Path(), null);
+        StatsTreeNode root = createSubtree(fieldStatisticsList, Path.empty(), null);
         if (root == null) {
             root = new StatsTreeNode(Tag.element("No statistics"));
         }
@@ -126,7 +126,7 @@ public class StatsTree implements Serializable {
     private static StatsTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, StatsTreeNode parent) {
         Map<Tag, List<FieldStatistics>> statisticsMap = new TreeMap<Tag, List<FieldStatistics>>();
         for (FieldStatistics fieldStatistics : fieldStatisticsList) {
-            Path subPath = new Path(fieldStatistics.getPath(), path.size());
+            Path subPath = fieldStatistics.getPath().chop(path.size());
             if (subPath.equals(path) && fieldStatistics.getPath().size() == path.size() + 1) {
                 Tag tag = fieldStatistics.getPath().getTag(path.size());
                 if (tag != null) {
@@ -144,7 +144,7 @@ public class StatsTree implements Serializable {
         Tag tag = path.peek();
         StatsTreeNode node = tag == null ? null : new StatsTreeNode(parent, tag);
         for (Map.Entry<Tag, List<FieldStatistics>> entry : statisticsMap.entrySet()) {
-            Path childPath = new Path(path);
+            Path childPath = path.copy();
             childPath.push(entry.getKey());
             FieldStatistics fieldStatisticsForChild = null;
             for (FieldStatistics fieldStatistics : entry.getValue()) {
