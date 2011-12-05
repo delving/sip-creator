@@ -111,7 +111,7 @@ public class RecMapping {
         Iterator<NodeMapping> walk = nodeMappings.iterator();
         while (walk.hasNext()) {
             NodeMapping nodeMapping = walk.next();
-            RecDefNode node = recDefTree.getRoot().getNode(new Path(), nodeMapping.outputPath);
+            RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath);
             if (node != null) {
                 node.setNodeMapping(nodeMapping);
             }

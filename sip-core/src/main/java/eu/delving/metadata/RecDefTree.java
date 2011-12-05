@@ -22,7 +22,6 @@
 package eu.delving.metadata;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -71,19 +70,13 @@ public class RecDefTree implements RecDefNode.Listener {
     }
 
     public RecDefNode getRecDefNode(Path path) {
-        return root.getNode(new Path(), path);
+        return root.getNode(path);
     }
 
     public List<NodeMapping> getNodeMappings() {
         List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
-        if (root.hasNodeMappings(new Path())) root.collectNodeMappings(nodeMappings);
+        root.collectNodeMappings(nodeMappings);
         return nodeMappings;
-    }
-
-    public List<RecDefNode> getNodesWithMappings() {
-        List<RecDefNode> nodesWithMappings = new ArrayList<RecDefNode>();
-        if (root.hasNodeMappings(new Path())) root.collectNodesWithMappings(nodesWithMappings);
-        return nodesWithMappings;
     }
 
     public String toCode(Map<String, String> facts, Path selectedPath, String editedCode) {
@@ -98,48 +91,12 @@ public class RecDefTree implements RecDefNode.Listener {
             ));
         }
         out.line("// Dictionaries:");
-        for (RecDefNode node : getNodesWithMappings()) generateDictionary(node, out);
+        for (NodeMapping nodeMapping : getNodeMappings()) nodeMapping.generateDictionaryCode(out);
         out.line("// Builder:");
         out.line("use (MappingCategory) { output.");
-        root.toCode(new Path(), out, selectedPath, editedCode);
+        root.toCode(out, selectedPath, editedCode);
         out.line("}");
         return out.toString();
-    }
-
-    private void generateDictionary(RecDefNode node, Out out) {
-        if (node.getNodeMapping().dictionary == null) return;
-        String name = node.getDictionaryName();
-        out.line(String.format("def %s_Dictionary = [", name));
-        out.before();
-        Iterator<Map.Entry<String, String>> walk = node.getNodeMapping().dictionary.entrySet().iterator();
-        while (walk.hasNext()) {
-            Map.Entry<String, String> entry = walk.next();
-            out.line(String.format("'''%s''':'''%s'''%s",
-                    Sanitizer.sanitizeGroovy(entry.getKey()),
-                    Sanitizer.sanitizeGroovy(entry.getValue()),
-                    walk.hasNext() ? "," : ""
-            ));
-        }
-        out.after();
-        out.line("]");
-        out.line("def $s_lookup = { value =>", name);
-        out.before();
-        out.line("if (!value) { '' } else {");
-        out.before();
-        out.line("def v = %s_Dictionary[value.sanitize()];", name);
-        out.line("if (!v) { '' } else {");
-        out.before();
-        out.line("if (!v.endsWith(':')) { v } else {");
-        out.before();
-        out.line("\"${v} ${value}\"");
-        out.after();
-        out.line("}");
-        out.after();
-        out.line("}");
-        out.after();
-        out.line("}");
-        out.after();
-        out.line("}");
     }
 
     public List<RecDef.Namespace> getNamespaces() {

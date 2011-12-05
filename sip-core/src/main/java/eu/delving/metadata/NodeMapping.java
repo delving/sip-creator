@@ -23,6 +23,7 @@ package eu.delving.metadata;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.*;
 
@@ -57,9 +58,12 @@ public class NodeMapping {
     @XStreamAlias("groovy-code")
     public List<String> groovyCode;
 
-    public NodeMapping setOutputPath(Path path) {
-        this.outputPath = path;
-        return this;
+    @XStreamOmitField
+    public RecDefNode recDefNode;
+
+    public void attachTo(RecDefNode recDefNode) {
+        this.recDefNode = recDefNode;
+        this.outputPath = recDefNode.getPath();
     }
 
     public void clearDictionary() {
@@ -111,7 +115,7 @@ public class NodeMapping {
     public void toCode(RecDefTree.Out out, String editedCode) {
         if (dictionary != null) {
             out.before();
-            out.line("//lookup in dictionary!");
+            out.line("%s_lookup(%s)", getDictionaryName(), "it"); // todo: param names won't be it everywhere
             out.after();
         }
         else if (groovyCode != null) {
@@ -121,6 +125,46 @@ public class NodeMapping {
                 if (codeIndent(codeLine) > 0) out.before();
             }
         }
+    }
+
+    public void generateDictionaryCode(RecDefTree.Out out) {
+        if (dictionary == null) return;
+        String name = getDictionaryName();
+        out.line(String.format("def %s_Dictionary = [", name));
+        out.before();
+        Iterator<Map.Entry<String, String>> walk = dictionary.entrySet().iterator();
+        while (walk.hasNext()) {
+            Map.Entry<String, String> entry = walk.next();
+            out.line(String.format("'''%s''':'''%s'''%s",
+                    Sanitizer.sanitizeGroovy(entry.getKey()),
+                    Sanitizer.sanitizeGroovy(entry.getValue()),
+                    walk.hasNext() ? "," : ""
+            ));
+        }
+        out.after();
+        out.line("]");
+        out.line("def $s_lookup = { value =>", name);
+        out.before();
+        out.line("if (!value) { '' } else {");
+        out.before();
+        out.line("def v = %s_Dictionary[value.sanitize()];", name);
+        out.line("if (!v) { '' } else {");
+        out.before();
+        out.line("if (!v.endsWith(':')) { v } else {");
+        out.before();
+        out.line("\"${v} ${value}\"");
+        out.after();
+        out.line("}");
+        out.after();
+        out.line("}");
+        out.after();
+        out.line("}");
+        out.after();
+        out.line("}");
+    }
+
+    private String getDictionaryName() {
+        return outputPath.toString().replaceAll("[@:/]", "_");
     }
 
     public String toAttributeValue() {

@@ -43,6 +43,7 @@ import java.util.List;
 
 public class RecDefNode {
     private RecDefNode parent;
+    private Path path;
     private RecDef.Elem elem;
     private RecDef.Attr attr;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
@@ -95,6 +96,13 @@ public class RecDefNode {
         return isAttr() ? attr.tag : elem.tag;
     }
 
+    public Path getPath() {
+        if (path == null) {
+            path = (parent == null) ? new Path().extend(getTag()) : parent.getPath().extend(getTag());
+        }
+        return path;
+    }
+
     public RecDef.Doc getDoc() {
         return isAttr() ? attr.doc : elem.doc;
     }
@@ -129,40 +137,24 @@ public class RecDefNode {
         return false;
     }
 
-    public RecDefNode getNode(Path path, Path soughtPath) {
-        path = path.extend(getTag());
-        if (path.equals(soughtPath)) return this;
+    public RecDefNode getNode(Path soughtPath) {
+        if (getPath().equals(soughtPath)) return this;
         for (RecDefNode sub : children) {
-            RecDefNode found = sub.getNode(path, soughtPath);
+            RecDefNode found = sub.getNode(soughtPath);
             if (found != null) return found;
         }
         return null;
     }
 
-    public boolean hasNodeMappings(Path path) {
-        path = path.extend(getTag());
-        boolean gotThem = nodeMapping != null;
-        if (gotThem) nodeMapping.setOutputPath(path);
-        for (RecDefNode sub : children) if (sub.hasNodeMappings(path)) gotThem = true;
-        return gotThem;
+    public boolean hasNodeMappings() {
+        if (nodeMapping != null) return true;
+        for (RecDefNode sub : children) if (sub.hasNodeMappings()) return true;
+        return false;
     }
 
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {
-        if (nodeMapping != null) {
-            nodeMappings.add(nodeMapping);
-        }
-        for (RecDefNode sub : children) {
-            sub.collectNodeMappings(nodeMappings);
-        }
-    }
-
-    public void collectNodesWithMappings(List<RecDefNode> nodesWithMappings) {
-        if (nodeMapping != null) {
-            nodesWithMappings.add(this);
-        }
-        for (RecDefNode sub : children) {
-            sub.collectNodesWithMappings(nodesWithMappings);
-        }
+        if (nodeMapping != null) nodeMappings.add(nodeMapping);
+        for (RecDefNode sub : children) sub.collectNodeMappings(nodeMappings);
     }
 
     public NodeMapping getNodeMapping() {
@@ -170,7 +162,7 @@ public class RecDefNode {
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
-        this.nodeMapping = nodeMapping;
+        if ((this.nodeMapping = nodeMapping) != null) this.nodeMapping.attachTo(this);
         listener.nodeMappingSet(this);
     }
 
@@ -178,16 +170,15 @@ public class RecDefNode {
         return "procrastinate"; // todo: based on path somehow
     }
 
-    public void toCode(Path path, RecDefTree.Out out, Path selectedPath, String editedCode) {
-        if (!hasNodeMappings(path)) return;
-        path = path.extend(getTag());
-        if (path.equals(selectedPath)) {
+    public void toCode(RecDefTree.Out out, Path selectedPath, String editedCode) {
+        if (!hasNodeMappings()) return;
+        if (getPath().equals(selectedPath)) {
             if (nodeMapping == null) throw new IllegalStateException("Node mapping expected at " + selectedPath);
             out.before();
             nodeMapping.toCode(out, editedCode);
             out.after();
         }
-        else if (selectedPath == null || path.isAncestorOf(selectedPath)) {
+        else if (selectedPath == null || getPath().isAncestorOf(selectedPath)) {
             if (isAttr()) {
 
             }
@@ -203,7 +194,7 @@ public class RecDefNode {
                 if (nodeMapping != null) {
                     nodeMapping.toCode(out, editedCode);
                 }
-                for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(path, out, selectedPath, editedCode);
+                for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
                 out.line("}");
                 out.after();
             }
