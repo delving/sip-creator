@@ -53,16 +53,23 @@ public class TestCodeGeneration {
     }
 
     @Test
-    public void simple() {
+    public void cornucopia() {
         recMapping.setFact("dogExists", "true");
+
         NodeMapping order = node("/lidoWrap/lido/@sortorder").setNodeMapping(mapping("/leadup/@orderofsort"));
         order.addCodeLine("// some groovy sort");
+
         node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").setNodeMapping(mapping("/leadup/record/list"));
-        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").setNodeMapping(mapping("/leadup/record/list/@index"));
+        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").setNodeMapping(mapping("/leadup/record/list/member/@index"));
+
         RecDefNode termNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
-        NodeMapping term = termNode.setNodeMapping(mapping("/leadup/record/list/member"));
+        NodeMapping term = termNode.setNodeMapping(mapping("/leadup/record/list/member/concept"));
         term.dictionary = new TreeMap<String, String>();
         term.dictionary.put("delving", "rulez");
+
+        RecDefNode actorNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
+        NodeMapping actor = actorNode.setNodeMapping(mapping("/leadup/record/list/member/name"));
+
         String code = recMapping.toCode(null, null);
         System.out.println(code);
     }

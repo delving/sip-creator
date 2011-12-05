@@ -118,7 +118,7 @@ public class NodeMapping {
 
     public void toCode(RecDefTree.Out out, String editedCode) {
         if (dictionary != null) {
-            out.line("lookup%s(%s)", getDictionaryName(), getParamName());
+            out.line("lookup%s(%s)", getDictionaryName(), getVariableName());
         }
         else if (groovyCode != null) {
             for (String codeLine : groovyCode) {

@@ -43,7 +43,7 @@ public class GroovyVariable {
         }
         else {
             out.append(paramName(ancestor));
-            path = path.minusAncestor(ancestor);
+            path = path.minusAncestor(ancestor).chop(-1);
         }
         out.append(pathToVariable(path));
         return out.toString();
