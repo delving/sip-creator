@@ -63,7 +63,8 @@ public class TestCodeGeneration {
         RecDefNode termNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
         NodeMapping term = termNode.setNodeMapping(mapping("/leadup/record/list/member/concept"));
         term.dictionary = new TreeMap<String, String>();
-        term.dictionary.put("delving", "rulez");
+        term.dictionary.put("superhero", "Clay Man");
+        term.dictionary.put("sidekick", "Clay Horse");
 
         RecDefNode actorNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
         NodeMapping mapping = actorNode.setNodeMapping(mapping("/leadup/record/list/member/name"));
