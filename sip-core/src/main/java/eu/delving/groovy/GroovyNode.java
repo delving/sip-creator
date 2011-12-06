@@ -184,13 +184,12 @@ public class GroovyNode {
      * @param key the name (or shortcut key) of the node(s) of interest
      * @return the nodes which match key
      */
-    public Object get(String key) {
+    public List get(String key) {
         if (key != null && key.charAt(0) == '@') {
-            String attributeName = key.substring(1);
-            return attributes().get(attributeName);
-        }
-        if ("..".equals(key)) {
-            return parent();
+            GroovyList answer = new GroovyList();
+            String value = attributes().get(key.substring(1));
+            if (value != null) answer.add(value);
+            return answer;
         }
         if ("*".equals(key)) {
             return children();

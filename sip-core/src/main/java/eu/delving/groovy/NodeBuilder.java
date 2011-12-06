@@ -51,25 +51,21 @@ public class NodeBuilder extends BuilderSupport {
 
     @Override
     protected Object createNode(Object name) {
-        System.out.println("createNodeZ: " + name);
         return new Node(getCurrentNode(), name, new ArrayList());
     }
 
     @Override
     protected Object createNode(Object name, Object value) {
-        System.out.println("createNodeA: " + name + " " + value);
         return new Node(getCurrentNode(), name, value);
     }
 
     @Override
     protected Object createNode(Object name, Map attributes) {
-        System.out.println("createNodeB: " + name + " " + attributes);
         return new Node(getCurrentNode(), name, attributes, new ArrayList());
     }
 
     @Override
     protected Object createNode(Object name, Map attributes, Object value) {
-        System.out.println("createNodeC: " + name + " " + attributes + " " + value);
         return new Node(getCurrentNode(), name, attributes, value);
     }
 
@@ -89,7 +85,7 @@ public class NodeBuilder extends BuilderSupport {
                 Object object = list.get(0);
                 if (object instanceof Map) {
                     node = createNode(name, (Map) object);
-                    runMapClosures((Node) node, (Map) object);
+                    runMapClosures((Node) node, (Map<String, Object>) object);
                 }
                 else if (object instanceof Closure) {
                     node = createNode(name);
@@ -106,7 +102,7 @@ public class NodeBuilder extends BuilderSupport {
                 if (object1 instanceof Map) {
                     if (object2 instanceof Closure) {
                         node = createNode(name, (Map) object1);
-                        runMapClosures((Node) node, (Map) object1);
+                        runMapClosures((Node) node, (Map<String, Object>) object1);
                         setValueFromClosure((Node) node, (Closure) object2);
                     }
                     else {
@@ -141,9 +137,8 @@ public class NodeBuilder extends BuilderSupport {
         if (result != null) node.setValue(result);
     }
 
-    private void runMapClosures(Node node, Map map) {
-        for (Object entryObj : map.entrySet()) {
-            Map.Entry entry = (Map.Entry) entryObj;
+    private void runMapClosures(Node node, Map<String, Object> map) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof Closure) {
                 String result = runClosure(node, (Closure) entry.getValue());
                 map.put(entry.getKey(), result);
@@ -155,9 +150,6 @@ public class NodeBuilder extends BuilderSupport {
         Object oldCurrent = getCurrent();
         setCurrent(node);
         setClosureDelegate(closure, node);
-        if (closure.getParameterTypes().length > 0) {
-            System.out.println("Lost parameter: " + closure.getParameterTypes()[0] + " length=" + closure.getParameterTypes().length);
-        }
         Object result = closure.call();
         setCurrent(oldCurrent);
         if (result instanceof String) {

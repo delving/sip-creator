@@ -66,7 +66,8 @@ public class TestCodeGeneration {
         term.dictionary.put("delving", "rulez");
 
         RecDefNode actorNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
-        actorNode.setNodeMapping(mapping("/leadup/record/list/member/name"));
+        NodeMapping mapping = actorNode.setNodeMapping(mapping("/leadup/record/list/member/name"));
+//        mapping.addCodeLine("\"It's surely ${X4.name[0]}!!\"");
 
         String code = recMapping.toCode(null, null);
         System.out.println(code);
@@ -83,15 +84,15 @@ public class TestCodeGeneration {
     private MetadataRecord createInputRecord() {
         GroovyNode input = new GroovyNode(null, "input");
         GroovyNode leadup = new GroovyNode(input, "leadup");
-        new GroovyNode(leadup, "@orderofsort", "backward");
+        leadup.attributes().put("orderofsort", "backward");
         GroovyNode record = new GroovyNode(leadup, "record");
         GroovyNode list = new GroovyNode(record, "list");
         GroovyNode member1 = new GroovyNode(list, "member");
-        new GroovyNode(member1, "@index", "23");
+        member1.attributes().put("index", "23");
         new GroovyNode(member1, "name", "Gumby");
         new GroovyNode(member1, "concept", "superhero");
         GroovyNode member2 = new GroovyNode(list, "member");
-        new GroovyNode(member2, "@index", "45");
+        member2.attributes().put("index", "45");
         new GroovyNode(member2, "name", "Pokey");
         new GroovyNode(member2, "concept", "sidekick");
         Map<String,String> ns = new TreeMap<String, String>();

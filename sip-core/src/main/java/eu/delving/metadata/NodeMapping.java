@@ -129,8 +129,7 @@ public class NodeMapping {
             }
         }
         else {
-//            out.line(getVariableName());
-            out.line("\"It's ${dogExists}!\"");
+            out.line("\"${%s[0]}\"", getVariableName());
         }
     }
 

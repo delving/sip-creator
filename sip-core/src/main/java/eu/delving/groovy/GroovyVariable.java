@@ -43,7 +43,7 @@ public class GroovyVariable {
         }
         else {
             out.append(paramName(ancestor));
-            path = path.minusAncestor(ancestor).chop(-1);
+            path = path.minusAncestor(ancestor);
         }
         out.append(pathToVariable(path));
         return out.toString();
@@ -104,7 +104,10 @@ public class GroovyVariable {
                 }
             }
         }
-        if (attr != null) sb.append(String.format("['%s']", attr.toString()));
+        if (attr != null) {
+            sb.append(String.format("['%s']", attr.toString()));
+            path.push(attr);
+        }
         return sb.toString();
     }
 }
