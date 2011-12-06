@@ -86,6 +86,10 @@ public class RecDefNode {
         return attr;
     }
 
+    public boolean isSingular() {
+        return !isAttr() && elem.singular;
+    }
+
     public RecDefNode getParent() {
         return parent;
     }
@@ -178,20 +182,18 @@ public class RecDefNode {
         if (selectedPath != null) throw new RuntimeException("unimplemented");
         if (nodeMapping != null) {
             if (isLeaf()) {
-                beforeLeaf(out);
-                nodeMapping.toCode(out, editedCode);
-                afterBrace(out);
+                nodeMapping.toLeafCode(out, editedCode);
             }
             else {
                 beforeIteration(out);
-                beforeChildren(out);
+                beforeChildren(out, editedCode);
                 childElements(out, selectedPath, editedCode);
                 afterBrace(out);
                 afterBrace(out);
             }
         }
         else {
-            beforeChildren(out);
+            beforeChildren(out, editedCode);
             childElements(out, selectedPath, editedCode);
             afterBrace(out);
         }
@@ -201,7 +203,7 @@ public class RecDefNode {
         for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
     }
 
-    private void beforeChildren(RecDefTree.Out out) {
+    private void beforeChildren(RecDefTree.Out out, String editedCode) {
         boolean activeChildren = false;
         for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeChildren = true;
         if (activeChildren) {
@@ -209,10 +211,7 @@ public class RecDefNode {
             out.before();
             for (RecDefNode sub : children)
                 if (sub.isAttr() && sub.hasNodeMappings()) {
-                    out.line("%s : {", sub.getTag().toBuilderCall());
-                    out.before();
-                    sub.nodeMapping.toCode(out, "edited code?"); // todo
-                    afterBrace(out);
+                    sub.nodeMapping.toLeafCode(out, editedCode);
                 }
             out.after();
             out.line(") {");
@@ -220,11 +219,6 @@ public class RecDefNode {
         else {
             out.line("%s {", getTag().toBuilderCall());
         }
-        out.before();
-    }
-
-    private void beforeLeaf(RecDefTree.Out out) {
-        out.line("%s { ", getTag().toBuilderCall());
         out.before();
     }
 

@@ -116,19 +116,72 @@ public class NodeMapping {
         for (String line : groovyCode.split("\n")) addCodeLine(line);
     }
 
-    public void toCode(RecDefTree.Out out, String editedCode) {
+    public void toLeafCode(RecDefTree.Out out, String editedCode) {
+        if (recDefNode.isAttr()) {
+            out.line("%s : { ", recDefNode.getTag().toBuilderCall());
+            out.before();
+            toGrabFirst(out);
+            out.after();
+            out.line("}");
+        }
+        else if (recDefNode.isSingular()) {
+            toGrabFirst(out);
+        }
+        else {
+            out.line("%s * { x ->", getVariableName());
+            out.before();
+            out.line("%s {", recDefNode.getTag().toBuilderCall());
+            out.before();
+            toBuildX(out);
+            out.after();
+            out.line("}");
+            out.after();
+            out.line("}");
+        }
+
+    }
+
+    private void toBuildX(RecDefTree.Out out) {
+        beginUserCode(out);
+        if (dictionary != null) {
+            out.line("from%s(x)", getDictionaryName());
+        }
+        else if (groovyCode != null) {
+            outputGroovyCode(out);
+        }
+        else {
+            out.line("\"${x}\"");
+        }
+        endUserCode(out);
+    }
+
+    private void toGrabFirst(RecDefTree.Out out) {
+        beginUserCode(out);
         if (dictionary != null) {
             out.line("from%s(%s[0])", getDictionaryName(), getVariableName());
         }
         else if (groovyCode != null) {
-            for (String codeLine : groovyCode) {
-                if (codeIndent(codeLine) < 0) out.after();
-                out.line(codeLine);
-                if (codeIndent(codeLine) > 0) out.before();
-            }
+            outputGroovyCode(out);
         }
         else {
             out.line("\"${%s[0]}\"", getVariableName());
+        }
+        endUserCode(out);
+    }
+
+    private void endUserCode(RecDefTree.Out out) {
+        out.line("// end user code");
+    }
+
+    private void beginUserCode(RecDefTree.Out out) {
+        out.line("// begin user code");
+    }
+
+    private void outputGroovyCode(RecDefTree.Out out) {
+        for (String codeLine : groovyCode) {
+            if (codeIndent(codeLine) < 0) out.after();
+            out.line(codeLine);
+            if (codeIndent(codeLine) > 0) out.before();
         }
     }
 
