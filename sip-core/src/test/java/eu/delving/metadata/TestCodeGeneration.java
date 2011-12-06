@@ -94,7 +94,8 @@ public class TestCodeGeneration {
         new GroovyNode(member1, "concept", "superhero");
         GroovyNode member2 = new GroovyNode(list, "member");
         member2.attributes().put("index", "45");
-        new GroovyNode(member2, "name", "Pokey");
+        new GroovyNode(member2, "name", "O'Pokey");
+        new GroovyNode(member2, "name", "McPokey");
         new GroovyNode(member2, "concept", "sidekick");
         Map<String,String> ns = new TreeMap<String, String>();
         ns.put("lido", "http://lidoland");

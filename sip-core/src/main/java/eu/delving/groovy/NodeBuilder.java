@@ -89,7 +89,7 @@ public class NodeBuilder extends BuilderSupport {
                 }
                 else if (object instanceof Closure) {
                     node = createNode(name);
-                    setValueFromClosure((Node) node, (Closure) object);
+                    setValuesFromClosure((Node) node, (Closure) object);
                 }
                 else {
                     node = createNode(name, object);
@@ -102,8 +102,8 @@ public class NodeBuilder extends BuilderSupport {
                 if (object1 instanceof Map) {
                     if (object2 instanceof Closure) {
                         node = createNode(name, (Map) object1);
-                        runMapClosures((Node) node, (Map<String, Object>) object1);
-                        setValueFromClosure((Node) node, (Closure) object2);
+                        runMapClosures((Node) node, (Map<String, Object>) object1); // todo: maybe this has to repeat upon multiple values
+                        setValuesFromClosure((Node) node, (Closure) object2);
                     }
                     else {
                         node = createNode(name, (Map) object1, object2);
@@ -112,7 +112,7 @@ public class NodeBuilder extends BuilderSupport {
                 else {
                     if (object2 instanceof Closure) {
                         node = createNode(name, object1);
-                        setValueFromClosure((Node) node, (Closure) object2);
+                        setValuesFromClosure((Node) node, (Closure) object2);
                     }
                     else if (object2 instanceof Map) {
                         node = createNode(name, (Map) object2, object1);
@@ -132,35 +132,42 @@ public class NodeBuilder extends BuilderSupport {
         return postNodeCompletion(getCurrent(), node);
     }
 
-    private void setValueFromClosure(Node node, Closure closure) {
-        String result = runClosure(node, closure);
-        if (result != null) node.setValue(result);
+    private void setValuesFromClosure(Node node, Closure closure) {
+        ClosureResult result = runClosure(node, closure);
+        if (result.string != null) node.setValue(result.string);
+        if (result.list != null) for (Object member : result.list) new Node(node, node.name(), member.toString());
     }
 
     private void runMapClosures(Node node, Map<String, Object> map) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof Closure) {
-                String result = runClosure(node, (Closure) entry.getValue());
-                map.put(entry.getKey(), result);
+                ClosureResult result = runClosure(node, (Closure) entry.getValue());
+                map.put(entry.getKey(), result.string);
             }
         }
     }
 
-    private String runClosure(Node node, Closure closure) {
+    private ClosureResult runClosure(Node node, Closure closure) {
+        ClosureResult cr = new ClosureResult();
         Object oldCurrent = getCurrent();
         setCurrent(node);
         setClosureDelegate(closure, node);
         Object result = closure.call();
         setCurrent(oldCurrent);
         if (result instanceof String) {
-            return (String) result;
+            cr.string = (String) result;
         }
         else if (result instanceof GString) {
-            return result.toString();
+            cr.string = result.toString();
         }
-        else {
-            return null;
+        else if (result instanceof List) {
+            cr.list = (List) result;
         }
+        return cr;
     }
 
+    private static class ClosureResult {
+        public String string;
+        public List list;
+    }
 }
