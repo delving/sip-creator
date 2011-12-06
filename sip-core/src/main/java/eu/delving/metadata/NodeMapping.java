@@ -118,7 +118,7 @@ public class NodeMapping {
 
     public void toCode(RecDefTree.Out out, String editedCode) {
         if (dictionary != null) {
-            out.line("lookup%s(%s[0])", getDictionaryName(), getVariableName());
+            out.line("from%s(%s[0])", getDictionaryName(), getVariableName());
         }
         else if (groovyCode != null) {
             for (String codeLine : groovyCode) {
@@ -135,7 +135,7 @@ public class NodeMapping {
     public void generateDictionaryCode(RecDefTree.Out out) {
         if (dictionary == null) return;
         String name = getDictionaryName();
-        out.line(String.format("def dictionary%s = [", name));
+        out.line(String.format("def %s = [", name));
         out.before();
         Iterator<Map.Entry<String, String>> walk = dictionary.entrySet().iterator();
         while (walk.hasNext()) {
@@ -148,11 +148,11 @@ public class NodeMapping {
         }
         out.after();
         out.line("]");
-        out.line("def lookup%s = { value ->", name);
+        out.line("def from%s = { value ->", name);
         out.before();
         out.line("if (value) {");
         out.before();
-        out.line("def v = dictionary%s[value.sanitize()];", name);
+        out.line("def v = %s[value.sanitize()];", name);
         out.line("if (v) {");
         out.before();
         out.line("if (v.endsWith(':')) {");
@@ -200,8 +200,10 @@ public class NodeMapping {
         return null;
     }
 
+    private static final Hasher HASHER = new Hasher();
+
     private String getDictionaryName() {
-        return outputPath.toString().replaceAll("[@:/]", "_");
+        return "Dict" + HASHER.getHashString(outputPath.toString()).substring(16);
     }
 
     private static int codeIndent(String line) {
