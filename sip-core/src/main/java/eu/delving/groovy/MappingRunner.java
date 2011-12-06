@@ -27,7 +27,6 @@ import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
 import groovy.lang.*;
 import groovy.util.Node;
-import groovy.util.NodeBuilder;
 import groovy.xml.NamespaceBuilder;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;

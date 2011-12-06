@@ -118,7 +118,8 @@ public class NodeMapping {
 
     public void toCode(RecDefTree.Out out, String editedCode) {
         if (dictionary != null) {
-            out.line("lookup%s(%s)", getDictionaryName(), getVariableName());
+//            out.line("lookup%s(%s)", getDictionaryName(), getVariableName());
+            out.line("'dictionary'");
         }
         else if (groovyCode != null) {
             for (String codeLine : groovyCode) {
@@ -128,7 +129,8 @@ public class NodeMapping {
             }
         }
         else {
-            out.line(getVariableName());
+//            out.line(getVariableName());
+            out.line("\"It's ${dogExists}!\"");
         }
     }
 
@@ -148,7 +150,7 @@ public class NodeMapping {
         }
         out.after();
         out.line("]");
-        out.line("def lookup%s = { value =>", name);
+        out.line("def lookup%s = { value ->", name);
         out.before();
         out.line("if (value) {");
         out.before();

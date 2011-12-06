@@ -229,7 +229,7 @@ public class RecDefNode {
     }
 
     private void beforeIteration(RecDefTree.Out out) {
-        out.line("%s * { %s ->", nodeMapping.getVariableName(), GroovyVariable.paramName(nodeMapping.inputPath)); // todo: the peek is wrong
+        out.line("%s * { %s ->", nodeMapping.getVariableName(), GroovyVariable.paramName(nodeMapping.inputPath));
         out.before();
     }
 
