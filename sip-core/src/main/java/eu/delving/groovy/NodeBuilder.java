@@ -29,6 +29,7 @@ import groovy.util.Node;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -162,6 +163,9 @@ public class NodeBuilder extends BuilderSupport {
         }
         else if (result instanceof List) {
             cr.list = (List) result;
+        }
+        else if (result instanceof Object[]) {
+            cr.list = Arrays.asList((Object[])result);
         }
         return cr;
     }

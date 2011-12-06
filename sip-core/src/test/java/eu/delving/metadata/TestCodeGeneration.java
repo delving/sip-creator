@@ -68,7 +68,7 @@ public class TestCodeGeneration {
 
         RecDefNode actorNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
         NodeMapping mapping = actorNode.setNodeMapping(mapping("/leadup/record/list/member/name"));
-//        mapping.addCodeLine("\"It's surely ${X4.name[0]}!!\"");
+        mapping.addCodeLine("if (this_name.contains(' ')) { return this_name.text().split(' '); } else { return this_name.text(); }");
 
         String code = recMapping.toCode(null, null);
         System.out.println(code);
@@ -90,7 +90,7 @@ public class TestCodeGeneration {
         GroovyNode list = new GroovyNode(record, "list");
         GroovyNode member1 = new GroovyNode(list, "member");
         member1.attributes().put("index", "23");
-        new GroovyNode(member1, "name", "Gumby");
+        new GroovyNode(member1, "name", "Gumby Dammit");
         new GroovyNode(member1, "concept", "superhero");
         GroovyNode member2 = new GroovyNode(list, "member");
         member2.attributes().put("index", "45");
