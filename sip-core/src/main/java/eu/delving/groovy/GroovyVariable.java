@@ -50,7 +50,7 @@ public class GroovyVariable {
     }
 
     public static String paramName(Path path) {
-        return String.format("X%d", path.size());
+        return String.format("this_%s", path.peek().getLocalName());
     }
 
     private static final String PLAIN_ASCII =

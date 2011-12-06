@@ -128,7 +128,7 @@ public class NodeMapping {
             toGrabFirst(out);
         }
         else {
-            out.line("%s * { x ->", getVariableName());
+            out.line("%s * { %s ->", getVariableName(), getParamName());
             out.before();
             out.line("%s {", recDefNode.getTag().toBuilderCall());
             out.before();
@@ -144,13 +144,13 @@ public class NodeMapping {
     private void toBuildX(RecDefTree.Out out) {
         beginUserCode(out);
         if (dictionary != null) {
-            out.line("from%s(x)", getDictionaryName());
+            out.line("from%s(%s)", getDictionaryName(), getParamName());
         }
         else if (groovyCode != null) {
             outputGroovyCode(out);
         }
         else {
-            out.line("\"${x}\"");
+            out.line("\"${%s}\"", getParamName());
         }
         endUserCode(out);
     }
@@ -237,9 +237,7 @@ public class NodeMapping {
     }
 
     public String getParamName() {
-        NodeMapping ancestor = getAncestorNodeMapping();
-        if (ancestor == null) throw new RuntimeException("Not sure what to do");
-        return GroovyVariable.paramName(ancestor.inputPath);
+        return GroovyVariable.paramName(inputPath);
     }
 
     public String toString() {
