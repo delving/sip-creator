@@ -116,9 +116,7 @@ public class RecDefTree implements RecDefNode.Listener {
         private StringBuilder stringBuilder = new StringBuilder();
 
         public void line(String line) {
-            for (int walk = 0; walk < indentLevel; walk++) {
-                stringBuilder.append('\t');
-            }
+            for (int walk = 0; walk < indentLevel; walk++) stringBuilder.append("  ");
             stringBuilder.append(line).append('\n');
         }
 

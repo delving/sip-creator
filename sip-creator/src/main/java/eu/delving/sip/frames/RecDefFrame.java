@@ -71,6 +71,7 @@ public class RecDefFrame extends FrameBase {
                 Exec.swing(new CodeUpdater());
             }
         });
+        codeArea.setFont(new Font("Monospaced", Font.BOLD, 14));
         recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty")));
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
