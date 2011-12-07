@@ -83,23 +83,32 @@ public class TestCodeGeneration {
     }
 
     private MetadataRecord createInputRecord() {
-        GroovyNode input = new GroovyNode(null, "input");
-        GroovyNode leadup = new GroovyNode(input, "leadup");
+        GroovyNode input, leadup, record, list, member1, member2;
+        input = n(null, "input");
+        leadup = n(input, "leadup");
         leadup.attributes().put("orderofsort", "backward");
-        GroovyNode record = new GroovyNode(leadup, "record");
-        GroovyNode list = new GroovyNode(record, "list");
-        GroovyNode member1 = new GroovyNode(list, "member");
+        record = n(leadup, "record");
+        list = n(record, "list");
+        member1 = n(list, "member");
         member1.attributes().put("index", "23");
-        new GroovyNode(member1, "name", "Gumby Dammit");
-        new GroovyNode(member1, "concept", "superhero");
-        GroovyNode member2 = new GroovyNode(list, "member");
+        n(member1, "name", "Gumby Dammit");
+        n(member1, "concept", "superhero");
+        member2 = n(list, "member");
         member2.attributes().put("index", "45");
-        new GroovyNode(member2, "name", "O'Pokey");
-        new GroovyNode(member2, "name", "McPokey");
-        new GroovyNode(member2, "concept", "sidekick");
+        n(member2, "name", "O'Pokey");
+        n(member2, "name", "McPokey");
+        n(member2, "concept", "sidekick");
         Map<String,String> ns = new TreeMap<String, String>();
         ns.put("lido", "http://lidoland");
         return new MetadataRecordFactory(ns).fromGroovyNode(input, -1, 1);
+    }
+
+    private static GroovyNode n(GroovyNode parent, String name) {
+        return new GroovyNode(parent, name);
+    }
+
+    private static GroovyNode n(GroovyNode parent, String name, String value) {
+        return new GroovyNode(parent, name, value);
     }
 
     private static NodeMapping mapping(String path) {
