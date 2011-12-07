@@ -84,10 +84,13 @@ public class RecDefFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Document Structure", createStructurePanel());
-        tabs.addTab("Builder Code", createCodePanel());
-        content.add(tabs, BorderLayout.CENTER);
+        content.setLayout(new GridLayout(1,0, 5, 5));
+        content.add(createStructurePanel());
+        content.add(createCodePanel());
+//        JTabbedPane tabs = new JTabbedPane();
+//        tabs.addTab("Document Structure", createStructurePanel());
+//        tabs.addTab("Builder Code", createCodePanel());
+//        content.add(tabs, BorderLayout.CENTER);
     }
 
     @Override

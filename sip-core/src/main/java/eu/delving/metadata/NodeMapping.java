@@ -247,7 +247,7 @@ public class NodeMapping {
 
     private NodeMapping getAncestorNodeMapping() {
         for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
-            if (ancestor.getNodeMapping() != null) return ancestor.getNodeMapping();
+            if (ancestor.getNodeMapping() != null && ancestor.getNodeMapping().inputPath.isAncestorOf(inputPath)) return ancestor.getNodeMapping();
         }
         return null;
     }

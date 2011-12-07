@@ -96,8 +96,10 @@ public class AllFrames {
                 ),
                 view(QUICK_MAPPING,
                         block(analysis, 0, 0),
-                        block(statistics, 1, 0),
-                        block(recDef, 2, 0)
+
+                        block(recDef, 1, 0, 2, 1)
+//                        block(statistics, 1, 0),
+//                        block(recDef, 2, 0)
                 ),
                 view(BIG_PICTURE,
                         block(input, 0, 0),
