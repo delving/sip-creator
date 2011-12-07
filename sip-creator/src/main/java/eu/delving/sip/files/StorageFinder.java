@@ -62,7 +62,7 @@ public class StorageFinder {
             case 1:
                 return files[0];
             default:
-                return chooseDirectory(files);
+                return chooseDirectory(files, args);
         }
     }
 
@@ -143,12 +143,14 @@ public class StorageFinder {
         }
     }
 
-    private static File chooseDirectory(File[] directories) {
-        String [] hostPorts = new String[directories.length];
+    private static File chooseDirectory(File[] directories, String [] args) {
+        String favoriteUser = args.length == 0 ? "" : args[0];
+        String [] endpoints = new String[directories.length];
         for (int walk=0; walk<directories.length; walk++) {
-            hostPorts[walk] = getHostPortUser(directories[walk]);
+            endpoints[walk] = getHostPortUser(directories[walk]);
+            if (favoriteUser.equals(getUser(directories[walk]))) return directories[walk];
         }
-        JComboBox box = new JComboBox(hostPorts);
+        JComboBox box = new JComboBox(endpoints);
         int okCancel = JOptionPane.showConfirmDialog(null, box, "Choose server", JOptionPane.OK_CANCEL_OPTION);
         if (okCancel == JOptionPane.CANCEL_OPTION) {
             System.exit(0);
