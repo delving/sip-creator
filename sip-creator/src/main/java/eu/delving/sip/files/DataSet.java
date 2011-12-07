@@ -22,6 +22,7 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.FactDefinition;
+import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.ProgressListener;
@@ -53,6 +54,8 @@ public interface DataSet {
     List<FactDefinition> getFactDefinitions() throws StorageException;
 
     List<String> getRecDefPrefixes() throws StorageException;
+
+    RecDef getRecDef(String prefix) throws StorageException;
 
     DataSetState getState();
 

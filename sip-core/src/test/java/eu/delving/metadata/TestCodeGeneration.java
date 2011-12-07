@@ -41,15 +41,21 @@ import java.util.*;
 
 public class TestCodeGeneration {
 
-    static final RecMapping recMapping = RecMapping.create("lido", recDefModel());
+    static RecMapping recMapping;
 
     static {
-        recMapping.getRecDefTree().setListener(new RecDefNode.Listener() {
-            @Override
-            public void nodeMappingSet(RecDefNode recDefNode) {
-                System.out.println("Mapping set: " + recDefNode);
-            }
-        });
+        try {
+            recMapping = RecMapping.create("lido", recDefModel());
+            recMapping.getRecDefTree().setListener(new RecDefNode.Listener() {
+                @Override
+                public void nodeMappingSet(RecDefNode recDefNode) {
+                    System.out.println("Mapping set: " + recDefNode);
+                }
+            });
+        }
+        catch (MetadataException e) {
+            throw new RuntimeException("Problem!");
+        }
     }
 
     @Test
@@ -98,7 +104,7 @@ public class TestCodeGeneration {
         n(member2, "name", "O'Pokey");
         n(member2, "name", "McPokey");
         n(member2, "concept", "sidekick");
-        Map<String,String> ns = new TreeMap<String, String>();
+        Map<String, String> ns = new TreeMap<String, String>();
         ns.put("lido", "http://lidoland");
         return new MetadataRecordFactory(ns).fromGroovyNode(input, -1, 1);
     }

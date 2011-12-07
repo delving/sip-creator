@@ -21,7 +21,6 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.metadata.FactDefinition;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -30,7 +29,6 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 /**
  * The menu for choosing from local data sets.
@@ -78,7 +76,6 @@ public class DataSetMenu extends JMenu {
             DataSetItem last = null;
             boolean somethingSelected = false;
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
-                List<FactDefinition> factDefinitions = dataSet.getFactDefinitions();
                 for (String prefix : dataSet.getRecDefPrefixes()) {
                     final DataSetItem item = new DataSetItem(dataSet, prefix);
                     bg.add(item);

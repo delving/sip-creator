@@ -21,10 +21,7 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.FactDefinition;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.RecDefModel;
-import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
@@ -81,12 +78,14 @@ public class DataSetModel implements RecDefModel {
     }
 
     @Override
-    public RecDefTree createRecDef(String prefix) {
-        RecDefTree def = null;
-        if (def == null) {
-            throw new RuntimeException("Expected to have a record definition for prefix " + prefix);
+    public RecDefTree createRecDef(String prefix) throws MetadataException {
+        try {
+            RecDef recDef = dataSet.getRecDef(prefix);
+            return RecDefTree.create(recDef);
         }
-        return def;
+        catch (StorageException e) {
+            throw new MetadataException(e);
+        }
     }
 
     public void setDataSet(final DataSet dataSet) throws StorageException {

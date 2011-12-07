@@ -45,5 +45,5 @@ public interface RecDefModel {
 
     Set<String> getPrefixes() throws MetadataException;
 
-    RecDefTree createRecDef(String prefix);
+    RecDefTree createRecDef(String prefix) throws MetadataException;
 }

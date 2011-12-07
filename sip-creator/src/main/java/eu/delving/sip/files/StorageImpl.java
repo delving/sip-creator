@@ -121,8 +121,13 @@ public class StorageImpl extends StorageBase implements Storage {
                 recMapping = getRecMapping(prefix, recDefModel);
             }
             else {
-                recMapping = RecMapping.create(prefix, recDefModel);
-                setRecMapping(recMapping);
+                try {
+                    recMapping = RecMapping.create(prefix, recDefModel);
+                    setRecMapping(recMapping);
+                }
+                catch (MetadataException e) {
+                    throw new StorageException("Unable to load record definition", e);
+                }
             }
             return recMapping;
         }
@@ -157,6 +162,17 @@ public class StorageImpl extends StorageBase implements Storage {
                 throw new StorageException("Unable to load metadata model");
             }
             return prefixes;
+        }
+
+        @Override
+        public RecDef getRecDef(String prefix) throws StorageException {
+            try {
+                File file = recordDefinitionFile(here, prefix);
+                return RecDef.read(new FileInputStream(file));
+            }
+            catch (FileNotFoundException e) {
+                throw new StorageException("Unable to load record definition for " + prefix, e);
+            }
         }
 
         @Override
@@ -371,7 +387,12 @@ public class StorageImpl extends StorageBase implements Storage {
                 }
             }
             else {
-                return RecMapping.create(prefix, recDefModel);
+                try {
+                    return RecMapping.create(prefix, recDefModel);
+                }
+                catch (MetadataException e) {
+                    throw new StorageException("Unable to load record definition", e);
+                }
             }
         }
 

@@ -31,8 +31,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
 
-import static eu.delving.sip.files.Storage.FileType.*;
 import static eu.delving.sip.files.Storage.*;
+import static eu.delving.sip.files.Storage.FileType.*;
 
 /**
  * This class contains helpers for the StorageImpl to lean on
@@ -196,6 +196,10 @@ public class StorageBase {
 
     File factDefinitionFile(File dir) {
         return new File(dir, Storage.FileType.FACT_DEFINITION.getName());
+    }
+
+    File recordDefinitionFile(File dir, String prefix) {
+        return new File(dir, String.format(FileType.RECORD_DEFINITION.getPattern(), prefix));
     }
 
     List<File> findRecordDefinitionFiles(File dir) {

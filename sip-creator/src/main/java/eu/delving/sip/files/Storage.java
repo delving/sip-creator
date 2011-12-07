@@ -49,7 +49,7 @@ public interface Storage {
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         VALIDATION(null, "validation_", null, "validation_%s.int", 1),
         REPORT(null, null, null, "report_%s.txt", 1),
-        RECORD_DEFINITION(null, null, "-record-definition.xml", null, 1),
+        RECORD_DEFINITION(null, null, "-record-definition.xml", "%s-record-definition.xml", 1),
         FACT_DEFINITION("fact-definition-list.xml");
 
         private String name, prefix, suffix, pattern;

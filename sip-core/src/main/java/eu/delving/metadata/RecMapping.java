@@ -121,7 +121,7 @@ public class RecMapping {
         }
     }
 
-    public static RecMapping create(String prefix, RecDefModel recDefModel) {
+    public static RecMapping create(String prefix, RecDefModel recDefModel) throws MetadataException {
         return new RecMapping(prefix, recDefModel.createRecDef(prefix));
     }
 
