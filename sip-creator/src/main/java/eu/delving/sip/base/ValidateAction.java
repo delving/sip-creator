@@ -51,7 +51,7 @@ public class ValidateAction extends AbstractAction {
         this.sipModel = sipModel;
         this.investigate = investigate;
         setEnabled(false);
-        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/validate-icon.png")));
+        putValue(Action.SMALL_ICON, Utility.VALIDATE_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())

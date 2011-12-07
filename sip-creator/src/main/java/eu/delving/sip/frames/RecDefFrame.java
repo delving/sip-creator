@@ -21,8 +21,10 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.RecDef;
+import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.model.RecDefTreeNode;
@@ -34,7 +36,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.io.IOException;
 
 /**
  * The structure of the input data, tree, variables and statistics.
@@ -49,16 +50,30 @@ public class RecDefFrame extends FrameBase {
 
     public RecDefFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Record Definition", false);
-        RecDef recDef;
-        RecDefNode root;
-        try {
-            recDef = RecDef.read(getClass().getResource("/lido-recdef.xml").openStream());
-            root = RecDefNode.create(new Ear(), recDef);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create(root)));
+        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+            @Override
+            public void recMappingSet(MappingModel mappingModel) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+            }
+
+            @Override
+            public void factChanged(MappingModel mappingModel) {
+            }
+
+            @Override
+            public void recDefNodeSelected(MappingModel mappingModel) {
+            }
+
+            @Override
+            public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
+            }
+        });
+        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty")));
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
@@ -74,6 +89,14 @@ public class RecDefFrame extends FrameBase {
 
     @Override
     protected void refresh() {
+        RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+        if (recMapping != null) {
+            recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create(recMapping.getRecDefTree().getRoot())));
+            recDefTree.setSelectionRow(0);
+        }
+        else {
+            recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
+        }
     }
 
     private JPanel createTreePanel() {
@@ -86,7 +109,7 @@ public class RecDefFrame extends FrameBase {
     private class Ear implements RecDefNode.Listener {
         @Override
         public void nodeMappingSet(RecDefNode recDefNode) {
-            System.out.println("!!! NodeMapping = "+recDefNode);
+            System.out.println("!!! NodeMapping = " + recDefNode);
         }
     }
 
@@ -94,10 +117,13 @@ public class RecDefFrame extends FrameBase {
 
         @Override
         public void valueChanged(TreeSelectionEvent event) {
-            RecDefTreeNode node = (RecDefTreeNode) event.getPath().getLastPathComponent();
-            showNode(node);
-            RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
-            root.showPath(recDefTree, node.getRecDefPath().getTagPath());
+            Object last = event.getPath().getLastPathComponent();
+            if (last instanceof RecDefTreeNode) {
+                RecDefTreeNode node = (RecDefTreeNode) last;
+                showNode(node);
+                RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
+                root.showPath(recDefTree, node.getRecDefPath().getTagPath());
+            }
         }
 
     }

@@ -58,7 +58,7 @@ public class ImportAction extends AbstractAction {
 
     public ImportAction(JDesktopPane parent, SipModel sipModel, HarvestPool harvestPool) {
         super("Import new data into this data set");
-        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/import-icon.png")));
+        putValue(Action.SMALL_ICON, Utility.IMPORT_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())

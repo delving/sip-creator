@@ -99,11 +99,11 @@ public class AllFrames {
                 ),
                 view(BIG_PICTURE,
                         block(input, 0, 0),
-//                        block(recordMapping, 1, 0),
+                        block(recDef, 1, 0),
                         block(output, 2, 0)
                 ),
                 view(CODE_TWEAKING,
-//                        block(recordMapping, 0, 0),
+                        block(recDef, 0, 0),
                         block(fieldMapping, 1, 0, 3, 1),
                         block(input, 4, 0)
                 ),
@@ -114,7 +114,7 @@ public class AllFrames {
                         block(create, 0, 0, 3, 3),
                         block(statistics, 0, 3, 2, 3),
                         block(input, 5, 0, 2, 4),
-//                        block(recordMapping, 3, 0, 2, 3),
+                        block(recDef, 3, 0, 2, 3),
                         block(fieldMapping, 2, 3, 3, 5),
                         block(output, 5, 4, 2, 4),
                         block(status, 0, 6, 2, 2)

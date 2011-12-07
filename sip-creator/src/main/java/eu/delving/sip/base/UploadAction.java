@@ -49,7 +49,7 @@ public class UploadAction extends AbstractAction {
 
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Upload this data set");
-        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/upload-icon.png")));
+        putValue(Action.SMALL_ICON, Utility.UPLOAD_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())

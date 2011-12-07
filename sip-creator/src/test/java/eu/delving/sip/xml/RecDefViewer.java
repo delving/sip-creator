@@ -26,6 +26,7 @@ import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.BookmarksTreeModel;
 import eu.delving.sip.model.RecDefTreeNode;
 
@@ -48,11 +49,10 @@ import java.io.IOException;
 public class RecDefViewer extends JFrame {
     private static final DataFlavor FLAVOR = new DataFlavor(StatsTreeNode.class, "node");
     private static final int MARGIN = 10;
-    private static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-expanded-icon.png"));
-    private static final Icon BOOKMARK_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-icon.png"));
-    private static final Icon VALUE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/value-element-icon.png"));
-    private static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/composite-element-icon.png"));
-    private static final Icon ATTRIBUTE_ICON = new ImageIcon(Icon.class.getResource("/icons/attribute-icon.png"));
+//    private static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-expanded-icon.png"));
+//    private static final Icon VALUE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/value-element-icon.png"));
+//    private static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/composite-element-icon.png"));
+//    private static final Icon ATTRIBUTE_ICON = new ImageIcon(Icon.class.getResource("/icons/attribute-icon.png"));
     private HtmlPanel recDefPanel = new HtmlPanel("Details");
     private HtmlPanel bookmarkPanel = new HtmlPanel("Details");
     private JTree recDefTree, bookmarksTree;
@@ -63,9 +63,9 @@ public class RecDefViewer extends JFrame {
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
-        recDefTree.collapseRow(0);
         recDefTree.setDropMode(DropMode.ON);
         recDefTree.setTransferHandler(new Xfer());
+        recDefTree.setSelectionRow(0);
         bookmarksTree = new JTree(new BookmarksTreeModel(recDef.bookmarks));
         bookmarksTree.setRootVisible(false);
         bookmarksTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -139,13 +139,13 @@ public class RecDefViewer extends JFrame {
             try {
                 node = (StatsTreeNode) transferable.getTransferData(FLAVOR);
                 if (node.getTag().isAttribute()) {
-                    return ATTRIBUTE_ICON;
+                    return Utility.ATTRIBUTE_ICON;
                 }
                 else if (node.getChildNodes().iterator().hasNext()) {
-                    return COMPOSITE_ELEMENT_ICON;
+                    return Utility.COMPOSITE_ELEMENT_ICON;
                 }
                 else {
-                    return VALUE_ELEMENT_ICON;
+                    return Utility.VALUE_ELEMENT_ICON;
                 }
             }
             catch (Exception e) {
@@ -285,18 +285,18 @@ public class RecDefViewer extends JFrame {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             if (value instanceof RecDef.Category) {
-                setIcon(expanded ? BOOKMARK_EXPANDED_ICON : BOOKMARK_ICON);
+                setIcon(expanded ? Utility.BOOKMARK_EXPANDED_ICON : Utility.BOOKMARK_ICON);
             }
             else if (value instanceof RecDef.Ref) {
                 RecDef.Ref ref = (RecDef.Ref) value;
                 if (ref.isAttr()) {
-                    setIcon(ATTRIBUTE_ICON);
+                    setIcon(Utility.ATTRIBUTE_ICON);
                 }
                 else if (!ref.elem.elemList.isEmpty()) {
-                    setIcon(COMPOSITE_ELEMENT_ICON);
+                    setIcon(Utility.COMPOSITE_ELEMENT_ICON);
                 }
                 else {
-                    setIcon(VALUE_ELEMENT_ICON);
+                    setIcon(Utility.VALUE_ELEMENT_ICON);
                 }
             }
             return component;

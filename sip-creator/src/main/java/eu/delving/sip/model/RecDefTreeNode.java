@@ -28,6 +28,7 @@ import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -49,6 +50,10 @@ public class RecDefTreeNode implements TreeNode {
     private StatsTreeNode statsTreeNode;
     private RecDefPath recDefPath;
     private Vector<RecDefTreeNode> children = new Vector<RecDefTreeNode>();
+
+    public static TreeNode create(String message) {
+        return new DefaultMutableTreeNode(message);
+    }
 
     public static RecDefTreeNode create(RecDefNode recDefNode) {
         return new RecDefTreeNode(null, recDefNode);
@@ -133,7 +138,8 @@ public class RecDefTreeNode implements TreeNode {
     }
 
     public RecDefPath getRecDefPath() {
-        if (recDefPath == null) recDefPath = parent == null ? new RecDefPath(this) : new RecDefPath(parent.getRecDefPath(), this);
+        if (recDefPath == null)
+            recDefPath = parent == null ? new RecDefPath(this) : new RecDefPath(parent.getRecDefPath(), this);
         return recDefPath;
     }
 
@@ -175,15 +181,20 @@ public class RecDefTreeNode implements TreeNode {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            RecDefTreeNode node = (RecDefTreeNode) value;
-            if (node.recDefNode.isAttr()) {
-                setIcon(Utility.ATTRIBUTE_ICON);
-            }
-            else if (node.hasChildElements()) {
-                setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+            if (value instanceof RecDefTreeNode) {
+                RecDefTreeNode node = (RecDefTreeNode) value;
+                if (node.recDefNode.isAttr()) {
+                    setIcon(Utility.ATTRIBUTE_ICON);
+                }
+                else if (node.hasChildElements()) {
+                    setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                }
+                else {
+                    setIcon(Utility.VALUE_ELEMENT_ICON);
+                }
             }
             else {
-                setIcon(Utility.VALUE_ELEMENT_ICON);
+                setIcon(Utility.COMPOSITE_ELEMENT_ICON);
             }
             return component;
         }

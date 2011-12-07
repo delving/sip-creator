@@ -59,7 +59,7 @@ public class DownloadAction extends AbstractAction {
 
     public DownloadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Download another data set");
-        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/download-icon.png")));
+        putValue(Action.SMALL_ICON, Utility.DOWNLOAD_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())

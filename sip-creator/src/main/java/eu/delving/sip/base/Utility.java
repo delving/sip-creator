@@ -43,9 +43,12 @@ public class Utility {
     public static final Icon BOOKMARK_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-icon.png"));
     public static final Icon VALUE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/value-element-icon.png"));
     public static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/composite-element-icon.png"));
+    public static final Icon DOWNLOAD_ICON = new ImageIcon(Icon.class.getResource("/icons/download-icon.png"));
+    public static final Icon UPLOAD_ICON = new ImageIcon(Icon.class.getResource("/icons/upload-icon.png"));
     public static final Icon ATTRIBUTE_ICON = new ImageIcon(Icon.class.getResource("/icons/attribute-icon.png"));
-
-
+    public static final Icon IMPORT_ICON = new ImageIcon(Icon.class.getResource("/icons/import-icon.png"));
+    public static final Icon VALIDATE_ICON = new ImageIcon(Icon.class.getResource("/icons/validate-icon.png"));
+    public static final Icon RELEASE_ICON = new ImageIcon(Icon.class.getResource("/icons/release-icon.png"));
 
     private static SpringLayout.Constraints getConstraintsForCell(int row, int col, Container parent, int cols) {
         SpringLayout layout = (SpringLayout) parent.getLayout();

@@ -63,6 +63,9 @@ public class RecMapping {
     @XStreamOmitField
     RecDefTree recDefTree;
 
+    public RecMapping() {
+    }
+
     private RecMapping(String prefix, RecDefTree recDefTree) {
         this.prefix = prefix;
         this.recDefTree = recDefTree;

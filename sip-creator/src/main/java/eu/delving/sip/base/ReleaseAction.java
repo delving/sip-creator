@@ -43,7 +43,7 @@ public class ReleaseAction extends AbstractAction {
 
     public ReleaseAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Release this data set for others to access");
-        putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/release-icon.png")));
+        putValue(Action.SMALL_ICON, Utility.RELEASE_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
