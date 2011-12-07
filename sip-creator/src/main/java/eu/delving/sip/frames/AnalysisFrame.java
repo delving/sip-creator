@@ -55,11 +55,13 @@ public class AnalysisFrame extends FrameBase {
     private JTree statisticsJTree;
     private DataSetState dataSetState;
 
-    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel) {
+    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler) {
         super(desktop, sipModel, "Analysis", false);
         statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel());
         statisticsJTree.getModel().addTreeModelListener(new Expander());
         statisticsJTree.setCellRenderer(new StatsTreeNode.Renderer());
+        statisticsJTree.setTransferHandler(transferHandler);
+        statisticsJTree.setDragEnabled(true);
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
         setDefaultSize(400, 800);

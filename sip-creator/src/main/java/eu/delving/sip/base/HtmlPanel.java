@@ -50,7 +50,7 @@ public class HtmlPanel extends JPanel {
         view.setContentType("text/html");
         view.setDocument(doc);
         add(new JScrollPane(view));
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(200, 200));
     }
 
     public HtmlPanel setTemplate(String template) {

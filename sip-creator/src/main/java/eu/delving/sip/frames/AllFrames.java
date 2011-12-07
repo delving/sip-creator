@@ -23,6 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.SipModel;
 
@@ -50,6 +51,7 @@ public class AllFrames {
     private int viewIndex = 1;
     private View current = CLEAR;
     private SipModel sipModel;
+    private TransferHandler transferHandler = new NodeTransferHandler();
 
     public enum View {
         CLEAR("Clear"),
@@ -78,9 +80,9 @@ public class AllFrames {
         FrameBase status, analysis, create, recDef, statistics, input, fieldMapping, output;
         this.frames = new FrameBase[]{
                 status = new FactsFrame(desktop, sipModel),
-                analysis = new AnalysisFrame(desktop, sipModel),
+                analysis = new AnalysisFrame(desktop, sipModel, transferHandler),
                 create = new CreateFrame(desktop, sipModel),
-                recDef = new RecDefFrame(desktop, sipModel),
+                recDef = new RecDefFrame(desktop, sipModel, transferHandler),
                 statistics = new StatisticsFrame(desktop, sipModel),
                 input = new InputFrame(desktop, sipModel),
                 fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory),

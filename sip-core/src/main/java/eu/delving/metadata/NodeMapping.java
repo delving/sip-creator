@@ -95,6 +95,7 @@ public class NodeMapping {
     }
 
     public boolean codeLooksLike(String codeString) {
+        if (groovyCode == null) return false;
         Iterator<String> walk = groovyCode.iterator();
         for (String line : codeString.split("\n")) {
             line = line.trim();

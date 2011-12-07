@@ -46,19 +46,16 @@ import java.awt.*;
 
 public class RecDefFrame extends FrameBase {
     private JTree recDefTree;
-    private HtmlPanel recDefPanel = new HtmlPanel("Details");
+    private JTextArea codeArea = new JTextArea();
+    private HtmlPanel detailsPanel = new HtmlPanel("Details");
 
-    public RecDefFrame(JDesktopPane desktop, SipModel sipModel) {
+    public RecDefFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler) {
         super(desktop, sipModel, "Record Definition", false);
         sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        refresh();
-                    }
-                });
+                Exec.swing(new TreeUpdater());
+                Exec.swing(new CodeUpdater());
             }
 
             @Override
@@ -71,6 +68,7 @@ public class RecDefFrame extends FrameBase {
 
             @Override
             public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
+                Exec.swing(new CodeUpdater());
             }
         });
         recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty")));
@@ -78,25 +76,31 @@ public class RecDefFrame extends FrameBase {
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
         recDefTree.setSelectionRow(0);
+        recDefTree.setDropMode(DropMode.ON);
+        recDefTree.setTransferHandler(transferHandler);
         setDefaultSize(400, 800);
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.add(createTreePanel(), BorderLayout.CENTER);
-        content.add(recDefPanel, BorderLayout.SOUTH);
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Document Structure", createStructurePanel());
+        tabs.addTab("Builder Code", createCodePanel());
+        content.add(tabs, BorderLayout.CENTER);
     }
 
     @Override
     protected void refresh() {
-        RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
-        if (recMapping != null) {
-            recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create(recMapping.getRecDefTree().getRoot())));
-            recDefTree.setSelectionRow(0);
-        }
-        else {
-            recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
-        }
+        new TreeUpdater().run();
+        new CodeUpdater().run();
+    }
+
+    private JPanel createStructurePanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
+        p.add(createTreePanel(), BorderLayout.CENTER);
+        p.add(detailsPanel, BorderLayout.SOUTH);
+        return p;
     }
 
     private JPanel createTreePanel() {
@@ -106,11 +110,11 @@ public class RecDefFrame extends FrameBase {
         return p;
     }
 
-    private class Ear implements RecDefNode.Listener {
-        @Override
-        public void nodeMappingSet(RecDefNode recDefNode) {
-            System.out.println("!!! NodeMapping = " + recDefNode);
-        }
+    private JPanel createCodePanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.setBorder(BorderFactory.createTitledBorder("Builder Code"));
+        p.add(scroll(codeArea), BorderLayout.CENTER);
+        return p;
     }
 
     private class RecDefSelection implements TreeSelectionListener {
@@ -120,17 +124,46 @@ public class RecDefFrame extends FrameBase {
             Object last = event.getPath().getLastPathComponent();
             if (last instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) last;
-                showNode(node);
+                showHtmlFor(node);
                 RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
                 root.showPath(recDefTree, node.getRecDefPath().getTagPath());
             }
         }
-
     }
 
-    private void showNode(RecDefTreeNode treeNode) {
+    private class TreeUpdater implements Runnable {
+
+        @Override
+        public void run() {
+            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+            if (recMapping != null) {
+                recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create(recMapping.getRecDefTree().getRoot())));
+                recDefTree.setSelectionRow(0);
+            }
+            else {
+                recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
+            }
+        }
+    }
+    
+    private class CodeUpdater implements Runnable {
+
+        @Override
+        public void run() {
+            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+            if (recMapping != null) {
+                String code = recMapping.toCode(null, null);
+                codeArea.setText(code);
+            }
+            else {
+                codeArea.setText("// No code");
+            }
+        }
+    }
+
+    private void showHtmlFor(RecDefTreeNode treeNode) {
         RecDefNode node = treeNode.getRecDefNode();
-        recDefPanel
+        detailsPanel
                 .setTemplate(node.isAttr() ? "templates/recdef-attribute" : "templates/recdef-element")
                 .put("name", node.getTag())
                 .put("doc", node.getDoc())

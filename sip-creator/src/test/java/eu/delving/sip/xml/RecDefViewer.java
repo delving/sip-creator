@@ -25,7 +25,6 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.HtmlPanel;
-import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.BookmarksTreeModel;
 import eu.delving.sip.model.RecDefTreeNode;
@@ -35,9 +34,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 /**
@@ -47,12 +43,7 @@ import java.io.IOException;
  */
 
 public class RecDefViewer extends JFrame {
-    private static final DataFlavor FLAVOR = new DataFlavor(StatsTreeNode.class, "node");
     private static final int MARGIN = 10;
-//    private static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-expanded-icon.png"));
-//    private static final Icon VALUE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/value-element-icon.png"));
-//    private static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/composite-element-icon.png"));
-//    private static final Icon ATTRIBUTE_ICON = new ImageIcon(Icon.class.getResource("/icons/attribute-icon.png"));
     private HtmlPanel recDefPanel = new HtmlPanel("Details");
     private HtmlPanel bookmarkPanel = new HtmlPanel("Details");
     private JTree recDefTree, bookmarksTree;
@@ -63,8 +54,6 @@ public class RecDefViewer extends JFrame {
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
-        recDefTree.setDropMode(DropMode.ON);
-        recDefTree.setTransferHandler(new Xfer());
         recDefTree.setSelectionRow(0);
         bookmarksTree = new JTree(new BookmarksTreeModel(recDef.bookmarks));
         bookmarksTree.setRootVisible(false);
@@ -129,84 +118,6 @@ public class RecDefViewer extends JFrame {
         p.add(new JScrollPane(recDefTree));
         p.add(recDefPanel);
         return p;
-    }
-
-    private class Xfer extends TransferHandler {
-
-        @Override
-        public Icon getVisualRepresentation(Transferable transferable) {
-            StatsTreeNode node;
-            try {
-                node = (StatsTreeNode) transferable.getTransferData(FLAVOR);
-                if (node.getTag().isAttribute()) {
-                    return Utility.ATTRIBUTE_ICON;
-                }
-                else if (node.getChildNodes().iterator().hasNext()) {
-                    return Utility.COMPOSITE_ELEMENT_ICON;
-                }
-                else {
-                    return Utility.VALUE_ELEMENT_ICON;
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        public int getSourceActions(javax.swing.JComponent jComponent) {
-            return LINK;
-        }
-
-        @Override
-        public Transferable createTransferable(JComponent c) {
-            return new Transferable() {
-                @Override
-                public DataFlavor[] getTransferDataFlavors() {
-                    return new DataFlavor[]{FLAVOR};
-                }
-
-                @Override
-                public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
-                    return dataFlavor.equals(FLAVOR);
-                }
-
-                @Override
-                public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
-//                    return analysisTree.getSelectionPath().getLastPathComponent();
-                    return "Gumby!";
-                }
-            };
-        }
-
-        @Override
-        public boolean canImport(TransferHandler.TransferSupport info) {
-//             if (!info.isDataFlavorSupported(DataFlavor.stringFlavor))
-//             JTree.DropLocation dl = (JTree.DropLocation)info.getDropLocation();
-//             TreePath path = dl.getPath();
-            return true;
-        }
-
-        @Override
-        public boolean importData(TransferHandler.TransferSupport info) {
-            if (!canImport(info)) return false;
-            StatsTreeNode node;
-            try {
-                node = (StatsTreeNode) info.getTransferable().getTransferData(FLAVOR);
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-            JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
-            TreePath path = location.getPath();
-            RecDefTreeNode target = (RecDefTreeNode) path.getLastPathComponent();
-            target.setStatsTreeNode(node);
-            showNode(target.getRecDefNode());
-            System.out.println("Dropped " + node + " into " + target);
-            return true;
-        }
     }
 
     private class RecDefSelection implements TreeSelectionListener {
