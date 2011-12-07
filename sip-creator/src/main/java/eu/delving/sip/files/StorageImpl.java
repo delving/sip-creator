@@ -132,7 +132,7 @@ public class StorageImpl extends StorageBase implements Storage {
             try {
                 File factDefFile = factDefinitionFile(here);
                 XStream stream = new XStream();
-                stream.processAnnotations(FactDefinition.class);
+                stream.processAnnotations(FactDefinition.List.class);
                 Reader reader = new InputStreamReader(new FileInputStream(factDefFile), "UTF-8");
                 FactDefinition.List factDefinitions = (FactDefinition.List) stream.fromXML(reader);
                 return factDefinitions.factDefinitions;
