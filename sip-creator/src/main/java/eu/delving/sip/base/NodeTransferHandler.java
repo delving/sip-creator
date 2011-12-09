@@ -88,10 +88,7 @@ public class NodeTransferHandler extends TransferHandler {
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
-//             if (!info.isDataFlavorSupported(DataFlavor.stringFlavor))
-//             JTree.DropLocation dl = (JTree.DropLocation)info.getDropLocation();
-//             TreePath path = dl.getPath();
-        return true;
+        return info.isDataFlavorSupported(FLAVOR);
     }
 
     @Override
