@@ -118,17 +118,10 @@ public class NodeMapping {
     }
 
     public void toLeafCode(RecDefTree.Out out, String editedCode) {
-        if (recDefNode.isAttr()) {
+        if (recDefNode.isAttr() || recDefNode.isSingular()) {
             out.line("%s : { ", recDefNode.getTag().toBuilderCall());
             out.before();
-            toGrabFirst(out);
-            out.after();
-            out.line("}");
-        }
-        else if (recDefNode.isSingular()) {
-            out.line("%s {", recDefNode.getTag().toBuilderCall());
-            out.before();
-            toGrabFirst(out);
+            toUserCode(out, true);
             out.after();
             out.line("}");
         }
@@ -137,57 +130,30 @@ public class NodeMapping {
             out.before();
             out.line("%s {", recDefNode.getTag().toBuilderCall());
             out.before();
-            toBuildX(out);
+            toUserCode(out, false);
             out.after();
             out.line("}");
             out.after();
             out.line("}");
         }
-
     }
 
-    private void toBuildX(RecDefTree.Out out) {
-        beginUserCode(out);
-        if (dictionary != null) {
-            out.line("from%s(%s)", getDictionaryName(), getParamName());
-        }
-        else if (groovyCode != null) {
-            outputGroovyCode(out);
-        }
-        else {
-            out.line("\"${%s}\"", getParamName());
-        }
-        endUserCode(out);
-    }
-
-    private void toGrabFirst(RecDefTree.Out out) {
-        beginUserCode(out);
-        if (dictionary != null) {
-            out.line("from%s(%s[0])", getDictionaryName(), getVariableName());
-        }
-        else if (groovyCode != null) {
-            outputGroovyCode(out);
-        }
-        else {
-            out.line("\"${%s[0]}\"", getVariableName());
-        }
-        endUserCode(out);
-    }
-
-    private void endUserCode(RecDefTree.Out out) {
-        out.line("// end user code");
-    }
-
-    private void beginUserCode(RecDefTree.Out out) {
+    private void toUserCode(RecDefTree.Out out, boolean grabFirst) {
         out.line("// begin user code");
-    }
-
-    private void outputGroovyCode(RecDefTree.Out out) {
-        for (String codeLine : groovyCode) {
-            if (codeIndent(codeLine) < 0) out.after();
-            out.line(codeLine);
-            if (codeIndent(codeLine) > 0) out.before();
+        if (groovyCode != null) {
+            for (String codeLine : groovyCode) {
+                if (codeIndent(codeLine) < 0) out.after();
+                out.line(codeLine);
+                if (codeIndent(codeLine) > 0) out.before();
+            }
         }
+        else if (dictionary != null) {
+            out.line("from%s(%s%s)", getDictionaryName(), getVariableName(), grabFirst ? "[0]" : "");
+        }
+        else {
+            out.line("\"${%s%s}\"", getVariableName(), grabFirst ? "[0]" : "");
+        }
+        out.line("// end user code");
     }
 
     public void generateDictionaryCode(RecDefTree.Out out) {
@@ -251,7 +217,8 @@ public class NodeMapping {
 
     private NodeMapping getAncestorNodeMapping() {
         for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
-            if (ancestor.getNodeMapping() != null && ancestor.getNodeMapping().inputPath.isAncestorOf(inputPath)) return ancestor.getNodeMapping();
+            if (ancestor.getNodeMapping() != null && ancestor.getNodeMapping().inputPath.isAncestorOf(inputPath))
+                return ancestor.getNodeMapping();
         }
         return null;
     }
