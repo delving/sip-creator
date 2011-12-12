@@ -126,7 +126,11 @@ public class NodeMapping {
             out.line("}");
         }
         else if (recDefNode.isSingular()) {
+            out.line("%s {", recDefNode.getTag().toBuilderCall());
+            out.before();
             toGrabFirst(out);
+            out.after();
+            out.line("}");
         }
         else {
             out.line("%s * { %s ->", getVariableName(), getParamName());
