@@ -60,7 +60,7 @@ public class SourceConverter {
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
     private Path recordRootPath;
     private Path uniqueElementPath;
-    private Map<String,String> namespaces;
+    private Map<String, String> namespaces;
     private int recordCount, totalRecords;
     private ProgressListener progressListener;
     private Path path = new Path();
@@ -70,7 +70,7 @@ public class SourceConverter {
     private boolean finished = false;
     private final Uniqueness uniqueness = new Uniqueness();
 
-    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath, Map<String,String> namespaces) {
+    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath, Map<String, String> namespaces) {
         this.recordRootPath = recordRootPath;
         this.totalRecords = totalRecords;
         this.uniqueElementPath = uniqueElementPath;
@@ -93,7 +93,8 @@ public class SourceConverter {
                         out.add(eventFactory.createStartDocument());
                         out.add(eventFactory.createCharacters("\n"));
                         List<Namespace> nslist = new ArrayList<Namespace>();
-                        for (Map.Entry<String,String> entry : namespaces.entrySet()) nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
+                        for (Map.Entry<String, String> entry : namespaces.entrySet())
+                            nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
                         out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
                         out.add(eventFactory.createCharacters("\n"));
                         break;
@@ -181,9 +182,11 @@ public class SourceConverter {
     }
 
     private void handleRecordAttribute(Attribute attr) {
+        path.push(Tag.attribute(attr.getName()));
+        if (path.equals(uniqueElementPath)) unique = attr.getValue();
+        path.pop();
         path.push(Tag.element(attr.getName()));
         addAttributeAsElement(attr);
-        if (path.equals(uniqueElementPath) && unique == null) unique = attr.getValue();
         path.pop();
     }
 
