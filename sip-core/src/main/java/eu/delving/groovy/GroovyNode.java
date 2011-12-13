@@ -27,7 +27,6 @@ import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
 import groovy.util.NodeList;
 import groovy.xml.QName;
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,12 +42,6 @@ import java.util.TreeMap;
 @SuppressWarnings("unchecked")
 public class GroovyNode {
     
-    private static Logger LOG = Logger.getLogger(GroovyNode.class);
-    
-    private static void log(String msg) {
-//        LOG.info(msg);
-    }
-                   
     private GroovyNode parent;
 
     private QName qName;
@@ -236,19 +229,11 @@ public class GroovyNode {
             if (child instanceof GroovyNode) {
                 GroovyNode childNode = (GroovyNode) child;
                 if (childNode.value() instanceof List && ((List) childNode.value).isEmpty()) {
-                    log("Child is empty list "+childNode.name());
                     continue;
                 }
                 if (name.equals(childNode.name())) {
-                    log("Grabbing"+childNode.name()+" containing "+childNode.value().getClass());
                     answer.add(childNode);
                 }
-                else {
-                    log("Skipping "+childNode.name());
-                }
-            }
-            else {
-                log("Child is not a GroovyNode");
             }
         }
         return answer;
