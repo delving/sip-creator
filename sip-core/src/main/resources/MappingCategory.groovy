@@ -1,40 +1,20 @@
 import eu.delving.groovy.DiscardRecordException
-import eu.delving.groovy.GroovyList
 import eu.delving.groovy.GroovyNode
 
 // MappingCategory is a class used as a Groovy Category to add methods to existing classes
 
 public class MappingCategory {
 
-    private static GroovyList toList(a) {
-        if (a instanceof GroovyList) {
-            return a
+    private static List toList(a) {
+        if (!a) return []
+        if (a instanceof List) {
+            if (a.size() == 1) return toList(a[0]) else return a
         }
-        else if (a instanceof List) {
-            if (!a) {
-                return new GroovyList()
-            }
-            else if (a.size() == 1) {
-                if (a[0] instanceof GroovyList) {
-                    return (GroovyList) a[0]
-                }
-                else if (a instanceof List) {
-                    return toList(a[0])
-                }
-                else {
-                    return new GroovyList(a[0])
-                }
-            }
-            else {
-                throw new RuntimeException("Unable to interpret list of ${a.size()} entries")
-            }
-        }
-        else if (a instanceof GroovyNode) {
-            return toList(((GroovyNode) a).value())
-        }
-        else {
-            return new GroovyList(a)
-        }
+        return [a]
+    }
+
+    static Object exists(List list) {
+        return ! toList(list).isEmpty();
     }
 
     static void discard(Boolean condition, String why) {
@@ -57,7 +37,7 @@ public class MappingCategory {
         return node.text().substring(from, to);
     }
 
-    static GroovyList ifAbsentUse(GroovyList list, Object factVariable) {
+    static List ifAbsentUse(List list, Object factVariable) {
         if (!list) {
             list += factVariable
         }
@@ -70,33 +50,33 @@ public class MappingCategory {
         return list
     }
 
-    static Object plus(a, b) { // operator +
-        GroovyList both = new GroovyList()
-        both.addAll(a.children())
-        both.addAll(b.children())
+    static Object plus(List a, List b) { // operator +
+        List both = new NodeList()
+        both.addAll(a)
+        both.addAll(b)
         return both;
     }
 
     static Object or(a, b) { // operator |
         a = toList(a)
         b = toList(b)
-        GroovyList listA = a.children()
-        GroovyList listB = b.children()
-        GroovyList tupleList = new GroovyList()
-        int max = Math.min(listA.size(), listB.size());
-        for (Integer index: 0..(max - 1)) tupleList.add(new GroovyList(listA[index], listB[index]))
+        List tupleList = new NodeList()
+        int max = Math.min(a.size(), b.size());
+        for (Integer index: 0..(max - 1)) {
+            tupleList.add([a[index], b[index]])
+        }
         return tupleList
     }
 
     static Object multiply(a, Closure closure) { // operator *
         a = toList(a)
-        for (Object child: a.children()) closure.call(child);
+        for (Object child: a) closure.call(child);
         return null
     }
 
-    static GroovyList multiply(a, String delimiter) {
+    static List multiply(a, String delimiter) {
         a = toList(a)
-        Iterator walk = a.children().iterator();
+        Iterator walk = a.iterator();
         StringBuilder out = new StringBuilder()
         while (walk.hasNext()) {
             out.append(walk.next())
@@ -104,33 +84,33 @@ public class MappingCategory {
                 out.append(delimiter)
             }
         }
-        return new GroovyList(out.toString())
+        return [out.toString()];
     }
 
     static Object power(a, Closure closure) {  // operator **
         a = toList(a)
-        for (Object child: a.children()) {
+        for (Object child: a) {
             closure.call(child)
             break
         }
         return null
     }
 
-    static GroovyList mod(a, String regex) {
+    static List mod(a, String regex) {
         a = toList(a)
-        GroovyList all = new GroovyList();
-        for (Object node: a.children()) {
+        List all = new NodeList();
+        for (Object node: a) {
             if (node instanceof GroovyNode) {
-                all += new GroovyList(node.text().split(regex))
+                all += node.text().split(regex)
             }
         }
         return all;
     }
 
-    static GroovyList extractYear(a) {
+    static List extractYear(a) {
         a = toList(a)
         String text = a.text()
-        GroovyList result = new GroovyList()
+        List result = new NodeList()
         switch (text) {
 
             case ~/$normalYear/:
@@ -177,7 +157,7 @@ public class MappingCategory {
 
     static String toId(a, spec) {
         a = toList(a)
-        String identifier = a.text()
+        String identifier = a.toString()
         if (!spec) {
             throw new MissingPropertyException("spec", String.class)
         }
@@ -198,7 +178,7 @@ public class MappingCategory {
         return sanitize(node.toString())
     }
 
-    static String sanitize(GroovyList list) {
+    static String sanitize(List list) {
         return sanitize(list.toString())
     }
 

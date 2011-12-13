@@ -25,7 +25,9 @@ import eu.delving.metadata.Sanitizer;
 import groovy.lang.DelegatingMetaClass;
 import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
+import groovy.util.NodeList;
 import groovy.xml.QName;
+import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +42,13 @@ import java.util.TreeMap;
 
 @SuppressWarnings("unchecked")
 public class GroovyNode {
-
+    
+    private static Logger LOG = Logger.getLogger(GroovyNode.class);
+    
+    private static void log(String msg) {
+        LOG.info(msg);
+    }
+                   
     private GroovyNode parent;
 
     private QName qName;
@@ -56,11 +64,11 @@ public class GroovyNode {
     }
 
     public GroovyNode(GroovyNode parent, String name) {
-        this(parent, new QName(name), new GroovyList());
+        this(parent, new QName(name), new NodeList());
     }
 
     public GroovyNode(GroovyNode parent, QName qName) {
-        this(parent, qName, new GroovyList());
+        this(parent, qName, new NodeList());
     }
 
     public GroovyNode(GroovyNode parent, String name, String value) {
@@ -116,8 +124,15 @@ public class GroovyNode {
         return "";
     }
 
-    public GroovyList children() {
-        return (value instanceof GroovyList) ? (GroovyList) value : new GroovyList(value);
+    public List children() {
+        if (value instanceof List) {
+            return(List)value;
+        }
+        else {
+            List l = new NodeList(4);
+            l.add(value);
+            return l;
+        }
     }
 
     public Map<String, String> attributes() {
@@ -208,43 +223,51 @@ public class GroovyNode {
             parentList = (List<Object>) parentValue;
         }
         else {
-            parentList = new GroovyList();
+            parentList = new NodeList();
             parentList.add(parentValue);
             parent.setValue(parentList);
         }
         return parentList;
     }
 
-    private GroovyList getByName(String name) {
-        GroovyList answer = new GroovyList();
+    private List getByName(String name) {
+        List answer = new NodeList();
         for (Object child : children()) {
             if (child instanceof GroovyNode) {
                 GroovyNode childNode = (GroovyNode) child;
                 if (childNode.value() instanceof List && ((List) childNode.value).isEmpty()) {
+                    log("Child is empty list "+childNode.name());
                     continue;
                 }
                 if (name.equals(childNode.name())) {
+                    log("Grabbing"+childNode.name()+" containing "+childNode.value().getClass());
                     answer.add(childNode);
                 }
+                else {
+                    log("Skipping "+childNode.name());
+                }
+            }
+            else {
+                log("Child is not a GroovyNode");
             }
         }
         return answer;
     }
 
     private List<Object> getValueNodes() {
-        GroovyList answer = new GroovyList();
+        List answer = new NodeList();
         getValueNodes(answer);
         return answer;
     }
 
-    private void getValueNodes(GroovyList answer) {
-        if (value instanceof GroovyList) {
-            for (Object object : ((GroovyList) value)) {
+    private void getValueNodes(List answer) {
+        if (value instanceof List) {
+            for (Object object : ((List) value)) {
                 if (object instanceof GroovyNode) {
                     ((GroovyNode) object).getValueNodes(answer);
                 }
                 else {
-                    getValueNodes((GroovyList) object);
+                    getValueNodes((List) object);
                 }
             }
         }

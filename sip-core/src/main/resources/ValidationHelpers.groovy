@@ -1,8 +1,8 @@
 // ValidationHelpers contains methods to help with building validation assertions
 
 def stringify(Object value) {
-    if (value instanceof NodeList) {
-        NodeList list = (NodeList)value;
+    if (value instanceof List) {
+        List list = (List)value;
         if (list.size() == 1) {
             value = list[0]
         }
@@ -35,8 +35,8 @@ def isUrl(Object value) {
 
 def isOption(Object value) {
     if (!value) return true;
-    if (value instanceof NodeList) {
-        NodeList list = (NodeList)value
+    if (value instanceof List) {
+        List list = (List)value
         boolean option = true;
         for (nodeObject in list) {
             if (!checkOption((Node)nodeObject)) option = false;
@@ -53,8 +53,8 @@ def isOption(Object value) {
 
 def isUnique(Object value) {
     if (!value) return true;
-    if (value instanceof NodeList) {
-        NodeList list = (NodeList)value
+    if (value instanceof List) {
+        List list = (List)value
         if (list.size() == 1) {
             return checkUnique((Node)list[0])
         }
