@@ -74,7 +74,7 @@ public class MappingCategory {
         return null
     }
 
-    static List multiply(a, String delimiter) {
+    static List delimitWith(List a, String delimiter) {
         a = toList(a)
         Iterator walk = a.iterator();
         StringBuilder out = new StringBuilder()
