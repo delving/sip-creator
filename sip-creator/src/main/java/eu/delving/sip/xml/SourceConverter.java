@@ -182,9 +182,11 @@ public class SourceConverter {
     }
 
     private void handleRecordAttribute(Attribute attr) {
+        path.push(Tag.attribute(attr.getName()));
+        if (path.equals(uniqueElementPath)) unique = attr.getValue();
+        path.pop();
         path.push(Tag.element(attr.getName()));
         addAttributeAsElement(attr);
-        if (path.equals(uniqueElementPath) && unique == null) unique = attr.getValue();
         path.pop();
     }
 
