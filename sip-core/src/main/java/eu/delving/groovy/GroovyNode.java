@@ -46,7 +46,7 @@ public class GroovyNode {
     private static Logger LOG = Logger.getLogger(GroovyNode.class);
     
     private static void log(String msg) {
-        LOG.info(msg);
+//        LOG.info(msg);
     }
                    
     private GroovyNode parent;

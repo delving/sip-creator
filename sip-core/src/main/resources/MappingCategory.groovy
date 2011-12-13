@@ -13,8 +13,10 @@ public class MappingCategory {
         return [a]
     }
 
-    static Object exists(List list) {
-        return ! toList(list).isEmpty();
+    static boolean asBoolean(List list) {
+        if (list.isEmpty()) return false;
+        if (list.size() == 1 && list[0] instanceof List) return list[0].asBoolean()
+        return true;
     }
 
     static void discard(Boolean condition, String why) {
