@@ -22,6 +22,7 @@
 package eu.delving.groovy;
 
 import groovy.util.BuilderSupport;
+import groovy.util.NodeList;
 import groovy.xml.QName;
 
 import java.util.Map;
@@ -40,7 +41,7 @@ public class GroovyBuilder extends BuilderSupport {
     }
 
     protected Object createNode(Object name) {
-        return new GroovyNode(getCurrentNode(), (QName)name, new GroovyList());
+        return new GroovyNode(getCurrentNode(), (QName)name, new NodeList());
     }
 
     protected Object createNode(Object name, Object value) {
@@ -48,7 +49,7 @@ public class GroovyBuilder extends BuilderSupport {
     }
 
     protected Object createNode(Object name, Map attributes) {
-        return new GroovyNode(getCurrentNode(), (QName)name, attributes, new GroovyList());
+        return new GroovyNode(getCurrentNode(), (QName)name, attributes, new NodeList());
     }
 
     protected Object createNode(Object name, Map attributes, Object value) {
