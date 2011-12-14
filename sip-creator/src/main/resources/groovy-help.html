@@ -1,0 +1,122 @@
+<html>
+<body>
+<h2>Groovy Tips</h2>
+
+<hr/>
+<b>Output Calls</b><br/>
+<p>
+    To cause parts of the output record to be generated, this groovy code makes use of the given set of
+    namespaces associated with the target definition.  For example, Dublin Core fields are output using
+    the dot like this:
+</p>
+<br/>
+<pre>
+    dc.description "here the value to be output"
+</pre>
+<br/>
+
+<hr/>
+<b>Input Variables</b><br/>
+<p>
+    Values from the input record are fetched by referring to the tree of values using dot-notation starting
+    with <code>input.</code>, and these variables each represent a <b><i>list of values</i></b>.
+    The individual values are accessed by "multiplying" them with a code block which is surrounded
+    by braces.
+</p>
+<br>
+<pre>
+    input.part.subpart * {
+       // Here the subpart values are referred to as "it"
+       dc.description it
+    }
+</pre>
+<p>
+    These values can also be used in if-statements in which case they reveal if there is any data present
+    within them.
+</p>
+<br>
+<pre>
+    if (input.part.subpart) {
+       namespace.localPart 'subpart is present'
+    }
+</pre>
+<p>
+    The application of an input variable to a code block has the effect of returning a truth value revealing
+    if any elements were encountered, so that you can handle cases where you want a default value.
+</p>
+<br>
+<pre>
+    any = input.part.subpart * {
+        dc.description it
+    }
+    if (!any) {
+        dc.description 'No description available'
+    }
+</pre>
+<br/>
+
+<hr/>
+<b>Concatenating lists</b><br/>
+<p>
+    Putting several input variables between brackets and connected with the "+" operator causes the lists to be
+    combined into one before the code block is called for each value.
+</p>
+<br>
+<pre>
+    (input.part.subject + input.part.meaning) * {
+       // Here we encounter all members of both lists
+    }
+</pre>
+<br/>
+
+<hr/>
+<b>First value only</b><br/>
+<p>
+    Since each of these input variables represents a list, it may be desirable to fetch only the first of these
+    and ignore the rest.  In that case the "*" symbol is doubled to become "**"
+</p>
+<br>
+<pre>
+    input.part.subject ** {
+       // Here we encounter only the first subject
+    }
+</pre>
+<br/>
+
+<hr/>
+<b>Concatenating values</b><br/>
+<p>
+    The multiple values of input represented by a variable can easily be concatenated together to make one
+    single value, using a delimiter in between values.
+</p>
+<br/>
+<pre>
+    input.part.subject.concat(', ') * {
+       // "it" here is one value like "subjectone, subjecttwo, subjectthree"
+    }
+</pre>
+<br/>
+
+<hr/>
+<b>Creating tuples</b><br/>
+<p>
+    Sometimes you will need to group values together into a list of tuples, for example when there are
+    fields like "dimension" and "unit" separately, each with multiple values.  Using the vertical-line
+    operator lets you apply the code block to tuples containing members from each list.
+    Suppose we have two "input.width" containing values 45 and 63, and "input.unit" with values "cm" and "mm"
+</p>
+<br/>
+<pre>
+    (input.width | input.unit) * {
+       // "it" here is a list containing one "width" and one "dimension"
+       dc.format "Width: ${it[0]}${it[1])"
+    }
+</pre>
+<br/>
+
+
+
+<hr/>
+
+</body>
+</html>

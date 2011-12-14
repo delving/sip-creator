@@ -470,6 +470,7 @@ public class Application {
                 try {
                     Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
+                    application.allFrames.restore();
                 }
                 catch (StorageException e) {
                     JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
