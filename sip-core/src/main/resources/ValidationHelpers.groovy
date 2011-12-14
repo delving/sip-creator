@@ -1,16 +1,11 @@
 // ValidationHelpers contains methods to help with building validation assertions
 
-def stringify(Object value) {
-    if (value instanceof List) {
-        List list = (List)value;
-        if (list.size() == 1) {
-            value = list[0]
-        }
-    }
-    if (value instanceof Node) {
-        value = ((Node)value).value()
-    }
-    return value.toString()
+private static String stringifyFirst(a) {
+    if (!a) return ''
+    if (a instanceof String) return a
+    if (a instanceof Node) return stringifyFirst(a.value())
+    if (a instanceof List) return stringifyFirst(a[0])
+    return a.toString();
 }
 
 def checkOption(Node node) {
@@ -24,11 +19,12 @@ def checkUnique(Node node) {
 def isUrl(Object value) {
     if (!value) return true;
     try {
-        value = stringify(value);
-        new URL(value.toString())
+        String string = stringifyFirst(value);
+        new URL(string)
         return true;
     }
     catch (Exception e) {
+        e.printStackTrace()
         return false;
     }
 }
