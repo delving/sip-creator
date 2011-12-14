@@ -47,6 +47,7 @@ class TestMappingEngine {
 
     @Test
     void initialMapping() {
+        IndexDocument doc;
         try {
             String record =
             """
@@ -86,7 +87,7 @@ class TestMappingEngine {
                 <association.subject>bestuurders (Utrecht)</association.subject>
                 <priref>6389</priref>
                 """
-            IndexDocument doc = mappingEngine.executeMapping(record);
+            doc = mappingEngine.executeMapping(record);
             println "VALID!\n ${doc}"
             compareLines(doc.toString(),
                """IndexDocument {
