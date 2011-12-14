@@ -28,10 +28,7 @@ import groovy.lang.MetaClass;
 import groovy.util.NodeList;
 import groovy.xml.QName;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * A variation on the Groovy Node class which is used to store XML-like data
@@ -194,7 +191,7 @@ public class GroovyNode {
      */
     public List get(String key) {
         if (key != null && key.charAt(0) == '@') {
-            GroovyList answer = new GroovyList();
+            List answer = new ArrayList();
             String value = attributes().get(key.substring(1));
             if (value != null) answer.add(value);
             return answer;
