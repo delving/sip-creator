@@ -5,12 +5,13 @@ import eu.delving.groovy.GroovyNode
 
 public class MappingCategory {
 
-    private static List toList(a) {
-        if (!a) return []
-        if (a instanceof List) {
-            if (a.size() == 1) return toList(a[0]) else return a
-        }
-        return [a]
+    private static NodeList unwrap(a) {
+        if (!a) return new NodeList(0);
+        if (a instanceof NodeList) return a;
+        if (a instanceof List && ((List) a).size() == 1) return unwrap(((List) a)[0])
+        NodeList list = new NodeList();
+        list.add(a)
+        return list;
     }
 
     static boolean asBoolean(List list) {
@@ -52,6 +53,7 @@ public class MappingCategory {
         return list
     }
 
+    // concatenate lists
     static Object plus(List a, List b) { // operator +
         List both = new NodeList()
         both.addAll(a)
@@ -59,9 +61,10 @@ public class MappingCategory {
         return both;
     }
 
-    static Object or(a, b) { // operator |
-        a = toList(a)
-        b = toList(b)
+    // make tuples out of the entries in two lists
+    static Object or(List a, List b) { // operator |
+        a = unwrap(a)
+        b = unwrap(b)
         List tupleList = new NodeList()
         int max = Math.min(a.size(), b.size());
         for (Integer index: 0..(max - 1)) {
@@ -70,27 +73,29 @@ public class MappingCategory {
         return tupleList
     }
 
-    static Object multiply(a, Closure closure) { // operator *
-        a = toList(a)
-        for (Object child: a) closure.call(child);
-        return null
+    // run a closure on each member of the list
+    static boolean multiply(List a, Closure closure) { // operator *
+        a = unwrap(a)
+        boolean any = !a.isEmpty()
+        for (Object child: a) closure.call(child)
+        return any
     }
-
-    static List delimitWith(List a, String delimiter) {
-        a = toList(a)
+    
+    // run the closure once for the concatenated values
+    static List concat(List a, String delimiter) {
+        a = unwrap(a)
         Iterator walk = a.iterator();
         StringBuilder out = new StringBuilder()
         while (walk.hasNext()) {
             out.append(walk.next())
-            if (walk.hasNext()) {
-                out.append(delimiter)
-            }
+            if (walk.hasNext()) out.append(delimiter)
         }
-        return [out.toString()];
+        return [out.toString()]
     }
 
-    static Object power(a, Closure closure) {  // operator **
-        a = toList(a)
+    // call closure for the first if there is one
+    static Object power(List a, Closure closure) {  // operator **
+        a = unwrap(a)
         for (Object child: a) {
             closure.call(child)
             break
@@ -98,19 +103,8 @@ public class MappingCategory {
         return null
     }
 
-    static List mod(a, String regex) {
-        a = toList(a)
-        List all = new NodeList();
-        for (Object node: a) {
-            if (node instanceof GroovyNode) {
-                all += node.text().split(regex)
-            }
-        }
-        return all;
-    }
-
     static List extractYear(a) {
-        a = toList(a)
+        a = unwrap(a)
         String text = a.text()
         List result = new NodeList()
         switch (text) {
@@ -157,15 +151,11 @@ public class MappingCategory {
         return result
     }
 
-    static String toId(a, spec) {
-        a = toList(a)
+    static List toId(a, spec) {
+        a = unwrap(a)
         String identifier = a.toString()
-        if (!spec) {
-            throw new MissingPropertyException("spec", String.class)
-        }
-        if (!identifier) {
-            throw new MissingPropertyException("Identifier passed to toId", String.class)
-        }
+        if (!spec) throw new MissingPropertyException("spec", String.class)
+        if (!identifier) throw new MissingPropertyException("Identifier passed to toId", String.class)
         def uriBytes = identifier.toString().getBytes("UTF-8");
         def digest = java.security.MessageDigest.getInstance("SHA-1")
         def hash = new StringBuilder()
@@ -173,7 +163,7 @@ public class MappingCategory {
             hash.append('0123456789ABCDEF'[(b & 0xF0) >> 4])
             hash.append('0123456789ABCDEF'[b & 0x0F])
         }
-        return "$spec/$hash"
+        return ["$spec/$hash"]
     }
 
     static String sanitize(GroovyNode node) {
