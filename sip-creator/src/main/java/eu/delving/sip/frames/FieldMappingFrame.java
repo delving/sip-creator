@@ -40,6 +40,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.IOException;
 
 /**
  * Refining the mapping interactively
@@ -50,6 +51,7 @@ import java.awt.event.FocusListener;
 public class FieldMappingFrame extends FrameBase {
     private JTextArea groovyCodeArea;
     private JTextArea outputArea;
+    private JEditorPane helpView;
     private JButton dictionaryCreate = new JButton("Create");
     private JButton dictionaryEdit = new JButton("Edit");
     private JButton dictionaryDelete = new JButton("Delete");
@@ -59,6 +61,12 @@ public class FieldMappingFrame extends FrameBase {
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel, final EditHistory editHistory) {
         super(desktop, sipModel, "Field Mapping", false);
         this.editHistory = editHistory;
+        try {
+            helpView = new JEditorPane(getClass().getResource("/groovy-help.html"));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         dictionaryCreate.setEnabled(false);
         dictionaryEdit.setEnabled(false);
         dictionaryDelete.setEnabled(false);
@@ -80,7 +88,6 @@ public class FieldMappingFrame extends FrameBase {
                 }
         );
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
-        outputArea.setEditable(false);
         Utility.attachUrlLauncher(outputArea);
         wireUp();
     }
@@ -106,7 +113,14 @@ public class FieldMappingFrame extends FrameBase {
         return p;
     }
 
-    private JPanel createGroovyPanel() {
+    private JComponent createGroovyPanel() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Code", createCodePanel());
+        tabs.addTab("Help", scroll(helpView));
+        return tabs;
+    }
+
+    private JComponent createCodePanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Groovy Code"));
         p.add(scroll(groovyCodeArea), BorderLayout.CENTER);

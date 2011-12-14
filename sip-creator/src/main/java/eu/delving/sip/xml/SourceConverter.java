@@ -39,7 +39,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
 import static eu.delving.sip.files.Storage.RECORD_TAG;
@@ -57,6 +60,7 @@ public class SourceConverter {
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
     private Path recordRootPath;
     private Path uniqueElementPath;
+    private Map<String, String> namespaces;
     private int recordCount, totalRecords;
     private ProgressListener progressListener;
     private Path path = Path.empty();
@@ -64,13 +68,13 @@ public class SourceConverter {
     private String unique;
     private List<XMLEvent> eventBuffer = new ArrayList<XMLEvent>();
     private boolean finished = false;
-    private NamespaceCollector namespaceCollector = new NamespaceCollector();
     private final Uniqueness uniqueness = new Uniqueness();
 
-    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath) {
+    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath, Map<String, String> namespaces) {
         this.recordRootPath = recordRootPath;
         this.totalRecords = totalRecords;
         this.uniqueElementPath = uniqueElementPath;
+        this.namespaces = namespaces;
     }
 
     public void setProgressListener(ProgressListener progressListener) {
@@ -88,27 +92,23 @@ public class SourceConverter {
                     case XMLEvent.START_DOCUMENT:
                         out.add(eventFactory.createStartDocument());
                         out.add(eventFactory.createCharacters("\n"));
+                        List<Namespace> nslist = new ArrayList<Namespace>();
+                        for (Map.Entry<String, String> entry : namespaces.entrySet())
+                            nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
+                        out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
+                        out.add(eventFactory.createCharacters("\n"));
                         break;
                     case XMLEvent.START_ELEMENT:
                         StartElement start = event.asStartElement();
                         path.push(Tag.element(start.getName()));
                         if (!eventBuffer.isEmpty()) {
                             if (unique == null && path.equals(uniqueElementPath)) uniqueBuilder = new StringBuilder();
-                            eventBuffer.add(start); // includes attributes
+                            eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
                         }
                         else if (path.equals(recordRootPath)) {
-                            if (namespaceCollector != null) {
-                                namespaceCollector.gatherFrom(start);
-                                out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, namespaceCollector.iterator()));
-                                out.add(eventFactory.createCharacters("\n"));
-                                namespaceCollector = null;
-                            }
                             eventBuffer.add(eventFactory.createCharacters("\n")); // nonempty: flag that record has started
                             handleRecordAttributes(start);
                             if (progressListener != null) progressListener.setProgress(recordCount);
-                        }
-                        else if (namespaceCollector != null) {
-                            namespaceCollector.gatherFrom(start);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -195,21 +195,5 @@ public class SourceConverter {
         eventBuffer.add(eventFactory.createCharacters(attr.getValue()));
         eventBuffer.add(eventFactory.createEndElement(attr.getName(), null));
         eventBuffer.add(eventFactory.createCharacters("\n"));
-    }
-
-    private class NamespaceCollector {
-        private Map<String, Namespace> map = new TreeMap<String, Namespace>();
-
-        public void gatherFrom(StartElement start) {
-            Iterator walk = start.getNamespaces();
-            while (walk.hasNext()) {
-                Namespace ns = (Namespace) walk.next();
-                map.put(ns.getPrefix(), ns);
-            }
-        }
-
-        public Iterator iterator() {
-            return map.values().iterator();
-        }
     }
 }

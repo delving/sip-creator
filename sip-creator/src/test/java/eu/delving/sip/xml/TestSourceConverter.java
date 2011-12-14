@@ -32,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Make sure the source converter works as expected
@@ -45,16 +47,14 @@ public class TestSourceConverter {
             "<the-root",
             " xmlns:a=\"http://a\"",
             " xmlns:b=\"http://b\"",
-            " xmlns:c=\"http://c\"",
             ">",
             "<sub-root xmlns:c=\"http://c\">", // repeated
             "<we-are-in-record>",
             "<a:boo>scary</a:boo>",
             "<a:unique>03030030</a:unique>",
             "<b:shh silent=\"very\">quiet</b:shh>",
-            "<c:boring>zzzz</c:boring>",
             "</we-are-in-record>",
-            "               <we-are-in-record>           ",
+            "               <we-are-in-record xmlns:c=\"http://c\">           ",
             "<a:boo>very scary</a:boo>",
             "<b:shh>deathly quiet",
             "</b:shh>",
@@ -70,7 +70,13 @@ public class TestSourceConverter {
     };
     private static Path ROOT = Path.create("/the-root/sub-root/we-are-in-record");
     private static Path UNIQ = Path.create("/the-root/sub-root/we-are-in-record/a:unique");
-    private SourceConverter converter = new SourceConverter(ROOT, 2, UNIQ);
+    private static Map<String,String> namespaces = new TreeMap<String, String>();
+    static {
+        namespaces.put("a", "http://a");
+        namespaces.put("b", "http://b");
+        namespaces.put("c", "http://c");
+    }
+    private SourceConverter converter = new SourceConverter(ROOT, 2, UNIQ, namespaces);
 
     @Test
     public void runThrough() throws IOException, XMLStreamException, UniquenessException {
@@ -91,7 +97,6 @@ public class TestSourceConverter {
                 "<a:boo>scary</a:boo>",
                 "<a:unique>03030030</a:unique>",
                 "<b:shh silent=\"very\">quiet</b:shh>",
-                "<c:boring>zzzz</c:boring>",
                 "</input>",
                 "<input>",
                 "<_id>0404040404</_id>",

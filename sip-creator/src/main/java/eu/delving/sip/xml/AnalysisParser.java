@@ -35,10 +35,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Analyze xml input and compile statistics. When analysis fails, the .error will be appended to the filename
@@ -52,6 +49,7 @@ public class AnalysisParser implements Runnable {
     public static final int ELEMENT_STEP = 10000;
     private Path path = Path.empty();
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
+    private Map<String,String> namespaces = new TreeMap<String, String>();
     private Listener listener;
     private DataSet dataSet;
 
@@ -97,12 +95,9 @@ public class AnalysisParser implements Runnable {
             while (running) {
                 switch (input.getEventType()) {
                     case XMLEvent.START_ELEMENT:
-                        if (++count % ELEMENT_STEP == 0) {
-                            if (null != listener) {
-                                if (!listener.progress(count)) {
-                                    running = false;
-                                }
-                            }
+                        if (++count % ELEMENT_STEP == 0 && null != listener && !listener.progress(count)) running = false;
+                        for (int walk=0; walk<input.getNamespaceCount(); walk++) {
+                            namespaces.put(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
                         }
                         path.push(Tag.element(input.getName()));
                         if (input.getAttributeCount() > 0) {
@@ -134,7 +129,7 @@ public class AnalysisParser implements Runnable {
             input.close();
             if (running) {
                 List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
-                listener.success(new Statistics(fieldStatisticsList, sourceFormat));
+                listener.success(new Statistics(namespaces, fieldStatisticsList, sourceFormat));
             }
             else {
                 listener.failure(null, null);
