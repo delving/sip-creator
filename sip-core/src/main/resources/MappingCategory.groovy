@@ -56,8 +56,8 @@ public class MappingCategory {
     // concatenate lists
     static Object plus(List a, List b) { // operator +
         List both = new NodeList()
-        both.addAll(a)
-        both.addAll(b)
+        both.addAll(unwrap(a))
+        both.addAll(unwrap(b))
         return both;
     }
 
