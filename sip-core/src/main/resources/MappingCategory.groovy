@@ -153,7 +153,7 @@ public class MappingCategory {
 
     static List toId(a, spec) {
         a = unwrap(a)
-        String identifier = a.toString()
+        String identifier = a[0].toString()
         if (!spec) throw new MissingPropertyException("spec", String.class)
         if (!identifier) throw new MissingPropertyException("Identifier passed to toId", String.class)
         def uriBytes = identifier.toString().getBytes("UTF-8");
