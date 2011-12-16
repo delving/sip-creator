@@ -63,7 +63,7 @@ public class Application {
     private VisualFeedback feedback;
     private HarvestDialog harvestDialog;
     private HarvestPool harvestPool;
-    private DataSetStateButton dataSetStateButton = new DataSetStateButton();
+    private StatusPanel statusPanel = new StatusPanel();
     private JToggleButton harvestToggleButton = new JToggleButton();
     private Timer resizeTimer;
     private EditHistory editHistory = new EditHistory();
@@ -125,7 +125,9 @@ public class Application {
         deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getButtonPanel(), BorderLayout.WEST);
-        home.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        screen.height -= 30;
+        home.setSize(screen);
         home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
         home.setIconImage(logo.getImage());
@@ -173,7 +175,7 @@ public class Application {
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                dataSetStateButton.setState(dataSetState);
+                statusPanel.setState(dataSetState);
             }
         });
         harvestPool.addListDataListener(new ListDataListener() {
@@ -229,9 +231,18 @@ public class Application {
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
         ));
-        p.add(dataSetStateButton);
+        statusPanel.setReaction(DataSetState.ABSENT, allFrames.prepareForNothing());
+        statusPanel.setReaction(DataSetState.EMPTY, importAction);
+        statusPanel.setReaction(DataSetState.IMPORTED, new AnalysisPerformer());
+        statusPanel.setReaction(DataSetState.ANALYZED_IMPORT, allFrames.prepareForDelimiting());
+        statusPanel.setReaction(DataSetState.DELIMITED, new ConvertPerformer());
+        statusPanel.setReaction(DataSetState.SOURCED, new AnalysisPerformer());
+        statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
+        statusPanel.setReaction(DataSetState.MAPPING, validateAction);
+        statusPanel.setReaction(DataSetState.VALIDATED, uploadAction);
+        p.add(statusPanel);
         p.add(right);
-//        p.setPreferredSize(new Dimension(100, 100));
+        p.setPreferredSize(new Dimension(80, 80));
         return p;
     }
 
@@ -259,57 +270,6 @@ public class Application {
         return menu;
     }
 
-    private class DataSetStateButton extends JButton implements ActionListener {
-        private Runnable work;
-        private Action action;
-
-        private DataSetStateButton() {
-            super("Status");
-            addActionListener(this);
-        }
-
-        public void setState(DataSetState state) {
-            setText(state.toHtml());
-            work = null;
-            action = null;
-            switch (state) {
-                case ABSENT:
-                    work = allFrames.prepareForNothing();
-                    break;
-                case EMPTY:
-                    action = importAction;
-                    break;
-                case IMPORTED:
-                    work = new AnalysisPerformer();
-                    break;
-                case ANALYZED_IMPORT:
-                    work = allFrames.prepareForDelimiting();
-                    break;
-                case DELIMITED:
-                    work = new ConvertPerformer();
-                    break;
-                case SOURCED:
-                    work = new AnalysisPerformer();
-                    break;
-                case ANALYZED_SOURCE:
-                    work = allFrames.prepareForMapping(desktop);
-                    break;
-                case MAPPING:
-                    action = validateAction;
-                    break;
-                case VALIDATED:
-                    action = uploadAction;
-                    break;
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            if (work != null) work.run();
-            if (action != null) action.actionPerformed(null);
-        }
-    }
-
     private class AnalysisPerformer implements Runnable {
         @Override
         public void run() {
@@ -317,12 +277,12 @@ public class Application {
             progress.setProgressMessage(String.format(
                     "<html><h3>Analyzing data of '%s'</h3>",
                     sipModel.getDataSetModel().getDataSet().getSpec()
-            ))  ;
+            ));
             progress.prepareFor(100);
             sipModel.analyzeFields(new SipModel.AnalysisListener() {
                 @Override
                 public boolean analysisProgress(final long elementCount) {
-                    int value = (int)(elementCount / AnalysisParser.ELEMENT_STEP);
+                    int value = (int) (elementCount / AnalysisParser.ELEMENT_STEP);
                     progress.setProgressString(String.format("%d elements", elementCount));
                     return progress.setProgress(value % 100);
                 }
