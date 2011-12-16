@@ -21,6 +21,8 @@
 
 package eu.delving.sip.files;
 
+import org.apache.commons.lang.WordUtils;
+
 /**
  * The different states that a data set can be in.
  *
@@ -28,23 +30,33 @@ package eu.delving.sip.files;
  */
 
 public enum DataSetState {
-    ABSENT("No dataset yet"),
-    EMPTY("Press here to import data"),
-    IMPORTED("Press here to analyze the imported data"),
-    ANALYZED_IMPORT("Press here for the analysis frames"),
-    DELIMITED("Press here to convert to source format"),
-    SOURCED("Press here to analyze the source"),
-    ANALYZED_SOURCE("Press here for the mapping frames"),
-    MAPPING("Press here to transform/validate"),
-    VALIDATED("Press here for upload");
+    ABSENT("There is currently no dataset selected", "Press here to clear the screen"),
+    EMPTY("This dataset is currently empty", "Press here to import data into it"),
+    IMPORTED("There is data imported for this dataset", "Press here to analyze the imported data"),
+    ANALYZED_IMPORT("The dataset is analyzed", "Press here to show analysis frames"),
+    DELIMITED("The delimiters have been set", "Press here to convert the data to source format"),
+    SOURCED("The source data is available", "Press here to analyze the source"),
+    ANALYZED_SOURCE("The source data has been analyzed", "Press here to show mapping frames"),
+    MAPPING("There is a mapping present", "Press here to try and transform and validate the data"),
+    VALIDATED("This dataset has been validated", "Press here to initiate upload to Culture Hub");
 
-    private String description;
+    private String [] description;
 
-    DataSetState(String description) {
+    DataSetState(String... description) {
         this.description = description;
     }
+    
+    public String toTitle() {
+        return WordUtils.capitalize(toString().replaceAll("_", " ").toLowerCase());
+    }
 
-    public String toHtml() {
-        return String.format("<html><center><strong>&quot;%s&quot;</strong><br><i>%s</i></center>", toString(), description);
+    public String toToolTip() {
+        StringBuilder out = new StringBuilder("<html><strong>&quot;");
+        out.append(toTitle());
+        out.append("&quot;</strong><br>");
+        for (String line : description) {
+            out.append("<p>").append(line).append("</p>");
+        }
+        return out.toString();
     }
 }

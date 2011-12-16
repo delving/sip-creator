@@ -107,7 +107,11 @@ public class StorageImpl extends StorageBase implements Storage {
         @Override
         public String getLatestPrefix() {
             File latestMapping = latestMappingFileOrNull(here);
-            return latestMapping != null ? extractName(latestMapping, FileType.MAPPING) : null;
+            if (latestMapping != null) return extractName(latestMapping, FileType.MAPPING);
+            Iterator<File> defWalk = findRecordDefinitionFiles(here).iterator();
+            if (!defWalk.hasNext()) return null;
+            String name = defWalk.next().getName();
+            return name.substring(0, name.length() - Storage.FileType.RECORD_DEFINITION.getSuffix().length());
         }
 
         @Override
@@ -145,8 +149,7 @@ public class StorageImpl extends StorageBase implements Storage {
         public List<RecordDefinition> getRecordDefinitions(List<FactDefinition> factDefinitions) throws StorageException {
             List<RecordDefinition> definitions = new ArrayList<RecordDefinition>();
             try {
-                List<File> recDefFile = findRecordDefinitionFiles(here);
-                for (File file : recDefFile) {
+                for (File file : findRecordDefinitionFiles(here)) {
                     RecordDefinition recordDefinition = readRecordDefinition(new FileInputStream(file), factDefinitions);
                     recordDefinition.initialize(factDefinitions);
                     definitions.add(recordDefinition);
