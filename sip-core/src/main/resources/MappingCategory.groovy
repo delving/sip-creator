@@ -68,7 +68,12 @@ public class MappingCategory {
         List tupleList = new NodeList()
         int max = Math.min(a.size(), b.size());
         for (Integer index: 0..(max - 1)) {
-            tupleList.add([a[index], b[index]])
+            if (a[index] instanceof List) {
+                tupleList.add(a[index] += b[index]);
+            }
+            else {
+                tupleList.add([a[index], b[index]])
+            }
         }
         return tupleList
     }
@@ -80,7 +85,7 @@ public class MappingCategory {
         for (Object child: a) closure.call(child)
         return any
     }
-    
+
     // run the closure once for the concatenated values
     static List concat(List a, String delimiter) {
         a = unwrap(a)
