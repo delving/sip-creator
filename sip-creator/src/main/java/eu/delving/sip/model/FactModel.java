@@ -21,8 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.RecordMapping;
-
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -54,14 +52,6 @@ public class FactModel {
     public void set(String name, String value) {
         facts.put(name, value);
         fireFactUpdated(name);
-    }
-
-    public boolean copyToRecordMapping(RecordMapping recordMapping) {
-        boolean changed = false;
-        for (Map.Entry<String, String> entry : facts.entrySet()) {
-            if (recordMapping.setFact(entry.getKey(), entry.getValue())) changed = true;
-        }
-        return changed;
     }
 
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();

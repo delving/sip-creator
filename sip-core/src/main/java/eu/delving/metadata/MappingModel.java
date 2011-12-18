@@ -68,11 +68,7 @@ public class MappingModel {
                 changed = recordMapping.facts.containsKey(path) && !recordMapping.facts.get(path).equals(value);
                 recordMapping.facts.put(path, value);
             }
-            if (changed) {
-                for (Listener listener : listeners) {
-                    listener.factChanged();
-                }
-            }
+            if (changed) for (Listener listener : listeners) listener.factChanged();
         }
     }
 
@@ -116,36 +112,14 @@ public class MappingModel {
 
     public interface Listener {
 
-        /**
-         * @deprecated Shouldn't happen anymore, only when data set is selected
-         */
-        @Deprecated
         void factChanged();
 
-        /**
-         * Set the current field mapping.
-         *
-         * @param fieldMapping The selected field mapping.
-         */
         void select(FieldMapping fieldMapping);
 
-        /**
-         * The code of an existing field mapping has changed.
-         */
         void fieldMappingChanged();
 
-        /**
-         * The record mapping has changed, could be triggered by removing or adding new field mappings.
-         *
-         * @param recordMapping The record mapping.
-         */
         void recordMappingChanged(RecordMapping recordMapping);
 
-        /**
-         * A new data set has been loaded and its record mapping is set.
-         *
-         * @param recordMapping The selected record mapping.
-         */
         void recordMappingSelected(RecordMapping recordMapping);
     }
 
