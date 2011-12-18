@@ -304,8 +304,10 @@ public class SipModel {
                     dataSetModel.getDataSet().setLatestPrefix(metadataPrefix, dataSetModel) :
                     dataSetModel.getDataSet().getRecordMapping(metadataPrefix, dataSetModel);
             dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-            dataSetFacts.copyToRecordMapping(recordMapping);
             mappingModel.setRecordMapping(recordMapping);
+            for (Map.Entry<String, String> entry : dataSetFacts.getFacts().entrySet()) {
+                mappingModel.setFact(entry.getKey(), entry.getValue());
+            }
             recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, getRecordDefinition()));
             feedback.say(String.format("Using '%s' mapping", metadataPrefix));
         }
