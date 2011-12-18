@@ -272,9 +272,11 @@ public class Harvestor implements Runnable {
     }
 
     private HttpEntity fetchFirstEntity() throws IOException {
+        String divider = context.harvestUrl().contains("?") ? "&" : "?";
         String url = String.format(
-                "%s?verb=ListRecords&metadataPrefix=%s",
+                "%s%sverb=ListRecords&metadataPrefix=%s",
                 context.harvestUrl(),
+                divider,
                 context.harvestPrefix()
         );
         if (context.harvestSpec() != null && !context.harvestSpec().isEmpty()) {
@@ -285,9 +287,11 @@ public class Harvestor implements Runnable {
     }
 
     private HttpEntity fetchNextEntity(String resumptionToken) throws IOException {
+        String divider = context.harvestUrl().contains("?") ? "&" : "?";
         String url = String.format(
-                "%s?verb=ListRecords&resumptionToken=%s",
+                "%s%sverb=ListRecords&resumptionToken=%s",
                 context.harvestUrl(),
+                divider,
                 URLEncoder.encode(resumptionToken, "UTF-8")
         );
         return doGet(url);
