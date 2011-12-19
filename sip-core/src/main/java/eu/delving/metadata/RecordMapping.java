@@ -360,21 +360,30 @@ public class RecordMapping {
         return stream().toXML(mapping);
     }
 
-    public static RecordMapping read(File file, MetadataModel metadataModel) throws MetadataException {
-        InputStream is = null;
+    public static RecordMapping read(InputStream is, MetadataModel metadataModel) throws MetadataException {
         try {
-            is = new FileInputStream(file);
             Reader isReader = new InputStreamReader(is, "UTF-8");
             RecordMapping recordMapping = (RecordMapping) stream().fromXML(isReader);
             RecordDefinition recordDefinition = metadataModel.getRecordDefinition(recordMapping.prefix);
             recordMapping.setRecordDefinition(recordDefinition);
             return recordMapping;
         }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static RecordMapping read(File file, MetadataModel metadataModel) throws MetadataException {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+            return read(inputStream, metadataModel);
+        }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
         finally {
-            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(inputStream);
         }
     }
 

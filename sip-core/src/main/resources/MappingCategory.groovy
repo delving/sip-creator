@@ -171,6 +171,14 @@ public class MappingCategory {
         return ["$spec/$hash"]
     }
 
+    static List toLocalId(a, spec) {
+        a = unwrap(a)
+        String identifier = a[0].toString()
+        if (!spec) throw new MissingPropertyException("spec", String.class)
+        if (!identifier) throw new MissingPropertyException("Identifier passed to toId", String.class)
+        return ["$spec/$identifier"]
+    }
+
     static String sanitize(GroovyNode node) {
         return sanitize(node.toString())
     }
