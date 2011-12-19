@@ -49,8 +49,6 @@ public interface DataSet {
 
     String getLatestPrefix();
 
-    RecordMapping setLatestPrefix(String prefix, MetadataModel metadataModel) throws StorageException;
-
     List<FactDefinition> getFactDefinitions() throws StorageException;
 
     List<RecordDefinition> getRecordDefinitions(List<FactDefinition> factDefinitions) throws StorageException;
