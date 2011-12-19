@@ -561,7 +561,14 @@ public class StorageImpl extends StorageBase implements Storage {
                     }
                     else {
                         File file = new File(here, fileName);
-                        IOUtils.copy(zipInputStream, new FileOutputStream(file));
+                        OutputStream output = null;
+                        try {
+                            output = new FileOutputStream(file);
+                            IOUtils.copy(zipInputStream, output);
+                        }
+                        finally {
+                            IOUtils.closeQuietly(output);
+                        }
                         if (progressListener != null && !progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
                             progressListener.finished(false);
                             break;
