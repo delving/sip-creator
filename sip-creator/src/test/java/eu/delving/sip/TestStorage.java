@@ -79,7 +79,7 @@ public class TestStorage {
         assertEquals("Should be one file", 1, mock.files().length);
         log.info("Created " + mock.files()[0].getAbsolutePath());
         InputStream inputStream = MockInput.sampleInputStream();
-        InputStream storedStream = dataSet().importedInput();
+        InputStream storedStream = dataSet().openImportedInputStream();
         int input = 0, stored;
         while (input != -1) {
             input = inputStream.read();

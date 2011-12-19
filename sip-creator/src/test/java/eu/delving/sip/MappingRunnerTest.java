@@ -60,7 +60,8 @@ public class MappingRunnerTest {
     public void setUp() throws Exception {
         namespaces = new TreeMap<String, String>();
         MetadataModel metadataModel = loadMetadataModel();
-        RecordMapping recordMapping = RecordMapping.read(getClass().getResourceAsStream(MAPPING_FILE), metadataModel);
+        File mappingFile = new File(getClass().getResource(MAPPING_FILE).getFile());
+        RecordMapping recordMapping = RecordMapping.read(mappingFile, metadataModel);
         LOG.info(String.format("RecordMapping has %d facts and %d fieldMappings",
                 recordMapping.getFacts().size(),
                 recordMapping.getFieldMappings().size()));
