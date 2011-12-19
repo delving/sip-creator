@@ -21,10 +21,14 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import org.apache.commons.io.IOUtils;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,5 +75,23 @@ public class RecordDefinition {
 
     public String toString() {
         return String.format("RecordDefinition(%s)", prefix);
+    }
+
+    public static RecordDefinition read(File file, List<FactDefinition> factDefinitions) throws FileNotFoundException, MetadataException {
+        Reader reader = null;
+        try {
+            reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
+            XStream stream = new XStream(new PureJavaReflectionProvider());
+            stream.processAnnotations(RecordDefinition.class);
+            RecordDefinition recordDefinition = (RecordDefinition) stream.fromXML(reader);
+            recordDefinition.initialize(factDefinitions);
+            return recordDefinition;
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(reader);
+        }
     }
 }

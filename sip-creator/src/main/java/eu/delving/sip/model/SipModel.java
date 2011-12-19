@@ -533,7 +533,7 @@ public class SipModel {
                 }
                 if (metadataParser == null) {
                     metadataParser = new MetadataParser(
-                            dataSetModel.getDataSet().sourceInput(),
+                            dataSetModel.getDataSet().openSourceInputStream(),
                             analysisModel.getRecordCount()
                     );
                 }

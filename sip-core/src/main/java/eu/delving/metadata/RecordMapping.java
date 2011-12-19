@@ -25,6 +25,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -340,13 +341,18 @@ public class RecordMapping {
         void indent(int change);
     }
 
-    public static void write(RecordMapping mapping, OutputStream out) {
+    public static void write(File file, RecordMapping mapping) throws FileNotFoundException {
+        OutputStream out = null;
         try {
+            out = new FileOutputStream(file);
             Writer outWriter = new OutputStreamWriter(out, "UTF-8");
             stream().toXML(mapping, outWriter);
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(out);
         }
     }
 
@@ -354,16 +360,21 @@ public class RecordMapping {
         return stream().toXML(mapping);
     }
 
-    public static RecordMapping read(InputStream is, MetadataModel metadataModel) throws MetadataException {
+    public static RecordMapping read(File file, MetadataModel metadataModel) throws MetadataException {
+        InputStream is = null;
         try {
+            is = new FileInputStream(file);
             Reader isReader = new InputStreamReader(is, "UTF-8");
             RecordMapping recordMapping = (RecordMapping) stream().fromXML(isReader);
             RecordDefinition recordDefinition = metadataModel.getRecordDefinition(recordMapping.prefix);
             recordMapping.setRecordDefinition(recordDefinition);
             return recordMapping;
         }
-        catch (UnsupportedEncodingException e) {
+        catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(is);
         }
     }
 

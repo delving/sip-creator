@@ -73,9 +73,9 @@ public interface DataSet {
 
     File importedOutput() throws StorageException;
 
-    InputStream importedInput() throws StorageException;
+    InputStream openImportedInputStream() throws StorageException;
 
-    InputStream sourceInput() throws StorageException;
+    InputStream openSourceInputStream() throws StorageException;
 
     File renameInvalidSource() throws StorageException;
 
@@ -93,7 +93,7 @@ public interface DataSet {
 
     void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 
-    PrintWriter reportWriter(RecordMapping recordMapping) throws StorageException;
+    PrintWriter openReportWriter(RecordMapping recordMapping) throws StorageException;
 
     List<String> getReport(RecordMapping recordMapping) throws StorageException;
 
