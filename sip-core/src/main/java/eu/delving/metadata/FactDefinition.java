@@ -21,9 +21,14 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import org.apache.commons.io.IOUtils;
+
+import java.io.*;
 
 
 /**
@@ -54,5 +59,22 @@ public class FactDefinition {
 
     public String toString() {
         return String.format("FactDefinition(%s)", name);
+    }
+
+    public static java.util.List<FactDefinition> read(File file) throws FileNotFoundException {
+        Reader reader = null;
+        try {
+            reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
+            XStream stream = new XStream(new PureJavaReflectionProvider());
+            stream.processAnnotations(FactDefinition.List.class);
+            FactDefinition.List factDefinitions = (FactDefinition.List) stream.fromXML(reader);
+            return factDefinitions.factDefinitions;
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(reader);
+        }
     }
 }
