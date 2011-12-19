@@ -114,23 +114,6 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public RecordMapping setLatestPrefix(String prefix, MetadataModel metadataModel) throws StorageException {
-            File latestForPrefix = findLatestMappingFile(here, prefix);
-            RecordMapping recordMapping;
-            if (latestForPrefix.exists()) {
-                if (!latestForPrefix.setLastModified(System.currentTimeMillis())) {
-                    throw new StorageException("Couldn't touch the file to give it priority");
-                }
-                recordMapping = getRecordMapping(prefix, metadataModel);
-            }
-            else {
-                recordMapping = new RecordMapping(prefix, metadataModel.getRecordDefinition(prefix));
-                setRecordMapping(recordMapping);
-            }
-            return recordMapping;
-        }
-
-        @Override
         public List<FactDefinition> getFactDefinitions() throws StorageException {
             try {
                 return FactDefinition.read(factDefinitionFile(here));

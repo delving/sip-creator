@@ -88,7 +88,7 @@ public class DataSetMenu extends JMenu {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
                             sipModel.setDataSet(item.getDataSet(), false);
-                            sipModel.setMetadataPrefix(item.getPrefix(), true);
+                            sipModel.setMetadataPrefix(item.getPrefix());
                             setPreference(item.getDataSet(), item.getPrefix());
                         }
                     });
