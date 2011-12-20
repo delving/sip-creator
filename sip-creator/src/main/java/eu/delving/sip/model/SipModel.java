@@ -268,7 +268,7 @@ public class SipModel {
                                     public void run() {
                                         String latestPrefix = dataSet.getLatestPrefix();
                                         if (latestPrefix != null) {
-                                            setPrefix(false, latestPrefix);
+                                            setPrefix(latestPrefix);
                                         }
                                         else {
                                             mappingModel.setRecMapping(null);
@@ -286,23 +286,23 @@ public class SipModel {
         });
     }
 
-    public void setMetadataPrefix(final String metadataPrefix, final boolean promoteToLatest) {
+    public void setMetadataPrefix(final String metadataPrefix) {
         Exec.work(new Runnable() {
             @Override
             public void run() {
-                setPrefix(promoteToLatest, metadataPrefix);
+                setPrefix(metadataPrefix);
             }
         });
     }
 
-    private void setPrefix(boolean promoteToLatest, String metadataPrefix) {
+    private void setPrefix(String metadataPrefix) {
         try {
-            final RecMapping recMapping = promoteToLatest ?
-                    dataSetModel.getDataSet().setLatestPrefix(metadataPrefix, dataSetModel) :
-                    dataSetModel.getDataSet().getRecMapping(metadataPrefix, dataSetModel);
+            final RecMapping recMapping = dataSetModel.getDataSet().getRecMapping(metadataPrefix, dataSetModel);
             dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-            dataSetFacts.copyToRecordMapping(recMapping);
             mappingModel.setRecMapping(recMapping);
+            for (Map.Entry<String, String> entry : dataSetFacts.getFacts().entrySet()) {
+                mappingModel.setFact(entry.getKey(), entry.getValue());
+            }
             recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, recMapping));
             feedback.say(String.format("Using '%s' mapping", metadataPrefix));
         }
@@ -520,7 +520,7 @@ public class SipModel {
                 }
                 if (metadataParser == null) {
                     metadataParser = new MetadataParser(
-                            dataSetModel.getDataSet().sourceInput(),
+                            dataSetModel.getDataSet().openSourceInputStream(),
                             statsModel.getRecordCount()
                     );
                 }

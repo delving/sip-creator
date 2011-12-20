@@ -41,6 +41,8 @@ public enum SummaryField {
     DESCRIPTION,
     SNIPPET,
     THUMBNAIL,
+    LANDING_PAGE("landingPage"),
+    DEEP_ZOOM_URL("deepZoomUrl"),
     TYPE("recordType"),
     HUB_ID("hubId"),
     VISIBILITY,

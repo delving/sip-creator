@@ -21,7 +21,6 @@
 
 package eu.delving.sip.files;
 
-import com.thoughtworks.xstream.XStream;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.xml.SourceConverter;
@@ -107,42 +106,19 @@ public class StorageImpl extends StorageBase implements Storage {
         @Override
         public String getLatestPrefix() {
             File latestMapping = latestMappingFileOrNull(here);
-            return latestMapping != null ? extractName(latestMapping, FileType.MAPPING) : null;
-        }
-
-        @Override
-        public RecMapping setLatestPrefix(String prefix, RecDefModel recDefModel) throws StorageException {
-            File latestForPrefix = findLatestMappingFile(here, prefix);
-            RecMapping recMapping;
-            if (latestForPrefix.exists()) {
-                if (!latestForPrefix.setLastModified(System.currentTimeMillis())) {
-                    throw new StorageException("Couldn't touch the file to give it priority");
-                }
-                recMapping = getRecMapping(prefix, recDefModel);
-            }
-            else {
-                try {
-                    recMapping = RecMapping.create(prefix, recDefModel);
-                    setRecMapping(recMapping);
-                }
-                catch (MetadataException e) {
-                    throw new StorageException("Unable to load record definition", e);
-                }
-            }
-            return recMapping;
+            if (latestMapping != null) return extractName(latestMapping, FileType.MAPPING);
+            Iterator<File> defWalk = findRecordDefinitionFiles(here).iterator();
+            if (!defWalk.hasNext()) return null;
+            String name = defWalk.next().getName();
+            return name.substring(0, name.length() - Storage.FileType.RECORD_DEFINITION.getSuffix().length());
         }
 
         @Override
         public List<FactDefinition> getFactDefinitions() throws StorageException {
             try {
-                File factDefFile = factDefinitionFile(here);
-                XStream stream = new XStream();
-                stream.processAnnotations(FactDefinition.List.class);
-                Reader reader = new InputStreamReader(new FileInputStream(factDefFile), "UTF-8");
-                FactDefinition.List factDefinitions = (FactDefinition.List) stream.fromXML(reader);
-                return factDefinitions.factDefinitions;
+                return FactDefinition.read(factDefinitionFile(here));
             }
-            catch (Exception e) {
+            catch (FileNotFoundException e) {
                 throw new StorageException("Unable to load fact definitions", e);
             }
         }
@@ -260,24 +236,17 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void deleteConverted() throws StorageException {
-            if (!isRecentlyImported()) {
-                File sourceFile = sourceFile(here);
-                delete(sourceFile);
-            }
+            if (!isRecentlyImported()) delete(sourceFile(here));
         }
 
         @Override
         public void deleteValidation(String metadataPrefix) throws StorageException {
-            for (File file : validationFiles(here, metadataPrefix)) {
-                delete(file);
-            }
+            for (File file : validationFiles(here, metadataPrefix)) delete(file);
         }
 
         @Override
         public void deleteValidations() throws StorageException {
-            for (File file : validationFiles(here)) {
-                delete(file);
-            }
+            for (File file : validationFiles(here)) delete(file);
         }
 
         @Override
@@ -286,12 +255,12 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public InputStream importedInput() throws StorageException {
+        public InputStream openImportedInputStream() throws StorageException {
             return zipIn(importedFile(here));
         }
 
         @Override
-        public InputStream sourceInput() throws StorageException {
+        public InputStream openSourceInputStream() throws StorageException {
             return zipIn(sourceFile(here));
         }
 
@@ -342,20 +311,16 @@ public class StorageImpl extends StorageBase implements Storage {
         public Statistics getStatistics(boolean sourceFormat) {
             File statisticsFile = statisticsFile(here, sourceFormat);
             if (statisticsFile.exists()) {
+                ObjectInputStream objectInputStream = null;
                 try {
-                    ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(statisticsFile)));
-                    @SuppressWarnings("unchecked")
-                    Statistics statistics = (Statistics) in.readObject();
-                    in.close();
-                    return statistics;
+                    objectInputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(statisticsFile)));
+                    return (Statistics) objectInputStream.readObject();
                 }
                 catch (Exception e) {
-                    try {
-                        delete(statisticsFile);
-                    }
-                    catch (StorageException e1) {
-                        // give up
-                    }
+                    FileUtils.deleteQuietly(statisticsFile);
+                }
+                finally {
+                    IOUtils.closeQuietly(objectInputStream);
                 }
             }
             return null;
@@ -364,13 +329,16 @@ public class StorageImpl extends StorageBase implements Storage {
         @Override
         public void setStatistics(Statistics statistics) throws StorageException {
             File statisticsFile = statisticsFile(here, statistics.isSourceFormat());
+            ObjectOutputStream out = null;
             try {
-                ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(statisticsFile)));
+                out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(statisticsFile)));
                 out.writeObject(statistics);
-                out.close();
             }
             catch (IOException e) {
                 throw new StorageException(String.format("Unable to save statistics file to %s", statisticsFile.getAbsolutePath()), e);
+            }
+            finally {
+                IOUtils.closeQuietly(out);
             }
         }
 
@@ -379,8 +347,7 @@ public class StorageImpl extends StorageBase implements Storage {
             File file = findLatestMappingFile(here, prefix);
             if (file.exists()) {
                 try {
-                    FileInputStream is = new FileInputStream(file);
-                    return RecMapping.read(is, recDefModel);
+                    return RecMapping.read(file, recDefModel);
                 }
                 catch (Exception e) {
                     throw new StorageException(String.format("Unable to read mapping from %s", file.getAbsolutePath()), e);
@@ -399,14 +366,7 @@ public class StorageImpl extends StorageBase implements Storage {
         @Override
         public void setRecMapping(RecMapping recMapping) throws StorageException {
             File file = new File(here, String.format(FileType.MAPPING.getPattern(), recMapping.getPrefix()));
-            try {
-                FileOutputStream out = new FileOutputStream(file);
-                RecMapping.write(out, recMapping);
-                out.close();
-            }
-            catch (IOException e) {
-                throw new StorageException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
-            }
+            RecMapping.write(file, recMapping);
         }
 
         @Override
@@ -416,23 +376,26 @@ public class StorageImpl extends StorageBase implements Storage {
             }
             else {
                 File file = new File(here, String.format(FileType.VALIDATION.getPattern(), metadataPrefix));
+                DataOutputStream out = null;
                 try {
-                    DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
+                    out = new DataOutputStream(new FileOutputStream(file));
                     int invalidCount = recordCount - validation.cardinality();
                     out.writeInt(invalidCount);
                     for (int index = validation.nextClearBit(0); index >= 0 && index < recordCount; index = validation.nextClearBit(index + 1)) {
                         out.writeInt(index);
                     }
-                    out.close();
                 }
                 catch (IOException e) {
                     throw new StorageException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
+                }
+                finally {
+                    IOUtils.closeQuietly(out);
                 }
             }
         }
 
         @Override
-        public PrintWriter reportWriter(RecMapping recMapping) throws StorageException {
+        public PrintWriter openReportWriter(RecMapping recMapping) throws StorageException {
             File file = new File(here, String.format(FileType.REPORT.getPattern(), recMapping.getPrefix()));
             try {
                 return new PrintWriter(file);
@@ -460,8 +423,9 @@ public class StorageImpl extends StorageBase implements Storage {
             File source = new File(here, FileType.IMPORTED.getName());
             Hasher hasher = new Hasher();
             boolean cancelled = false;
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
             try {
-                InputStream inputStream;
                 CountingInputStream countingInput;
                 if (inputFile.getName().endsWith(".xml")) {
                     inputStream = new FileInputStream(inputFile);
@@ -476,11 +440,11 @@ public class StorageImpl extends StorageBase implements Storage {
                 else {
                     throw new IllegalArgumentException("Input file should be .xml or .xml.gz, but it is " + inputFile.getName());
                 }
-                OutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(source));
+                outputStream = new GZIPOutputStream(new FileOutputStream(source));
                 byte[] buffer = new byte[BLOCK_SIZE];
                 int bytesRead;
                 while (-1 != (bytesRead = inputStream.read(buffer))) {
-                    gzipOutputStream.write(buffer, 0, bytesRead);
+                    outputStream.write(buffer, 0, bytesRead);
                     if (progressListener != null) {
                         if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
                             cancelled = true;
@@ -490,13 +454,15 @@ public class StorageImpl extends StorageBase implements Storage {
                     hasher.update(buffer, bytesRead);
                 }
                 if (progressListener != null) progressListener.finished(!cancelled);
-                inputStream.close();
-                gzipOutputStream.close();
                 delete(statisticsFile(here, false));
             }
             catch (Exception e) {
                 if (progressListener != null) progressListener.finished(false);
                 throw new StorageException("Unable to capture XML input into " + source.getAbsolutePath(), e);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
             }
             if (cancelled) {
                 delete(source);
@@ -528,12 +494,10 @@ public class StorageImpl extends StorageBase implements Storage {
                 converter.setProgressListener(progressListener);
                 Hasher hasher = new Hasher();
                 DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, FileType.SOURCE.getName())));
-                converter.parse(importedInput(), digestOut);
+                converter.parse(openImportedInputStream(), digestOut); // streams closed within parse()
                 File source = new File(here, FileType.SOURCE.getName());
                 File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
-                if (hashedSource.exists()) {
-                    FileUtils.deleteQuietly(hashedSource);
-                }
+                if (hashedSource.exists()) FileUtils.deleteQuietly(hashedSource);
                 FileUtils.moveFile(source, hashedSource);
                 FileUtils.deleteQuietly(statisticsFile(here, true));
             }
@@ -583,19 +547,24 @@ public class StorageImpl extends StorageBase implements Storage {
                     if (fileName.equals(unzippedName)) {
                         Hasher hasher = new Hasher();
                         File source = new File(here, FileType.SOURCE.getName());
-                        GZIPOutputStream outputStream = new GZIPOutputStream(new FileOutputStream(source));
-                        while (!cancelled && -1 != (bytesRead = zipInputStream.read(buffer))) {
-                            outputStream.write(buffer, 0, bytesRead);
-                            if (progressListener != null) {
-                                if (!progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
-                                    cancelled = true;
-                                    break;
+                        GZIPOutputStream outputStream = null;
+                        try {
+                            outputStream = new GZIPOutputStream(new FileOutputStream(source));
+                            while (!cancelled && -1 != (bytesRead = zipInputStream.read(buffer))) {
+                                outputStream.write(buffer, 0, bytesRead);
+                                if (progressListener != null) {
+                                    if (!progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
+                                        cancelled = true;
+                                        break;
+                                    }
                                 }
+                                hasher.update(buffer, bytesRead);
                             }
-                            hasher.update(buffer, bytesRead);
+                            if (progressListener != null) progressListener.finished(!cancelled);
                         }
-                        if (progressListener != null) progressListener.finished(!cancelled);
-                        outputStream.close();
+                        finally {
+                            IOUtils.closeQuietly(outputStream);
+                        }
                         File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
                         if (hashedSource.exists()) {
                             FileUtils.deleteQuietly(source); // already got it
@@ -606,7 +575,14 @@ public class StorageImpl extends StorageBase implements Storage {
                     }
                     else {
                         File file = new File(here, fileName);
-                        IOUtils.copy(zipInputStream, new FileOutputStream(file));
+                        OutputStream output = null;
+                        try {
+                            output = new FileOutputStream(file);
+                            IOUtils.copy(zipInputStream, output);
+                        }
+                        finally {
+                            IOUtils.closeQuietly(output);
+                        }
                         if (progressListener != null && !progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
                             progressListener.finished(false);
                             break;

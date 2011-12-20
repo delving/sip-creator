@@ -26,6 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.HashMap;
@@ -127,6 +128,20 @@ public class RecMapping {
     public static RecMapping create(String prefix, RecDefModel recDefModel) throws MetadataException {
         return new RecMapping(prefix, recDefModel.createRecDef(prefix));
     }
+    
+    public static RecMapping read(File file, RecDefModel recDefModel) throws MetadataException {
+        InputStream is = null;
+        try {
+            is = new FileInputStream(file);
+            return read(is, recDefModel);
+        }
+        catch (FileNotFoundException e) {
+            throw new MetadataException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(is);
+        }
+    }
 
     public static RecMapping read(InputStream is, RecDefModel recDefModel) throws MetadataException {
         try {
@@ -143,6 +158,20 @@ public class RecMapping {
         recMapping.recDefTree = recDefModel.createRecDef(recMapping.prefix);
         recMapping.resolve();
         return recMapping;
+    }
+    
+    public static void write(File file, RecMapping recMapping) {
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(file);
+            write(os, recMapping);
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(os);
+        }
     }
 
     public static void write(OutputStream os, RecMapping recMapping) {

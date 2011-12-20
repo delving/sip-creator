@@ -49,8 +49,6 @@ public interface DataSet {
 
     String getLatestPrefix();
 
-    RecMapping setLatestPrefix(String prefix, RecDefModel recDefModel) throws StorageException;
-
     List<FactDefinition> getFactDefinitions() throws StorageException;
 
     List<String> getRecDefPrefixes() throws StorageException;
@@ -75,9 +73,9 @@ public interface DataSet {
 
     File importedOutput() throws StorageException;
 
-    InputStream importedInput() throws StorageException;
+    InputStream openImportedInputStream() throws StorageException;
 
-    InputStream sourceInput() throws StorageException;
+    InputStream openSourceInputStream() throws StorageException;
 
     File renameInvalidSource() throws StorageException;
 
@@ -95,7 +93,7 @@ public interface DataSet {
 
     void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 
-    PrintWriter reportWriter(RecMapping recordMapping) throws StorageException;
+    PrintWriter openReportWriter(RecMapping recMapping) throws StorageException;
 
     List<String> getReport(RecMapping recordMapping) throws StorageException;
 

@@ -27,6 +27,7 @@ import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.StorageException;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
@@ -49,7 +50,7 @@ public class AnalysisParser implements Runnable {
     public static final int ELEMENT_STEP = 10000;
     private Path path = Path.empty();
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
-    private Map<String,String> namespaces = new TreeMap<String, String>();
+    private Map<String, String> namespaces = new TreeMap<String, String>();
     private Listener listener;
     private DataSet dataSet;
 
@@ -75,58 +76,63 @@ public class AnalysisParser implements Runnable {
             xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
             xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
             xmlif.configureForSpeed();
-            InputStream inputStream;
-            boolean sourceFormat = false;
-            switch (dataSet.getState()) {
-                case IMPORTED:
-                    inputStream = dataSet.importedInput();
-                    break;
-                case SOURCED:
-                    inputStream = dataSet.sourceInput();
-                    sourceFormat = true;
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected state: "+dataSet.getState());
-            }
-            XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
-            StringBuilder text = new StringBuilder();
-            long count = 0;
             boolean running = true;
-            while (running) {
-                switch (input.getEventType()) {
-                    case XMLEvent.START_ELEMENT:
-                        if (++count % ELEMENT_STEP == 0 && null != listener && !listener.progress(count)) running = false;
-                        for (int walk=0; walk<input.getNamespaceCount(); walk++) {
-                            namespaces.put(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
-                        }
-                        path.push(Tag.element(input.getName()));
-                        if (input.getAttributeCount() > 0) {
-                            for (int walk = 0; walk < input.getAttributeCount(); walk++) {
-                                QName attributeName = input.getAttributeName(walk);
-                                path.push(Tag.attribute(attributeName));
-                                recordValue(input.getAttributeValue(walk));
-                                path.pop();
+            boolean sourceFormat = false;
+            InputStream inputStream = null;
+            try {
+                switch (dataSet.getState()) {
+                    case IMPORTED:
+                        inputStream = dataSet.openImportedInputStream(); // todo: close this stream
+                        break;
+                    case SOURCED:
+                        inputStream = dataSet.openSourceInputStream(); // todo: close this stream
+                        sourceFormat = true;
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected state: " + dataSet.getState());
+                }
+                XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
+                StringBuilder text = new StringBuilder();
+                long count = 0;
+                while (running) {
+                    switch (input.getEventType()) {
+                        case XMLEvent.START_ELEMENT:
+                            if (++count % ELEMENT_STEP == 0 && null != listener && !listener.progress(count))
+                                running = false;
+                            for (int walk = 0; walk < input.getNamespaceCount(); walk++) {
+                                namespaces.put(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
                             }
-                        }
+                            path.push(Tag.element(input.getName()));
+                            if (input.getAttributeCount() > 0) {
+                                for (int walk = 0; walk < input.getAttributeCount(); walk++) {
+                                    QName attributeName = input.getAttributeName(walk);
+                                    path.push(Tag.attribute(attributeName));
+                                    recordValue(input.getAttributeValue(walk));
+                                    path.pop();
+                                }
+                            }
+                            break;
+                        case XMLEvent.CHARACTERS:
+                            text.append(input.getText());
+                            break;
+                        case XMLEvent.CDATA:
+                            text.append(input.getText());
+                            break;
+                        case XMLEvent.END_ELEMENT:
+                            recordValue(ValueFilter.filter(text.toString()));
+                            text.setLength(0);
+                            path.pop();
+                            break;
+                    }
+                    if (!input.hasNext()) {
                         break;
-                    case XMLEvent.CHARACTERS:
-                        text.append(input.getText());
-                        break;
-                    case XMLEvent.CDATA:
-                        text.append(input.getText());
-                        break;
-                    case XMLEvent.END_ELEMENT:
-                        recordValue(ValueFilter.filter(text.toString()));
-                        text.setLength(0);
-                        path.pop();
-                        break;
+                    }
+                    input.next();
                 }
-                if (!input.hasNext()) {
-                    break;
-                }
-                input.next();
             }
-            input.close();
+            finally {
+                IOUtils.closeQuietly(inputStream);
+            }
             if (running) {
                 List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
                 listener.success(new Statistics(namespaces, fieldStatisticsList, sourceFormat));
@@ -147,7 +153,7 @@ public class AnalysisParser implements Runnable {
                         renamedTo = dataSet.renameInvalidSource();
                         break;
                     default:
-                        throw new IllegalStateException("Unexpected state "+dataSet.getState());
+                        throw new IllegalStateException("Unexpected state " + dataSet.getState());
                 }
                 listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
             }

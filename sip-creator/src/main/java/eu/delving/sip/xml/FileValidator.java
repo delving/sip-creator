@@ -31,6 +31,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import groovy.util.Node;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -87,6 +88,7 @@ public class FileValidator implements Runnable {
         RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getMappingModel().getRecMapping());
         recordValidator.guardUniqueness(uniqueness);
         BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
+        PrintWriter out = null;
         try {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping == null) {
@@ -94,11 +96,11 @@ public class FileValidator implements Runnable {
             }
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping);
             MetadataParser parser = new MetadataParser(
-                    sipModel.getDataSetModel().getDataSet().sourceInput(),
+                    sipModel.getDataSetModel().getDataSet().openSourceInputStream(),
                     sipModel.getStatsModel().getRecordCount()
             );
             progressListener.prepareFor(sipModel.getStatsModel().getRecordCount());
-            PrintWriter out = dataSet.reportWriter(recMapping);
+            out = dataSet.openReportWriter(recMapping);
             int count = 0;
             try {
                 MetadataRecord record;
@@ -175,6 +177,7 @@ public class FileValidator implements Runnable {
             LOG.info("Validation aborted by user");
         }
         finally {
+            IOUtils.closeQuietly(out);
             if (aborted) {
                 sipModel.getFeedback().say("Validation canceled");
                 listener.finished(null, 0);

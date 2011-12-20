@@ -28,6 +28,7 @@ import eu.delving.metadata.Uniqueness;
 import eu.delving.metadata.UniquenessException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
+import org.apache.commons.io.IOUtils;
 
 import javax.xml.stream.*;
 import javax.xml.stream.events.Attribute;
@@ -156,8 +157,8 @@ public class SourceConverter {
         }
         finally {
             if (progressListener != null) progressListener.finished(finished);
-            inputStream.close();
-            outputStream.close();
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
     }
 

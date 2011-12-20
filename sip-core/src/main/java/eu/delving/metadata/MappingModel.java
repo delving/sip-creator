@@ -72,7 +72,7 @@ public class MappingModel implements RecDefNode.Listener {
                 changed = recMapping.facts.containsKey(path) && !recMapping.facts.get(path).equals(value);
                 recMapping.facts.put(path, value);
             }
-            if (changed) fireFactChanged();
+            if (changed)  fireFactChanged();
         }
     }
 
