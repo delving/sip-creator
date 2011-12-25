@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -155,7 +156,8 @@ public class TestCodeGeneration {
             public RecDefTree createRecDef(String prefix) {
                 if (!"lido".equals(prefix)) throw new RuntimeException();
                 try {
-                    InputStream inputStream = getClass().getResource("/lido-recdef.xml").openStream();
+                    URL url = getClass().getResource("/lido-recdef.xml");
+                    InputStream inputStream = url.openStream();
                     return RecDefTree.create(RecDef.read(inputStream));
                 }
                 catch (Exception e) {
