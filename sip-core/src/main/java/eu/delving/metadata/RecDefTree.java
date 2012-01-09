@@ -107,8 +107,13 @@ public class RecDefTree implements RecDefNode.Listener {
     }
 
     @Override
-    public void nodeMappingSet(RecDefNode recDefNode) {
-        if (listener != null) listener.nodeMappingSet(recDefNode);
+    public void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping) {
+        if (listener != null) listener.nodeMappingAdded(recDefNode, nodeMapping);
+    }
+
+    @Override
+    public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
+        if (listener != null) listener.nodeMappingRemoved(recDefNode, nodeMapping);
     }
 
     public class Out {

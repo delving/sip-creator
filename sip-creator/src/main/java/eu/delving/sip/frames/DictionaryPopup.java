@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.FrameBase;
@@ -74,10 +75,10 @@ public class DictionaryPopup extends FrameBase {
         setDefaultSize(800, 600);
     }
 
-    public void editDictionary(RecDefNode recDefNode, Runnable finishedRunnable) {
+    public void editDictionary(RecDefNode recDefNode, NodeMapping nodeMapping, Runnable finishedRunnable) {
         this.finishedRunnable = finishedRunnable;
-        setTitle(String.format("Dictionary for %s", recDefNode.getNodeMapping().outputPath));
-        mapModel.setRecDefNode(recDefNode);
+        setTitle(String.format("Dictionary for %s", nodeMapping.outputPath));
+        mapModel.setNodeMapping(nodeMapping);
         valueModel.setRecDefNode(recDefNode);
         setLocation(parent.getLocation());
         setSize(parent.getSize());
@@ -225,7 +226,7 @@ public class DictionaryPopup extends FrameBase {
     }
 
     private static class MapModel extends AbstractTableModel {
-        private RecDefNode recDefNode;
+        private NodeMapping nodeMapping;
         private List<String[]> rows = new ArrayList<String[]>();
         private Map<Integer, Integer> index;
         private JLabel statusLabel;
@@ -234,11 +235,11 @@ public class DictionaryPopup extends FrameBase {
             this.statusLabel = statusLabel;
         }
 
-        public void setRecDefNode(RecDefNode recDefNode) {
-            this.recDefNode = recDefNode;
+        public void setNodeMapping(NodeMapping nodeMapping) {
+            this.nodeMapping = nodeMapping;
             this.index = null;
             rows.clear();
-            for (Map.Entry<String, String> entry : recDefNode.getNodeMapping().dictionary.entrySet()) {
+            for (Map.Entry<String, String> entry : nodeMapping.dictionary.entrySet()) {
                 rows.add(new String[]{entry.getKey(), entry.getValue()});
             }
             setPattern("", false);
@@ -323,7 +324,7 @@ public class DictionaryPopup extends FrameBase {
                     mappedRow = foundRow;
                 }
             }
-            recDefNode.getNodeMapping().dictionary.put(rows.get(mappedRow)[0], rows.get(mappedRow)[1] = (String) valueObject);
+            nodeMapping.dictionary.put(rows.get(mappedRow)[0], rows.get(mappedRow)[1] = (String) valueObject);
             fireTableCellUpdated(rowIndex, columnIndex);
         }
     }

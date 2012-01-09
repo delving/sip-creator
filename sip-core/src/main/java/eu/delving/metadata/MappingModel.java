@@ -39,7 +39,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MappingModel implements RecDefNode.Listener {
 
     private RecMapping recMapping;
-    private RecDefNode selected;
+    private NodeMapping selectedNodeMapping;
 
     public void setRecMapping(RecMapping recMapping) {
         this.recMapping = recMapping;
@@ -51,14 +51,13 @@ public class MappingModel implements RecDefNode.Listener {
         return recMapping;
     }
 
-    public NodeMapping selectRecDefNode(RecDefNode recDefNode) {
-        this.selected = recDefNode;
-        fireRecDefNodeSelected();
-        return selected == null ? null : selected.getNodeMapping();
+    public NodeMapping getSelectedNodeMapping() {
+        return selectedNodeMapping;
     }
 
-    public RecDefNode getSelectedRecDefNode() {
-        return selected;
+    public void selectNodeMapping(NodeMapping nodeMapping) {
+        this.selectedNodeMapping = nodeMapping;
+        fireNodeMappingSelected();
     }
 
     public void setFact(String path, String value) {
@@ -77,8 +76,13 @@ public class MappingModel implements RecDefNode.Listener {
     }
 
     @Override
-    public void nodeMappingSet(RecDefNode recDefNode) {
-        for (Listener listener : listeners) listener.nodeMappingSet(this, recDefNode);
+    public void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping) {
+        for (Listener listener : listeners) listener.nodeMappingAdded(this, recDefNode, nodeMapping);
+    }
+
+    @Override
+    public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
+        for (Listener listener : listeners) listener.nodeMappingRemoved(this, recDefNode, nodeMapping);
     }
 
     // observable
@@ -89,9 +93,11 @@ public class MappingModel implements RecDefNode.Listener {
 
         void factChanged(MappingModel mappingModel);
 
-        void recDefNodeSelected(MappingModel mappingModel);
+        void nodeMappingSelected(MappingModel mappingModel);
 
-        void nodeMappingSet(MappingModel mappingModel, RecDefNode node);
+        void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
+
+        void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 
     }
 
@@ -109,8 +115,8 @@ public class MappingModel implements RecDefNode.Listener {
         for (Listener listener : listeners) listener.factChanged(this);
     }
 
-    private void fireRecDefNodeSelected() {
-        for (Listener listener : listeners) listener.recDefNodeSelected(this);
+    private void fireNodeMappingSelected() {
+        for (Listener listener : listeners) listener.nodeMappingSelected(this);
     }
 
 }

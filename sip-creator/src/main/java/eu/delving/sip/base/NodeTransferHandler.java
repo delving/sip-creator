@@ -103,7 +103,7 @@ public class NodeTransferHandler extends TransferHandler {
                 @Override
                 public void run() {
                     try {
-                        target.setStatsTreeNode(node);
+                        target.addStatsTreeNode(node);
                         System.out.println("Dropped " + node + " into " + target);
                     }
                     catch (Exception e) {

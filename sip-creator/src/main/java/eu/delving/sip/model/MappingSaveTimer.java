@@ -22,6 +22,7 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
@@ -76,11 +77,16 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
     }
 
     @Override
-    public void recDefNodeSelected(MappingModel mappingModel) {
+    public void nodeMappingSelected(MappingModel mappingModel) {
     }
 
     @Override
-    public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
+    public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+        timer.restart();
+    }
+
+    @Override
+    public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
         timer.restart();
     }
 }

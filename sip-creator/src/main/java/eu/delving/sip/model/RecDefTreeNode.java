@@ -36,6 +36,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 /**
@@ -47,7 +49,7 @@ import java.util.Vector;
 public class RecDefTreeNode implements TreeNode {
     private RecDefTreeNode parent;
     private RecDefNode recDefNode;
-    private StatsTreeNode statsTreeNode;
+    private Set<StatsTreeNode> statsTreeNodes = new TreeSet<StatsTreeNode>();
     private RecDefPath recDefPath;
     private Vector<RecDefTreeNode> children = new Vector<RecDefTreeNode>();
 
@@ -147,13 +149,18 @@ public class RecDefTreeNode implements TreeNode {
         return recDefNode;
     }
 
-    public StatsTreeNode getStatsTreeNode() {
-        return statsTreeNode;
+    public Set<StatsTreeNode> getStatsTreeNodes() {
+        return statsTreeNodes;
     }
 
-    public void setStatsTreeNode(StatsTreeNode statsTreeNode) {
-        this.recDefNode.setNodeMapping(statsTreeNode != null ? new NodeMapping().setInputPath(statsTreeNode.getPath()) : null);
-        this.statsTreeNode = statsTreeNode;
+    public void addStatsTreeNode(StatsTreeNode statsTreeNode) {
+        this.recDefNode.addNodeMapping(new NodeMapping().setInputPath(statsTreeNode.getPath()));
+        this.statsTreeNodes.add(statsTreeNode);
+    }
+
+    public void removeStatsTreeNode(StatsTreeNode statsTreeNode) {
+        this.recDefNode.removeNodeMapping(new NodeMapping().setInputPath(statsTreeNode.getPath()));
+        this.statsTreeNodes.remove(statsTreeNode);
     }
 
     public static class RecDefPath extends TreePath {

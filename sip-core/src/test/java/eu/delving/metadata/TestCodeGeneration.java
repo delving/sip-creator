@@ -49,8 +49,13 @@ public class TestCodeGeneration {
             recMapping = RecMapping.create("lido", recDefModel());
             recMapping.getRecDefTree().setListener(new RecDefNode.Listener() {
                 @Override
-                public void nodeMappingSet(RecDefNode recDefNode) {
-                    System.out.println("Mapping set: " + recDefNode);
+                public void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping) {
+                    System.out.println("Mapping added: " + recDefNode);
+                }
+
+                @Override
+                public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
+                    System.out.println("Mapping removed: " + recDefNode);
                 }
             });
         }
@@ -63,18 +68,18 @@ public class TestCodeGeneration {
     public void cornucopia() throws MappingException {
         recMapping.setFact("dogExists", "true");
 
-        node("/lidoWrap/lido/@sortorder").setNodeMapping(mapping("/leadup/@orderofsort"));
-        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").setNodeMapping(mapping("/leadup/record/list/member"));
-        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").setNodeMapping(mapping("/leadup/record/list/member/@index"));
+        node("/lidoWrap/lido/@sortorder").addNodeMapping(mapping("/leadup/@orderofsort"));
+        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").addNodeMapping(mapping("/leadup/record/list/member"));
+        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").addNodeMapping(mapping("/leadup/record/list/member/@index"));
 
         RecDefNode termNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
-        NodeMapping term = termNode.setNodeMapping(mapping("/leadup/record/list/member/concept"));
+        NodeMapping term = termNode.addNodeMapping(mapping("/leadup/record/list/member/concept"));
         term.dictionary = new TreeMap<String, String>();
         term.dictionary.put("superhero", "Clay Man");
         term.dictionary.put("sidekick", "Clay Horse");
 
         RecDefNode actorNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
-        NodeMapping mapping = actorNode.setNodeMapping(mapping("/leadup/record/list/member/name"));
+        NodeMapping mapping = actorNode.addNodeMapping(mapping("/leadup/record/list/member/name"));
         mapping.addCodeLine("if (this_name.contains(' ')) { return this_name.text().split(' '); } else { return this_name.text(); }");
 
         String code = recMapping.toCode(null, null);

@@ -147,9 +147,8 @@ public class FieldMappingFrame extends FrameBase {
         return p;
     }
 
-    private void setRecDefNode(RecDefNode recDefNode) {
-        NodeMapping nodeMapping = recDefNode == null ? null : recDefNode.getNodeMapping();
-        if (recDefNode != null && nodeMapping != null) {
+    private void setNodeMapping(NodeMapping nodeMapping) {
+        if (nodeMapping != null) {
             StatsTreeNode node = null; // todo: where to get it?
             if (node != null) {
                 dictionaryCreate.setEnabled(nodeMapping.dictionary == null);// todo && CodeGenerator.isDictionaryPossible(fieldMapping.getDefinition(), node));
@@ -186,14 +185,20 @@ public class FieldMappingFrame extends FrameBase {
             }
 
             @Override
-            public void recDefNodeSelected(MappingModel mappingModel) {
+            public void nodeMappingSelected(MappingModel mappingModel) {
 //                setFieldMapping(fieldMapping);
             }
 
             @Override
-            public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
                 // todo: implement
             }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+                // todo: implement
+            }
+
         });
         dictionaryCreate.addActionListener(new ActionListener() {
             @Override
@@ -226,9 +231,8 @@ public class FieldMappingFrame extends FrameBase {
         dictionaryDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                RecDefNode recDefNode = sipModel.getMappingModel().getSelectedRecDefNode();
-                NodeMapping nodeMapping = recDefNode == null ? null : recDefNode.getNodeMapping();
-                if (recDefNode != null && nodeMapping != null) {
+                NodeMapping nodeMapping = sipModel.getMappingModel().getSelectedNodeMapping();
+                if (nodeMapping != null) {
                     if (nodeMapping.dictionary == null) {
                         throw new RuntimeException("No dictionary to delete!");
                     }

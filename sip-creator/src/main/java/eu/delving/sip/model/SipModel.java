@@ -107,14 +107,20 @@ public class SipModel {
             }
 
             @Override
-            public void recDefNodeSelected(MappingModel mappingModel) {
+            public void nodeMappingSelected(MappingModel mappingModel) {
                 // todo: implement
             }
 
             @Override
-            public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
-                        LOG.info("FieldMapping has changed");
-                        clearValidation(mappingModel.getRecMapping());
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+                LOG.info("node mapping added");
+                clearValidation(mappingModel.getRecMapping());
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+                LOG.info("node mapping removed");
+                clearValidation(mappingModel.getRecMapping());
             }
         }
 //                new MappingModelAdapter() {

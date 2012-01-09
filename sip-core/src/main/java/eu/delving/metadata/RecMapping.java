@@ -117,7 +117,7 @@ public class RecMapping {
             NodeMapping nodeMapping = walk.next();
             RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath);
             if (node != null) {
-                node.setNodeMapping(nodeMapping);
+                node.addNodeMapping(nodeMapping);
             }
             else {
                 walk.remove();

@@ -22,6 +22,7 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.MappingModel;
+import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
@@ -101,10 +102,14 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
     }
 
     @Override
-    public void recDefNodeSelected(MappingModel mappingModel) {
+    public void nodeMappingSelected(MappingModel mappingModel) {
     }
 
     @Override
-    public void nodeMappingSet(MappingModel mappingModel, RecDefNode node) {
+    public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+    }
+
+    @Override
+    public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
     }
 }

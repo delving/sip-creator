@@ -48,7 +48,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class CompileModel {
     public final static int COMPILE_DELAY = 500;
     private RecMapping recMapping;
-    private RecDefNode selectedRecDefNode;
+    private NodeMapping selectedNodeMapping;
     private MetadataRecord metadataRecord;
     private Document codeDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
@@ -123,8 +123,8 @@ public class CompileModel {
     }
 
     public void setCode(String code) {
-        if (selectedRecDefNode != null && selectedRecDefNode.getNodeMapping() != null) {
-            if (!selectedRecDefNode.getNodeMapping().codeLooksLike(code)) {
+        if (selectedNodeMapping != null) {
+            if (!selectedNodeMapping.codeLooksLike(code)) {
                 editedCode = code;
                 notifyStateChange(State.EDITED);
             }
@@ -150,12 +150,12 @@ public class CompileModel {
 
     // === privates
 
-    private Path getSelectedPath() {
+    private Path getSelectedOutputPath() {
         switch (type) {
             case RECORD:
                 return null;
             case FIELD:
-                return selectedRecDefNode == null ? null : selectedRecDefNode.getNodeMapping().outputPath;
+                return selectedNodeMapping == null ? null : selectedNodeMapping.outputPath;
             default:
                 throw new RuntimeException();
         }
@@ -171,11 +171,11 @@ public class CompileModel {
                     return "// no mapping";
                 }
             case FIELD:
-                if (selectedRecDefNode == null || recMapping == null) {
+                if (selectedNodeMapping == null || recMapping == null) {
                     return "// no code";
                 }
                 else {
-                    return recMapping.toCode(selectedRecDefNode.getNodeMapping().outputPath, editedCode);
+                    return recMapping.toCode(selectedNodeMapping.outputPath, editedCode);
                 }
             default:
                 throw new RuntimeException();
@@ -209,12 +209,12 @@ public class CompileModel {
         }
 
         @Override
-        public void recDefNodeSelected(MappingModel mappingModel) {
-            if (mappingModel.getSelectedRecDefNode() == selectedRecDefNode) {
-                if (selectedRecDefNode != null) notifyStateChange(State.REGENERATED);
+        public void nodeMappingSelected(MappingModel mappingModel) {
+            if (mappingModel.getSelectedNodeMapping() == selectedNodeMapping) {
+                if (selectedNodeMapping != null) notifyStateChange(State.REGENERATED);
             }
             else {
-                selectedRecDefNode = mappingModel.getSelectedRecDefNode();
+                selectedNodeMapping = mappingModel.getSelectedNodeMapping();
                 notifyStateChange(State.ORIGINAL);
             }
             Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
@@ -222,9 +222,18 @@ public class CompileModel {
         }
 
         @Override
-        public void nodeMappingSet(MappingModel mappingModel, RecDefNode recDefNode) {
+        public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             editedCode = null;
-            selectedRecDefNode = recDefNode;
+            selectedNodeMapping = nodeMapping;
+            Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
+            notifyStateChange(State.ORIGINAL);
+            compileSoon();
+        }
+
+        @Override
+        public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            editedCode = null;
+            selectedNodeMapping = null; // todo: test whether it's the same one??
             Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
             notifyStateChange(State.ORIGINAL);
             compileSoon();
@@ -240,7 +249,7 @@ public class CompileModel {
             }
             compiling = true;
             try {
-                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedPath(), editedCode);
+                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedOutputPath(), editedCode);
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
                     feedback.say("Compiled code for " + type);
@@ -259,9 +268,8 @@ public class CompileModel {
                             notifyStateChange(State.SAVED);
                         }
                         else {
-                            NodeMapping nodeMapping = getSelectedNodeMapping();
-                            if (nodeMapping != null) {
-                                nodeMapping.setGroovyCode(editedCode);
+                            if (selectedNodeMapping != null) {
+                                selectedNodeMapping.setGroovyCode(editedCode);
                                 notifyStateChange(State.COMMITTED);
                                 editedCode = null;
                                 notifyStateChange(State.SAVED);
@@ -274,10 +282,9 @@ public class CompileModel {
                 }
                 catch (DiscardRecordException e) {
                     compilationComplete(e.getMessage());
-                    NodeMapping nodeMapping = getSelectedNodeMapping();
-                    if (nodeMapping != null) {
+                    if (selectedNodeMapping != null) {
                         if (editedCode != null) {
-                            nodeMapping.setGroovyCode(editedCode);
+                            selectedNodeMapping.setGroovyCode(editedCode);
                             notifyStateChange(State.COMMITTED);
                             editedCode = null;
                         }
@@ -357,8 +364,7 @@ public class CompileModel {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (compiling) return;
-            NodeMapping nodeMapping = getSelectedNodeMapping();
-            if (nodeMapping == null && type == Type.FIELD) {
+            if (selectedNodeMapping == null && type == Type.FIELD) {
                 try {
                     outputDocument.remove(0, outputDocument.getLength() - 1);
                     return;
@@ -373,10 +379,6 @@ public class CompileModel {
         public void triggerSoon() {
             timer.restart();
         }
-    }
-
-    private NodeMapping getSelectedNodeMapping() {
-        return selectedRecDefNode == null ? null : selectedRecDefNode.getNodeMapping();
     }
 
     private void notifyStateChange(final State state) {

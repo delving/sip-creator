@@ -25,6 +25,8 @@ import eu.delving.groovy.GroovyVariable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The RecDefNode is the node element of a RecDefTree which stores the whole
@@ -49,11 +51,13 @@ public class RecDefNode {
     private RecDef.Elem elem;
     private RecDef.Attr attr;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
-    private NodeMapping nodeMapping;
+    private Set<NodeMapping> nodeMappings = new TreeSet<NodeMapping>();
     private Listener listener;
 
     public interface Listener {
-        void nodeMappingSet(RecDefNode recDefNode);
+        void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping);
+
+        void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping);
     }
 
     public static RecDefNode create(Listener listener, RecDef recDef) {
@@ -76,14 +80,6 @@ public class RecDefNode {
 
     public boolean isAttr() {
         return attr != null;
-    }
-
-    public RecDef.Elem getElem() {
-        return elem;
-    }
-
-    public RecDef.Attr getAttr() {
-        return attr;
     }
 
     public boolean isSingular() {
@@ -156,40 +152,65 @@ public class RecDefNode {
         return null;
     }
 
+    public boolean hasOneNodeMapping() {
+        return nodeMappings.size() == 1;
+    }
+
     public boolean hasNodeMappings() {
-        if (nodeMapping != null) return true;
+        if (!nodeMappings.isEmpty()) return true;
         for (RecDefNode sub : children) if (sub.hasNodeMappings()) return true;
         return false;
     }
 
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {
-        if (nodeMapping != null) nodeMappings.add(nodeMapping);
+        nodeMappings.addAll(this.nodeMappings);
         for (RecDefNode sub : children) sub.collectNodeMappings(nodeMappings);
     }
 
-    public NodeMapping getNodeMapping() {
+    public NodeMapping getOneNodeMapping() {
+        if (!hasOneNodeMapping()) throw new RuntimeException("Test hasOneNodeMapping first");
+        return nodeMappings.iterator().next();
+    }
+
+    public Set<NodeMapping> getNodeMappings() {
+        return nodeMappings;
+    }
+
+    public NodeMapping addNodeMapping(NodeMapping nodeMapping) {
+        nodeMapping.attachTo(this);
+        if (!nodeMappings.contains(nodeMapping)) {
+            nodeMappings.add(nodeMapping);
+            listener.nodeMappingAdded(this, nodeMapping);
+        }
         return nodeMapping;
     }
 
-    public NodeMapping setNodeMapping(NodeMapping nodeMapping) {
-        if ((this.nodeMapping = nodeMapping) != null) this.nodeMapping.attachTo(this);
-        listener.nodeMappingSet(this);
-        return nodeMapping;
+    public NodeMapping removeNodeMapping(NodeMapping nodeMapping) {
+        if (nodeMappings.contains(nodeMapping)) {
+            nodeMappings.remove(nodeMapping);
+            listener.nodeMappingRemoved(this, nodeMapping);
+            return nodeMapping;
+        }
+        else {
+            return null;
+        }
     }
 
     public void toCode(RecDefTree.Out out, Path selectedPath, String editedCode) {
         if (!hasNodeMappings()) return;
         if (selectedPath != null) throw new RuntimeException("unimplemented");
-        if (nodeMapping != null) {
-            if (isLeaf()) {
-                nodeMapping.toLeafCode(out, editedCode);
-            }
-            else {
-                beforeIteration(out);
-                beforeChildren(out, editedCode);
-                childElements(out, selectedPath, editedCode);
-                afterBrace(out);
-                afterBrace(out);
+        if (!nodeMappings.isEmpty()) {
+            for (NodeMapping nodeMapping : nodeMappings) { // todo: when can + be used?
+                if (isLeaf()) {
+                    nodeMapping.toLeafCode(out, editedCode);
+                }
+                else {
+                    beforeIteration(nodeMapping, out);
+                    beforeChildren(out, editedCode);
+                    childElements(out, selectedPath, editedCode);
+                    afterBrace(out);
+                    afterBrace(out);
+                }
             }
         }
         else {
@@ -211,7 +232,9 @@ public class RecDefNode {
             out.before();
             for (RecDefNode sub : children)
                 if (sub.isAttr() && sub.hasNodeMappings()) {
-                    sub.nodeMapping.toLeafCode(out, editedCode);
+                    for (NodeMapping nodeMapping : sub.nodeMappings) {
+                        nodeMapping.toLeafCode(out, editedCode);
+                    }
                 }
             out.after();
             out.line(") {");
@@ -222,7 +245,7 @@ public class RecDefNode {
         out.before();
     }
 
-    private void beforeIteration(RecDefTree.Out out) {
+    private void beforeIteration(NodeMapping nodeMapping, RecDefTree.Out out) {
         out.line("%s * { %s ->", nodeMapping.getVariableName(), GroovyVariable.paramName(nodeMapping.inputPath));
         out.before();
     }
@@ -235,10 +258,9 @@ public class RecDefNode {
     private String getAttributes() {
         StringBuilder attrs = new StringBuilder();
         for (RecDefNode sub : children) {
-            if (sub.isAttr() && sub.getNodeMapping() != null) {
+            if (sub.isAttr() && sub.hasOneNodeMapping()) {
                 if (attrs.length() > 0) attrs.append(", ");
-                NodeMapping subNodeMapping = sub.getNodeMapping();
-                String value = subNodeMapping.getVariableName();
+                String value = sub.getOneNodeMapping().getVariableName();
                 attrs.append(sub.getTag().getLocalName()).append(":{ ").append(value).append(" }");
             }
         }

@@ -44,7 +44,7 @@ import java.util.*;
  */
 
 @XStreamAlias("node-mapping")
-public class NodeMapping {
+public class NodeMapping implements Comparable<NodeMapping> {
 
     @XStreamAsAttribute
     public Path inputPath;
@@ -60,6 +60,16 @@ public class NodeMapping {
 
     @XStreamOmitField
     public RecDefNode recDefNode;
+    
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof NodeMapping && ((NodeMapping) o).inputPath.equals(inputPath);
+    }
+    
+    @Override
+    public int hashCode() {
+        return inputPath.hashCode();
+    }
 
     public void attachTo(RecDefNode recDefNode) {
         this.recDefNode = recDefNode;
@@ -217,8 +227,9 @@ public class NodeMapping {
 
     private NodeMapping getAncestorNodeMapping() {
         for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
-            if (ancestor.getNodeMapping() != null && ancestor.getNodeMapping().inputPath.isAncestorOf(inputPath))
-                return ancestor.getNodeMapping();
+            for (NodeMapping nodeMapping : ancestor.getNodeMappings()) {
+                if (nodeMapping.inputPath.isAncestorOf(inputPath)) return nodeMapping;
+            }
         }
         return null;
     }
@@ -244,5 +255,14 @@ public class NodeMapping {
         return indent;
     }
 
+    /**
+     * For comparing node mappings within a RecDefNode
+     * @param nodeMapping who to compare with
+     * @return true if the input paths were the same
+     */
+    @Override
+    public int compareTo(NodeMapping nodeMapping) {
+        return this.inputPath.compareTo(nodeMapping.inputPath);
+    }
 }
 
