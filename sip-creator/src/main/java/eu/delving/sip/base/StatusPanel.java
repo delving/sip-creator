@@ -39,11 +39,11 @@ public class StatusPanel extends JPanel {
 
     public StatusPanel() {
         super(new GridLayout(1, 0, 5, 5));
-        setBorder(BorderFactory.createTitledBorder("Dataset State - Actions"));
+        setBorder(BorderFactory.createTitledBorder("Actions"));
         for (int walk = 0; walk < actions.length; walk++) actions[walk] = new StateAction(DataSetState.values()[walk]);
         for (StateAction action : actions) {
             JButton button = new JButton(action);
-            button.setToolTipText(action.state.toToolTip());
+            button.setToolTipText(action.state.toHtml());
             add(button);
         }
     }
