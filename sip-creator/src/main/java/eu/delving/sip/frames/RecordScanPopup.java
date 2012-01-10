@@ -51,7 +51,7 @@ public class RecordScanPopup extends FrameBase {
     public RecordScanPopup(JComponent parent, SipModel sipModel, Listener listener) {
         super(parent, sipModel, "Scan Criteria", true);
         this.listener = listener;
-        setDefaultSize(500, 240);
+// todo: setPlacement(); or something
     }
 
     @Override

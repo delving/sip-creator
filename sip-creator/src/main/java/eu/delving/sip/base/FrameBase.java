@@ -44,16 +44,22 @@ public abstract class FrameBase extends JInternalFrame {
     private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     private static final int DEFAULT_MOVE_INTERVAL = 1000;
     private static final int MARGIN = 12;
-    private Dimension defaultSize = DEFAULT_SIZE;
+    private Placement placement;
     protected JDesktopPane desktopPane;
     protected JComponent parent;
     protected FrameBase childFrame;
     protected JComponent focusOwner;
     protected SipModel sipModel;
     protected PopupAction action;
-    private boolean modal;
+    protected JToggleButton toggle;
     private boolean initialized;
     private Timer positionTimer;
+
+    public interface Placement {
+        Point getLocation();
+
+        Dimension getSize();
+    }
 
     public FrameBase(final JComponent parent, SipModel sipModel, String title, boolean modal) {
         super(
@@ -72,7 +78,18 @@ public abstract class FrameBase extends JInternalFrame {
         this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title);
-        this.modal = modal;
+        this.toggle = new JToggleButton(title);
+        this.toggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                    openFrame();
+                }
+                else {
+                    closeFrame();
+                }
+            }
+        });
         this.desktopPane = parent instanceof FrameBase ? ((FrameBase) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
         positionTimer = new Timer(DEFAULT_MOVE_INTERVAL,
                 new ActionListener() {
@@ -117,8 +134,8 @@ public abstract class FrameBase extends JInternalFrame {
         );
     }
 
-    public void setDefaultSize(int width, int height) {
-        defaultSize = new Dimension(width, height);
+    public void setPlacement(Placement placement) {
+        this.placement = placement;
     }
 
     public SipModel getSipModel() {
@@ -142,6 +159,11 @@ public abstract class FrameBase extends JInternalFrame {
         return action;
     }
 
+    public JToggleButton getToggle() {
+        setClosable(false);
+        return toggle;
+    }
+
     private class PopupAction extends AbstractAction {
 
         public PopupAction(String title) {
@@ -157,7 +179,7 @@ public abstract class FrameBase extends JInternalFrame {
     public void openFrame() {
         init();
         refresh();
-        Point added = addIfAbsent();
+        boolean added = addIfAbsent();
         if (parent instanceof FrameBase) {
             ((FrameBase) parent).setChildFrame(FrameBase.this);
             // Need to inform parent its about to lose its focus due
@@ -165,6 +187,11 @@ public abstract class FrameBase extends JInternalFrame {
             ((FrameBase) parent).childOpening();
         }
         super.show();
+        if (added) {
+            if (placement == null) placement = new DefaultPlacement();
+            setLocation(placement.getLocation());
+            setSize(placement.getSize());
+        }
         ensureOnScreen();
         if (hasChildFrame()) {
             childFrame.moveToFront();
@@ -192,39 +219,12 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
-    private Point addIfAbsent() {
+    private boolean addIfAbsent() {
         boolean add = true;
         JInternalFrame[] frames = desktopPane.getAllFrames();
-        Point max = new Point();
-        for (JInternalFrame frame : frames) {
-            if (frame == this) {
-                add = false;
-            }
-            Point loc = frame.getLocation();
-            if (max.x < loc.x) {
-                max.x = loc.x;
-            }
-            if (max.y < loc.y) {
-                max.y = loc.y;
-            }
-        }
-        if (add) {
-            desktopPane.add(this);
-            if (modal) {
-                parent.getLocation(max);
-                max.x += 25;
-                max.y += 25;
-                return max;
-            }
-            else {
-                max.x += 25;
-                max.y += 25;
-                return max;
-            }
-        }
-        else {
-            return null;
-        }
+        for (JInternalFrame frame : frames) if (frame == this) add = false;
+        if (add) desktopPane.add(this);
+        return add;
     }
 
     /**
@@ -260,6 +260,7 @@ public abstract class FrameBase extends JInternalFrame {
     public void closeFrame() {
         try {
             setClosed(true);
+            if (toggle.isSelected()) toggle.setSelected(false);
         }
         catch (PropertyVetoException e) {
             e.printStackTrace();  // nobody should be vetoing this
@@ -401,6 +402,21 @@ public abstract class FrameBase extends JInternalFrame {
             super.paint(g);
             g.setColor(new Color(255, 255, 255, 100));
             g.fillRect(0, 0, getWidth(), getHeight());
+        }
+    }
+
+    private class DefaultPlacement implements Placement {
+        final int margin = 50;
+
+        @Override
+        public Point getLocation() {
+            return new Point(margin, margin);
+        }
+
+        @Override
+        public Dimension getSize() {
+            Dimension s = desktopPane.getSize();
+            return new Dimension(s.width - margin * 2, s.height - margin * 2);
         }
     }
 

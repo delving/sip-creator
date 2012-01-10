@@ -47,7 +47,6 @@ import java.awt.*;
 
 public class RecDefFrame extends FrameBase {
     private JTree recDefTree;
-    private JTextArea codeArea = new JTextArea();
     private HtmlPanel detailsPanel = new HtmlPanel("Details");
 
     public RecDefFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler) {
@@ -56,7 +55,6 @@ public class RecDefFrame extends FrameBase {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
                 Exec.swing(new TreeUpdater());
-                Exec.swing(new CodeUpdater());
             }
 
             @Override
@@ -69,15 +67,12 @@ public class RecDefFrame extends FrameBase {
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                Exec.swing(new CodeUpdater());
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                Exec.swing(new CodeUpdater());
             }
         });
-        codeArea.setFont(new Font("Monospaced", Font.BOLD, 14));
         recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty")));
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -85,45 +80,23 @@ public class RecDefFrame extends FrameBase {
         recDefTree.setSelectionRow(0);
         recDefTree.setDropMode(DropMode.ON);
         recDefTree.setTransferHandler(transferHandler);
-        setDefaultSize(400, 800);
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.setLayout(new GridLayout(1,0, 5, 5));
-        content.add(createStructurePanel());
-        content.add(createCodePanel());
-//        JTabbedPane tabs = new JTabbedPane();
-//        tabs.addTab("Document Structure", createStructurePanel());
-//        tabs.addTab("Builder Code", createCodePanel());
-//        content.add(tabs, BorderLayout.CENTER);
+        content.add(createTreePanel(), BorderLayout.CENTER);
+        content.add(detailsPanel, BorderLayout.SOUTH);
     }
 
     @Override
     protected void refresh() {
         new TreeUpdater().run();
-        new CodeUpdater().run();
-    }
-
-    private JPanel createStructurePanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
-        p.add(createTreePanel(), BorderLayout.CENTER);
-        p.add(detailsPanel, BorderLayout.SOUTH);
-        return p;
     }
 
     private JPanel createTreePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
         p.add(scroll(recDefTree), BorderLayout.CENTER);
-        return p;
-    }
-
-    private JPanel createCodePanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Builder Code"));
-        p.add(scroll(codeArea), BorderLayout.CENTER);
         return p;
     }
 
@@ -152,21 +125,6 @@ public class RecDefFrame extends FrameBase {
             }
             else {
                 recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
-            }
-        }
-    }
-    
-    private class CodeUpdater implements Runnable {
-
-        @Override
-        public void run() {
-            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
-            if (recMapping != null) {
-                String code = recMapping.toCode(null, null);
-                codeArea.setText(code);
-            }
-            else {
-                codeArea.setText("// No code");
             }
         }
     }

@@ -34,7 +34,8 @@ import java.awt.event.ActionEvent;
  * the individual harvests are cancellable.
  */
 public class HarvestDialog extends FrameBase {
-
+    private static int MARG = 40;
+    private static Dimension SIZE = new Dimension(600,600);
     private JButton cancel = new JButton(new CancelAction());
     private JList harvestList;
     private HarvestPool harvestPool;
@@ -42,7 +43,6 @@ public class HarvestDialog extends FrameBase {
     public HarvestDialog(JComponent parent, SipModel sipModel, HarvestPool harvestPool) {
         super(parent, sipModel, "Active harvests", false);
         this.harvestPool = harvestPool;
-        setClosable(false);
     }
 
     @Override
@@ -59,16 +59,21 @@ public class HarvestDialog extends FrameBase {
         setLayout(new BorderLayout());
         content.add(new JScrollPane(harvestList), BorderLayout.CENTER);
         content.add(cancel, BorderLayout.SOUTH);
-        setSize(new Dimension(desktopPane.getWidth() / 100 * 40, desktopPane.getHeight()/3));
-        setLocation(desktopPane.getWidth() - getWidth() + 8, desktopPane.getHeight() - getHeight() + 8);
+        setPlacement(new Placement() {
+            @Override
+            public Point getLocation() {
+                return new Point(desktopPane.getSize().width - SIZE.width - MARG, desktopPane.getSize().height - SIZE.height - MARG);
+            }
+
+            @Override
+            public Dimension getSize() {
+                return SIZE;
+            }
+        });
     }
 
     @Override
     protected void refresh() {
-    }
-
-    public void openAtPosition() {
-        openFrame();
     }
 
     private class CancelAction extends AbstractAction {

@@ -72,7 +72,7 @@ public class DictionaryPopup extends FrameBase {
             }
         });
         this.timer.setRepeats(false);
-        setDefaultSize(800, 600);
+// todo: setPlacement(); or something
     }
 
     public void editDictionary(RecDefNode recDefNode, NodeMapping nodeMapping, Runnable finishedRunnable) {

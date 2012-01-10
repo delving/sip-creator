@@ -64,7 +64,6 @@ public class AnalysisFrame extends FrameBase {
         statisticsJTree.setDragEnabled(true);
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
-        setDefaultSize(400, 800);
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {

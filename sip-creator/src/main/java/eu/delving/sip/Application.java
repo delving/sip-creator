@@ -25,6 +25,7 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
+import eu.delving.sip.frames.CodeFrame;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.DataSetModel;
@@ -64,9 +65,9 @@ public class Application {
     private HarvestDialog harvestDialog;
     private HarvestPool harvestPool;
     private StatusPanel statusPanel = new StatusPanel();
-    private JToggleButton harvestToggleButton = new JToggleButton();
     private Timer resizeTimer;
     private EditHistory editHistory = new EditHistory();
+    private CodeFrame codeFrame;
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -116,6 +117,7 @@ public class Application {
         home = new JFrame("Delving SIP Creator");
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
+        codeFrame = new CodeFrame(desktop, sipModel);
         allFrames = new AllFrames(desktop, sipModel, editHistory);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
@@ -194,17 +196,6 @@ public class Application {
                 refreshToggleButton();
             }
         });
-        harvestToggleButton.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                    harvestDialog.openAtPosition();
-                }
-                else {
-                    harvestDialog.closeFrame();
-                }
-            }
-        });
     }
 
     private boolean quit() {
@@ -224,8 +215,9 @@ public class Application {
     private JPanel createStatePanel() {
         refreshToggleButton();
         JPanel right = new JPanel(new BorderLayout(6, 6));
+        right.add(codeFrame.getToggle(), BorderLayout.WEST);
         right.add(feedback.getToggle(), BorderLayout.CENTER);
-        right.add(harvestToggleButton, BorderLayout.EAST);
+        right.add(harvestDialog.getToggle(), BorderLayout.EAST);
         JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
@@ -247,7 +239,7 @@ public class Application {
     }
 
     private void refreshToggleButton() {
-        harvestToggleButton.setText(String.format("%d harvests", harvestPool.getSize()));
+        harvestDialog.getToggle().setText(String.format("%d harvests", harvestPool.getSize()));
     }
 
     private JMenuBar createMenuBar() {

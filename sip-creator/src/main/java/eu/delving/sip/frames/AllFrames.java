@@ -51,7 +51,6 @@ public class AllFrames {
     private int viewIndex = 1;
     private View current = CLEAR;
     private SipModel sipModel;
-    private TransferHandler transferHandler = new NodeTransferHandler();
 
     public enum View {
         CLEAR("Clear"),
@@ -78,6 +77,7 @@ public class AllFrames {
         this.desktop = desktop;
         this.sipModel = sipModel;
         FrameBase status, analysis, create, recDef, statistics, input, fieldMapping, output;
+        TransferHandler transferHandler = new NodeTransferHandler();
         this.frames = new FrameBase[]{
                 status = new FactsFrame(desktop, sipModel),
                 analysis = new AnalysisFrame(desktop, sipModel, transferHandler),
@@ -242,9 +242,22 @@ public class AllFrames {
         return new Block(frame, x, y, w, h);
     }
 
-    private class Situation {
-        Point location;
-        Dimension size;
+    private class Situation implements FrameBase.Placement {
+        private Point location;
+        private Dimension size;
+
+        private Situation(Point location, Dimension size) {
+            this.location = location;
+            this.size = size;
+        }
+
+        public Point getLocation() {
+            return location;
+        }
+
+        public Dimension getSize() {
+            return size;
+        }
     }
 
     private class Block {
@@ -262,10 +275,18 @@ public class AllFrames {
         Situation situate(Dimension all, int rows, int cols, boolean useInsets) {
             int wx = all.width / cols - (all.width % 2);
             int hx = all.height / rows - (all.height % 2);
-            Situation situation = new Situation();
-            situation.location = useInsets ? new Point(x * wx - INSETS.left, y * hx - INSETS.top) : new Point(x * wx, y * hx);
-            situation.size = useInsets ? new Dimension(w * wx + INSETS.left + INSETS.right, h * hx + INSETS.top + INSETS.bottom) : new Dimension(w * wx, h * hx);
-            return situation;
+            if (useInsets) {
+                return new Situation(
+                        new Point(x * wx - INSETS.left, y * hx - INSETS.top),
+                        new Dimension(w * wx + INSETS.left + INSETS.right, h * hx + INSETS.top + INSETS.bottom)
+                );
+            }
+            else {
+                return new Situation(
+                        new Point(x * wx, y * hx),
+                        new Dimension(w * wx, h * hx)
+                );
+            }
         }
 
         int rows(int max) {
@@ -306,8 +327,7 @@ public class AllFrames {
             }
             for (Block block : blocks) {
                 Situation situation = block.situate(desktop.getSize(), rows, cols, true);
-                block.frame.setLocation(situation.location);
-                block.frame.setSize(situation.size);
+                block.frame.setPlacement(situation);
             }
             for (Block block : blocks) {
                 block.frame.openFrame();
@@ -337,7 +357,7 @@ public class AllFrames {
             }
             for (Block block : a.blocks) {
                 Situation situation = block.situate(size, rows, cols, false);
-                g.drawRect(x + situation.location.x + 1, y + situation.location.y + 1, situation.size.width, situation.size.height);
+                g.drawRect(x + situation.getLocation().x + 1, y + situation.getLocation().y + 1, situation.getSize().width, situation.getSize().height);
             }
         }
 
