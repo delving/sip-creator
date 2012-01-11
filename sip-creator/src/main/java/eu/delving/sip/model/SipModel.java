@@ -33,7 +33,7 @@ import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
+import javax.swing.ListModel;
 import java.io.File;
 import java.util.BitSet;
 import java.util.List;
@@ -137,10 +137,6 @@ public class SipModel {
         );
         statsModel = new StatsModel(this);
         statsModel.addListener(new StatsModel.Listener() {
-            @Override
-            public void statisticsSelected(FieldStatistics fieldStatistics) {
-            }
-
             @Override
             public void recordRootSet(Path recordRootPath) {
                 deleteSourceFile();

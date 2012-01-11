@@ -80,7 +80,7 @@ public class AllFrames {
         FrameBase status = new FactsFrame(desktop, sipModel);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
         FrameBase analysis = new AnalysisFrame(desktop, sipModel, transferHandler, statistics);
-        FrameBase create = new CreateFrame(desktop, sipModel);
+        FrameBase create = new CreateFrame(desktop, sipModel, statistics);
         FrameBase recDef = new RecDefFrame(desktop, sipModel, transferHandler);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);

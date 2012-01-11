@@ -30,7 +30,10 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.StatsModel;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,20 +54,6 @@ public class StatisticsFrame extends FrameBase {
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
         sipModel.getStatsModel().addListener(new StatsModel.Listener() {
             @Override
-            public void statisticsSelected(FieldStatistics fieldStatistics) {
-                setSummary(fieldStatistics);
-                if (fieldStatistics == null) {
-                    histogramModel.setHistogram(null);
-                    randomSampleModel.setRandomSample(null);
-                }
-                else {
-                    histogramModel.setHistogram(fieldStatistics.getHistogram());
-                    randomSampleModel.setRandomSample(fieldStatistics.getRandomSample());
-                }
-                moveToFront();
-            }
-
-            @Override
             public void recordRootSet(Path recordRootPath) {
             }
 
@@ -72,6 +61,18 @@ public class StatisticsFrame extends FrameBase {
             public void uniqueElementSet(Path uniqueElementPath) {
             }
         });
+    }
+
+    public void setStatistics(final FieldStatistics fieldStatistics) {
+        setSummary(fieldStatistics);
+        if (fieldStatistics == null) {
+            histogramModel.setHistogram(null);
+            randomSampleModel.setRandomSample(null);
+        }
+        else {
+            histogramModel.setHistogram(fieldStatistics.getHistogram());
+            randomSampleModel.setRandomSample(fieldStatistics.getRandomSample());
+        }
     }
 
     @Override
@@ -90,18 +91,6 @@ public class StatisticsFrame extends FrameBase {
         }
         else {
             summaryLabel.setText(String.format("<html><center><h3>%s</h3><b>%s</b><br><br>", fieldStatistics.getPath(), fieldStatistics.getSummary()));
-        }
-    }
-
-    private void setStatistics(final FieldStatistics fieldStatistics) {
-        setSummary(fieldStatistics);
-        if (fieldStatistics == null) {
-            histogramModel.setHistogram(null);
-            randomSampleModel.setRandomSample(null);
-        }
-        else {
-            histogramModel.setHistogram(fieldStatistics.getHistogram());
-            randomSampleModel.setRandomSample(fieldStatistics.getRandomSample());
         }
     }
 

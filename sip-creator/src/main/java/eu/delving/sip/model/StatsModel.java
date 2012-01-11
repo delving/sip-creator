@@ -21,7 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.SourceVariable;
@@ -31,7 +30,8 @@ import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.*;
+import javax.swing.ListModel;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import java.awt.event.ActionEvent;
@@ -50,7 +50,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
-    private Statistics statistics;
     private StatsTree statsTree = StatsTree.create("Select a data set from the File menu, or download one");
     private DefaultTreeModel statsTreeModel = new DefaultTreeModel(statsTree.getRoot());
     private VariableListModel variableListModel = new VariableListModel();
@@ -61,7 +60,6 @@ public class StatsModel {
     }
 
     public void setStatistics(Statistics statistics) {
-        this.statistics = statistics;
         Path recordRoot = null;
         Path uniqueElement = null;
         if (statistics != null) {
@@ -80,7 +78,6 @@ public class StatsModel {
         }
         statsTreeModel.setRoot(statsTree.getRoot());
         setDelimiters(recordRoot, uniqueElement);
-        selectStatistics(null);
     }
 
     private void setDelimiters(Path recordRoot, Path uniqueElement) {
@@ -123,10 +120,6 @@ public class StatsModel {
         return recordCount == null ? 0 : Integer.parseInt(recordCount);
     }
 
-    public long getElementCount() {
-        return statistics.getElementCount();
-    }
-
     public void setUniqueElement(Path uniqueElement) {
         StatsTree.setUniqueElement(statsTreeModel, uniqueElement);
         hintsModel.set(Storage.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
@@ -135,12 +128,6 @@ public class StatsModel {
 
     public Path getUniqueElement() {
         return Path.create(hintsModel.get(Storage.UNIQUE_ELEMENT_PATH));
-    }
-
-    public void selectStatistics(FieldStatistics fieldStatistics) {
-        for (Listener listener : listeners) {
-            listener.statisticsSelected(fieldStatistics);
-        }
     }
 
     public TreeModel getStatsTreeModel() {
@@ -182,8 +169,6 @@ public class StatsModel {
     }
 
     public interface Listener {
-        void statisticsSelected(FieldStatistics fieldStatistics);
-
         void recordRootSet(Path recordRootPath);
 
         void uniqueElementSet(Path uniqueElementPath);

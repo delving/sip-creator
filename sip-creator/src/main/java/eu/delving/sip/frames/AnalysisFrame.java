@@ -123,12 +123,12 @@ public class AnalysisFrame extends FrameBase {
                     final StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
-                    sipModel.getStatsModel().selectStatistics(node.getStatistics());
+                    statisticsFrame.setStatistics(node.getStatistics());
                 }
                 else {
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
-                    sipModel.getStatsModel().selectStatistics(null);
+                    statisticsFrame.setStatistics(null);
                 }
             }
         });

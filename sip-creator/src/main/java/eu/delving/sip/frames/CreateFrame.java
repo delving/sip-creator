@@ -34,7 +34,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -55,9 +57,11 @@ public class CreateFrame extends FrameBase {
     private JTextField constantField = new JTextField("?");
     private JList variablesList;
     private final CreateMappingAction createMappingAction = new CreateMappingAction();
+    private StatisticsFrame statisticsFrame;
 
-    public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
+    public CreateFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
         super(desktop, sipModel, "Create", false);
+        this.statisticsFrame = statisticsFrame;
         createMappingAction.setEnabled(false);
         variablesList = new JList(sipModel.getStatsModel().getVariablesListModel());
         wireUp();
@@ -109,7 +113,7 @@ public class CreateFrame extends FrameBase {
                 if (e.getValueIsAdjusting()) return;
                 final SourceVariable sourceVariable = (SourceVariable) variablesList.getSelectedValue();
                 if (sourceVariable != null && sourceVariable.hasStatistics()) {
-                    sipModel.getStatsModel().selectStatistics(sourceVariable.getStatistics());
+                    statisticsFrame.setStatistics(sourceVariable.getStatistics());
                     constantField.setText("?");
                 }
             }
