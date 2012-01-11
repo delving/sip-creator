@@ -26,13 +26,15 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
+import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.*;
+import javax.swing.JTree;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
@@ -52,6 +54,7 @@ public class RecDefTreeNode implements TreeNode {
     private Set<StatsTreeNode> statsTreeNodes = new TreeSet<StatsTreeNode>();
     private RecDefPath recDefPath;
     private Vector<RecDefTreeNode> children = new Vector<RecDefTreeNode>();
+    private String html;
 
     public static TreeNode create(String message) {
         return new DefaultMutableTreeNode(message);
@@ -110,6 +113,18 @@ public class RecDefTreeNode implements TreeNode {
 
     public Vector<RecDefTreeNode> getChildren() {
         return children;
+    }
+
+    public String toHtml() {
+        if (html == null) {
+            StringTemplate t = Utility.getTemplate(recDefNode.isAttr() ? "recdef-attribute" : "recdef-element");
+            t.setAttribute("name", recDefNode.getTag());
+            t.setAttribute("doc", recDefNode.getDoc());
+            t.setAttribute("options", recDefNode.getOptions());
+//            t.setAttribute("node", null) // todo: node.geInputNode())??
+            html = t.toString();
+        }
+        return html;
     }
 
     public String toString() {

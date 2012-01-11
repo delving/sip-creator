@@ -62,6 +62,7 @@ import java.util.List;
 @XStreamAlias("record-definition")
 public class RecDef {
 
+    private static final int LINE_WIDTH = 100;
     private static final String DELIM = "[ ,]+";
     private static final String INDENT = "    ";
 
@@ -248,8 +249,33 @@ public class RecDef {
 
         @XStreamImplicit
         public List<String> lines;
-
+        
         public List<String> getLines() {
+            boolean repair = false;
+            for (String line : lines) if (line.length() > LINE_WIDTH || line.contains("\n")) repair = true;
+            if (repair) {
+                List<String> freshLines = new ArrayList<String>();
+                for (String line : lines) {
+                    for (String part : line.split("\n")) {
+                        part = part.trim();
+                        if (part.length() > LINE_WIDTH) {
+                            while (part.length() >= LINE_WIDTH) {
+                                String chunk = part.substring(0, LINE_WIDTH);
+                                int space = chunk.lastIndexOf(" ");
+                                if (space < 0) space = LINE_WIDTH;
+                                chunk = chunk.substring(0, space);
+                                freshLines.add(chunk);
+                                part = part.substring(part.length()).trim();
+                            }
+                            if (!part.trim().isEmpty()) freshLines.add(part);
+                        }
+                        else {
+                            freshLines.add(part);
+                        }
+                    }
+                }
+                lines = freshLines;
+            }
             return lines;
         }
 

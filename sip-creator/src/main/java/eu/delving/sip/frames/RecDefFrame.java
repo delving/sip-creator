@@ -27,7 +27,6 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
@@ -35,8 +34,12 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 
 /**
  * The structure of the input data, tree, variables and statistics.
@@ -47,7 +50,6 @@ import java.awt.*;
 
 public class RecDefFrame extends FrameBase {
     private JTree recDefTree;
-    private HtmlPanel detailsPanel = new HtmlPanel("Details");
 
     public RecDefFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler) {
         super(desktop, sipModel, "Record Definition", false);
@@ -73,7 +75,14 @@ public class RecDefFrame extends FrameBase {
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
         });
-        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty")));
+        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty"))) {
+            @Override
+            public String getToolTipText(MouseEvent evt) {
+                TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
+                return treePath != null ? ((RecDefTreeNode) treePath.getLastPathComponent()).toHtml() : "";
+            }
+        };
+        recDefTree.setToolTipText("?");
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
@@ -85,7 +94,6 @@ public class RecDefFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.add(createTreePanel(), BorderLayout.CENTER);
-        content.add(detailsPanel, BorderLayout.SOUTH);
     }
 
     @Override
@@ -107,7 +115,6 @@ public class RecDefFrame extends FrameBase {
             Object last = event.getPath().getLastPathComponent();
             if (last instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) last;
-                showHtmlFor(node);
                 RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
                 root.showPath(recDefTree, node.getRecDefPath().getTagPath());
             }
@@ -127,17 +134,6 @@ public class RecDefFrame extends FrameBase {
                 recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
             }
         }
-    }
-
-    private void showHtmlFor(RecDefTreeNode treeNode) {
-        RecDefNode node = treeNode.getRecDefNode();
-        detailsPanel
-                .setTemplate(node.isAttr() ? "recdef-attribute" : "recdef-element")
-                .put("name", node.getTag())
-                .put("doc", node.getDoc())
-                .put("options", node.getOptions())
-                .put("node", null) // todo: node.geInputNode())??
-                .render();
     }
 
     @Override
