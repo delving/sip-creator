@@ -36,10 +36,14 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
@@ -55,9 +59,11 @@ public class AnalysisFrame extends FrameBase {
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
     private JTree statisticsJTree;
     private DataSetState dataSetState;
+    private StatisticsFrame statisticsFrame;
 
-    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler) {
+    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler, StatisticsFrame statisticsFrame) {
         super(desktop, sipModel, "Analysis", false);
+        this.statisticsFrame = statisticsFrame;
         statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {
@@ -103,12 +109,16 @@ public class AnalysisFrame extends FrameBase {
     protected void refresh() {
     }
 
+    private void onDoubleClick() {
+        statisticsFrame.setPlacement(getPlacement());
+        statisticsFrame.openFrame();
+    }
+
     private void wireUp() {
         statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
                 TreePath path = event.getPath();
-                System.out.println("### path " + path + " : " + statisticsJTree.getSelectionModel().isPathSelected(path));
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
                     final StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
@@ -120,6 +130,28 @@ public class AnalysisFrame extends FrameBase {
                     selectUniqueElementButton.setEnabled(false);
                     sipModel.getStatsModel().selectStatistics(null);
                 }
+            }
+        });
+        statisticsJTree.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                if (mouseEvent.getClickCount() == 2) onDoubleClick();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
             }
         });
         selectRecordRootButton.addActionListener(new ActionListener() {

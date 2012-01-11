@@ -138,6 +138,10 @@ public abstract class FrameBase extends JInternalFrame {
         this.placement = placement;
     }
 
+    public Placement getPlacement() {
+        return placement;
+    }
+
     public SipModel getSipModel() {
         return sipModel;
     }

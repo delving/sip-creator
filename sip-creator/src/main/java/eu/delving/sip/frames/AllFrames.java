@@ -76,17 +76,24 @@ public class AllFrames {
     public AllFrames(JDesktopPane desktop, final SipModel sipModel, EditHistory editHistory) {
         this.desktop = desktop;
         this.sipModel = sipModel;
-        FrameBase status, analysis, create, recDef, statistics, input, fieldMapping, output;
         TransferHandler transferHandler = new NodeTransferHandler();
+        FrameBase status = new FactsFrame(desktop, sipModel);
+        StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
+        FrameBase analysis = new AnalysisFrame(desktop, sipModel, transferHandler, statistics);
+        FrameBase create = new CreateFrame(desktop, sipModel);
+        FrameBase recDef = new RecDefFrame(desktop, sipModel, transferHandler);
+        FrameBase input = new InputFrame(desktop, sipModel);
+        FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
+        FrameBase output = new OutputFrame(desktop, sipModel);
         this.frames = new FrameBase[]{
-                status = new FactsFrame(desktop, sipModel),
-                analysis = new AnalysisFrame(desktop, sipModel, transferHandler),
-                create = new CreateFrame(desktop, sipModel),
-                recDef = new RecDefFrame(desktop, sipModel, transferHandler),
-                statistics = new StatisticsFrame(desktop, sipModel),
-                input = new InputFrame(desktop, sipModel),
-                fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory),
-                output = new OutputFrame(desktop, sipModel)
+                status,
+                analysis,
+                create,
+                recDef,
+                statistics,
+                input,
+                fieldMapping,
+                output
         };
         this.views = new Arrangement[]{
                 view(FIRST_CONTACT,
@@ -103,8 +110,7 @@ public class AllFrames {
                 ),
                 view(BIG_PICTURE,
                         block(input, 0, 0),
-                        block(recDef, 1, 0),
-                        block(output, 2, 0)
+                        block(output, 1, 0)
                 ),
                 view(CODE_TWEAKING,
                         block(recDef, 0, 0),

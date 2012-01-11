@@ -22,9 +22,7 @@
 package eu.delving.metadata;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Regardless of what happens, just grab some random values as a backup in case other interesting statistics
@@ -35,6 +33,8 @@ import java.util.TreeSet;
  */
 
 public class RandomSample implements Serializable {
+    private static final int SAMPLE_SIZE = 15;
+    private static final int MAX_VALUE_LENGTH = 40;
     private int size;
     private Set<String> values = new TreeSet<String>();
 
@@ -55,6 +55,16 @@ public class RandomSample implements Serializable {
                 }
             }
         }
+    }
+
+    public List<String> getFirstValues() {
+        List<String> first = new ArrayList<String>(SAMPLE_SIZE);
+        Iterator<String> it = values.iterator();
+        for (int walk = 0; walk < SAMPLE_SIZE; walk++) if (it.hasNext()) {
+            String value = it.next();
+            first.add(value.length() > MAX_VALUE_LENGTH ? value.substring(0, MAX_VALUE_LENGTH) + "..." : value);
+        }
+        return first;
     }
 
     public Set<String> getValues() {
