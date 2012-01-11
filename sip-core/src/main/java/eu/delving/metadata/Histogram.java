@@ -29,7 +29,7 @@ import java.util.*;
  * This class maintains a map of counters in such a way that it grows to certain
  * size and then trims itself.  This is all about keeping memory usage in check
  * since there can be very many of these around at one time.
- *
+ * <p/>
  * There are two things that can cause a histogram to give up and effectively
  * delete itself:  the number of values becomes outrageous or the amount of
  * storage becomes outrageous.
@@ -38,6 +38,8 @@ import java.util.*;
  */
 
 public class Histogram implements Serializable {
+    private static final int SAMPLE_SIZE = 15;
+    private static final int MAX_VALUE_LENGTH = 40;
     private static final DecimalFormat PERCENT = new DecimalFormat("#0.00%");
     private static final double OVERSAMPLING = 1.2;
     private int maxStorageSize, maxSize;
@@ -75,6 +77,13 @@ public class Histogram implements Serializable {
 
     public int getSize() {
         return counterMap.size();
+    }
+
+    public List<Counter> getFirstValues() {
+        List<Counter> values = new ArrayList<Counter>(SAMPLE_SIZE);
+        Iterator<Counter> it = counterMap.values().iterator();
+        for (int walk = 0; walk < SAMPLE_SIZE; walk++) if (it.hasNext()) values.add(it.next());
+        return values;
     }
 
     public Set<String> getValues() {
@@ -123,7 +132,7 @@ public class Histogram implements Serializable {
         }
 
         public String getValue() {
-            return value;
+            return value.length() > MAX_VALUE_LENGTH ? value.substring(0, MAX_VALUE_LENGTH) + "..." : value;
         }
 
         public int getCount() {

@@ -134,7 +134,7 @@ public class RecDefViewer extends JFrame {
 
     private void showNode(RecDefNode node) {
         recDefPanel
-                .setTemplate(node.isAttr() ? "templates/recdef-attribute" : "templates/recdef-element")
+                .setTemplate(node.isAttr() ? "recdef-attribute" : "recdef-element")
                 .put("name", node.getTag())
                 .put("doc", node.getDoc())
                 .put("options", node.getOptions())
@@ -150,7 +150,7 @@ public class RecDefViewer extends JFrame {
             if (object instanceof RecDef.Category) {
                 RecDef.Category category = (RecDef.Category) object;
                 bookmarkPanel
-                        .setTemplate("templates/bookmark-category")
+                        .setTemplate("bookmark-category")
                         .put("name", category.name)
                         .put("doc", category.doc)
                         .render();
@@ -166,7 +166,7 @@ public class RecDefViewer extends JFrame {
                 TreePath path = getTreePath(ref.path, recDefTree.getModel());
                 recDefTree.setSelectionPath(path);
                 bookmarkPanel
-                        .setTemplate(ref.isAttr() ? "templates/bookmark-attribute" : "templates/bookmark-element")
+                        .setTemplate(ref.isAttr() ? "bookmark-attribute" : "bookmark-element")
                         .put("name", ref.display)
                         .put("doc", ref.doc)
                         .put("options", ref.options).

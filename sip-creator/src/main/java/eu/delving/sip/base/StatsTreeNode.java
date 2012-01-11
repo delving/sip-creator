@@ -24,6 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -50,6 +51,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     private Path path;
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
+    private String briefHtml, fullHtml;
 
     StatsTreeNode(Tag tag) {
         this.tag = tag;
@@ -97,9 +99,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
             List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
             compilePathList(list);
             path = Path.empty();
-            for (StatsTreeNode node : list) {
-                path.push(node.getTag());
-            }
+            for (StatsTreeNode node : list) path.push(node.getTag());
         }
         return path;
     }
@@ -210,6 +210,15 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     @Override
     public int compareTo(StatsTreeNode other) {
         return getPath().compareTo(other.getPath());
+    }
+    
+    public String toBriefHtml() {
+        if (briefHtml == null) {
+            StringTemplate t = Utility.getTemplate("stats-brief");
+            t.setAttribute("stats", fieldStatistics);
+            briefHtml = t.toString();
+        }
+        return briefHtml;
     }
 
     public String toString() {

@@ -132,7 +132,7 @@ public class RecDefFrame extends FrameBase {
     private void showHtmlFor(RecDefTreeNode treeNode) {
         RecDefNode node = treeNode.getRecDefNode();
         detailsPanel
-                .setTemplate(node.isAttr() ? "templates/recdef-attribute" : "templates/recdef-element")
+                .setTemplate(node.isAttr() ? "recdef-attribute" : "recdef-element")
                 .put("name", node.getTag())
                 .put("doc", node.getDoc())
                 .put("options", node.getOptions())

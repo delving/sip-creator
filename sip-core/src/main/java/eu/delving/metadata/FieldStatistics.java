@@ -64,10 +64,6 @@ public class FieldStatistics implements Comparable<FieldStatistics>, Serializabl
         return path;
     }
 
-    public void setPath(Path path) {
-        this.path = path;
-    }
-
     public int getTotal() {
         return total;
     }

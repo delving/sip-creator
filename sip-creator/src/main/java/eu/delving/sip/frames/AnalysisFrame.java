@@ -39,6 +39,7 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
@@ -57,7 +58,14 @@ public class AnalysisFrame extends FrameBase {
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler) {
         super(desktop, sipModel, "Analysis", false);
-        statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel());
+        statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel()) {
+            @Override
+            public String getToolTipText(MouseEvent evt) {
+                TreePath treePath = statisticsJTree.getPathForLocation(evt.getX(), evt.getY());
+                return treePath != null ? ((StatsTreeNode) treePath.getLastPathComponent()).toBriefHtml() : "";
+            }
+        };
+        statisticsJTree.setToolTipText("huh?");
         statisticsJTree.getModel().addTreeModelListener(new Expander());
         statisticsJTree.setCellRenderer(new StatsTreeNode.Renderer());
         statisticsJTree.setTransferHandler(transferHandler);
@@ -100,6 +108,7 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
                 TreePath path = event.getPath();
+                System.out.println("### path " + path + " : " + statisticsJTree.getSelectionModel().isPathSelected(path));
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
                     final StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());

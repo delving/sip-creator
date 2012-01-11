@@ -21,6 +21,9 @@
 
 package eu.delving.sip.base;
 
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
+
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
@@ -49,6 +52,12 @@ public class Utility {
     public static final Icon IMPORT_ICON = new ImageIcon(Icon.class.getResource("/icons/import-icon.png"));
     public static final Icon VALIDATE_ICON = new ImageIcon(Icon.class.getResource("/icons/validate-icon.png"));
     public static final Icon RELEASE_ICON = new ImageIcon(Icon.class.getResource("/icons/release-icon.png"));
+
+    private static final StringTemplateGroup STRING_TEMPLATE = new StringTemplateGroup("Templates");
+
+    public static StringTemplate getTemplate(String name) {
+        return STRING_TEMPLATE.getInstanceOf("templates/" + name);
+    }
 
     private static SpringLayout.Constraints getConstraintsForCell(int row, int col, Container parent, int cols) {
         SpringLayout layout = (SpringLayout) parent.getLayout();

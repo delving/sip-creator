@@ -159,6 +159,10 @@ public class Path implements Comparable<Path>, Serializable {
         return stack.isEmpty() ? null : stack.peek();
     }
 
+    public String getTail() {
+        return stack.isEmpty() ? "?" : stack.peek().toString();
+    }
+
     public boolean isEmpty() {
         return stack.isEmpty();
     }

@@ -22,7 +22,6 @@
 package eu.delving.sip.base;
 
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -39,7 +38,6 @@ import java.io.StringReader;
  */
 
 public class HtmlPanel extends JPanel {
-    private static final StringTemplateGroup TEMPLATE_GROUP = new StringTemplateGroup("Templates");
     private HTMLDocument doc = (HTMLDocument) new HTMLEditorKit().createDefaultDocument();
     private StringTemplate template;
 
@@ -54,7 +52,7 @@ public class HtmlPanel extends JPanel {
     }
 
     public HtmlPanel setTemplate(String template) {
-        this.template = TEMPLATE_GROUP.getInstanceOf(template);
+        this.template = Utility.getTemplate(template);
         return this;
     }
 
