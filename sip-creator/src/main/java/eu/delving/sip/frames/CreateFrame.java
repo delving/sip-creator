@@ -52,7 +52,7 @@ public class CreateFrame extends FrameBase {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                // todo: implement
+                setStatsTreeNode(createModel.getStatsTreeNode());
             }
 
             @Override

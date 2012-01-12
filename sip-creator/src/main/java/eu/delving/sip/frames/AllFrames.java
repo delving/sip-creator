@@ -80,7 +80,7 @@ public class AllFrames {
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
         FrameBase analysis = new AnalysisFrame(desktop, sipModel, statistics);
         RecDefFrame recDef = new RecDefFrame(desktop, sipModel);
-        FrameBase bookmark = new BookmarkFrame(desktop, sipModel, create, recDef);
+        FrameBase bookmark = new BookmarkFrame(desktop, sipModel, recDef);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
         FrameBase output = new OutputFrame(desktop, sipModel);

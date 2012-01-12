@@ -54,7 +54,12 @@ public class StatisticsFrame extends FrameBase {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                setStatistics(createModel.getStatsTreeNode().getStatistics());
+                if (createModel.getStatsTreeNode() != null) {
+                    setStatistics(createModel.getStatsTreeNode().getStatistics());
+                }
+                else {
+                    setStatistics(null);
+                }
             }
 
             @Override

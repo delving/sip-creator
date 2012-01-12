@@ -57,11 +57,9 @@ import java.awt.event.MouseEvent;
 public class BookmarkFrame extends FrameBase {
     private JTree bookmarkTree;
     private RecDefFrame recDefFrame;
-    private CreateFrame createFrame;
 
-    public BookmarkFrame(JDesktopPane desktop, SipModel sipModel, CreateFrame createFrame, RecDefFrame recDefFrame) {
+    public BookmarkFrame(JDesktopPane desktop, SipModel sipModel, RecDefFrame recDefFrame) {
         super(desktop, sipModel, "Bookmarks", false);
-        this.createFrame = createFrame;
         this.recDefFrame = recDefFrame;
         sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
@@ -85,6 +83,7 @@ public class BookmarkFrame extends FrameBase {
             @Override
             public String getToolTipText(MouseEvent evt) {
                 TreePath treePath = bookmarkTree.getPathForLocation(evt.getX(), evt.getY());
+                if (treePath == null) return "";
                 Object last = treePath.getLastPathComponent();
                 if (last instanceof RecDef.Category) {
                     RecDef.Category category = (RecDef.Category) last;
@@ -109,11 +108,12 @@ public class BookmarkFrame extends FrameBase {
         };
         bookmarkTree.setRootVisible(false);
         bookmarkTree.setToolTipText("?");
+        bookmarkTree.setDragEnabled(false);
         bookmarkTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         bookmarkTree.getSelectionModel().addTreeSelectionListener(new BookmarkSelection());
         bookmarkTree.setCellRenderer(new BookmarksTreeModel.BookmarkRenderer());
         bookmarkTree.setDropMode(DropMode.ON);
-        bookmarkTree.setTransferHandler(createFrame.getTransferHandler());
+        bookmarkTree.setTransferHandler(sipModel.getNodeTransferHandler());
     }
 
     @Override

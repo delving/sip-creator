@@ -83,6 +83,7 @@ public class RecDefFrame extends FrameBase {
         };
         recDefTree.setToolTipText("?");
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
+        recDefTree.setDragEnabled(false);
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
         recDefTree.setDropMode(DropMode.ON);

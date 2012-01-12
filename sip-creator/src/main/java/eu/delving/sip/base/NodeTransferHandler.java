@@ -30,6 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
+import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -77,28 +78,23 @@ public class NodeTransferHandler extends TransferHandler {
 
     @Override
     public Transferable createTransferable(final JComponent component) {
-        return new Transferable() {
-            @Override
-            public DataFlavor[] getTransferDataFlavors() {
-                return new DataFlavor[]{FLAVOR};
-            }
-
-            @Override
-            public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
-                return dataFlavor.equals(FLAVOR);
-            }
-
-            @Override
-            public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
-                JTree tree = (JTree) component;
-                return tree.getSelectionPath().getLastPathComponent();
-            }
-        };
+        return new NodeTransferable(component);
     }
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
-        return info.isDataFlavorSupported(FLAVOR);
+        JTree targetTree = (JTree) info.getComponent();
+//        System.out.println("transferable="+info.getTransferable());
+//        System.out.println("component="+targetTree);
+//        System.out.println("drop="+info.isDrop());
+//        System.out.println("flavorsupported=" + info.isDataFlavorSupported(FLAVOR));
+        if (targetTree.getDragEnabled()) {
+            info.setShowDropLocation(false);
+            return false;
+        }
+        else {
+            return info.isDataFlavorSupported(FLAVOR);
+        }
     }
 
     @Override
@@ -111,7 +107,7 @@ public class NodeTransferHandler extends TransferHandler {
             if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
                 sipModel.getCreateModel().setRecDefTreePath(((RecDef.Ref) treePath.getLastPathComponent()).path);
             }
-            if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
+            else if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
                 sipModel.getCreateModel().setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
             }
             return true;
@@ -119,6 +115,30 @@ public class NodeTransferHandler extends TransferHandler {
         catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    private class NodeTransferable implements Transferable {
+        private Component component;
+
+        private NodeTransferable(Component component) {
+            this.component = component;
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[]{FLAVOR};
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
+            return dataFlavor.equals(FLAVOR);
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
+            JTree tree = (JTree) component;
+            return tree.getSelectionPath().getLastPathComponent();
         }
     }
 }
