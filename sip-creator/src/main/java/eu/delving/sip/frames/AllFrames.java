@@ -78,10 +78,10 @@ public class AllFrames {
         this.sipModel = sipModel;
         TransferHandler transferHandler = new NodeTransferHandler();
         FrameBase status = new FactsFrame(desktop, sipModel);
+        CreateFrame create = new CreateFrame(desktop, sipModel);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
-        FrameBase analysis = new AnalysisFrame(desktop, sipModel, transferHandler, statistics);
-        FrameBase create = new CreateFrame(desktop, sipModel, statistics);
-        RecDefFrame recDef = new RecDefFrame(desktop, sipModel, transferHandler);
+        FrameBase analysis = new AnalysisFrame(desktop, sipModel, transferHandler, statistics, create);
+        RecDefFrame recDef = new RecDefFrame(desktop, sipModel, transferHandler, create);
         FrameBase bookmark = new BookmarkFrame(desktop, sipModel, transferHandler, recDef);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
@@ -104,9 +104,10 @@ public class AllFrames {
                         block(status, 1, 2)
                 ),
                 view(QUICK_MAPPING,
-                        block(analysis, 0, 0),
-                        block(bookmark, 1, 0),
-                        block(recDef, 2, 0)
+                        block(analysis, 0, 0, 1, 3),
+                        block(bookmark, 1, 0, 1, 2),
+                        block(create, 1, 2),
+                        block(recDef, 2, 0, 1, 3)
                 ),
                 view(BIG_PICTURE,
                         block(input, 0, 0),

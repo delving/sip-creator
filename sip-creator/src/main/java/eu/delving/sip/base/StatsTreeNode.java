@@ -26,17 +26,15 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.*;
+import javax.swing.JTree;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * A node of the analysis tree
@@ -51,7 +49,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     private Path path;
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
-    private String briefHtml, fullHtml;
+    private String html;
 
     StatsTreeNode(Tag tag) {
         this.tag = tag;
@@ -70,6 +68,16 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     public void setStatistics(FieldStatistics fieldStatistics) {
         this.fieldStatistics = fieldStatistics;
+    }
+    
+    public Set<String> getVariableNames() {
+        Set<String> names = new TreeSet<String>();
+        for (StatsTreeNode child : getChildNodes()) {
+            if (child.getTag().isAttribute()) {
+                names.add(child.getTag().toString());
+            }
+        }
+        return names;
     }
 
     public List<StatsTreeNode> getChildren() {
@@ -212,13 +220,13 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         return getPath().compareTo(other.getPath());
     }
     
-    public String toBriefHtml() {
-        if (briefHtml == null) {
+    public String toHtml() {
+        if (html == null) {
             StringTemplate t = Utility.getTemplate("stats-brief");
             t.setAttribute("stats", fieldStatistics);
-            briefHtml = t.toString();
+            html = t.toString();
         }
-        return briefHtml;
+        return html;
     }
 
     public String toString() {

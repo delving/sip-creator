@@ -21,13 +21,15 @@
 
 package eu.delving.sip.base;
 
-import org.antlr.stringtemplate.StringTemplate;
-
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -38,38 +40,26 @@ import java.io.StringReader;
  */
 
 public class HtmlPanel extends JPanel {
+    private JEditorPane view = new JEditorPane();
     private HTMLDocument doc = (HTMLDocument) new HTMLEditorKit().createDefaultDocument();
-    private StringTemplate template;
 
     public HtmlPanel(String title) {
         super(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder(title));
-        JEditorPane view = new JEditorPane();
         view.setContentType("text/html");
         view.setDocument(doc);
         add(new JScrollPane(view));
         setPreferredSize(new Dimension(200, 200));
     }
 
-    public HtmlPanel setTemplate(String template) {
-        this.template = Utility.getTemplate(template);
-        return this;
-    }
-
-    public HtmlPanel put(String key, Object value) {
-        if (template == null) throw new RuntimeException("No template!");
-        template.setAttribute(key, value);
-        return this;
-    }
-
-    public void render() {
+    public void setHtml(String html) {
         int docLength = doc.getLength();
         try {
-            String html = template.toString();
             doc.remove(0, docLength);
             HTMLEditorKit.ParserCallback callback = doc.getReader(0);
             doc.getParser().parse(new StringReader(html), callback, true);
             callback.flush();
+            view.setCaretPosition(0);
         }
         catch (BadLocationException e) {
             throw new RuntimeException(e);

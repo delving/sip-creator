@@ -48,9 +48,11 @@ import java.awt.event.MouseEvent;
 
 public class RecDefFrame extends FrameBase {
     private JTree recDefTree;
+    private CreateFrame createFrame;
 
-    public RecDefFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler) {
+    public RecDefFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler, CreateFrame createFrame) {
         super(desktop, sipModel, "Record Definition", false);
+        this.createFrame = createFrame;
         sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
@@ -84,7 +86,6 @@ public class RecDefFrame extends FrameBase {
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
-        recDefTree.setSelectionRow(0);
         recDefTree.setDropMode(DropMode.ON);
         recDefTree.setTransferHandler(transferHandler);
     }
@@ -124,6 +125,7 @@ public class RecDefFrame extends FrameBase {
         }
         return null;
     }
+
     private class RecDefSelection implements TreeSelectionListener {
 
         @Override
@@ -131,10 +133,18 @@ public class RecDefFrame extends FrameBase {
             Object last = event.getPath().getLastPathComponent();
             if (last instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) last;
-                RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
-                root.showPath(recDefTree, node.getRecDefPath().getTagPath());
+                showPath(node);
+                createFrame.setRecDefNode(node);
+            }
+            else {
+                createFrame.setRecDefNode(null);
             }
         }
+    }
+
+    private void showPath(RecDefTreeNode node) {
+        RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
+        root.showPath(recDefTree, node.getRecDefPath().getTagPath());
     }
 
     private class TreeUpdater implements Runnable {
@@ -143,8 +153,9 @@ public class RecDefFrame extends FrameBase {
         public void run() {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping != null) {
-                recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create(recMapping.getRecDefTree().getRoot())));
-                recDefTree.setSelectionRow(0);
+                RecDefTreeNode node = RecDefTreeNode.create(recMapping.getRecDefTree().getRoot());
+                recDefTree.setModel(new DefaultTreeModel(node));
+                showPath(node);
             }
             else {
                 recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));

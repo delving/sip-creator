@@ -255,18 +255,6 @@ public class RecDefNode {
         out.line("}");
     }
 
-    private String getAttributes() {
-        StringBuilder attrs = new StringBuilder();
-        for (RecDefNode sub : children) {
-            if (sub.isAttr() && sub.hasOneNodeMapping()) {
-                if (attrs.length() > 0) attrs.append(", ");
-                String value = sub.getOneNodeMapping().getVariableName();
-                attrs.append(sub.getTag().getLocalName()).append(":{ ").append(value).append(" }");
-            }
-        }
-        return attrs.toString();
-    }
-
     public String toString() {
         return isAttr() ? attr.tag.toString().substring(1) : elem.tag.toString();
     }

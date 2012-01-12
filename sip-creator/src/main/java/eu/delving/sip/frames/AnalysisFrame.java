@@ -60,15 +60,17 @@ public class AnalysisFrame extends FrameBase {
     private JTree statisticsJTree;
     private DataSetState dataSetState;
     private StatisticsFrame statisticsFrame;
+    private CreateFrame createFrame;
 
-    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler, StatisticsFrame statisticsFrame) {
+    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler, StatisticsFrame statisticsFrame, CreateFrame createFrame) {
         super(desktop, sipModel, "Analysis", false);
         this.statisticsFrame = statisticsFrame;
+        this.createFrame = createFrame;
         statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {
                 TreePath treePath = statisticsJTree.getPathForLocation(evt.getX(), evt.getY());
-                return treePath != null ? ((StatsTreeNode) treePath.getLastPathComponent()).toBriefHtml() : "";
+                return treePath != null ? ((StatsTreeNode) treePath.getLastPathComponent()).toHtml() : "";
             }
         };
         statisticsJTree.setToolTipText("huh?");
@@ -124,11 +126,13 @@ public class AnalysisFrame extends FrameBase {
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
                     statisticsFrame.setStatistics(node.getStatistics());
+                    createFrame.setStatsTreeNode(node);
                 }
                 else {
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
                     statisticsFrame.setStatistics(null);
+                    createFrame.setStatsTreeNode(null);
                 }
             }
         });

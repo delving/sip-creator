@@ -121,7 +121,6 @@ public class RecDefTreeNode implements TreeNode {
             t.setAttribute("name", recDefNode.getTag());
             t.setAttribute("doc", recDefNode.getDoc());
             t.setAttribute("options", recDefNode.getOptions());
-//            t.setAttribute("node", null) // todo: node.geInputNode())??
             html = t.toString();
         }
         return html;

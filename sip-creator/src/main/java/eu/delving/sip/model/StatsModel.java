@@ -23,14 +23,12 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.SourceVariable;
 import eu.delving.sip.base.StatsTree;
 import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.ListModel;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -52,7 +50,6 @@ public class StatsModel {
     private FactModel hintsModel = new FactModel();
     private StatsTree statsTree = StatsTree.create("Select a data set from the File menu, or download one");
     private DefaultTreeModel statsTreeModel = new DefaultTreeModel(statsTree.getRoot());
-    private VariableListModel variableListModel = new VariableListModel();
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -86,10 +83,6 @@ public class StatsModel {
             hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
             List<StatsTreeNode> variables = new ArrayList<StatsTreeNode>();
             statsTree.getVariables(variables);
-            variableListModel.setVariableList(variables);
-        }
-        else {
-            variableListModel.clear();
         }
         if (uniqueElement != null) {
             StatsTree.setUniqueElement(statsTreeModel, uniqueElement);
@@ -132,20 +125,6 @@ public class StatsModel {
 
     public TreeModel getStatsTreeModel() {
         return statsTreeModel;
-    }
-
-    public ListModel getVariablesListModel() {
-        return variableListModel;
-    }
-
-    public List<SourceVariable> getVariables() {
-        List<StatsTreeNode> nodes = new ArrayList<StatsTreeNode>();
-        statsTree.getVariables(nodes);
-        List<SourceVariable> variables = new ArrayList<SourceVariable>(nodes.size());
-        for (StatsTreeNode node : nodes) {
-            variables.add(new SourceVariable(node));
-        }
-        return variables;
     }
 
     private void fireRecordRootSet() {
