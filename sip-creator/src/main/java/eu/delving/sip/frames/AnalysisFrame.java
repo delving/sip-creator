@@ -60,12 +60,10 @@ public class AnalysisFrame extends FrameBase {
     private JTree statisticsJTree;
     private DataSetState dataSetState;
     private StatisticsFrame statisticsFrame;
-    private CreateFrame createFrame;
 
-    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler, StatisticsFrame statisticsFrame, CreateFrame createFrame) {
+    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
         super(desktop, sipModel, "Analysis", false);
         this.statisticsFrame = statisticsFrame;
-        this.createFrame = createFrame;
         statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {
@@ -73,10 +71,10 @@ public class AnalysisFrame extends FrameBase {
                 return treePath != null ? ((StatsTreeNode) treePath.getLastPathComponent()).toHtml() : "";
             }
         };
-        statisticsJTree.setToolTipText("huh?");
+        statisticsJTree.setToolTipText("?");
         statisticsJTree.getModel().addTreeModelListener(new Expander());
         statisticsJTree.setCellRenderer(new StatsTreeNode.Renderer());
-        statisticsJTree.setTransferHandler(transferHandler);
+        statisticsJTree.setTransferHandler(sipModel.getNodeTransferHandler());
         statisticsJTree.setDragEnabled(true);
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         wireUp();
@@ -125,14 +123,12 @@ public class AnalysisFrame extends FrameBase {
                     final StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
-                    statisticsFrame.setStatistics(node.getStatistics());
-                    createFrame.setStatsTreeNode(node);
+                    sipModel.getCreateModel().setStatsTreeNode(node);
                 }
                 else {
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
-                    statisticsFrame.setStatistics(null);
-                    createFrame.setStatsTreeNode(null);
+                    sipModel.getCreateModel().setStatsTreeNode(null);
                 }
             }
         });

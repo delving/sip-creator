@@ -23,7 +23,6 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.SipModel;
 
@@ -76,13 +75,12 @@ public class AllFrames {
     public AllFrames(JDesktopPane desktop, final SipModel sipModel, EditHistory editHistory) {
         this.desktop = desktop;
         this.sipModel = sipModel;
-        TransferHandler transferHandler = new NodeTransferHandler();
-        FrameBase status = new FactsFrame(desktop, sipModel);
         CreateFrame create = new CreateFrame(desktop, sipModel);
+        FrameBase status = new FactsFrame(desktop, sipModel);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
-        FrameBase analysis = new AnalysisFrame(desktop, sipModel, transferHandler, statistics, create);
-        RecDefFrame recDef = new RecDefFrame(desktop, sipModel, transferHandler, create);
-        FrameBase bookmark = new BookmarkFrame(desktop, sipModel, transferHandler, recDef);
+        FrameBase analysis = new AnalysisFrame(desktop, sipModel, statistics);
+        RecDefFrame recDef = new RecDefFrame(desktop, sipModel);
+        FrameBase bookmark = new BookmarkFrame(desktop, sipModel, create, recDef);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
         FrameBase output = new OutputFrame(desktop, sipModel);

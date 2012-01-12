@@ -21,9 +21,14 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.model.RecDefTreeNode;
+import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -38,6 +43,11 @@ import java.io.IOException;
 
 public class NodeTransferHandler extends TransferHandler {
     public static final DataFlavor FLAVOR = new DataFlavor(StatsTreeNode.class, "node");
+    private SipModel sipModel;
+
+    public NodeTransferHandler(SipModel sipModel) {
+        this.sipModel = sipModel;
+    }
 
     @Override
     public Icon getVisualRepresentation(Transferable transferable) {
@@ -95,22 +105,15 @@ public class NodeTransferHandler extends TransferHandler {
     public boolean importData(TransferHandler.TransferSupport info) {
         if (!canImport(info)) return false;
         try {
-            final StatsTreeNode node = (StatsTreeNode) info.getTransferable().getTransferData(FLAVOR);
+            sipModel.getCreateModel().setStatsTreeNode((StatsTreeNode) info.getTransferable().getTransferData(FLAVOR));
             JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
-            TreePath path = location.getPath();
-            final RecDefTreeNode target = (RecDefTreeNode) path.getLastPathComponent();
-            Exec.work(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        target.addStatsTreeNode(node);
-                        System.out.println("Dropped " + node + " into " + target);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            TreePath treePath = location.getPath();
+            if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
+                sipModel.getCreateModel().setRecDefTreePath(((RecDef.Ref) treePath.getLastPathComponent()).path);
+            }
+            if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
+                sipModel.getCreateModel().setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
+            }
             return true;
         }
         catch (Exception e) {

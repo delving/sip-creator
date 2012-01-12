@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
@@ -38,9 +39,7 @@ import java.awt.event.ActionEvent;
  */
 
 public class CreateFrame extends FrameBase {
-    private StatsTreeNode statsTreeNode;
     private HtmlPanel statsHtml = new HtmlPanel("Input");
-    private RecDefTreeNode recDefTreeNode;
     private HtmlPanel recDefHtml = new HtmlPanel("Output");
     private CreateMappingAction createMappingAction = new CreateMappingAction();
     private CancelAction cancelAction = new CancelAction();
@@ -48,26 +47,44 @@ public class CreateFrame extends FrameBase {
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Create", false);
         setStatsTreeNode(null);
-        setRecDefNode(null);
+        setRecDefTreeNode(null);
         createMappingAction.setEnabled(false);
+        sipModel.getCreateModel().addListener(new CreateModel.Listener() {
+            @Override
+            public void statsTreeNodeSet(CreateModel createModel) {
+                // todo: implement
+            }
+
+            @Override
+            public void recDefTreeNodeSet(CreateModel createModel) {
+                setNode(createModel.getRecDefTreeNode());
+            }
+
+            @Override
+            public void nodeMappingSet(CreateModel createModel) {
+                // todo: implement
+            }
+        });
 //        getActionMap().put(createMappingAction.getValue(Action.NAME), createMappingAction);
 //        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), createMappingAction.getValue(Action.NAME));
     }
 
-    public void setStatsTreeNode(StatsTreeNode statsTreeNode) {
-        this.statsTreeNode = statsTreeNode;
+    private void setStatsTreeNode(StatsTreeNode statsTreeNode) {
         statsHtml.setHtml(statsTreeNode != null ? statsTreeNode.toHtml() : "<html><h1>Select</h1></html>");
         checkEnableCreate();
     }
 
-    public void setRecDefNode(RecDefTreeNode recDefTreeNode) {
-        this.recDefTreeNode = recDefTreeNode;
+    private void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
+        setNode(recDefTreeNode);
+    }
+
+    private void setNode(RecDefTreeNode recDefTreeNode) {
         recDefHtml.setHtml(recDefTreeNode != null ? recDefTreeNode.toHtml() : "<html><h1>Select</h1></html>");
         checkEnableCreate();
     }
 
     private void checkEnableCreate() {
-        createMappingAction.setEnabled(statsTreeNode != null && recDefTreeNode != null);
+        createMappingAction.setEnabled(sipModel.getCreateModel().canCreate());
     }
 
     @Override
@@ -102,8 +119,7 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (recDefTreeNode == null) throw new RuntimeException();
-            recDefTreeNode.addStatsTreeNode(statsTreeNode);
+            sipModel.getCreateModel().createMapping();
         }
     }
 

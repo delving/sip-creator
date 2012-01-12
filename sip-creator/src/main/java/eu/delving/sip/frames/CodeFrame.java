@@ -21,15 +21,16 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.JDesktopPane;
+import javax.swing.JTextArea;
 import java.awt.*;
 
 /**
@@ -55,10 +56,6 @@ public class CodeFrame extends FrameBase {
             @Override
             public void factChanged(MappingModel mappingModel) {
                 refresh();
-            }
-
-            @Override
-            public void nodeMappingSelected(MappingModel mappingModel) {
             }
 
             @Override

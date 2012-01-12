@@ -21,18 +21,22 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.BookmarksTreeModel;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import org.antlr.stringtemplate.StringTemplate;
 
+import javax.swing.DropMode;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.TransferHandler;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -53,9 +57,11 @@ import java.awt.event.MouseEvent;
 public class BookmarkFrame extends FrameBase {
     private JTree bookmarkTree;
     private RecDefFrame recDefFrame;
+    private CreateFrame createFrame;
 
-    public BookmarkFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler, RecDefFrame recDefFrame) {
+    public BookmarkFrame(JDesktopPane desktop, SipModel sipModel, CreateFrame createFrame, RecDefFrame recDefFrame) {
         super(desktop, sipModel, "Bookmarks", false);
+        this.createFrame = createFrame;
         this.recDefFrame = recDefFrame;
         sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
@@ -65,10 +71,6 @@ public class BookmarkFrame extends FrameBase {
 
             @Override
             public void factChanged(MappingModel mappingModel) {
-            }
-
-            @Override
-            public void nodeMappingSelected(MappingModel mappingModel) {
             }
 
             @Override
@@ -110,6 +112,8 @@ public class BookmarkFrame extends FrameBase {
         bookmarkTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         bookmarkTree.getSelectionModel().addTreeSelectionListener(new BookmarkSelection());
         bookmarkTree.setCellRenderer(new BookmarksTreeModel.BookmarkRenderer());
+        bookmarkTree.setDropMode(DropMode.ON);
+        bookmarkTree.setTransferHandler(createFrame.getTransferHandler());
     }
 
     @Override

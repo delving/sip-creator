@@ -23,11 +23,10 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Histogram;
-import eu.delving.metadata.Path;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.StatsModel;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
@@ -52,18 +51,23 @@ public class StatisticsFrame extends FrameBase {
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Statistics", false);
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
-        sipModel.getStatsModel().addListener(new StatsModel.Listener() {
+        sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void recordRootSet(Path recordRootPath) {
+            public void statsTreeNodeSet(CreateModel createModel) {
+                setStatistics(createModel.getStatsTreeNode().getStatistics());
             }
 
             @Override
-            public void uniqueElementSet(Path uniqueElementPath) {
+            public void recDefTreeNodeSet(CreateModel createModel) {
+            }
+
+            @Override
+            public void nodeMappingSet(CreateModel createModel) {
             }
         });
     }
 
-    public void setStatistics(final FieldStatistics fieldStatistics) {
+    private void setStatistics(final FieldStatistics fieldStatistics) {
         setSummary(fieldStatistics);
         if (fieldStatistics == null) {
             histogramModel.setHistogram(null);

@@ -167,9 +167,9 @@ public class RecDefTreeNode implements TreeNode {
         return statsTreeNodes;
     }
 
-    public void addStatsTreeNode(StatsTreeNode statsTreeNode) {
-        this.recDefNode.addNodeMapping(new NodeMapping().setInputPath(statsTreeNode.getPath()));
+    public NodeMapping addStatsTreeNode(StatsTreeNode statsTreeNode) {
         this.statsTreeNodes.add(statsTreeNode);
+        return this.recDefNode.addNodeMapping(new NodeMapping().setInputPath(statsTreeNode.getPath()));
     }
 
     public void removeStatsTreeNode(StatsTreeNode statsTreeNode) {

@@ -21,13 +21,17 @@
 
 package eu.delving.sip;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.Tag;
 import eu.delving.sip.base.StatsTree;
 import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.xml.AnalysisParser;
 import org.apache.log4j.Logger;
 import org.junit.After;

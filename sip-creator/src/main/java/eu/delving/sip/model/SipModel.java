@@ -26,6 +26,7 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.*;
 import eu.delving.sip.xml.AnalysisParser;
@@ -61,8 +62,10 @@ public class SipModel {
     private DataSetModel dataSetModel = new DataSetModel();
     private FactModel dataSetFacts = new FactModel();
     private MappingModel mappingModel = new MappingModel();
+    private CreateModel createModel = new CreateModel(mappingModel);
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
+    private NodeTransferHandler nodeTransferHandler = new NodeTransferHandler(this);
     private volatile boolean converting, validating, analyzing, importing;
 
     public interface AnalysisListener {
@@ -91,6 +94,7 @@ public class SipModel {
         fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel.getParseEar());
         parseListeners.add(fieldCompileModel.getParseEar());
+        createModel.addListener(fieldCompileModel.getCreateModelEar());
         mappingModel.addListener(reportFileModel);
         mappingModel.addListener(recordCompileModel.getMappingModelEar());
         mappingModel.addListener(fieldCompileModel.getMappingModelEar());
@@ -103,12 +107,6 @@ public class SipModel {
 
             @Override
             public void factChanged(MappingModel mappingModel) {
-                // todo: implement
-            }
-
-            @Override
-            public void nodeMappingSelected(MappingModel mappingModel) {
-                // todo: implement
             }
 
             @Override
@@ -122,19 +120,10 @@ public class SipModel {
                 LOG.info("node mapping removed");
                 clearValidation(mappingModel.getRecMapping());
             }
-        }
-//                new MappingModelAdapter() {
-//
-//                    @Override
-//                    public void fieldMappingChanged() {
-//                    }
-//
-//                    @Override
-//                    public void recordMappingChanged(RecordMapping recordMapping) {
-//                        clearValidation(recordMapping);
-//                    }
-//                }
-        );
+        });
+
+// todo: on changes in create model?..  clearValidation(recordMapping);
+
         statsModel = new StatsModel(this);
         statsModel.addListener(new StatsModel.Listener() {
             @Override
@@ -217,6 +206,14 @@ public class SipModel {
 
     public MappingModel getMappingModel() {
         return mappingModel;
+    }
+
+    public CreateModel getCreateModel() {
+        return createModel;
+    }
+
+    public NodeTransferHandler getNodeTransferHandler() {
+        return nodeTransferHandler;
     }
 
     public boolean hasDataSet() {

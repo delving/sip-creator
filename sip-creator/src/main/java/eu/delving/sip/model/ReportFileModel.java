@@ -21,14 +21,13 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.*;
+import javax.swing.AbstractListModel;
 import java.util.List;
 
 /**
@@ -99,10 +98,6 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
 
     @Override
     public void factChanged(MappingModel mappingModel) {
-    }
-
-    @Override
-    public void nodeMappingSelected(MappingModel mappingModel) {
     }
 
     @Override

@@ -21,7 +21,6 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingModel;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
@@ -30,6 +29,7 @@ import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.CompileModel;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -166,9 +166,9 @@ public class FieldMappingFrame extends FrameBase {
         }
     }
 
-//    private StatsTreeNode getNode(FieldMapping fieldMapping) {
+//    private StatsTreeNode getRecDefTreeNode(FieldMapping fieldMapping) {
 //        SourceVariable sourceVariable = getSourceVariable(fieldMapping);
-//        return sourceVariable != null ? sourceVariable.getNode() : null;
+//        return sourceVariable != null ? sourceVariable.getRecDefTreeNode() : null;
 //        return null;
 //    }
 
@@ -185,11 +185,6 @@ public class FieldMappingFrame extends FrameBase {
             }
 
             @Override
-            public void nodeMappingSelected(MappingModel mappingModel) {
-//                setFieldMapping(fieldMapping);
-            }
-
-            @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
                 // todo: implement
             }
@@ -203,7 +198,7 @@ public class FieldMappingFrame extends FrameBase {
         dictionaryCreate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-//                FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedNodeMapping();
+//                FieldMapping fieldMapping = sipModel.getMappingModel().getNodeMapping();
 //                if (fieldMapping != null) {
 //                    throw new RuntimeException("implement!");
 //                    CodeGenerator codeGenerator = new CodeGenerator();
@@ -231,7 +226,7 @@ public class FieldMappingFrame extends FrameBase {
         dictionaryDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                NodeMapping nodeMapping = sipModel.getMappingModel().getSelectedNodeMapping();
+                NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
                 if (nodeMapping != null) {
                     if (nodeMapping.dictionary == null) {
                         throw new RuntimeException("No dictionary to delete!");

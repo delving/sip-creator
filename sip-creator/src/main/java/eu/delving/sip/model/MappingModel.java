@@ -19,8 +19,14 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.sip.model;
 
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
+
+import javax.swing.tree.TreePath;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -39,10 +45,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MappingModel implements RecDefNode.Listener {
 
     private RecMapping recMapping;
-    private NodeMapping selectedNodeMapping;
+    private RecDefTreeNode recDefTreeRoot;
 
     public void setRecMapping(RecMapping recMapping) {
         this.recMapping = recMapping;
+        recDefTreeRoot = null;
         if (recMapping != null) recMapping.getRecDefTree().setListener(this);
         fireRecMappingSet();
     }
@@ -51,25 +58,27 @@ public class MappingModel implements RecDefNode.Listener {
         return recMapping;
     }
 
-    public NodeMapping getSelectedNodeMapping() {
-        return selectedNodeMapping;
+    public RecDefTreeNode getRecDefTreeRoot() {
+        if (recDefTreeRoot == null && recMapping != null) {
+            recDefTreeRoot = RecDefTreeNode.create(recMapping.getRecDefTree().getRoot());
+        }
+        return recDefTreeRoot;
     }
-
-    public void selectNodeMapping(NodeMapping nodeMapping) {
-        this.selectedNodeMapping = nodeMapping;
-        fireNodeMappingSelected();
+    
+    public TreePath getTreePath(Path path) {
+        return getTreePath(path, getRecDefTreeRoot());
     }
 
     public void setFact(String path, String value) {
         if (recMapping != null) {
             boolean changed;
             if (value == null) {
-                changed = recMapping.facts.containsKey(path);
-                recMapping.facts.remove(path);
+                changed = recMapping.getFacts().containsKey(path);
+                recMapping.getFacts().remove(path);
             }
             else {
-                changed = recMapping.facts.containsKey(path) && !recMapping.facts.get(path).equals(value);
-                recMapping.facts.put(path, value);
+                changed = recMapping.getFacts().containsKey(path) && !recMapping.getFacts().get(path).equals(value);
+                recMapping.getFacts().put(path, value);
             }
             if (changed)  fireFactChanged();
         }
@@ -93,13 +102,23 @@ public class MappingModel implements RecDefNode.Listener {
 
         void factChanged(MappingModel mappingModel);
 
-        void nodeMappingSelected(MappingModel mappingModel);
-
         void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 
         void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 
     }
+
+    private TreePath getTreePath(Path path, RecDefTreeNode node) {
+        if (node.getRecDefPath().getTagPath().equals(path)) {
+            return node.getRecDefPath();
+        }
+        for (RecDefTreeNode sub : node.getChildren()) {
+            TreePath subPath = getTreePath(path, sub);
+            if (subPath != null) return subPath;
+        }
+        return null;
+    }
+
 
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
@@ -114,9 +133,4 @@ public class MappingModel implements RecDefNode.Listener {
     private void fireFactChanged() {
         for (Listener listener : listeners) listener.factChanged(this);
     }
-
-    private void fireNodeMappingSelected() {
-        for (Listener listener : listeners) listener.nodeMappingSelected(this);
-    }
-
 }

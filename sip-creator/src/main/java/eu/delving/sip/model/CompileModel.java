@@ -26,7 +26,7 @@ import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import groovy.util.Node;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
@@ -62,6 +62,7 @@ public class CompileModel {
     private volatile boolean compiling;
     private ParseEar parseEar = new ParseEar();
     private MappingModelEar mappingModelEar = new MappingModelEar();
+    private CreateModelEar createModelEar = new CreateModelEar();
 
     public enum Type {
         RECORD("record mapping"),
@@ -101,6 +102,10 @@ public class CompileModel {
 
     public MappingModel.Listener getMappingModelEar() {
         return mappingModelEar;
+    }
+    
+    public CreateModel.Listener getCreateModelEar() {
+        return createModelEar;
     }
 
     public SipModel.ParseListener getParseEar() {
@@ -196,6 +201,30 @@ public class CompileModel {
         }
     }
 
+    private class CreateModelEar implements CreateModel.Listener {
+
+        @Override
+        public void statsTreeNodeSet(CreateModel createModel) {
+        }
+
+        @Override
+        public void recDefTreeNodeSet(CreateModel createModel) {
+        }
+
+        @Override
+        public void nodeMappingSet(CreateModel createModel) {
+            if (createModel.getNodeMapping() == selectedNodeMapping) {
+                if (selectedNodeMapping != null) notifyStateChange(State.REGENERATED);
+            }
+            else {
+                selectedNodeMapping = createModel.getNodeMapping();
+                notifyStateChange(State.ORIGINAL);
+            }
+            Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
+            compileSoon();
+        }
+    }
+
     private class MappingModelEar implements MappingModel.Listener {
 
         @Override
@@ -205,19 +234,6 @@ public class CompileModel {
 
         @Override
         public void factChanged(MappingModel mappingModel) {
-            compileSoon();
-        }
-
-        @Override
-        public void nodeMappingSelected(MappingModel mappingModel) {
-            if (mappingModel.getSelectedNodeMapping() == selectedNodeMapping) {
-                if (selectedNodeMapping != null) notifyStateChange(State.REGENERATED);
-            }
-            else {
-                selectedNodeMapping = mappingModel.getSelectedNodeMapping();
-                notifyStateChange(State.ORIGINAL);
-            }
-            Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
             compileSoon();
         }
 

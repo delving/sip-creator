@@ -21,17 +21,22 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.DropMode;
+import javax.swing.JDesktopPane;
+import javax.swing.JPanel;
+import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
@@ -48,11 +53,9 @@ import java.awt.event.MouseEvent;
 
 public class RecDefFrame extends FrameBase {
     private JTree recDefTree;
-    private CreateFrame createFrame;
 
-    public RecDefFrame(JDesktopPane desktop, SipModel sipModel, TransferHandler transferHandler, CreateFrame createFrame) {
+    public RecDefFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Record Definition", false);
-        this.createFrame = createFrame;
         sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
@@ -61,10 +64,6 @@ public class RecDefFrame extends FrameBase {
 
             @Override
             public void factChanged(MappingModel mappingModel) {
-            }
-
-            @Override
-            public void nodeMappingSelected(MappingModel mappingModel) {
             }
 
             @Override
@@ -87,14 +86,13 @@ public class RecDefFrame extends FrameBase {
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
         recDefTree.setDropMode(DropMode.ON);
-        recDefTree.setTransferHandler(transferHandler);
+        recDefTree.setTransferHandler(sipModel.getNodeTransferHandler());
     }
 
     public void setPath(Path path) {
-        TreePath treePath = getTreePath(path, recDefTree.getModel());
-        recDefTree.setSelectionPath(treePath);
+        recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(path));
     }
-
+    
     @Override
     protected void buildContent(Container content) {
         content.add(createRecDefTreePanel());
@@ -111,21 +109,6 @@ public class RecDefFrame extends FrameBase {
         return p;
     }
 
-    private TreePath getTreePath(Path path, TreeModel model) {
-        return getTreePath(path, (RecDefTreeNode) model.getRoot());
-    }
-
-    private TreePath getTreePath(Path path, RecDefTreeNode node) {
-        if (node.getRecDefPath().getTagPath().equals(path)) {
-            return node.getRecDefPath();
-        }
-        for (RecDefTreeNode sub : node.getChildren()) {
-            TreePath subPath = getTreePath(path, sub);
-            if (subPath != null) return subPath;
-        }
-        return null;
-    }
-
     private class RecDefSelection implements TreeSelectionListener {
 
         @Override
@@ -134,10 +117,10 @@ public class RecDefFrame extends FrameBase {
             if (last instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) last;
                 showPath(node);
-                createFrame.setRecDefNode(node);
+                sipModel.getCreateModel().setRecDefTreeNode(node);
             }
             else {
-                createFrame.setRecDefNode(null);
+                sipModel.getCreateModel().setRecDefTreeNode(null);
             }
         }
     }
@@ -151,11 +134,10 @@ public class RecDefFrame extends FrameBase {
 
         @Override
         public void run() {
-            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
-            if (recMapping != null) {
-                RecDefTreeNode node = RecDefTreeNode.create(recMapping.getRecDefTree().getRoot());
-                recDefTree.setModel(new DefaultTreeModel(node));
-                showPath(node);
+            RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
+            if (root != null) {
+                recDefTree.setModel(new DefaultTreeModel(root));
+                showPath(root);
             }
             else {
                 recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
