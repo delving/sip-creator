@@ -21,10 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingModel;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
-import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.RecDefTreeNode;
@@ -34,6 +31,7 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
@@ -91,9 +89,14 @@ public class RecDefFrame extends FrameBase {
         recDefTree.setTransferHandler(transferHandler);
     }
 
+    public void setPath(Path path) {
+        TreePath treePath = getTreePath(path, recDefTree.getModel());
+        recDefTree.setSelectionPath(treePath);
+    }
+
     @Override
     protected void buildContent(Container content) {
-        content.add(createTreePanel(), BorderLayout.CENTER);
+        content.add(createRecDefTreePanel());
     }
 
     @Override
@@ -101,13 +104,26 @@ public class RecDefFrame extends FrameBase {
         new TreeUpdater().run();
     }
 
-    private JPanel createTreePanel() {
+    private JPanel createRecDefTreePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
         p.add(scroll(recDefTree), BorderLayout.CENTER);
         return p;
     }
 
+    private TreePath getTreePath(Path path, TreeModel model) {
+        return getTreePath(path, (RecDefTreeNode) model.getRoot());
+    }
+
+    private TreePath getTreePath(Path path, RecDefTreeNode node) {
+        if (node.getRecDefPath().getTagPath().equals(path)) {
+            return node.getRecDefPath();
+        }
+        for (RecDefTreeNode sub : node.getChildren()) {
+            TreePath subPath = getTreePath(path, sub);
+            if (subPath != null) return subPath;
+        }
+        return null;
+    }
     private class RecDefSelection implements TreeSelectionListener {
 
         @Override

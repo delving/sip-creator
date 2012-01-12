@@ -81,7 +81,8 @@ public class AllFrames {
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
         FrameBase analysis = new AnalysisFrame(desktop, sipModel, transferHandler, statistics);
         FrameBase create = new CreateFrame(desktop, sipModel, statistics);
-        FrameBase recDef = new RecDefFrame(desktop, sipModel, transferHandler);
+        RecDefFrame recDef = new RecDefFrame(desktop, sipModel, transferHandler);
+        FrameBase bookmark = new BookmarkFrame(desktop, sipModel, transferHandler, recDef);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
         FrameBase output = new OutputFrame(desktop, sipModel);
@@ -89,6 +90,7 @@ public class AllFrames {
                 status,
                 analysis,
                 create,
+                bookmark,
                 recDef,
                 statistics,
                 input,
@@ -103,10 +105,8 @@ public class AllFrames {
                 ),
                 view(QUICK_MAPPING,
                         block(analysis, 0, 0),
-
-                        block(recDef, 1, 0, 2, 1)
-//                        block(statistics, 1, 0),
-//                        block(recDef, 2, 0)
+                        block(bookmark, 1, 0),
+                        block(recDef, 2, 0)
                 ),
                 view(BIG_PICTURE,
                         block(input, 0, 0),

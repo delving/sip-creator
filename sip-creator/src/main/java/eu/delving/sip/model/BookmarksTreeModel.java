@@ -1,10 +1,14 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.RecDef;
+import eu.delving.sip.base.Utility;
 
+import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import java.awt.Component;
 import java.util.List;
 
 /**
@@ -15,6 +19,9 @@ import java.util.List;
 
 public class BookmarksTreeModel implements TreeModel {
     private List<RecDef.Category> bookmarks;
+
+    public BookmarksTreeModel() {
+    }
 
     public BookmarksTreeModel(List<RecDef.Category> bookmarks) {
         this.bookmarks = bookmarks;
@@ -27,6 +34,7 @@ public class BookmarksTreeModel implements TreeModel {
 
     @Override
     public Object getChild(Object object, int index) {
+        if (bookmarks == null) return "Empty";
         if (object == bookmarks) {
             return bookmarks.get(index);
         }
@@ -83,4 +91,30 @@ public class BookmarksTreeModel implements TreeModel {
     @Override
     public void removeTreeModelListener(TreeModelListener treeModelListener) {
     }
+
+    public static class BookmarkRenderer extends DefaultTreeCellRenderer {
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            if (value instanceof RecDef.Category) {
+                setIcon(expanded ? Utility.BOOKMARK_EXPANDED_ICON : Utility.BOOKMARK_ICON);
+            }
+            else if (value instanceof RecDef.Ref) {
+                RecDef.Ref ref = (RecDef.Ref) value;
+                if (ref.isAttr()) {
+                    setIcon(Utility.ATTRIBUTE_ICON);
+                }
+                else if (!ref.elem.elemList.isEmpty()) {
+                    setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                }
+                else {
+                    setIcon(Utility.VALUE_ELEMENT_ICON);
+                }
+            }
+            return component;
+        }
+    }
+
+
 }
