@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.base.StatsTreeNode;
@@ -29,7 +30,10 @@ import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 
 /**
@@ -42,7 +46,6 @@ public class CreateFrame extends FrameBase {
     private HtmlPanel statsHtml = new HtmlPanel("Input");
     private HtmlPanel recDefHtml = new HtmlPanel("Output");
     private CreateMappingAction createMappingAction = new CreateMappingAction();
-    private CancelAction cancelAction = new CancelAction();
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Create", false);
@@ -65,8 +68,10 @@ public class CreateFrame extends FrameBase {
                 // todo: implement
             }
         });
-//        getActionMap().put(createMappingAction.getValue(Action.NAME), createMappingAction);
-//        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), createMappingAction.getValue(Action.NAME));
+    }
+
+    public CreateMappingAction getAction() {
+        return createMappingAction;
     }
 
     private void setStatsTreeNode(StatsTreeNode statsTreeNode) {
@@ -90,7 +95,7 @@ public class CreateFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.add(createPanel(), BorderLayout.CENTER);
-        content.add(createButtonPanel(), BorderLayout.SOUTH);
+        content.add(new JButton(createMappingAction), BorderLayout.SOUTH);
     }
 
     @Override
@@ -104,13 +109,6 @@ public class CreateFrame extends FrameBase {
         return p;
     }
 
-    private JComponent createButtonPanel() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        p.add(new JButton(cancelAction));
-        p.add(new JButton(createMappingAction));
-        return p;
-    }
-
     private class CreateMappingAction extends AbstractAction {
 
         private CreateMappingAction() {
@@ -119,7 +117,12 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.getCreateModel().createMapping();
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    sipModel.getCreateModel().createMapping();
+                }
+            });
         }
     }
 

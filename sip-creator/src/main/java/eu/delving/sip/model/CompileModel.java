@@ -398,9 +398,7 @@ public class CompileModel {
     }
 
     private void notifyStateChange(final State state) {
-        for (Listener listener : listeners) {
-            listener.stateChanged(state);
-        }
+        for (Listener listener : listeners) listener.stateChanged(state);
     }
 
     public interface Listener {

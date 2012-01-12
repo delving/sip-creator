@@ -41,6 +41,7 @@ import static eu.delving.sip.frames.AllFrames.View.*;
  */
 
 public class AllFrames {
+    private final String CREATE = "create";
     private final String VIEW_PREF = "currentView";
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
@@ -76,11 +77,15 @@ public class AllFrames {
         this.desktop = desktop;
         this.sipModel = sipModel;
         CreateFrame create = new CreateFrame(desktop, sipModel);
+        addSpaceBarCreate(create, create);
         FrameBase status = new FactsFrame(desktop, sipModel);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
         FrameBase analysis = new AnalysisFrame(desktop, sipModel, statistics);
+        addSpaceBarCreate(create, analysis);
         RecDefFrame recDef = new RecDefFrame(desktop, sipModel);
+        addSpaceBarCreate(create, recDef);
         FrameBase bookmark = new BookmarkFrame(desktop, sipModel, recDef);
+        addSpaceBarCreate(create, bookmark);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
         FrameBase output = new OutputFrame(desktop, sipModel);
@@ -139,6 +144,11 @@ public class AllFrames {
                 ),
                 view(CLEAR)
         };
+    }
+
+    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
+        analysis.getActionMap().put(CREATE, create.getAction());
+        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
     public Runnable prepareForNothing() {

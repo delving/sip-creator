@@ -63,6 +63,7 @@ public class CreateModel {
     public void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
         this.recDefTreeNode = recDefTreeNode;
         for (Listener listener : listeners) listener.recDefTreeNodeSet(this);
+        if (nodeMapping != null) setNodeMapping(null);
     }
 
     public void setRecDefTreePath(Path path) {
@@ -95,6 +96,8 @@ public class CreateModel {
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
         setNodeMapping(recDefTreeNode.addStatsTreeNode(statsTreeNode));
+        setStatsTreeNode(null);
+        setRecDefTreeNode(null);
     }
 
     // observable
