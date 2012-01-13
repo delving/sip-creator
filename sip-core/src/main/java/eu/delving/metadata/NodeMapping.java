@@ -222,7 +222,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public String toString() {
-        return outputPath.toString();
+        return String.format("[%s] => [%s]", inputPath.getTail(), outputPath.getTail());
     }
 
     private NodeMapping getAncestorNodeMapping() {

@@ -39,13 +39,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 
 public class CreateModel {
-    private MappingModel mappingModel;
+    private SipModel sipModel;
     private StatsTreeNode statsTreeNode;
     private RecDefTreeNode recDefTreeNode;
     private NodeMapping nodeMapping;
 
-    public CreateModel(MappingModel mappingModel) {
-        this.mappingModel = mappingModel;
+    public CreateModel(SipModel sipModel) {
+        this.sipModel = sipModel;
     }
 
     public StatsTreeNode getStatsTreeNode() {
@@ -68,7 +68,7 @@ public class CreateModel {
     }
 
     public void setRecDefTreePath(Path path) {
-        TreePath treePath = mappingModel.getTreePath(path);
+        TreePath treePath = sipModel.getMappingModel().getTreePath(path);
         RecDefTreeNode node = ((RecDefTreeNode)(treePath.getLastPathComponent()));
         setRecDefTreeNode(node);
     }
@@ -88,6 +88,13 @@ public class CreateModel {
     public void setNodeMapping(NodeMapping nodeMapping) {
         this.nodeMapping = nodeMapping;
         for (Listener listener : listeners) listener.nodeMappingSet(this);
+        if (nodeMapping != null) {
+            TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
+            RecDefTreeNode rdn = (RecDefTreeNode) treePath.getLastPathComponent();
+            if (recDefTreeNode != rdn) setRecDefTreeNode(rdn);
+            StatsTreeNode stn = sipModel.getStatsModel().getStatsTreeNode(nodeMapping.inputPath);
+            if (statsTreeNode != stn) setStatsTreeNode(stn);
+        }
     }
     
     public boolean canCreate() {

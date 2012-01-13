@@ -64,7 +64,6 @@ public class CreateFrame extends FrameBase {
 
             @Override
             public void nodeMappingSet(CreateModel createModel) {
-                // todo: implement
             }
         });
     }

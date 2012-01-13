@@ -32,6 +32,7 @@ import eu.delving.sip.files.StorageException;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -125,6 +126,24 @@ public class StatsModel {
 
     public TreeModel getStatsTreeModel() {
         return statsTreeModel;
+    }
+
+    public StatsTreeNode getStatsTreeNode(Path path) {
+        if (!(statsTreeModel.getRoot() instanceof StatsTreeNode)) return null;
+        TreePath treePath = getTreePath(path, (StatsTreeNode) statsTreeModel.getRoot());
+        if (treePath == null) return null;
+        return (StatsTreeNode) treePath.getLastPathComponent();
+    }
+
+    private TreePath getTreePath(Path path, StatsTreeNode node) {
+        if (node.getPath().equals(path)) {
+            return node.getTreePath();
+        }
+        for (StatsTreeNode sub : node.getChildren()) {
+            TreePath subPath = getTreePath(path, sub);
+            if (subPath != null) return subPath;
+        }
+        return null;
     }
 
     private void fireRecordRootSet() {

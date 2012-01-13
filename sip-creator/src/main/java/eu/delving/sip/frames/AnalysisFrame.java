@@ -22,6 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.files.DataSet;
@@ -119,17 +120,24 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
                 TreePath path = event.getPath();
+                StatsTreeNode node;
                 if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
-                    final StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
+                    node = (StatsTreeNode) path.getLastPathComponent();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
-                    sipModel.getCreateModel().setStatsTreeNode(node);
                 }
                 else {
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
-                    sipModel.getCreateModel().setStatsTreeNode(null);
+                    node = null;
                 }
+                final StatsTreeNode nodeToSet = node;
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getCreateModel().setStatsTreeNode(nodeToSet);
+                    }
+                });
             }
         });
         statisticsJTree.addMouseListener(new MouseListener() {

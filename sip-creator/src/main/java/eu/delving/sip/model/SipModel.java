@@ -62,7 +62,7 @@ public class SipModel {
     private DataSetModel dataSetModel = new DataSetModel();
     private FactModel dataSetFacts = new FactModel();
     private MappingModel mappingModel = new MappingModel();
-    private CreateModel createModel = new CreateModel(mappingModel);
+    private CreateModel createModel = new CreateModel(this);
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
     private NodeTransferHandler nodeTransferHandler = new NodeTransferHandler(this);

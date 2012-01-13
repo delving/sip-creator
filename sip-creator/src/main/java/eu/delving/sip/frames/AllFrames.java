@@ -87,6 +87,7 @@ public class AllFrames {
         FrameBase bookmark = new BookmarkFrame(desktop, sipModel, recDef);
         addSpaceBarCreate(create, bookmark);
         FrameBase input = new InputFrame(desktop, sipModel);
+        FrameBase recMapping = new RecMappingFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
         FrameBase output = new OutputFrame(desktop, sipModel);
         this.frames = new FrameBase[]{
@@ -97,6 +98,7 @@ public class AllFrames {
                 recDef,
                 statistics,
                 input,
+                recMapping,
                 fieldMapping,
                 output
         };
@@ -117,7 +119,7 @@ public class AllFrames {
                         block(output, 1, 0)
                 ),
                 view(CODE_TWEAKING,
-                        block(recDef, 0, 0),
+                        block(recMapping, 0, 0),
                         block(fieldMapping, 1, 0, 3, 1),
                         block(input, 4, 0)
                 ),

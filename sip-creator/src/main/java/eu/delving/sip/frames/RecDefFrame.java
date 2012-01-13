@@ -45,8 +45,7 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 
 /**
- * The structure of the input data, tree, variables and statistics.
- * From here mappings are made.
+ * Render the record definition as a JTree
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

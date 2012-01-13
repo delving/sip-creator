@@ -98,23 +98,31 @@ public class NodeTransferHandler extends TransferHandler {
     }
 
     @Override
-    public boolean importData(TransferHandler.TransferSupport info) {
+    public boolean importData(final TransferHandler.TransferSupport info) {
         if (!canImport(info)) return false;
         try {
-            sipModel.getCreateModel().setStatsTreeNode((StatsTreeNode) info.getTransferable().getTransferData(FLAVOR));
-            JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
-            TreePath treePath = location.getPath();
-            if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
-                sipModel.getCreateModel().setRecDefTreePath(((RecDef.Ref) treePath.getLastPathComponent()).path);
-            }
-            else if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
-                sipModel.getCreateModel().setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
-            }
+            final StatsTreeNode statsTreeNode = (StatsTreeNode) info.getTransferable().getTransferData(FLAVOR);
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    sipModel.getCreateModel().setStatsTreeNode(statsTreeNode);
+                    JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
+                    TreePath treePath = location.getPath();
+                    if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
+                        sipModel.getCreateModel().setRecDefTreePath(((RecDef.Ref) treePath.getLastPathComponent()).path);
+                    }
+                    else if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
+                        sipModel.getCreateModel().setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
+                    }
+                }
+            });
             return true;
         }
-        catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        catch (UnsupportedFlavorException e) {
+            throw new RuntimeException(e);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
     
