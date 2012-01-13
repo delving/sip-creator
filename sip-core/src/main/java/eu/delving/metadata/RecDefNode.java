@@ -196,7 +196,7 @@ public class RecDefNode {
 
     public void toCode(RecDefTree.Out out, Path selectedPath, String editedCode) {
         if (!hasNodeMappings()) return;
-        if (selectedPath != null) throw new RuntimeException("unimplemented");
+        if (selectedPath != null && !path.isAncestorOf(selectedPath)) return;
         if (!nodeMappings.isEmpty()) {
             for (NodeMapping nodeMapping : nodeMappings.values()) { // todo: when can + be used?
                 if (isLeaf()) {

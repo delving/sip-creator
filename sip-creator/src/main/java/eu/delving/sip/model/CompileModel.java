@@ -229,6 +229,7 @@ public class CompileModel {
 
         @Override
         public void recMappingSet(MappingModel mappingModel) {
+            recMapping = mappingModel.getRecMapping();
             compileSoon();
         }
 

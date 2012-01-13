@@ -50,7 +50,7 @@ public class GroovyVariable {
     }
 
     public static String paramName(Path path) {
-        return String.format("this_%s", path.peek().getLocalName());
+        return String.format("this_%s", nameToVariable(path.peek().getLocalName()));
     }
 
     private static final String PLAIN_ASCII =
@@ -80,6 +80,23 @@ public class GroovyVariable {
                     + "."
                     + ":";
 
+    private static String nameToVariable(String name) {
+        if (name.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        int n = name.length();
+        for (int i = 0; i < n; i++) {
+            char c = name.charAt(i);
+            int pos = UNICODE.indexOf(c);
+            if (pos > -1) {
+                sb.append(PLAIN_ASCII.charAt(pos));
+            }
+            else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
     private static String pathToVariable(Path path) {
         if (path.isEmpty()) return "";
         Tag attr = path.peek().isAttribute() ? path.pop() : null;
@@ -90,9 +107,6 @@ public class GroovyVariable {
             char c = s.charAt(i);
             if (c == '/') {
                 sb.append(".");
-            }
-            else if (c == ':') {
-                sb.append('_');
             }
             else {
                 int pos = UNICODE.indexOf(c);

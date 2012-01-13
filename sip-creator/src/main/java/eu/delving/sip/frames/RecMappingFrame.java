@@ -107,6 +107,11 @@ public class RecMappingFrame extends FrameBase {
         @Override
         public void run() {
             listModel.setList(recDefTree);
+            NodeMapping nm = sipModel.getCreateModel().getNodeMapping();
+            if (nm != null) {
+                int index = listModel.list.indexOf(nm);
+                if (index >= 0) nodeMappingList.setSelectedIndex(index);
+            }
         }
     }
 

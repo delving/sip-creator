@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.base.StatsTreeNode;
@@ -111,7 +112,12 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.getCreateModel().createMapping();
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    sipModel.getCreateModel().createMapping();
+                }
+            });
         }
     }
 
