@@ -28,7 +28,9 @@ import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -125,13 +127,6 @@ public class RecordScanPopup extends FrameBase {
         content.add(createCancel(), BorderLayout.SOUTH);
         setSize(500, 240);
         setLocation(parent.getLocation().x + 10, parent.getLocation().y + 10);
-    }
-
-    @Override
-    protected void refresh() {
-        for (JTextField field : fields) {
-            field.setText(null);
-        }
     }
 
     private JPanel createCancel() {

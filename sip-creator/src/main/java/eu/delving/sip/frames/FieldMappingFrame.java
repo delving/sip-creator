@@ -102,10 +102,6 @@ public class FieldMappingFrame extends FrameBase {
         add(createPanel(), BorderLayout.CENTER);
     }
 
-    @Override
-    protected void refresh() {
-    }
-
     private JPanel createPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
         p.add(createGroovyPanel());

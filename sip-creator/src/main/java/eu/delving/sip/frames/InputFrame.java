@@ -91,10 +91,6 @@ public class InputFrame extends FrameBase {
         content.add(createRecordButtonPanel(), BorderLayout.SOUTH);
     }
 
-    @Override
-    protected void refresh() {
-    }
-
     private JComponent createRecordView() {
         final JEditorPane recordView = new JEditorPane();
         recordView.setContentType("text/html");

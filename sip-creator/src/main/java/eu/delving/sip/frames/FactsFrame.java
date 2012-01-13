@@ -57,10 +57,6 @@ public class FactsFrame extends FrameBase {
         content.add(createFactsPanel(), BorderLayout.CENTER);
     }
 
-    @Override
-    protected void refresh() {
-    }
-
     private JPanel createFactsPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Data Set Facts"));

@@ -90,10 +90,6 @@ public class StatisticsFrame extends FrameBase {
         add(createListPanels(), BorderLayout.CENTER);
     }
 
-    @Override
-    protected void refresh() {
-    }
-
     private void setSummary(FieldStatistics fieldStatistics) {
         if (fieldStatistics == null) {
             summaryLabel.setText(EMPTY);

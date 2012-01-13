@@ -106,10 +106,6 @@ public class AnalysisFrame extends FrameBase {
         content.add(createPanel());
     }
 
-    @Override
-    protected void refresh() {
-    }
-
     private void onDoubleClick() {
         statisticsFrame.setPlacement(getPlacement());
         statisticsFrame.openFrame();

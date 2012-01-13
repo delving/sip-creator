@@ -24,8 +24,13 @@ package eu.delving.sip.frames;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JDesktopPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 
 /**
  * The transformation from input record to output
@@ -48,10 +53,6 @@ public class OutputFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.add(createOutputPanel(), BorderLayout.CENTER);
-    }
-
-    @Override
-    protected void refresh() {
     }
 
     private JPanel createOutputPanel() {

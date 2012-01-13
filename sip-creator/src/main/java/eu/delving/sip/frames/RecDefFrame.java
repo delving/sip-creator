@@ -98,11 +98,6 @@ public class RecDefFrame extends FrameBase {
         content.add(createRecDefTreePanel());
     }
 
-    @Override
-    protected void refresh() {
-        new TreeUpdater().run();
-    }
-
     private JPanel createRecDefTreePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.add(scroll(recDefTree), BorderLayout.CENTER);

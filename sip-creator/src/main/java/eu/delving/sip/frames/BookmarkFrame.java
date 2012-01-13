@@ -121,11 +121,6 @@ public class BookmarkFrame extends FrameBase {
         content.add(createBookmarkTreePanel());
     }
 
-    @Override
-    protected void refresh() {
-        new TreeUpdater().run();
-    }
-
     private JPanel createBookmarkTreePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.add(scroll(bookmarkTree), BorderLayout.CENTER);

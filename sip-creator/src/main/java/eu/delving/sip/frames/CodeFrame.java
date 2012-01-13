@@ -67,6 +67,10 @@ public class CodeFrame extends FrameBase {
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
                 refresh();
             }
+
+            void refresh() {
+                Exec.swingAny(new CodeUpdater());
+            }
         });
     }
 
@@ -84,11 +88,6 @@ public class CodeFrame extends FrameBase {
                 return new Dimension(desktopPane.getSize().width - MARG * 2, desktopPane.getSize().height - MARG * 2);
             }
         });
-    }
-
-    @Override
-    protected void refresh() {
-        Exec.swingAny(new CodeUpdater());
     }
 
     private class CodeUpdater implements Runnable {

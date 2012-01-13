@@ -41,7 +41,6 @@ import java.beans.VetoableChangeListener;
 
 public abstract class FrameBase extends JInternalFrame {
     public static Insets INSETS = new Insets(2, /* top */ 8, /* left */ 14, /* bottom */ 10 /* right */);
-    private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
     private static final int DEFAULT_MOVE_INTERVAL = 1000;
     private static final int MARGIN = 12;
     private Placement placement;
@@ -148,8 +147,6 @@ public abstract class FrameBase extends JInternalFrame {
 
     protected abstract void buildContent(Container content);
 
-    protected abstract void refresh();
-
     public void init() {
         if (!initialized) {
             JPanel content = (JPanel) getContentPane();
@@ -182,7 +179,6 @@ public abstract class FrameBase extends JInternalFrame {
 
     public void openFrame() {
         init();
-        refresh();
         boolean added = addIfAbsent();
         if (parent instanceof FrameBase) {
             ((FrameBase) parent).setChildFrame(FrameBase.this);

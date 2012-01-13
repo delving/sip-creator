@@ -92,10 +92,6 @@ public class DictionaryPopup extends FrameBase {
         content.add(createSouth(), BorderLayout.SOUTH);
     }
 
-    @Override
-    protected void refresh() {
-    }
-
     private JPanel createSouth() {
         JPanel p = new JPanel(new GridLayout(1, 0));
         p.add(statusLabel);

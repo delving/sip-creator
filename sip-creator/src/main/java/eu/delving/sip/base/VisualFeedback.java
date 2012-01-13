@@ -26,7 +26,8 @@ import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DateFormat;
@@ -138,10 +139,6 @@ public class VisualFeedback implements Feedback {
         @Override
         protected void buildContent(Container content) {
             content.add(scroll(list), BorderLayout.CENTER);
-        }
-
-        @Override
-        protected void refresh() {
         }
 
         public void openAtPosition() {

@@ -26,7 +26,10 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 
 /**
@@ -70,10 +73,6 @@ public class HarvestDialog extends FrameBase {
                 return SIZE;
             }
         });
-    }
-
-    @Override
-    protected void refresh() {
     }
 
     private class CancelAction extends AbstractAction {

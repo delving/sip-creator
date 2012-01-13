@@ -79,10 +79,6 @@ public class RecMappingFrame extends FrameBase {
         content.add(createListPanel());
     }
 
-    @Override
-    protected void refresh() {
-    }
-
     private JPanel createListPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.add(scroll(nodeMappingList), BorderLayout.CENTER);
