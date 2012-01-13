@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.StatsTreeNode;
 
 import javax.swing.tree.TreePath;
@@ -95,9 +96,19 @@ public class CreateModel {
     
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
-        setNodeMapping(recDefTreeNode.addStatsTreeNode(statsTreeNode));
+        Exec.work(new MappingCreator());
         setStatsTreeNode(null);
         setRecDefTreeNode(null);
+    }
+
+    private class MappingCreator implements Runnable {
+        final RecDefTreeNode target = recDefTreeNode;
+        final StatsTreeNode source = statsTreeNode;
+
+        @Override
+        public void run() {
+            target.addStatsTreeNode(source);
+        }
     }
 
     // observable

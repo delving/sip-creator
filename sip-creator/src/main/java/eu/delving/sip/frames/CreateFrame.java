@@ -21,7 +21,6 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.HtmlPanel;
 import eu.delving.sip.base.StatsTreeNode;
@@ -112,29 +111,12 @@ public class CreateFrame extends FrameBase {
     private class CreateMappingAction extends AbstractAction {
 
         private CreateMappingAction() {
-            super("Create Mapping");
+            super("<html><h2>Create Mapping</h2></html>");
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(new Runnable() {
-                @Override
-                public void run() {
-                    sipModel.getCreateModel().createMapping();
-                }
-            });
-        }
-    }
-
-    private class CancelAction extends AbstractAction {
-
-        private CancelAction() {
-            super("Cancel");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-
+            sipModel.getCreateModel().createMapping();
         }
     }
 
