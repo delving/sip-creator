@@ -23,10 +23,7 @@ package eu.delving.metadata;
 
 import eu.delving.groovy.GroovyVariable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * The RecDefNode is the node element of a RecDefTree which stores the whole
@@ -51,7 +48,7 @@ public class RecDefNode {
     private RecDef.Elem elem;
     private RecDef.Attr attr;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
-    private Set<NodeMapping> nodeMappings = new TreeSet<NodeMapping>();
+    private Map<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
 
     public interface Listener {
@@ -163,31 +160,32 @@ public class RecDefNode {
     }
 
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {
-        nodeMappings.addAll(this.nodeMappings);
+        nodeMappings.addAll(this.nodeMappings.values());
         for (RecDefNode sub : children) sub.collectNodeMappings(nodeMappings);
     }
 
     public NodeMapping getOneNodeMapping() {
         if (!hasOneNodeMapping()) throw new RuntimeException("Test hasOneNodeMapping first");
-        return nodeMappings.iterator().next();
+        return nodeMappings.values().iterator().next();
     }
 
-    public Set<NodeMapping> getNodeMappings() {
+    public Map<Path, NodeMapping> getNodeMappings() {
         return nodeMappings;
     }
 
     public NodeMapping addNodeMapping(NodeMapping nodeMapping) {
         nodeMapping.attachTo(this);
-        if (!nodeMappings.contains(nodeMapping)) {
-            nodeMappings.add(nodeMapping);
+        if (!nodeMappings.containsKey(nodeMapping.inputPath)) {
+            nodeMappings.put(nodeMapping.inputPath, nodeMapping);
             listener.nodeMappingAdded(this, nodeMapping);
         }
         return nodeMapping;
     }
 
-    public NodeMapping removeNodeMapping(NodeMapping nodeMapping) {
-        if (nodeMappings.contains(nodeMapping)) {
-            nodeMappings.remove(nodeMapping);
+    public NodeMapping removeNodeMapping(Path path) {
+        NodeMapping nodeMapping = nodeMappings.get(path);
+        if (nodeMapping != null) {
+            nodeMappings.remove(path);
             listener.nodeMappingRemoved(this, nodeMapping);
             return nodeMapping;
         }
@@ -200,7 +198,7 @@ public class RecDefNode {
         if (!hasNodeMappings()) return;
         if (selectedPath != null) throw new RuntimeException("unimplemented");
         if (!nodeMappings.isEmpty()) {
-            for (NodeMapping nodeMapping : nodeMappings) { // todo: when can + be used?
+            for (NodeMapping nodeMapping : nodeMappings.values()) { // todo: when can + be used?
                 if (isLeaf()) {
                     nodeMapping.toLeafCode(out, editedCode);
                 }
@@ -232,7 +230,7 @@ public class RecDefNode {
             out.before();
             for (RecDefNode sub : children)
                 if (sub.isAttr() && sub.hasNodeMappings()) {
-                    for (NodeMapping nodeMapping : sub.nodeMappings) {
+                    for (NodeMapping nodeMapping : sub.nodeMappings.values()) {
                         nodeMapping.toLeafCode(out, editedCode);
                     }
                 }
@@ -256,7 +254,20 @@ public class RecDefNode {
     }
 
     public String toString() {
-        return isAttr() ? attr.tag.toString().substring(1) : elem.tag.toString();
+        String name = isAttr() ? attr.tag.toString().substring(1) : elem.tag.toString();
+        if (nodeMappings.isEmpty()) {
+            return name;
+        }
+        else {
+            StringBuilder out = new StringBuilder(name);
+            out.append(" <- ");
+            Iterator<Path> walk = nodeMappings.keySet().iterator();
+            while (walk.hasNext()) {
+                out.append(walk.next().getTail());
+                if (walk.hasNext()) out.append(", ");
+            }
+            return out.toString();
+        }
     }
 
 }

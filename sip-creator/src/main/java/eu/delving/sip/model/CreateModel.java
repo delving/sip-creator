@@ -28,8 +28,6 @@ import eu.delving.sip.base.StatsTreeNode;
 
 import javax.swing.tree.TreePath;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -71,14 +69,6 @@ public class CreateModel {
         TreePath treePath = sipModel.getMappingModel().getTreePath(path);
         RecDefTreeNode node = ((RecDefTreeNode)(treePath.getLastPathComponent()));
         setRecDefTreeNode(node);
-    }
-
-    public Set<NodeMapping> getPossibleNodeMappings() {
-        Set<NodeMapping> possible = new TreeSet<NodeMapping>();
-        if (recDefTreeNode != null) {
-            possible.addAll(recDefTreeNode.getRecDefNode().getNodeMappings());
-        }
-        return possible;
     }
 
     public NodeMapping getNodeMapping() {

@@ -61,6 +61,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
     @XStreamOmitField
     public RecDefNode recDefNode;
     
+    @XStreamOmitField
+    public Object statsTreeNode;
+
     @Override
     public boolean equals(Object o) {
         return o instanceof NodeMapping && ((NodeMapping) o).inputPath.equals(inputPath);
@@ -74,6 +77,11 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public void attachTo(RecDefNode recDefNode) {
         this.recDefNode = recDefNode;
         this.outputPath = recDefNode.getPath();
+    }
+
+    public NodeMapping setStatsTreeNode(Object statsTreeNode) {
+        this.statsTreeNode = statsTreeNode;
+        return this;
     }
 
     public NodeMapping setInputPath(Path inputPath) {
@@ -227,7 +235,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     private NodeMapping getAncestorNodeMapping() {
         for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
-            for (NodeMapping nodeMapping : ancestor.getNodeMappings()) {
+            for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
                 if (nodeMapping.inputPath.isAncestorOf(inputPath)) return nodeMapping;
             }
         }

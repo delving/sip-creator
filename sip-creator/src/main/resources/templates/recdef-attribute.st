@@ -1,6 +1,11 @@
 <html>
 <table cellpadding="10">
 <tr><td><h1>Attribute $name$</h1></td></tr>
+$if (nodeMappings)$
+    $nodeMappings : { nm |
+        <tr><td><b>&lt;- $nm.inputPath$</b></td></tr>
+    }$
+$endif$
 $if (doc)$
     $doc.lines:{ line |
         <tr><td><p>$line$</p></td></tr>

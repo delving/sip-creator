@@ -38,8 +38,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.Vector;
 
 /**
@@ -51,7 +49,6 @@ import java.util.Vector;
 public class RecDefTreeNode implements TreeNode {
     private RecDefTreeNode parent;
     private RecDefNode recDefNode;
-    private Set<StatsTreeNode> statsTreeNodes = new TreeSet<StatsTreeNode>();
     private RecDefPath recDefPath;
     private Vector<RecDefTreeNode> children = new Vector<RecDefTreeNode>();
     private String html;
@@ -72,7 +69,7 @@ public class RecDefTreeNode implements TreeNode {
         this.parent = parent;
         this.recDefNode = recDefNode;
         if (parent != null) parent.children.add(this);
-        for (RecDefNode sub : recDefNode.getChildren()) new RecDefTreeNode(this, sub);
+        for (RecDefNode subRecDefNode : recDefNode.getChildren()) new RecDefTreeNode(this, subRecDefNode);
     }
 
     @Override
@@ -121,6 +118,7 @@ public class RecDefTreeNode implements TreeNode {
             t.setAttribute("name", recDefNode.getTag());
             t.setAttribute("doc", recDefNode.getDoc());
             t.setAttribute("options", recDefNode.getOptions());
+            t.setAttribute("nodeMappings", recDefNode.getNodeMappings().values());
             html = t.toString();
         }
         return html;
@@ -163,18 +161,12 @@ public class RecDefTreeNode implements TreeNode {
         return recDefNode;
     }
 
-    public Set<StatsTreeNode> getStatsTreeNodes() {
-        return statsTreeNodes;
-    }
-
     public NodeMapping addStatsTreeNode(StatsTreeNode statsTreeNode) {
-        this.statsTreeNodes.add(statsTreeNode);
-        return this.recDefNode.addNodeMapping(new NodeMapping().setInputPath(statsTreeNode.getPath()));
+        return this.recDefNode.addNodeMapping(new NodeMapping().setStatsTreeNode(statsTreeNode).setInputPath(statsTreeNode.getPath()));
     }
 
-    public void removeStatsTreeNode(StatsTreeNode statsTreeNode) {
-        this.recDefNode.removeNodeMapping(new NodeMapping().setInputPath(statsTreeNode.getPath()));
-        this.statsTreeNodes.remove(statsTreeNode);
+    public void removeStatsTreeNode(Path path) {
+        this.recDefNode.removeNodeMapping(path);
     }
 
     public static class RecDefPath extends TreePath {
