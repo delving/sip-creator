@@ -46,7 +46,7 @@ public class CodeFrame extends FrameBase {
 
     public CodeFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Mapping Code", false);
-        codeArea.setFont(new Font("Monospaced", Font.BOLD, 14));
+        codeArea.setFont(new Font("Monospaced", Font.BOLD, 10));
         sipModel.getMappingModel().addListener(new MappingModel.Listener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {

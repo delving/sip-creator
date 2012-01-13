@@ -72,6 +72,7 @@ public class FieldMappingFrame extends FrameBase {
         dictionaryDelete.setEnabled(false);
         dictionaryPopup = new DictionaryPopup(this);
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
+        groovyCodeArea.setFont(new Font("Monospaced", Font.BOLD, 12));
         groovyCodeArea.setTabSize(3);
         groovyCodeArea.getDocument().addUndoableEditListener(editHistory);
         groovyCodeArea.addFocusListener(

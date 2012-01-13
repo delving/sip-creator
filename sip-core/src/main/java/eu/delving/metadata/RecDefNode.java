@@ -194,9 +194,9 @@ public class RecDefNode {
         }
     }
 
-    public void toCode(RecDefTree.Out out, Path selectedPath, String editedCode) {
+    public void toCode(Out out, Path selectedPath, String editedCode) {
         if (!hasNodeMappings()) return;
-        if (selectedPath != null && !path.isAncestorOf(selectedPath)) return;
+        if (selectedPath != null && !path.equals(selectedPath) && !path.isAncestorOf(selectedPath)) return;
         if (!nodeMappings.isEmpty()) {
             for (NodeMapping nodeMapping : nodeMappings.values()) { // todo: when can + be used?
                 if (isLeaf()) {
@@ -218,11 +218,11 @@ public class RecDefNode {
         }
     }
 
-    private void childElements(RecDefTree.Out out, Path selectedPath, String editedCode) {
+    private void childElements(Out out, Path selectedPath, String editedCode) {
         for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
     }
 
-    private void beforeChildren(RecDefTree.Out out, String editedCode) {
+    private void beforeChildren(Out out, String editedCode) {
         boolean activeChildren = false;
         for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeChildren = true;
         if (activeChildren) {
@@ -243,12 +243,12 @@ public class RecDefNode {
         out.before();
     }
 
-    private void beforeIteration(NodeMapping nodeMapping, RecDefTree.Out out) {
+    private void beforeIteration(NodeMapping nodeMapping, Out out) {
         out.line("%s * { %s ->", nodeMapping.getVariableName(), GroovyVariable.paramName(nodeMapping.inputPath));
         out.before();
     }
 
-    private void afterBrace(RecDefTree.Out out) {
+    private void afterBrace(Out out) {
         out.after();
         out.line("}");
     }

@@ -85,7 +85,7 @@ public class RecDefTree implements RecDefNode.Listener {
         out.line("// ----------------------------------");
         out.line("// Facts:");
         for (Map.Entry<String, String> factEntry : facts.entrySet()) {
-            out.line(String.format("def %s = '''%s'''",
+            out.line(String.format("String %s = '''%s'''",
                     factEntry.getKey(),
                     Sanitizer.sanitizeGroovy(factEntry.getValue())
             ));
@@ -114,33 +114,6 @@ public class RecDefTree implements RecDefNode.Listener {
     @Override
     public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
         if (listener != null) listener.nodeMappingRemoved(recDefNode, nodeMapping);
-    }
-
-    public class Out {
-        private int indentLevel;
-        private StringBuilder stringBuilder = new StringBuilder();
-
-        public void line(String line) {
-            for (int walk = 0; walk < indentLevel; walk++) stringBuilder.append("  ");
-            stringBuilder.append(line).append('\n');
-        }
-
-        public void line(String pattern, Object... params) {
-            line(String.format(pattern, params));
-        }
-
-        public void before() {
-            indentLevel++;
-        }
-
-        public void after() {
-            indentLevel--;
-        }
-
-        @Override
-        public String toString() {
-            return stringBuilder.toString();
-        }
     }
 
 }

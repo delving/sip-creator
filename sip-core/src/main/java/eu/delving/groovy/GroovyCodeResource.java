@@ -23,18 +23,20 @@ package eu.delving.groovy;
 
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
+import groovy.lang.GroovySystem;
 import groovy.lang.Script;
 
 import java.io.*;
 import java.net.URL;
+import java.util.Iterator;
 
 /**
  * This class is supposed to make it easy to build Groovy scripts from some bits of code which are
  * stored in the resources of the project.
- *
+ * <p/>
  * For DSL aspects, the MappingCategory is automatically wrapped around the builder code
  * which does the mapping transformation.
- *
+ * <p/>
  * Various helper functions are automatically added to make record validation nicer.
  *
  * @author Gerald de Jong <gerald@delving.eu>
@@ -44,25 +46,31 @@ public class GroovyCodeResource {
     private static final URL MAPPING_CATEGORY = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
     private static final URL VALIDATION_HELPERS = GroovyCodeResource.class.getResource("/ValidationHelpers.groovy");
     private final ClassLoader classLoader;
+    private GroovyClassLoader groovyClassLoader;
 
     public GroovyCodeResource(ClassLoader classLoader) {
         this.classLoader = classLoader;
     }
 
     public Script createMappingScript(String code) {
-        return getCategoryShell().parse(code);
+        return new GroovyShell(getGroovyClassLoader()).parse(code);
     }
 
-    public GroovyShell getCategoryShell() {
-        try {
-            ClassLoader classLoader = this.classLoader;
-            GroovyClassLoader mappingClassLoader = new GroovyClassLoader(classLoader);
-            String categoryCode = readResourceCode(MAPPING_CATEGORY);
-            mappingClassLoader.parseClass(categoryCode);
-            return new GroovyShell(mappingClassLoader);
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
+    private GroovyClassLoader getGroovyClassLoader() {
+        if (groovyClassLoader == null) {
+            try {
+                ClassLoader classLoader = this.classLoader;
+                GroovyClassLoader categoryClassLoader = new GroovyClassLoader(classLoader);
+                String categoryCode = readResourceCode(MAPPING_CATEGORY);
+                categoryClassLoader.parseClass(categoryCode);
+                groovyClassLoader = new GroovyClassLoader(categoryClassLoader); 
+            }
+            catch (Exception e) {
+                throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
+            }
         }
+        groovyClassLoader.clearCache();
+        return groovyClassLoader;
     }
 
     public Script createValidationScript(String code) {
@@ -94,5 +102,23 @@ public class GroovyCodeResource {
         }
         in.close();
         return out.toString();
+    }
+
+    public void flush() {
+        // Groovy generates classes for each script evaluation
+        // this ends up eating up all permGen space
+        // thus we clear the caches referencing those classes so that GC can remove them
+
+        // additionally Groovy also at each script evaluation generates instances of MetaMethodIndex$Elem
+        // those are SoftReferences so they only disappear when the used memory reaches its max allowed heap
+        // but they also pretty much impact on the execution time, probably because method cache lookup time increases
+        // (maybe because of a poorly implemented equals() & hashcode() implementation)
+        // thus in order to get rid of this performance impact we need a reasonabily low -XX:MaxPermSize
+        // yet it can't be too low because otherwise Groovy won't be able to generate its classes anymore
+        // this is why we now clear those every 50 iterations.
+
+        GroovySystem.setKeepJavaMetaClasses(false);
+        for (Iterator it = GroovySystem.getMetaClassRegistry().iterator(); it.hasNext(); ) it.remove();
+//        groovyClassLoader.clearCache();
     }
 }

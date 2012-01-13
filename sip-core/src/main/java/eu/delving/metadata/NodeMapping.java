@@ -102,7 +102,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             groovyCode = new ArrayList<String>();
         }
         groovyCode.add(line.trim());
-    }
+    }            
 
     public void setDictionaryDomain(Set<String> domainValues) {
         if (dictionary == null) dictionary = new TreeMap<String, String>();
@@ -135,7 +135,8 @@ public class NodeMapping implements Comparable<NodeMapping> {
         for (String line : groovyCode.split("\n")) addCodeLine(line);
     }
 
-    public void toLeafCode(RecDefTree.Out out, String editedCode) {
+    public void toLeafCode(Out out, String editedCode) {
+        // todo: use editedCode
         if (recDefNode.isAttr() || recDefNode.isSingular()) {
             out.line("%s : { ", recDefNode.getTag().toBuilderCall());
             out.before();
@@ -156,14 +157,15 @@ public class NodeMapping implements Comparable<NodeMapping> {
         }
     }
 
-    private void toUserCode(RecDefTree.Out out, boolean grabFirst) {
-        out.line("// begin user code");
+    public String getUserCode() {
+        Out out = new Out();
+        toUserCode(out, false);
+        return out.toString();
+    }
+
+    private void toUserCode(Out out, boolean grabFirst) {
         if (groovyCode != null) {
-            for (String codeLine : groovyCode) {
-                if (codeIndent(codeLine) < 0) out.after();
-                out.line(codeLine);
-                if (codeIndent(codeLine) > 0) out.before();
-            }
+            indentCode(groovyCode, out);
         }
         else if (dictionary != null) {
             out.line("from%s(%s%s)", getDictionaryName(), getVariableName(), grabFirst ? "[0]" : "");
@@ -171,10 +173,17 @@ public class NodeMapping implements Comparable<NodeMapping> {
         else {
             out.line("\"${%s%s}\"", getVariableName(), grabFirst ? "[0]" : "");
         }
-        out.line("// end user code");
     }
 
-    public void generateDictionaryCode(RecDefTree.Out out) {
+    private static void indentCode(List<String> code, Out out) {
+        for (String codeLine : code) {
+            if (codeIndent(codeLine) < 0) out.after();
+            out.line(codeLine);
+            if (codeIndent(codeLine) > 0) out.before();
+        }
+    }
+
+    public void generateDictionaryCode(Out out) {
         if (dictionary == null) return;
         String name = getDictionaryName();
         out.line(String.format("def %s = [", name));
@@ -272,5 +281,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public int compareTo(NodeMapping nodeMapping) {
         return this.inputPath.compareTo(nodeMapping.inputPath);
     }
+
 }
 

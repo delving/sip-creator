@@ -179,8 +179,11 @@ public class CompileModel {
                 if (selectedNodeMapping == null || recMapping == null) {
                     return "// no code";
                 }
+                else if (editedCode != null) {
+                    return editedCode;
+                }
                 else {
-                    return recMapping.toCode(selectedNodeMapping.outputPath, editedCode);
+                    return selectedNodeMapping.getUserCode();
                 }
             default:
                 throw new RuntimeException();
@@ -267,6 +270,9 @@ public class CompileModel {
             compiling = true;
             try {
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedOutputPath(), editedCode);
+
+                System.out.println(mappingRunner.getCode());
+
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
                     feedback.say("Compiled code for " + type);
