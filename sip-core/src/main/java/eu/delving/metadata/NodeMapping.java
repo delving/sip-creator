@@ -171,6 +171,11 @@ public class NodeMapping implements Comparable<NodeMapping> {
             out.line("from%s(%s%s)", getDictionaryName(), getVariableName(true), grabFirst ? "[0]" : "");
         }
         else {
+            // todo: show these somewhere in the GUI
+            for (String v : getContextVariables()) {
+                out.line("// "+v);
+            }
+            
             out.line("\"${%s%s}\"", getVariableName(true), grabFirst ? "[0]" : "");
         }
     }
@@ -232,6 +237,16 @@ public class NodeMapping implements Comparable<NodeMapping> {
         else {
             return GroovyVariable.name(inputPath);
         }
+    }
+    
+    public List<String> getContextVariables() {
+        List<String> variables = new ArrayList<String>();
+        for (RecDefNode ancestor = this.recDefNode; ancestor != null; ancestor = ancestor.getParent()) {
+            for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
+                variables.add(nodeMapping.getParamName());
+            }
+        }
+        return variables;
     }
 
     public String getParamName() {
