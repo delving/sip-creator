@@ -27,14 +27,17 @@ import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
@@ -46,6 +49,7 @@ import java.util.List;
 public class RecMappingFrame extends FrameBase {
     private NodeMappingListModel listModel = new NodeMappingListModel();
     private JList nodeMappingList = new JList(listModel);
+    private RemoveNodeMappingAction removeAction = new RemoveNodeMappingAction();  
 
     public RecMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Node Mappings", false);
@@ -76,7 +80,8 @@ public class RecMappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(createListPanel());
+        content.add(createListPanel(), BorderLayout.CENTER);
+        content.add(new JButton(removeAction), BorderLayout.SOUTH);
     }
 
     private JPanel createListPanel() {
@@ -89,12 +94,12 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void valueChanged(ListSelectionEvent event) {
-            final Object selected = nodeMappingList.getSelectedValue();
+            final NodeMapping selected = (NodeMapping)nodeMappingList.getSelectedValue();
             if (selected != null) {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        sipModel.getCreateModel().setNodeMapping((NodeMapping) selected);
+                        sipModel.getCreateModel().setNodeMapping(selected);
                     }
                 });
             }
@@ -141,7 +146,33 @@ public class RecMappingFrame extends FrameBase {
     
     private class CellRenderer extends DefaultListCellRenderer {
         public Component getListCellRendererComponent(JList jList, java.lang.Object o, int i, boolean b, boolean b1) {
+            // todo: icons
             return super.getListCellRendererComponent(jList, o, i, b, b1);
         }
     }
+    
+    private class RemoveNodeMappingAction extends AbstractAction implements Runnable {
+
+        private RemoveNodeMappingAction() {
+            super("Remove selected mapping");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Exec.work(this);
+        }
+
+        @Override
+        public void run() {
+            NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
+            if (nodeMapping != null) {
+                TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
+                if (treePath != null) {
+                    ((RecDefTreeNode)treePath.getLastPathComponent()).getRecDefNode().removeNodeMapping(nodeMapping.inputPath);
+                    sipModel.getCreateModel().setNodeMapping(null);
+                    new ListUpdater().run();
+                }
+            }
+        }
+    } 
 }

@@ -50,6 +50,7 @@ public class CreateModel {
     }
 
     public void setStatsTreeNode(StatsTreeNode statsTreeNode) {
+        if (statsTreeNode != null && statsTreeNode.getParent() == null) statsTreeNode = null;
         this.statsTreeNode = statsTreeNode;
         for (Listener listener : listeners) listener.statsTreeNodeSet(this);
     }
@@ -59,9 +60,10 @@ public class CreateModel {
     }
 
     public void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
+        if (recDefTreeNode != null && recDefTreeNode.getParent() == null) recDefTreeNode = null;
         this.recDefTreeNode = recDefTreeNode;
         for (Listener listener : listeners) listener.recDefTreeNodeSet(this);
-        if (nodeMapping != null && nodeMapping.recDefNode != recDefTreeNode.getRecDefNode()) setNodeMapping(null);
+        if (nodeMapping != null && recDefTreeNode != null && nodeMapping.recDefNode != recDefTreeNode.getRecDefNode()) setNodeMapping(null);
     }
 
     public void setRecDefTreePath(Path path) {
