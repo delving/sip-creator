@@ -124,8 +124,7 @@
 
     </elems>
 
-    <root tag="lidoWrap" attrs="relatedencoding" required="true" singular="true">
-    <elem tag="lido" attrs="sortorder" required="true">
+    <root tag="lido" attrs="sortorder" required="true">
         <elem tag="lidoRecID" attrs="pref, type, source, encodinganalog, label" required="true"/>
         <elem tag="objectPublishedID" attrs="pref, type, source, encodinganalog, label"/>
         <elem tag="category" elems="term, conceptID" singular="true"/>
@@ -252,12 +251,11 @@
             </elem>
         </elem>
 
-    </elem>
     </root>
 
 
     <options>
-        <option-list path="/lidoWrap/lido/administrativeMetadata/recordWrap">
+        <option-list path="/lido/administrativeMetadata/recordWrap">
             <opt key="1">Item</opt>
             <opt key="2">Collection</opt>
             <opt key="3">Series</opt>
@@ -273,27 +271,27 @@
            <doc>
                <string>These elements must be included by any professional mapper. If that's too much work, maybe you can find employment in the food services industry</string>
            </doc>
-           <ref path="/lidoWrap/lido/administrativeMetadata/@xml:lang" name="adminLanguage" display="Administrative Language"/>
-           <ref path="/lidoWrap/lido/descriptiveMetadata/@xml:lang" name="descriptiveLanguage" display="Descriptive Language"/>
-           <ref path="/lidoWrap/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term" name="objectWorkType" display="Work Type"/>
-           <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue" name="title" display="Object Title">
+           <ref path="/lido/administrativeMetadata/@xml:lang" name="adminLanguage" display="Administrative Language"/>
+           <ref path="/lido/descriptiveMetadata/@xml:lang" name="descriptiveLanguage" display="Descriptive Language"/>
+           <ref path="/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term" name="objectWorkType" display="Work Type"/>
+           <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue" name="title" display="Object Title">
             <doc>
                 <string>LIDO: Maps to the title set as a preferred appellation value</string>
                 <string>Requirements: @pref="yes"</string>
               </doc>
             </ref>
-           <ref path="/lidoWrap/lido/administrativeMetadata/recordWrap/recordID" name="recordID" display="Record ID"/>
-           <ref path="/lidoWrap/lido/administrativeMetadata/recordWrap/recordType/term" name="recordType" display="Record type"/>
-           <ref path="/lidoWrap/lido/administrativeMetadata/recordWrap/recordSource/legalBodyName/appellationValue" name="recordSource" display="Record source"/>
+           <ref path="/lido/administrativeMetadata/recordWrap/recordID" name="recordID" display="Record ID"/>
+           <ref path="/lido/administrativeMetadata/recordWrap/recordType/term" name="recordType" display="Record type"/>
+           <ref path="/lido/administrativeMetadata/recordWrap/recordSource/legalBodyName/appellationValue" name="recordSource" display="Record source"/>
         </category>
 
         <category name="Classifications">
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="material" display="Material">
+            <ref path="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="material" display="Material">
                 <doc>
                     <string>What is it actually made of?</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="technique" display="Technique">
+            <ref path="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="technique" display="Technique">
                 <options>
                     <opt key="1">Schilderkunst</opt>
                     <opt key="2">Prentkunst</opt>
@@ -305,33 +303,33 @@
                     <opt key="8">Anders:</opt>
                 </options>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="iconclass" display="Iconclass"/>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="aat" display="AAT"/>
+            <ref path="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="iconclass" display="Iconclass"/>
+            <ref path="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="aat" display="AAT"/>
         </category>
 
         <category name="Subject relations">
             <doc>
                <string>Concepts, actors, dates, events, places and objects that are depicted on an image or on an object etc</string>
            </doc>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term" name="subjectConcept" display="Related Concepts"/>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor" name="subjectActor" display="Relatated Actors"/>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectDate/displayDate" name="subjectDate" display="Relatated Dates"/>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectEvent/displayEvent" name="subjectEvent" display="Relatated Events"/>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectPlace/displayPlace" name="subjectPlace" display="Relatated Places"/>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectObject/displayObject" name="subjectObject" display="Related Objects"/>
+            <ref path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term" name="subjectConcept" display="Related Concepts"/>
+            <ref path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor" name="subjectActor" display="Relatated Actors"/>
+            <ref path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectDate/displayDate" name="subjectDate" display="Relatated Dates"/>
+            <ref path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectEvent/displayEvent" name="subjectEvent" display="Relatated Events"/>
+            <ref path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectPlace/displayPlace" name="subjectPlace" display="Relatated Places"/>
+            <ref path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectObject/displayObject" name="subjectObject" display="Related Objects"/>
         </category>
 
         <category name="Object relations">
             <doc>
                 <string>Related objects, is_partOf etc</string>
             </doc>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/relatedWorksWrap/relatedWorkSet/relatedWork/displayObject" name="relatedWork" display="Related work"/>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/relatedWorksWrap/relatedWorkSet/relatedWorkRelType/term" name="objectRelationType" display="Relation Type"/>
+            <ref path="/lido/descriptiveMetadata/objectRelationWrap/relatedWorksWrap/relatedWorkSet/relatedWork/displayObject" name="relatedWork" display="Related work"/>
+            <ref path="/lido/descriptiveMetadata/objectRelationWrap/relatedWorksWrap/relatedWorkSet/relatedWorkRelType/term" name="objectRelationType" display="Relation Type"/>
         </category>
 
         <!--
         <category name="Events">
-            <ref path="/lidoWrap/lido/lidoRecID" name="acqusition" display="AcqusitionEvent"/>
+            <ref path="/lido/lidoRecID" name="acqusition" display="AcqusitionEvent"/>
 
         </category>
 
@@ -339,14 +337,14 @@
             <doc>
                 <string>Collection name, type and what bigger collection it is part should be taken from Musip (and the URIs).</string>
             </doc>
-            <ref path="/lidoWrap/lido/lidoRecID" name="collectionTitle" factName="name" display="Collection Name"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="collectionType" factName="collectionType" display="Collection Type"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="collectionPart" display="Part of collection"/>
+            <ref path="/lido/lidoRecID" name="collectionTitle" factName="name" display="Collection Name"/>
+            <ref path="/lido/lidoRecID" name="collectionType" factName="collectionType" display="Collection Type"/>
+            <ref path="/lido/lidoRecID" name="collectionPart" display="Part of collection"/>
         </category>
         -->
 
         <category name="DiMCoN Rijks elements">
-            <ref path="/lidoWrap/lido/descriptiveMetadata/eventWrap/eventSet/event/eventDate/displayDate" name="acquisitionYear" display="Year of acquisition">
+            <ref path="/lido/descriptiveMetadata/eventWrap/eventSet/event/eventDate/displayDate" name="acquisitionYear" display="Year of acquisition">
                 <doc>
                     <string>The source dataset acquisition date is mapped into event - eventDate - displayDate  </string>
                     <string>Acquisition is a LIDO event of type CRM E8 Acquisition (URI http://www.cidoc-crm.org/rdfs/crm_e8). </string>
@@ -358,7 +356,7 @@
                 </options>
             </ref>
 
-            <ref path="/lidoWrap/lido/descriptiveMetadata/eventWrap/eventSet/event/eventMethod/term" name="meansOfAcquisition" display="Means of acquisition">
+            <ref path="/lido/descriptiveMetadata/eventWrap/eventSet/event/eventMethod/term" name="meansOfAcquisition" display="Means of acquisition">
                 <doc>
                     <string>This should be mapped as in what method the same acquisition event as above was carried out.</string>
                     <string>The option key is mapped into event - eventMethod - conceptID </string>
@@ -380,14 +378,14 @@
                     <opt key="20">onbekend</opt>
                 </options>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" name="acquiredWithHelpFrom" display="Acquired with help from">
+            <ref path="/lido/lidoRecID" name="acquiredWithHelpFrom" display="Acquired with help from">
                 <doc>
                     <string>This is an actor in the same event that helped out in some way to carry out the acquisition</string>
                     <string>To be continued...</string>
 
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" name="legalStatus" display="Legal status">
+            <ref path="/lido/lidoRecID" name="legalStatus" display="Legal status">
                 <doc>
                     <string>To be continued...</string>
                 </doc>
@@ -399,9 +397,9 @@
                     <opt key="25">unknown</opt>
                 </options>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" name="chargesByState" display="Charges by state ????"/>
+            <ref path="/lido/lidoRecID" name="chargesByState" display="Charges by state ????"/>
 
-            <ref path="/lidoWrap/lido/descriptiveMetadata/eventWrap/eventSet/event/eventMethod/term" name="methodOfDisposal" display="Method of disposal">
+            <ref path="/lido/descriptiveMetadata/eventWrap/eventSet/event/eventMethod/term" name="methodOfDisposal" display="Method of disposal">
                <doc>
                     <string>This is sligthly different from the acquisition event. LIDO uses CIDOC CRM to define events and CRM defines them a bit different than just one "disposal event"</string>
                     <string>Sale, donation and exchange are  "E10 Transfer of Custody" events and destruction is an "E6 Destruction" event. </string>
@@ -415,7 +413,7 @@
                     <opt key="http://www.cidoc-crm.org/rdfs/crm_e10">exchange</opt>
                 </options>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" name="yearOfDisposal" display="Year of disposal">
+            <ref path="/lido/lidoRecID" name="yearOfDisposal" display="Year of disposal">
                 <doc>
                      <string>The source dataset date for the destruction or transfer of custody event is mapped into event - eventDate - displayDate  </string>
                  </doc>
@@ -423,66 +421,66 @@
         </category>
 <!--
         <category name="Facts from dataset registration">
-            <ref path="/lidoWrap/lido/lidoRecID" name="collectionType" factName="collectionType" display="Collection Type"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="collectionTitle" factName="name" display="Collection Name"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="country" factName="country" display="Provider country"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="dataProvider" factName="dataProvider" display="Data provider"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="language" fieldType="string" factName="language" display="Default language"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="rights" factName="rights" display="Rigths"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="type" fieldType="string" factName="type" display="Type"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="unstored" fieldType="text" display="Unstored"/>
-            <ref path="/lidoWrap/lido/lidoRecID" name="hub_uri" summaryField="HUB_ID" display="CultureHub URI"/>
+            <ref path="/lido/lidoRecID" name="collectionType" factName="collectionType" display="Collection Type"/>
+            <ref path="/lido/lidoRecID" name="collectionTitle" factName="name" display="Collection Name"/>
+            <ref path="/lido/lidoRecID" name="country" factName="country" display="Provider country"/>
+            <ref path="/lido/lidoRecID" name="dataProvider" factName="dataProvider" display="Data provider"/>
+            <ref path="/lido/lidoRecID" name="language" fieldType="string" factName="language" display="Default language"/>
+            <ref path="/lido/lidoRecID" name="rights" factName="rights" display="Rigths"/>
+            <ref path="/lido/lidoRecID" name="type" fieldType="string" factName="type" display="Type"/>
+            <ref path="/lido/lidoRecID" name="unstored" fieldType="text" display="Unstored"/>
+            <ref path="/lido/lidoRecID" name="hub_uri" summaryField="HUB_ID" display="CultureHub URI"/>
         </category>
 
 
 
 -->     <category name="SPECTRUM Object Identification Information">
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/repositoryWrap/repositorySet/workID" display="Object number" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/repositoryWrap/repositorySet/workID" display="Object number" localName="">
                 <doc>
                     <string>[Object Identification]/repositoryWrap/repositorySet/workID (no type attribute)</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/repositoryWrap/repositorySet/workID" display="Other number" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/repositoryWrap/repositorySet/workID" display="Other number" localName="">
                 <doc>
                     <string>[Object Identification]/repositoryWrap/repositorySet/workID (type attribute = data from Other number type Unit)</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/repositoryWrap/repositorySet/@type" display="Other number type" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/repositoryWrap/repositorySet/@type" display="Other number type" localName="">
                 <doc>
                     <string>[See above]</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue" display="Brief description" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue" display="Brief description" localName="">
                 <doc>
                     <string>[Object Identification]/objectDescriptionWrap/objectDescriptionSet (no type attribute)/descriptiveNoteValue</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue" display="Comments" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue" display="Comments" localName="">
                 <doc>
                     <string>[Object Identification]/objectDescriptionWrap/objectDescriptionSet (type attribute = ‘Comments’)/descriptiveNoteValue </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue" display="Distinguishing features" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue" display="Distinguishing features" localName="">
                 <doc>
                     <string>[Object Identification]/objectDescriptionWrap/objectDescriptionSet (type attribute = ‘Distinguishing-features’)/descriptiveNoteValue</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue" display="Number of objects" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue" display="Number of objects" localName="">
                 <doc>
                     <string>([Object Identification]/objectDescriptionWrap/objectDescriptionSet (type attribute = ‘Number-of-objects’)/descriptiveNoteValue</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue" display="Object name [if no title only]" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue" display="Object name [if no title only]" localName="">
                 <doc>
                     <string>[Object Identification]/titleWrap/titleSet/appellationValue</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term" display="Object name" localName="">
+            <ref path="/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term" display="Object name" localName="">
                 <doc>
                     <string>[Object Classification]/objectWorkTypeWrap/objectWorkType/term</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue" display="Title" localName="">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue" display="Title" localName="">
                 <doc>
                     <string>[Object Identification]/titleWrap/titleSet/appellationValue</string>
                 </doc>
@@ -495,20 +493,20 @@
                 <string>This bookmark will only be provided as an overview and as a guide for providers that delivers data using OAI-PMH and Dublin Core and until they have realized that they should drop Dublin Core.</string>
                 <string>This will take some time to get right...</string>
             </doc>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:creatorYearOfBirth" localName="creatorYearOfBirth"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:technique" localName="technique"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:material" localName="material"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:location" localName="location"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:province" localName="province"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:collectionPart" localName="collectionPart"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:acquisitionMeans" localName="acquisitionMeans"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn_collectionType" name="collectionType"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:acquisitionYear" name="acquisitionYear"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:purchasePrice" name="purchasePrice"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:acquiredWithHelpFrom" name="acquiredWithHelpFrom"/>
-            <ref path="/lidoWrap/lido/lidoRecID" display="icn:physicalState" name="physicalState"/>
+            <ref path="/lido/lidoRecID" display="icn:creatorYearOfBirth" localName="creatorYearOfBirth"/>
+            <ref path="/lido/lidoRecID" display="icn:technique" localName="technique"/>
+            <ref path="/lido/lidoRecID" display="icn:material" localName="material"/>
+            <ref path="/lido/lidoRecID" display="icn:location" localName="location"/>
+            <ref path="/lido/lidoRecID" display="icn:province" localName="province"/>
+            <ref path="/lido/lidoRecID" display="icn:collectionPart" localName="collectionPart"/>
+            <ref path="/lido/lidoRecID" display="icn:acquisitionMeans" localName="acquisitionMeans"/>
+            <ref path="/lido/lidoRecID" display="icn_collectionType" name="collectionType"/>
+            <ref path="/lido/lidoRecID" display="icn:acquisitionYear" name="acquisitionYear"/>
+            <ref path="/lido/lidoRecID" display="icn:purchasePrice" name="purchasePrice"/>
+            <ref path="/lido/lidoRecID" display="icn:acquiredWithHelpFrom" name="acquiredWithHelpFrom"/>
+            <ref path="/lido/lidoRecID" display="icn:physicalState" name="physicalState"/>
 
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:contributor" name="contributor">
+            <ref path="/lido/lidoRecID" display="dc:contributor" name="contributor">
                 <doc>
                     <string>Description: An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>
                     <string>Europeana definition: An entity responsible for making contributions to the resource</string>
@@ -516,7 +514,7 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:coverage" name="coverage">
+            <ref path="/lido/lidoRecID" display="dc:coverage" name="coverage">
                 <doc>
                     <string>Description: The extent or scope of the content of the resource. Coverage will typically include spatial location (a place name or geographic co-ordinates), temporal period (a period label, date, or date range) or jurisdiction (such as a named administrative entity). Recommended best practice is to select a value from a controlled vocabulary (for example, the Thesaurus of Geographic Names [Getty Thesaurus of Geographic Names, http://www. getty.edu/research/tools/vocabulary/tgn/]). Where appropriate, named places or time periods should be used in preference to numeric identifiers such as sets of co-ordinates or date ranges.</string>
                     <string>Example: Coverage="1995-1996", Coverage="Boston, MA", Coverage="17th century", Coverage="Upstate New York"</string>
@@ -534,7 +532,7 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:creator" name="creator">
+            <ref path="/lido/lidoRecID" display="dc:creator" name="creator">
                 <doc>
                     <string>Description: An entity primarily responsible for making the content of the resource. Examples of a Creator include a person, an organization, or a service. Typically the name of the Creator should be used to indicate the entity.</string>
                     <string>Europeana definition: An entity primarily responsible for making the resource. This may be a person, organisation or a service.</string>
@@ -542,7 +540,7 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:date" name="date">
+            <ref path="/lido/lidoRecID" display="dc:date" name="date">
                 <doc>
                     <string>Description: A date associated with an event in the life cycle of the resource. Typically, Date will be associated with the creation or availability of the resource. Recommended best practice for encoding the date value is defined in a profile of ISO 8601 [Date and Time Formats, W3C Note, http://www.w3.org/TR/NOTE- datetime] and follows the YYYY-MM-DD format.</string>
                     <string>Europeana definition: A point or period of time associated with an event in the lifecycle of the resource.
@@ -557,7 +555,7 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:description" name="description">
+            <ref path="/lido/lidoRecID" display="dc:description" name="description">
                 <doc>
                     <string>Description: An account of the content of the resource. Description may include but is not limited to: an abstract, table of contents, reference to a graphical representation of content or a free-text account of the content.</string>
                     <string>Europeana definition: An account of the resource.  Refined by: dcterms:tableOfContents</string>
@@ -565,7 +563,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:format" name="format">
+            <ref path="/lido/lidoRecID" display="dc:format" name="format">
                 <doc>
                     <string>Description: The physical or digital manifestation of the resource. Typically, Format may include the media-type or dimensions of the resource. Examples of dimensions include size and duration. Format may be used to determine the software, hardware or other equipment needed to display or operate the resource.
                             Recommended best practice is to select a value from a controlled vocabulary (for example, the list of Internet Media Types [http://www.iana.org/ assignments/media-types/] defining computer media formats).</string>
@@ -578,7 +576,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:identifier" name="identifier">
+            <ref path="/lido/lidoRecID" display="dc:identifier" name="identifier">
                 <doc>
                     <string>Description: An unambiguous reference to the resource within a given context. Recommended best practice is to identify the resource by means of a string or number conforming to a formal identification system. Examples of formal identification systems include the Uniform Resource Identifier (URI) (including the Uniform Resource Locator (URL), the Digital Object Identifier (DOI) and the International Standard Book Number (ISBN).</string>
                     <string>Europeana definition: An unambiguous reference to the resource within a given context. </string>
@@ -586,7 +584,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:language" name="language">
+            <ref path="/lido/lidoRecID" display="dc:language" name="language">
                 <doc>
                     <string>Description: A language of the intellectual content of the resource. Recommended best practice for the values of the Language element is defined by RFC 3066 [RFC 3066, http://www.ietf.org/rfc/ rfc3066.txt] which, in conjunction with ISO 639 [ISO 639, http://www.oasis- open.org/cover/iso639a.html]), defines two- and three-letter primary language tags with optional subtags. Examples include "en" or "eng" for English, "akk" for Akkadian, and "en-GB" for English used in the United Kingdom.</string>
                     <string>Europeana definition: A language of the resource.</string>
@@ -598,7 +596,7 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:publisher" name="publisher">
+            <ref path="/lido/lidoRecID" display="dc:publisher" name="publisher">
                 <doc>
                     <string>Description: The entity responsible for making the resource available. Examples of a Publisher include a person, an organization, or a service. Typically, the name of a Publisher should be used to indicate the entity.</string>
                     <string>Europeana definition: An entity responsible for making the resource available. Examples of a publisher include a person, an organisation and a service.</string>
@@ -606,7 +604,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:relation" name="relation">
+            <ref path="/lido/lidoRecID" display="dc:relation" name="relation">
                 <doc>
                     <string>Description: A reference to a related resource. Recommended best practice is to reference the resource by means of a string or number conforming to a formal identification system.</string>
                     <string>Europeana definition: A related resource. The recommended best practice is to identify the resource using a formal identification scheme.  </string>
@@ -622,7 +620,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:rights" name="rights">
+            <ref path="/lido/lidoRecID" display="dc:rights" name="rights">
                 <doc>
                     <string>Description: Information about rights held in and over the resource. Typically a Rights element will contain a rights management statement for the resource, or reference a service providing such information. Rights information often encompasses Intellectual Property Rights (IPR), Copyright, and various Property Rights. If the rights element is absent, no assumptions can be made about the status of these and other rights with respect to the resource.</string>
                     <string>Europeana definition: Information about rights held in and over the resource.</string>
@@ -630,7 +628,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:source" name="source">
+            <ref path="/lido/lidoRecID" display="dc:source" name="source">
                 <doc>
                     <string>Description: A Reference to a resource from which the present resource is derived. The present resource may be derived from the Source resource in whole or part. Recommended best practice is to reference the resource by means of a string or number conforming to a formal identification system.</string>
                     <string>Europeana definition: A related resource from which the described resource is derived in whole or in part.</string>
@@ -638,7 +636,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:subject" name="subject">
+            <ref path="/lido/lidoRecID" display="dc:subject" name="subject">
                 <doc>
                     <string>Description: The topic of the content of the resource. Typically, a Subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. Recommended best practice is to select a value from a controlled vocabulary or formal classification scheme.</string>
                     <string>Europeana definition: The topic of the resource</string>
@@ -646,7 +644,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:title" name="title">
+            <ref path="/lido/lidoRecID" display="dc:title" name="title">
                 <doc>
                     <string>Description: The name given to the resource. Typically, a Title will be a name by which the resource is formally known.</string>
                     <string>Europeana definition: A name given to the resource. Typically, a Title will be a name by which the resource is formally known.  Refined by: dcterms:alternative</string>
@@ -654,7 +652,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dc:type" name="type">
+            <ref path="/lido/lidoRecID" display="dc:type" name="type">
                 <doc>
                     <string>Description: The nature or genre of the content of the resource. Type includes terms describing general categories, functions, genres, or aggregation levels for content. Recommended best practice is to select a value from a controlled vocabulary (for example, the DCMIType vocabulary ). To describe the physical or digital manifestation of the resource, use the FORMAT element.</string>
                     <string>Europeana definition: The nature or genre of the resource.  Type includes terms describing general categories, functions, genres, or aggregation levels for content.  The recommended best practice is to select a value from a controlled vocabulary (for example, the DC Type vocabulary is available at http://dublincore.org/documents/dcmi-type-vocabulary/).</string>
@@ -662,7 +660,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue" display="dcterms:alternative" name="dcterms:alternative">
+            <ref path="/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue" display="dcterms:alternative" name="dcterms:alternative">
                 <doc>
                     <string>Dublin Core definition: An alternative name for the resource.</string>
                     <string>Comment: The distinction between titles and alternative titles is application-specific.</string>
@@ -671,7 +669,7 @@
                     <string>LIDO: Maps to the title set as a non preferred appellation value</string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:conformsTo" name="conformsTo">
+            <ref path="/lido/lidoRecID" display="dcterms:conformsTo" name="conformsTo">
                 <doc>
                     <string>Dublin Core definition: An established standard to which the described resource conforms.</string>
                     <string>Europeana definition: An established standard to which the described resource conforms. Refinement of dc:relation.</string>
@@ -679,7 +677,7 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:created" name="created">
+            <ref path="/lido/lidoRecID" display="dcterms:created" name="created">
                 <doc>
                     <string>Dublin Core definition: Date of creation of the resource.</string>
                     <string>Europeana definition:  Date of creation of the resource.  Refinement of dc:date</string>
@@ -691,7 +689,7 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:extent" name="extent">
+            <ref path="/lido/lidoRecID" display="dcterms:extent" name="extent">
                 <doc>
                     <string>Dublin Core definition: </string>
                     <string>Europeana definition: The size or duration of the resource.  Refinement of dc:format.</string>
@@ -699,7 +697,7 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:hasFormat" name="hasFormat">
+            <ref path="/lido/lidoRecID" display="dcterms:hasFormat" name="hasFormat">
                 <doc>
                     <string>Dublin Core definition: </string>
                     <string>Europeana definition: A related resource that is substantially the same as the pre-existing described resource, but in another format. Refinement of dc:relation.  See also dcterms:isFormatOf</string>
@@ -707,14 +705,14 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:hasPart" name="hasPart">
+            <ref path="/lido/lidoRecID" display="dcterms:hasPart" name="hasPart">
                 <doc>
                     <string>Dublin Core definition: A related resource that is included either physically or logically in the described resource.</string>
                     <string>Europeana definition: A related resource that is included either physically or logically in the described resource. Refinement of dc:relation.  See also dcterms:isPartOf.</string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:hasVersion" name="hasVersion">
+            <ref path="/lido/lidoRecID" display="dcterms:hasVersion" name="hasVersion">
                 <doc>
                     <string>Dublin Core definition: A related resource that is a version, edition, or adaptation of the described resource.</string>
                     <string>Europeana definition: A related resource that is a version, edition, or adaptation of the described resource. Changes in version imply substantive changes in content rather than differences in format. Refinement of dc:relation.  See also dcterms:isVersionOf</string>
@@ -722,7 +720,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:isFormatOf" name="isFormatOf">
+            <ref path="/lido/lidoRecID" display="dcterms:isFormatOf" name="isFormatOf">
                <doc>
                     <string>Dublin Core definition: A related resource that is substantially the same as the described resource, but in another format.</string>
                     <string>Europeana definition: A related resource that is substantially the same as the described resource, but in another format.  Refinement of dc:relation.  See also dcterms:hasFormat. </string>
@@ -730,7 +728,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:isPartOf" name="isPartOf">
+            <ref path="/lido/lidoRecID" display="dcterms:isPartOf" name="isPartOf">
                <doc>
                     <string>Dublin Core definition: A related resource in which the described resource is physically or logically included.</string>
                     <string>Europeana definition: A related resource in which the described resource is physically or logically included. Refinement of dc:relation.  See also dcterms:hasPart.</string>
@@ -738,35 +736,35 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:isReferencedBy" name="isReferencedBy">
+            <ref path="/lido/lidoRecID" display="dcterms:isReferencedBy" name="isReferencedBy">
                <doc>
                     <string>Dublin Core definition: A related resource that references, cites, or otherwise points to the described resource.</string>
                     <string>Europeana definition: A related resource that references, cites, or otherwise points to the described resource.  Refinement of dc:relation.  See also dcterms:references.</string>
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:isReplacedBy" name="isReplacedBy">
+            <ref path="/lido/lidoRecID" display="dcterms:isReplacedBy" name="isReplacedBy">
                <doc>
                     <string>Dublin Core definition: A related resource that supplants, displaces, or supersedes the described resource.</string>
                     <string>Europeana definition: A related resource that supplants, displaces, or supersedes the described resource. Refinement of dc:relation.  See also dcterms:replaces. </string>
                     <string>LIDO: </string>
                </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:isRequiredBy" name="isRequiredBy">
+            <ref path="/lido/lidoRecID" display="dcterms:isRequiredBy" name="isRequiredBy">
                <doc>
                     <string>Dublin Core definition: A related resource that requires the described resource to support its function, delivery, or coherence.</string>
                     <string>Europeana definition: A related resource that requires the described resource to support its function, delivery or coherence. Refinement of dc:relation.  See also dcterms:requires.</string>
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:isVersionOf" name="isVersionOf">
+            <ref path="/lido/lidoRecID" display="dcterms:isVersionOf" name="isVersionOf">
                <doc>
                     <string>Dublin Core definition: A related resource of which the described resource is a version, edition, or adaptation.</string>
                     <string>Europeana definition: A related resource of which the described resource is a version, edition, or adaptation. Changes in version imply substantive changes in content rather than differences in format.  Refinement of dc:relation.  See also dcterms:hasVersion.</string>
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:issued" name="issued">
+            <ref path="/lido/lidoRecID" display="dcterms:issued" name="issued">
                <doc>
                     <string>Dublin Core definition: Date of formal issuance (e.g., publication) of the resource.</string>
                     <string>Europeana definition: Date of formal issuance (e.g., publication) of the resource.  Refinement of dc:date</string>
@@ -774,7 +772,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:medium" name="medium">
+            <ref path="/lido/lidoRecID" display="dcterms:medium" name="medium">
                <doc>
                     <string>Dublin Core definition: The material or physical carrier of the resource.</string>
                     <string>Europeana definition: The material or physical carrier of the resource. Refinement of dc:format </string>
@@ -782,7 +780,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:provenance" name="provenance">
+            <ref path="/lido/lidoRecID" display="dcterms:provenance" name="provenance">
                <doc>
                     <string>Dublin Core definition: A statement of any changes in ownership and custody of the resource since its creation that are significant for its authenticity, integrity, and interpretation.</string>
                     <string>Europeana definition: A statement of any changes in ownership and custody of the resource since its creation that are significant for its authenticity, integrity and interpretation.This may include a description of any changes successive custodians made to the resourc</string>
@@ -790,7 +788,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:references" name="references">
+            <ref path="/lido/lidoRecID" display="dcterms:references" name="references">
                <doc>
                     <string>Dublin Core definition: A related resource that is referenced, cited, or otherwise pointed to by the described resource.</string>
                     <string>Europeana definition: A related resource that is referenced, cited, or otherwise pointed to by the described resource.  Refinement of dc:relation.  See also dcterms:isReferencedBy.</string>
@@ -798,21 +796,21 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:replaces" name="replaces">
+            <ref path="/lido/lidoRecID" display="dcterms:replaces" name="replaces">
                <doc>
                     <string>Dublin Core definition: A related resource that is supplanted, displaced, or superseded by the described resource.</string>
                     <string>Europeana definition: A related resource that is supplanted, displaced, or superseded by the described resource. Refinement of dc:relation.  See also dcterms:isReplacedBy</string>
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:requires" name="requires">
+            <ref path="/lido/lidoRecID" display="dcterms:requires" name="requires">
                <doc>
                     <string>Dublin Core definition: A related resource that is required by the described resource to support its function, delivery, or coherence.</string>
                     <string>Europeana definition: A related resource that is required by the described resource to support its function, delivery or coherence.  Refinement of dc:relation.  See also dcterms:isRequiredBy</string>
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:spatial" name="spatial">
+            <ref path="/lido/lidoRecID" display="dcterms:spatial" name="spatial">
                <doc>
                     <string>Dublin Core definition: Spatial characteristics of the resource.</string>
                     <string>Europeana definition: Spatial characteristics of the resource.  Refinement of dc:coverage.</string>
@@ -820,7 +818,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:tableOfContents" name="tableOfContents">
+            <ref path="/lido/lidoRecID" display="dcterms:tableOfContents" name="tableOfContents">
                <doc>
                     <string>Dublin Core definition: A list of subunits of the resource.</string>
                     <string>Europeana definition: A list of subunits of the resource.   Refinement of dc:description.</string>
@@ -828,7 +826,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:temporal" name="temporal">
+            <ref path="/lido/lidoRecID" display="dcterms:temporal" name="temporal">
                <doc>
                     <string>Dublin Core definition: Temporal characteristics of the resource.</string>
                     <string>Europeana definition: Temporal characteristics of the resource. Refinement of dc:coverage</string>
@@ -836,7 +834,7 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="dcterms:rightsHolder" name="rightsHolder">
+            <ref path="/lido/lidoRecID" display="dcterms:rightsHolder" name="rightsHolder">
                <doc>
                     <string>Dublin Core definition: A person or organization owning or managing rights over the resource.</string>
                     <string>Europeana definition: </string>
@@ -844,28 +842,28 @@
                     <string>LIDO: </string>
                 </doc>
              </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:collectionName" name="collectionName">
+            <ref path="/lido/lidoRecID" display="europeana:collectionName" name="collectionName">
                 <doc>
                     <string>Europeana definition: </string>
                     <string>Europeana note: </string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:collectionTitle" name="collectionTitle">
+            <ref path="/lido/lidoRecID" display="europeana:collectionTitle" name="collectionTitle">
                 <doc>
                     <string>Europeana definition: </string>
                     <string>Europeana note: </string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:country" name="country">
+            <ref path="/lido/lidoRecID" display="europeana:country" name="country">
                 <doc>
                     <string>Europeana definition: The name of the country of the data provider or “Europe” in the case of Europe-wide projects</string>
                     <string>Europeana note: Europeana enters the name of the country of the data provider as part of the ingest process but can only do this accurately if Providers (aggregators) supply datasets by country. </string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:dataProvider" name="dataProvider">
+            <ref path="/lido/lidoRecID" display="europeana:dataProvider" name="dataProvider">
                 <doc>
                     <string>Europeana definition: The name or identifier of the organisation that contributes data to Europeana</string>
                     <string>Europeana note:
@@ -889,84 +887,84 @@
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:isShownAt" name="isShownAt">
+            <ref path="/lido/lidoRecID" display="europeana:isShownAt" name="isShownAt">
                 <doc>
                     <string>Europeana definition: An unambiguous URL reference to the digital object on the provider’s web site in its full information context.  Refinement of dc:relation.  See also europeana:isShownBy.</string>
                     <string>Europeana note: This is a URL that will be active in the Europeana interface. It will lead users to the digital object displayed on the provider’s web site in its full information context.  Use europeana:isShownAt if you display the digital object with extra information (such as header, banner etc).</string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:isShownBy" name="isShownBy">
+            <ref path="/lido/lidoRecID" display="europeana:isShownBy" name="isShownBy">
                 <doc>
                     <string>Europeana definition: An unambiguous URL reference to the digital object on the provider’s web site in the best available resolution/quality.  Refinement of dc:relation.  See also europeana:isShownAt.</string>
                     <string>Europeana note: This is a URL that will be active in the Europeana interface.  It will lead users to the digital object on the provider’s website where they can view or play it.  The digital object needs to be directly accessible by the URL and reasonably independent at that location. If the URL includes short copyright information with the pointer to the object it can be entered in europeana:isShownBy. Use europeana:isShownAt for digital objects embedded in HTML pages (even where the page is extremely simple)</string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:language" name="language">
+            <ref path="/lido/lidoRecID" display="europeana:language" name="language">
                 <doc>
                     <string>Europeana definition: A normalised language value assigned to the resource with reference to the language given in the dc:language element.  </string>
                     <string>Europeana note: As part of the ingest process the language(s) stated in dc:language will be normalised and entered in this element to support the Language facet. It/they will be expressed using the ISO 639-2 (the three-character code) (e.g. “eng”.  </string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/administrativeMetadata/resourceWrap/resourceSet/resourceRepresentation/linkResource" display="europeana:object" name="object">
+            <ref path="/lido/administrativeMetadata/resourceWrap/resourceSet/resourceRepresentation/linkResource" display="europeana:object" name="object">
                 <doc>
                     <string>Europeana definition: The URL of a suitable source image in the best resolution available on the web site of the data provider from which small images could be generated for use in the portal.  This will often be the same URL as given in  europeana:isShownBy.</string>
                     <string>Europeana note: The specifications for suitable source images and details of their use and processing in Europeana can be found in the Europeana Portal Image Policy. Please consult this document before entering a URL in this metadata element. Note that there is no requirement to provide an image in any other format than those readily available on the providers website. If it is not possible to generate a suitable image a default icon corresponding to the Europeana type of object will be displayed.</string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:provider" name="provider">
+            <ref path="/lido/lidoRecID" display="europeana:provider" name="provider">
                 <doc>
                     <string>Europeana definition: Name of the organization that delivers data to Europeana. </string>
                     <string>Europeana note: The europeana:provider is the organization that sends the data to Europeana, and this is not necessarily the institution that holds or owns the original or digitised object.  Where data is being supplied by an aggregator or project europeana:provider is the name of aggregator/project.  The name of the content holder can be recorded in the new europeana:dataProvider element. If the content holder supplies data directly to Europeana then the name should appear in both these elements. The name should be in the original language(s)</string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:rights" name="rights">
+            <ref path="/lido/lidoRecID" display="europeana:rights" name="rights">
                 <doc>
                     <string>Europeana definition: Information about copyright of the digital object that is specified in isShownBy and isShownAt </string>
                     <string>Europeana note: The value must be a URL constructed according to the specifications in the “Rights Guidelines” document on the Technical Requirements page at:http://version1.europeana.eu/web/guest/technicalrequirements/ The URLs are constructed by adding a code indicating the copyright status of an object to the domain name where that status is defined.  For users of Europeana.eu this copyright information also applies to the preview specified in europeana:object. The rights statement will be represented as a badge below the preview on the object page.</string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:type" name="type">
+            <ref path="/lido/lidoRecID" display="europeana:type" name="type">
                 <doc>
                     <string>Europeana definition: on  The Europeana material type of the resource.</string>
                     <string>Europeana note: All digital objects in Europeana must be classified as one of the four Europeana types using upper case letters: TEXT, IMAGE, SOUND or VIDEO. This element is used to create the Type facet based on the Europeana material types. A default icon is used for each object type in the short or full record display when an image is not available (see europeana:object).As well as recording the orignal type values in #dc:type#, providers are asked to map from the local type terminology to the four types used in Europeana. </string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:unstored" name="unstored">
+            <ref path="/lido/lidoRecID" display="europeana:unstored" name="unstored">
                 <doc>
                     <string>Europeana definition: This is a container element which includes all relevant information that otherwise cannot be mapped to another element in the ESE.</string>
                     <string>Europeana note: The europeana:unstored element is provided in order to include important information for indexing purposes. All relevant information elements, which cannot be mapped to another element in the ESE, should be mapped into this element. This element is not available in “full search result display”. </string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:uri" name="uri">
+            <ref path="/lido/lidoRecID" display="europeana:uri" name="uri">
                 <doc>
                     <string>Europeana definition: An unambiguous URI to the resource within Europeana’s context.</string>
                     <string>Europeana note: This is a record identifier for the object in the Europeana system. It is created by Europeana based on the unique identifiers provided in the source metadata.  Please note that in cases where a provider supplies two or more records with the same record identifier, only the first record is kept by Europeana. Subsequent records with the same identifier are discarded.</string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:userTag" name="userTag">
+            <ref path="/lido/lidoRecID" display="europeana:userTag" name="userTag">
                 <doc>
                     <string>Europeana definition:  This is a tag created by a user through the Europeana interface.</string>
                     <string>Europeana note: These are tags created by registered users.</string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:hasDigitalObject" name="hasDigitalObject">
+            <ref path="/lido/lidoRecID" display="europeana:hasDigitalObject" name="hasDigitalObject">
                 <doc>
                     <string>Europeana definition: </string>
                     <string>Europeana note: </string>
                     <string>LIDO: </string>
                 </doc>
             </ref>
-            <ref path="/lidoWrap/lido/lidoRecID" display="europeana:year" name="year">
+            <ref path="/lido/lidoRecID" display="europeana:year" name="year">
                 <doc>
                     <string>Europeana definition: A point of time associated with an event in the life of the original analog or born digital object.</string>
                     <string>Europeana note: This is a 4 digit year in the Gregorian calendar (e.g. 1523), which is derived by Europeana from date values in the source metadata.  It is derived from dc:date and its refinements. It is used in the Europeana timeline and the date facet. Objects with no europeana:year will not be represented in the Timeline or the date facet.  </string>

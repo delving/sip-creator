@@ -46,7 +46,6 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     private StatsTreeNode parent;
     private List<StatsTreeNode> children = new ArrayList<StatsTreeNode>();
     private Tag tag;
-    private Path path;
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
     private String html;
@@ -69,7 +68,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     public void setStatistics(FieldStatistics fieldStatistics) {
         this.fieldStatistics = fieldStatistics;
     }
-    
+
     public Set<String> getVariableNames() {
         Set<String> names = new TreeSet<String>();
         for (StatsTreeNode child : getChildNodes()) {
@@ -94,7 +93,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     public TreePath getTreePath() {
         List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
-        compilePathList(list);
+        compilePathList(list, true);
         return new TreePath(list.toArray());
     }
 
@@ -102,25 +101,23 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         return tag;
     }
 
-    public Path getPath() {
-        if (path == null) {
-            List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
-            compilePathList(list);
-            path = Path.empty();
-            for (StatsTreeNode node : list) path.push(node.getTag());
-        }
+    public Path getPath(boolean fromRoot) {
+        List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
+        compilePathList(list, fromRoot);
+        Path path = Path.empty();
+        for (StatsTreeNode node : list) path.push(node.getTag());
         return path;
     }
 
     public boolean setRecordRoot(Path recordRoot) {
         boolean oldValue = this.recordRoot;
-        this.recordRoot = recordRoot != null && getPath().equals(recordRoot);
+        this.recordRoot = recordRoot != null && getPath(true).equals(recordRoot);
         return this.recordRoot || this.recordRoot != oldValue;
     }
 
     public boolean setUniqueElement(Path uniqueElement) {
         boolean oldValue = this.uniqueElement;
-        this.uniqueElement = uniqueElement != null && getPath().equals(uniqueElement);
+        this.uniqueElement = uniqueElement != null && getPath(true).equals(uniqueElement);
         return this.uniqueElement != oldValue;
     }
 
@@ -151,7 +148,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     }
 
     public void showPath(final JTree tree, final Path pathToShow) {
-        final Path here = getPath();
+        final Path here = getPath(true);
         Timer timer = new Timer(30, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -168,9 +165,9 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         timer.start();
     }
 
-    private void compilePathList(List<StatsTreeNode> list) {
-        if (parent != null) {
-            parent.compilePathList(list);
+    private void compilePathList(List<StatsTreeNode> list, boolean fromRoot) {
+        if (parent != null && (fromRoot || !parent.recordRoot)) {
+            parent.compilePathList(list, fromRoot);
         }
         list.add(this);
     }
@@ -217,9 +214,9 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     @Override
     public int compareTo(StatsTreeNode other) {
-        return getPath().compareTo(other.getPath());
+        return getPath(true).compareTo(other.getPath(true));
     }
-    
+
     public String toHtml() {
         if (html == null) {
             StringTemplate t = Utility.getTemplate("stats-brief");

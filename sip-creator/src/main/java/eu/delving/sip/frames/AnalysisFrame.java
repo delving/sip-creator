@@ -163,7 +163,7 @@ public class AnalysisFrame extends FrameBase {
             public void actionPerformed(ActionEvent e) {
                 TreePath path = statisticsJTree.getSelectionPath();
                 StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
-                Path recordRoot = node.getPath();
+                Path recordRoot = node.getPath(true);
                 if (recordRoot != null) {
                     sipModel.getStatsModel().setRecordRoot(recordRoot);
                 }
@@ -174,7 +174,7 @@ public class AnalysisFrame extends FrameBase {
             public void actionPerformed(ActionEvent e) {
                 TreePath path = statisticsJTree.getSelectionPath();
                 StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
-                sipModel.getStatsModel().setUniqueElement(node.getPath());
+                sipModel.getStatsModel().setUniqueElement(node.getPath(true));
             }
         });
     }

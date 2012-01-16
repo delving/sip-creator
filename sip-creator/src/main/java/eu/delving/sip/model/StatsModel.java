@@ -136,7 +136,7 @@ public class StatsModel {
     }
 
     private TreePath getTreePath(Path path, StatsTreeNode node) {
-        if (node.getPath().equals(path)) {
+        if (node.getPath(true).equals(path)) {
             return node.getTreePath();
         }
         for (StatsTreeNode sub : node.getChildren()) {
