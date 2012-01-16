@@ -60,7 +60,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     @XStreamOmitField
     public RecDefNode recDefNode;
-    
+
     @XStreamOmitField
     public Object statsTreeNode;
 
@@ -68,7 +68,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public boolean equals(Object o) {
         return o instanceof NodeMapping && ((NodeMapping) o).inputPath.equals(inputPath);
     }
-    
+
     @Override
     public int hashCode() {
         return inputPath.hashCode();
@@ -102,7 +102,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             groovyCode = new ArrayList<String>();
         }
         groovyCode.add(line.trim());
-    }            
+    }
 
     public void setDictionaryDomain(Set<String> domainValues) {
         if (dictionary == null) dictionary = new TreeMap<String, String>();
@@ -145,7 +145,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             out.line("}");
         }
         else {
-            out.line("%s * { %s ->", getVariableName(), getParamName());
+            out.line("%s * { %s ->", getVariableName(false), getParamName());
             out.before();
             out.line("%s {", recDefNode.getTag().toBuilderCall());
             out.before();
@@ -168,10 +168,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
             indentCode(groovyCode, out);
         }
         else if (dictionary != null) {
-            out.line("from%s(%s%s)", getDictionaryName(), getVariableName(), grabFirst ? "[0]" : "");
+            out.line("from%s(%s%s)", getDictionaryName(), getVariableName(true), grabFirst ? "[0]" : "");
         }
         else {
-            out.line("\"${%s%s}\"", getVariableName(), grabFirst ? "[0]" : "");
+            out.line("\"${%s%s}\"", getVariableName(true), grabFirst ? "[0]" : "");
         }
     }
 
@@ -224,8 +224,8 @@ public class NodeMapping implements Comparable<NodeMapping> {
         out.line("}");
     }
 
-    public String getVariableName() {
-        NodeMapping ancestor = getAncestorNodeMapping();
+    public String getVariableName(boolean includeSelf) {
+        NodeMapping ancestor = getAncestorNodeMapping(includeSelf);
         if (ancestor != null) {
             return GroovyVariable.name(ancestor.inputPath, inputPath);
         }
@@ -242,10 +242,14 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return String.format("[%s] => [%s]", inputPath.getTail(), outputPath.getTail());
     }
 
-    private NodeMapping getAncestorNodeMapping() {
-        for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
+    private NodeMapping getAncestorNodeMapping(boolean includeSelf) {
+        RecDefNode start = includeSelf ? recDefNode : recDefNode.getParent();
+        for (RecDefNode ancestor = start; ancestor != null; ancestor = ancestor.getParent()) {
             for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
-                if (nodeMapping.inputPath.isAncestorOf(inputPath)) return nodeMapping;
+                if ((includeSelf && nodeMapping.inputPath.equals(inputPath)) ||
+                        (nodeMapping.inputPath.isAncestorOf(inputPath))) {
+                    return nodeMapping;
+                }
             }
         }
         return null;
@@ -274,6 +278,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     /**
      * For comparing node mappings within a RecDefNode
+     *
      * @param nodeMapping who to compare with
      * @return true if the input paths were the same
      */

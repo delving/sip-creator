@@ -152,8 +152,9 @@ public class RecDefTreeNode implements TreeNode {
     }
 
     public RecDefPath getRecDefPath() {
-        if (recDefPath == null)
+        if (recDefPath == null) {
             recDefPath = parent == null ? new RecDefPath(this) : new RecDefPath(parent.getRecDefPath(), this);
+        }
         return recDefPath;
     }
 

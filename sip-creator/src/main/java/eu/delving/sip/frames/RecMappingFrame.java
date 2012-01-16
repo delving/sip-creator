@@ -127,7 +127,7 @@ public class RecMappingFrame extends FrameBase {
             if (list != null) {
                 int size = getSize();
                 list = null;
-                fireIntervalRemoved(this, 0, size - 1);
+                if (size > 0) fireIntervalRemoved(this, 0, size - 1);
             }
             list = recDefTree.getNodeMappings();
             fireIntervalAdded(this, 0, getSize());

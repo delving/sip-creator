@@ -1218,9 +1218,6 @@
     <doc tag="lidoRecID">
         <string name="Definition">A unique lido record identification preferably composed of an identifier for the contributor and a record identification in the contributor&#39;s (local) system.</string>
     </doc>
-    <doc tag="lidoWrap">
-        <string name="Definition">Holds one or multiple object records.</string>
-    </doc>
     <doc tag="linkResource">
         <string name="Definition">A url reference in the worldwide web environment.</string>
     </doc>
@@ -1368,9 +1365,6 @@
     <doc tag="recordWrap">
         <string name="Definition">A wrapper for information about the record that contains the cataloguing information.</string>
         <string name="Notes">Note that this section does not refer to any object or resource information, but only to the source record. </string>
-    </doc>
-    <doc tag="relatedencoding">
-        <string name="Definition">Indicates the format of the data source from which the data were migrated. For each sub-element with data values then the related source data fields can be referenced through the attributes encodinganalog and label.</string>
     </doc>
     <doc tag="relatedEventSet">
         <string name="Definition">References an event which is linked in some way to this event, e.g. a field trip within which this object was collected. </string>

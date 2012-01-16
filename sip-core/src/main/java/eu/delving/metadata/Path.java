@@ -132,7 +132,9 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     public Path minusAncestor(Path ancestor) {
-        if (!ancestor.isAncestorOf(this)) throw new IllegalArgumentException(String.format("%s is not an ancestor of %s", ancestor, this));
+        if (!(ancestor.isAncestorOf(this) || ancestor.equals(this))) {
+            throw new IllegalArgumentException(String.format("%s is not an ancestor of %s", ancestor, this));
+        }
         return chop(-ancestor.size());
     }
 

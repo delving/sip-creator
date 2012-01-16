@@ -244,7 +244,7 @@ public class RecDefNode {
     }
 
     private void beforeIteration(NodeMapping nodeMapping, Out out) {
-        out.line("%s * { %s ->", nodeMapping.getVariableName(), GroovyVariable.paramName(nodeMapping.inputPath));
+        out.line("%s * { %s ->", nodeMapping.getVariableName(false), GroovyVariable.paramName(nodeMapping.inputPath));
         out.before();
     }
 
