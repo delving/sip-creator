@@ -128,19 +128,19 @@ public class StatsModel {
         return statsTreeModel;
     }
 
-    public StatsTreeNode getStatsTreeNode(Path path) {
+    public StatsTreeNode findNodeForInputPath(Path path) {
         if (!(statsTreeModel.getRoot() instanceof StatsTreeNode)) return null;
-        TreePath treePath = getTreePath(path, (StatsTreeNode) statsTreeModel.getRoot());
+        TreePath treePath = findNodeForInputPath(path, (StatsTreeNode) statsTreeModel.getRoot());
         if (treePath == null) return null;
         return (StatsTreeNode) treePath.getLastPathComponent();
     }
 
-    private TreePath getTreePath(Path path, StatsTreeNode node) {
-        if (node.getPath(true).equals(path)) {
+    private TreePath findNodeForInputPath(Path path, StatsTreeNode node) {
+        if (node.getPath(false).equals(path)) {
             return node.getTreePath();
         }
         for (StatsTreeNode sub : node.getChildren()) {
-            TreePath subPath = getTreePath(path, sub);
+            TreePath subPath = findNodeForInputPath(path, sub);
             if (subPath != null) return subPath;
         }
         return null;

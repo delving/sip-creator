@@ -83,7 +83,7 @@ public class CreateModel {
             TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
             RecDefTreeNode rdn = (RecDefTreeNode) treePath.getLastPathComponent();
             if (recDefTreeNode != rdn) setRecDefTreeNode(rdn);
-            StatsTreeNode stn = sipModel.getStatsModel().getStatsTreeNode(nodeMapping.inputPath);
+            StatsTreeNode stn = sipModel.getStatsModel().findNodeForInputPath(nodeMapping.inputPath);
             if (statsTreeNode != stn) setStatsTreeNode(stn);
         }
     }
