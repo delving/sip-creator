@@ -66,6 +66,11 @@ public class CreateFrame extends FrameBase {
             @Override
             public void nodeMappingSet(CreateModel createModel) {
             }
+
+            @Override
+            public void nodeMappingChanged(CreateModel createModel) {
+                // todo: maybe do some update, either here or in CompileModel
+            }
         });
     }
 

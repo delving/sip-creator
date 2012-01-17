@@ -226,6 +226,11 @@ public class CompileModel {
             Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
             compileSoon();
         }
+
+        @Override
+        public void nodeMappingChanged(CreateModel createModel) {
+            // todo: may need to create dictionary lookup code or freshly generate user code
+        }
     }
 
     private class MappingModelEar implements MappingModel.Listener {

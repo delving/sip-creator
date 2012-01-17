@@ -69,6 +69,10 @@ public class StatisticsFrame extends FrameBase {
             @Override
             public void nodeMappingSet(CreateModel createModel) {
             }
+
+            @Override
+            public void nodeMappingChanged(CreateModel createModel) {
+            }
         });
     }
 

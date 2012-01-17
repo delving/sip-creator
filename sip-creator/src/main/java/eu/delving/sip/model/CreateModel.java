@@ -23,10 +23,13 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.base.StatsTreeNode;
 
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -97,6 +100,43 @@ public class CreateModel {
         setNodeMapping(recDefTreeNode.addStatsTreeNode(statsTreeNode));
     }
 
+    public boolean isComplete() {
+        return statsTreeNode != null && recDefTreeNode != null && nodeMapping != null;
+    }
+    
+    public boolean isDictionaryPossible() {
+        if (!isComplete()) return false;
+        Set<String> values = statsTreeNode.getStatistics().getHistogramValues();
+        List<RecDef.Opt> options = recDefTreeNode.getRecDefNode().getOptions();
+        return values != null && options != null && nodeMapping.dictionary == null;
+    }
+
+    public void createDictionary() {
+        if (!isDictionaryPossible()) throw new RuntimeException();
+        List<String> options = new ArrayList<String>();
+        for (RecDef.Opt opt : recDefTreeNode.getRecDefNode().getOptions()) options.add(opt.content); // todo: not key?
+        nodeMapping.setDictionaryDomain(options);
+        fireNodeMappingChanged();
+    }
+
+    public boolean isDictionaryPresent() {
+        return nodeMapping != null && nodeMapping.dictionary != null;
+    }
+    
+    public int countNonemptyDictionaryEntries() {
+        if (nodeMapping == null || nodeMapping.dictionary == null) return 0;
+        int nonemptyEntries = 0;
+        for (String value : nodeMapping.dictionary.values()) if (!value.trim().isEmpty()) nonemptyEntries++;
+        return nonemptyEntries;
+    }
+
+    public void removeDictionary() {
+        if (nodeMapping != null && nodeMapping.dictionary != null) {
+            nodeMapping.dictionary = null;
+            fireNodeMappingChanged();
+        }
+    }
+
     // observable
 
     public interface Listener {
@@ -104,12 +144,17 @@ public class CreateModel {
         void statsTreeNodeSet(CreateModel createModel);
         void recDefTreeNodeSet(CreateModel createModel);
         void nodeMappingSet(CreateModel createModel);
+        void nodeMappingChanged(CreateModel createModel);
 
     }
-
+    
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
     public void addListener(Listener listener) {
         listeners.add(listener);
+    }
+    
+    private void fireNodeMappingChanged() {
+        for (Listener listener : listeners) listener.nodeMappingChanged(this);
     }
 }

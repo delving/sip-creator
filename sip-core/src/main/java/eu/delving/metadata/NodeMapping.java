@@ -104,7 +104,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         groovyCode.add(line.trim());
     }
 
-    public void setDictionaryDomain(Set<String> domainValues) {
+    public void setDictionaryDomain(Collection<String> domainValues) {
         if (dictionary == null) dictionary = new TreeMap<String, String>();
         for (String key : domainValues) if (!dictionary.containsKey(key)) dictionary.put(key, "");
         Set<String> unused = new HashSet<String>(dictionary.keySet());

@@ -21,23 +21,17 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.CompileModel;
-import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.IOException;
@@ -52,10 +46,7 @@ public class FieldMappingFrame extends FrameBase {
     private JTextArea groovyCodeArea;
     private JTextArea outputArea;
     private JEditorPane helpView;
-    private JButton dictionaryCreate = new JButton("Create");
-    private JButton dictionaryEdit = new JButton("Edit");
-    private JButton dictionaryDelete = new JButton("Delete");
-    private DictionaryPopup dictionaryPopup;
+    private DictionaryPanel dictionaryPanel;
     private EditHistory editHistory;
 
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel, final EditHistory editHistory) {
@@ -67,10 +58,7 @@ public class FieldMappingFrame extends FrameBase {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-        dictionaryCreate.setEnabled(false);
-        dictionaryEdit.setEnabled(false);
-        dictionaryDelete.setEnabled(false);
-        dictionaryPopup = new DictionaryPopup(this);
+        dictionaryPanel = new DictionaryPanel(sipModel.getCreateModel());
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         groovyCodeArea.setFont(new Font("Monospaced", Font.BOLD, 12));
         groovyCodeArea.setTabSize(3);
@@ -112,28 +100,10 @@ public class FieldMappingFrame extends FrameBase {
 
     private JComponent createGroovyPanel() {
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Code", createCodePanel());
+        tabs.addTab("Code", scroll(groovyCodeArea));
+        tabs.addTab("Dictionary", dictionaryPanel);
         tabs.addTab("Help", scroll(helpView));
         return tabs;
-    }
-
-    private JComponent createCodePanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Groovy Code"));
-        p.add(scroll(groovyCodeArea), BorderLayout.CENTER);
-        p.add(createDictionaryButtons(), BorderLayout.EAST);
-        return p;
-    }
-
-    private JPanel createDictionaryButtons() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
-        p.setBorder(BorderFactory.createTitledBorder("Dictionary"));
-        p.add(dictionaryCreate);
-        p.add(dictionaryEdit);
-        p.add(dictionaryDelete);
-        p.add(Box.createVerticalGlue());
-        return p;
     }
 
     private JPanel createOutputPanel() {
@@ -144,119 +114,7 @@ public class FieldMappingFrame extends FrameBase {
         return p;
     }
 
-    private void setNodeMapping(NodeMapping nodeMapping) {
-        if (nodeMapping != null) {
-            StatsTreeNode node = null; // todo: where to get it?
-            if (node != null) {
-                dictionaryCreate.setEnabled(nodeMapping.dictionary == null);// todo && CodeGenerator.isDictionaryPossible(fieldMapping.getDefinition(), node));
-            }
-            else {
-                dictionaryCreate.setEnabled(false);
-            }
-            dictionaryEdit.setEnabled(nodeMapping.dictionary != null);
-            dictionaryDelete.setEnabled(nodeMapping.dictionary != null);
-        }
-        else {
-            dictionaryCreate.setEnabled(false);
-            dictionaryEdit.setEnabled(false);
-            dictionaryDelete.setEnabled(false);
-        }
-    }
-
-//    private StatsTreeNode getRecDefTreeNode(FieldMapping fieldMapping) {
-//        SourceVariable sourceVariable = getSourceVariable(fieldMapping);
-//        return sourceVariable != null ? sourceVariable.getRecDefTreeNode() : null;
-//        return null;
-//    }
-
     private void wireUp() {
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
-            @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                // todo: implement
-            }
-
-            @Override
-            public void factChanged(MappingModel mappingModel) {
-                // todo: implement
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                // todo: implement
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                // todo: implement
-            }
-
-        });
-        dictionaryCreate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-//                FieldMapping fieldMapping = sipModel.getMappingModel().getNodeMapping();
-//                if (fieldMapping != null) {
-//                    throw new RuntimeException("implement!");
-//                    CodeGenerator codeGenerator = new CodeGenerator();
-//                    Statistics statistics = null; // todo: get them from somewhere
-//                    fieldMapping.createDictionary(statistics.getHistogramValues());
-//                    codeGenerator.generateCodeFor(fieldMapping, sourceVariable, true);
-//                    setFieldMapping(fieldMapping);
-//                }
-            }
-        });
-        dictionaryEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                final FieldMapping fieldMapping = sipModel.getMappingModel().getSelectedRecDefNode();
-//                if (fieldMapping != null) {
-//                    dictionaryPopup.editDictionary(fieldMapping, new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            setFieldMapping(fieldMapping);
-//                        }
-//                    });
-//                }
-            }
-        });
-        dictionaryDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
-                if (nodeMapping != null) {
-                    if (nodeMapping.dictionary == null) {
-                        throw new RuntimeException("No dictionary to delete!");
-                    }
-                    int nonemptyEntries = 0;
-                    for (String value : nodeMapping.dictionary.values()) {
-                        if (!value.trim().isEmpty()) {
-                            nonemptyEntries++;
-                        }
-                    }
-                    if (nonemptyEntries > 0) {
-                        int response = JOptionPane.showConfirmDialog(
-                                parent,
-                                String.format(
-                                        "Are you sure that you want to discard the %d entries set?",
-                                        nonemptyEntries
-                                ),
-                                "Delete Dictionary",
-                                JOptionPane.OK_CANCEL_OPTION
-                        );
-                        if (response != JOptionPane.OK_OPTION) {
-                            return;
-                        }
-                    }
-                    nodeMapping.dictionary = null;
-//                    SourceVariable sourceVariable = getSourceVariable(fieldMapping);
-//                    if (sourceVariable != null) {
-//                        codeGenerator.generateCodeFor(fieldMapping, sourceVariable, false);
-//                    }
-//                    setFieldMapping(fieldMapping);
-                }
-            }
-        });
         sipModel.getFieldCompileModel().getCodeDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -350,4 +208,5 @@ public class FieldMappingFrame extends FrameBase {
     public Dimension getMinimumSize() {
         return new Dimension(400, 250);
     }
+    
 }
