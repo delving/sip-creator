@@ -114,15 +114,6 @@ public class MetadataRecord {
         }
     }
 
-    public String toHtml() {
-        StringBuilder out = new StringBuilder(String.format("<html><strong>Record Number %d</strong><dl>", recordNumber));
-        for (MetadataVariable variable : getVariables()) {
-            out.append(String.format("<dt>%s</dt><dd><strong>%s</strong></dd>", variable.getName(), variable.getValue()));
-        }
-        out.append("</dl><html>");
-        return out.toString();
-    }
-
     public String toString() {
         StringBuilder out = new StringBuilder();
         out.append("Record #").append(recordNumber).append('\n');

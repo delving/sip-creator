@@ -21,23 +21,23 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.StringReader;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * The transformation from input record to output
@@ -46,7 +46,8 @@ import java.io.StringReader;
  */
 
 public class InputFrame extends FrameBase {
-    private HTMLDocument inputDocument = (HTMLDocument) new HTMLEditorKit().createDefaultDocument();
+    private static final DefaultTreeModel EMPTY_MODEL = new DefaultTreeModel(new DefaultMutableTreeNode("No input"));
+    private JTree recordTree;
     private JButton firstButton = new JButton("First");
     private JButton nextButton = new JButton("Next");
     private RecordScanPopup recordScanPopup;
@@ -58,13 +59,22 @@ public class InputFrame extends FrameBase {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {
                 if (metadataRecord == null) {
-                    Exec.swing(new DocumentSetter(inputDocument, "<html><h1>No input</h1>"));
+                    Exec.swing(new RecordSetter(null));
                 }
                 else {
-                    Exec.swing(new DocumentSetter(inputDocument, metadataRecord.toHtml()));
+                    Exec.swing(new RecordSetter(metadataRecord));
                 }
             }
         });
+        recordTree = new JTree(EMPTY_MODEL) {
+            @Override
+            public String getToolTipText(MouseEvent evt) {
+                TreePath treePath = recordTree.getPathForLocation(evt.getX(), evt.getY());
+                return treePath != null ? ((GroovyTreeNode) treePath.getLastPathComponent()).toolTip : "";
+            }
+        };
+        recordTree.setToolTipText("Input Record");
+        recordTree.setCellRenderer(new Renderer());
         this.recordScanPopup = new RecordScanPopup(this, sipModel, new RecordScanPopup.Listener() {
             @Override
             public void searchStarted(String description) {
@@ -87,36 +97,8 @@ public class InputFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(scroll(createRecordView()), BorderLayout.CENTER);
+        content.add(scroll(recordTree), BorderLayout.CENTER);
         content.add(createRecordButtonPanel(), BorderLayout.SOUTH);
-    }
-
-    private JComponent createRecordView() {
-        final JEditorPane recordView = new JEditorPane();
-        recordView.setContentType("text/html");
-        recordView.setDocument(inputDocument);
-        recordView.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                Exec.swingLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        recordView.setCaretPosition(0);
-                    }
-                });
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-            }
-        });
-        recordView.setEditable(false);
-        return recordView;
-
     }
 
     private JPanel createRecordButtonPanel() {
@@ -136,49 +118,157 @@ public class InputFrame extends FrameBase {
         return p;
     }
 
-    private class DocumentSetter implements Runnable {
+    private class RecordSetter implements Runnable {
+        private MetadataRecord metadataRecord;
 
-        private Document document;
-        private String content;
-
-        private DocumentSetter(Document document, String content) {
-            this.document = document;
-            this.content = content;
+        private RecordSetter(MetadataRecord metadataRecord) {
+            this.metadataRecord = metadataRecord;
         }
 
         @Override
         public void run() {
-            if (document instanceof HTMLDocument) {
-                HTMLDocument htmlDocument = (HTMLDocument) document;
-                int docLength = document.getLength();
-                try {
-                    document.remove(0, docLength);
-                    HTMLEditorKit.ParserCallback callback = htmlDocument.getReader(0);
-                    htmlDocument.getParser().parse(new StringReader(content), callback, true);
-                    callback.flush();
-                }
-                catch (BadLocationException e) {
-                    throw new RuntimeException(e);
-                }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            if (metadataRecord == null) {
+                recordTree.setModel(EMPTY_MODEL);
             }
             else {
-                int docLength = document.getLength();
-                try {
-                    document.remove(0, docLength);
-                    document.insertString(0, content, null);
-                }
-                catch (BadLocationException e) {
-                    throw new RuntimeException(e);
-                }
+                GroovyTreeNode root = new GroovyTreeNode(null, metadataRecord.getRootNode());
+                recordTree.setModel(new DefaultTreeModel(root));
+                root.expand();
             }
         }
     }
 
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(280, 300);
+    private class GroovyTreeNode implements TreeNode {
+        private static final int MAX_LENGTH = 40;
+        private GroovyTreeNode parent;
+        private GroovyNode node;
+        private Vector<TreeNode> children = new Vector<TreeNode>();
+        private String string;
+        private String toolTip;
+
+        private GroovyTreeNode(GroovyTreeNode parent, GroovyNode node) {
+            this.parent = parent;
+            this.node = node;
+            if (node.value() instanceof List) {
+                string = node.name();
+                toolTip = String.format("Size: %d", ((List) node.value()).size());
+            }
+            else {
+                String value = node.text();
+                if (value.contains("\n") || value.length() >= MAX_LENGTH) {
+                    int index = value.indexOf('\n');
+                    if (index > 0) {
+                        value = value.substring(0, index);
+                    }
+                    if (value.length() >= MAX_LENGTH) {
+                        value = value.substring(0, MAX_LENGTH);
+                    }
+                    string = String.format("<html><b>%s</b> = %s ...</html>", node.name(), value);
+                    toolTip = node.text();
+                }
+                else {
+                    string = String.format("<html><b>%s</b> = %s</html>", node.name(), value);
+                    toolTip = value;
+                }
+            }
+            if (this.node.value() instanceof List) {
+                for (Object sub : ((List) this.node.value())) {
+                    GroovyNode subnode = (GroovyNode) sub;
+                    children.add(new GroovyTreeNode(this, subnode));
+                }
+            }
+        }
+
+        @Override
+        public TreeNode getChildAt(int i) {
+            return children.elementAt(i);
+        }
+
+        @Override
+        public int getChildCount() {
+            return children.size();
+        }
+
+        @Override
+        public TreeNode getParent() {
+            return parent;
+        }
+
+        @Override
+        public int getIndex(TreeNode treeNode) {
+            return children.indexOf(treeNode);
+        }
+
+        @Override
+        public boolean getAllowsChildren() {
+            return !children.isEmpty();
+        }
+
+        @Override
+        public boolean isLeaf() {
+            return children.isEmpty();
+        }
+
+        @Override
+        public Enumeration children() {
+            return children.elements();
+        }
+
+        @Override
+        public String toString() {
+            return string;
+        }
+
+        public void expand() {
+            if (!isLeaf()) {
+                Timer timer = new Timer(50, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        recordTree.expandPath(getTreePath());
+                        for (TreeNode sub : children) {
+                            ((GroovyTreeNode)sub).expand();
+                        }
+                    }
+                });
+                timer.setRepeats(false);
+                timer.start();
+            }
+        }
+
+        public TreePath getTreePath() {
+            List<TreeNode> list = new ArrayList<TreeNode>();
+            compilePathList(list);
+            return new TreePath(list.toArray());
+        }
+
+        private void compilePathList(List<TreeNode> list) {
+            if (parent != null) parent.compilePathList(list);
+            list.add(this);
+        }
     }
+
+    public static class Renderer extends DefaultTreeCellRenderer {
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            if (value instanceof GroovyTreeNode) {
+                GroovyTreeNode node = (GroovyTreeNode) value;
+//                if (node) {
+//                    setIcon(Utility.ATTRIBUTE_ICON);
+//                }
+                if (!node.isLeaf()) {
+                    setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                }
+                else {
+                    setIcon(Utility.VALUE_ELEMENT_ICON);
+                }
+            }
+            else {
+                setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+            }
+            return component;
+        }
+    }
+
 }
