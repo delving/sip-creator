@@ -179,11 +179,8 @@ public class CompileModel {
                 if (selectedNodeMapping == null || recMapping == null) {
                     return "// no code";
                 }
-                else if (editedCode != null) {
-                    return editedCode;
-                }
                 else {
-                    return selectedNodeMapping.getUserCode();
+                    return selectedNodeMapping.getUserCode(editedCode);
                 }
             default:
                 throw new RuntimeException();

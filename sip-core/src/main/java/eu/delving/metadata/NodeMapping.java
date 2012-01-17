@@ -89,14 +89,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return this;
     }
 
-    public void clearDictionary() {
-        dictionary = null;
-    }
-
-    public void clearCode() {
-        groovyCode = null;
-    }
-
     public void addCodeLine(String line) {
         if (groovyCode == null) {
             groovyCode = new ArrayList<String>();
@@ -136,11 +128,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public void toLeafCode(Out out, String editedCode) {
-        // todo: use editedCode
         if (recDefNode.isAttr() || recDefNode.isSingular()) {
             out.line("%s : { ", recDefNode.getTag().toBuilderCall());
             out.before();
-            toUserCode(out, true);
+            toUserCode(out, editedCode, true);
             out.after();
             out.line("}");
         }
@@ -149,7 +140,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             out.before();
             out.line("%s {", recDefNode.getTag().toBuilderCall());
             out.before();
-            toUserCode(out, false);
+            toUserCode(out, editedCode, false);
             out.after();
             out.line("}");
             out.after();
@@ -157,27 +148,29 @@ public class NodeMapping implements Comparable<NodeMapping> {
         }
     }
 
-    public String getUserCode() {
+    public String getUserCode(String editedCode) {
         Out out = new Out();
-        toUserCode(out, false);
+        toUserCode(out, editedCode, false);
         return out.toString();
     }
 
-    private void toUserCode(Out out, boolean grabFirst) {
-        if (groovyCode != null) {
+    private void toUserCode(Out out, String editedCode, boolean grabFirst) {
+        if (editedCode != null) {
+            indentCode(editedCode, out);
+        }
+        else if (groovyCode != null) {
             indentCode(groovyCode, out);
         }
         else if (dictionary != null) {
             out.line("from%s(%s%s)", getDictionaryName(), getVariableName(true), grabFirst ? "[0]" : "");
         }
         else {
-            // todo: show these somewhere in the GUI
-            for (String v : getContextVariables()) {
-                out.line("// "+v);
-            }
-            
             out.line("\"${%s%s}\"", getVariableName(true), grabFirst ? "[0]" : "");
         }
+    }
+    
+    private static void indentCode(String code, Out out) {
+        indentCode(Arrays.asList(code.split("\n")), out);
     }
 
     private static void indentCode(List<String> code, Out out) {

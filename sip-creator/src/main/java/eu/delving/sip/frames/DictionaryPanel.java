@@ -381,7 +381,7 @@ public class DictionaryPanel extends JPanel {
             int size = values.size();
             values.clear();
             fireIntervalRemoved(this, 0, size);
-            if (recDefNode != null) {
+            if (recDefNode != null && recDefNode.hasOptions()) {
                 values.add(0, COPY_VERBATIM);
                 values.addAll(recDefNode.getOptions());
                 fireIntervalAdded(this, 0, values.size());

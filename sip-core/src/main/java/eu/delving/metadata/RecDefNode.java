@@ -110,6 +110,10 @@ public class RecDefNode {
         return isAttr() ? attr.doc : elem.doc;
     }
 
+    public boolean hasOptions() {
+        return getOptions() != null;
+    }
+
     public List<RecDef.Opt> getOptions() {
         return isAttr() ? null : elem.options;
     }
@@ -218,10 +222,6 @@ public class RecDefNode {
         }
     }
 
-    private void childElements(Out out, Path selectedPath, String editedCode) {
-        for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
-    }
-
     private void beforeChildren(Out out, String editedCode) {
         boolean activeChildren = false;
         for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeChildren = true;
@@ -246,6 +246,10 @@ public class RecDefNode {
     private void beforeIteration(NodeMapping nodeMapping, Out out) {
         out.line("%s * { %s ->", nodeMapping.getVariableName(false), GroovyVariable.paramName(nodeMapping.inputPath));
         out.before();
+    }
+
+    private void childElements(Out out, Path selectedPath, String editedCode) {
+        for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
     }
 
     private void afterBrace(Out out) {
