@@ -39,6 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 /**
  * Represent an element in the JTree
@@ -52,6 +53,7 @@ public class RecDefTreeNode implements TreeNode {
     private RecDefPath recDefPath;
     private Vector<RecDefTreeNode> children = new Vector<RecDefTreeNode>();
     private String html;
+    private boolean passesFilter = true;
 
     public static TreeNode create(String message) {
         return new DefaultMutableTreeNode(message);
@@ -70,6 +72,26 @@ public class RecDefTreeNode implements TreeNode {
         this.recDefNode = recDefNode;
         if (parent != null) parent.children.add(this);
         for (RecDefNode subRecDefNode : recDefNode.getChildren()) new RecDefTreeNode(this, subRecDefNode);
+    }
+
+    public void clearFilter() {
+        passesFilter = false;
+        for (RecDefTreeNode sub : children) sub.clearFilter();
+    }
+
+    public void filter(Pattern pattern) {
+        if (!passesFilter) {
+            String tag = recDefNode.getTag().toString();
+            boolean found = pattern.matcher(tag).find();
+            if (found) {
+                for (RecDefTreeNode mark = this; mark != null; mark = mark.parent) mark.passesFilter = true;
+            }
+        }
+        for (RecDefTreeNode sub : children) sub.filter(pattern);
+    }
+
+    public boolean passesFilter() {
+        return passesFilter;
     }
 
     @Override

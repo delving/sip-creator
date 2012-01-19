@@ -30,19 +30,23 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.DropMode;
-import javax.swing.JDesktopPane;
-import javax.swing.JPanel;
-import javax.swing.JTree;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Render the record definition as a JTree
@@ -52,6 +56,17 @@ import java.awt.event.MouseEvent;
 
 public class RecDefFrame extends FrameBase {
     private JTree recDefTree;
+    private JTextField filterField = new JTextField();
+    private Timer timer = new Timer(300, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Object model = recDefTree.getModel();
+            if (model instanceof FilterTreeModel) {
+                FilterTreeModel ftm = (FilterTreeModel) model;
+                ftm.setFilter(Pattern.compile(filterField.getText().trim(), Pattern.CASE_INSENSITIVE));
+            }
+        }
+    });
 
     public RecDefFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Record Definition", false);
@@ -87,6 +102,25 @@ public class RecDefFrame extends FrameBase {
         recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
         recDefTree.setDropMode(DropMode.ON);
         recDefTree.setTransferHandler(sipModel.getNodeTransferHandler());
+        timer.setRepeats(false);
+        filterField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                timer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                timer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                timer.restart();
+            }
+        });
+
+
     }
 
     public void setPath(Path path) {
@@ -95,12 +129,14 @@ public class RecDefFrame extends FrameBase {
     
     @Override
     protected void buildContent(Container content) {
-        content.add(createRecDefTreePanel());
+        content.add(createFilterPanel(), BorderLayout.NORTH);
+        content.add(scroll(recDefTree), BorderLayout.CENTER);
     }
-
-    private JPanel createRecDefTreePanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(scroll(recDefTree), BorderLayout.CENTER);
+    
+    private JPanel createFilterPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder("Filter"));
+        p.add(filterField);
         return p;
     }
 
@@ -131,7 +167,7 @@ public class RecDefFrame extends FrameBase {
         public void run() {
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
             if (root != null) {
-                recDefTree.setModel(new DefaultTreeModel(root));
+                recDefTree.setModel(new FilterTreeModel(root));
                 showPath(root);
             }
             else {
@@ -139,9 +175,57 @@ public class RecDefFrame extends FrameBase {
             }
         }
     }
+    
+    private class FilterTreeModel extends DefaultTreeModel {
 
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(270, 300);
+        private FilterTreeModel(RecDefTreeNode root) {
+            super(root);
+        }
+        
+        public void setFilter(Pattern pattern) {
+            node(root).clearFilter();
+            node(root).filter(pattern);
+            fireTreeStructureChanged(this, new TreeNode[] {root}, new int[] {}, new Object[] { });
+            showPath(node(root));
+        }
+
+        @Override
+        public Object getRoot() {
+            return root;
+        }
+
+        @Override
+        public Object getChild(Object nodeObject, int index) {
+            return filterChildren(nodeObject).get(index);
+        }
+
+        @Override
+        public int getChildCount(Object nodeObject) {
+            RecDefTreeNode node = node(nodeObject);
+            int count = 0;
+            for (RecDefTreeNode sub : node.getChildren()) if (sub.passesFilter()) count++; 
+            return count;
+        }
+
+        @Override
+        public boolean isLeaf(Object nodeObject) {
+            RecDefTreeNode node = node(nodeObject);
+            return node.isLeaf();
+        }
+
+        @Override
+        public int getIndexOfChild(Object nodeObject, Object child) {
+            return filterChildren(nodeObject).indexOf(node(child));
+        }
+
+        private RecDefTreeNode node(Object nodeObject) {
+            return (RecDefTreeNode) nodeObject;
+        }
+        
+        private List<RecDefTreeNode> filterChildren(Object nodeObject) {
+            List<RecDefTreeNode> filtered = new ArrayList<RecDefTreeNode>();
+            for (RecDefTreeNode sub : node(nodeObject).getChildren()) if (sub.passesFilter()) filtered.add(sub);
+            return filtered;
+        }
     }
 }
