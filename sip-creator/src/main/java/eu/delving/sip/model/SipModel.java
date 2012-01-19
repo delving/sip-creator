@@ -70,6 +70,7 @@ public class SipModel {
 
     public interface AnalysisListener {
         boolean analysisProgress(long elementCount);
+
         void analysisComplete();
     }
 
@@ -80,10 +81,6 @@ public class SipModel {
 
     public interface ParseListener {
         void updatedRecord(MetadataRecord metadataRecord);
-    }
-
-    public interface ScanPredicate {
-        boolean accept(MetadataRecord record);
     }
 
     public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback) throws StorageException {
@@ -483,17 +480,19 @@ public class SipModel {
         seekRecordNumber(0, null);
     }
 
+    public interface ScanPredicate {
+        boolean accept(MetadataRecord record);
+    }
+
     public void seekRecordNumber(final int recordNumber, ProgressListener progressListener) {
+        ScanPredicate numberScan = new ScanPredicate() {
+            @Override
+            public boolean accept(MetadataRecord record) {
+                return record.getRecordNumber() == recordNumber;
+            }
+        };
         seekReset();
-        seekRecord(
-                new ScanPredicate() {
-                    @Override
-                    public boolean accept(MetadataRecord record) {
-                        return record.getRecordNumber() == recordNumber;
-                    }
-                },
-                progressListener
-        );
+        seekRecord(numberScan, progressListener);
     }
 
     public void seekRecord(ScanPredicate scanPredicate, ProgressListener progressListener) {
@@ -515,16 +514,11 @@ public class SipModel {
         public void run() {
             try {
                 if (!hasDataSet() || !statsModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
-                    for (ParseListener parseListener : parseListeners) {
-                        parseListener.updatedRecord(null);
-                    }
+                    for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                     return;
                 }
                 if (metadataParser == null) {
-                    metadataParser = new MetadataParser(
-                            dataSetModel.getDataSet().openSourceInputStream(),
-                            statsModel.getRecordCount()
-                    );
+                    metadataParser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(), statsModel.getRecordCount());
                 }
                 metadataParser.setProgressListener(progressListener);
                 MetadataRecord metadataRecord;
@@ -534,9 +528,7 @@ public class SipModel {
                             for (ParseListener parseListener : parseListeners) {
                                 parseListener.updatedRecord(metadataRecord);
                             }
-                            if (progressListener != null) {
-                                progressListener.finished(true);
-                            }
+                            if (progressListener != null) progressListener.finished(true);
                             break;
                         }
                     }

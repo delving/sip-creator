@@ -73,14 +73,12 @@ public class MetadataRecord {
             List list = (List) groovyNode.value();
             for (Object member : list) {
                 GroovyNode childNode = (GroovyNode) member;
-                if (checkFor(childNode, pattern)) {
-                    return true;
-                }
+                if (checkFor(childNode, pattern)) return true;
             }
             return false;
         }
         else {
-            return pattern.matcher(groovyNode.text()).matches();
+            return pattern.matcher(groovyNode.text()).find();
         }
     }
 

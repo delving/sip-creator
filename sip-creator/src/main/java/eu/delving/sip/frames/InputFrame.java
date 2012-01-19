@@ -25,12 +25,16 @@ import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import javax.swing.tree.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -38,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 /**
  * The transformation from input record to output
@@ -48,10 +53,25 @@ import java.util.Vector;
 public class InputFrame extends FrameBase {
     private static final DefaultTreeModel EMPTY_MODEL = new DefaultTreeModel(new DefaultMutableTreeNode("No input"));
     private JTree recordTree;
-    private JButton firstButton = new JButton("First");
-    private JButton nextButton = new JButton("Next");
-    private RecordScanPopup recordScanPopup;
-    private JLabel criterionLabel = new JLabel();
+    private JComboBox filterBox = new JComboBox(Filter.values());
+    private JTextField filterField = new JTextField();
+
+    private enum Filter {
+        REGEX("Regex"),
+        REGEX_CI("Regex (CI)"),
+        MODULO("Modulo");
+
+        private String name;
+
+        private Filter(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     public InputFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Input", false);
@@ -75,24 +95,7 @@ public class InputFrame extends FrameBase {
         };
         recordTree.setToolTipText("Input Record");
         recordTree.setCellRenderer(new Renderer());
-        this.recordScanPopup = new RecordScanPopup(this, sipModel, new RecordScanPopup.Listener() {
-            @Override
-            public void searchStarted(String description) {
-                criterionLabel.setText(description);
-            }
-        });
-        firstButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                recordScanPopup.scan(false);
-            }
-        });
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                recordScanPopup.scan(true);
-            }
-        });
+        filterField.addActionListener(rewind);
     }
 
     @Override
@@ -102,19 +105,14 @@ public class InputFrame extends FrameBase {
     }
 
     private JPanel createRecordButtonPanel() {
-        int margin = 4;
-        criterionLabel.setHorizontalAlignment(JLabel.CENTER);
-        criterionLabel.setBackground(Color.WHITE);
-        criterionLabel.setOpaque(true);
-        criterionLabel.setBorder(BorderFactory.createEtchedBorder());
-        JPanel p = new JPanel(new GridLayout(2, 2, margin, margin));
-        p.setBorder(BorderFactory.createEmptyBorder(margin, margin, margin, margin));
-        p.add(firstButton);
-        p.add(nextButton);
-        p.add(new JButton(recordScanPopup.getAction()));
-        recordScanPopup.init();
-        criterionLabel.setText(recordScanPopup.getPredicateDescription());
-        p.add(criterionLabel);
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder("Filter"));
+        JPanel bp = new JPanel(new GridLayout(1,0));
+        bp.add(new JButton(rewind));
+        bp.add(new JButton(play));
+        p.add(bp, BorderLayout.EAST);
+        p.add(filterBox, BorderLayout.WEST);
+        p.add(filterField, BorderLayout.CENTER);
         return p;
     }
 
@@ -131,7 +129,7 @@ public class InputFrame extends FrameBase {
                 recordTree.setModel(EMPTY_MODEL);
             }
             else {
-                GroovyTreeNode root = new GroovyTreeNode(null, metadataRecord.getRootNode());
+                GroovyTreeNode root = new GroovyTreeNode(metadataRecord);
                 recordTree.setModel(new DefaultTreeModel(root));
                 root.expand();
             }
@@ -140,11 +138,17 @@ public class InputFrame extends FrameBase {
 
     private class GroovyTreeNode implements TreeNode {
         private static final int MAX_LENGTH = 40;
+        private MetadataRecord metadataRecord;
         private GroovyTreeNode parent;
         private GroovyNode node;
         private Vector<TreeNode> children = new Vector<TreeNode>();
         private String string;
         private String toolTip;
+        
+        private GroovyTreeNode(MetadataRecord metadataRecord) {
+            this(null, metadataRecord.getRootNode());
+            this.metadataRecord = metadataRecord;
+        }
 
         private GroovyTreeNode(GroovyTreeNode parent, GroovyNode node) {
             this.parent = parent;
@@ -216,7 +220,7 @@ public class InputFrame extends FrameBase {
 
         @Override
         public String toString() {
-            return string;
+            return metadataRecord == null ? string : String.format("record %d", metadataRecord.getRecordNumber());
         }
 
         public void expand() {
@@ -271,4 +275,69 @@ public class InputFrame extends FrameBase {
         }
     }
 
+    private RewindAction rewind = new RewindAction();
+    private class RewindAction extends AbstractAction {
+        private RewindAction() {
+            putValue(Action.SMALL_ICON, Utility.REWIND_ICON);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            sipModel.seekReset();
+            play.actionPerformed(actionEvent);
+        }
+    }
+    
+    private PlayAction play = new PlayAction();
+    private class PlayAction extends AbstractAction {
+        private PlayAction() {
+            putValue(Action.SMALL_ICON, Utility.PLAY_ICON);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            ProgressListener progress = sipModel.getFeedback().progressListener("Scanning");
+            progress.setProgressMessage(String.format("Scanning for %s: %s", filterBox.getSelectedItem(), filterField.getText().trim()));
+            sipModel.seekRecord(createPredicate(), progress);
+        }
+    }
+
+    private SipModel.ScanPredicate createPredicate() {
+        final String filterString = filterField.getText().trim();
+        switch ((Filter)filterBox.getSelectedItem()) {
+            case REGEX:
+                return new SipModel.ScanPredicate() {
+                    @Override
+                    public boolean accept(MetadataRecord record) {
+                        return record.contains(Pattern.compile(filterString));
+                    }
+                };
+            case REGEX_CI:
+                return new SipModel.ScanPredicate() {
+                    @Override
+                    public boolean accept(MetadataRecord record) {
+                        return record.contains(Pattern.compile(filterString, Pattern.CASE_INSENSITIVE));
+                    }
+                };
+            case MODULO:
+                int modulo;
+                try {
+                    modulo = Integer.parseInt(filterString);
+                }
+                catch (NumberFormatException e) {
+                    modulo = 1;
+                }
+                if (modulo <= 0) modulo = 1;
+                final int recordNumberModulo = modulo; 
+                return new SipModel.ScanPredicate() {
+                    @Override
+                    public boolean accept(MetadataRecord record) {
+                        return recordNumberModulo == 1 || record.getRecordNumber() % recordNumberModulo == 0;
+                    }
+                };
+            default :
+                throw new RuntimeException();
+        }
+    }
+    
 }

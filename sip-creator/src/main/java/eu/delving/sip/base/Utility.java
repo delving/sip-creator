@@ -30,7 +30,8 @@ import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -52,6 +53,8 @@ public class Utility {
     public static final Icon IMPORT_ICON = new ImageIcon(Icon.class.getResource("/icons/import-icon.png"));
     public static final Icon VALIDATE_ICON = new ImageIcon(Icon.class.getResource("/icons/validate-icon.png"));
     public static final Icon RELEASE_ICON = new ImageIcon(Icon.class.getResource("/icons/release-icon.png"));
+    public static final Icon REWIND_ICON = new ImageIcon(Icon.class.getResource("/icons/rewind-icon.png"));
+    public static final Icon PLAY_ICON = new ImageIcon(Icon.class.getResource("/icons/play-icon.png"));
 
     private static final StringTemplateGroup STRING_TEMPLATE = new StringTemplateGroup("Templates");
 
