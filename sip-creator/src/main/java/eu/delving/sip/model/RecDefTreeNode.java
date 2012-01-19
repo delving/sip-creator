@@ -74,9 +74,9 @@ public class RecDefTreeNode implements TreeNode {
         for (RecDefNode subRecDefNode : recDefNode.getChildren()) new RecDefTreeNode(this, subRecDefNode);
     }
 
-    public void clearFilter() {
-        passesFilter = false;
-        for (RecDefTreeNode sub : children) sub.clearFilter();
+    public void setPassesFilter(boolean passesFilter) {
+        this.passesFilter = passesFilter;
+        for (RecDefTreeNode sub : children) sub.setPassesFilter(passesFilter);
     }
 
     public void filter(Pattern pattern) {
@@ -84,7 +84,8 @@ public class RecDefTreeNode implements TreeNode {
             String tag = recDefNode.getTag().toString();
             boolean found = pattern.matcher(tag).find();
             if (found) {
-                for (RecDefTreeNode mark = this; mark != null; mark = mark.parent) mark.passesFilter = true;
+                setPassesFilter(true);
+                for (RecDefTreeNode mark = this.parent; mark != null; mark = mark.parent) mark.passesFilter = true;
             }
         }
         for (RecDefTreeNode sub : children) sub.filter(pattern);

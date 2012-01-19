@@ -41,9 +41,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -119,8 +117,14 @@ public class RecDefFrame extends FrameBase {
                 timer.restart();
             }
         });
-
-
+        filterField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                String text = filterField.getText();
+                filterField.setSelectionStart(0);
+                filterField.setSelectionEnd(text.length());
+            }
+        });
     }
 
     public void setPath(Path path) {
@@ -140,13 +144,20 @@ public class RecDefFrame extends FrameBase {
         return p;
     }
 
-    private class RecDefSelection implements TreeSelectionListener {
+    private class RecDefSelection implements TreeSelectionListener, Runnable {
+
+        private Object nodeObject;
 
         @Override
         public void valueChanged(TreeSelectionEvent event) {
-            Object last = event.getPath().getLastPathComponent();
-            if (last instanceof RecDefTreeNode) {
-                RecDefTreeNode node = (RecDefTreeNode) last;
+            nodeObject = event.getPath().getLastPathComponent();
+            Exec.work(this);
+        }
+
+        @Override
+        public void run() {
+            if (nodeObject instanceof RecDefTreeNode) {
+                RecDefTreeNode node = (RecDefTreeNode) nodeObject;
                 showPath(node);
                 sipModel.getCreateModel().setRecDefTreeNode(node);
             }
@@ -183,7 +194,7 @@ public class RecDefFrame extends FrameBase {
         }
         
         public void setFilter(Pattern pattern) {
-            node(root).clearFilter();
+            node(root).setPassesFilter(false);
             node(root).filter(pattern);
             fireTreeStructureChanged(this, new TreeNode[] {root}, new int[] {}, new Object[] { });
             showPath(node(root));
