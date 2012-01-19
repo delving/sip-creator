@@ -24,6 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.files.Storage;
 
 import javax.swing.tree.DefaultTreeModel;
 import java.io.Serializable;
@@ -68,6 +69,9 @@ public class StatsTree implements Serializable {
         StatsTreeNode root = createSubtree(fieldStatisticsList, Path.empty(), null);
         if (root == null) {
             root = new StatsTreeNode(Tag.element("No statistics"));
+        }
+        if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
+            root = root.extractChild();
         }
         return new StatsTree(root);
     }

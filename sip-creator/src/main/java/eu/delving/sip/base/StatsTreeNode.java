@@ -68,6 +68,12 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     public void setStatistics(FieldStatistics fieldStatistics) {
         this.fieldStatistics = fieldStatistics;
     }
+    
+    public StatsTreeNode extractChild() {
+        if (getChildren().size() != 1) throw new IllegalStateException("One child expected");
+        children.get(0).parent = null;
+        return children.get(0);
+    }
 
     public Set<String> getVariableNames() {
         Set<String> names = new TreeSet<String>();
