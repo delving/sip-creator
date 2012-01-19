@@ -128,19 +128,26 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public void toLeafCode(Out out, String editedCode) {
-        if (recDefNode.isAttr() || recDefNode.isSingular()) {
+        if (recDefNode.isAttr()) {
             out.line("%s : { ", recDefNode.getTag().toBuilderCall());
             out.before();
-            toUserCode(out, editedCode, true);
+            toUserCode(out, editedCode, getVariableName(false));
+            out.after();
+            out.line("}");
+        }
+        else if (recDefNode.isSingular()) {
+            out.line("%s {", recDefNode.getTag().toBuilderCall());
+            out.before();
+            toUserCode(out, editedCode, getVariableName(false));
             out.after();
             out.line("}");
         }
         else {
-            out.line("%s * { %s ->", getVariableName(false), getParamName());
+            out.line("%s * { %s ->", getVariableName(true), getParamName());
             out.before();
             out.line("%s {", recDefNode.getTag().toBuilderCall());
             out.before();
-            toUserCode(out, editedCode, false);
+            toUserCode(out, editedCode, getParamName());
             out.after();
             out.line("}");
             out.after();
@@ -150,11 +157,12 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public String getUserCode(String editedCode) {
         Out out = new Out();
-        toUserCode(out, editedCode, false);
+        String variable = (recDefNode.isAttr() || recDefNode.isSingular())? getVariableName(false) : getParamName();
+        toUserCode(out, editedCode, variable);
         return out.toString();
     }
 
-    private void toUserCode(Out out, String editedCode, boolean grabFirst) {
+    private void toUserCode(Out out, String editedCode, String variable) {
         if (editedCode != null) {
             indentCode(editedCode, out);
         }
@@ -162,13 +170,13 @@ public class NodeMapping implements Comparable<NodeMapping> {
             indentCode(groovyCode, out);
         }
         else if (dictionary != null) {
-            out.line("from%s(%s%s)", getDictionaryName(), getVariableName(true), grabFirst ? "[0]" : "");
+            out.line("from%s(%s)", getDictionaryName(), variable);
         }
         else {
-            out.line("\"${%s%s}\"", getVariableName(true), grabFirst ? "[0]" : "");
+            out.line("\"${%s}\"", variable);
         }
     }
-    
+
     private static void indentCode(String code, Out out) {
         indentCode(Arrays.asList(code.split("\n")), out);
     }
@@ -222,16 +230,16 @@ public class NodeMapping implements Comparable<NodeMapping> {
         out.line("}");
     }
 
-    public String getVariableName(boolean includeSelf) {
-        NodeMapping ancestor = getAncestorNodeMapping(includeSelf);
-        if (ancestor != null) {
-            return GroovyVariable.name(ancestor.inputPath, inputPath);
-        }
-        else {
-            return GroovyVariable.name(inputPath);
-        }
+    public String getVariableName(boolean loop) {
+        NodeMapping ancestor = getAncestorNodeMapping();
+        Path ancestorInputPath = ancestor == null ? null : ancestor.inputPath;
+        return GroovyVariable.fromPaths(ancestorInputPath, inputPath, loop);
     }
-    
+
+    public String getParamName() {
+        return GroovyVariable.paramName(inputPath);
+    }
+
     public List<String> getContextVariables() {
         List<String> variables = new ArrayList<String>();
         for (RecDefNode ancestor = this.recDefNode; ancestor != null; ancestor = ancestor.getParent()) {
@@ -242,22 +250,14 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return variables;
     }
 
-    public String getParamName() {
-        return GroovyVariable.paramName(inputPath);
-    }
-
     public String toString() {
         return String.format("[%s] => [%s]", inputPath.getTail(), outputPath.getTail());
     }
 
-    private NodeMapping getAncestorNodeMapping(boolean includeSelf) {
-        RecDefNode start = includeSelf ? recDefNode : recDefNode.getParent();
-        for (RecDefNode ancestor = start; ancestor != null; ancestor = ancestor.getParent()) {
+    private NodeMapping getAncestorNodeMapping() {
+        for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
             for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
-                if ((includeSelf && nodeMapping.inputPath.equals(inputPath)) ||
-                        (nodeMapping.inputPath.isAncestorOf(inputPath))) {
-                    return nodeMapping;
-                }
+                if (nodeMapping.inputPath.isAncestorOf(inputPath)) return nodeMapping;
             }
         }
         return null;

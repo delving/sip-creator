@@ -172,7 +172,11 @@ public class Path implements Comparable<Path>, Serializable {
     public int size() {
         return stack.size();
     }
-
+    
+    public Iterator<Tag> iterator() {
+        return stack.iterator();
+    }
+    
     public String toString() {
         if (string == null) {
             StringBuilder builder = new StringBuilder(150);

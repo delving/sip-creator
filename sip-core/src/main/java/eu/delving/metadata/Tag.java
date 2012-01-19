@@ -172,20 +172,15 @@ public class Tag implements Comparable<Tag>, Serializable {
 
     public String toPathElement() {
         if (attribute) {
-            return "/@" + (prefix != null ? prefix + ":" + localName : localName);
+            return "/@" + toString();
         }
         else {
-            return "/" + (prefix != null ? prefix + ":" + localName : localName);
+            return "/" + toString();
         }
     }
 
     public String toString() {
-        if (attribute) {
-            return "@" + (prefix != null ? prefix + ":" + localName : localName);
-        }
-        else {
-            return prefix != null ? prefix + ":" + localName : localName;
-        }
+        return prefix != null ? prefix + ":" + localName : localName;
     }
 
     public static class Converter extends AbstractSingleValueConverter {

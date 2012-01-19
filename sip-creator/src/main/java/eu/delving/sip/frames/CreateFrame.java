@@ -43,28 +43,35 @@ import java.awt.event.ActionEvent;
  */
 
 public class CreateFrame extends FrameBase {
+    private static final String SELECT_STATS = "<html><h1>Select</h1></html>";
+    private static final String SELECT_RECDEF = "<html><h1>Select</h1></html>";
     private HtmlPanel statsHtml = new HtmlPanel("Input");
     private HtmlPanel recDefHtml = new HtmlPanel("Output");
     private CreateMappingAction createMappingAction = new CreateMappingAction();
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Create", false);
-        setStatsTreeNode(null);
-        setRecDefTreeNode(null);
+        statsHtml.setHtml(SELECT_STATS);
+        recDefHtml.setHtml(SELECT_RECDEF);
         createMappingAction.setEnabled(false);
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                setStatsTreeNode(createModel.getStatsTreeNode());
+                StatsTreeNode statsTreeNode = createModel.getStatsTreeNode();
+                statsHtml.setHtml(statsTreeNode != null ? statsTreeNode.toHtml() : SELECT_STATS);
+                createMappingAction.handleEnablement();
             }
 
             @Override
             public void recDefTreeNodeSet(CreateModel createModel) {
-                setNode(createModel.getRecDefTreeNode());
+                RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
+                recDefHtml.setHtml(recDefTreeNode != null ? recDefTreeNode.toHtml() : SELECT_RECDEF);
+                createMappingAction.handleEnablement();
             }
 
             @Override
             public void nodeMappingSet(CreateModel createModel) {
+                createMappingAction.handleEnablement();
             }
 
             @Override
@@ -78,26 +85,9 @@ public class CreateFrame extends FrameBase {
         return createMappingAction;
     }
 
-    private void setStatsTreeNode(StatsTreeNode statsTreeNode) {
-        statsHtml.setHtml(statsTreeNode != null ? statsTreeNode.toHtml() : "<html><h1>Select</h1></html>");
-        checkEnableCreate();
-    }
-
-    private void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
-        setNode(recDefTreeNode);
-    }
-
-    private void setNode(RecDefTreeNode recDefTreeNode) {
-        recDefHtml.setHtml(recDefTreeNode != null ? recDefTreeNode.toHtml() : "<html><h1>Select</h1></html>");
-        checkEnableCreate();
-    }
-
-    private void checkEnableCreate() {
-        createMappingAction.setEnabled(sipModel.getCreateModel().canCreate());
-    }
-
     @Override
     protected void buildContent(Container content) {
+        content.setLayout(new BorderLayout(8, 8));
         content.add(createPanel(), BorderLayout.CENTER);
         content.add(new JButton(createMappingAction), BorderLayout.SOUTH);
     }
@@ -110,9 +100,12 @@ public class CreateFrame extends FrameBase {
     }
 
     private class CreateMappingAction extends AbstractAction {
+        private static final String CREATE = "<html><h2>Create mapping</h2></html>";
+        private static final String SELECT = "<html><h2>Select source and target</h2></html>";
+        private static final String EXISTS = "<html><h2>Mapping exists</h2></html>";
 
         private CreateMappingAction() {
-            super("<html><h2>Create Mapping</h2></html>");
+            super(SELECT);
         }
 
         @Override
@@ -123,6 +116,21 @@ public class CreateFrame extends FrameBase {
                     sipModel.getCreateModel().createMapping();
                 }
             });
+        }
+
+        public void handleEnablement() {
+            if (sipModel.getCreateModel().canCreate()) {
+                setEnabled(true);
+                putValue(Action.NAME, CREATE);
+            }
+            else if (sipModel.getCreateModel().isComplete()) {
+                setEnabled(false);
+                putValue(Action.NAME, EXISTS);
+            }
+            else {
+                setEnabled(false);
+                putValue(Action.NAME, SELECT);
+            }
         }
     }
 

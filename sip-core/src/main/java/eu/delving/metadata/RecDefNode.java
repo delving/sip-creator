@@ -21,8 +21,6 @@
 
 package eu.delving.metadata;
 
-import eu.delving.groovy.GroovyVariable;
-
 import java.util.*;
 
 /**
@@ -222,6 +220,10 @@ public class RecDefNode {
         }
     }
 
+    public boolean canLoop() {
+        return !(isAttr() || isSingular());
+    }
+
     private void beforeChildren(Out out, String editedCode) {
         boolean activeChildren = false;
         for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeChildren = true;
@@ -244,7 +246,7 @@ public class RecDefNode {
     }
 
     private void beforeIteration(NodeMapping nodeMapping, Out out) {
-        out.line("%s * { %s ->", nodeMapping.getVariableName(false), GroovyVariable.paramName(nodeMapping.inputPath));
+        out.line("%s * { %s ->", nodeMapping.getVariableName(true), nodeMapping.getParamName());
         out.before();
     }
 
