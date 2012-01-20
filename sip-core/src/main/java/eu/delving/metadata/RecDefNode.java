@@ -77,6 +77,10 @@ public class RecDefNode {
         return attr != null;
     }
 
+    public boolean isLeafElem() {
+        return elem != null && elem.elemList.isEmpty();
+    }
+
     public boolean isSingular() {
         return !isAttr() && elem.singular;
     }
@@ -91,10 +95,6 @@ public class RecDefNode {
 
     public Tag getTag() {
         return isAttr() ? attr.tag : elem.tag;
-    }
-
-    public boolean isLeaf() {
-        return isAttr() || elem.elemList.isEmpty();
     }
 
     public Path getPath() {
@@ -172,6 +172,9 @@ public class RecDefNode {
             nodeMappings.put(nodeMapping.inputPath, nodeMapping);
             listener.nodeMappingAdded(this, nodeMapping);
         }
+        else {
+            throw new RuntimeException();
+        }
         return nodeMapping;
     }
 
@@ -190,18 +193,18 @@ public class RecDefNode {
     public void toCode(Out out, Path selectedPath, String editedCode) {
         if (!hasNodeMappings()) return;
         if (selectedPath != null && !path.equals(selectedPath) && !path.isAncestorOf(selectedPath)) return;
-        if (nodeMappings.isEmpty()) {
+        if (isAttr()) {
+            if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
+            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
+            nodeMapping.toLeafCode(out, editedCode);
+        }
+        else if (nodeMappings.isEmpty()) {
             childrenToCode(out, selectedPath, editedCode);
         }
         else {
-            for (NodeMapping nodeMapping : nodeMappings.values()) { // todo: when can + be used?
-                if (isLeaf()) {
-                    nodeMapping.toLeafCode(out, editedCode);
-                }
-                else {
-                    toLoop(nodeMapping.getLocalPath(), out, selectedPath, editedCode);
-                }
-            }
+            if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
+            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
+            toLoop(nodeMapping.getLocalPath(), out, selectedPath, editedCode);
         }
     }
 
@@ -240,6 +243,11 @@ public class RecDefNode {
         }
         out.before();
         for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
+        if (elem.elemList.isEmpty() && !nodeMappings.isEmpty()) {
+            if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
+            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
+            nodeMapping.toLeafCode(out, editedCode);
+        }
         out.after();
         out.line("}");
     }

@@ -72,17 +72,20 @@ public class TestCodeGeneration {
         node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").addNodeMapping(mapping("/input/leadup/record/list/member"));
         node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
 
+
         RecDefNode termNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
         NodeMapping term = termNode.addNodeMapping(mapping("/input/leadup/record/list/member/concept"));
         term.dictionary = new TreeMap<String, String>();
         term.dictionary.put("superhero", "Clay Man");
         term.dictionary.put("sidekick", "Clay Horse");
 
+        RecDefNode prefNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term/@pref");
+        NodeMapping attr2attr = prefNode.addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
+        System.out.println("attr="+attr2attr);
+
         RecDefNode actorNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
         NodeMapping mapping = actorNode.addNodeMapping(mapping("/input/leadup/record/list/member/name"));
-        mapping.addCodeLine("_member.name * { _name ->");
         mapping.addCodeLine("if (_name.contains(' ')) { return _name.split(' '); } else { return _name.text(); }");
-        mapping.addCodeLine("}");
         String code = recMapping.toCode(null, null);
         System.out.println(code);
 

@@ -133,18 +133,23 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public void toLeafCode(Out out, String editedCode) {
         if (recDefNode.isAttr()) {
-            out.line("%s : { ", recDefNode.getTag().toBuilderCall());
+            out.line("%s : { // attr", recDefNode.getTag().toBuilderCall());
             out.before();
             toUserCode(out, editedCode);
             out.after();
             out.line("}");
         }
+        else if (recDefNode.isLeafElem()) {
+            out.line("// leaf");
+            toUserCode(out, editedCode);
+        }
         else {
-            out.line("%s {", recDefNode.getTag().toBuilderCall());
+            out.line("%s { // nonleaf", recDefNode.getTag().toBuilderCall());
             out.before();
             toUserCode(out, editedCode);
             out.after();
             out.line("}");
+            throw new RuntimeException("never runs");
         }
     }
 
@@ -162,7 +167,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
             indentCode(groovyCode, out);
         }
         else {
+            out.line("// begin");
             toInnerLoop(getLocalPath(), out);
+            out.line("// end");
         }
     }
 
@@ -173,9 +180,11 @@ public class NodeMapping implements Comparable<NodeMapping> {
             if (inner.isAttribute()) {
                 if (dictionary != null) {
                     out.line("from%s(_%s[0])", getDictionaryName(), inner.toGroovy());
+                    throw new RuntimeException("hasn't run");
                 }
                 else {
                     out.line("\"${_%s[0]}\" // path 1", inner.toGroovy());
+                    throw new RuntimeException("hasn't run");
                 }
             }
             else {
@@ -184,18 +193,23 @@ public class NodeMapping implements Comparable<NodeMapping> {
                 }
                 else {
                     out.line("\"${_%s}\"", inner.toGroovy());
+                    throw new RuntimeException("hasn't run");
                 }
             }
+        }
+        else if (recDefNode.isLeafElem()) {
+            Tag inner = path.getTag(1);
+            out.line("\"${_%s}\" // leaf element", inner.toGroovy());
         }
         else if (path.getTag(1).isAttribute()) {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line("_%s%s // path 2", outer.toGroovy(), inner.toGroovy());
+            out.line("_%s%s // attr ref", outer.toGroovy(), inner.toGroovy());
         }
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
+            out.line("_%s.%s * { _%s -> // subnode access", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
             out.before();
             toInnerLoop(path.chop(-1), out);
             out.after();
