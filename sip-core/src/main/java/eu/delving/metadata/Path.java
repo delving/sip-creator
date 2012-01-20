@@ -130,6 +130,12 @@ public class Path implements Comparable<Path>, Serializable {
     public Path chop(int index) {
         return new Path(this, index);
     }
+    
+    public Path prefixWith(Tag tag) {
+        Path copy = new Path(this);
+        copy.stack.insertElementAt(tag, 0);
+        return copy;
+    }
 
     public Path minusAncestor(Path ancestor) {
         if (!(ancestor.isAncestorOf(this) || ancestor.equals(this))) {

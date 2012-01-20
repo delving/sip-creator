@@ -36,6 +36,8 @@ import org.codehaus.groovy.syntax.SyntaxException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,7 +102,9 @@ public class MappingRunner {
             for (RecDef.Namespace ns : recMapping.getRecDefTree().getNamespaces()) {
                 binding.setVariable(ns.prefix, xmlns.namespace(ns.uri, ns.prefix));
             }
-            binding.setVariable("_input", metadataRecord.getRootNode());
+            List<GroovyNode> input = new ArrayList<GroovyNode>(1);
+            input.add(metadataRecord.getRootNode());
+            binding.setVariable("input", input);
             script.setBinding(binding);
             return (Node) script.run();
         }

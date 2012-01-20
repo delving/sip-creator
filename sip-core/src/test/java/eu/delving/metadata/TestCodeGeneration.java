@@ -80,8 +80,9 @@ public class TestCodeGeneration {
 
         RecDefNode actorNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
         NodeMapping mapping = actorNode.addNodeMapping(mapping("/input/leadup/record/list/member/name"));
+        mapping.addCodeLine("_member.name * { _name ->");
         mapping.addCodeLine("if (_name.contains(' ')) { return _name.split(' '); } else { return _name.text(); }");
-
+        mapping.addCodeLine("}");
         String code = recMapping.toCode(null, null);
         System.out.println(code);
 

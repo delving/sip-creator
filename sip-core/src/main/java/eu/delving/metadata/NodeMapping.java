@@ -24,7 +24,6 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import eu.delving.groovy.GroovyVariable;
 
 import java.util.*;
 
@@ -89,6 +88,11 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return this;
     }
 
+    public NodeMapping setOutputPath(Path outputPath) {
+        this.outputPath = outputPath;
+        return this;
+    }
+
     public void addCodeLine(String line) {
         if (groovyCode == null) {
             groovyCode = new ArrayList<String>();
@@ -143,13 +147,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             out.line("}");
         }
         else {
-            Tag outer = getLeadupPath().peek();
-            Tag inner = inputPath.peek();
-            out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
-            out.before();
             toUserCode(out, editedCode);
-            out.after();
-            out.line("}");
         }
     }
 
@@ -167,7 +165,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             indentCode(groovyCode, out);
         }
         else {
-            toInnerLoop(getContainedPath(), out);
+            toInnerLoop(getLocalPath(), out);
         }
     }
 
@@ -176,12 +174,11 @@ public class NodeMapping implements Comparable<NodeMapping> {
         if (path.size() == 1) {
             Tag inner = path.getTag(0);
             if (inner.isAttribute()) {
-                Tag outer = getLeadupPath().peek();
                 if (dictionary != null) {
-                    out.line("from%s(_%s%s[0])", getDictionaryName(), outer.toGroovy(), inner.toGroovy());
+                    out.line("from%s(_%s[0])", getDictionaryName(), inner.toGroovy());
                 }
                 else {
-                    out.line("\"${_%s%s[0]}\" // path 1", outer.toGroovy(), inner.toGroovy());
+                    out.line("\"${_%s[0]}\" // path 1", inner.toGroovy());
                 }
             }
             else {
@@ -201,6 +198,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
+            out.line("// nodemapping");
             out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
             out.before();
             toInnerLoop(path.chop(-1), out);
@@ -250,24 +248,14 @@ public class NodeMapping implements Comparable<NodeMapping> {
         out.line("}");
     }
 
-    public Path getLeadupPath() {
-        NodeMapping ancestor = getAncestorNodeMapping();
-        return ancestor != null ? ancestor.inputPath : Path.empty();
+    public Path getContextPath() {
+        return getAncestorNodeMapping().inputPath;
     }
 
-    public Path getContainedPath() {
+    public Path getLocalPath() {
         NodeMapping ancestor = getAncestorNodeMapping();
-        return ancestor != null ? inputPath.minusAncestor(ancestor.inputPath) : inputPath;
-    }
-
-    public String getVariableName(boolean loop) {
-        NodeMapping ancestor = getAncestorNodeMapping();
-        Path ancestorInputPath = ancestor == null ? null : ancestor.inputPath;
-        return GroovyVariable.fromPaths(ancestorInputPath, inputPath, loop);
-    }
-
-    public String getParamName() {
-        return GroovyVariable.paramName(inputPath);
+        Path contained = inputPath.minusAncestor(ancestor.inputPath);
+        return contained.prefixWith(ancestor.inputPath.peek());
     }
 
     public List<String> getContextVariables() {
@@ -276,7 +264,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
         variables.add("still");
 //        for (RecDefNode ancestor = this.recDefNode; ancestor != null; ancestor = ancestor.getParent()) {
 //            for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
-//                variables.add(nodeMapping.getParamName());
 //            }
 //        }
         return variables;
@@ -304,7 +291,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
                 if (nodeMapping.inputPath.isAncestorOf(inputPath)) return nodeMapping;
             }
         }
-        return null;
+        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.chop(1));
     }
 
     private static final Hasher HASHER = new Hasher();

@@ -199,12 +199,12 @@ public class RecDefNode {
                     nodeMapping.toLeafCode(out, editedCode);
                 }
                 else {
-                    toLoop(nodeMapping.getContainedPath(), out, selectedPath, editedCode);
+                    toLoop(nodeMapping.getLocalPath(), out, selectedPath, editedCode);
                 }
             }
         }
     }
-    
+
     private void toLoop(Path path, Out out, Path selectedPath, String editedCode) {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
@@ -213,6 +213,7 @@ public class RecDefNode {
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
+            out.line("// recdefnode");
             out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
             out.before();
             toLoop(path.chop(-1), out, selectedPath, editedCode);
