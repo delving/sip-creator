@@ -244,10 +244,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
         out.line("}");
     }
 
-    public Path getContextPath() {
-        return getAncestorNodeMapping().inputPath;
-    }
-
     public Path getLocalPath() {
         NodeMapping ancestor = getAncestorNodeMapping();
         Path contained = inputPath.minusAncestor(ancestor.inputPath);
@@ -256,12 +252,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public List<String> getContextVariables() {
         List<String> variables = new ArrayList<String>();
-        variables.add("fake");
-        variables.add("still");
-//        for (RecDefNode ancestor = this.recDefNode; ancestor != null; ancestor = ancestor.getParent()) {
-//            for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
-//            }
-//        }
+        Path back = inputPath.copy();
+        while (!back.isEmpty()) {
+            variables.add(String.format("_%s", back.pop().toGroovy()));
+        }
         return variables;
     }
 
