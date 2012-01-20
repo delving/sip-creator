@@ -142,6 +142,7 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void nodeMappingSet(CreateModel createModel) {
                 contextVarModel.setList(createModel.getNodeMapping());
+                groovyCodeArea.setEditable(createModel.getNodeMapping().isUserCodeEditable());
             }
 
             @Override

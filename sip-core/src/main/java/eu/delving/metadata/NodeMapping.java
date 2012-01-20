@@ -144,12 +144,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             toUserCode(out, editedCode);
         }
         else {
-            out.line("%s { // nonleaf", recDefNode.getTag().toBuilderCall());
-            out.before();
-            toUserCode(out, editedCode);
-            out.after();
-            out.line("}");
-            throw new RuntimeException("never runs");
+            throw new RuntimeException("Should not call this");
         }
     }
 
@@ -157,6 +152,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
         Out out = new Out();
         toUserCode(out, editedCode);
         return out.toString();
+    }
+    
+    public boolean isUserCodeEditable() {
+        return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
 
     private void toUserCode(Out out, String editedCode) {
@@ -193,13 +192,11 @@ public class NodeMapping implements Comparable<NodeMapping> {
                 }
                 else {
                     out.line("\"${_%s}\"", inner.toGroovy());
-                    throw new RuntimeException("hasn't run");
                 }
             }
         }
         else if (recDefNode.isLeafElem()) {
-            Tag inner = path.getTag(1);
-            out.line("\"${_%s}\" // leaf element", inner.toGroovy());
+            toInnerLoop(path.chop(-1), out);
         }
         else if (path.getTag(1).isAttribute()) {
             Tag outer = path.getTag(0);
