@@ -132,11 +132,16 @@ public class NodeBuilder extends BuilderSupport {
         nodeCompleted(getCurrent(), node);
         return postNodeCompletion(getCurrent(), node);
     }
-
+    
     private void setValuesFromClosure(Node node, Closure closure) {
         ClosureResult result = runClosure(node, closure);
         if (result.string != null) node.setValue(result.string);
-        if (result.list != null) for (Object member : result.list) new Node(node, node.name(), member.toString());
+        if (result.list != null && !result.list.isEmpty()) {
+            node.setValue(result.list.get(0));
+            for (int walk = 1; walk<result.list.size(); walk++) {
+                new Node(node.parent(), node.name(), result.list.get(walk));
+            }
+        }
     }
 
     private void runMapClosures(Node node, Map<String, Object> map) {

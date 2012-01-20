@@ -213,7 +213,6 @@ public class RecDefNode {
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line("// recdefnode");
             out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
             out.before();
             toLoop(path.chop(-1), out, selectedPath, editedCode);

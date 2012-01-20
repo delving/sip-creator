@@ -139,15 +139,12 @@ public class NodeMapping implements Comparable<NodeMapping> {
             out.after();
             out.line("}");
         }
-        else if (recDefNode.isSingular()) {
+        else {
             out.line("%s {", recDefNode.getTag().toBuilderCall());
             out.before();
             toUserCode(out, editedCode);
             out.after();
             out.line("}");
-        }
-        else {
-            toUserCode(out, editedCode);
         }
     }
 
@@ -198,7 +195,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line("// nodemapping");
             out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
             out.before();
             toInnerLoop(path.chop(-1), out);
