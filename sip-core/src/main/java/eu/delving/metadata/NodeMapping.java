@@ -131,25 +131,23 @@ public class NodeMapping implements Comparable<NodeMapping> {
         if (recDefNode.isAttr()) {
             out.line("%s : { ", recDefNode.getTag().toBuilderCall());
             out.before();
-            toUserCode(out, editedCode, getVariableName(false));
+            toUserCode(out, editedCode);
             out.after();
             out.line("}");
         }
         else if (recDefNode.isSingular()) {
             out.line("%s {", recDefNode.getTag().toBuilderCall());
             out.before();
-            toUserCode(out, editedCode, getVariableName(false));
+            toUserCode(out, editedCode);
             out.after();
             out.line("}");
         }
         else {
-            out.line("%s * { %s ->", getVariableName(true), getParamName());
+            Tag outer = getLeadupPath().peek();
+            Tag inner = inputPath.peek();
+            out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
             out.before();
-            out.line("%s {", recDefNode.getTag().toBuilderCall());
-            out.before();
-            toUserCode(out, editedCode, getParamName());
-            out.after();
-            out.line("}");
+            toUserCode(out, editedCode);
             out.after();
             out.line("}");
         }
@@ -157,35 +155,57 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public String getUserCode(String editedCode) {
         Out out = new Out();
-        String variable = (recDefNode.isAttr() || recDefNode.isSingular())? getVariableName(false) : getParamName();
-        toUserCode(out, editedCode, variable);
+        toUserCode(out, editedCode);
         return out.toString();
     }
 
-    private void toUserCode(Out out, String editedCode, String variable) {
+    private void toUserCode(Out out, String editedCode) {
         if (editedCode != null) {
             indentCode(editedCode, out);
         }
         else if (groovyCode != null) {
             indentCode(groovyCode, out);
         }
-        else if (dictionary != null) {
-            out.line("from%s(%s)", getDictionaryName(), variable);
+        else {
+            toInnerLoop(getContainedPath(), out);
+        }
+    }
+
+    private void toInnerLoop(Path path, Out out) {
+        if (path.isEmpty()) throw new RuntimeException();
+        if (path.size() == 1) {
+            Tag inner = path.getTag(0);
+            if (inner.isAttribute()) {
+                Tag outer = getLeadupPath().peek();
+                if (dictionary != null) {
+                    out.line("from%s(_%s%s[0])", getDictionaryName(), outer.toGroovy(), inner.toGroovy());
+                }
+                else {
+                    out.line("\"${_%s%s[0]}\" // path 1", outer.toGroovy(), inner.toGroovy());
+                }
+            }
+            else {
+                if (dictionary != null) {
+                    out.line("from%s(_%s)", getDictionaryName(), inner.toGroovy());
+                }
+                else {
+                    out.line("\"${_%s}\"", inner.toGroovy());
+                }
+            }
+        }
+        else if (path.getTag(1).isAttribute()) {
+            Tag outer = path.getTag(0);
+            Tag inner = path.getTag(1);
+            out.line("_%s%s // path 2", outer.toGroovy(), inner.toGroovy());
         }
         else {
-            out.line("\"${%s}\"", variable);
-        }
-    }
-
-    private static void indentCode(String code, Out out) {
-        indentCode(Arrays.asList(code.split("\n")), out);
-    }
-
-    private static void indentCode(List<String> code, Out out) {
-        for (String codeLine : code) {
-            if (codeIndent(codeLine) < 0) out.after();
-            out.line(codeLine);
-            if (codeIndent(codeLine) > 0) out.before();
+            Tag outer = path.getTag(0);
+            Tag inner = path.getTag(1);
+            out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
+            out.before();
+            toInnerLoop(path.chop(-1), out);
+            out.after();
+            out.line("}");
         }
     }
 
@@ -230,6 +250,16 @@ public class NodeMapping implements Comparable<NodeMapping> {
         out.line("}");
     }
 
+    public Path getLeadupPath() {
+        NodeMapping ancestor = getAncestorNodeMapping();
+        return ancestor != null ? ancestor.inputPath : Path.empty();
+    }
+
+    public Path getContainedPath() {
+        NodeMapping ancestor = getAncestorNodeMapping();
+        return ancestor != null ? inputPath.minusAncestor(ancestor.inputPath) : inputPath;
+    }
+
     public String getVariableName(boolean loop) {
         NodeMapping ancestor = getAncestorNodeMapping();
         Path ancestorInputPath = ancestor == null ? null : ancestor.inputPath;
@@ -242,16 +272,30 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public List<String> getContextVariables() {
         List<String> variables = new ArrayList<String>();
-        for (RecDefNode ancestor = this.recDefNode; ancestor != null; ancestor = ancestor.getParent()) {
-            for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
-                variables.add(nodeMapping.getParamName());
-            }
-        }
+        variables.add("fake");
+        variables.add("still");
+//        for (RecDefNode ancestor = this.recDefNode; ancestor != null; ancestor = ancestor.getParent()) {
+//            for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
+//                variables.add(nodeMapping.getParamName());
+//            }
+//        }
         return variables;
     }
 
     public String toString() {
         return String.format("[%s] => [%s]", inputPath.getTail(), outputPath.getTail());
+    }
+
+    private static void indentCode(String code, Out out) {
+        indentCode(Arrays.asList(code.split("\n")), out);
+    }
+
+    private static void indentCode(List<String> code, Out out) {
+        for (String codeLine : code) {
+            if (codeIndent(codeLine) < 0) out.after();
+            out.line(codeLine);
+            if (codeIndent(codeLine) > 0) out.before();
+        }
     }
 
     private NodeMapping getAncestorNodeMapping() {

@@ -151,10 +151,6 @@ public class RecDefNode {
         return null;
     }
 
-    public boolean hasOneNodeMapping() {
-        return nodeMappings.size() == 1;
-    }
-
     public boolean hasNodeMappings() {
         if (!nodeMappings.isEmpty()) return true;
         for (RecDefNode sub : children) if (sub.hasNodeMappings()) return true;
@@ -164,11 +160,6 @@ public class RecDefNode {
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {
         nodeMappings.addAll(this.nodeMappings.values());
         for (RecDefNode sub : children) sub.collectNodeMappings(nodeMappings);
-    }
-
-    public NodeMapping getOneNodeMapping() {
-        if (!hasOneNodeMapping()) throw new RuntimeException("Test hasOneNodeMapping first");
-        return nodeMappings.values().iterator().next();
     }
 
     public Map<Path, NodeMapping> getNodeMappings() {
@@ -199,43 +190,48 @@ public class RecDefNode {
     public void toCode(Out out, Path selectedPath, String editedCode) {
         if (!hasNodeMappings()) return;
         if (selectedPath != null && !path.equals(selectedPath) && !path.isAncestorOf(selectedPath)) return;
-        if (!nodeMappings.isEmpty()) {
+        if (nodeMappings.isEmpty()) {
+            childrenToCode(out, selectedPath, editedCode);
+        }
+        else {
             for (NodeMapping nodeMapping : nodeMappings.values()) { // todo: when can + be used?
                 if (isLeaf()) {
                     nodeMapping.toLeafCode(out, editedCode);
                 }
                 else {
-                    beforeIteration(nodeMapping, out);
-                    beforeChildren(out, editedCode);
-                    childElements(out, selectedPath, editedCode);
-                    afterBrace(out);
-                    afterBrace(out);
+                    toLoop(nodeMapping.getContainedPath(), out, selectedPath, editedCode);
                 }
             }
         }
+    }
+    
+    private void toLoop(Path path, Out out, Path selectedPath, String editedCode) {
+        if (path.isEmpty()) throw new RuntimeException();
+        if (path.size() == 1) {
+            childrenToCode(out, selectedPath, editedCode);
+        }
         else {
-            beforeChildren(out, editedCode);
-            childElements(out, selectedPath, editedCode);
-            afterBrace(out);
+            Tag outer = path.getTag(0);
+            Tag inner = path.getTag(1);
+            out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
+            out.before();
+            toLoop(path.chop(-1), out, selectedPath, editedCode);
+            out.after();
+            out.line("}");
         }
     }
 
-    public boolean canLoop() {
-        return !(isAttr() || isSingular());
-    }
-
-    private void beforeChildren(Out out, String editedCode) {
-        boolean activeChildren = false;
-        for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeChildren = true;
-        if (activeChildren) {
+    private void childrenToCode(Out out, Path selectedPath, String editedCode) {
+        boolean activeAttributes = false;
+        for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeAttributes = true;
+        if (activeAttributes) {
             out.line("%s (", getTag().toBuilderCall());
             out.before();
-            for (RecDefNode sub : children)
+            for (RecDefNode sub : children) {
                 if (sub.isAttr() && sub.hasNodeMappings()) {
-                    for (NodeMapping nodeMapping : sub.nodeMappings.values()) {
-                        nodeMapping.toLeafCode(out, editedCode);
-                    }
+                    for (NodeMapping nodeMapping : sub.nodeMappings.values()) nodeMapping.toLeafCode(out, editedCode);
                 }
+            }
             out.after();
             out.line(") {");
         }
@@ -243,18 +239,7 @@ public class RecDefNode {
             out.line("%s {", getTag().toBuilderCall());
         }
         out.before();
-    }
-
-    private void beforeIteration(NodeMapping nodeMapping, Out out) {
-        out.line("%s * { %s ->", nodeMapping.getVariableName(true), nodeMapping.getParamName());
-        out.before();
-    }
-
-    private void childElements(Out out, Path selectedPath, String editedCode) {
         for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
-    }
-
-    private void afterBrace(Out out) {
         out.after();
         out.line("}");
     }

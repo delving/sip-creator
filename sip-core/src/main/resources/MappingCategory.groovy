@@ -105,11 +105,27 @@ public class MappingCategory {
     }
 
     // run a closure on each member of the list
-    static boolean multiply(List a, Closure closure) { // operator *
+    static List multiply(List a, Closure closure) { // operator *
         a = unwrap(a)
-        boolean any = !a.isEmpty()
-        for (Object child: a) closure.call(child)
-        return any
+        List output = new ArrayList();
+        for (Object child: a) {
+            Object returnValue = closure.call(child)
+            if (returnValue) {
+                if (returnValue instanceof Object[]) {
+                    output.addAll(returnValue)
+                }
+                else if (returnValue instanceof List) {
+                    output.addAll(returnValue)
+                }
+                else if (returnValue instanceof String) {
+                    output.add(returnValue)
+                }
+                else if (!(returnValue instanceof Node)) {
+                    output.add(returnValue.toString())
+                }
+            }
+        }
+        return output
     }
 
     // run the closure once for the concatenated values

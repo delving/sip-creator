@@ -100,7 +100,7 @@ public class MappingRunner {
             for (RecDef.Namespace ns : recMapping.getRecDefTree().getNamespaces()) {
                 binding.setVariable(ns.prefix, xmlns.namespace(ns.uri, ns.prefix));
             }
-            binding.setVariable("input", metadataRecord.getRootNode());
+            binding.setVariable("_input", metadataRecord.getRootNode());
             script.setBinding(binding);
             return (Node) script.run();
         }

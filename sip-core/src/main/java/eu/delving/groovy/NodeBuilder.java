@@ -143,7 +143,12 @@ public class NodeBuilder extends BuilderSupport {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof Closure) {
                 ClosureResult result = runClosure(node, (Closure) entry.getValue());
-                map.put(entry.getKey(), result.string);
+                if (result.string != null) map.put(entry.getKey(), result.string);
+                if (result.list != null) {
+                    StringBuilder sb = new StringBuilder();
+                    for (Object member : result.list) sb.append(member.toString());
+                    map.put(entry.getKey(), sb.toString());
+                }
             }
         }
     }

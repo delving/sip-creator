@@ -68,19 +68,19 @@ public class TestCodeGeneration {
     public void cornucopia() throws MappingException {
         recMapping.setFact("dogExists", "true");
 
-        node("/lidoWrap/lido/@sortorder").addNodeMapping(mapping("/leadup/@orderofsort"));
-        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").addNodeMapping(mapping("/leadup/record/list/member"));
-        node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").addNodeMapping(mapping("/leadup/record/list/member/@index"));
+        node("/lido/@sortorder").addNodeMapping(mapping("/input/leadup/@orderofsort"));
+        node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").addNodeMapping(mapping("/input/leadup/record/list/member"));
+        node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
 
-        RecDefNode termNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
-        NodeMapping term = termNode.addNodeMapping(mapping("/leadup/record/list/member/concept"));
+        RecDefNode termNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
+        NodeMapping term = termNode.addNodeMapping(mapping("/input/leadup/record/list/member/concept"));
         term.dictionary = new TreeMap<String, String>();
         term.dictionary.put("superhero", "Clay Man");
         term.dictionary.put("sidekick", "Clay Horse");
 
-        RecDefNode actorNode = node("/lidoWrap/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
-        NodeMapping mapping = actorNode.addNodeMapping(mapping("/leadup/record/list/member/name"));
-        mapping.addCodeLine("if (this_name.contains(' ')) { return this_name.text().split(' '); } else { return this_name.text(); }");
+        RecDefNode actorNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
+        NodeMapping mapping = actorNode.addNodeMapping(mapping("/input/leadup/record/list/member/name"));
+        mapping.addCodeLine("if (_name.contains(' ')) { return _name.split(' '); } else { return _name.text(); }");
 
         String code = recMapping.toCode(null, null);
         System.out.println(code);
