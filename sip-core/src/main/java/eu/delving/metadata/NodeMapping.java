@@ -94,10 +94,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public void addCodeLine(String line) {
-        if (groovyCode == null) {
-            groovyCode = new ArrayList<String>();
-        }
-        groovyCode.add(line.trim());
+        if (groovyCode == null) groovyCode = new ArrayList<String>();
+        line = line.trim();
+        if (!line.isEmpty()) groovyCode.add(line);
     }
 
     public void setDictionaryDomain(Collection<String> domainValues) {
@@ -113,15 +112,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
         Iterator<String> walk = groovyCode.iterator();
         for (String line : codeString.split("\n")) {
             line = line.trim();
-            if (!line.isEmpty()) {
-                if (!walk.hasNext()) {
-                    return false;
-                }
-                String codeLine = walk.next();
-                if (!codeLine.equals(line)) {
-                    return false;
-                }
-            }
+            if (line.isEmpty()) continue;
+            if (!walk.hasNext()) return false;
+            if (!walk.next().equals(line)) return false;
         }
         return !walk.hasNext();
     }
@@ -133,14 +126,11 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public void toLeafCode(Out out, String editedCode) {
         if (recDefNode.isAttr()) {
-            out.line("%s : { // attr", recDefNode.getTag().toBuilderCall());
-            out.before();
+            out.line_("%s : {", recDefNode.getTag().toBuilderCall());
             toUserCode(out, editedCode);
-            out.after();
-            out.line("}");
+            out._line("}");
         }
         else if (recDefNode.isLeafElem()) {
-            out.line("// leaf");
             toUserCode(out, editedCode);
         }
         else {
@@ -153,7 +143,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         toUserCode(out, editedCode);
         return out.toString();
     }
-    
+
     public boolean isUserCodeEditable() {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
@@ -166,9 +156,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             indentCode(groovyCode, out);
         }
         else {
-            out.line("// begin");
             toInnerLoop(getLocalPath(), out);
-            out.line("// end");
         }
     }
 
@@ -199,26 +187,21 @@ public class NodeMapping implements Comparable<NodeMapping> {
             toInnerLoop(path.chop(-1), out);
         }
         else if (path.getTag(1).isAttribute()) {
-            Tag outer = path.getTag(0);
-            Tag inner = path.getTag(1);
-            out.line("_%s%s // attr ref", outer.toGroovy(), inner.toGroovy());
+            out.line("_%s%s", path.getTag(0).toGroovy(), path.getTag(1).toGroovy());
         }
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line("_%s.%s * { _%s -> // subnode access", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
-            out.before();
+            out.line_("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
             toInnerLoop(path.chop(-1), out);
-            out.after();
-            out.line("}");
+            out._line("}");
         }
     }
 
     public void generateDictionaryCode(Out out) {
         if (dictionary == null) return;
         String name = getDictionaryName();
-        out.line(String.format("def %s = [", name));
-        out.before();
+        out.line_(String.format("def %s = [", name));
         Iterator<Map.Entry<String, String>> walk = dictionary.entrySet().iterator();
         while (walk.hasNext()) {
             Map.Entry<String, String> entry = walk.next();
@@ -228,31 +211,20 @@ public class NodeMapping implements Comparable<NodeMapping> {
                     walk.hasNext() ? "," : ""
             ));
         }
-        out.after();
-        out.line("]");
-        out.line("def from%s = { value ->", name);
-        out.before();
-        out.line("if (value) {");
-        out.before();
+        out._line("]");
+        out.line_("def from%s = { value ->", name);
+        out.line_("if (value) {");
         out.line("def v = %s[value.sanitize()];", name);
-        out.line("if (v) {");
-        out.before();
-        out.line("if (v.endsWith(':')) {");
-        out.before();
+        out.line_("if (v) {");
+        out.line_("if (v.endsWith(':')) {");
         out.line("return \"${v} ${value}\"");
-        out.after();
-        out.line("} else {");
-        out.before();
+        out._line("} else {").in();
         out.line("return v");
-        out.after();
-        out.line("}");
-        out.after();
-        out.line("}");
-        out.after();
-        out.line("}");
+        out._line("}");
+        out._line("}");
+        out._line("}");
         out.line("return ''");
-        out.after();
-        out.line("}");
+        out._line("}");
     }
 
     public Path getLocalPath() {
@@ -264,9 +236,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public List<String> getContextVariables() {
         List<String> variables = new ArrayList<String>();
         Path back = inputPath.copy();
-        while (!back.isEmpty()) {
-            variables.add(String.format("_%s", back.pop().toGroovy()));
-        }
+        while (!back.isEmpty()) variables.add(String.format("_%s", back.pop().toGroovy()));
         return variables;
     }
 
@@ -280,9 +250,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     private static void indentCode(List<String> code, Out out) {
         for (String codeLine : code) {
-            if (codeIndent(codeLine) < 0) out.after();
+            int indent = codeIndent(codeLine);
+            if (indent < 0) out.in();
             out.line(codeLine);
-            if (codeIndent(codeLine) > 0) out.before();
+            if (indent > 0) out.out();
         }
     }
 
@@ -304,14 +275,8 @@ public class NodeMapping implements Comparable<NodeMapping> {
     private static int codeIndent(String line) {
         int indent = 0;
         for (char c : line.toCharArray()) {
-            switch (c) {
-                case '}':
-                    indent--;
-                    break;
-                case '{':
-                    indent++;
-                    break;
-            }
+            if (c == '}') indent--;
+            if (c == '{') indent++;
         }
         return indent;
     }

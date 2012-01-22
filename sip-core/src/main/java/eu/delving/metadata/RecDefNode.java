@@ -216,11 +216,9 @@ public class RecDefNode {
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
-            out.before();
+            out.line_("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
             toLoop(path.chop(-1), out, selectedPath, editedCode);
-            out.after();
-            out.line("}");
+            out._line("}");
         }
     }
 
@@ -228,28 +226,24 @@ public class RecDefNode {
         boolean activeAttributes = false;
         for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeAttributes = true;
         if (activeAttributes) {
-            out.line("%s (", getTag().toBuilderCall());
-            out.before();
+            out.line_("%s (", getTag().toBuilderCall());
             for (RecDefNode sub : children) {
                 if (sub.isAttr() && sub.hasNodeMappings()) {
                     for (NodeMapping nodeMapping : sub.nodeMappings.values()) nodeMapping.toLeafCode(out, editedCode);
                 }
             }
-            out.after();
-            out.line(") {");
+            out._line(") {").in();
         }
         else {
-            out.line("%s {", getTag().toBuilderCall());
+            out.line_("%s {", getTag().toBuilderCall());
         }
-        out.before();
         for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
         if (elem.elemList.isEmpty() && !nodeMappings.isEmpty()) {
             if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
             NodeMapping nodeMapping = nodeMappings.values().iterator().next();
             nodeMapping.toLeafCode(out, editedCode);
         }
-        out.after();
-        out.line("}");
+        out._line("}");
     }
 
     public String toString() {

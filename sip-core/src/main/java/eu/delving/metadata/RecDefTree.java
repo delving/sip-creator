@@ -83,6 +83,7 @@ public class RecDefTree implements RecDefNode.Listener {
         Out out = new Out();
         out.line("// SIP-Creator Generated Mapping Code");
         out.line("// ----------------------------------");
+        out.line();
         out.line("// Facts:");
         for (Map.Entry<String, String> factEntry : facts.entrySet()) {
             out.line(String.format("String %s = '''%s'''",
@@ -90,20 +91,18 @@ public class RecDefTree implements RecDefNode.Listener {
                     Sanitizer.sanitizeGroovy(factEntry.getValue())
             ));
         }
+        out.line();
         out.line("// Dictionaries:");
         for (NodeMapping nodeMapping : getNodeMappings()) nodeMapping.generateDictionaryCode(out);
+        out.line();
         out.line("// DSL Category wraps Builder call:");
         out.line("Node outputNode");
-        out.line("use (MappingCategory) {");
-        out.before();
-        out.line("input * { _input -> outputNode = output.");
-        out.before();
+        out.line_("use (MappingCategory) {");
+        out.line_("input * { _input -> outputNode = output.");
         root.toCode(out, selectedPath, editedCode);
-        out.after();
-        out.line("}");
+        out._line("}");
         out.line("outputNode");
-        out.after();
-        out.line("}");
+        out._line("}");
         return out.toString();
     }
 
