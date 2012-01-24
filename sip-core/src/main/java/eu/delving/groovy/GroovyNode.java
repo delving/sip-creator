@@ -41,7 +41,7 @@ import java.util.TreeMap;
 
 @SuppressWarnings("unchecked")
 public class GroovyNode {
-    
+
     private GroovyNode parent;
 
     private QName qName;
@@ -53,7 +53,7 @@ public class GroovyNode {
     private Object value;
 
     public GroovyNode(GroovyNode parent, String namespaceUri, String localName, String prefix) {
-        this(parent, new QName(namespaceUri, localName, prefix));
+        this(parent, new QName(namespaceUri, localName, prefix == null ? "" : prefix));
     }
 
     public GroovyNode(GroovyNode parent, String name) {
@@ -119,7 +119,7 @@ public class GroovyNode {
 
     public List children() {
         if (value instanceof List) {
-            return(List)value;
+            return (List) value;
         }
         else {
             List l = new NodeList(4);
@@ -160,7 +160,7 @@ public class GroovyNode {
         return text().contains(s);
     }
 
-    public String [] split(String s) {
+    public String[] split(String s) {
         return text().split(s);
     }
 
