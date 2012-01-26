@@ -113,7 +113,7 @@ public class RecDefNode {
     }
 
     public List<RecDef.Opt> getOptions() {
-        return isAttr() ? null : elem.options;
+        return isAttr() ? attr.options : elem.options;
     }
 
     public boolean allowOption(String value) {
@@ -216,7 +216,7 @@ public class RecDefNode {
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line_("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
+            out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
             toLoop(path.chop(-1), out, selectedPath, editedCode);
             out._line("}");
         }

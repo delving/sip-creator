@@ -83,11 +83,18 @@ public class TestCodeGeneration {
         NodeMapping attr2attr = prefNode.addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
         System.out.println("attr="+attr2attr);
 
+        RecDefNode optionsNode = node("/lido/administrativeMetadata/recordWrap/recordID/@type");
+        List<RecDef.Opt> options = optionsNode.getOptions();
+        Assert.assertNotNull(options);
+        NodeMapping dictionaryMapping = optionsNode.addNodeMapping(mapping("/input/leadup/@orderofsort"));
+        dictionaryMapping.dictionary = new TreeMap<String, String>();
+        dictionaryMapping.dictionary.put("backward", "reverse reverse");
+
         RecDefNode actorNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
         NodeMapping mapping = actorNode.addNodeMapping(mapping("/input/leadup/record/list/member/name"));
         mapping.addCodeLine("if (_name.contains(' ')) { return _name.split(' '); } else { return _name.text(); }");
         String code = recMapping.toCode(null, null);
-        System.out.println(code);
+        printWithLineNumbers(code);
 
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping);
@@ -96,6 +103,13 @@ public class TestCodeGeneration {
         XmlNodePrinter printer = new XmlNodePrinter(writer);
         printer.print(node);
         System.out.println(writer.toString());
+    }
+
+    private void printWithLineNumbers(String code) {
+        int lineNumber = 1;
+        for (String line : code.split("\n")) {
+            System.out.println(String.format("%3d: %s", lineNumber++, line));
+        }
     }
 
     private MetadataRecord createInputRecord() {

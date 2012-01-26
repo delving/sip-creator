@@ -169,14 +169,13 @@ public class Tag implements Comparable<Tag>, Serializable {
             return localName;
         }
     }
-    
-    public String toGroovy() {
-        if (attribute) {
-            return String.format("['@%s']", toString());
-        }
-        else {
-            return nameToVariable(toString());
-        }
+
+    public String toGroovyRef() {
+        return attribute ? String.format("['@%s']", toString()) : "." + nameToVariable(toString());
+    }
+
+    public String toGroovyParam() {
+        return "_" + nameToVariable(toString());
     }
 
     public String toPathElement() {

@@ -164,35 +164,20 @@ public class NodeMapping implements Comparable<NodeMapping> {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
             Tag inner = path.getTag(0);
-            if (inner.isAttribute()) {
-                if (dictionary != null) {
-                    out.line("from%s(_%s[0])", getDictionaryName(), inner.toGroovy());
-                    throw new RuntimeException("hasn't run");
-                }
-                else {
-                    out.line("\"${_%s[0]}\" // path 1", inner.toGroovy());
-                    throw new RuntimeException("hasn't run");
-                }
+            if (dictionary != null) {
+                out.line("from%s(%s)", getDictionaryName(), inner.toGroovyParam());
             }
             else {
-                if (dictionary != null) {
-                    out.line("from%s(_%s)", getDictionaryName(), inner.toGroovy());
-                }
-                else {
-                    out.line("\"${_%s}\"", inner.toGroovy());
-                }
+                out.line("\"${%s}\"", inner.toGroovyParam());
             }
         }
         else if (recDefNode.isLeafElem()) {
             toInnerLoop(path.chop(-1), out);
         }
-        else if (path.getTag(1).isAttribute()) {
-            out.line("_%s%s", path.getTag(0).toGroovy(), path.getTag(1).toGroovy());
-        }
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line_("_%s.%s * { _%s ->", outer.toGroovy(), inner.toGroovy(), inner.toGroovy());
+            out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
             toInnerLoop(path.chop(-1), out);
             out._line("}");
         }
@@ -236,7 +221,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public List<String> getContextVariables() {
         List<String> variables = new ArrayList<String>();
         Path back = inputPath.copy();
-        while (!back.isEmpty()) variables.add(String.format("_%s", back.pop().toGroovy()));
+        while (!back.isEmpty()) variables.add(back.pop().toGroovyParam());
         return variables;
     }
 

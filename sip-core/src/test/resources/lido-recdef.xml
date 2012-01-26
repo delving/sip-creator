@@ -262,6 +262,11 @@
             <opt key="4">Group</opt>
             <opt key="5">Fonds</opt>
         </option-list>
+        <option-list path="/lido/administrativeMetadata/recordWrap/recordID/@type">
+            <opt key="1">Small</opt>
+            <opt key="2">Medium</opt>
+            <opt key="3">Large</opt>
+        </option-list>
     </options>
 
 

@@ -36,22 +36,22 @@ import java.util.List;
 
 /**
  * This class defines the structure of a record definition, and it involves a lot of recursion.
- *
+ * <p/>
  * There is a system of references built in which parses comma-delimited lists of identifiers which
  * are sought in the lists of common elements and attributes attrs and elems.  Any of these can
  * be referred by a subsequent one and this makes it easy to have patterns repeated throughout
  * the record definition, as is often the case.
- *
+ * <p/>
  * The main part is stored in the Elem called "root", which is a composite tree of Elem and
  * Attr instances.
- *
+ * <p/>
  * Information about which values are allowed can be stored in a list of options for that element
  * by adding entries to the option lists and identifying the path.  These option lists are placed
  * into the appropriate places when the RecDef is resolved.
- *
+ * <p/>
  * The same is true for the Doc instances, which hold human-facing documentation about the meaning
  * of the element.
- *
+ * <p/>
  * Bookmarks are a mechanism which provides for more easy navigation of elaborate record definitions
  * which are hard to work with due to their size.  Each bookmark can also include its own documentation,
  * which can instruct the mapper how to use the element to which it refers.
@@ -99,11 +99,19 @@ public class RecDef {
     public List<Category> bookmarks;
 
     private Attr findAttr(Path path) {
-        return root.findAttr(path, 0);
+        Attr found = root.findAttr(path, 0);
+        if (found == null) {
+            throw new RuntimeException("No attribute found for path "+path);
+        }
+        return found;
     }
 
     private Elem findElem(Path path) {
-        return root.findElem(path, 0);
+        Elem found = root.findElem(path, 0);
+        if (found == null) {
+            throw new RuntimeException("No element found for path "+path);
+        }
+        return found;
     }
 
     public Attr attr(Tag tag) {
@@ -195,9 +203,12 @@ public class RecDef {
 
         public void resolve(RecDef recDef) {
             path.defaultPrefix(recDef.prefix);
-            this.elem = recDef.findElem(path);
-            this.attr = recDef.findAttr(path);
-            if (this.attr == null && this.elem == null) throw new RuntimeException("Cannot resolve " + path);
+            if (path.peek().isAttribute()) {
+                this.attr = recDef.findAttr(path);
+            }
+            else {
+                this.elem = recDef.findElem(path);
+            }
         }
 
         public String toString() {
@@ -220,9 +231,12 @@ public class RecDef {
 
         public void resolve(RecDef recDef) {
             path.defaultPrefix(recDef.prefix);
-            Elem elem = recDef.findElem(path);
-            if (elem == null) throw new RuntimeException("Cannot find path " + path);
-            elem.options = opts;
+            if (path.peek().isAttribute()) {
+                recDef.findAttr(path).options = opts;
+            }
+            else {
+                recDef.findElem(path).options = opts;
+            }
         }
     }
 
@@ -249,7 +263,7 @@ public class RecDef {
 
         @XStreamImplicit
         public List<String> lines;
-        
+
         public List<String> getLines() {
             boolean repair = false;
             for (String line : lines) if (line.length() > LINE_WIDTH || line.contains("\n")) repair = true;
@@ -309,6 +323,9 @@ public class RecDef {
 
         @XStreamOmitField
         public Doc doc;
+
+        @XStreamOmitField
+        public List<Opt> options;
     }
 
     @XStreamAlias("elem")
@@ -393,11 +410,13 @@ public class RecDef {
             if (tag == null) throw new RuntimeException("Null tag!");
             tag = tag.defaultPrefix(recDef.prefix);
             if (attrs != null) {
-                for (String localName : attrs.split(DELIM)) attrList.add(recDef.attr(Tag.attribute(recDef.prefix, localName)));
+                for (String localName : attrs.split(DELIM))
+                    attrList.add(recDef.attr(Tag.attribute(recDef.prefix, localName)));
                 attrs = null;
             }
             if (elems != null) {
-                for (String localName : elems.split(DELIM)) elemList.add(recDef.elem(Tag.element(recDef.prefix, localName)));
+                for (String localName : elems.split(DELIM))
+                    elemList.add(recDef.elem(Tag.element(recDef.prefix, localName)));
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(recDef);
