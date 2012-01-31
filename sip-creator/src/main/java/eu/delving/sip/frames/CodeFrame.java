@@ -54,7 +54,12 @@ public class CodeFrame extends FrameBase {
             }
 
             @Override
-            public void factChanged(MappingModel mappingModel) {
+            public void factChanged(MappingModel mappingModel, String name) {
+                refresh();
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, String name) {
                 refresh();
             }
 

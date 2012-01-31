@@ -51,6 +51,11 @@ public class GroovyCodeResource {
     public GroovyCodeResource(ClassLoader classLoader) {
         this.classLoader = classLoader;
     }
+    
+    public Script createFunctionScript(String functionName, String functionCode) {
+        String scriptCode = String.format("def %s = { it ->\n%s\n}\n%s(param)", functionName, functionCode, functionName);
+        return new GroovyShell(getGroovyClassLoader()).parse(scriptCode);
+    }
 
     public Script createMappingScript(String code) {
         return new GroovyShell(getGroovyClassLoader()).parse(code);

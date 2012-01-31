@@ -97,7 +97,11 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
     }
 
     @Override
-    public void factChanged(MappingModel mappingModel) {
+    public void factChanged(MappingModel mappingModel, String name) {
+    }
+
+    @Override
+    public void functionChanged(MappingModel mappingModel, String name) {
     }
 
     @Override

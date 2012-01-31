@@ -71,7 +71,12 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
     }
 
     @Override
-    public void factChanged(MappingModel mappingModel) {
+    public void factChanged(MappingModel mappingModel, String name) {
+        timer.restart();
+    }
+
+    @Override
+    public void functionChanged(MappingModel mappingModel, String name) {
         timer.restart();
     }
 

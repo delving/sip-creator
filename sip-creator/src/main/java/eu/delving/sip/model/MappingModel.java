@@ -53,11 +53,15 @@ public class MappingModel implements RecDefNode.Listener {
         if (recMapping != null) recMapping.getRecDefTree().setListener(this);
         fireRecMappingSet();
     }
+    
+    public boolean hasRecMapping() {
+        return recMapping != null;
+    }
 
     public RecMapping getRecMapping() {
         return recMapping;
     }
-
+    
     public RecDefTreeNode getRecDefTreeRoot() {
         if (recDefTreeRoot == null && recMapping != null) {
             recDefTreeRoot = RecDefTreeNode.create(recMapping.getRecDefTree().getRoot());
@@ -80,8 +84,26 @@ public class MappingModel implements RecDefNode.Listener {
                 changed = recMapping.getFacts().containsKey(path) && !recMapping.getFacts().get(path).equals(value);
                 recMapping.getFacts().put(path, value);
             }
-            if (changed)  fireFactChanged();
+            if (changed) {
+                for (Listener listener : listeners) listener.factChanged(this, path);
+            }
         }
+    }
+    
+    public void setFunction(String name, String value) {
+        if (recMapping != null) {
+            recMapping.getFunctions().put(name, value);
+            for (Listener listener : listeners) listener.functionChanged(this, name);
+        }
+    }
+    
+    public String getFunctionCode(String name) {
+        String code = "it";
+        if (recMapping != null) {
+            String existing = recMapping.getFunctions().get(name);
+            if (existing != null) code = existing;
+        }
+        return code;
     }
 
     @Override
@@ -100,7 +122,9 @@ public class MappingModel implements RecDefNode.Listener {
 
         void recMappingSet(MappingModel mappingModel);
 
-        void factChanged(MappingModel mappingModel);
+        void factChanged(MappingModel mappingModel, String name);
+        
+        void functionChanged(MappingModel mappingModel, String name);
 
         void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 
@@ -128,9 +152,5 @@ public class MappingModel implements RecDefNode.Listener {
 
     private void fireRecMappingSet() {
         for (Listener listener : listeners) listener.recMappingSet(this);
-    }
-
-    private void fireFactChanged() {
-        for (Listener listener : listeners) listener.factChanged(this);
     }
 }

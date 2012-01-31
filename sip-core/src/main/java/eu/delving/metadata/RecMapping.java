@@ -58,6 +58,9 @@ public class RecMapping {
     @XStreamAlias("facts")
     Map<String, String> facts = new HashMap<String, String>();
 
+    @XStreamAlias("functions")
+    Map<String, String> functions = new HashMap<String, String>();
+
     @XStreamAlias("node-mappings")
     List<NodeMapping> nodeMappings;
 
@@ -99,12 +102,16 @@ public class RecMapping {
         return facts;
     }
 
+    public Map<String, String> getFunctions() {
+        return functions;
+    }
+
     public RecDefTree getRecDefTree() {
         return recDefTree;
     }
 
     public String toCode(Path selectedPath, String editedCode) {
-        return recDefTree.toCode(facts, selectedPath, editedCode);
+        return recDefTree.toCode(facts, functions, selectedPath, editedCode);
     }
 
     public String toString() {

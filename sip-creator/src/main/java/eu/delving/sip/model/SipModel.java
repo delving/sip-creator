@@ -55,6 +55,7 @@ public class SipModel {
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private Feedback feedback;
+    private FunctionCompileModel functionCompileModel;
     private CompileModel recordCompileModel;
     private CompileModel fieldCompileModel;
     private MetadataParser metadataParser;
@@ -87,12 +88,14 @@ public class SipModel {
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
+        functionCompileModel = new FunctionCompileModel(mappingModel, feedback, groovyCodeResource);
         recordCompileModel = new CompileModel(CompileModel.Type.RECORD, feedback, groovyCodeResource);
         fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel.getParseEar());
         parseListeners.add(fieldCompileModel.getParseEar());
         createModel.addListener(fieldCompileModel.getCreateModelEar());
         mappingModel.addListener(reportFileModel);
+        mappingModel.addListener(functionCompileModel.getMappingModelEar());
         mappingModel.addListener(recordCompileModel.getMappingModelEar());
         mappingModel.addListener(fieldCompileModel.getMappingModelEar());
         mappingModel.addListener(new MappingSaveTimer(this));
@@ -103,7 +106,11 @@ public class SipModel {
             }
 
             @Override
-            public void factChanged(MappingModel mappingModel) {
+            public void factChanged(MappingModel mappingModel, String name) {
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, String name) {
             }
 
             @Override
@@ -231,6 +238,10 @@ public class SipModel {
 
     public Feedback getFeedback() {
         return feedback;
+    }
+
+    public FunctionCompileModel getFunctionCompileModel() {
+        return functionCompileModel;
     }
 
     public CompileModel getRecordCompileModel() {

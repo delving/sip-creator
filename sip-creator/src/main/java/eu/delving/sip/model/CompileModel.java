@@ -239,7 +239,12 @@ public class CompileModel {
         }
 
         @Override
-        public void factChanged(MappingModel mappingModel) {
+        public void factChanged(MappingModel mappingModel, String name) {
+            compileSoon();
+        }
+
+        @Override
+        public void functionChanged(MappingModel mappingModel, String name) {
             compileSoon();
         }
 
