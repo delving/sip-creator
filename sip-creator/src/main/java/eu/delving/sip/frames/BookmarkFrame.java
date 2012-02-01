@@ -21,9 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDef;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -61,26 +59,10 @@ public class BookmarkFrame extends FrameBase {
     public BookmarkFrame(JDesktopPane desktop, SipModel sipModel, RecDefFrame recDefFrame) {
         super(desktop, sipModel, "Bookmarks", false);
         this.recDefFrame = recDefFrame;
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
                 Exec.swing(new TreeUpdater());
-            }
-
-            @Override
-            public void factChanged(MappingModel mappingModel, String name) {
-            }
-
-            @Override
-            public void functionChanged(MappingModel mappingModel, String name) {
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
         });
         bookmarkTree = new JTree(new BookmarksTreeModel()) {

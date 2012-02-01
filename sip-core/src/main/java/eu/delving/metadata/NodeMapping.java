@@ -122,6 +122,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public void setGroovyCode(String groovyCode) {
         this.groovyCode = null;
         for (String line : groovyCode.split("\n")) addCodeLine(line);
+        recDefNode.notifyNodeMappingChange(this);
     }
 
     public void toLeafCode(Out out, String editedCode) {

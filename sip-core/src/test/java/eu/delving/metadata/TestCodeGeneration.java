@@ -49,6 +49,11 @@ public class TestCodeGeneration {
             recMapping = RecMapping.create("lido", recDefModel());
             recMapping.getRecDefTree().setListener(new RecDefNode.Listener() {
                 @Override
+                public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping) {
+                    System.out.println("Mapping changed: " + recDefNode);
+                }
+
+                @Override
                 public void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping) {
                     System.out.println("Mapping added: " + recDefNode);
                 }

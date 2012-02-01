@@ -50,6 +50,8 @@ public class RecDefNode {
     private Listener listener;
 
     public interface Listener {
+        void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping);
+
         void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping);
 
         void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping);
@@ -188,6 +190,10 @@ public class RecDefNode {
         else {
             return null;
         }
+    }
+
+    public void notifyNodeMappingChange(NodeMapping nodeMapping) {
+        listener.nodeMappingChanged(this, nodeMapping);
     }
 
     public void toCode(Out out, Path selectedPath, String editedCode) {

@@ -21,9 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.MappingModel;
@@ -68,26 +66,10 @@ public class RecDefFrame extends FrameBase {
 
     public RecDefFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Record Definition", false);
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
                 Exec.swing(new TreeUpdater());
-            }
-
-            @Override
-            public void factChanged(MappingModel mappingModel, String name) {
-            }
-
-            @Override
-            public void functionChanged(MappingModel mappingModel, String name) {
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
         });
         recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty"))) {

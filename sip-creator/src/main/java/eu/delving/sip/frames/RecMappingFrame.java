@@ -53,33 +53,45 @@ public class RecMappingFrame extends FrameBase {
 
     public RecMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Node Mappings", false);
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                Exec.swing(new ListUpdater());
+                updateList();
             }
-
+        });
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void factChanged(MappingModel mappingModel, String name) {
+                updateList();
             }
 
             @Override
             public void functionChanged(MappingModel mappingModel, String name) {
+                updateList();
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+                updateList();
             }
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                Exec.swing(new ListUpdater());
+                updateList();
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                Exec.swing(new ListUpdater());
+                updateList();
             }
         });
         nodeMappingList.setCellRenderer(new CellRenderer());
         nodeMappingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         nodeMappingList.getSelectionModel().addListSelectionListener(new NodeMappingSelection());
+    }
+
+    private void updateList() {
+        Exec.swing(new ListUpdater());
     }
 
     @Override

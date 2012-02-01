@@ -47,12 +47,13 @@ public class CodeFrame extends FrameBase {
     public CodeFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Mapping Code", false);
         codeArea.setFont(new Font("Monospaced", Font.BOLD, 10));
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
                 refresh();
             }
-
+        });
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void factChanged(MappingModel mappingModel, String name) {
                 refresh();
@@ -60,6 +61,11 @@ public class CodeFrame extends FrameBase {
 
             @Override
             public void functionChanged(MappingModel mappingModel, String name) {
+                refresh();
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
                 refresh();
             }
 
@@ -73,10 +79,11 @@ public class CodeFrame extends FrameBase {
                 refresh();
             }
 
-            void refresh() {
-                Exec.swingAny(new CodeUpdater());
-            }
         });
+    }
+
+    void refresh() {
+        Exec.swingAny(new CodeUpdater());
     }
 
     @Override

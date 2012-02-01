@@ -37,7 +37,7 @@ import java.awt.event.ActionListener;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class MappingSaveTimer implements MappingModel.Listener, ActionListener, Runnable {
+public class MappingSaveTimer implements MappingModel.ChangeListener, MappingModel.SetListener, ActionListener, Runnable {
     private SipModel sipModel;
     private Timer timer = new Timer(200, this);
 
@@ -77,6 +77,11 @@ public class MappingSaveTimer implements MappingModel.Listener, ActionListener, 
 
     @Override
     public void functionChanged(MappingModel mappingModel, String name) {
+        timer.restart();
+    }
+
+    @Override
+    public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
         timer.restart();
     }
 

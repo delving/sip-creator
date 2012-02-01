@@ -21,8 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.StorageException;
@@ -36,7 +34,7 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class ReportFileModel extends AbstractListModel implements MappingModel.Listener {
+public class ReportFileModel extends AbstractListModel implements MappingModel.SetListener {
     private SipModel sipModel;
     private List<String> lines;
     private RecMapping recMapping;
@@ -96,19 +94,4 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.L
         refresh();
     }
 
-    @Override
-    public void factChanged(MappingModel mappingModel, String name) {
-    }
-
-    @Override
-    public void functionChanged(MappingModel mappingModel, String name) {
-    }
-
-    @Override
-    public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-    }
-
-    @Override
-    public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-    }
 }

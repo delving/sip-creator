@@ -102,7 +102,7 @@ public class FunctionCompileModel {
         this.codeDocument.addDocumentListener(documentTrigger);
     }
 
-    public MappingModel.Listener getMappingModelEar() {
+    public MappingModel.ChangeListener getMappingModelChangeListener() {
         return mappingModelEar;
     }
 
@@ -180,12 +180,7 @@ public class FunctionCompileModel {
         return toLines(toString(document));
     }
 
-    private class MappingModelEar implements MappingModel.Listener {
-
-        @Override
-        public void recMappingSet(MappingModel mappingModel) {
-            compileSoon();
-        }
+    private class MappingModelEar implements MappingModel.ChangeListener {
 
         @Override
         public void factChanged(MappingModel mappingModel, String name) {
@@ -194,7 +189,11 @@ public class FunctionCompileModel {
 
         @Override
         public void functionChanged(MappingModel mappingModel, String name) {
-            // todo: implement?
+            compileSoon();
+        }
+
+        @Override
+        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
         }
 
         @Override

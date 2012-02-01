@@ -94,23 +94,34 @@ public class SipModel {
         parseListeners.add(recordCompileModel.getParseEar());
         parseListeners.add(fieldCompileModel.getParseEar());
         createModel.addListener(fieldCompileModel.getCreateModelEar());
-        mappingModel.addListener(reportFileModel);
-        mappingModel.addListener(functionCompileModel.getMappingModelEar());
-        mappingModel.addListener(recordCompileModel.getMappingModelEar());
-        mappingModel.addListener(fieldCompileModel.getMappingModelEar());
-        mappingModel.addListener(new MappingSaveTimer(this));
-        mappingModel.addListener(new MappingModel.Listener() {
+        mappingModel.addSetListener(reportFileModel);
+        mappingModel.addChangeListener(functionCompileModel.getMappingModelChangeListener());
+        mappingModel.addSetListener(recordCompileModel.getMappingModelSetListener());
+        mappingModel.addChangeListener(recordCompileModel.getMappingModelChangeListener());
+        mappingModel.addSetListener(fieldCompileModel.getMappingModelSetListener());
+        mappingModel.addChangeListener(fieldCompileModel.getMappingModelChangeListener());
+        MappingSaveTimer saveTimer = new MappingSaveTimer(this);
+        mappingModel.addSetListener(saveTimer);
+        mappingModel.addChangeListener(saveTimer);
+        mappingModel.addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
                 clearValidation(mappingModel.getRecMapping());
             }
-
+        });
+        mappingModel.addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void factChanged(MappingModel mappingModel, String name) {
             }
 
             @Override
             public void functionChanged(MappingModel mappingModel, String name) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+                LOG.info("node mapping changed");
+                clearValidation(mappingModel.getRecMapping());
             }
 
             @Override

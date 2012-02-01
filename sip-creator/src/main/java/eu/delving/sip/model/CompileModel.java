@@ -100,10 +100,14 @@ public class CompileModel {
         if (enabled) compileSoon();
     }
 
-    public MappingModel.Listener getMappingModelEar() {
+    public MappingModel.ChangeListener getMappingModelChangeListener() {
         return mappingModelEar;
     }
     
+    public MappingModel.SetListener getMappingModelSetListener() {
+        return mappingModelEar;
+    }
+
     public CreateModel.Listener getCreateModelEar() {
         return createModelEar;
     }
@@ -230,7 +234,7 @@ public class CompileModel {
         }
     }
 
-    private class MappingModelEar implements MappingModel.Listener {
+    private class MappingModelEar implements MappingModel.ChangeListener, MappingModel.SetListener {
 
         @Override
         public void recMappingSet(MappingModel mappingModel) {
@@ -245,6 +249,11 @@ public class CompileModel {
 
         @Override
         public void functionChanged(MappingModel mappingModel, String name) {
+            compileSoon();
+        }
+
+        @Override
+        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             compileSoon();
         }
 
@@ -278,7 +287,7 @@ public class CompileModel {
             try {
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedOutputPath(), editedCode);
 
-                System.out.println(mappingRunner.getCode());
+                System.out.println(mappingRunner.getCode()); // todo: remove
 
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);

@@ -34,7 +34,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * This class makes a RecMapping instance observable, and also assumes that
  * there is potentially one node in its tree of RecDefNode instances which
  * is currently selected.
- *
+ * <p/>
  * The RecMapping informs us here of any changes happening in its nodes,
  * and we watch all changes in the facts and notify the world when any
  * of this changes, or when a new node is selected.
@@ -53,7 +53,7 @@ public class MappingModel implements RecDefNode.Listener {
         if (recMapping != null) recMapping.getRecDefTree().setListener(this);
         fireRecMappingSet();
     }
-    
+
     public boolean hasRecMapping() {
         return recMapping != null;
     }
@@ -61,14 +61,14 @@ public class MappingModel implements RecDefNode.Listener {
     public RecMapping getRecMapping() {
         return recMapping;
     }
-    
+
     public RecDefTreeNode getRecDefTreeRoot() {
         if (recDefTreeRoot == null && recMapping != null) {
             recDefTreeRoot = RecDefTreeNode.create(recMapping.getRecDefTree().getRoot());
         }
         return recDefTreeRoot;
     }
-    
+
     public TreePath getTreePath(Path path) {
         return getTreePath(path, getRecDefTreeRoot());
     }
@@ -85,18 +85,18 @@ public class MappingModel implements RecDefNode.Listener {
                 recMapping.getFacts().put(path, value);
             }
             if (changed) {
-                for (Listener listener : listeners) listener.factChanged(this, path);
+                for (ChangeListener changeListener : changeListeners) changeListener.factChanged(this, path);
             }
         }
     }
-    
+
     public void setFunction(String name, String value) {
         if (recMapping != null) {
             recMapping.getFunctions().put(name, value);
-            for (Listener listener : listeners) listener.functionChanged(this, name);
+            for (ChangeListener changeListener : changeListeners) changeListener.functionChanged(this, name);
         }
     }
-    
+
     public String getFunctionCode(String name) {
         String code = "it";
         if (recMapping != null) {
@@ -107,24 +107,36 @@ public class MappingModel implements RecDefNode.Listener {
     }
 
     @Override
+    public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping) {
+        for (ChangeListener changeListener : changeListeners)
+            changeListener.nodeMappingChanged(this, recDefNode, nodeMapping);
+    }
+
+    @Override
     public void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping) {
-        for (Listener listener : listeners) listener.nodeMappingAdded(this, recDefNode, nodeMapping);
+        for (ChangeListener changeListener : changeListeners)
+            changeListener.nodeMappingAdded(this, recDefNode, nodeMapping);
     }
 
     @Override
     public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
-        for (Listener listener : listeners) listener.nodeMappingRemoved(this, recDefNode, nodeMapping);
+        for (ChangeListener changeListener : changeListeners)
+            changeListener.nodeMappingRemoved(this, recDefNode, nodeMapping);
     }
 
     // observable
 
-    public interface Listener {
-
+    public interface SetListener {
         void recMappingSet(MappingModel mappingModel);
+    }
+
+    public interface ChangeListener {
 
         void factChanged(MappingModel mappingModel, String name);
-        
+
         void functionChanged(MappingModel mappingModel, String name);
+
+        void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 
         void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 
@@ -144,13 +156,18 @@ public class MappingModel implements RecDefNode.Listener {
     }
 
 
-    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+    private List<SetListener> setListeners = new CopyOnWriteArrayList<SetListener>();
+    private List<ChangeListener> changeListeners = new CopyOnWriteArrayList<ChangeListener>();
 
-    public void addListener(Listener listener) {
-        listeners.add(listener);
+    public void addSetListener(SetListener listener) {
+        setListeners.add(listener);
+    }
+
+    public void addChangeListener(ChangeListener listener) {
+        changeListeners.add(listener);
     }
 
     private void fireRecMappingSet() {
-        for (Listener listener : listeners) listener.recMappingSet(this);
+        for (SetListener listener : setListeners) listener.recMappingSet(this);
     }
 }

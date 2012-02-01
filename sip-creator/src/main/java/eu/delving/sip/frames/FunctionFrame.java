@@ -21,8 +21,6 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -81,30 +79,9 @@ public class FunctionFrame extends FrameBase {
         inputArea.setDocument(sipModel.getFunctionCompileModel().getInputDocument());
         codeArea.setDocument(sipModel.getFunctionCompileModel().getCodeDocument());
         outputArea.setDocument(sipModel.getFunctionCompileModel().getOutputDocument());
-        sipModel.getMappingModel().addListener(new MappingModel.Listener() {
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                refreshList(mappingModel);
-            }
-
-            @Override
-            public void factChanged(MappingModel mappingModel, String name) {
-            }
-
-            @Override
-            public void functionChanged(MappingModel mappingModel, String name) {
-//                refreshList(mappingModel);
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            private void refreshList(final MappingModel mappingModel) {
+            public void recMappingSet(final MappingModel mappingModel) {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {

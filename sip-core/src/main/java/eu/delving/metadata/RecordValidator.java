@@ -149,18 +149,14 @@ public class RecordValidator {
         }
     }
 
-    private static class Counter {
-        int count;
-    }
-
     private static Comparator<Object> NODE_COMPARATOR = new Comparator<Object>() {
         @Override
         public int compare(Object a, Object b) {
             Node nodeA = (Node) a;
             Node nodeB = (Node) b;
-            QName nameA = (QName) nodeA.name();
-            QName nameB = (QName) nodeB.name();
-            int comp = nameA.toString().compareTo(nameB.toString());
+            String nameA = nodeA.name().toString();
+            String nameB = nodeB.name().toString();
+            int comp = nameA.compareTo(nameB);
             if (comp != 0) return comp;
             String valueA = valueToString(nodeA.value());
             String valueB = valueToString(nodeB.value());
