@@ -142,7 +142,7 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void nodeMappingSet(CreateModel createModel) {
                 contextVarModel.setList(createModel.getNodeMapping());
-                groovyCodeArea.setEditable(createModel.getNodeMapping().isUserCodeEditable());
+                groovyCodeArea.setEditable(createModel.getNodeMapping() != null && createModel.getNodeMapping().isUserCodeEditable());
             }
 
             @Override
@@ -217,7 +217,7 @@ public class FieldMappingFrame extends FrameBase {
             if (size > 0) {
                 fireIntervalRemoved(this, 0, size);
             }
-            vars.addAll(nodeMapping.getContextVariables());
+            if (nodeMapping != null) vars.addAll(nodeMapping.getContextVariables());
             size = getSize();
             if (size > 0) {
                 selected = vars.get(0);
