@@ -21,6 +21,7 @@
 
 package eu.delving.groovy;
 
+import eu.delving.metadata.MappingFunction;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
 import groovy.lang.GroovySystem;
@@ -52,8 +53,8 @@ public class GroovyCodeResource {
         this.classLoader = classLoader;
     }
     
-    public Script createFunctionScript(String functionName, String functionCode) {
-        String scriptCode = String.format("def %s = { it ->\n%s\n}\n%s(param)", functionName, functionCode, functionName);
+    public Script createFunctionScript(MappingFunction function, String editedCode) {
+        String scriptCode = function.toCode(editedCode) + String.format("%s(param)\n", function.name);
         return new GroovyShell(getGroovyClassLoader()).parse(scriptCode);
     }
 

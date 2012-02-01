@@ -21,10 +21,7 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecDefNode;
-import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.*;
 
 import javax.swing.tree.TreePath;
 import java.util.List;
@@ -90,20 +87,8 @@ public class MappingModel implements RecDefNode.Listener {
         }
     }
 
-    public void setFunction(String name, String value) {
-        if (recMapping != null) {
-            recMapping.getFunctions().put(name, value);
-            for (ChangeListener changeListener : changeListeners) changeListener.functionChanged(this, name);
-        }
-    }
-
-    public String getFunctionCode(String name) {
-        String code = "it";
-        if (recMapping != null) {
-            String existing = recMapping.getFunctions().get(name);
-            if (existing != null) code = existing;
-        }
-        return code;
+    public void notifyFunctionChanged(MappingFunction mappingFunction) {
+        for (ChangeListener changeListener : changeListeners) changeListener.functionChanged(this, mappingFunction);
     }
 
     @Override
@@ -134,7 +119,7 @@ public class MappingModel implements RecDefNode.Listener {
 
         void factChanged(MappingModel mappingModel, String name);
 
-        void functionChanged(MappingModel mappingModel, String name);
+        void functionChanged(MappingModel mappingModel, MappingFunction function);
 
         void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 

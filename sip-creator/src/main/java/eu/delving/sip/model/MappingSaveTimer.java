@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
@@ -76,7 +77,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     }
 
     @Override
-    public void functionChanged(MappingModel mappingModel, String name) {
+    public void functionChanged(MappingModel mappingModel, MappingFunction function) {
         timer.restart();
     }
 

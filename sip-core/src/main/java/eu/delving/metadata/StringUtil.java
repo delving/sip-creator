@@ -21,13 +21,42 @@
 
 package eu.delving.metadata;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
+ * Handle some common string manipulations.
+ *
  * Remove the frightening things from tag strings so that they can become proper Groovy variable names.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class Sanitizer {
+public class StringUtil {
+
+    public static void indentCode(String code, Out out) {
+        indentCode(Arrays.asList(code.split("\n")), out);
+    }
+
+    public static void indentCode(List<String> code, Out out) {
+        for (String codeLine : code) {
+            int indent = codeIndent(codeLine);
+            if (indent < 0) out.in();
+            out.line(codeLine);
+            if (indent > 0) out.out();
+        }
+    }
+
+    private static int codeIndent(String line) {
+        int indent = 0;
+        for (char c : line.toCharArray()) {
+            if (c == '}') indent--;
+            if (c == '{') indent++;
+        }
+        return indent;
+    }
+
+
     private static final String PLAIN_ASCII =
       "AaEeIiOoUu"    // grave
     + "AaEeIiOoUuYy"  // acute

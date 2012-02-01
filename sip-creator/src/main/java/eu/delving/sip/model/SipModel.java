@@ -115,7 +115,7 @@ public class SipModel {
             }
 
             @Override
-            public void functionChanged(MappingModel mappingModel, String name) {
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             }
 
             @Override

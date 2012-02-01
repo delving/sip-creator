@@ -21,7 +21,7 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.Sanitizer;
+import eu.delving.metadata.StringUtil;
 import groovy.lang.DelegatingMetaClass;
 import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
@@ -142,10 +142,10 @@ public class GroovyNode {
     public String name() {
         if (stringName == null) {
             if (qName.getPrefix().isEmpty()) {
-                stringName = Sanitizer.tagToVariable(qName.getLocalPart());
+                stringName = StringUtil.tagToVariable(qName.getLocalPart());
             }
             else {
-                stringName = qName.getPrefix() + "_" + Sanitizer.tagToVariable(qName.getLocalPart());
+                stringName = qName.getPrefix() + "_" + StringUtil.tagToVariable(qName.getLocalPart());
             }
         }
         return stringName;

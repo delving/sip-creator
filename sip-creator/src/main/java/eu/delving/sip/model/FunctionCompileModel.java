@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
@@ -66,7 +67,7 @@ public class FunctionCompileModel {
     private Feedback feedback;
     private volatile boolean compiling;
     private MappingModelEar mappingModelEar = new MappingModelEar();
-    private String functionName;
+    private MappingFunction mappingFunction;
 
     public enum State {
         ORIGINAL,
@@ -107,16 +108,12 @@ public class FunctionCompileModel {
     }
 
     public void compileSoon() {
-        compileTimer.triggerSoon();
+        if (!compiling) compileTimer.triggerSoon();
     }
 
     public void setFunctionName(String functionName) {
-        this.functionName = functionName;
-        if (functionName != null && mappingModel.hasRecMapping()) {
-            String code = mappingModel.getRecMapping().getFunctions().get(functionName);
-            if (code == null) {
-                mappingModel.setFunction(functionName, getOriginalCode());
-            }
+        if (mappingModel.hasRecMapping()) {
+            this.mappingFunction = mappingModel.getRecMapping().getFunction(functionName);
         }
         Exec.swing(new DocumentSetter(codeDocument, getOriginalCode()));
         notifyStateChange(State.ORIGINAL);
@@ -138,8 +135,8 @@ public class FunctionCompileModel {
     // === privates
 
     private String getOriginalCode() {
-        if (functionName == null) return "// function not chosen";
-        return mappingModel.getFunctionCode(functionName);
+        if (mappingFunction == null) return "// function not chosen";
+        return mappingFunction.getUserCode();
     }
 
     private String getEditedCode() {
@@ -188,7 +185,7 @@ public class FunctionCompileModel {
         }
 
         @Override
-        public void functionChanged(MappingModel mappingModel, String name) {
+        public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             compileSoon();
         }
 
@@ -209,10 +206,10 @@ public class FunctionCompileModel {
 
         @Override
         public void run() {
-            if (functionName == null) return;
+            if (mappingFunction == null) return;
             compiling = true;
             try {
-                FunctionRunner functionRunner = new FunctionRunner(getEditedCode());
+                FunctionRunner functionRunner = new FunctionRunner();
                 List<String> outputLines = new ArrayList<String>();
                 boolean problems = false;
                 for (String line : toLines(inputDocument)) {
@@ -230,8 +227,10 @@ public class FunctionCompileModel {
                     notifyStateChange(State.ERROR);
                 }
                 else {
-                    mappingModel.setFunction(functionName, getEditedCode());
+                    mappingFunction.setGroovyCode(getEditedCode());
+                    mappingModel.notifyFunctionChanged(mappingFunction);
                     notifyStateChange(State.COMMITTED);
+// todo                   editedCode = null;
                     notifyStateChange(State.SAVED);
                 }
             }
@@ -265,8 +264,8 @@ public class FunctionCompileModel {
     private class FunctionRunner {
         private Script script;
 
-        public FunctionRunner(String code) {
-            this.script = groovyCodeResource.createFunctionScript(functionName, code);
+        public FunctionRunner() {
+            this.script = groovyCodeResource.createFunctionScript(mappingFunction, getEditedCode());
         }
 
         public Object runFunction(Object argument) throws Problem {

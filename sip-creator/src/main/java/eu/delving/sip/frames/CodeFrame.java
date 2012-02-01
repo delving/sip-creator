@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
@@ -60,7 +61,7 @@ public class CodeFrame extends FrameBase {
             }
 
             @Override
-            public void functionChanged(MappingModel mappingModel, String name) {
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
                 refresh();
             }
 

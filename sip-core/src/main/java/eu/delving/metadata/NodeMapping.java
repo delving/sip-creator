@@ -151,10 +151,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     private void toUserCode(Out out, String editedCode) {
         if (editedCode != null) {
-            indentCode(editedCode, out);
+            StringUtil.indentCode(editedCode, out);
         }
         else if (groovyCode != null) {
-            indentCode(groovyCode, out);
+            StringUtil.indentCode(groovyCode, out);
         }
         else {
             toInnerLoop(getLocalPath(), out);
@@ -192,8 +192,8 @@ public class NodeMapping implements Comparable<NodeMapping> {
         while (walk.hasNext()) {
             Map.Entry<String, String> entry = walk.next();
             out.line(String.format("'''%s''':'''%s'''%s",
-                    Sanitizer.sanitizeGroovy(entry.getKey()),
-                    Sanitizer.sanitizeGroovy(entry.getValue()),
+                    StringUtil.sanitizeGroovy(entry.getKey()),
+                    StringUtil.sanitizeGroovy(entry.getValue()),
                     walk.hasNext() ? "," : ""
             ));
         }
@@ -230,19 +230,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return String.format("[%s] => [%s]", inputPath.getTail(), outputPath.getTail());
     }
 
-    private static void indentCode(String code, Out out) {
-        indentCode(Arrays.asList(code.split("\n")), out);
-    }
-
-    private static void indentCode(List<String> code, Out out) {
-        for (String codeLine : code) {
-            int indent = codeIndent(codeLine);
-            if (indent < 0) out.in();
-            out.line(codeLine);
-            if (indent > 0) out.out();
-        }
-    }
-
     private NodeMapping getAncestorNodeMapping() {
         for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
             for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
@@ -256,15 +243,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     private String getDictionaryName() {
         return "Dict" + HASHER.getHashString(outputPath.toString()).substring(16);
-    }
-
-    private static int codeIndent(String line) {
-        int indent = 0;
-        for (char c : line.toCharArray()) {
-            if (c == '}') indent--;
-            if (c == '{') indent++;
-        }
-        return indent;
     }
 
     /**

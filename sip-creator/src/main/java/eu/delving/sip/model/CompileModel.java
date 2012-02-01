@@ -248,7 +248,7 @@ public class CompileModel {
         }
 
         @Override
-        public void functionChanged(MappingModel mappingModel, String name) {
+        public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             compileSoon();
         }
 
@@ -286,9 +286,6 @@ public class CompileModel {
             compiling = true;
             try {
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedOutputPath(), editedCode);
-
-                System.out.println(mappingRunner.getCode()); // todo: remove
-
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
                     feedback.say("Compiled code for " + type);

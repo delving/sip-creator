@@ -29,10 +29,7 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A record mapping describes how an input format is transformed into an output format in the form of a Groovy builder,
@@ -59,7 +56,7 @@ public class RecMapping {
     Map<String, String> facts = new HashMap<String, String>();
 
     @XStreamAlias("functions")
-    Map<String, String> functions = new HashMap<String, String>();
+    List<MappingFunction> functions = new ArrayList<MappingFunction>();
 
     @XStreamAlias("node-mappings")
     List<NodeMapping> nodeMappings;
@@ -102,8 +99,15 @@ public class RecMapping {
         return facts;
     }
 
-    public Map<String, String> getFunctions() {
+    public List<MappingFunction> getFunctions() {
         return functions;
+    }
+    
+    public MappingFunction getFunction(String name) {
+        for (MappingFunction existing : functions) if (existing.name.equals(name)) return existing;
+        MappingFunction fresh = new MappingFunction(name);
+        functions.add(fresh);
+        return fresh;
     }
 
     public RecDefTree getRecDefTree() {

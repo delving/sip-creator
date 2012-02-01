@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -141,7 +142,10 @@ public class FunctionFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             String name = JOptionPane.showInputDialog(FunctionFrame.this, "Please enter the function name");
             if (name != null) {
-                sipModel.getMappingModel().setFunction(name.trim(), "it");
+                // todo: test the name with a regex
+                // todo: check it's new
+                MappingFunction mappingFunction = sipModel.getMappingModel().getRecMapping().getFunction(name.trim());
+                sipModel.getMappingModel().notifyFunctionChanged(mappingFunction);
             }
         }
     }
@@ -155,7 +159,7 @@ public class FunctionFrame extends FrameBase {
                 names.clear();
                 fireIntervalRemoved(this, 0, size);
             }
-            names.addAll(recMapping.getFunctions().keySet());
+            for (MappingFunction function : recMapping.getFunctions()) names.add(function.name);
             Collections.sort(names);
             if (!names.isEmpty()) {
                 fireIntervalRemoved(this, 0, getSize());
