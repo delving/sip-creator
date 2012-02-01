@@ -218,8 +218,8 @@ public class FunctionCompileModel {
                 boolean problems = false;
                 for (String line : toLines(inputDocument)) {
                     try {
-                        String output = functionRunner.runFunction(line);
-                        outputLines.add(output);
+                        Object output = functionRunner.runFunction(line);
+                        addToOutput(outputLines, output);
                     }
                     catch (Problem p) {
                         outputLines.add(p.getMessage());
@@ -245,6 +245,15 @@ public class FunctionCompileModel {
             }
         }
 
+        private void addToOutput(List<String> outputLines, Object output) {
+            if (output instanceof List) {
+                for (Object member : (List) output) addToOutput(outputLines, member);
+            }
+            else {
+                outputLines.add(output.toString());
+            }
+        }
+
         private void compilationComplete(final String result) {
             Exec.swing(new DocumentSetter(outputDocument, result));
         }
@@ -261,15 +270,15 @@ public class FunctionCompileModel {
             this.script = groovyCodeResource.createFunctionScript(functionName, code);
         }
 
-        public String runFunction(Object argument) throws Problem {
+        public Object runFunction(Object argument) throws Problem {
             if (argument == null) throw new RuntimeException("Null input");
             try {
                 Binding binding = new Binding();
                 binding.setVariable("param", argument);
                 script.setBinding(binding);
                 Object result = script.run();
-                if (result == null) return "null";
-                return result.toString();
+                if (result == null) return "";
+                return result;
             }
             catch (DiscardRecordException e) {
                 throw e;

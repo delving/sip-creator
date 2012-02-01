@@ -172,12 +172,29 @@ public class NodeBuilder extends BuilderSupport {
             cr.string = result.toString();
         }
         else if (result instanceof List) {
-            cr.list = (List) result;
+            cr.list = unpack((List) result);
         }
         else if (result instanceof Object[]) {
-            cr.list = Arrays.asList((Object[])result);
+            cr.list = unpack(Arrays.asList((Object[])result));
         }
         return cr;
+    }
+    
+    private List unpack(List list) {
+        List result = new ArrayList();
+        unpack(list, result);
+        return result;
+    }
+    
+    private void unpack(List from, List to) {
+        for (Object member : from) {
+            if (member instanceof List) {
+                unpack((List) member, to);
+            }
+            else {
+                to.add(member);
+            }
+        }
     }
 
     private static class ClosureResult {
