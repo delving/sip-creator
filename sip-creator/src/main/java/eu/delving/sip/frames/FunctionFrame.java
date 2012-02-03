@@ -25,16 +25,14 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,6 +91,7 @@ public class FunctionFrame extends FrameBase {
                 });
             }
         });
+        sipModel.getFunctionCompileModel().addListener(new ModelStateListener());
     }
 
     @Override
@@ -193,4 +192,30 @@ public class FunctionFrame extends FrameBase {
             return names.contains(name);
         }
     }
+
+    private class ModelStateListener implements FunctionCompileModel.Listener {
+
+        @Override
+        public void stateChanged(final FunctionCompileModel.State state) {
+            Exec.swing(new Runnable() {
+
+                @Override
+                public void run() {
+                    switch (state) {
+                        case ORIGINAL:
+                            codeArea.setBackground(new Color(1.0f, 1.0f, 1.0f));
+                            break;
+                        case EDITED:
+                            codeArea.setBackground(new Color(1.0f, 1.0f, 0.9f));
+                            break;
+                        case ERROR:
+                            codeArea.setBackground(new Color(1.0f, 0.9f, 0.9f));
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
+
 }

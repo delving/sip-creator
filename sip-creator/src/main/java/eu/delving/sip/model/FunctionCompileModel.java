@@ -71,12 +71,8 @@ public class FunctionCompileModel {
 
     public enum State {
         ORIGINAL,
-        UNCOMPILED,
-        SAVED,
         EDITED,
-        ERROR,
-        COMMITTED,
-        REGENERATED
+        ERROR
     }
 
     public FunctionCompileModel(MappingModel mappingModel, Feedback feedback, GroovyCodeResource groovyCodeResource) {
@@ -93,6 +89,7 @@ public class FunctionCompileModel {
             @Override
             public void run() {
                 functionRunner = null;
+                notifyStateChange(State.EDITED);
                 trigger(COMPILE_DELAY);
             }
         });
@@ -105,7 +102,7 @@ public class FunctionCompileModel {
         Exec.swing(new DocumentSetter(inputDocument, getSampleInput(), true));
         Exec.swing(new DocumentSetter(codeDocument, getOriginalCode(), true));
         notifyStateChange(State.ORIGINAL);
-        trigger(RUN_DELAY);
+        trigger(COMPILE_DELAY);
     }
 
     public Document getInputDocument() {
@@ -188,9 +185,7 @@ public class FunctionCompileModel {
                     mappingFunction.setSampleInput(documentToString(inputDocument));
                     mappingFunction.setGroovyCode(documentToString(codeDocument));
                     mappingModel.notifyFunctionChanged(mappingFunction);
-                    notifyStateChange(State.COMMITTED);
-// todo                   editedCode = null;
-                    notifyStateChange(State.SAVED);
+                    notifyStateChange(State.ORIGINAL);
                 }
             }
             catch (Exception e) {
@@ -347,17 +342,21 @@ public class FunctionCompileModel {
 
         @Override
         public void insertUpdate(DocumentEvent documentEvent) {
-            if (!ignoreDocChanges) run();
+            go();
         }
 
         @Override
         public void removeUpdate(DocumentEvent documentEvent) {
-            if (!ignoreDocChanges) run();
+            go();
         }
 
         @Override
         public void changedUpdate(DocumentEvent documentEvent) {
-            if (!ignoreDocChanges) run();
+            go();
+        }
+
+        private void go() {
+            if (!ignoreDocChanges) Exec.work(this);
         }
     }
 
