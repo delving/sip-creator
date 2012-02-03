@@ -23,8 +23,10 @@ package eu.delving.metadata;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,6 +42,9 @@ public class MappingFunction implements Comparable<MappingFunction> {
     @XStreamAsAttribute
     public String name;
 
+    @XStreamAlias("sample-input")
+    public List<String> sampleInput;
+    
     @XStreamAlias("groovy-code")
     public List<String> groovyCode;
 
@@ -50,13 +55,16 @@ public class MappingFunction implements Comparable<MappingFunction> {
         this.name = name;
     }
 
-    public void addCodeLine(String line) {
-        if (groovyCode == null) groovyCode = new ArrayList<String>();
-        line = line.trim();
-        if (!line.isEmpty()) groovyCode.add(line);
+    public void setSampleInput(String sampleInput) {
+        this.sampleInput = Arrays.asList(sampleInput.split("\n"));
     }
 
-    public boolean codeLooksLike(String codeString) { // todo: use this!
+    public void setGroovyCode(String groovyCode) {
+        this.groovyCode = null;
+        for (String line : groovyCode.split("\n")) addCodeLine(line);
+    }
+
+    public boolean isCodeLike(String codeString) {
         if (groovyCode == null) return false;
         Iterator<String> walk = groovyCode.iterator();
         for (String line : codeString.split("\n")) {
@@ -68,9 +76,8 @@ public class MappingFunction implements Comparable<MappingFunction> {
         return !walk.hasNext();
     }
 
-    public void setGroovyCode(String groovyCode) {
-        this.groovyCode = null;
-        for (String line : groovyCode.split("\n")) addCodeLine(line);
+    public String getSampleInputString() {
+        return StringUtils.join(sampleInput, '\n');
     }
 
     public String getUserCode(String editedCode) {
@@ -110,6 +117,13 @@ public class MappingFunction implements Comparable<MappingFunction> {
             out.line("it");
         }
     }
+
+    private void addCodeLine(String line) {
+        if (groovyCode == null) groovyCode = new ArrayList<String>();
+        line = line.trim();
+        if (!line.isEmpty()) groovyCode.add(line);
+    }
+
 
     public String toString() {
         return name + "(it)";

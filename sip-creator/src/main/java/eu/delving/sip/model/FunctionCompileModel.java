@@ -24,8 +24,6 @@ package eu.delving.sip.model;
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
@@ -57,17 +55,19 @@ import java.util.regex.Pattern;
  */
 
 public class FunctionCompileModel {
+    public final static int RUN_DELAY = 100;
     public final static int COMPILE_DELAY = 500;
     private MappingModel mappingModel;
     private Document inputDocument = new PlainDocument();
     private Document codeDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
-    private CompileTimer compileTimer = new CompileTimer();
+    private TriggerTimer triggerTimer = new TriggerTimer();
     private GroovyCodeResource groovyCodeResource;
+    private FunctionRunner functionRunner;
     private Feedback feedback;
-    private volatile boolean compiling;
-    private MappingModelEar mappingModelEar = new MappingModelEar();
+    private volatile boolean busy;
     private MappingFunction mappingFunction;
+    private boolean ignoreDocChanges;
 
     public enum State {
         ORIGINAL,
@@ -83,41 +83,29 @@ public class FunctionCompileModel {
         this.mappingModel = mappingModel;
         this.feedback = feedback;
         this.groovyCodeResource = groovyCodeResource;
-        DocumentListener documentTrigger = new DocumentListener() {
+        this.inputDocument.addDocumentListener(new DocChangeListener() {
             @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                compileSoon();
+            public void run() {
+                trigger(RUN_DELAY);
             }
-
+        });
+        this.codeDocument.addDocumentListener(new DocChangeListener() {
             @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                compileSoon();
+            public void run() {
+                functionRunner = null;
+                trigger(COMPILE_DELAY);
             }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                compileSoon();
-            }
-        };
-        this.inputDocument.addDocumentListener(documentTrigger);
-        this.codeDocument.addDocumentListener(documentTrigger);
-    }
-
-    public MappingModel.ChangeListener getMappingModelChangeListener() {
-        return mappingModelEar;
-    }
-
-    public void compileSoon() {
-        if (!compiling) compileTimer.triggerSoon();
+        });
     }
 
     public void setFunctionName(String functionName) {
         if (mappingModel.hasRecMapping()) {
             this.mappingFunction = mappingModel.getRecMapping().getFunction(functionName);
         }
-        Exec.swing(new DocumentSetter(codeDocument, getOriginalCode()));
+        Exec.swing(new DocumentSetter(inputDocument, getSampleInput(), true));
+        Exec.swing(new DocumentSetter(codeDocument, getOriginalCode(), true));
         notifyStateChange(State.ORIGINAL);
-        compileSoon();
+        trigger(RUN_DELAY);
     }
 
     public Document getInputDocument() {
@@ -133,24 +121,19 @@ public class FunctionCompileModel {
     }
 
     // === privates
+    
+    private String getSampleInput() {
+        if (mappingFunction == null) return "no input";
+        return mappingFunction.getSampleInputString();
+    }
 
     private String getOriginalCode() {
         if (mappingFunction == null) return "// function not chosen";
         return mappingFunction.getUserCode();
     }
 
-    private String getEditedCode() {
-        return toString(codeDocument);
-    }
-
-    private boolean isCodeChanged() {
-        List<String> functionLines = toLines(getOriginalCode());
-        List<String> editedLines = toLines(inputDocument);
-        if (functionLines.size() != editedLines.size()) return true;
-        for (int walk = 0; walk < functionLines.size(); walk++) {
-            if (!functionLines.get(walk).equals(editedLines.get(walk))) return false;
-        }
-        return true;
+    private void trigger(int millis) {
+        if (!busy) triggerTimer.triggerSoon(millis);
     }
 
     private static List<String> toLines(String code) {
@@ -163,7 +146,7 @@ public class FunctionCompileModel {
         return lines;
     }
 
-    private static String toString(Document document) {
+    private static String documentToString(Document document) {
         try {
             int length = document.getLength();
             return document.getText(0, length);
@@ -174,42 +157,17 @@ public class FunctionCompileModel {
     }
 
     private static List<String> toLines(Document document) {
-        return toLines(toString(document));
+        return toLines(documentToString(document));
     }
 
-    private class MappingModelEar implements MappingModel.ChangeListener {
-
-        @Override
-        public void factChanged(MappingModel mappingModel, String name) {
-            compileSoon();
-        }
-
-        @Override
-        public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-            compileSoon();
-        }
-
-        @Override
-        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        }
-
-        @Override
-        public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        }
-
-        @Override
-        public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        }
-    }
-
-    private class CompilationRunner implements Runnable {
+    private class RunJob implements Runnable {
 
         @Override
         public void run() {
             if (mappingFunction == null) return;
-            compiling = true;
+            busy = true;
             try {
-                FunctionRunner functionRunner = new FunctionRunner();
+                if (functionRunner == null) functionRunner = new FunctionRunner();
                 List<String> outputLines = new ArrayList<String>();
                 boolean problems = false;
                 for (String line : toLines(inputDocument)) {
@@ -227,7 +185,8 @@ public class FunctionCompileModel {
                     notifyStateChange(State.ERROR);
                 }
                 else {
-                    mappingFunction.setGroovyCode(getEditedCode());
+                    mappingFunction.setSampleInput(documentToString(inputDocument));
+                    mappingFunction.setGroovyCode(documentToString(codeDocument));
                     mappingModel.notifyFunctionChanged(mappingFunction);
                     notifyStateChange(State.COMMITTED);
 // todo                   editedCode = null;
@@ -235,11 +194,11 @@ public class FunctionCompileModel {
                 }
             }
             catch (Exception e) {
-                compilationComplete(e.getMessage());
+                compilationComplete(e.toString());
                 notifyStateChange(State.ERROR);
             }
             finally {
-                compiling = false;
+                busy = false;
             }
         }
 
@@ -253,7 +212,7 @@ public class FunctionCompileModel {
         }
 
         private void compilationComplete(final String result) {
-            Exec.swing(new DocumentSetter(outputDocument, result));
+            Exec.swing(new DocumentSetter(outputDocument, result, false));
         }
 
         public String toString() {
@@ -265,7 +224,7 @@ public class FunctionCompileModel {
         private Script script;
 
         public FunctionRunner() {
-            this.script = groovyCodeResource.createFunctionScript(mappingFunction, getEditedCode());
+            this.script = groovyCodeResource.createFunctionScript(mappingFunction, documentToString(codeDocument));
         }
 
         public Object runFunction(Object argument) throws Problem {
@@ -316,7 +275,7 @@ public class FunctionCompileModel {
             if (matcher.find()) {
                 StringBuilder sb = new StringBuilder();
                 int lineNumber = Integer.parseInt(matcher.group(1));
-                for (String line : toLines(getEditedCode())) {
+                for (String line : toLines(documentToString(codeDocument))) {
                     lineNumber--;
                     if (Math.abs(lineNumber) <= 2) {
                         sb.append(lineNumber == 0 ? ">>>" : "   ");
@@ -335,10 +294,12 @@ public class FunctionCompileModel {
 
         private Document document;
         private String content;
+        private boolean ignore;
 
-        private DocumentSetter(Document document, String content) {
+        private DocumentSetter(Document document, String content, boolean ignore) {
             this.document = document;
             this.content = content;
+            this.ignore = ignore;
         }
 
         private DocumentSetter(Document document, List<String> content) {
@@ -350,10 +311,12 @@ public class FunctionCompileModel {
 
         @Override
         public void run() {
+            ignoreDocChanges = ignore;
             int docLength = document.getLength();
             try {
                 document.remove(0, docLength);
                 document.insertString(0, content, null);
+                ignoreDocChanges = false;
             }
             catch (BadLocationException e) {
                 throw new RuntimeException(e);
@@ -361,21 +324,40 @@ public class FunctionCompileModel {
         }
     }
 
-    private class CompileTimer implements ActionListener {
-        private Timer timer = new Timer(COMPILE_DELAY, this);
+    private class TriggerTimer implements ActionListener {
+        private Timer timer = new Timer(0, this);
 
-        private CompileTimer() {
+        private TriggerTimer() {
             timer.setRepeats(false);
         }
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (compiling) return;
-            Exec.work(new CompilationRunner());
+            if (busy) return;
+            Exec.work(new RunJob());
         }
 
-        public void triggerSoon() {
+        public void triggerSoon(int millis) {
+            timer.setInitialDelay(millis);
             timer.restart();
+        }
+    }
+    
+    private abstract class DocChangeListener implements DocumentListener, Runnable {
+
+        @Override
+        public void insertUpdate(DocumentEvent documentEvent) {
+            if (!ignoreDocChanges) run();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent documentEvent) {
+            if (!ignoreDocChanges) run();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent documentEvent) {
+            if (!ignoreDocChanges) run();
         }
     }
 

@@ -39,6 +39,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * This frame shows the entire builder that is responsible for transforming the input to output,
@@ -48,6 +49,7 @@ import java.util.List;
  */
 
 public class FunctionFrame extends FrameBase {
+    private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 18);
     private FunctionListModel functionListModel = new FunctionListModel();
     private JList functionList = new JList(functionListModel);
@@ -140,12 +142,23 @@ public class FunctionFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            String name = JOptionPane.showInputDialog(FunctionFrame.this, "Please enter the function name");
+            final String name = JOptionPane.showInputDialog(FunctionFrame.this, "Please enter the function name");
             if (name != null) {
-                // todo: test the name with a regex
-                // todo: check it's new
-                MappingFunction mappingFunction = sipModel.getMappingModel().getRecMapping().getFunction(name.trim());
-                sipModel.getMappingModel().notifyFunctionChanged(mappingFunction);
+                if (!FUNCTION_NAME.matcher(name).matches()) {
+                    JOptionPane.showMessageDialog(FunctionFrame.this, "Sorry, the name must be of the form 'aaaaa' or 'aaaaAaaa'");
+                    return;
+                }
+                if (functionListModel.contains(name)) {
+                    JOptionPane.showMessageDialog(FunctionFrame.this, "Sorry, but this function name already exists");
+                    return;
+                }
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        MappingFunction mappingFunction = sipModel.getMappingModel().getRecMapping().getFunction(name.trim());
+                        sipModel.getMappingModel().notifyFunctionChanged(mappingFunction);
+                    }
+                });
             }
         }
     }
@@ -174,6 +187,10 @@ public class FunctionFrame extends FrameBase {
         @Override
         public Object getElementAt(int i) {
             return names.get(i);
+        }
+
+        public boolean contains(String name) {
+            return names.contains(name);
         }
     }
 }

@@ -95,7 +95,6 @@ public class SipModel {
         parseListeners.add(fieldCompileModel.getParseEar());
         createModel.addListener(fieldCompileModel.getCreateModelEar());
         mappingModel.addSetListener(reportFileModel);
-        mappingModel.addChangeListener(functionCompileModel.getMappingModelChangeListener());
         mappingModel.addSetListener(recordCompileModel.getMappingModelSetListener());
         mappingModel.addChangeListener(recordCompileModel.getMappingModelChangeListener());
         mappingModel.addSetListener(fieldCompileModel.getMappingModelSetListener());
