@@ -27,17 +27,17 @@ import eu.delving.sip.base.Exec;
 import groovy.util.Node;
 
 import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
 
 /**
  * This model is behind the scenario with input data, groovy code, and output record
@@ -45,24 +45,25 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class CompileModel {
+public class MappingCompileModel {
+    public final static int RUN_DELAY = 100;
     public final static int COMPILE_DELAY = 500;
     private RecMapping recMapping;
     private NodeMapping selectedNodeMapping;
     private MetadataRecord metadataRecord;
     private Document codeDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
-    private CompileTimer compileTimer = new CompileTimer();
+    private TriggerTimer triggerTimer = new TriggerTimer();
     private Type type;
     private RecordValidator recordValidator;
-    private String editedCode;
     private GroovyCodeResource groovyCodeResource;
     private Feedback feedback;
     private boolean enabled;
     private volatile boolean compiling;
     private ParseEar parseEar = new ParseEar();
+    private boolean ignoreDocChanges;
+    private MappingRunner mappingRunner;
     private MappingModelEar mappingModelEar = new MappingModelEar();
-    private CreateModelEar createModelEar = new CreateModelEar();
 
     public enum Type {
         RECORD("record mapping"),
@@ -81,35 +82,40 @@ public class CompileModel {
 
     public enum State {
         ORIGINAL,
-        UNCOMPILED,
         SAVED,
         EDITED,
         ERROR,
-        COMMITTED,
-        REGENERATED
     }
 
-    public CompileModel(Type type, Feedback feedback, GroovyCodeResource groovyCodeResource) {
+    public MappingCompileModel(Type type, Feedback feedback, GroovyCodeResource groovyCodeResource) {
         this.type = type;
         this.feedback = feedback;
         this.groovyCodeResource = groovyCodeResource;
+        this.codeDocument.addDocumentListener(new DocChangeListener() {
+            @Override
+            public void run() {
+                triggerCompile();
+            }
+        });
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if (enabled) compileSoon();
+        if (enabled) triggerCompile();
+    }
+
+    public void setNodeMapping(NodeMapping nodeMapping) {
+        this.selectedNodeMapping = nodeMapping;
+        Exec.swing(new DocumentSetter(codeDocument, getGeneratedCode(), false));
+        notifyStateChange(State.ORIGINAL);
     }
 
     public MappingModel.ChangeListener getMappingModelChangeListener() {
         return mappingModelEar;
     }
-    
+
     public MappingModel.SetListener getMappingModelSetListener() {
         return mappingModelEar;
-    }
-
-    public CreateModel.Listener getCreateModelEar() {
-        return createModelEar;
     }
 
     public SipModel.ParseListener getParseEar() {
@@ -118,31 +124,6 @@ public class CompileModel {
 
     public void setRecordValidator(RecordValidator recordValidator) {
         this.recordValidator = recordValidator;
-    }
-
-    public void refreshCode() {
-        Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
-        compileSoon();
-    }
-
-    public void compileSoon() {
-        if (enabled) {
-            compileTimer.triggerSoon();
-        }
-    }
-
-    public void setCode(String code) {
-        if (selectedNodeMapping != null) {
-            if (!selectedNodeMapping.codeLooksLike(code)) {
-                editedCode = code;
-                notifyStateChange(State.EDITED);
-            }
-            else {
-                editedCode = null;
-                notifyStateChange(State.SAVED);
-            }
-            compileSoon();
-        }
     }
 
     public Document getCodeDocument() {
@@ -159,6 +140,27 @@ public class CompileModel {
 
     // === privates
 
+    private static String documentToString(Document document) {
+        try {
+            int length = document.getLength();
+            return document.getText(0, length);
+        }
+        catch (BadLocationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void triggerCompile() {
+        if (!enabled) return;
+        mappingRunner = null;
+        triggerTimer.triggerSoon(COMPILE_DELAY);
+    }
+
+    private void triggerRun() {
+        if (!enabled) return;
+        triggerTimer.triggerSoon(RUN_DELAY);
+    }
+
     private Path getSelectedOutputPath() {
         switch (type) {
             case RECORD:
@@ -170,21 +172,21 @@ public class CompileModel {
         }
     }
 
-    private String getDisplayCode() {
+    private String getGeneratedCode() {
         switch (type) {
             case RECORD:
-                if (recMapping != null) {
-                    return recMapping.toCode(null, null);
+                if (recMapping == null) {
+                    return "// no mapping";
                 }
                 else {
-                    return "// no mapping";
+                    return recMapping.toCode(null, null);
                 }
             case FIELD:
                 if (selectedNodeMapping == null || recMapping == null) {
                     return "// no code";
                 }
                 else {
-                    return selectedNodeMapping.getUserCode(editedCode);
+                    return selectedNodeMapping.getUserCode(null);
                 }
             default:
                 throw new RuntimeException();
@@ -197,40 +199,11 @@ public class CompileModel {
         public void updatedRecord(MetadataRecord updated) {
             metadataRecord = updated;
             if (metadataRecord != null) {
-                compileSoon();
+                triggerRun();
             }
             else {
-                Exec.swing(new DocumentSetter(outputDocument, ""));
+                Exec.swing(new DocumentSetter(outputDocument, "No input", false));
             }
-        }
-    }
-
-    private class CreateModelEar implements CreateModel.Listener {
-
-        @Override
-        public void statsTreeNodeSet(CreateModel createModel) {
-        }
-
-        @Override
-        public void recDefTreeNodeSet(CreateModel createModel) {
-        }
-
-        @Override
-        public void nodeMappingSet(CreateModel createModel) {
-            if (createModel.getNodeMapping() == selectedNodeMapping) {
-                if (selectedNodeMapping != null) notifyStateChange(State.REGENERATED);
-            }
-            else {
-                selectedNodeMapping = createModel.getNodeMapping();
-                notifyStateChange(State.ORIGINAL);
-            }
-            Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
-            compileSoon();
-        }
-
-        @Override
-        public void nodeMappingChanged(CreateModel createModel) {
-            // todo: may need to create dictionary lookup code or freshly generate user code
         }
     }
 
@@ -254,81 +227,55 @@ public class CompileModel {
 
         @Override
         public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            compileSoon();
+            if (type == RECORD) compileSoon();
         }
 
         @Override
         public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            editedCode = null;
-            selectedNodeMapping = nodeMapping;
-            Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
-            notifyStateChange(State.ORIGINAL);
-            compileSoon();
+            if (type == RECORD) compileSoon();
         }
 
         @Override
         public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            editedCode = null;
-            selectedNodeMapping = null; // todo: test whether it's the same one??
-            Exec.swing(new DocumentSetter(codeDocument, getDisplayCode()));
-            notifyStateChange(State.ORIGINAL);
-            compileSoon();
+            if (type == RECORD) {
+                compileSoon();
+            }
+            else if (selectedNodeMapping == nodeMapping) {
+                setNodeMapping(null);
+            }
+        }
+
+        private void compileSoon() {
+            triggerCompile();
         }
     }
 
-    private class CompilationRunner implements Runnable {
+    private class MappingJob implements Runnable {
 
         @Override
         public void run() {
-            if (metadataRecord == null) {
-                return;
-            }
+            if (metadataRecord == null) return;
             compiling = true;
             try {
-                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedOutputPath(), editedCode);
+                if (mappingRunner == null) {
+                    feedback.say("Compiling code for " + type);
+                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedOutputPath(), documentToString(codeDocument));
+                }
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
-                    feedback.say("Compiled code for " + type);
-                    if (null == outputNode) {
-                        return;
-                    }
+                    if (outputNode == null) return;
                     if (recordValidator != null) {
                         recordValidator.validateRecord(outputNode, metadataRecord.getRecordNumber());
-                        String output = XmlNodePrinter.serialize(outputNode);
-                        compilationComplete(output);
+                        compilationComplete(XmlNodePrinter.serialize(outputNode));
                     }
                     else {
-                        String output = XmlNodePrinter.serialize(outputNode);
-                        compilationComplete(output);
-                        if (editedCode == null) {
-                            notifyStateChange(State.SAVED);
-                        }
-                        else {
-                            if (selectedNodeMapping != null) {
-                                selectedNodeMapping.setGroovyCode(editedCode);
-                                notifyStateChange(State.COMMITTED);
-                                editedCode = null;
-                                notifyStateChange(State.SAVED);
-                            }
-                            else {
-                                notifyStateChange(State.EDITED);
-                            }
-                        }
+                        compilationComplete(XmlNodePrinter.serialize(outputNode));
+                        setMappingCode();
                     }
                 }
                 catch (DiscardRecordException e) {
                     compilationComplete(e.getMessage());
-                    if (selectedNodeMapping != null) {
-                        if (editedCode != null) {
-                            selectedNodeMapping.setGroovyCode(editedCode);
-                            notifyStateChange(State.COMMITTED);
-                            editedCode = null;
-                        }
-                        notifyStateChange(State.SAVED);
-                    }
-                    else {
-                        notifyStateChange(State.EDITED);
-                    }
+                    setMappingCode();
                 }
             }
             catch (Exception e) {
@@ -340,8 +287,18 @@ public class CompileModel {
             }
         }
 
+        private void setMappingCode() {
+            if (selectedNodeMapping != null) {
+                String editedCode = documentToString(codeDocument);
+                if (!selectedNodeMapping.codeLooksLike(editedCode)) {
+                    selectedNodeMapping.setGroovyCode(editedCode);
+                    notifyStateChange(State.SAVED);
+                }
+            }
+        }
+
         private void compilationComplete(final String result) {
-            Exec.swing(new DocumentSetter(outputDocument, result));
+            Exec.swing(new DocumentSetter(outputDocument, result, false));
         }
 
         public String toString() {
@@ -353,47 +310,33 @@ public class CompileModel {
 
         private Document document;
         private String content;
+        private boolean ignore;
 
-        private DocumentSetter(Document document, String content) {
+        private DocumentSetter(Document document, String content, boolean ignore) {
             this.document = document;
             this.content = content;
+            this.ignore = ignore;
         }
 
         @Override
         public void run() {
-            if (document instanceof HTMLDocument) {
-                HTMLDocument htmlDocument = (HTMLDocument) document;
-                int docLength = document.getLength();
-                try {
-                    document.remove(0, docLength);
-                    HTMLEditorKit.ParserCallback callback = htmlDocument.getReader(0);
-                    htmlDocument.getParser().parse(new StringReader(content), callback, true);
-                    callback.flush();
-                }
-                catch (BadLocationException e) {
-                    throw new RuntimeException(e);
-                }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            ignoreDocChanges = ignore;
+            int docLength = document.getLength();
+            try {
+                document.remove(0, docLength);
+                document.insertString(0, content, null);
+                ignoreDocChanges = false;
             }
-            else {
-                int docLength = document.getLength();
-                try {
-                    document.remove(0, docLength);
-                    document.insertString(0, content, null);
-                }
-                catch (BadLocationException e) {
-                    throw new RuntimeException(e);
-                }
+            catch (BadLocationException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    private class CompileTimer implements ActionListener {
+    private class TriggerTimer implements ActionListener {
         private Timer timer = new Timer(COMPILE_DELAY, this);
 
-        private CompileTimer() {
+        private TriggerTimer() {
             timer.setRepeats(false);
         }
 
@@ -409,13 +352,37 @@ public class CompileModel {
                     throw new RuntimeException(e);
                 }
             }
-            Exec.work(new CompilationRunner());
+            Exec.work(new MappingJob());
         }
 
-        public void triggerSoon() {
+        public void triggerSoon(int delay) {
+            timer.setInitialDelay(delay);
             timer.restart();
         }
     }
+
+    private abstract class DocChangeListener implements DocumentListener, Runnable {
+
+        @Override
+        public void insertUpdate(DocumentEvent documentEvent) {
+            go();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent documentEvent) {
+            go();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent documentEvent) {
+            go();
+        }
+
+        private void go() {
+            if (!ignoreDocChanges) Exec.work(this);
+        }
+    }
+
 
     private void notifyStateChange(final State state) {
         for (Listener listener : listeners) listener.stateChanged(state);

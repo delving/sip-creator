@@ -63,17 +63,14 @@ public class RecMappingFrame extends FrameBase {
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void factChanged(MappingModel mappingModel, String name) {
-                updateList();
             }
 
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-                updateList();
             }
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                updateList();
             }
 
             @Override
@@ -111,6 +108,7 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void valueChanged(ListSelectionEvent event) {
+            if (event.getValueIsAdjusting()) return;
             final NodeMapping selected = (NodeMapping)nodeMappingList.getSelectedValue();
             if (selected != null) {
                 Exec.work(new Runnable() {

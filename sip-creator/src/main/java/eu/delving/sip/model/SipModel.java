@@ -56,8 +56,8 @@ public class SipModel {
     private Preferences preferences = Preferences.userNodeForPackage(getClass());
     private Feedback feedback;
     private FunctionCompileModel functionCompileModel;
-    private CompileModel recordCompileModel;
-    private CompileModel fieldCompileModel;
+    private MappingCompileModel recordCompileModel;
+    private MappingCompileModel fieldCompileModel;
     private MetadataParser metadataParser;
     private StatsModel statsModel;
     private DataSetModel dataSetModel = new DataSetModel();
@@ -89,11 +89,10 @@ public class SipModel {
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
         functionCompileModel = new FunctionCompileModel(mappingModel, feedback, groovyCodeResource);
-        recordCompileModel = new CompileModel(CompileModel.Type.RECORD, feedback, groovyCodeResource);
-        fieldCompileModel = new CompileModel(CompileModel.Type.FIELD, feedback, groovyCodeResource);
+        recordCompileModel = new MappingCompileModel(MappingCompileModel.Type.RECORD, feedback, groovyCodeResource);
+        fieldCompileModel = new MappingCompileModel(MappingCompileModel.Type.FIELD, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel.getParseEar());
         parseListeners.add(fieldCompileModel.getParseEar());
-        createModel.addListener(fieldCompileModel.getCreateModelEar());
         mappingModel.addSetListener(reportFileModel);
         mappingModel.addSetListener(recordCompileModel.getMappingModelSetListener());
         mappingModel.addChangeListener(recordCompileModel.getMappingModelChangeListener());
@@ -159,16 +158,6 @@ public class SipModel {
                 }
                 catch (StorageException e) {
                     feedback.alert("Unable to delete converted source file", e);
-                }
-            }
-        });
-        fieldCompileModel.addListener(new CompileModel.Listener() {
-            @Override
-            public void stateChanged(CompileModel.State state) {
-                switch (state) {
-                    case COMMITTED:
-                    case REGENERATED:
-// todo                       mappingModel.notifySelectedFieldMappingChange();
                 }
             }
         });
@@ -254,11 +243,11 @@ public class SipModel {
         return functionCompileModel;
     }
 
-    public CompileModel getRecordCompileModel() {
+    public MappingCompileModel getRecordCompileModel() {
         return recordCompileModel;
     }
 
-    public CompileModel getFieldCompileModel() {
+    public MappingCompileModel getFieldCompileModel() {
         return fieldCompileModel;
     }
 

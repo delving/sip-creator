@@ -26,8 +26,8 @@ import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.menus.EditHistory;
-import eu.delving.sip.model.CompileModel;
 import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -142,51 +142,12 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void nodeMappingSet(CreateModel createModel) {
                 contextVarModel.setList(createModel.getNodeMapping());
+                sipModel.getFieldCompileModel().setNodeMapping(createModel.getNodeMapping());
                 groovyCodeArea.setEditable(createModel.getNodeMapping() != null && createModel.getNodeMapping().isUserCodeEditable());
             }
 
             @Override
             public void nodeMappingChanged(CreateModel createModel) {
-            }
-        });
-        sipModel.getFieldCompileModel().getCodeDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                setCode();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                setCode();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                setCode();
-            }
-
-            private void setCode() {
-                Exec.work(new Runnable() {
-                    @Override
-                    public void run() {
-                        sipModel.getFieldCompileModel().setCode(groovyCodeArea.getText());
-                    }
-                });
-            }
-        });
-        groovyCodeArea.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                Exec.work(new Runnable() {
-                    @Override
-                    public void run() {
-                        sipModel.getRecordCompileModel().refreshCode(); // todo: somebody else do this?
-                    }
-                });
             }
         });
         sipModel.getFieldCompileModel().addListener(new ModelStateListener());
@@ -246,10 +207,10 @@ public class FieldMappingFrame extends FrameBase {
         }
     }
 
-    private class ModelStateListener implements CompileModel.Listener {
+    private class ModelStateListener implements MappingCompileModel.Listener {
 
         @Override
-        public void stateChanged(final CompileModel.State state) {
+        public void stateChanged(final MappingCompileModel.State state) {
             Exec.swing(new Runnable() {
 
                 @Override
@@ -259,7 +220,6 @@ public class FieldMappingFrame extends FrameBase {
                             editHistory.discardAllEdits();
                             // fall through
                         case SAVED:
-                        case UNCOMPILED:
                             groovyCodeArea.setBackground(new Color(1.0f, 1.0f, 1.0f));
                             break;
                         case EDITED:
@@ -267,9 +227,6 @@ public class FieldMappingFrame extends FrameBase {
                             break;
                         case ERROR:
                             groovyCodeArea.setBackground(new Color(1.0f, 0.9f, 0.9f));
-                            break;
-                        case COMMITTED:
-                            groovyCodeArea.setBackground(new Color(0.9f, 1.0f, 0.9f));
                             break;
                     }
                 }

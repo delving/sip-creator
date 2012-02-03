@@ -76,7 +76,7 @@ public class CreateFrame extends FrameBase {
 
             @Override
             public void nodeMappingChanged(CreateModel createModel) {
-                // todo: maybe do some update, either here or in CompileModel
+                // todo: maybe do some update, either here or in MappingCompileModel
             }
         });
     }
