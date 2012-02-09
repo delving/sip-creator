@@ -56,10 +56,10 @@ public class RecordMapping {
     long normalizeTime;
 
     @XStreamAlias("facts")
-    Map<String, String> facts = new HashMap<String, String>();
+    Map<String, String> facts = new TreeMap<String, String>();
 
     @XStreamAlias("field-mappings")
-    Map<String, FieldMapping> fieldMappings = new HashMap<String, FieldMapping>();
+    Map<String, FieldMapping> fieldMappings = new TreeMap<String, FieldMapping>();
 
     @XStreamOmitField
     private RecordDefinition recordDefinition;
