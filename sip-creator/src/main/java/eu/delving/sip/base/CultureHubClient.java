@@ -468,7 +468,7 @@ public class CultureHubClient {
                 context.getFeedback().alert(String.format("Invalid password for user %s", context.getUser()));
                 break;
             default:
-                context.getFeedback().alert("Authorization problem: " + problem);
+                context.getFeedback().alert("Authorization problem: " + e);
                 break;
         }
     }
