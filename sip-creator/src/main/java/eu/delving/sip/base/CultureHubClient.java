@@ -35,6 +35,7 @@ import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -90,15 +91,11 @@ public class CultureHubClient {
         UNKNOWN_RESPONSE(-1, "Unknown response");
 
         private int httpCode;
-        private String say;
+        private String message;
 
-        Code(int httpCode, String say) {
+        Code(int httpCode, String message) {
             this.httpCode = httpCode;
-            this.say = say;
-        }
-
-        void notifyUser(Context context) {
-            context.getFeedback().alert("Problem communicating with hub: " + say);
+            this.message = message;
         }
 
         static Code from(HttpResponse httpResponse) {
@@ -239,8 +236,13 @@ public class CultureHubClient {
                             }
                             break;
                         default:
-                            code.notifyUser(context);
-                            listReceiveListener.failed(new Exception("Response was " + code));
+                            reportResponse(code, response.getStatusLine());
+                            listReceiveListener.failed(new Exception(String.format(
+                                    "Response was %s. Status: [%d] %s",
+                                    code,
+                                    response.getStatusLine().getStatusCode(),
+                                    response.getStatusLine().getReasonPhrase()
+                            )));
                             context.invalidateTokens();
                             break;
                     }
@@ -292,7 +294,7 @@ public class CultureHubClient {
                     default:
                         unlockListener.unlockComplete(false);
                         context.invalidateTokens();
-                        Code.from(response).notifyUser(context);
+                        reportResponse(code, response.getStatusLine());
                         break;
                 }
             }
@@ -343,7 +345,7 @@ public class CultureHubClient {
                             break;
                         default:
                             context.invalidateTokens();
-                            Code.from(response).notifyUser(context);
+                            reportResponse(code, response.getStatusLine());
                             break;
                     }
                     EntityUtils.consume(entity);
@@ -417,7 +419,7 @@ public class CultureHubClient {
                                     code = Code.from(uploadResponse);
                                     if (code != Code.OK && !fileEntity.abort) {
                                         context.invalidateTokens();
-                                        Code.from(uploadResponse).notifyUser(context);
+                                        reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
                                         uploadListener.finished(false);
                                         return;
                                     }
@@ -434,7 +436,7 @@ public class CultureHubClient {
                             break;
                         default:
                             context.invalidateTokens();
-                            code.notifyUser(context);
+                            reportResponse(code, listResponse.getStatusLine());
                             break;
                     }
                     EntityUtils.consume(listResponse.getEntity());
@@ -610,7 +612,6 @@ public class CultureHubClient {
         return upload;
     }
 
-
     private HttpGet createUnlockRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
         String url = String.format(
                 "%s/unlock/%s/%s?accessKey=%s",
@@ -620,28 +621,15 @@ public class CultureHubClient {
         get.setHeader("Accept", "text/xml");
         return get;
     }
-
-    /*
-        <data-set-list>
-            <data-set>
-                <spec>{ds.spec}</spec>
-                <name>{ds.details.name}</name>
-                <orgId>{connectedOrg.get.orgId}</orgId>
-                <createdBy>
-                    <username>{creator.userName}</username>
-                    <fullname>{creator.fullname}</fullname>
-                    <email>{creator.email}</email>
-                </createdBy>{if (lockedBy != None) {
-                <lockedBy>
-                    <username>{lockedBy.get.userName}</username>
-                    <fullname>{lockedBy.get.fullname}</fullname>
-                    <email>{lockedBy.get.email}</email>
-                </lockedBy>}}
-                <state>{ds.state.toString}</state>
-                <recordCount>{ds.details.total_records}</recordCount>
-            </data-set>
-        </data-set-list>
-    */
+    
+    private void reportResponse(Code code, StatusLine statusLine) {
+        context.getFeedback().alert(String.format(
+                "Problem communicating with the CultureHub: %s. Status [%d] %s",
+                code.message,
+                statusLine.getStatusCode(),
+                statusLine.getReasonPhrase()
+        ));
+    }
 
     @XStreamAlias("data-set-list")
     public static class DataSetList {
