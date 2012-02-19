@@ -81,25 +81,34 @@
 
     </root>
 
+    <facts>
+        <fact path="delving/admin/owner_uri" name="mets:"/>
+        <fact path="delving/admin/owner_name" name="mets:"/>
+        <fact path="delving/admin/provider_uri" name="mets:"/>
+        <fact path="delving/admin/provider_name" name="mets:"/>
+        <fact path="delving/admin/rights" name="mets:"/>
+        <fact path="delving/thing/language" name="mets:"/>
+    </facts>
+
     <options> <!-- keys should be uri's -->
         <option-list path="/delving/actors/actor/actor_role">
-            <opt key="1">Crator</opt>
+            <opt key="1">Creator</opt>
             <opt key="2">Artist</opt>
             <opt key="3">Photographer</opt>
             <opt key="3">etc</opt>
         </option-list>
         <option-list path="/delving/places/place/place_role">
-            <opt key="1">actor_birth_place</opt>
-            <opt key="2">actor_death_place</opt>
-            <opt key="3">creation</opt>
+            <opt key="1">Actors place of birth</opt>
+            <opt key="2">Actor place of death</opt>
+            <opt key="3">Production place</opt>
             <opt key="4">etc CRM</opt>
         </option-list>
         <option-list path="/delving/types/type/type_category">
-            <opt key="1">classification</opt>
-            <opt key="2">subject</opt>
-            <opt key="3">technique</opt>
-            <opt key="4">material</opt>
-            <opt key="5">colour</opt>
+            <opt key="1">Classification</opt>
+            <opt key="2">Subject</opt>
+            <opt key="3">Technique</opt>
+            <opt key="4">Material</opt>
+            <opt key="5">Colour</opt>
             <opt key="6">etc</opt>
         </option-list>
     </options>
