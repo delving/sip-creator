@@ -161,17 +161,6 @@ public class MappingCompileModel {
         triggerTimer.triggerSoon(RUN_DELAY);
     }
 
-    private Path getSelectedOutputPath() {
-        switch (type) {
-            case RECORD:
-                return null;
-            case FIELD:
-                return selectedNodeMapping == null ? null : selectedNodeMapping.outputPath;
-            default:
-                throw new RuntimeException();
-        }
-    }
-
     private String getGeneratedCode() {
         switch (type) {
             case RECORD:
@@ -259,7 +248,15 @@ public class MappingCompileModel {
             try {
                 if (mappingRunner == null) {
                     feedback.say("Compiling code for " + type);
-                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getSelectedOutputPath(), documentToString(codeDocument));
+                    switch (type) {
+                        case RECORD:
+                            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, null);
+                            break;
+                        case FIELD:
+                            Path outputPath = selectedNodeMapping == null ? null : selectedNodeMapping.outputPath;
+                            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, outputPath, documentToString(codeDocument));
+                            break;
+                    }
                 }
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);
