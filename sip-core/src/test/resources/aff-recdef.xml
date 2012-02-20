@@ -74,34 +74,29 @@
             </elem>
         </elem>
 
-        <elem tag="custom">
-
-            <!-- if needed, specific for each hub -->
-        </elem>
-
     </root>
 
-    <facts>
-        <fact path="delving/admin/owner_uri" name="mets:"/>
-        <fact path="delving/admin/owner_name" name="mets:"/>
-        <fact path="delving/admin/provider_uri" name="mets:"/>
-        <fact path="delving/admin/provider_name" name="mets:"/>
-        <fact path="delving/admin/rights" name="mets:"/>
-        <fact path="delving/thing/language" name="mets:"/>
-    </facts>
+    <!--<facts>-->
+        <!--<fact path="/aff/admin/owner_uri" name="mets:"/>-->
+        <!--<fact path="/aff/admin/owner_name" name="mets:"/>-->
+        <!--<fact path="/aff/admin/provider_uri" name="mets:"/>-->
+        <!--<fact path="/aff/admin/provider_name" name="mets:"/>-->
+        <!--<fact path="/aff/admin/rights" name="mets:"/>-->
+        <!--<fact path="/aff/thing/language" name="mets:"/>-->
+    <!--</facts>-->
 
     <options> <!-- keys should be uri's -->
-        <option-list path="/delving/actors/actor/role">
+        <option-list path="/aff/actors/actor/role">
             <opt key="1">Creator</opt>
             <opt key="2">Artist</opt>
             <opt key="3">Photographer</opt>
-            <opt key="3">etc</opt>
+            <!--todo: more values-->
         </option-list>
         <option-list path="/delving/places/place/role">
             <opt key="1">Actors place of birth</opt>
             <opt key="2">Actor place of death</opt>
             <opt key="3">Production place</opt>
-            <opt key="4">etc CRM</opt>
+            <!--todo: more values-->
         </option-list>
         <option-list path="/delving/types/type/category">
             <opt key="1">Classification</opt>
@@ -109,7 +104,7 @@
             <opt key="3">Technique</opt>
             <opt key="4">Material</opt>
             <opt key="5">Colour</opt>
-            <opt key="6">etc</opt>
+            <!--todo: more values-->
         </option-list>
     </options>
 
