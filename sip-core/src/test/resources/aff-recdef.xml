@@ -20,7 +20,6 @@
     </elems>
 
     <root tag="aff">
-
         <elem tag="admin">
             <elem tag="owner_uri"/>
             <elem tag="owner_name"/>
@@ -30,50 +29,37 @@
         </elem>
 
         <elem tag="thing" elems="type, uri" singular="true">
-            <elem tag="local_id"/>
             <elem tag="title"/>
             <elem tag="description"/>
             <elem tag="measurement"/>
             <elem tag="language"/>
             <elem tag="date_created"/>
-            <elem tag="collection_uri"/>
             <elem tag="collection_name"/>
             <elem tag="landing_Page"/>
         </elem>
 
-        <!--todo: there may be multiple uris, is this the ideal way to represent that?-->
-        <!--todo: mime type option?-->
         <elem tag="media">
             <elem tag="thumbnail_source"/>
             <elem tag="full_view_source"/>
             <elem tag="deep_zoom_source"/>
-            <elem tag="thumbnail_uri" hidden="true"/>
-            <elem tag="full_view_uri" hidden="true"/>
-            <elem tag="deep_zoom_uri" hidden="true"/>
         </elem>
 
         <elem tag="actors" singular="true">
-            <elem tag="actor" elems="role, local_id, uri, source, date">
+            <elem tag="actor" elems="role, date">
                 <elem tag="first_name"/>
                 <elem tag="last_name"/>
             </elem>
         </elem>
 
         <elem tag="places" singular="true">
-            <elem tag="place" elems="role, uri, local_id, source, date, name"/>
+            <elem tag="place" elems="role, date, name, lat, long"/>
         </elem>
 
         <elem tag="types" singular="true">
-            <elem tag="type" elems="uri, local_id, source, name">
+            <elem tag="type" elems="source, name">
                 <elem tag="category"/>
             </elem>
         </elem>
-
-        <elem tag="events" singular="true">
-            <elem tag="event" elems="type, role, uri, local_id, source, name">
-            </elem>
-        </elem>
-
     </root>
 
     <!--<facts>-->
