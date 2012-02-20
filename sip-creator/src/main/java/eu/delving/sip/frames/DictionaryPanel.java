@@ -26,6 +26,7 @@ import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.RecDefTreeNode;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -272,7 +273,13 @@ public class DictionaryPanel extends JPanel {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
-                        valueModel.setRecDefNode(createModel.getRecDefTreeNode().getRecDefNode());
+                        RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
+                        if (recDefTreeNode != null) {
+                            valueModel.setRecDefNode(recDefTreeNode.getRecDefNode());
+                        }
+                        else {
+                            valueModel.setRecDefNode(null);
+                        }
                     }
                 });
                 handleEnablement();

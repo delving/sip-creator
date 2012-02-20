@@ -93,7 +93,7 @@ public class CreateFrame extends FrameBase {
     }
 
     private JComponent createPanel() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
+        JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
         p.add(statsHtml);
         p.add(recDefHtml);
         return p;

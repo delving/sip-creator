@@ -84,8 +84,6 @@ public class AllFrames {
         addSpaceBarCreate(create, analysis);
         RecDefFrame recDef = new RecDefFrame(desktop, sipModel);
         addSpaceBarCreate(create, recDef);
-        FrameBase bookmark = new BookmarkFrame(desktop, sipModel, recDef);
-        addSpaceBarCreate(create, bookmark);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase recMapping = new RecMappingFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
@@ -94,7 +92,6 @@ public class AllFrames {
                 status,
                 analysis,
                 create,
-                bookmark,
                 recDef,
                 statistics,
                 input,
@@ -109,10 +106,9 @@ public class AllFrames {
                         block(status, 1, 2)
                 ),
                 view(QUICK_MAPPING,
-                        block(analysis, 0, 0, 1, 3),
-                        block(bookmark, 1, 0, 1, 2),
-                        block(create, 1, 2),
-                        block(recDef, 2, 0, 1, 3)
+                        block(analysis, 0, 0),
+                        block(create, 1, 0),
+                        block(recDef, 2, 0)
                 ),
                 view(BIG_PICTURE,
                         block(input, 0, 0),

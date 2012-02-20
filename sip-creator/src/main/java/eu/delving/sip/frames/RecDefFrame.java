@@ -21,12 +21,16 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Utility;
+import eu.delving.sip.model.BookmarksTreeModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
+import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -39,6 +43,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +57,9 @@ import java.util.regex.Pattern;
 
 public class RecDefFrame extends FrameBase {
     private JTree recDefTree;
+    private JTree bookmarkTree;
     private JTextField filterField = new JTextField();
+    private JPanel treePanel = new JPanel(new GridLayout(0, 1));
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -72,20 +79,8 @@ public class RecDefFrame extends FrameBase {
                 Exec.swing(new TreeUpdater());
             }
         });
-        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty"))) {
-            @Override
-            public String getToolTipText(MouseEvent evt) {
-                TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
-                return treePath != null ? ((RecDefTreeNode) treePath.getLastPathComponent()).toHtml() : "";
-            }
-        };
-        recDefTree.setToolTipText("?");
-        recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
-        recDefTree.setDragEnabled(false);
-        recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
-        recDefTree.setDropMode(DropMode.ON);
-        recDefTree.setTransferHandler(sipModel.getNodeTransferHandler());
+        createRecDefTree(sipModel);
+        createBookmarkTree(sipModel);
         timer.setRepeats(false);
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -113,16 +108,13 @@ public class RecDefFrame extends FrameBase {
         });
     }
 
-    public void setPath(Path path) {
-        recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(path));
-    }
-    
     @Override
     protected void buildContent(Container content) {
         content.add(createFilterPanel(), BorderLayout.NORTH);
-        content.add(scroll(recDefTree), BorderLayout.CENTER);
+        content.add(treePanel, BorderLayout.CENTER);
+//        content.add(scroll(recDefTree), BorderLayout.CENTER);
     }
-    
+
     private JPanel createFilterPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Filter"));
@@ -153,9 +145,84 @@ public class RecDefFrame extends FrameBase {
         }
     }
 
+    private class BookmarkSelection implements TreeSelectionListener {
+
+        @Override
+        public void valueChanged(TreeSelectionEvent event) {
+            Object object = event.getPath().getLastPathComponent();
+            if (object instanceof RecDef.Category) {
+                if (bookmarkTree.isCollapsed(event.getPath())) {
+                    bookmarkTree.expandPath(event.getPath());
+                }
+                else {
+                    bookmarkTree.collapsePath(event.getPath());
+                }
+            }
+            else if (object instanceof RecDef.Ref) {
+                RecDef.Ref ref = (RecDef.Ref) object;
+                recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(ref.path));
+            }
+        }
+    }
+
     private void showPath(RecDefTreeNode node) {
         RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
         root.showPath(recDefTree, node.getRecDefPath().getTagPath());
+    }
+
+    private void createBookmarkTree(SipModel sipModel) {
+        bookmarkTree = new JTree(new BookmarksTreeModel()) {
+            @Override
+            public String getToolTipText(MouseEvent evt) {
+                TreePath treePath = bookmarkTree.getPathForLocation(evt.getX(), evt.getY());
+                if (treePath == null) return "";
+                Object last = treePath.getLastPathComponent();
+                if (last instanceof RecDef.Category) {
+                    RecDef.Category category = (RecDef.Category) last;
+                    StringTemplate t = Utility.getTemplate("bookmark-category");
+                    t.setAttribute("name", category.name);
+                    t.setAttribute("doc", category.doc);
+                    return t.toString();
+
+                }
+                else if (last instanceof RecDef.Ref) {
+                    RecDef.Ref ref = (RecDef.Ref) last;
+                    StringTemplate t = Utility.getTemplate(ref.isAttr() ? "bookmark-attribute" : "bookmark-element");
+                    t.setAttribute("name", ref.display);
+                    t.setAttribute("doc", ref.doc);
+                    t.setAttribute("options", ref.options);
+                    return t.toString();
+                }
+                else {
+                    return "";
+                }
+            }
+        };
+        bookmarkTree.setRootVisible(false);
+        bookmarkTree.setToolTipText("?");
+        bookmarkTree.setDragEnabled(false);
+        bookmarkTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        bookmarkTree.getSelectionModel().addTreeSelectionListener(new BookmarkSelection());
+        bookmarkTree.setCellRenderer(new BookmarksTreeModel.BookmarkRenderer());
+        bookmarkTree.setDropMode(DropMode.ON);
+        bookmarkTree.setTransferHandler(sipModel.getNodeTransferHandler());
+    }
+
+    private void createRecDefTree(SipModel sipModel) {
+        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty"))) {
+            @Override
+            public String getToolTipText(MouseEvent evt) {
+                TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
+                return treePath != null ? ((RecDefTreeNode) treePath.getLastPathComponent()).toHtml() : "";
+            }
+        };
+        recDefTree.setToolTipText("?");
+        recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
+        recDefTree.setDragEnabled(false);
+        recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        recDefTree.getSelectionModel().addTreeSelectionListener(new RecDefSelection());
+        recDefTree.setDropMode(DropMode.ON);
+        recDefTree.setTransferHandler(sipModel.getNodeTransferHandler());
     }
 
     private class TreeUpdater implements Runnable {
@@ -170,19 +237,32 @@ public class RecDefFrame extends FrameBase {
             else {
                 recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
             }
+            boolean bookmarksPresent = false;
+            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+            if (recMapping != null) {
+                RecDef recDef = recMapping.getRecDefTree().getRecDef();
+                bookmarksPresent = !recDef.bookmarks.isEmpty();
+                bookmarkTree.setModel(new BookmarksTreeModel(recDef.bookmarks));
+            }
+            else {
+                bookmarkTree.setModel(new BookmarksTreeModel());
+            }
+            treePanel.removeAll();
+            treePanel.add(scroll("Record Definition", recDefTree));
+            if (bookmarksPresent) treePanel.add(scroll("Bookmarks", bookmarkTree));
         }
     }
-    
+
     private class FilterTreeModel extends DefaultTreeModel {
 
         private FilterTreeModel(RecDefTreeNode root) {
             super(root);
         }
-        
+
         public void setFilter(Pattern pattern) {
             node(root).setPassesFilter(false);
             node(root).filter(pattern);
-            fireTreeStructureChanged(this, new TreeNode[] {root}, new int[] {}, new Object[] { });
+            fireTreeStructureChanged(this, new TreeNode[]{root}, new int[]{}, new Object[]{});
             showPath(node(root));
         }
 
@@ -200,7 +280,7 @@ public class RecDefFrame extends FrameBase {
         public int getChildCount(Object nodeObject) {
             RecDefTreeNode node = node(nodeObject);
             int count = 0;
-            for (RecDefTreeNode sub : node.getChildren()) if (sub.passesFilter()) count++; 
+            for (RecDefTreeNode sub : node.getChildren()) if (sub.passesFilter()) count++;
             return count;
         }
 
@@ -218,7 +298,7 @@ public class RecDefFrame extends FrameBase {
         private RecDefTreeNode node(Object nodeObject) {
             return (RecDefTreeNode) nodeObject;
         }
-        
+
         private List<RecDefTreeNode> filterChildren(Object nodeObject) {
             List<RecDefTreeNode> filtered = new ArrayList<RecDefTreeNode>();
             for (RecDefTreeNode sub : node(nodeObject).getChildren()) if (sub.passesFilter()) filtered.add(sub);
