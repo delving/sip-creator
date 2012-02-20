@@ -101,7 +101,7 @@ public class RecDef {
     private Attr findAttr(Path path) {
         Attr found = root.findAttr(path, 0);
         if (found == null) {
-            throw new RuntimeException("No attribute found for path "+path);
+            throw new RuntimeException("No attribute found for path " + path);
         }
         return found;
     }
@@ -109,7 +109,7 @@ public class RecDef {
     private Elem findElem(Path path) {
         Elem found = root.findElem(path, 0);
         if (found == null) {
-            throw new RuntimeException("No element found for path "+path);
+            throw new RuntimeException("No element found for path " + path);
         }
         return found;
     }
@@ -144,7 +144,7 @@ public class RecDef {
     }
 
     private void resolve() {
-        root.resolve(this);
+        root.resolve(Path.empty(), this);
         for (Doc doc : docs) doc.resolve(this);
         for (Category category : bookmarks) category.resolve(this);
         for (OptionList optionList : options) optionList.resolve(this);
@@ -406,8 +406,9 @@ public class RecDef {
             return null;
         }
 
-        public void resolve(RecDef recDef) {
-            if (tag == null) throw new RuntimeException("Null tag!");
+        public void resolve(Path path, RecDef recDef) {
+            if (tag == null) throw new RuntimeException("Null tag at: " + path);
+            path.push(tag);
             tag = tag.defaultPrefix(recDef.prefix);
             if (attrs != null) {
                 for (String localName : attrs.split(DELIM))
@@ -419,7 +420,8 @@ public class RecDef {
                     elemList.add(recDef.elem(Tag.element(recDef.prefix, localName)));
                 elems = null;
             }
-            for (Elem elem : elemList) elem.resolve(recDef);
+            for (Elem elem : elemList) elem.resolve(path, recDef);
+            path.pop();
         }
 
         public void print(StringBuilder out, int level) {

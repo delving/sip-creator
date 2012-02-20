@@ -1,12 +1,24 @@
 <?xml version="1.0"?>
-<record-definition prefix="delving">
+<record-definition prefix="aff">
+
+    <!--todo: summary fields are not accounted for yet-->
+
     <namespaces>
-        <namespace prefix="delving" uri="" schema="http://www.delving/eu"/>
+        <namespace prefix="aff" uri="http://www.delving.eu/aff" schema="http://www.delving.eu/aff_1.0.xsd"/>
     </namespaces>
 
-    <root>
+    <elems>
+        <elem tag="type"/>
+        <elem tag="role"/>
+        <elem tag="uri"/>
+        <elem tag="date"/>
+        <elem tag="source"/>
+        <elem tag="name"/>
+    </elems>
 
-        <elem tag="admin">
+    <root tag="aff">
+
+        <elem tag="admin" singular="true">
             <elem tag="owner_uri"/>
             <elem tag="owner_name"/>
             <elem tag="provider_uri"/>
@@ -14,10 +26,8 @@
             <elem tag="rights"/>
         </elem>
 
-        <elem tag="thing" >
-            <elem tag="thing_type"/>
+        <elem tag="thing" elems="type, uri" singular="true">
             <elem tag="local_id"/>
-            <elem tag="uri"/>
             <elem tag="title"/>
             <elem tag="description"/>
             <elem tag="measurement"/>
@@ -28,73 +38,54 @@
             <elem tag="landing_Page"/>
         </elem>
 
-        <elem tag="media" >
+        <!--todo: there may be multiple uris, is this the ideal way to represent that?-->
+        <!--todo: mime type option?-->
+        <elem tag="media">
             <elem tag="thumbnail_uri"/>
             <elem tag="full_view_uri"/>
             <elem tag="deep_zoom_uri"/>
         </elem>
 
-        <elem tag="actors">
-            <elem tag="actor" repeatable="true">
-                <elem tag="actor_role"/>
-                <elem tag="actor_uri"/>
-                <elem tag="actor_source"/>
-                <elem tag="date"/>
+        <elem tag="actors" singular="true">
+            <elem tag="actor" elems="role, uri, source, date">
                 <elem tag="first_name"/>
                 <elem tag="last_name"/>
             </elem>
         </elem>
 
-        <elem tag="places">
-            <elem tag="place" repeatable="true">
-                <elem tag="place_role"/>
-                <elem tag="place_uri"/>
-                <elem tag="place_source"/>
-                <elem tag="place_date"/>
-                <elem tag="place_name"/>
+        <elem tag="places" singular="true">
+            <elem tag="place" elems="role, uri, source, date, name">
+                <!--todo: some coordinates?  lat/long?-->
             </elem>
         </elem>
 
-        <elem tag="types" repeatable="true">
-            <elem tag="type">
-                <elem tag="type_category"/>
-                <elem tag="type_uri"/>
-                <elem tag="type_source"/>
-                <elem tag="type_name"/>
+        <elem tag="types" singular="true">
+            <elem tag="type" elems="uri, source, name">
+                <elem tag="category"/>
             </elem>
         </elem>
 
-        <elem tag="events" repeatable="true">
-            <elem tag="event">
-                <elem tag="event_type"/>
-                <elem tag="event_role"/>
-                <elem tag="event_uri"/>
-                <elem tag="event_source"/>
-                <elem tag="event_name"/>
+        <elem tag="events" singular="true">
+            <elem tag="event" elems="type, role, uri, source, name">
             </elem>
-        </elem>
-
-        <elem tag="custom">
-
-            <!-- if needed, specific for each hub -->
         </elem>
 
     </root>
 
     <options> <!-- keys should be uri's -->
-        <option-list path="/delving/actors/actor/actor_role">
-            <opt key="1">Crator</opt>
+        <option-list path="/aff/actors/actor/role">
+            <opt key="1">Creator</opt>
             <opt key="2">Artist</opt>
             <opt key="3">Photographer</opt>
             <opt key="3">etc</opt>
         </option-list>
-        <option-list path="/delving/places/place/place_role">
+        <option-list path="/aff/places/place/role">
             <opt key="1">actor_birth_place</opt>
             <opt key="2">actor_death_place</opt>
             <opt key="3">creation</opt>
             <opt key="4">etc CRM</opt>
         </option-list>
-        <option-list path="/delving/types/type/type_category">
+        <option-list path="/aff/types/type/category">
             <opt key="1">classification</opt>
             <opt key="2">subject</opt>
             <opt key="3">technique</opt>
@@ -103,5 +94,8 @@
             <opt key="6">etc</opt>
         </option-list>
     </options>
+
+    <docs/>
+    <bookmarks/>
 
 </record-definition>
