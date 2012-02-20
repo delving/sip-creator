@@ -10,10 +10,13 @@
     <elems>
         <elem tag="type"/>
         <elem tag="role"/>
+        <elem tag="local_id"/>
         <elem tag="uri"/>
         <elem tag="date"/>
         <elem tag="source"/>
         <elem tag="name"/>
+        <elem tag="lat"/>
+        <elem tag="long"/>
     </elems>
 
     <root tag="aff">
@@ -41,32 +44,33 @@
         <!--todo: there may be multiple uris, is this the ideal way to represent that?-->
         <!--todo: mime type option?-->
         <elem tag="media">
-            <elem tag="thumbnail_uri"/>
-            <elem tag="full_view_uri"/>
-            <elem tag="deep_zoom_uri"/>
+            <elem tag="thumbnail_source"/>
+            <elem tag="full_view_source"/>
+            <elem tag="deep_zoom_source"/>
+            <elem tag="thumbnail_uri" hidden="true"/>
+            <elem tag="full_view_uri" hidden="true"/>
+            <elem tag="deep_zoom_uri" hidden="true"/>
         </elem>
 
         <elem tag="actors" singular="true">
-            <elem tag="actor" elems="role, uri, source, date">
+            <elem tag="actor" elems="role, local_id, uri, source, date">
                 <elem tag="first_name"/>
                 <elem tag="last_name"/>
             </elem>
         </elem>
 
         <elem tag="places" singular="true">
-            <elem tag="place" elems="role, uri, source, date, name">
-                <!--todo: some coordinates?  lat/long?-->
-            </elem>
+            <elem tag="place" elems="role, uri, local_id, source, date, name"/>
         </elem>
 
         <elem tag="types" singular="true">
-            <elem tag="type" elems="uri, source, name">
+            <elem tag="type" elems="uri, local_id, source, name">
                 <elem tag="category"/>
             </elem>
         </elem>
 
         <elem tag="events" singular="true">
-            <elem tag="event" elems="type, role, uri, source, name">
+            <elem tag="event" elems="type, role, uri, local_id, source, name">
             </elem>
         </elem>
 
