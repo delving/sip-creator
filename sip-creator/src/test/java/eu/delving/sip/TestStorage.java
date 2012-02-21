@@ -23,15 +23,12 @@ package eu.delving.sip;
 
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.RecMapping;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.StatsTree;
-import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
-import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.xml.AnalysisParser;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -40,10 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.swing.tree.DefaultTreeModel;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
 import static eu.delving.sip.files.DataSetState.*;
 import static org.junit.Assert.*;
@@ -56,17 +51,14 @@ import static org.junit.Assert.*;
 
 public class TestStorage {
     private Logger log = Logger.getLogger(getClass());
-    private MockDataSetFactory mock;
-    private Storage storage;
+    private Mockery mock;
     private StatsTree statsTree;
+    
     private DefaultTreeModel analysisTreeModel;
-    private int recordCount;
-    private List<StatsTreeNode> variables = new ArrayList<StatsTreeNode>();
 
     @Before
     public void createStorage() throws StorageException, IOException, MetadataException {
-        mock = new MockDataSetFactory();
-        storage = mock.getStorage();
+        mock = new Mockery();
     }
 
     @After
@@ -75,116 +67,70 @@ public class TestStorage {
     }
 
     @Test
-    public void createDelete() throws IOException, StorageException {
-        assertEquals("Should be EMPTY", EMPTY, dataSet().getState());
-        assertEquals("Should be no files", 0, mock.files().length);
-        dataSet().externalToImported(MockInput.sampleFile(), null);
-        assertEquals("Should be one file", 1, mock.directories().length);
-        assertEquals("Should be IMPORTED", IMPORTED, dataSet().getState());
-        assertEquals("Should be one spec", 1, storage.getDataSets().size());
-        assertEquals("Should be one file", 1, mock.files().length);
-        log.info("Created " + mock.files()[0].getAbsolutePath());
-        InputStream inputStream = MockInput.sampleInputStream();
-        InputStream storedStream = dataSet().openImportedInputStream();
-        int input = 0, stored;
-        while (input != -1) {
-            input = inputStream.read();
-            stored = storedStream.read();
-            assertEquals("Stream discrepancy", input, stored);
-        }
-        dataSet().remove();
-        assertEquals("Should be one file", 1, mock.directories().length);
-    }
-
-    @Test
-    public void cycle() throws IOException, StorageException, InterruptedException {
-        dataSet().externalToImported(MockInput.sampleFile(), null);
+    public void experiment() throws Exception {
+        assertEquals(0, mock.fileCount());
+        mock.preloadDataset();
+        assertEquals(4, mock.fileCount());
+        dataSet().externalToImported(mock.sampleInputFile(), null);
+        assertEquals(5, mock.fileCount());
         assertEquals(IMPORTED, dataSet().getState());
-        analyze();
-        assertEquals("Should be imported and stats", 2, mock.files().length);
-        assertFalse("Zero variables!", variables.isEmpty());
-
-        dataSet().setHints(mock.hints(recordCount));
-        assertEquals("Should be imported, stats and hints", 3, mock.files().length);
+        performAnalysis();
+        assertEquals(6, mock.fileCount());
+        assertEquals(ANALYZED_IMPORT, dataSet().getState());
+        assertEquals("2", mock.hints().get(Storage.RECORD_COUNT));
+        dataSet().setHints(mock.hints());
+        assertEquals(7, mock.fileCount());
         assertEquals(DELIMITED, dataSet().getState());
-
-        Statistics statistics = dataSet().getLatestStatistics();
-        assertFalse("Should be analysis format", statistics.isSourceFormat());
-        int statsSize = statistics.size();
-        int recordCount = Integer.parseInt(dataSet().getHints().get(Storage.RECORD_COUNT));
-        assertTrue("Zero records!", recordCount > 0);
-
+        assertFalse(dataSet().getLatestStatistics().isSourceFormat());
         dataSet().importedToSource(null);
-        assertEquals("Should be imported, hints, stats, and source", 4, mock.files().length);
-
+        assertEquals(8, mock.fileCount());
         assertEquals(SOURCED, dataSet().getState());
-        analyze();
-        assertEquals("Should be imported, hints, 2 stats, and source: "+mock.files(), 5, mock.files().length);
+        performAnalysis();
+        assertEquals(9, mock.fileCount());
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
-
-        statistics = dataSet().getLatestStatistics();
-        assertTrue("Should be less items in analysis", statistics.size() < statsSize);
-        assertTrue("Should be source format", statistics.isSourceFormat());
+        Statistics statistics = dataSet().getLatestStatistics();
+        assertTrue(statistics.isSourceFormat());
         StatsTree tree = statistics.createAnalysisTree();
-        assertTrue("Should have a new form of path", tree.getRoot().getTag().equals(Tag.element(Storage.RECORD_TAG)));
-
-        RecMapping recMapping = dataSet().getRecMapping(mock.getMetadataPrefix(), mock.getRecDefModel());
-        assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recMapping.getPrefix());
-        MappingModel mappingModel = new MappingModel();
-        mappingModel.setRecMapping(recMapping);
-        mappingModel.setFact("/some/path", "value");
-        dataSet().setRecMapping(recMapping);
-        showUploadFiles("start");
-        recMapping = dataSet().getRecMapping(mock.getMetadataPrefix(), mock.getRecDefModel());
-        assertEquals("Should have held fact", "value", recMapping.getFact("/some/path"));
-        assertEquals(MAPPING, dataSet().getState());
-        assertEquals(6, mock.files().length); // mapping file added
-
-        assertEquals("Should be hints and source", 2, dataSet().getUploadFiles().size());
-        dataSet().setValidation(mock.getMetadataPrefix(), new BitSet(), recordCount);
-        assertEquals(7, mock.files().length);
-        for (int walk = 0; walk < Storage.FileType.MAPPING.getHistorySize() + 5; walk++) {
-            dataSet().getUploadFiles();
-//            showUploadFiles("iteration before " + walk);
-            mappingModel.setFact("/some/path", "value" + walk);
-            dataSet().setRecMapping(mappingModel.getRecMapping());
-            dataSet().getUploadFiles();
-//            showUploadFiles("iteration after " + walk);
-            if (walk < Storage.FileType.MAPPING.getHistorySize() - 1) {
-                assertEquals(8 + walk, mock.files().length);
-            }
-            else {
-                assertEquals(6 + Storage.FileType.MAPPING.getHistorySize(), mock.files().length);
-            }
-        }
-        showUploadFiles("after many settings of record mappings");
-        assertEquals(6 + Storage.FileType.MAPPING.getHistorySize(), mock.files().length);
-        assertEquals(4, dataSet().getUploadFiles().size());
-        showUploadFiles("finally");
+        assertEquals(Tag.element(Storage.RECORD_TAG),tree.getRoot().getTag());
     }
 
-    @Test
-    public void validation() throws StorageException, IOException {
-        int bits = 100;
-        BitSet valid = new BitSet(bits);
-        for (int walk = 0; walk < bits; walk++) {
-            if ((walk % 25) > 0) {
-                valid.set(walk);
-            }
-        }
-        assertEquals("Cardinality unexpected", 96, valid.cardinality());
-        dataSet().setValidation("bla", valid, bits);
-        assertEquals("Should have held fact", 1, mock.files().length);
-        DataInputStream dis = new DataInputStream(new FileInputStream(mock.files()[0]));
-        int size = dis.readInt();
-        BitSet invalid = new BitSet(bits);
-        for (int walk = 0; walk < size; walk++) {
-            int index = dis.readInt();
-            invalid.set(index);
-        }
-        invalid.xor(valid);
-        assertEquals("Should not be any clear bits in the first " + bits, bits, invalid.nextClearBit(0));
-    }
+// todo =========================================
+//    @Test
+//    public void mapping() throws IOException, StorageException, InterruptedException {
+//        RecMapping recMapping = dataSet().getRecMapping(mock.getMetadataPrefix(), mock.getRecDefModel());
+//        assertEquals("Prefixes should be the same", mock.getMetadataPrefix(), recMapping.getPrefix());
+//        MappingModel mappingModel = new MappingModel();
+//        mappingModel.setRecMapping(recMapping);
+//        mappingModel.setFact("/some/path", "value");
+//        dataSet().setRecMapping(recMapping);
+//        showUploadFiles("start");
+//        recMapping = dataSet().getRecMapping(mock.getMetadataPrefix(), mock.getRecDefModel());
+//        assertEquals("Should have held fact", "value", recMapping.getFact("/some/path"));
+//        assertEquals(MAPPING, dataSet().getState());
+//        assertEquals(6, mock.files().length); // mapping file added
+//
+//        assertEquals("Should be hints and source", 2, dataSet().getUploadFiles().size());
+//        dataSet().setValidation(mock.getMetadataPrefix(), new BitSet(), recordCount);
+//        assertEquals(7, mock.files().length);
+//        for (int walk = 0; walk < Storage.FileType.MAPPING.getHistorySize() + 5; walk++) {
+//            dataSet().getUploadFiles();
+////            showUploadFiles("iteration before " + walk);
+//            mappingModel.setFact("/some/path", "value" + walk);
+//            dataSet().setRecMapping(mappingModel.getRecMapping());
+//            dataSet().getUploadFiles();
+////            showUploadFiles("iteration after " + walk);
+//            if (walk < Storage.FileType.MAPPING.getHistorySize() - 1) {
+//                assertEquals(8 + walk, mock.files().length);
+//            }
+//            else {
+//                assertEquals(6 + Storage.FileType.MAPPING.getHistorySize(), mock.files().length);
+//            }
+//        }
+//        showUploadFiles("after many settings of record mappings");
+//        assertEquals(6 + Storage.FileType.MAPPING.getHistorySize(), mock.files().length);
+//        assertEquals(4, dataSet().getUploadFiles().size());
+//        showUploadFiles("finally");
+//    }
 
     private void showUploadFiles(String message) throws StorageException {
         log.info("Upload: " + message);
@@ -197,15 +143,15 @@ public class TestStorage {
         }
     }
 
-    private void analyze() {
-        AnalysisParser parser = new AnalysisParser(dataSet(), new AnalysisParser.Listener() {
+    private void performAnalysis() {
+        new AnalysisParser(dataSet(), new AnalysisParser.Listener() {
             @Override
             public void success(Statistics statistics) {
                 try {
                     Path recordRoot = null;
                     switch (dataSet().getState()) {
                         case IMPORTED:
-                            recordRoot = Path.create("/adlibXML/recordList/record");
+                            recordRoot = Path.create(mock.hints().get(Storage.RECORD_ROOT_PATH));
                             break;
                         case SOURCED:
                             recordRoot = Storage.RECORD_ROOT;
@@ -216,8 +162,8 @@ public class TestStorage {
                     dataSet().setStatistics(statistics);
                     statsTree = statistics.createAnalysisTree();
                     analysisTreeModel = new DefaultTreeModel(statsTree.getRoot());
-                    recordCount = StatsTree.setRecordRoot(analysisTreeModel, recordRoot);
-                    statsTree.getVariables(variables);
+                    int recordCount = StatsTree.setRecordRoot(analysisTreeModel, recordRoot);
+                    mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));
                 }
                 catch (StorageException e) {
                     throw new RuntimeException("Coudn't save", e);
@@ -233,8 +179,7 @@ public class TestStorage {
             public boolean progress(long elementCount) {
                 return true;
             }
-        });
-        parser.run();
+        }).run();
     }
 
     private DataSet dataSet() {
