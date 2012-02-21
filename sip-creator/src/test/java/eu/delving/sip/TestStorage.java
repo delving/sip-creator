@@ -35,8 +35,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import javax.swing.tree.DefaultTreeModel;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 
@@ -53,7 +57,7 @@ public class TestStorage {
     private Logger log = Logger.getLogger(getClass());
     private Mockery mock;
     private StatsTree statsTree;
-    
+
     private DefaultTreeModel analysisTreeModel;
 
     @Before
@@ -91,7 +95,18 @@ public class TestStorage {
         Statistics statistics = dataSet().getLatestStatistics();
         assertTrue(statistics.isSourceFormat());
         StatsTree tree = statistics.createAnalysisTree();
-        assertEquals(Tag.element(Storage.RECORD_TAG),tree.getRoot().getTag());
+        assertEquals(Tag.element(Storage.RECORD_TAG), tree.getRoot().getTag());
+
+        // todo: just trying out some validation
+        Validator validator = dataSet().getValidator("lido");
+        assertNotNull(validator);
+        Source source = new StreamSource(mock.sampleInputStream());
+        try {
+            validator.validate(source);
+        }
+        catch (SAXException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 // todo =========================================

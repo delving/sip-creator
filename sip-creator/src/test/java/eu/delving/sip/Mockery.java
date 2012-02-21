@@ -58,8 +58,8 @@ public class Mockery {
         storage = new StorageImpl(root);
         dataSet = storage.createDataSet(SPEC, ORG);
         dataSetDir = new File(root, SPEC + "_" + ORG);
-        hints.put(Storage.RECORD_ROOT_PATH, "/lido:lidoWrap/lido:lido");
-        hints.put(Storage.UNIQUE_ELEMENT_PATH, "/lido:lidoWrap/lido:lido/lido:lidoRecID");
+        hints.put(Storage.RECORD_ROOT_PATH, "/bunch-of-chunks/chunk");
+        hints.put(Storage.UNIQUE_ELEMENT_PATH, "/bunch-of-chunks/chunk/identi-fire");
     }
 
     public void preloadDataset() throws IOException {
@@ -93,7 +93,7 @@ public class Mockery {
     }
     
     private URL sampleResource() {
-        return getClass().getResource("/lido-example.xml");
+        return getClass().getResource("/non-lido-example.xml");
     }
 
     public File sampleInputFile() throws IOException {

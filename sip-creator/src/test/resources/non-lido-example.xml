@@ -1,0 +1,539 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+<bunch-of-chunks>
+    <chunk>
+        <identi-fire>
+            DE-Mb112/lido/obj/00000001
+        </identi-fire>
+        <story>
+            <objectClassificationWrap>
+                <objectWorkTypeWrap>
+                    <objectWorkType type="Sachbegriff">
+                        <term>Bild</term>
+                        <term addedSearchTerm="yes">Bildwerk</term>
+                    </objectWorkType>
+                </objectWorkTypeWrap>
+                <classificationWrap>
+                    <classification type="Gattung">
+                        <term>Tafelmalerei</term>
+                        <term addedSearchTerm="yes">Malerei</term>
+                    </classification>
+                </classificationWrap>
+            </objectClassificationWrap>
+            <objectIdentificationWrap>
+                <titleWrap>
+                    <titleSet>
+                        <appellationValue pref="preferred">Via San Giovanni in Laterano mit
+                            Blick auf das Kolosseum
+                        </appellationValue>
+                    </titleSet>
+                </titleWrap>
+                <repositoryWrap>
+                    <repositorySet type="current">
+                        <repositoryName>
+                            <legalBodyName>
+                                <appellationValue>Museen der Stadt Aachen — Suermondt-Ludwig-Museum
+                                    (Aachen)
+                                </appellationValue>
+                            </legalBodyName>
+                        </repositoryName>
+                        <workID type="Inventarnummer">4</workID>
+                        <repositoryLocation>
+                            <placeID type="local" source="TGN">7004799</placeID>
+                            <namePlaceSet>
+                                <appellationValue>Aachen</appellationValue>
+                            </namePlaceSet>
+                            <partOfPlace politicalEntity="Kreis">
+                                <namePlaceSet>
+                                    <appellationValue>kreisfrei</appellationValue>
+                                </namePlaceSet>
+                                <partOfPlace politicalEntity="Regierungsbezirk/Provinz">
+                                    <namePlaceSet>
+                                        <appellationValue>Aachen, Regierungsbezirk
+                                        </appellationValue>
+                                    </namePlaceSet>
+                                    <partOfPlace politicalEntity="Bundesland">
+                                        <namePlaceSet>
+                                            <appellationValue>Nordrhein-Westfalen
+                                            </appellationValue>
+                                        </namePlaceSet>
+                                        <partOfPlace politicalEntity="Staat">
+                                            <namePlaceSet>
+                                                <appellationValue>Deutschland
+                                                </appellationValue>
+                                            </namePlaceSet>
+                                        </partOfPlace>
+                                    </partOfPlace>
+                                </partOfPlace>
+                            </partOfPlace>
+                        </repositoryLocation>
+                    </repositorySet>
+                </repositoryWrap>
+                <objectMeasurementsWrap>
+                    <objectMeasurementsSet>
+                        <displayObjectMeasurements>Höhe x Breite: 130 x 110 cm
+                        </displayObjectMeasurements>
+                        <objectMeasurements>
+                            <measurementsSet>
+                                <measurementType>Höhe x Breite</measurementType>
+                                <measurementUnit>cm</measurementUnit>
+                                <measurementValue>130 x 110</measurementValue>
+                            </measurementsSet>
+                        </objectMeasurements>
+                    </objectMeasurementsSet>
+                </objectMeasurementsWrap>
+            </objectIdentificationWrap>
+            <eventWrap>
+                <eventSet>
+                    <event>
+                        <eventType>
+                            <term>Herstellung</term>
+                            <term addedSearchTerm="yes">Herstellung</term>
+                        </eventType>
+                        <eventActor>
+                            <actorInRole>
+                                <actor type="person">
+                                    <actorID type="local" source="Bildindex-KUE-Datei">
+                                        kue/02530967
+                                    </actorID>
+                                    <nameActorSet>
+                                        <appellationValue pref="preferred">Achenbach, Andreas
+                                        </appellationValue>
+                                    </nameActorSet>
+                                    <nationalityActor>
+                                        <term>Deutschland</term>
+                                    </nationalityActor>
+                                    <vitalDatesActor>
+                                        <earliestDate type="birthDate">1815-09-29
+                                        </earliestDate>
+                                        <latestDate type="deathDate">1910-04-01
+                                        </latestDate>
+                                    </vitalDatesActor>
+                                    <genderActor>männlich</genderActor>
+                                </actor>
+                                <roleActor>
+                                    <term>Maler</term>
+                                </roleActor>
+                            </actorInRole>
+                        </eventActor>
+                        <eventDate>
+                            <displayDate>1875</displayDate>
+                            <date>
+                                <earliestDate>1875</earliestDate>
+                                <latestDate>1875</latestDate>
+                            </date>
+                        </eventDate>
+                        <eventMaterialsTech>
+                            <materialsTech>
+                                <termMaterialsTech type="Material">
+                                    <term>Öl</term>
+                                    <term addedSearchTerm="yes">Farbmaterial</term>
+                                </termMaterialsTech>
+                            </materialsTech>
+                        </eventMaterialsTech>
+                        <eventMaterialsTech>
+                            <materialsTech>
+                                <termMaterialsTech type="Material">
+                                    <term>Leinwand</term>
+                                    <term addedSearchTerm="yes">Textil</term>
+                                </termMaterialsTech>
+                            </materialsTech>
+                        </eventMaterialsTech>
+                    </event>
+                </eventSet>
+            </eventWrap>
+            <objectRelationWrap>
+                <subjectWrap>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/11Q758
+                                </conceptID>
+                                <term pref="preferred">11 Q 75 8</term>
+                                <term pref="alternative">Prozessionen in der christlichen
+                                    Religion
+                                </term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/11P31521
+                                </conceptID>
+                                <term pref="preferred">11 P 31 52 1</term>
+                                <term pref="alternative">Mönch(e), Klosterbrüder</term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/25I141:
+                                </conceptID>
+                                <term pref="preferred">25 I 14 1 :</term>
+                                <term pref="alternative">Straße</term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/61F(VIA SAN GIOVANNI IN LATERANO)
+                                </conceptID>
+                                <term pref="preferred">61 F (VIA SAN GIOVANNI IN LATERANO)
+                                </term>
+                                <term pref="alternative">Namen historischer Gebäude,
+                                    Örtlichkeiten, Straßen, etc. (mit NAMEN)
+                                </term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/61E(ROMA)
+                                </conceptID>
+                                <term pref="preferred">61 E (ROMA)</term>
+                                <term pref="alternative">Namen von Städten und Dörfern (mit
+                                    NAMEN)
+                                </term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/43C8:
+                                </conceptID>
+                                <term pref="preferred">43 C 8 :</term>
+                                <term pref="alternative">Plätze, Anlagen, Einrichtungen für
+                                    Sport, Spiele und körperliche Freizeitbeschäftigungen
+                                </term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/61F(KOLOSSEUM)
+                                </conceptID>
+                                <term pref="preferred">61 F (KOLOSSEUM)</term>
+                                <term pref="alternative">Namen historischer Gebäude,
+                                    Örtlichkeiten, Straßen, etc. (mit NAMEN)
+                                </term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                </subjectWrap>
+                <relatedWorksWrap>
+                    <relatedWorkSet>
+                        <relatedWork>
+                            <object>
+                                <objectID type="local" source="Bildindex-LIT-Datei">
+                                    lit/05017576
+                                </objectID>
+                                <objectNote type="Kurztitel">Achenbach, Andreas u. Oswald,
+                                    Düsseld.-Hamburg-Linz, 1997-98, S. 132
+                                </objectNote>
+                            </object>
+                        </relatedWork>
+                        <relatedWorkRelType>
+                            <term>dokumentiert in</term>
+                        </relatedWorkRelType>
+                    </relatedWorkSet>
+                </relatedWorksWrap>
+            </objectRelationWrap>
+        </story>
+        <administrativeMetadata xml:lang="deu">
+            <recordWrap>
+                <recordID type="local">obj/00000001</recordID>
+                <recordType>
+                    <term>Einzelobjekt</term>
+                </recordType>
+                <recordSource>
+                    <legalBodyName>
+                        <appellationValue>Foto Marburg</appellationValue>
+                    </legalBodyName>
+                </recordSource>
+                <recordRights>
+                    <rightsHolder>
+                        <legalBodyName>
+                            <appellationValue>Foto Marburg</appellationValue>
+                        </legalBodyName>
+                    </rightsHolder>
+                </recordRights>
+                <recordInfoSet>
+                    <recordInfoLink formatResource="html">
+                        http://www.bildindex.de/dokumente/html/obj00000001
+                    </recordInfoLink>
+                </recordInfoSet>
+            </recordWrap>
+            <resourceWrap>
+                <resourceSet>
+                    <resourceID type="local">192.356</resourceID>
+                    <resourceRepresentation type="image_thumb">
+                        <linkResource formatResource="jpg">
+                            http://www.bildindex.de/bilder/mi00012a01b.jpg
+                        </linkResource>
+                    </resourceRepresentation>
+                    <resourceType>
+                        <term>Digitales Bild (retrodigitalisiert)</term>
+                    </resourceType>
+                    <resourceDateTaken>
+                        <displayDate>1945/1946</displayDate>
+                    </resourceDateTaken>
+                    <resourceSource type="Fotoverwalter">
+                        <legalBodyName>
+                            <appellationValue>Foto Marburg</appellationValue>
+                        </legalBodyName>
+                    </resourceSource>
+                    <rightsResource>
+                        <rightsHolder>
+                            <legalBodyName>
+                                <appellationValue>Foto Marburg</appellationValue>
+                            </legalBodyName>
+                        </rightsHolder>
+                    </rightsResource>
+                </resourceSet>
+            </resourceWrap>
+        </administrativeMetadata>
+    </chunk>
+    <chunk>
+        <identi-fire>
+            DE-Mb112/lido/obj/00000002
+        </identi-fire>
+        <story xml:lang="deu">
+            <objectClassificationWrap>
+                <objectWorkTypeWrap>
+                    <objectWorkType type="Sachbegriff">
+                        <term>Bild</term>
+                        <term addedSearchTerm="yes">Bildwerk</term>
+                    </objectWorkType>
+                </objectWorkTypeWrap>
+                <classificationWrap>
+                    <classification type="Gattung">
+                        <term>Tafelmalerei</term>
+                        <term addedSearchTerm="yes">Malerei</term>
+                    </classification>
+                </classificationWrap>
+            </objectClassificationWrap>
+            <objectIdentificationWrap>
+                <titleWrap>
+                    <titleSet>
+                        <appellationValue pref="preferred">Marktszene</appellationValue>
+                    </titleSet>
+                </titleWrap>
+                <repositoryWrap>
+                    <repositorySet type="current">
+                        <repositoryName>
+                            <legalBodyName>
+                                <appellationValue>Museen der Stadt Aachen — Suermondt-Ludwig-Museum
+                                    (Aachen)
+                                </appellationValue>
+                            </legalBodyName>
+                        </repositoryName>
+                        <workID type="Inventarnummer">11</workID>
+                        <repositoryLocation>
+                            <placeID type="local" source="TGN">7004799</placeID>
+                            <namePlaceSet>
+                                <appellationValue>Aachen</appellationValue>
+                            </namePlaceSet>
+                            <partOfPlace politicalEntity="Kreis">
+                                <namePlaceSet>
+                                    <appellationValue>kreisfrei</appellationValue>
+                                </namePlaceSet>
+                                <partOfPlace politicalEntity="Regierungsbezirk/Provinz">
+                                    <namePlaceSet>
+                                        <appellationValue>Aachen, Regierungsbezirk
+                                        </appellationValue>
+                                    </namePlaceSet>
+                                    <partOfPlace politicalEntity="Bundesland">
+                                        <namePlaceSet>
+                                            <appellationValue>Nordrhein-Westfalen
+                                            </appellationValue>
+                                        </namePlaceSet>
+                                        <partOfPlace politicalEntity="Staat">
+                                            <namePlaceSet>
+                                                <appellationValue>Deutschland
+                                                </appellationValue>
+                                            </namePlaceSet>
+                                        </partOfPlace>
+                                    </partOfPlace>
+                                </partOfPlace>
+                            </partOfPlace>
+                        </repositoryLocation>
+                    </repositorySet>
+                </repositoryWrap>
+                <objectMeasurementsWrap>
+                    <objectMeasurementsSet>
+                        <displayObjectMeasurements>Höhe x Breite: 69 x 135 cm
+                        </displayObjectMeasurements>
+                        <objectMeasurements>
+                            <measurementsSet>
+                                <measurementType>Höhe x Breite</measurementType>
+                                <measurementUnit>cm</measurementUnit>
+                                <measurementValue>69 x 135</measurementValue>
+                            </measurementsSet>
+                        </objectMeasurements>
+                    </objectMeasurementsSet>
+                </objectMeasurementsWrap>
+            </objectIdentificationWrap>
+            <eventWrap>
+                <eventSet>
+                    <event>
+                        <eventType>
+                            <term>Herstellung</term>
+                            <term addedSearchTerm="yes">Herstellung</term>
+                        </eventType>
+                        <eventActor>
+                            <actorInRole>
+                                <actor type="person">
+                                    <actorID type="local" source="Bildindex-KUE-Datei">
+                                        kue/02553237
+                                    </actorID>
+                                    <nameActorSet>
+                                        <appellationValue pref="preferred">Aertsen, Pieter
+                                        </appellationValue>
+                                    </nameActorSet>
+                                    <nameActorSet>
+                                        <appellationValue pref="alternative">Aertsz, Pieter
+                                        </appellationValue>
+                                    </nameActorSet>
+                                    <nameActorSet>
+                                        <appellationValue pref="alternative">Aertszone, Pieter
+                                        </appellationValue>
+                                    </nameActorSet>
+                                    <nameActorSet>
+                                        <appellationValue pref="alternative">Lange Pier
+                                        </appellationValue>
+                                    </nameActorSet>
+                                    <nationalityActor>
+                                        <term>Niederlande</term>
+                                    </nationalityActor>
+                                    <vitalDatesActor>
+                                        <earliestDate type="birthDate">1508
+                                        </earliestDate>
+                                        <latestDate type="deathDate">1575-06-02
+                                        </latestDate>
+                                    </vitalDatesActor>
+                                    <genderActor>männlich</genderActor>
+                                </actor>
+                                <roleActor>
+                                    <term>Maler</term>
+                                </roleActor>
+                            </actorInRole>
+                        </eventActor>
+                        <eventDate>
+                            <displayDate>1559?</displayDate>
+                            <date>
+                                <earliestDate>1559</earliestDate>
+                                <latestDate>1559</latestDate>
+                            </date>
+                        </eventDate>
+                        <eventMaterialsTech>
+                            <materialsTech>
+                                <termMaterialsTech type="Material">
+                                    <term>Öl</term>
+                                    <term addedSearchTerm="yes">Farbmaterial</term>
+                                </termMaterialsTech>
+                            </materialsTech>
+                        </eventMaterialsTech>
+                        <eventMaterialsTech>
+                            <materialsTech>
+                                <termMaterialsTech type="Material">
+                                    <term>Eichenholz</term>
+                                    <term addedSearchTerm="yes">Holz</term>
+                                </termMaterialsTech>
+                            </materialsTech>
+                        </eventMaterialsTech>
+                    </event>
+                </eventSet>
+            </eventWrap>
+            <objectRelationWrap>
+                <subjectWrap>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/46B11
+                                </conceptID>
+                                <term pref="preferred">46 B 11</term>
+                                <term pref="alternative">Markt</term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                    <subjectSet>
+                        <subject type="Ikonographie">
+                            <subjectConcept>
+                                <conceptID type="URI" source="Iconclass">
+                                    http://iconclass.org/41C6
+                                </conceptID>
+                                <term pref="preferred">41 C 6</term>
+                                <term pref="alternative">Lebensmittel; Stilleben mit
+                                    Lebensmitteln
+                                </term>
+                            </subjectConcept>
+                        </subject>
+                    </subjectSet>
+                </subjectWrap>
+            </objectRelationWrap>
+        </story>
+        <administrativeMetadata xml:lang="deu">
+            <recordWrap>
+                <recordID type="local">obj/00000002</recordID>
+                <recordType>
+                    <term>Einzelobjekt</term>
+                </recordType>
+                <recordSource>
+                    <legalBodyName>
+                        <appellationValue>Foto Marburg</appellationValue>
+                    </legalBodyName>
+                </recordSource>
+                <recordRights>
+                    <rightsHolder>
+                        <legalBodyName>
+                            <appellationValue>Foto Marburg</appellationValue>
+                        </legalBodyName>
+                    </rightsHolder>
+                </recordRights>
+                <recordInfoSet>
+                    <recordInfoLink formatResource="html">
+                        http://www.bildindex.de/dokumente/html/obj00000002
+                    </recordInfoLink>
+                </recordInfoSet>
+            </recordWrap>
+            <resourceWrap>
+                <resourceSet>
+                    <resourceID type="local">192.357</resourceID>
+                    <resourceRepresentation type="image_thumb">
+                        <linkResource formatResource="jpg">
+                            http://www.bildindex.de/bilder/mi00012a02b.jpg
+                        </linkResource>
+                    </resourceRepresentation>
+                    <resourceType>
+                        <term>Digitales Bild (retrodigitalisiert)</term>
+                    </resourceType>
+                    <resourceSource type="Fotoverwalter">
+                        <legalBodyName>
+                            <appellationValue>Foto Marburg</appellationValue>
+                        </legalBodyName>
+                    </resourceSource>
+                    <rightsResource>
+                        <rightsHolder>
+                            <legalBodyName>
+                                <appellationValue>Foto Marburg</appellationValue>
+                            </legalBodyName>
+                        </rightsHolder>
+                    </rightsResource>
+                </resourceSet>
+            </resourceWrap>
+        </administrativeMetadata>
+    </chunk>
+</bunch-of-chunks>
