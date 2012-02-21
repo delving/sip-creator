@@ -50,6 +50,7 @@ public interface Storage {
         VALIDATION(null, "validation_", null, "validation_%s.int", 1),
         REPORT(null, null, null, "report_%s.txt", 1),
         RECORD_DEFINITION(null, null, "-record-definition.xml", "%s-record-definition.xml", 1),
+        SCHEMA(null, null, "-validation.xsd", "%s-validation.xsd", 1),
         FACT_DEFINITION("fact-definition-list.xml");
 
         private String name, prefix, suffix, pattern;

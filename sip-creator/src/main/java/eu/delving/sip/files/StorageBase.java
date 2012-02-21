@@ -201,6 +201,10 @@ public class StorageBase {
     File recordDefinitionFile(File dir, String prefix) {
         return new File(dir, String.format(FileType.RECORD_DEFINITION.getPattern(), prefix));
     }
+    
+    File schemaFile(File dir, String prefix) {
+        return new File(dir, String.format(FileType.SCHEMA.getPattern(), prefix));
+    }
 
     List<File> findRecordDefinitionFiles(File dir) {
         File[] files = dir.listFiles(new SuffixFileFilter(Storage.FileType.RECORD_DEFINITION));

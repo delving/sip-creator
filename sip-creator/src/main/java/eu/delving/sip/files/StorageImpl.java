@@ -27,7 +27,11 @@ import eu.delving.sip.xml.SourceConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
+import org.xml.sax.SAXException;
 
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.*;
 import java.security.DigestOutputStream;
 import java.text.SimpleDateFormat;
@@ -367,6 +371,20 @@ public class StorageImpl extends StorageBase implements Storage {
         public void setRecMapping(RecMapping recMapping) throws StorageException {
             File file = new File(here, String.format(FileType.MAPPING.getPattern(), recMapping.getPrefix()));
             RecMapping.write(file, recMapping);
+        }
+
+        @Override
+        public Validator getValidator(String prefix) throws StorageException {
+            File schemaFile = schemaFile(here, prefix);
+            if (!schemaFile.exists()) throw new StorageException(String.format("Schema file for %s missing", prefix));
+            try {
+                SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+                Schema schema = factory.newSchema(schemaFile);
+                return schema.newValidator();
+            }
+            catch (SAXException e) {
+                throw new StorageException("Unable to create schema validator for " + prefix);
+            }
         }
 
         @Override

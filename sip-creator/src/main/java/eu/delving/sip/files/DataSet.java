@@ -27,6 +27,7 @@ import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.ProgressListener;
 
+import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,6 +91,8 @@ public interface DataSet {
     RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException;
 
     void setRecMapping(RecMapping recMapping) throws StorageException;
+
+    Validator getValidator(String prefix) throws StorageException;
 
     void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 
