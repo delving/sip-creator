@@ -168,7 +168,7 @@ public class MappingCompileModel {
                     return "// no mapping";
                 }
                 else {
-                    return recMapping.toCode(null, null);
+                    return recMapping.toCode(null);
                 }
             case FIELD:
                 if (selectedNodeMapping == null || recMapping == null) {
@@ -180,6 +180,21 @@ public class MappingCompileModel {
             default:
                 throw new RuntimeException();
         }
+    }
+
+    private EditPath getEditPath() {
+        if (type == RECORD || selectedNodeMapping == null) return null;
+        return new EditPath() {
+            @Override
+            public Path getPath() {
+                return selectedNodeMapping.outputPath;
+            }
+
+            @Override
+            public String getEditedCode() {
+                return documentToString(codeDocument);
+            }
+        };
     }
 
     private class ParseEar implements SipModel.ParseListener {
@@ -248,15 +263,7 @@ public class MappingCompileModel {
             try {
                 if (mappingRunner == null) {
                     feedback.say("Compiling code for " + type);
-                    switch (type) {
-                        case RECORD:
-                            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, null);
-                            break;
-                        case FIELD:
-                            Path outputPath = selectedNodeMapping == null ? null : selectedNodeMapping.outputPath;
-                            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, outputPath, documentToString(codeDocument));
-                            break;
-                    }
+                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getEditPath());
                 }
                 try {
                     Node outputNode = mappingRunner.runMapping(metadataRecord);

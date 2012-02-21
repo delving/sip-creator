@@ -79,7 +79,7 @@ public class RecDefTree implements RecDefNode.Listener {
         return nodeMappings;
     }
 
-    public String toCode(Map<String, String> facts, List<MappingFunction> mappingFunctions, Path selectedPath, String editedCode) {
+    public String toCode(Map<String, String> facts, List<MappingFunction> mappingFunctions, EditPath editPath) {
         Out out = new Out();
         out.line("// SIP-Creator Generated Mapping Code");
         out.line("// ----------------------------------");
@@ -102,7 +102,7 @@ public class RecDefTree implements RecDefNode.Listener {
         out.line("Node outputNode");
         out.line_("use (MappingCategory) {");
         out.line_("input * { _input -> outputNode = output.");
-        root.toCode(out, selectedPath, editedCode);
+        root.toCode(out, editPath);
         out._line("}");
         out.line("outputNode");
         out._line("}");

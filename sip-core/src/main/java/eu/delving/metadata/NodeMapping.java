@@ -125,7 +125,8 @@ public class NodeMapping implements Comparable<NodeMapping> {
         recDefNode.notifyNodeMappingChange(this);
     }
 
-    public void toLeafCode(Out out, String editedCode) {
+    public void toLeafCode(Out out, EditPath editPath) {
+        String editedCode = editPath == null ? null : editPath.getEditedCode();
         if (recDefNode.isAttr()) {
             out.line_("%s : {", recDefNode.getTag().toBuilderCall());
             toUserCode(out, editedCode);

@@ -53,7 +53,7 @@ public class MappingEngine {
         RecMapping recMapping = RecMapping.read(reader, recDefModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
         long now = System.currentTimeMillis();
-        mappingRunner = new MappingRunner(groovyCodeResource, recMapping);
+        mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
         compileTime += System.currentTimeMillis() - now;
         metadataRecordFactory = new MetadataRecordFactory(namespaces);
         recordValidator = new RecordValidator(groovyCodeResource, recMapping);

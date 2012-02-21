@@ -98,11 +98,11 @@ public class TestCodeGeneration {
         RecDefNode actorNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
         NodeMapping mapping = actorNode.addNodeMapping(mapping("/input/leadup/record/list/member/name"));
         mapping.addCodeLine("if (_name.contains(' ')) { return _name.split(' '); } else { return _name.text(); }");
-        String code = recMapping.toCode(null, null);
+        String code = recMapping.toCode(null);
         printWithLineNumbers(code);
 
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
-        MappingRunner mappingRunner = new MappingRunner(resource, recMapping);
+        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
         Node node = mappingRunner.runMapping(createInputRecord());
         StringWriter writer = new StringWriter();
         XmlNodePrinter printer = new XmlNodePrinter(writer);

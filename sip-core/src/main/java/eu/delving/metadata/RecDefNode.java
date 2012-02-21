@@ -196,46 +196,46 @@ public class RecDefNode {
         listener.nodeMappingChanged(this, nodeMapping);
     }
 
-    public void toCode(Out out, Path selectedPath, String editedCode) {
+    public void toCode(Out out, EditPath editPath) {
         if (!hasNodeMappings()) return;
-        if (selectedPath != null && !path.equals(selectedPath) && !path.isAncestorOf(selectedPath)) return;
+        if (editPath != null && !path.equals(editPath.getPath()) && !path.isAncestorOf(editPath.getPath())) return;
         if (isAttr()) {
             if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
             NodeMapping nodeMapping = nodeMappings.values().iterator().next();
-            nodeMapping.toLeafCode(out, editedCode);
+            nodeMapping.toLeafCode(out, editPath);
         }
         else if (nodeMappings.isEmpty()) {
-            childrenToCode(out, selectedPath, editedCode);
+            childrenToCode(out, editPath);
         }
         else {
             if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
             NodeMapping nodeMapping = nodeMappings.values().iterator().next();
-            toLoop(nodeMapping.getLocalPath(), out, selectedPath, editedCode);
+            toLoop(nodeMapping.getLocalPath(), out, editPath);
         }
     }
 
-    private void toLoop(Path path, Out out, Path selectedPath, String editedCode) {
+    private void toLoop(Path path, Out out, EditPath editPath) {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
-            childrenToCode(out, selectedPath, editedCode);
+            childrenToCode(out, editPath);
         }
         else {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
             out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
-            toLoop(path.chop(-1), out, selectedPath, editedCode);
+            toLoop(path.chop(-1), out, editPath);
             out._line("}");
         }
     }
 
-    private void childrenToCode(Out out, Path selectedPath, String editedCode) {
+    private void childrenToCode(Out out, EditPath editPath) {
         boolean activeAttributes = false;
         for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeAttributes = true;
         if (activeAttributes) {
             out.line_("%s (", getTag().toBuilderCall());
             for (RecDefNode sub : children) {
                 if (sub.isAttr() && sub.hasNodeMappings()) {
-                    for (NodeMapping nodeMapping : sub.nodeMappings.values()) nodeMapping.toLeafCode(out, editedCode);
+                    for (NodeMapping nodeMapping : sub.nodeMappings.values()) nodeMapping.toLeafCode(out, editPath);
                 }
             }
             out._line(") {").in();
@@ -243,11 +243,11 @@ public class RecDefNode {
         else {
             out.line_("%s {", getTag().toBuilderCall());
         }
-        for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, selectedPath, editedCode);
+        for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, editPath);
         if (elem.elemList.isEmpty() && !nodeMappings.isEmpty()) {
             if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
             NodeMapping nodeMapping = nodeMappings.values().iterator().next();
-            nodeMapping.toLeafCode(out, editedCode);
+            nodeMapping.toLeafCode(out, editPath);
         }
         out._line("}");
     }
