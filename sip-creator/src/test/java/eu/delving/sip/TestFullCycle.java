@@ -144,30 +144,30 @@ public class TestFullCycle {
                 "/input/story/@xml:lang",
                 "/lido/descriptiveMetadata/@xml:lang"
         );
-        mock.map(
-                "/input/story/objectClassificationWrap",
-                "/lido/descriptiveMetadata/objectClassificationWrap"
-        );
-        mock.map(
-                "/input/story/objectClassificationWrap/objectWorkTypeWrap",
-                "/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap"
-        );
+//        mock.map(
+//                "/input/story/objectClassificationWrap",
+//                "/lido/descriptiveMetadata/objectClassificationWrap"
+//        );
+//        mock.map(
+//                "/input/story/objectClassificationWrap/objectWorkTypeWrap",
+//                "/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap"
+//        );
         mock.map(
                 "/input/story/objectClassificationWrap/objectWorkTypeWrap/objectWorkType",
                 "/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType"
         );
-        mock.map(
-                "/input/story/objectIdentificationWrap",
-                "/lido/descriptiveMetadata/objectIdentificationWrap"
-        );
-        mock.map(
-                "/input/story/objectIdentificationWrap/titleWrap",
-                "/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap"
-        );
-        mock.map(
-                "/input/story/objectIdentificationWrap/titleWrap/titleSet",
-                "/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet"
-        );
+//        mock.map(
+//                "/input/story/objectIdentificationWrap",
+//                "/lido/descriptiveMetadata/objectIdentificationWrap"
+//        );
+//        mock.map(
+//                "/input/story/objectIdentificationWrap/titleWrap",
+//                "/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap"
+//        );
+//        mock.map(
+//                "/input/story/objectIdentificationWrap/titleWrap/titleSet",
+//                "/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet"
+//        );
         mock.map(
                 "/input/story/objectIdentificationWrap/titleWrap/titleSet/appellationValue",
                 "/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue"
@@ -192,22 +192,22 @@ public class TestFullCycle {
                 "/input/sticker/recordWrap/recordID/@type",
                 "/lido/administrativeMetadata/recordWrap/recordID/@type"
         );
-        mock.map(
-                "/input/sticker/recordWrap/recordSource",
-                "/lido/administrativeMetadata/recordWrap/recordSource"
-        );
-        mock.map(
-                "/input/sticker/recordWrap/recordSource/legalBodyName",
-                "/lido/administrativeMetadata/recordWrap/recordSource/legalBodyName"
-        );
+//        mock.map(
+//                "/input/sticker/recordWrap/recordSource",
+//                "/lido/administrativeMetadata/recordWrap/recordSource"
+//        );
+//        mock.map(
+//                "/input/sticker/recordWrap/recordSource/legalBodyName",
+//                "/lido/administrativeMetadata/recordWrap/recordSource/legalBodyName"
+//        );
         mock.map(
                 "/input/sticker/recordWrap/recordSource/legalBodyName/appellationValue",
                 "/lido/administrativeMetadata/recordWrap/recordSource/legalBodyName/appellationValue"
         );
-        mock.map(
-                "/input/sticker/recordWrap/recordType",
-                "/lido/administrativeMetadata/recordWrap/recordType"
-        );
+//        mock.map(
+//                "/input/sticker/recordWrap/recordType",
+//                "/lido/administrativeMetadata/recordWrap/recordType"
+//        );
         mock.map(
                 "/input/sticker/recordWrap/recordType/term",
                 "/lido/administrativeMetadata/recordWrap/recordType/term"
