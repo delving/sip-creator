@@ -32,10 +32,7 @@ import groovy.util.Node;
 import org.apache.commons.io.FileUtils;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
@@ -86,8 +83,10 @@ public class Mockery {
         return dataSetModel;
     }
 
-    public RecMapping mapping() {
-        return recMapping;
+    public String mapping() throws UnsupportedEncodingException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        RecMapping.write(os, recMapping);
+        return os.toString("UTF-8");
     }
 
     public NodeMapping map(String fromString, String toString) {

@@ -105,6 +105,8 @@ public class TestFullCycle {
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
         buildMapping();
+        System.out.println(mock.mapping());
+        System.out.println();
 
         MetadataParser parser = mock.parser();
         MetadataRecord record = parser.nextRecord();
@@ -121,7 +123,7 @@ public class TestFullCycle {
             validator.validate(source);
         }
         catch (SAXException e) {
-            System.out.println(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
