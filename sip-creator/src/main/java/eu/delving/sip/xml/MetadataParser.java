@@ -96,7 +96,13 @@ public class MetadataParser {
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                 QName qName = input.getAttributeName(walk);
-                                String attrName = qName.getPrefix() == null ? qName.getLocalPart() : String.format("%s:%s", qName.getPrefix(), qName.getLocalPart());
+                                String attrName;
+                                if (qName.getPrefix() == null || qName.getPrefix().isEmpty()) {
+                                    attrName = qName.getLocalPart();
+                                }
+                                else {
+                                    attrName = String.format("%s:%s", qName.getPrefix(), qName.getLocalPart());
+                                }
                                 node.attributes().put(attrName, input.getAttributeValue(walk));
                             }
                         }

@@ -110,7 +110,7 @@ public class Mockery {
     public String runMapping(MetadataRecord record) throws MappingException {
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
-//        System.out.println(mappingRunner.getCode());
+        System.out.println(mappingRunner.getCode());
         Node node = mappingRunner.runMapping(record);
         StringWriter writer = new StringWriter();
         XmlNodePrinter printer = new XmlNodePrinter(writer);
