@@ -76,6 +76,10 @@ public class MappingRunner {
         return recMapping.getRecDefTree();
     }
 
+    public String getCode() {
+        return code;
+    }
+
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
 
         if ((counter % 50) == 0) {

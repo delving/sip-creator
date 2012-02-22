@@ -1,10 +1,10 @@
 <?xml version ="1.0" encoding="UTF-8"?>
 <bunch-of-chunks>
     <chunk>
-        <identi-fire>
+        <identi-fire type="local">
             DE-Mb112/lido/obj/00000001
         </identi-fire>
-        <story>
+        <story xml:lang="deu">
             <objectClassificationWrap>
                 <objectWorkTypeWrap>
                     <objectWorkType type="Sachbegriff">
@@ -251,7 +251,7 @@
                 </relatedWorksWrap>
             </objectRelationWrap>
         </story>
-        <administrativeMetadata xml:lang="deu">
+        <sticker xml:lang="deu">
             <recordWrap>
                 <recordID type="local">obj/00000001</recordID>
                 <recordType>
@@ -303,10 +303,10 @@
                     </rightsResource>
                 </resourceSet>
             </resourceWrap>
-        </administrativeMetadata>
+        </sticker>
     </chunk>
     <chunk>
-        <identi-fire>
+        <identi-fire type="local">
             DE-Mb112/lido/obj/00000002
         </identi-fire>
         <story xml:lang="deu">
@@ -485,7 +485,7 @@
                 </subjectWrap>
             </objectRelationWrap>
         </story>
-        <administrativeMetadata xml:lang="deu">
+        <sticker xml:lang="deu">
             <recordWrap>
                 <recordID type="local">obj/00000002</recordID>
                 <recordType>
@@ -534,6 +534,6 @@
                     </rightsResource>
                 </resourceSet>
             </resourceWrap>
-        </administrativeMetadata>
+        </sticker>
     </chunk>
 </bunch-of-chunks>

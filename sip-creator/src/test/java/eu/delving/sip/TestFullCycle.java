@@ -21,6 +21,7 @@
 
 package eu.delving.sip;
 
+import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
@@ -30,6 +31,7 @@ import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.AnalysisParser;
+import eu.delving.sip.xml.MetadataParser;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
@@ -43,6 +45,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 
 import static eu.delving.sip.files.DataSetState.*;
 import static org.junit.Assert.*;
@@ -53,11 +56,10 @@ import static org.junit.Assert.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class TestStorage {
+public class TestFullCycle {
     private Logger log = Logger.getLogger(getClass());
     private Mockery mock;
     private StatsTree statsTree;
-
     private DefaultTreeModel analysisTreeModel;
 
     @Before
@@ -72,41 +74,142 @@ public class TestStorage {
 
     @Test
     public void experiment() throws Exception {
+
         assertEquals(0, mock.fileCount());
         mock.preloadDataset();
         assertEquals(4, mock.fileCount());
         dataSet().externalToImported(mock.sampleInputFile(), null);
         assertEquals(5, mock.fileCount());
         assertEquals(IMPORTED, dataSet().getState());
+
         performAnalysis();
         assertEquals(6, mock.fileCount());
         assertEquals(ANALYZED_IMPORT, dataSet().getState());
+
         assertEquals("2", mock.hints().get(Storage.RECORD_COUNT));
         dataSet().setHints(mock.hints());
         assertEquals(7, mock.fileCount());
         assertEquals(DELIMITED, dataSet().getState());
+
         assertFalse(dataSet().getLatestStatistics().isSourceFormat());
         dataSet().importedToSource(null);
         assertEquals(8, mock.fileCount());
         assertEquals(SOURCED, dataSet().getState());
+
         performAnalysis();
         assertEquals(9, mock.fileCount());
-        assertEquals(ANALYZED_SOURCE, dataSet().getState());
         Statistics statistics = dataSet().getLatestStatistics();
         assertTrue(statistics.isSourceFormat());
         StatsTree tree = statistics.createAnalysisTree();
         assertEquals(Tag.element(Storage.RECORD_TAG), tree.getRoot().getTag());
+        assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
-        // todo: just trying out some validation
+        buildMapping();
+
+        MetadataParser parser = mock.parser();
+        MetadataRecord record = parser.nextRecord();
+        assertNotNull(parser.nextRecord());
+        assertNull(parser.nextRecord());
+
+        String lido = mock.runMapping(record);
+
+        System.out.println(lido);
+
         Validator validator = dataSet().getValidator("lido");
-        assertNotNull(validator);
-        Source source = new StreamSource(mock.sampleInputStream());
+        Source source = new StreamSource(new StringReader(lido));
         try {
             validator.validate(source);
         }
         catch (SAXException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void buildMapping() {
+        mock.map(
+                "/input/identi-fire",
+                "/lido/lidoRecID"
+        );
+        mock.map(
+                "/input/identi-fire/@type",
+                "/lido/lidoRecID/@type"
+        );
+        mock.map(
+                "/input/story",
+                "/lido/descriptiveMetadata"
+        );
+        mock.map(
+                "/input/story/@xml:lang",
+                "/lido/descriptiveMetadata/@xml:lang"
+        );
+        mock.map(
+                "/input/story/objectClassificationWrap",
+                "/lido/descriptiveMetadata/objectClassificationWrap"
+        );
+        mock.map(
+                "/input/story/objectClassificationWrap/objectWorkTypeWrap",
+                "/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap"
+        );
+        mock.map(
+                "/input/story/objectClassificationWrap/objectWorkTypeWrap/objectWorkType",
+                "/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType"
+        );
+        mock.map(
+                "/input/story/objectIdentificationWrap",
+                "/lido/descriptiveMetadata/objectIdentificationWrap"
+        );
+        mock.map(
+                "/input/story/objectIdentificationWrap/titleWrap",
+                "/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap"
+        );
+        mock.map(
+                "/input/story/objectIdentificationWrap/titleWrap/titleSet",
+                "/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet"
+        );
+        mock.map(
+                "/input/story/objectIdentificationWrap/titleWrap/titleSet/appellationValue",
+                "/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue"
+        );
+        mock.map(
+                "/input/sticker",
+                "/lido/administrativeMetadata"
+        );
+        mock.map(
+                "/input/sticker/@xml:lang",
+                "/lido/administrativeMetadata/@xml:lang"
+        );
+        mock.map(
+                "/input/sticker/recordWrap",
+                "/lido/administrativeMetadata/recordWrap"
+        );
+        mock.map(
+                "/input/sticker/recordWrap/recordID",
+                "/lido/administrativeMetadata/recordWrap/recordID"
+        );
+        mock.map(
+                "/input/sticker/recordWrap/recordID/@type",
+                "/lido/administrativeMetadata/recordWrap/recordID/@type"
+        );
+        mock.map(
+                "/input/sticker/recordWrap/recordSource",
+                "/lido/administrativeMetadata/recordWrap/recordSource"
+        );
+        mock.map(
+                "/input/sticker/recordWrap/recordSource/legalBodyName",
+                "/lido/administrativeMetadata/recordWrap/recordSource/legalBodyName"
+        );
+        mock.map(
+                "/input/sticker/recordWrap/recordSource/legalBodyName/appellationValue",
+                "/lido/administrativeMetadata/recordWrap/recordSource/legalBodyName/appellationValue"
+        );
+        mock.map(
+                "/input/sticker/recordWrap/recordType",
+                "/lido/administrativeMetadata/recordWrap/recordType"
+        );
+        mock.map(
+                "/input/sticker/recordWrap/recordType/term",
+                "/lido/administrativeMetadata/recordWrap/recordType/term"
+        );
     }
 
 // todo =========================================
@@ -198,6 +301,6 @@ public class TestStorage {
     }
 
     private DataSet dataSet() {
-        return mock.dataSet();
+        return mock.model().getDataSet();
     }
 }
