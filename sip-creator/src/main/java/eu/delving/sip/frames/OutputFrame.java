@@ -28,7 +28,11 @@ import javax.swing.BorderFactory;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 
@@ -56,9 +60,30 @@ public class OutputFrame extends FrameBase {
     }
 
     private JPanel createOutputPanel() {
-        JPanel p = new JPanel(new BorderLayout());
+        final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
-        JTextArea area = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        final JTextArea area = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        area.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                try {
+                    String first = documentEvent.getDocument().getText(0, 1);
+                    boolean error = first.startsWith("#");
+                    area.setBackground(error ? new Color(1.0f, 0.9f, 0.9f) : Color.WHITE);
+                }
+                catch (BadLocationException e) {
+                    // who cares
+                }
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+            }
+        });
         p.add(scroll(area));
         return p;
     }

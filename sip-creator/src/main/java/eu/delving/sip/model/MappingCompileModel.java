@@ -25,6 +25,7 @@ import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -270,22 +271,28 @@ public class MappingCompileModel {
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
                     if (node == null) return;
+                    String output = XmlSerializer.toXml(node);
                     if (validator != null) {
-                        validator.validate(new DOMSource(node));
-                        compilationComplete(XmlSerializer.toXml(node));
+                        try {
+                            validator.validate(new DOMSource(node));
+                            compilationComplete(output, null);
+                        }
+                        catch (SAXException e) {
+                            compilationComplete(output, e.getMessage());
+                        }
                     }
                     else {
-                        compilationComplete(XmlSerializer.toXml(node));
+                        compilationComplete(output, null);
                         setMappingCode();
                     }
                 }
                 catch (DiscardRecordException e) {
-                    compilationComplete(e.getMessage());
+                    compilationComplete("No output", e.getMessage());
                     setMappingCode();
                 }
             }
             catch (Exception e) {
-                compilationComplete(e.getMessage());
+                compilationComplete("No output available", e.getMessage());
                 notifyStateChange(State.ERROR);
             }
             finally {
@@ -303,7 +310,8 @@ public class MappingCompileModel {
             }
         }
 
-        private void compilationComplete(final String result) {
+        private void compilationComplete(String result, String error) {
+            if (error != null) result = String.format("## VALIDATION ERROR! ##\n%s\n\n## OUTPUT ##\n%s", error, result);
             Exec.swing(new DocumentSetter(outputDocument, result, false));
         }
 
