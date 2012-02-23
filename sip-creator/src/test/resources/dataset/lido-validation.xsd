@@ -767,25 +767,25 @@
 		</xsd:sequence>
 		<xsd:attribute ref="lido:relatedencoding"/>
 	</xsd:complexType>
-	<xsd:element name="lidoWrap">
-		<xsd:annotation>
-			<xsd:documentation>Definition: Holds one or multiple object records.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:sequence>
-				<xsd:element name="lido" maxOccurs="unbounded">
-					<xsd:complexType>
-						<xsd:complexContent>
-							<xsd:extension base="lido:lidoComplexType">
-								<xsd:attribute ref="lido:sortorder"/>
-							</xsd:extension>
-						</xsd:complexContent>
-					</xsd:complexType>
-				</xsd:element>
-			</xsd:sequence>
-			<xsd:attribute ref="lido:relatedencoding"/>
-		</xsd:complexType>
-	</xsd:element>
+	<!--<xsd:element name="lidoWrap">-->
+		<!--<xsd:annotation>-->
+			<!--<xsd:documentation>Definition: Holds one or multiple object records.</xsd:documentation>-->
+		<!--</xsd:annotation>-->
+		<!--<xsd:complexType>-->
+			<!--<xsd:sequence>-->
+				<!--<xsd:element name="lido" maxOccurs="unbounded">-->
+					<!--<xsd:complexType>-->
+						<!--<xsd:complexContent>-->
+							<!--<xsd:extension base="lido:lidoComplexType">-->
+								<!--<xsd:attribute ref="lido:sortorder"/>-->
+							<!--</xsd:extension>-->
+						<!--</xsd:complexContent>-->
+					<!--</xsd:complexType>-->
+				<!--</xsd:element>-->
+			<!--</xsd:sequence>-->
+			<!--<xsd:attribute ref="lido:relatedencoding"/>-->
+		<!--</xsd:complexType>-->
+	<!--</xsd:element>-->
 	<xsd:complexType name="materialsTechComplexType">
 		<xsd:annotation>
 			<xsd:documentation>Definition: Materials and techniques for retrieval.</xsd:documentation>

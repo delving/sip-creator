@@ -95,7 +95,7 @@ public class RecDefTree implements RecDefNode.Listener {
         out.line("// Dictionaries:");
         for (NodeMapping nodeMapping : getNodeMappings()) nodeMapping.generateDictionaryCode(out);
         out.line("// DSL Category wraps Builder call:");
-        out.line("Node outputNode");
+        out.line("org.w3c.dom.Node outputNode");
         out.line_("use (MappingCategory) {");
         out.line_("input * { _input -> outputNode = output.");
         root.toCode(out, editPath);

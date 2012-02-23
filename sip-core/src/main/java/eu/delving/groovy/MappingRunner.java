@@ -22,17 +22,15 @@
 package eu.delving.groovy;
 
 import eu.delving.metadata.EditPath;
-import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
-import groovy.util.Node;
-import groovy.xml.NamespaceBuilder;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
 import org.codehaus.groovy.syntax.SyntaxException;
+import org.w3c.dom.Node;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -43,8 +41,8 @@ import java.util.regex.Pattern;
 
 /**
  * This core class takes a RecMapping and execute the code that it can generate to
- * transform an input to output in the form of a tree of Groovy Nodes using the
- * normal Groovy NodeBuilder class.
+ * transform an input to output in the form of a tree of Groovy Nodes using a custom
+ * DOMBuilder class.
  * <p/>
  * It wraps the mapping code in the MappingCategory for DSL features, and before
  * executing the mapping it binds the input and output to the script to be run.
@@ -92,12 +90,8 @@ public class MappingRunner {
 //        long now = System.currentTimeMillis();
         try {
             Binding binding = new Binding();
-            NodeBuilder builder = NodeBuilder.newInstance();
-            NamespaceBuilder xmlns = new NamespaceBuilder(builder);
+            DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getNamespaces());
             binding.setVariable("output", builder);
-            for (RecDef.Namespace ns : recMapping.getRecDefTree().getNamespaces()) {
-                binding.setVariable(ns.prefix, xmlns.namespace(ns.uri, ns.prefix));
-            }
             List<GroovyNode> input = new ArrayList<GroovyNode>(1);
             input.add(metadataRecord.getRootNode());
             binding.setVariable("input", input);

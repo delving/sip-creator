@@ -37,15 +37,12 @@ import java.util.Iterator;
  * <p/>
  * For DSL aspects, the MappingCategory is automatically wrapped around the builder code
  * which does the mapping transformation.
- * <p/>
- * Various helper functions are automatically added to make record validation nicer.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class GroovyCodeResource {
     private static final URL MAPPING_CATEGORY = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
-    private static final URL VALIDATION_HELPERS = GroovyCodeResource.class.getResource("/ValidationHelpers.groovy");
     private final ClassLoader classLoader;
     private GroovyClassLoader groovyClassLoader;
 
@@ -77,16 +74,6 @@ public class GroovyCodeResource {
         }
         groovyClassLoader.clearCache();
         return groovyClassLoader;
-    }
-
-    public Script createValidationScript(String code) {
-        try {
-            String validationHelperCode = readResourceCode(VALIDATION_HELPERS);
-            return new GroovyShell(getClass().getClassLoader()).parse(validationHelperCode + "\n//=========\n" + code);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
-        }
     }
 
     private String readResourceCode(URL resource) throws IOException {

@@ -23,18 +23,20 @@ package eu.delving.sip.xml;
 
 import eu.delving.groovy.*;
 import eu.delving.metadata.RecMapping;
-import eu.delving.metadata.RecordValidator;
 import eu.delving.metadata.Uniqueness;
-import eu.delving.metadata.ValidationException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
-import groovy.util.Node;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.BitSet;
@@ -60,7 +62,7 @@ public class FileValidator implements Runnable {
     public interface Listener {
         void invalidInput(MappingException exception);
 
-        void invalidOutput(ValidationException exception);
+        void invalidOutput(MetadataRecord record, String message);
 
         void finished(BitSet valid, int recordCount);
     }
@@ -85,15 +87,12 @@ public class FileValidator implements Runnable {
         }
         DataSet dataSet = sipModel.getDataSetModel().getDataSet();
         Uniqueness uniqueness = new Uniqueness();
-        RecordValidator recordValidator = new RecordValidator(groovyCodeResource, sipModel.getMappingModel().getRecMapping());
-        recordValidator.guardUniqueness(uniqueness);
         BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
         PrintWriter out = null;
         try {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
-            if (recMapping == null) {
-                return;
-            }
+            if (recMapping == null) return;
+            Validator validator = dataSet.getValidator(recMapping.getPrefix());
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
             MetadataParser parser = new MetadataParser(
                     sipModel.getDataSetModel().getDataSet().openSourceInputStream(),
@@ -108,7 +107,8 @@ public class FileValidator implements Runnable {
                     if (!progressListener.setProgress(count++)) abort();
                     try {
                         Node outputNode = mappingRunner.runMapping(record);
-                        recordValidator.validateRecord(outputNode, record.getRecordNumber());
+                        Source source = new DOMSource(outputNode);
+                        validator.validate(source);
                         validCount++;
                         valid.set(record.getRecordNumber());
                     }
@@ -120,13 +120,13 @@ public class FileValidator implements Runnable {
                         abort();
                         listener.invalidInput(e);
                     }
-                    catch (ValidationException e) {
+                    catch (SAXException e) {
                         invalidCount++;
                         out.println(record.toString());
                         out.println("=========");
                         if (!allowInvalid) {
                             abort();
-                            listener.invalidOutput(e);
+                            listener.invalidOutput(record, e.getMessage());
                         }
                     }
                     catch (DiscardRecordException e) {

@@ -22,6 +22,7 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
@@ -37,15 +38,15 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 
 import static eu.delving.sip.files.DataSetState.*;
 import static org.junit.Assert.*;
@@ -113,12 +114,12 @@ public class TestFullCycle {
         assertNotNull(parser.nextRecord());
         assertNull(parser.nextRecord());
 
-        String lido = mock.runMapping(record);
+        Node node = mock.runMapping(record);
 
-        System.out.println(lido);
+        System.out.println(XmlSerializer.toXml(node));
 
         Validator validator = dataSet().getValidator("lido");
-        Source source = new StreamSource(new StringReader(lido));
+        Source source = new DOMSource(node);
         try {
             validator.validate(source);
         }

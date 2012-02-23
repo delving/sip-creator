@@ -77,7 +77,7 @@ public class SipModel {
 
     public interface ValidationListener {
 
-        void failed(int recordNumber, Exception exception);
+        void failed(MetadataRecord record, String message);
     }
 
     public interface ParseListener {
@@ -312,7 +312,7 @@ public class SipModel {
             for (Map.Entry<String, String> entry : dataSetFacts.getFacts().entrySet()) {
                 mappingModel.setFact(entry.getKey(), entry.getValue());
             }
-            recordCompileModel.setRecordValidator(new RecordValidator(groovyCodeResource, recMapping));
+            recordCompileModel.setValidator(dataSetModel.getDataSet().getValidator(metadataPrefix));
             feedback.say(String.format("Using '%s' mapping", metadataPrefix));
         }
         catch (StorageException e) {
@@ -454,12 +454,12 @@ public class SipModel {
                     new FileValidator.Listener() {
                         @Override
                         public void invalidInput(final MappingException exception) {
-                            validationListener.failed(exception.getMetadataRecord().getRecordNumber(), exception);
+                            validationListener.failed(exception.getMetadataRecord(), exception.getMessage());
                         }
 
                         @Override
-                        public void invalidOutput(final ValidationException exception) {
-                            validationListener.failed(exception.getRecordNumber(), exception);
+                        public void invalidOutput(MetadataRecord record, String message) {
+                            validationListener.failed(record, message);
                         }
 
                         @Override

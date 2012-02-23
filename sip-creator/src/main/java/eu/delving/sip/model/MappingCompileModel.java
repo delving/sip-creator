@@ -24,7 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
-import groovy.util.Node;
+import org.w3c.dom.Node;
 
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -32,6 +32,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -55,7 +57,7 @@ public class MappingCompileModel {
     private Document outputDocument = new PlainDocument();
     private TriggerTimer triggerTimer = new TriggerTimer();
     private Type type;
-    private RecordValidator recordValidator;
+    private Validator validator;
     private GroovyCodeResource groovyCodeResource;
     private Feedback feedback;
     private boolean enabled;
@@ -122,8 +124,8 @@ public class MappingCompileModel {
         return parseEar;
     }
 
-    public void setRecordValidator(RecordValidator recordValidator) {
-        this.recordValidator = recordValidator;
+    public void setValidator(Validator validator) {
+        this.validator = validator;
     }
 
     public Document getCodeDocument() {
@@ -266,14 +268,14 @@ public class MappingCompileModel {
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getEditPath());
                 }
                 try {
-                    Node outputNode = mappingRunner.runMapping(metadataRecord);
-                    if (outputNode == null) return;
-                    if (recordValidator != null) {
-                        recordValidator.validateRecord(outputNode, metadataRecord.getRecordNumber());
-                        compilationComplete(XmlNodePrinter.serialize(outputNode));
+                    Node node = mappingRunner.runMapping(metadataRecord);
+                    if (node == null) return;
+                    if (validator != null) {
+                        validator.validate(new DOMSource(node));
+                        compilationComplete(XmlSerializer.toXml(node));
                     }
                     else {
-                        compilationComplete(XmlNodePrinter.serialize(outputNode));
+                        compilationComplete(XmlSerializer.toXml(node));
                         setMappingCode();
                     }
                 }

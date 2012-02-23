@@ -21,15 +21,18 @@
 
 package eu.delving.sip;
 
-import eu.delving.groovy.*;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.*;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.xml.MetadataParser;
-import groovy.util.Node;
 import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Node;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
@@ -106,20 +109,20 @@ public class Mockery {
         );
     }
 
-    public String runMapping(MetadataRecord record) throws MappingException {
+    public Node runMapping(MetadataRecord record) throws MappingException {
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
         System.out.println(mappingRunner.getCode());
-        Node node = mappingRunner.runMapping(record);
-        StringWriter writer = new StringWriter();
-        XmlNodePrinter printer = new XmlNodePrinter(writer);
-        printer.print(node);
-        return String.format(
-                "<?xml version =\"1.0\" encoding=\"UTF-8\"?>\n" +
-                        "<lido:lidoWrap xmlns:lido=\"http://www.lido-schema.org\">\n" +
-                        "%s</lido:lidoWrap>\n",
-                writer.toString()
-        );
+        return mappingRunner.runMapping(record);
+//        StringWriter writer = new StringWriter();
+//        XmlNodePrinter printer = new XmlNodePrinter(writer);
+//        printer.print(node);
+//        return String.format(
+//                "<?xml version =\"1.0\" encoding=\"UTF-8\"?>\n" +
+//                        "<lido:lidoWrap xmlns:lido=\"http://www.lido-schema.org\">\n" +
+//                        "%s</lido:lidoWrap>\n",
+//                writer.toString()
+//        );
     }
 
     public File[] files() {
