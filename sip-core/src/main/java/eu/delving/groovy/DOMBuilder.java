@@ -194,7 +194,7 @@ public class DOMBuilder extends BuilderSupport {
             node.appendChild(document.createTextNode(result.string));
         }
         if (result.list != null && !result.list.isEmpty()) {
-            node.appendChild(document.createTextNode(result.string));
+            node.appendChild(document.createTextNode(result.list.get(0)));
             for (int walk = 1; walk < result.list.size(); walk++) {
                 Node child = (Node) createNode(node.getNodeName(), result.list.get(walk));
                 Node parent = node.getParentNode();
@@ -205,9 +205,9 @@ public class DOMBuilder extends BuilderSupport {
     }
 
     private Map runMapClosures(Map map) {
-        Map<String, String> out = new TreeMap<String,String>();
+        Map<String, String> out = new TreeMap<String, String>();
         for (Object entryObject : map.entrySet()) {
-            Map.Entry entry = (Map.Entry) entryObject; 
+            Map.Entry entry = (Map.Entry) entryObject;
             if (entry.getValue() instanceof Closure) {
                 ClosureResult result = runClosure(null, (Closure) entry.getValue());
                 if (result.string != null) out.put(entry.getKey().toString(), result.string);
@@ -247,13 +247,17 @@ public class DOMBuilder extends BuilderSupport {
         else if (result instanceof Object[]) {
             cr.list = unpack(Arrays.asList((Object[]) result));
         }
+        if (cr.list != null && cr.list.size() == 1) {
+            cr.string = cr.list.get(0);
+            cr.list = null;
+        }
         return cr;
     }
 
     private List<String> unpack(List list) {
         List<String> result = new ArrayList<String>();
         unpack(list, result);
-        return result;
+        return result.isEmpty() ? null : result;
     }
 
     private void unpack(List from, List<String> to) {
@@ -261,8 +265,17 @@ public class DOMBuilder extends BuilderSupport {
             if (member instanceof List) {
                 unpack((List) member, to);
             }
-            else {
+            else if (member instanceof Object[]) {
+                unpack(Arrays.asList((Object[]) member), to);
+            }
+            else if (member instanceof String) {
+                to.add((String)member);
+            }
+            else if (!(member instanceof Node)) {
                 to.add(member.toString());
+            }
+            else {
+                throw new RuntimeException("unpack: "+member.getClass());
             }
         }
     }
@@ -270,6 +283,18 @@ public class DOMBuilder extends BuilderSupport {
     private static class ClosureResult {
         public String string;
         public List<String> list;
+
+        public String toString() {
+            if (string != null) {
+                return String.format("String(%s)", string);
+            }
+            else if (list != null) {
+                return String.format("List(%s)", list);
+            }
+            else {
+                return "Empty";
+            }
+        }
     }
 
     private String getNamespace(String name) {

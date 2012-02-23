@@ -120,7 +120,7 @@ public class MappingCategory {
                 else if (returnValue instanceof String) {
                     output.add(returnValue)
                 }
-                else if (!(returnValue instanceof Node)) {
+                else if (!(returnValue instanceof org.w3c.dom.Node)) {
                     output.add(returnValue.toString())
                 }
             }

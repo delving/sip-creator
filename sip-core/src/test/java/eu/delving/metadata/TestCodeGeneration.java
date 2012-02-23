@@ -104,12 +104,9 @@ public class TestCodeGeneration {
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
         Node node = mappingRunner.runMapping(createInputRecord());
         
-        System.out.println(XmlSerializer.toXml(node));
-//        StringWriter writer = new StringWriter();
-//        XmlNodePrinter printer = new XmlNodePrinter(writer);
-//        printer.print(node);
-//        Assert.assertEquals(EXPECT, writer.toString());
-//        System.out.println(writer.toString());
+        String xml = XmlSerializer.toXml(node);
+        System.out.println(xml);
+        Assert.assertEquals(EXPECT, xml);
     }
 
     private void printWithLineNumbers(String code) {
@@ -140,41 +137,42 @@ public class TestCodeGeneration {
         return new MetadataRecordFactory(ns).fromGroovyNode(input, -1, 1);
     }
     
-    private static final String EXPECT = 
-            "<lido:lido lido:sortorder=\"backward\">\n"+
-            "  <lido:descriptiveMetadata>\n"+
-            "    <lido:objectRelationWrap>\n"+
-            "      <lido:subjectWrap>\n"+
-            "        <lido:subjectSet lido:sortorder=\"23\">\n"+
-            "          <lido:subject>\n"+
-            "            <lido:subjectConcept>\n"+
-            "              <lido:term lido:pref=\"23\">Clay Man</lido:term>\n"+
-            "            </lido:subjectConcept>\n"+
-            "            <lido:subjectActor>\n"+
-            "              <lido:displayActor>Gumby</lido:displayActor>\n"+
-            "              <lido:displayActor>Dammit</lido:displayActor>\n"+
-            "            </lido:subjectActor>\n"+
-            "          </lido:subject>\n"+
-            "        </lido:subjectSet>\n"+
-            "        <lido:subjectSet lido:sortorder=\"45\">\n"+
-            "          <lido:subject>\n"+
-            "            <lido:subjectConcept>\n"+
-            "              <lido:term lido:pref=\"45\">Clay Horse</lido:term>\n"+
-            "            </lido:subjectConcept>\n"+
-            "            <lido:subjectActor>\n"+
-            "              <lido:displayActor>O'Pokey</lido:displayActor>\n"+
-            "              <lido:displayActor>McPokey</lido:displayActor>\n"+
-            "            </lido:subjectActor>\n"+
-            "          </lido:subject>\n"+
-            "        </lido:subjectSet>\n"+
-            "      </lido:subjectWrap>\n"+
-            "    </lido:objectRelationWrap>\n"+
-            "  </lido:descriptiveMetadata>\n"+
-            "  <lido:administrativeMetadata>\n"+
-            "    <lido:recordWrap>\n"+
-            "      <lido:recordID lido:type=\"reverse reverse\"/>\n"+
-            "    </lido:recordWrap>\n"+
-            "  </lido:administrativeMetadata>\n"+
+    private static final String EXPECT =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"backward\">\n"+
+            "    <lido:descriptiveMetadata>\n"+
+            "        <lido:objectRelationWrap>\n"+
+            "            <lido:subjectWrap>\n"+
+            "                <lido:subjectSet lido:sortorder=\"23\">\n"+
+            "                    <lido:subject>\n"+
+            "                        <lido:subjectConcept>\n"+
+            "                            <lido:term lido:pref=\"23\">Clay Man</lido:term>\n"+
+            "                        </lido:subjectConcept>\n"+
+            "                        <lido:subjectActor>\n"+
+            "                            <lido:displayActor>Gumby</lido:displayActor>\n"+
+            "                            <lido:displayActor>Dammit</lido:displayActor>\n"+
+            "                        </lido:subjectActor>\n"+
+            "                    </lido:subject>\n"+
+            "                </lido:subjectSet>\n"+
+            "                <lido:subjectSet lido:sortorder=\"45\">\n"+
+            "                    <lido:subject>\n"+
+            "                        <lido:subjectConcept>\n"+
+            "                            <lido:term lido:pref=\"45\">Clay Horse</lido:term>\n"+
+            "                        </lido:subjectConcept>\n"+
+            "                        <lido:subjectActor>\n"+
+            "                            <lido:displayActor>O'Pokey</lido:displayActor>\n"+
+            "                            <lido:displayActor>McPokey</lido:displayActor>\n"+
+            "                        </lido:subjectActor>\n"+
+            "                    </lido:subject>\n"+
+            "                </lido:subjectSet>\n"+
+            "            </lido:subjectWrap>\n"+
+            "        </lido:objectRelationWrap>\n"+
+            "    </lido:descriptiveMetadata>\n"+
+            "    <lido:administrativeMetadata>\n"+
+            "        <lido:recordWrap>\n"+
+            "            <lido:recordID lido:type=\"reverse reverse\"/>\n"+
+            "        </lido:recordWrap>\n"+
+            "    </lido:administrativeMetadata>\n"+
             "</lido:lido>\n";
 
     private static GroovyNode n(GroovyNode parent, String name) {
