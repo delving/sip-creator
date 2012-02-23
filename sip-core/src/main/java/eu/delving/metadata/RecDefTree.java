@@ -98,7 +98,12 @@ public class RecDefTree implements RecDefNode.Listener {
         out.line("org.w3c.dom.Node outputNode");
         out.line_("use (MappingCategory) {");
         out.line_("input * { _input -> outputNode = output.");
-        root.toCode(out, editPath);
+        if (root.hasNodeMappings()) {
+            root.toCode(out, editPath);
+        }
+        else {
+            out.line("'no' { 'mapping' }");
+        }
         out._line("}");
         out.line("outputNode");
         out._line("}");
