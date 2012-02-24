@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.NodeTransferHandler;
@@ -33,6 +34,7 @@ import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Node;
 
 import javax.swing.ListModel;
 import java.io.File;
@@ -77,7 +79,7 @@ public class SipModel {
 
     public interface ValidationListener {
 
-        void failed(MetadataRecord record, String message);
+        void failed(int recordNumber, String record, String message);
     }
 
     public interface ParseListener {
@@ -433,13 +435,15 @@ public class SipModel {
                     progressListener,
                     new FileValidator.Listener() {
                         @Override
-                        public void invalidInput(final MappingException exception) {
-                            validationListener.failed(exception.getMetadataRecord(), exception.getMessage());
+                        public void mappingFailed(final MappingException exception) {
+                            String xml = XmlSerializer.toXml(exception.getMetadataRecord().getRootNode());
+                            validationListener.failed(exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
                         }
 
                         @Override
-                        public void invalidOutput(MetadataRecord record, String message) {
-                            validationListener.failed(record, message);
+                        public void outputInvalid(int recordNumber, Node outputNode, String message) {
+                            String xml = XmlSerializer.toXml(outputNode);
+                            validationListener.failed(recordNumber, xml, message);
                         }
 
                         @Override

@@ -60,9 +60,9 @@ public class FileValidator implements Runnable {
     private int validCount, invalidCount;
 
     public interface Listener {
-        void invalidInput(MappingException exception);
+        void mappingFailed(MappingException exception);
 
-        void invalidOutput(MetadataRecord record, String message);
+        void outputInvalid(int recordNumber, Node node, String message);
 
         void finished(BitSet valid, int recordCount);
     }
@@ -104,8 +104,9 @@ public class FileValidator implements Runnable {
                 MetadataRecord record;
                 while ((record = parser.nextRecord()) != null && !aborted) {
                     if (!progressListener.setProgress(count++)) abort();
+                    Node outputNode = null;
                     try {
-                        Node outputNode = mappingRunner.runMapping(record);
+                        outputNode = mappingRunner.runMapping(record);
                         Source source = new DOMSource(outputNode);
                         validator.validate(source);
                         validCount++;
@@ -113,24 +114,25 @@ public class FileValidator implements Runnable {
                     }
                     catch (MappingException e) {
                         out.println("Mapping exception!");
-                        out.println(record.toString());
+                        out.println(XmlSerializer.toXml(e.getMetadataRecord().getRootNode()));
                         e.printStackTrace(out);
                         out.println("========");
                         abort();
-                        listener.invalidInput(e);
+                        listener.mappingFailed(e);
                     }
                     catch (SAXException e) {
                         invalidCount++;
-                        out.println(record.toString());
+                        out.println(XmlSerializer.toXml(outputNode));
                         out.println("=========");
                         if (!allowInvalid) {
                             abort();
-                            listener.invalidOutput(record, e.getMessage());
+                            listener.outputInvalid(record.getRecordNumber(), outputNode, e.getMessage());
                         }
                     }
                     catch (DiscardRecordException e) {
                         invalidCount++;
-                        out.println("Discarded explicitly: \n" + record.toString());
+                        out.println("Discarded explicitly:");
+                        out.println(XmlSerializer.toXml(record.getRootNode()));
                         out.println("=========");
                     }
                     catch (Exception e) {

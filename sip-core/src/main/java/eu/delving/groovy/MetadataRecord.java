@@ -21,9 +21,6 @@
 
 package eu.delving.groovy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -62,12 +59,6 @@ public class MetadataRecord {
         return recordCount;
     }
 
-    private List<MetadataVariable> getVariables() {
-        List<MetadataVariable> variables = new ArrayList<MetadataVariable>();
-        getVariables(rootNode, variables);
-        return variables;
-    }
-
     private boolean checkFor(GroovyNode groovyNode, Pattern pattern) {
         if (groovyNode.value() instanceof List) {
             List list = (List) groovyNode.value();
@@ -82,64 +73,7 @@ public class MetadataRecord {
         }
     }
 
-    private void getVariables(GroovyNode groovyNode, List<MetadataVariable> variables) {
-        if (groovyNode.value() instanceof List) {
-            List list = (List) groovyNode.value();
-            for (Object member : list) {
-                GroovyNode childNode = (GroovyNode) member;
-                getVariables(childNode, variables);
-            }
-        }
-        else {
-            List<GroovyNode> path = new ArrayList<GroovyNode>();
-            GroovyNode walk = groovyNode;
-            while (walk != null) {
-                path.add(walk);
-                walk = walk.parent();
-            }
-            Collections.reverse(path);
-            StringBuilder out = new StringBuilder();
-            Iterator<GroovyNode> nodeWalk = path.iterator();
-            while (nodeWalk.hasNext()) {
-                String nodeName = nodeWalk.next().name();
-                out.append(nodeName);
-                if (nodeWalk.hasNext()) {
-                    out.append('.');
-                }
-            }
-            String variableName = out.toString();
-            variables.add(new MetadataVariable(variableName, (String) groovyNode.value()));
-        }
-    }
-
     public String toString() {
-        StringBuilder out = new StringBuilder();
-        out.append("Record #").append(recordNumber).append('\n');
-        for (MetadataVariable variable : getVariables()) {
-            out.append(variable.toString()).append('\n');
-        }
-        return out.toString();
-    }
-
-    private static class MetadataVariable {
-        private String name;
-        private String value;
-
-        public MetadataVariable(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public String toString() {
-            return name + "= \"" + value+"\"";
-        }
+        return String.format("MetadataRecord(%d / %d)", recordNumber, recordCount);
     }
 }

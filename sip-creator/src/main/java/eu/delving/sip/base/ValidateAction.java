@@ -21,7 +21,6 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -124,11 +123,11 @@ public class ValidateAction extends AbstractAction {
                 progressListener,
                 new SipModel.ValidationListener() {
                     @Override
-                    public void failed(final MetadataRecord record, String message) {
+                    public void failed(final int recordNumber, final String record, String message) {
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
-                                investigateRecordAction.setRecordNumber(record.getRecordNumber());
+                                investigateRecordAction.setRecordNumber(recordNumber);
                                 Dimension all = parent.getSize();
                                 Dimension d = dialog.getSize();
                                 dialog.setLocation((all.width - d.width) / 2, (all.height - d.height) / 2);

@@ -28,6 +28,7 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
@@ -39,6 +40,7 @@ import java.io.StringWriter;
 public class XmlSerializer {
 
     public static String toXml(Node node) {
+        if (node == null) return "<?xml?>";
         DOMImplementation domImplementation = node.getOwnerDocument().getImplementation();
         if (domImplementation.hasFeature("LS", "3.0") && domImplementation.hasFeature("Core", "2.0")) {
             DOMImplementationLS domImplementationLS = (DOMImplementationLS) domImplementation.getFeature("LS", "3.0");
@@ -60,5 +62,12 @@ public class XmlSerializer {
         else {
             throw new RuntimeException("DOM 3.0 LS and/or DOM 2.0 Core not supported.");
         }
+    }
+    
+    public static String toXml(GroovyNode node) {
+        StringWriter writer = new StringWriter();
+        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+        xmlNodePrinter.print(node);
+        return writer.toString();
     }
 }
