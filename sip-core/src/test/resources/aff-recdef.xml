@@ -11,16 +11,18 @@
         <elem tag="type"/>
         <elem tag="role"/>
         <elem tag="local_id"/>
-        <elem tag="uri"/>
+        <elem tag="local_uri"/>
+        <elem tag="source_uri"/>
         <elem tag="date"/>
         <elem tag="source"/>
         <elem tag="name"/>
         <elem tag="lat"/>
         <elem tag="long"/>
+        <elem tag="category"/>
     </elems>
 
     <root tag="aff">
-        <elem tag="admin">
+        <elem tag="admin" singular="true">
             <elem tag="owner_uri"/>
             <elem tag="owner_name"/>
             <elem tag="provider_uri"/>
@@ -28,38 +30,46 @@
             <elem tag="rights"/>
         </elem>
 
-        <elem tag="thing" elems="type, uri" singular="true">
+        <elem tag="thing" elems="type, local_id, local_uri" singular="true">
             <elem tag="title"/>
             <elem tag="description"/>
             <elem tag="measurement"/>
+            <elem tag="year"/>
             <elem tag="language"/>
             <elem tag="date_created"/>
             <elem tag="collection_name"/>
-            <elem tag="landing_Page"/>
+            <elem tag="landing_page"/>
         </elem>
 
         <elem tag="media">
+            <!-- t.b.d., depends on media-server architecture -->
             <elem tag="thumbnail_source"/>
-            <elem tag="full_view_source"/>
+            <elem tag="full_media_source"/>
             <elem tag="deep_zoom_source"/>
         </elem>
 
         <elem tag="actors" singular="true">
-            <elem tag="actor" elems="role, date">
+            <elem tag="actor" elems="role, date, local_id, source, source_uri">
                 <elem tag="first_name"/>
                 <elem tag="last_name"/>
             </elem>
         </elem>
 
         <elem tag="places" singular="true">
-            <elem tag="place" elems="role, date, name, lat, long"/>
+            <elem tag="place" elems="role, local_id, source, source_uri, date, name, lat, long"/>
         </elem>
 
         <elem tag="types" singular="true">
-            <elem tag="type" elems="source, name">
-                <elem tag="category"/>
+            <elem tag="type" elems="category, local_id, source, source_uri, name"/>
+        </elem>
+
+        <elem tag="events" singular="true">
+            <elem tag="event" elems="category, name">
+               <elem tag="start_date"/>
+               <elem tag="end_date"/>
             </elem>
         </elem>
+
     </root>
 
     <!--<facts>-->
@@ -91,6 +101,15 @@
             <opt key="4">Material</opt>
             <opt key="5">Colour</opt>
             <!--todo: more values-->
+        </option-list>
+
+        <option-list path="/aff/events/event/category">
+            <opt key="1">Production</opt>
+            <opt key="2">Creation</opt>
+            <opt key="3">etc</opt>
+            <opt key="4">etc</opt>
+            <opt key="5">etc</opt>
+            <!--todo: CRM EVENTS, same as i LIDO-->
         </option-list>
     </options>
 
