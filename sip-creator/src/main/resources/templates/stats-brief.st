@@ -2,7 +2,7 @@
 <table>
 
 <tr><td>
-<h1>$stats.path.tail$ ($stats.total$)</h1>
+<h3>$stats.path.tail$ ($stats.total$)</h3>
 </td></tr>
 
 <tr><td>
@@ -11,7 +11,7 @@ $stats.summary$
 
 $if (stats.histogram)$
 <tr><td>
-<h3>Histogram</h3>
+<h4>Histogram</h4>
 </td></tr>
 <tr><td>
 <table>
@@ -25,7 +25,7 @@ $else$
 $if (stats.randomSample)$
 
 <tr><td>
-<h3>Sample</h3>
+<h4>Sample</h4>
 </td></tr>
 <tr><td>
 <table>

@@ -1,6 +1,6 @@
 <html>
 <table cellpadding="10">
-<tr><td><h1>Attribute $name$</h1></td></tr>
+<tr><td><h4>Attribute $name$</h4></td></tr>
 $if (nodeMappings)$
     $nodeMappings : { nm |
         <tr><td><b>&lt;- $nm.inputPath$</b></td></tr>

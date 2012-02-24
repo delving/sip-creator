@@ -43,8 +43,8 @@ import java.awt.event.ActionEvent;
  */
 
 public class CreateFrame extends FrameBase {
-    private static final String SELECT_STATS = "<html><h1>Select</h1></html>";
-    private static final String SELECT_RECDEF = "<html><h1>Select</h1></html>";
+    private static final String SELECT_STATS = "<html><center><h1>Select</h1></center></html>";
+    private static final String SELECT_RECDEF = "<html><center><h1>Select</h1></center></html>";
     private HtmlPanel statsHtml = new HtmlPanel("Input");
     private HtmlPanel recDefHtml = new HtmlPanel("Output");
     private CreateMappingAction createMappingAction = new CreateMappingAction();
@@ -100,9 +100,9 @@ public class CreateFrame extends FrameBase {
     }
 
     private class CreateMappingAction extends AbstractAction {
-        private static final String CREATE = "<html><h2>Create mapping</h2></html>";
-        private static final String SELECT = "<html><h2>Select source and target</h2></html>";
-        private static final String EXISTS = "<html><h2>Mapping exists</h2></html>";
+        private static final String CREATE = "<html><h3>Create mapping</h3></html>";
+        private static final String SELECT = "<html><h3>Select source and target</h3></html>";
+        private static final String EXISTS = "<html><h3>Mapping exists</h3></html>";
 
         private CreateMappingAction() {
             super(SELECT);

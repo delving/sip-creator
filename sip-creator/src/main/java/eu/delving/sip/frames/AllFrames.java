@@ -123,13 +123,13 @@ public class AllFrames {
                         block(fieldMapping, 0, 0)
                 ),
                 view(DECADENT_DISPLAY,
-                        block(create, 0, 0, 3, 3),
-                        block(statistics, 0, 3, 2, 3),
-                        block(input, 5, 0, 2, 4),
+                        block(analysis, 0, 0, 2, 3),
+                        block(create, 2, 0, 1, 3),
                         block(recDef, 3, 0, 2, 3),
+                        block(input, 5, 0, 2, 4),
                         block(fieldMapping, 2, 3, 3, 5),
                         block(output, 5, 4, 2, 4),
-                        block(status, 0, 6, 2, 2)
+                        block(recMapping, 0, 3, 2, 5)
                 ),
                 view(PROJECTOR,
                         block(analysis, 0, 0),
