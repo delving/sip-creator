@@ -87,7 +87,7 @@ public class ProgressPopup implements ProgressListener {
 
     @Override
     public void setProgressString(final String message) {
-        Exec.swing(new Runnable() {
+        Exec.swingAny(new Runnable() {
             @Override
             public void run() {
                 if (!progressBar.isStringPainted()) progressBar.setStringPainted(true);
@@ -119,7 +119,7 @@ public class ProgressPopup implements ProgressListener {
     @Override
     public boolean setProgress(final int progress) {
         if (System.currentTimeMillis() > lastProgress + PATIENCE) { // not too many events
-            Exec.swing(new Runnable() {
+            Exec.swingAny(new Runnable() {
                 @Override
                 public void run() {
                     boundedRangeModel.setValue(progress);
@@ -132,13 +132,12 @@ public class ProgressPopup implements ProgressListener {
 
     @Override
     public void finished(final boolean success) {
-        Exec.swing(new Runnable() {
+        Exec.swingAny(new Runnable() {
             @Override
             public void run() {
+                cancel = true;
                 showTimer.stop();
-                if (dialog.isVisible()) {
-                    dialog.setVisible(false);
-                }
+                if (dialog.isVisible()) dialog.setVisible(false);
                 for (End end : ends) end.finished(success);
             }
         });

@@ -22,11 +22,15 @@
 package eu.delving.sip.menus;
 
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -71,21 +75,28 @@ public class DataSetMenu extends JMenu {
 
     private void refresh() {
         removeAll();
-        ButtonGroup bg = new ButtonGroup();
+        final ButtonGroup buttonGroup = new ButtonGroup();
         try {
             DataSetItem last = null;
             boolean somethingSelected = false;
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 for (String prefix : dataSet.getRecDefPrefixes()) {
                     final DataSetItem item = new DataSetItem(dataSet, prefix);
-                    bg.add(item);
+                    buttonGroup.add(item);
                     add(item);
                     item.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
-                            sipModel.setDataSet(item.getDataSet(), false);
-                            sipModel.setMetadataPrefix(item.getPrefix());
-                            setPreference(item.getDataSet(), item.getPrefix());
+                            final ProgressListener listener = sipModel.getFeedback().progressListener("Loading Dataset");
+                            listener.setIndeterminateMessage(String.format("Preparing dataset %s for mapping %s", item.getDataSet(), item.getPrefix()));
+                            listener.prepareFor(-1);
+                            sipModel.setDataSet(item.getDataSet(), item.getPrefix(), new SipModel.DataSetCompletion() {
+                                @Override
+                                public void complete(final boolean success) {
+                                    listener.finished(success);
+                                    if (success) setPreference(item.getDataSet(), item.getPrefix());
+                                }
+                            });
                         }
                     });
                     if (item.isPreferred()) {
@@ -109,7 +120,7 @@ public class DataSetMenu extends JMenu {
                     }
                 });
             }
-            if (bg.getButtonCount() == 0) {
+            if (buttonGroup.getButtonCount() == 0) {
                 JMenuItem empty = new JMenuItem("No data sets available");
                 empty.setEnabled(false);
                 add(empty);

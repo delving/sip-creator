@@ -54,6 +54,7 @@ public class VisualFeedback implements Feedback {
     private JList list = new JList(listModel);
     private LogFrame logFrame;
     private JDesktopPane desktop;
+    private ProgressPopup progressPopup;
 
     public VisualFeedback(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -92,6 +93,7 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void alert(final String message) {
+        if (progressPopup != null) progressPopup.finished(false);
         log.warn(message);
         Exec.swingWait(new Runnable() {
             @Override
@@ -104,6 +106,7 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void alert(final String message, Exception exception) {
+        if (progressPopup != null) progressPopup.finished(false);
         log.warn(message, exception);
         Exec.swingWait(new Runnable() {
             @Override
@@ -116,7 +119,15 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public ProgressListener progressListener(String title) {
-        return new ProgressPopup(desktop, title);
+        if (progressPopup != null) progressPopup.finished(false);
+        final ProgressPopup fresh = progressPopup = new ProgressPopup(desktop, title);
+        progressPopup.onFinished(new ProgressListener.End() {
+            @Override
+            public void finished(boolean success) {
+                if (progressPopup != fresh) progressPopup = null;
+            }
+        });
+        return progressPopup;
     }
 
     private void addToList(final String message) {

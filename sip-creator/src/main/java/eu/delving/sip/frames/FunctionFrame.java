@@ -171,10 +171,10 @@ public class FunctionFrame extends FrameBase {
                 names.clear();
                 fireIntervalRemoved(this, 0, size);
             }
-            for (MappingFunction function : recMapping.getFunctions()) names.add(function.name);
+            if (recMapping != null) for (MappingFunction function : recMapping.getFunctions()) names.add(function.name);
             Collections.sort(names);
             if (!names.isEmpty()) {
-                fireIntervalRemoved(this, 0, getSize());
+                fireIntervalAdded(this, 0, getSize());
             }
         }
 

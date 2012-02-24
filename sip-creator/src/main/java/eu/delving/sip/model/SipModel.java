@@ -84,6 +84,10 @@ public class SipModel {
         void updatedRecord(MetadataRecord metadataRecord);
     }
 
+    public interface ScanPredicate {
+        boolean accept(MetadataRecord record);
+    }
+
     public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback) throws StorageException {
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
@@ -251,7 +255,11 @@ public class SipModel {
         return fieldCompileModel;
     }
 
-    public void setDataSet(final DataSet dataSet, final boolean useLatestPrefix) {
+    public interface DataSetCompletion {
+        void complete(boolean success);
+    }
+    
+    public void setDataSet(final DataSet dataSet, final String requestedPrefix, final DataSetCompletion completion) {
         Exec.work(new Runnable() {
             @Override
             public void run() {
@@ -259,7 +267,19 @@ public class SipModel {
                     final Statistics statistics = dataSet.getLatestStatistics();
                     final Map<String, String> facts = dataSet.getDataSetFacts();
                     final Map<String, String> hints = dataSet.getHints();
+                    final String prefix = requestedPrefix.isEmpty() ? dataSet.getLatestPrefix() : requestedPrefix;
                     dataSetModel.setDataSet(dataSet);
+                    final RecMapping recMapping = dataSetModel.getRecMapping(prefix);
+                    dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
+                    for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
+                        nodeMapping.statsTreeNode = statsModel.findNodeForInputPath(nodeMapping.inputPath);
+                    }
+                    mappingModel.setRecMapping(recMapping);
+                    for (Map.Entry<String, String> entry : facts.entrySet()) {
+                        mappingModel.setFact(entry.getKey(), entry.getValue());
+                    }
+                    recordCompileModel.setValidator(dataSetModel.getValidator(prefix));
+                    feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), prefix));
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
@@ -267,57 +287,17 @@ public class SipModel {
                             statsModel.set(hints);
                             statsModel.setStatistics(statistics);
                             seekFirstRecord();
-                            feedback.say("Loaded data set " + dataSet.getSpec());
-                            if (useLatestPrefix) {
-                                Exec.work(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        String latestPrefix = dataSet.getLatestPrefix();
-                                        if (latestPrefix != null) {
-                                            setPrefix(latestPrefix);
-                                        }
-                                        else {
-                                            mappingModel.setRecMapping(null);
-                                        }
-                                    }
-                                });
-                            }
                         }
                     });
+                    completion.complete(true);
                 }
-                catch (StorageException e) {
+                catch (final Exception e) {
+                    completion.complete(false);
                     feedback.alert(String.format("Unable to switch to data set %s", dataSet.getSpec()), e);
+                    dataSetModel.clearDataSet();
                 }
             }
         });
-    }
-
-    public void setMetadataPrefix(final String metadataPrefix) {
-        Exec.work(new Runnable() {
-            @Override
-            public void run() {
-                setPrefix(metadataPrefix);
-            }
-        });
-    }
-
-    private void setPrefix(String metadataPrefix) {
-        try {
-            final RecMapping recMapping = dataSetModel.getDataSet().getRecMapping(metadataPrefix, dataSetModel);
-            dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-            for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
-                nodeMapping.statsTreeNode = statsModel.findNodeForInputPath(nodeMapping.inputPath);
-            }
-            mappingModel.setRecMapping(recMapping);
-            for (Map.Entry<String, String> entry : dataSetFacts.getFacts().entrySet()) {
-                mappingModel.setFact(entry.getKey(), entry.getValue());
-            }
-            recordCompileModel.setValidator(dataSetModel.getDataSet().getValidator(metadataPrefix));
-            feedback.say(String.format("Using '%s' mapping", metadataPrefix));
-        }
-        catch (StorageException e) {
-            feedback.alert("Unable to select Metadata Prefix " + metadataPrefix, e);
-        }
     }
 
     public void importSource(final File file, final ProgressListener progressListener) {
@@ -480,28 +460,30 @@ public class SipModel {
     }
 
     public void seekReset() {
-        if (metadataParser != null) {
-            metadataParser.close();
-            metadataParser = null;
-        }
+        Exec.work(new Runnable() {
+            @Override
+            public void run() {
+                if (metadataParser != null) {
+                    metadataParser.close();
+                    metadataParser = null;
+                    for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
+                }
+            }
+        });
     }
 
     public void seekFirstRecord() {
         seekRecordNumber(0, null);
     }
 
-    public interface ScanPredicate {
-        boolean accept(MetadataRecord record);
-    }
-
     public void seekRecordNumber(final int recordNumber, ProgressListener progressListener) {
+        seekReset();
         ScanPredicate numberScan = new ScanPredicate() {
             @Override
             public boolean accept(MetadataRecord record) {
                 return record.getRecordNumber() == recordNumber;
             }
         };
-        seekReset();
         seekRecord(numberScan, progressListener);
     }
 

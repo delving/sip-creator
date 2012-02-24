@@ -122,7 +122,11 @@ public class RecMappingFrame extends FrameBase {
     }
 
     private class ListUpdater implements Runnable {
-        private final RecDefTree recDefTree = sipModel.getMappingModel().getRecMapping().getRecDefTree();
+        private RecDefTree recDefTree;
+
+        private ListUpdater() {
+            if (sipModel.getMappingModel().hasRecMapping()) recDefTree = sipModel.getMappingModel().getRecMapping().getRecDefTree();
+        }
 
         @Override
         public void run() {
@@ -144,7 +148,7 @@ public class RecMappingFrame extends FrameBase {
                 list = null;
                 if (size > 0) fireIntervalRemoved(this, 0, size - 1);
             }
-            list = recDefTree.getNodeMappings();
+            if (recDefTree != null) list = recDefTree.getNodeMappings();
             fireIntervalAdded(this, 0, getSize());
         }
 

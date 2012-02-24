@@ -22,10 +22,10 @@
 package eu.delving.sip.xml;
 
 import eu.delving.groovy.*;
+import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecMapping;
 import eu.delving.metadata.Uniqueness;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
@@ -85,21 +85,20 @@ public class FileValidator implements Runnable {
         if (!sipModel.hasDataSet() || !sipModel.hasPrefix()) {
             throw new RuntimeException("No data set selected");
         }
-        DataSet dataSet = sipModel.getDataSetModel().getDataSet();
         Uniqueness uniqueness = new Uniqueness();
         BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
         PrintWriter out = null;
         try {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping == null) return;
-            Validator validator = dataSet.getValidator(recMapping.getPrefix());
+            Validator validator = sipModel.getDataSetModel().getValidator(recMapping.getPrefix());
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
             MetadataParser parser = new MetadataParser(
                     sipModel.getDataSetModel().getDataSet().openSourceInputStream(),
                     sipModel.getStatsModel().getRecordCount()
             );
             progressListener.prepareFor(sipModel.getStatsModel().getRecordCount());
-            out = dataSet.openReportWriter(recMapping);
+            out = sipModel.getDataSetModel().getDataSet().openReportWriter(recMapping);
             int count = 0;
             try {
                 MetadataRecord record;
@@ -175,6 +174,10 @@ public class FileValidator implements Runnable {
         catch (MetadataParser.AbortException e) {
             aborted = true;
             LOG.info("Validation aborted by user");
+        }
+        catch (MetadataException e) {
+            aborted = true;
+            LOG.info("Validation problem", e);
         }
         finally {
             IOUtils.closeQuietly(out);

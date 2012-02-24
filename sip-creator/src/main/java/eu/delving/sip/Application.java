@@ -163,15 +163,14 @@ public class Application {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        sipModel.seekReset();
                         sipModel.getMappingModel().setRecMapping(null);
-                        sipModel.getStatsModel().setStatistics(null);
                         sipModel.getDataSetFacts().set(null);
-                        sipModel.getRecordCompileModel().getParseEar().updatedRecord(null);
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
                                 dataSetMenu.refreshAndChoose(null);
+                                sipModel.getStatsModel().setStatistics(null);
+                                sipModel.seekReset();
                             }
                         });
                     }

@@ -27,13 +27,12 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -44,6 +43,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
+    private Map<String, Validator> validatorMap = new TreeMap<String, Validator>();
     private DataSetState dataSetState = DataSetState.EMPTY;
     private List<FactDefinition> factDefinitions = new ArrayList<FactDefinition>();
 
@@ -60,6 +60,19 @@ public class DataSetModel implements RecDefModel {
             throw new IllegalStateException("There is no data set in the model!");
         }
         return dataSet;
+    }
+
+    public Validator getValidator(String metadataPrefix) throws MetadataException {
+        try {
+            Validator found = validatorMap.get(metadataPrefix);
+            if (found == null) {
+                validatorMap.put(metadataPrefix, found = getDataSet().getValidator(metadataPrefix));
+            }
+            return found;
+        }
+        catch (StorageException e) {
+            throw new MetadataException("Unable to get validator", e);
+        }
     }
 
     @Override
@@ -88,8 +101,23 @@ public class DataSetModel implements RecDefModel {
         }
     }
 
+    public void clearDataSet() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            for (Listener listener : listeners) listener.dataSetRemoved();
+        }
+        else {
+            Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    for (Listener listener : listeners) listener.dataSetRemoved();
+                }
+            });
+        }
+    }
+
     public void setDataSet(final DataSet dataSet) throws StorageException {
         this.dataSet = dataSet;
+        this.validatorMap.clear();
         this.factDefinitions.clear();
         if (dataSet != null) {
             this.factDefinitions.addAll(dataSet.getFactDefinitions());
@@ -111,22 +139,12 @@ public class DataSetModel implements RecDefModel {
             }
         }
         else {
-            if (SwingUtilities.isEventDispatchThread()) {
-                for (Listener listener : listeners) {
-                    listener.dataSetRemoved();
-                }
-            }
-            else {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Listener listener : listeners) {
-                            listener.dataSetRemoved();
-                        }
-                    }
-                });
-            }
+            clearDataSet();
         }
+    }
+
+    public RecMapping getRecMapping(String prefix) throws StorageException {
+        return getDataSet().getRecMapping(prefix, this);
     }
 
     private class StateCheckTimer implements Runnable, ActionListener {
