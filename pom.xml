@@ -28,10 +28,10 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
-    <artifactId>sip-parent</artifactId>
+    <artifactId>sip-creator</artifactId>
     <version>0.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>SIP-Creator Parent</name>
+    <name>SIP-Creator</name>
     <description>
         This parent project defines the version management, repositories, etc for all the other modules.
     </description>
@@ -106,7 +106,7 @@
 
     <modules>
         <module>sip-core</module>
-        <module>sip-creator</module>
+        <module>sip-app</module>
     </modules>
 
     <build>

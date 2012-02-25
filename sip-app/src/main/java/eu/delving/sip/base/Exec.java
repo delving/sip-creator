@@ -21,7 +21,7 @@
 
 package eu.delving.sip.base;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

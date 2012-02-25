@@ -24,7 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.sip.files.DataSetState;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 
 /**

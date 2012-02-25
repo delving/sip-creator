@@ -26,7 +26,7 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 

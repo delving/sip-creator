@@ -24,7 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
+import javax.swing.AbstractListModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;

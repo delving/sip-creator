@@ -23,7 +23,8 @@ package eu.delving.sip.files;
 
 import eu.delving.sip.base.Utility;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;

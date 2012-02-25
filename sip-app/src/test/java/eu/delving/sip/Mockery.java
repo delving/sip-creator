@@ -58,8 +58,10 @@ public class Mockery {
     private Map<String, String> hints = new TreeMap<String, String>();
 
     public Mockery() throws StorageException, MetadataException {
-        File target = new File("sip-creator/target");
-        if (!target.exists()) throw new RuntimeException("target directory not found: " + target);
+        File target = null, target1 = new File("sip-app/target"), target2 = new File("target");
+        if (target1.exists()) target = target1;
+        if (target2.exists()) target = target2;
+        if (target == null) throw new RuntimeException("target directory not found: " + target);
         root = new File(target, "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());

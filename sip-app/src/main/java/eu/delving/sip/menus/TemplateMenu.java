@@ -24,8 +24,10 @@ package eu.delving.sip.menus;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.JMenu;
+import javax.swing.JOptionPane;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 /**
