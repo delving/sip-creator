@@ -1,0 +1,86 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+
+<aff:aff xmlns:aff="http://www.aff-schema.org">
+
+    <aff:admin>
+        <aff:ownerUri>http://www.vbm.se</aff:ownerUri>
+        <aff:ownerName>Västerbottens museum</aff:ownerName>
+        <aff:providerUri>xxxxxx</aff:providerUri>
+        <aff:providerName>HUBNAME</aff:providerName>
+        <aff:rigths>Wahtever</aff:rigths>
+        <aff:checksum>45893245893243264</aff:checksum>
+    </aff:admin>
+    <aff:collection>
+        <aff:collectionID>3</aff:collectionID>
+        <aff:collectionUri>http://id.vbm.se/collection/3</aff:collectionUri>
+        <aff:collectionName>Skidsamlingen</aff:collectionName>
+    </aff:collection>
+    <aff:thing>
+        <aff:thingId>string</aff:thingId>
+        <aff:thingUri>string</aff:thingUri>
+        <aff:workType>string</aff:workType>
+        <aff:title>string</aff:title>
+        <aff:description>string</aff:description>
+        <aff:language>string</aff:language>
+        <aff:displayMeasurement>string</aff:displayMeasurement>
+        <aff:displayYear>string</aff:displayYear>
+        <aff:landingPage>string</aff:landingPage>
+    </aff:thing>
+    <aff:mediaFiles>
+        <aff:mediaFile>
+            <aff:localURL>string</aff:localURL>
+            <aff:localMediaTypeUri>string</aff:localMediaTypeUri>
+            <aff:localMimeType>string</aff:localMimeType>
+            <aff:delvingMediaURI>string</aff:delvingMediaURI>
+        </aff:mediaFile>
+    </aff:mediaFiles>
+    <aff:actors>
+        <aff:actor>
+           <aff:localId>string</aff:localId>
+           <aff:localUri>string</aff:localUri>
+           <aff:roleUri>string</aff:roleUri>
+           <aff:roleName>string</aff:roleName>
+           <aff:sourceName>string</aff:sourceName>
+           <aff:sourceUri>string</aff:sourceUri>
+           <aff:displayDate>string</aff:displayDate>
+           <aff:firstName>string</aff:firstName>
+           <aff:lastName>string</aff:lastName>
+        </aff:actor>
+    </aff:actors>
+    <aff:places>
+        <aff:place>
+            <aff:localId>string</aff:localId>
+            <aff:localUri>string</aff:localUri>
+            <aff:roleUri>string</aff:roleUri>
+            <aff:roleName>string</aff:roleName>
+            <aff:sourceName>string</aff:sourceName>
+            <aff:sourceUri>string</aff:sourceUri>
+            <aff:displayDate>string</aff:displayDate>
+            <aff:placeName>string</aff:placeName>
+            <aff:lat>string</aff:lat>
+            <aff:long>string</aff:long>
+        </aff:place>
+    </aff:places>
+    <aff:types>
+        <aff:type>
+            <aff:localId>string</aff:localId>
+            <aff:localUri>string</aff:localUri>
+            <aff:roleUri>string</aff:roleUri>
+            <aff:roleName>string</aff:roleName>
+            <aff:sourceName>string</aff:sourceName>
+            <aff:sourceUri>string</aff:sourceUri>
+            <aff:typeName>string</aff:typeName>
+        </aff:type>
+    </aff:types>
+    <aff:events>
+        <aff:event>
+            <aff:displayDate>string</aff:displayDate>
+            <aff:eventTypeUri>string</aff:eventTypeUri>
+            <aff:evenTypeName>string</aff:evenTypeName>
+            <aff:eventName>string</aff:eventName>
+        </aff:event>
+    </aff:events>
+</aff:aff>
+
+
+

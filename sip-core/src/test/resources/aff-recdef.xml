@@ -57,14 +57,14 @@
         </elem>
 
         <elem tag="actors" singular="true">
-            <elem tag="actor" elems="roleUri, roleName, localId, localUri, sourceName, sourceUri, displayDate">
+            <elem tag="actor" elems="localId, localUri, roleUri, roleName, sourceName, sourceUri, displayDate">
                 <elem tag="firstName"/>
                 <elem tag="lastName"/>
             </elem>
         </elem>
 
         <elem tag="places" singular="true">
-            <elem tag="place" elems="roleUri, roleName, localId, localUri, sourceName, sourceUri, displayDate">
+            <elem tag="place" elems="localId, localUri, roleUri, roleName, sourceName, sourceUri, displayDate">
                 <elem tag="placeName"/>
                 <elem tag="lat"/>
                 <elem tag="long"/>
@@ -72,7 +72,7 @@
         </elem>
 
         <elem tag="types" singular="true">
-            <elem tag="type" elems="roleUri, roleName, localId, localUri, sourceName, sourceUri, displayDate">
+            <elem tag="type" elems="localId, localUri, roleUri, roleName, sourceName, sourceUri">
                 <elem tag="typeName"/>
             </elem>
         </elem>

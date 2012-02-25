@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.aff-schema.org" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="aff">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="admin">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="ownerUri"/>
+              <xs:element type="xs:string" name="ownerName"/>
+              <xs:element type="xs:string" name="providerUri"/>
+              <xs:element type="xs:string" name="providerName"/>
+              <xs:element type="xs:string" name="rigths"/>
+              <xs:element type="xs:string" name="checksum"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="collection">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="collectionID"/>
+              <xs:element type="xs:string" name="collectionUri"/>
+              <xs:element type="xs:string" name="collectionName"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="thing">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="thingId"/>
+              <xs:element type="xs:string" name="thingUri"/>
+              <xs:element type="xs:string" name="workType"/>
+              <xs:element type="xs:string" name="title"/>
+              <xs:element type="xs:string" name="description"/>
+              <xs:element type="xs:string" name="language"/>
+              <xs:element type="xs:string" name="displayMeasurement"/>
+              <xs:element type="xs:string" name="displayYear"/>
+              <xs:element type="xs:string" name="landingPage"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="mediaFiles">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="mediaFile">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="localURL"/>
+                    <xs:element type="xs:string" name="localMediaTypeUri"/>
+                    <xs:element type="xs:string" name="localMimeType"/>
+                    <xs:element type="xs:string" name="delvingMediaURI"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="actors">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="actor">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="localId"/>
+                    <xs:element type="xs:string" name="localUri"/>
+                    <xs:element type="xs:string" name="roleUri"/>
+                    <xs:element type="xs:string" name="roleName"/>
+                    <xs:element type="xs:string" name="sourceName"/>
+                    <xs:element type="xs:string" name="sourceUri"/>
+                    <xs:element type="xs:string" name="displayDate"/>
+                    <xs:element type="xs:string" name="firstName"/>
+                    <xs:element type="xs:string" name="lastName"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="places">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="place">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="localId"/>
+                    <xs:element type="xs:string" name="localUri"/>
+                    <xs:element type="xs:string" name="roleUri"/>
+                    <xs:element type="xs:string" name="roleName"/>
+                    <xs:element type="xs:string" name="sourceName"/>
+                    <xs:element type="xs:string" name="sourceUri"/>
+                    <xs:element type="xs:string" name="displayDate"/>
+                    <xs:element type="xs:string" name="placeName"/>
+                    <xs:element type="xs:string" name="lat"/>
+                    <xs:element type="xs:string" name="long"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="types">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="type">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="localId"/>
+                    <xs:element type="xs:string" name="localUri"/>
+                    <xs:element type="xs:string" name="roleUri"/>
+                    <xs:element type="xs:string" name="roleName"/>
+                    <xs:element type="xs:string" name="sourceName"/>
+                    <xs:element type="xs:string" name="sourceUri"/>
+                    <xs:element type="xs:string" name="typeName"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="events">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="event">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="displayDate"/>
+                    <xs:element type="xs:string" name="eventTypeUri"/>
+                    <xs:element type="xs:string" name="evenTypeName"/>
+                    <xs:element type="xs:string" name="eventName"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
