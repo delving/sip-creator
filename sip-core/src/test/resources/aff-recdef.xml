@@ -1,100 +1,109 @@
 <?xml version="1.0"?>
 <record-definition prefix="aff">
 
-    <!--todo: summary fields are not accounted for yet-->
+    <!--todo: summary fields are not accounted for yet -->
 
     <namespaces>
         <namespace prefix="aff" uri="http://www.delving.eu/aff" schema="http://www.delving.eu/aff_1.0.xsd"/>
     </namespaces>
 
     <elems>
-        <elem tag="type"/>
-        <elem tag="role"/>
-        <elem tag="local_id"/>
-        <elem tag="local_uri"/>
-        <elem tag="source_uri"/>
-        <elem tag="date"/>
-        <elem tag="source"/>
-        <elem tag="name"/>
-        <elem tag="lat"/>
-        <elem tag="long"/>
-        <elem tag="category"/>
+        <elem tag="localId"/>
+        <elem tag="localUri"/>
+        <elem tag="sourceUri"/>
+        <elem tag="sourceName"/>
+        <elem tag="roleUri"/>
+        <elem tag="roleName"/>
+        <elem tag="displayDate"/>
+        <!-- don't move around or/add more elems up here. keep it as it is below -->
     </elems>
 
     <root tag="aff">
+
         <elem tag="admin" singular="true">
-            <elem tag="owner_uri"/>
-            <elem tag="owner_name"/>
-            <elem tag="provider_uri"/>
-            <elem tag="provider_name"/>
+            <elem tag="ownerUri"/>
+            <elem tag="ownerName"/>
+            <elem tag="providerUri"/>
+            <elem tag="providerName"/>
             <elem tag="rights"/>
+            <elem tag="checksum"/> <!--  hidden="true" -->
         </elem>
 
-        <elem tag="thing" elems="type, local_id, local_uri" singular="true">
+        <elem tag="collection" singular="true">
+            <elem tag="collectionId"/>
+            <elem tag="collectionUri"/>
+            <elem tag="collectionName"/>
+        </elem>
+
+        <elem tag="thing" singular="true">
+            <elem tag="thingId"/>
+            <elem tag="thingUri"/>
+            <elem tag="workType"/>
             <elem tag="title"/>
             <elem tag="description"/>
-            <elem tag="measurement"/>
-            <elem tag="year"/>
             <elem tag="language"/>
-            <elem tag="date_created"/>
-            <elem tag="collection_name"/>
-            <elem tag="landing_page"/>
+            <elem tag="displayMeasurement"/>
+            <elem tag="displayYear"/>
+            <elem tag="landingPage"/>
         </elem>
 
-        <elem tag="media">
-            <!-- t.b.d., depends on media-server architecture -->
-            <elem tag="thumbnail_source"/>
-            <elem tag="full_media_source"/>
-            <elem tag="deep_zoom_source"/>
+        <elem tag="mediaFiles">
+	        <elem tag="mediaFile">
+                <elem tag="localURL"/>
+                <elem tag="localMediaTypeUri"/>
+                <elem tag="localMimeType"/>
+                <elem tag="delvingMediaURI"/> <!--  hidden="true" -->
+            </elem>
         </elem>
 
         <elem tag="actors" singular="true">
-            <elem tag="actor" elems="role, date, local_id, source, source_uri">
-                <elem tag="first_name"/>
-                <elem tag="last_name"/>
+            <elem tag="actor" elems="roleUri, roleName, localId, localUri, sourceName, sourceUri, displayDate">
+                <elem tag="firstName"/>
+                <elem tag="lastName"/>
             </elem>
         </elem>
 
         <elem tag="places" singular="true">
-            <elem tag="place" elems="role, local_id, source, source_uri, date, name, lat, long"/>
+            <elem tag="place" elems="roleUri, roleName, localId, localUri, sourceName, sourceUri, displayDate">
+                <elem tag="placeName"/>
+                <elem tag="lat"/>
+                <elem tag="long"/>
+            </elem>
         </elem>
 
         <elem tag="types" singular="true">
-            <elem tag="type" elems="category, local_id, source, source_uri, name"/>
+            <elem tag="type" elems="roleUri, roleName, localId, localUri, sourceName, sourceUri, displayDate">
+                <elem tag="typeName"/>
+            </elem>
         </elem>
 
+        <!-- other events, not part of Actors and places -->
         <elem tag="events" singular="true">
-            <elem tag="event" elems="category, name">
-               <elem tag="start_date"/>
-               <elem tag="end_date"/>
+            <elem tag="event" elems="displayDate">
+               <elem tag="eventTypeUri"/>
+               <elem tag="evenTypeName"/>
+               <elem tag="eventName"/>
             </elem>
         </elem>
 
     </root>
 
-    <!--<facts>-->
-        <!--<fact path="/aff/admin/owner_uri" name="mets:"/>-->
-        <!--<fact path="/aff/admin/owner_name" name="mets:"/>-->
-        <!--<fact path="/aff/admin/provider_uri" name="mets:"/>-->
-        <!--<fact path="/aff/admin/provider_name" name="mets:"/>-->
-        <!--<fact path="/aff/admin/rights" name="mets:"/>-->
-        <!--<fact path="/aff/thing/language" name="mets:"/>-->
-    <!--</facts>-->
-
     <options> <!-- keys should be uri's -->
-        <option-list path="/aff/actors/actor/role">
+        <option-list keyPath="/aff/actors/actor/roleUri"> <!--valuePath="/aff/actors/actor/roleName"> -->
             <opt key="1">Creator</opt>
             <opt key="2">Artist</opt>
             <opt key="3">Photographer</opt>
             <!--todo: more values-->
         </option-list>
-        <option-list path="/aff/places/place/role">
+
+        <option-list keypath="/aff/places/place/roleURI"> <!--valuePath="/aff/places/place/roleName"> -->
             <opt key="1">Actors place of birth</opt>
             <opt key="2">Actor place of death</opt>
             <opt key="3">Production place</opt>
             <!--todo: more values-->
         </option-list>
-        <option-list path="/aff/types/type/category">
+
+        <option-list keyPath="/aff/types/type/roleUri"> <!--valuePath="/aff/types/type/roleName"> -->
             <opt key="1">Classification</opt>
             <opt key="2">Subject</opt>
             <opt key="3">Technique</opt>
@@ -103,7 +112,7 @@
             <!--todo: more values-->
         </option-list>
 
-        <option-list path="/aff/events/event/category">
+        <option-list keyPath="/aff/events/event/eventTypeUri"> <!--valuePath="aff/events/event/eventTypeName">  -->
             <opt key="1">Production</opt>
             <opt key="2">Creation</opt>
             <opt key="3">etc</opt>
@@ -111,9 +120,51 @@
             <opt key="5">etc</opt>
             <!--todo: CRM EVENTS, same as i LIDO-->
         </option-list>
+
+        <option-list keyPath="/aff/mediaFiles/mediaFile/localMediaTypeUri">
+            <opt key="1">Thumbnail</opt>
+            <opt key="2">Full image</opt>
+            <opt key="3">Deep zoom image</opt>
+            <opt key="4">Document</opt>
+            <opt key="5">Video</opt>
+            <opt key="5">Sound</opt>
+            <opt key="6">etc</opt>
+        </option-list>
     </options>
 
-    <docs/>
-    <bookmarks/>
+      <!--<facts>-->
+        <!--<fact path="/aff/admin/owner_uri" name="mets:"/>-->
+        <!--<fact path="/aff/admin/owner_name" name="mets:"/>-->
+        <!--<fact path="/aff/admin/provider_uri" name="mets:"/>-->
+        <!--<fact path="/aff/admin/provider_name" name="mets:"/>-->
+        <!--<fact path="/aff/admin/rights" name="mets:"/>-->
+        <!--<fact path="/aff/thing/language" name="mets:"/>-->
+    <!--</facts>-->
+
+
+<!--    <docs>
+        <doc tag="admin">
+            <string name="Definition"></string>
+        </doc>
+        <doc tag="owner_uri">
+            <string name="Definition"></string>
+        </doc>
+        <doc tag="provider_uri">
+            <string name="Definition"></string>
+        </doc>
+        <doc tag="provider_name">
+            <string name="Definition"></string>
+        </doc>
+        <doc tag="rights">
+            <string name="Definition"></string>
+        </doc>
+        <doc tag="thing">
+            <string name="Definition"></string>
+        </doc>
+        <doc tag="title">
+            <string name="Definition"></string>
+        </doc>
+    </docs>
+-->
 
 </record-definition>
