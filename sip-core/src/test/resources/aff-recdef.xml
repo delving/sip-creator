@@ -45,6 +45,7 @@
             <elem tag="displayMeasurement"/>
             <elem tag="displayYear"/>
             <elem tag="landingPage"/>
+            <!-- what about facets ?? <elem tag="landingPage"/> ?? -->
         </elem>
 
         <elem tag="mediaFiles">

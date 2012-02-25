@@ -1,0 +1,85 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+
+<aff>
+    <admin>
+        <ownerUri>http://www.vbm.se</ownerUri>
+        <ownerName>Västerbottens museum</ownerName>
+        <providerUri>xxxxxx</providerUri>
+        <providerName>HUBNAME</providerName>
+        <rigths>Wahtever</rigths>
+        <checksum>45893245893243264</checksum>
+    </admin>
+    <collection>
+        <collectionID>3</collectionID>
+        <collectionUri>http://id.vbm.se/collection/3</collectionUri>
+        <collectionName>Skidsamlingen</collectionName>
+    </collection>
+    <thing>
+        <thingId>string</thingId>
+        <thingUri>string</thingUri>
+        <workType>string</workType>
+        <title>string</title>
+        <description>string</description>
+        <language>string</language>
+        <displayMeasurement>string</displayMeasurement>
+        <displayYear>string</displayYear>
+        <landingPage>string</landingPage>
+    </thing>
+    <mediaFiles>
+        <mediaFile>
+            <localURL>string</localURL>
+            <localMediaTypeUri>string</localMediaTypeUri>
+            <localMimeType>string</localMimeType>
+            <delvingMediaURI>string</delvingMediaURI>
+        </mediaFile>
+    </mediaFiles>
+    <actors>
+        <actor>
+           <localId>string</localId>
+           <localUri>string</localUri>
+           <roleUri>string</roleUri>
+           <roleName>string</roleName>
+           <sourceName>string</sourceName>
+           <sourceUri>string</sourceUri>
+           <displayDate>string</displayDate>
+           <firstName>string</firstName>
+           <lastName>string</lastName>
+        </actor>
+    </actors>
+    <places>
+        <place>
+            <localId>string</localId>
+            <localUri>string</localUri>
+            <roleUri>string</roleUri>
+            <roleName>string</roleName>
+            <sourceName>string</sourceName>
+            <sourceUri>string</sourceUri>
+            <displayDate>string</displayDate>
+            <placeName>string</placeName>
+            <lat>string</lat>
+            <long>string</long>
+        </place>
+    </places>
+    <types>
+        <type>
+            <localId>string</localId>
+            <localUri>string</localUri>
+            <roleUri>string</roleUri>
+            <roleName>string</roleName>
+            <sourceName>string</sourceName>
+            <sourceUri>string</sourceUri>
+            <typeName>string</typeName>
+        </type>
+    </types>
+    <events>
+        <event>
+            <displayDate>string</displayDate>
+            <eventTypeUri>string</eventTypeUri>
+            <evenTypeName>string</evenTypeName>
+            <eventName>string</eventName>
+        </event>
+    </events>
+</aff>
+
+
+
