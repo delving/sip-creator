@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<record-definition>
+
+    <namespaces>
+        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
+        <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
+        <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
+        <namespace prefix="ese" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
+        <namespace prefix="icn" uri="http://www.icn.nl/" schema="http://www.icn.nl/schemas/ICN-V3.2.xsd"/>
+        <namespace prefix="delving" uri="http://www.delving.eu/" schema="http://www.delving.eu/schemas/delving-1.0.xsd"/>
+    </namespaces>
+
+    <root tag="icn">
+        <elem prefix="icn" tag="creatorYearOfBirth"/>
+        <elem prefix="icn" tag="creatorYearOfDeath"/>
+        <elem prefix="icn" tag="creatorRole"/>
+        <elem prefix="icn" tag="technique"/>
+        <elem prefix="icn" tag="material"/>
+        <elem prefix="icn" tag="location"/>
+        <elem prefix="icn" tag="province"/>
+        <elem prefix="icn" tag="collectionPart"/>
+        <elem prefix="icn" tag="acquisitionMeans"/>
+        <elem prefix="icn" tag="collectionType"/>
+        <elem prefix="icn" tag="acquisitionYear"/>
+        <elem prefix="icn" tag="purchasePrice"/>
+        <elem prefix="icn" tag="acquiredWithHelpFrom"/>
+        <elem prefix="icn" tag="physicalState"/>
+        <elem prefix="dc" tag="contributor"/>
+        <elem prefix="dc" tag="coverage"/>
+        <elem prefix="dc" tag="creator"/>
+        <elem prefix="dc" tag="date"/>
+        <elem prefix="dc" tag="description"/>
+        <elem prefix="dc" tag="format"/>
+        <elem prefix="dc" tag="identifier"/>
+        <elem prefix="dc" tag="language"/>
+        <elem prefix="dc" tag="publisher"/>
+        <elem prefix="dc" tag="relation"/>
+        <elem prefix="dc" tag="rights"/>
+        <elem prefix="dc" tag="source"/>
+        <elem prefix="dc" tag="subject"/>
+        <elem prefix="dc" tag="title"/>
+        <elem prefix="dc" tag="type"/>
+        <elem prefix="dcterms" tag="alternative"/>
+        <elem prefix="dcterms" tag="conformsTo"/>
+        <elem prefix="dcterms" tag="created"/>
+        <elem prefix="dcterms" tag="extent"/>
+        <elem prefix="dcterms" tag="hasFormat"/>
+        <elem prefix="dcterms" tag="hasPart"/>
+        <elem prefix="dcterms" tag="hasVersion"/>
+        <elem prefix="dcterms" tag="isFormatOf"/>
+        <elem prefix="dcterms" tag="isPartOf"/>
+        <elem prefix="dcterms" tag="isReferencedBy"/>
+        <elem prefix="dcterms" tag="isReplacedBy"/>
+        <elem prefix="dcterms" tag="isRequiredBy"/>
+        <elem prefix="dcterms" tag="isVersionOf"/>
+        <elem prefix="dcterms" tag="issued"/>
+        <elem prefix="dcterms" tag="medium"/>
+        <elem prefix="dcterms" tag="provenance"/>
+        <elem prefix="dcterms" tag="references"/>
+        <elem prefix="dcterms" tag="replaces"/>
+        <elem prefix="dcterms" tag="requires"/>
+        <elem prefix="dcterms" tag="spatial"/>
+        <elem prefix="dcterms" tag="tableOfContents"/>
+        <elem prefix="dcterms" tag="temporal"/>
+        <elem prefix="dcterms" tag="rightsHolder"/>
+        <elem prefix="europeana" tag="collectionName"/>
+        <elem prefix="europeana" tag="collectionTitle"/>
+        <elem prefix="europeana" tag="country"/>
+        <elem prefix="europeana" tag="dataProvider"/>
+        <elem prefix="europeana" tag="isShownAt"/>
+        <elem prefix="europeana" tag="isShownBy"/>
+        <elem prefix="europeana" tag="language"/>
+        <elem prefix="europeana" tag="object"/>
+        <elem prefix="europeana" tag="provider"/>
+        <elem prefix="europeana" tag="rights"/>
+        <elem prefix="europeana" tag="source"/>
+        <elem prefix="europeana" tag="type"/>
+        <elem prefix="europeana" tag="unstored"/>
+        <elem prefix="europeana" tag="uri"/>
+        <elem prefix="delving" tag="year"/>
+        <elem prefix="delving" tag="thumbnail"/>
+        <elem prefix="delving" tag="deepZoomUrl"/>
+        <elem prefix="delving" tag="fullTextObjectUrl"/>
+        <elem prefix="delving" tag="fullText"/>
+    </root>
+
+    <options>
+        <option-list valuePath="/icn/icn/technique">
+            <opt key="1">Schilderkunst</opt>
+            <opt key="2">Prentkunst</opt>
+            <opt key="3">Fotografie</opt>
+            <opt key="4">Tekeningen</opt>
+            <opt key="5">Beeldhouwkunst</opt>
+            <opt key="6">Textiel</opt>
+            <opt key="7">Film/Video/DVD</opt>
+            <opt key="8">Anders:</opt>
+        </option-list>
+        <option-list valuePath="/icn/icn/acquisitionMeans">
+            <opt key="1">aankoop</opt>
+            <opt key="2">schenking</opt>
+            <opt key="3">bruikleen</opt>
+            <opt key="4">ruil</opt>
+            <opt key="5">opdracht</opt>
+            <opt key="6">opdracht derden</opt>
+            <opt key="7">opdracht museum</opt>
+            <opt key="8">legaat</opt>
+            <opt key="9">overdracht</opt>
+            <opt key="10">successieregeling</opt>
+            <opt key="11">vondst</opt>
+            <opt key="12">onbekend:</opt>
+        </option-list>
+        <option-list valuePath="/icn/icn/collectionType">
+            <opt key="1">all</opt>
+            <opt key="2">portal</opt>
+            <opt key="3">mm</opt>
+        </option-list>
+    </options>
+
+    <summaryFields>
+        <summaryField name="CREATOR" path="/icn/creator"/>
+        <summaryField name="TITLE" path="/icn/title"/>
+        <summaryField name="DESCRIPTION" path="/icn/description"/>
+        <summaryField name="OWNER" path="/icn/dataProvider"/>
+        <summaryField name="LANDING_PAGE" path="/icn/isShownAt"/>
+        <summaryField name="THUMBNAIL" path="/icn/object"/>
+        <summaryField name="THUMBNAIL" path="/icn/thumbnail"/>
+        <summaryField name="SNIPPET" path="/icn/fullText"/>
+        <summaryField name="SNIPPET" path="/icn/subject"/>
+        <summaryField name="SNIPPET" path="/icn/alternative"/>
+        <summaryField name="SNIPPET" path="/icn/collectionTitle"/>
+    </summaryFields>
+
+    <facts>
+        <fact name="spec" path="/icn/collectionName"/>
+        <fact name="name" path="/icn/collectionTitle"/>
+        <fact name="country" path="/icn/country"/>
+        <fact name="dataProvider" path="/icn/dataProvider"/>
+        <fact name="language" path="/icn/language"/>
+        <fact name="provider" path="/icn/provider"/>
+        <fact name="rights" path="/icn/rights"/>
+        <fact name="type" path="/icn/type"/>
+    </facts>
+
+    <converters>
+        <converter multipleOutput="true" call=".extractYear()" path="/icn/creatorYearOfBirth"/>
+        <converter multipleOutput="true" call=".extractYear()" path="/icn/creatorYearOfDeath"/>
+        <converter call=".toLocalId(spec)" path="/icn/uri"/>
+        <converter multipleOutput="true" call=".extractYear()" path="/icn/year"/>
+    </converters>
+
+    <validation>
+        assert record.'europeana:collectionTitle'
+        assert record.'europeana:country'
+        assert record.'europeana:dataProvider'
+        assert record.'europeana:provider'
+        assert record.'europeana:language'
+        assert record.'europeana:rights'
+        assert record.'europeana:type'
+        assert record.'europeana:uri'
+        assert record.'europeana:isShownAt' || record.'europeana:isShownBy'
+        assert isUrl(record.'europeana:isShownAt')
+        assert isOption(record.'icn:acquisitionMeans')
+        assert isUnique(record.'europeana:uri')
+    </validation>
+
+</record-definition>
+
+

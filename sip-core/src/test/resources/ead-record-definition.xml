@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<record-definition prefix="ead">
+    <namespaces>
+        <namespace prefix="ead" uri="" schema=""/>
+    </namespaces>
+
+    <attrs>
+
+        <attr tag="xmlns"/>
+        <attr tag="xmlns:xlink"/>
+        <attr tag="xmlns:xsi"/>
+        <attr tag="xsi:schemaLocation"/>
+        <attr tag="audience"/>
+
+        <attr tag="countryencoding"/>
+        <attr tag="dateencoding"/>
+        <attr tag="langencoding"/>
+        <attr tag="repositoryencoding"/>
+        <attr tag="scriptencoding"/>
+        <attr tag="relatedencoding"/>
+
+        <attr tag="countrycode"/>
+        <attr tag="identifier"/>
+        <attr tag="mainagencycode"/>
+        <attr tag="url"/>
+
+        <attr tag="type"/>
+        <attr tag="encodinganalog"/>
+
+        <attr tag="calendar"/>
+        <attr tag="era"/>
+        <attr tag="normal"/>
+
+        <attr tag=""/>
+
+    </attrs>
+
+    <elems>
+        <elem tag="emph" render="bold, italic"/>  <!-- OPTION -->
+        <elem tag="lb"/>
+        <elem tag="date" attrs="calendar, era, normal, encodinganalog"/>
+
+        <elem tag="address" elems="addressline">
+        <elem tag="addressline"/>
+
+    </elems>
+
+
+    <root tag="ead" attrs="xmlns, xmlns:xlink, xmlns:xsi, xsi:schemaLocation, audience ">
+
+        <elem tag="eadheader" attrs="countryencoding, dateencoding, langencoding, repositoryencoding, scriptencoding, relatedencoding">
+            <elem tag="eadid" attrs="countrycode, identifier, mainagencycode, url"/>
+            <elem tag="filedesc">
+                <elem tag="titlestmt">
+                    <elem tag="titleproper" elems="lb, emph" attrs="type, encodinganalog"/>
+                    <elem tag="subtitle" elems="lb, emph" attrs="type, encodinganalog"/>
+                    <elem tag="author" attrs="encodinganalog"/>
+                </elem>
+                <elem tag="publicationstmt" elems="date, address">
+                    <elem tag="publisher" attrs="encodinganalog"/>
+                </elem>
+            </elem>
+            <elem tag="seriesstmt">
+                <elem tag="titleproper"/>
+            </elem>
+
+
+
+
+
+
+
+        </elem>
+
+
+
+
+
+
+
+    </root>
+
+</record-definition>
