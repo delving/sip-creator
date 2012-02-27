@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.FunctionPanel;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.CreateModel;
@@ -53,6 +54,7 @@ public class FieldMappingFrame extends FrameBase {
     private ContextVarListModel contextVarModel = new ContextVarListModel();
     private JComboBox contextVarBox = new JComboBox(contextVarModel);
     private DictionaryPanel dictionaryPanel;
+    private FunctionPanel functionPanel;
     private EditHistory editHistory;
 
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel, final EditHistory editHistory) {
@@ -65,6 +67,7 @@ public class FieldMappingFrame extends FrameBase {
             throw new RuntimeException(e);
         }
         dictionaryPanel = new DictionaryPanel(sipModel.getCreateModel());
+        functionPanel = new FunctionPanel(sipModel);
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         groovyCodeArea.setFont(new Font("Monospaced", Font.BOLD, 12));
         groovyCodeArea.setTabSize(3);
@@ -92,22 +95,23 @@ public class FieldMappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        add(createPanel(), BorderLayout.CENTER);
+        add(createTabs(), BorderLayout.CENTER);
     }
 
-    private JPanel createPanel() {
+    private JComponent createTabs() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Field", createCodeOutputPanel());
+        tabs.addTab("Functions", functionPanel);
+        tabs.addTab("Dictionary", dictionaryPanel);
+        tabs.addTab("Help", Utility.scroll(helpView));
+        return tabs;
+    }
+
+    private JPanel createCodeOutputPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
-        p.add(createGroovyPanel());
+        p.add(createCodePanel());
         p.add(createOutputPanel());
         return p;
-    }
-
-    private JComponent createGroovyPanel() {
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Code", createCodePanel());
-        tabs.addTab("Dictionary", dictionaryPanel);
-        tabs.addTab("Help", scroll(helpView));
-        return tabs;
     }
 
     private JPanel createCodePanel() {
@@ -117,14 +121,14 @@ public class FieldMappingFrame extends FrameBase {
         north.add(new JLabel("Context variables:"), BorderLayout.WEST);
         north.add(contextVarBox, BorderLayout.CENTER);
         p.add(north, BorderLayout.NORTH);
-        p.add(scroll(groovyCodeArea), BorderLayout.CENTER);
+        p.add(Utility.scroll(groovyCodeArea), BorderLayout.CENTER);
         return p;
     }
 
     private JPanel createOutputPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output Record"));
-        p.add(scroll(outputArea), BorderLayout.CENTER);
+        p.add(Utility.scroll(outputArea), BorderLayout.CENTER);
         p.add(new JLabel("Note: URLs can be launched by double-clicking them.", JLabel.CENTER), BorderLayout.SOUTH);
         return p;
     }
@@ -165,7 +169,6 @@ public class FieldMappingFrame extends FrameBase {
             public void changedUpdate(DocumentEvent documentEvent) {
             }
         });
-
     }
 
     private class ContextVarListModel extends AbstractListModel implements ComboBoxModel {

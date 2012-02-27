@@ -27,6 +27,7 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
@@ -100,7 +101,7 @@ public class RecMappingFrame extends FrameBase {
 
     private JPanel createListPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(scroll(nodeMappingList), BorderLayout.CENTER);
+        p.add(Utility.scroll(nodeMappingList), BorderLayout.CENTER);
         return p;
     }
 

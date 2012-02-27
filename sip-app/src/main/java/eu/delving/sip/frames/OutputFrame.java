@@ -22,6 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.BorderFactory;
@@ -84,7 +85,7 @@ public class OutputFrame extends FrameBase {
             public void changedUpdate(DocumentEvent documentEvent) {
             }
         });
-        p.add(scroll(area));
+        p.add(Utility.scroll(area));
         return p;
     }
 

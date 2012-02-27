@@ -25,6 +25,7 @@ import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -186,7 +187,7 @@ public class AnalysisFrame extends FrameBase {
     private JPanel createPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
-        p.add(scroll(statisticsJTree), BorderLayout.CENTER);
+        p.add(Utility.scroll(statisticsJTree), BorderLayout.CENTER);
         p.add(createSelectButtonPanel(), BorderLayout.SOUTH);
         return p;
     }

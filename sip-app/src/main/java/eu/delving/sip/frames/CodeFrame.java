@@ -27,6 +27,7 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
@@ -89,7 +90,7 @@ public class CodeFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(scroll(codeArea), BorderLayout.CENTER);
+        content.add(Utility.scroll(codeArea), BorderLayout.CENTER);
         setPlacement(new Placement() {
             @Override
             public Point getLocation() {

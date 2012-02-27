@@ -135,7 +135,7 @@ public class UploadAction extends AbstractAction {
         private void buildContent(Container content) {
             JPanel p = new JPanel(new BorderLayout());
             p.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            p.add(FrameBase.scroll(list), BorderLayout.CENTER);
+            p.add(Utility.scroll(list), BorderLayout.CENTER);
             p.add(createButtons(), BorderLayout.SOUTH);
             content.add(p, BorderLayout.CENTER);
         }

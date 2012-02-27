@@ -27,11 +27,10 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import java.awt.BorderLayout;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -147,6 +146,23 @@ public class Utility {
         catch (UnavailableServiceException ue) {
             return null;
         }
+    }
+
+    public static JComponent scroll(JComponent content) {
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        return scroll;
+    }
+
+    public static JComponent scroll(String title, JComponent content) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder(title));
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        p.add(scroll);
+        return p;
     }
 
 

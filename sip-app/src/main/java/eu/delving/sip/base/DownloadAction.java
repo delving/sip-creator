@@ -104,7 +104,7 @@ public class DownloadAction extends AbstractAction {
         private JPanel createListPanel() {
             JPanel p = new JPanel(new BorderLayout());
             p.setBorder(BorderFactory.createTitledBorder("Data sets"));
-            p.add(FrameBase.scroll(list), BorderLayout.CENTER);
+            p.add(Utility.scroll(list), BorderLayout.CENTER);
             return p;
         }
 

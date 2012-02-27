@@ -100,7 +100,7 @@ public class InputFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(scroll(recordTree), BorderLayout.CENTER);
+        content.add(Utility.scroll(recordTree), BorderLayout.CENTER);
         content.add(createRecordButtonPanel(), BorderLayout.SOUTH);
     }
 

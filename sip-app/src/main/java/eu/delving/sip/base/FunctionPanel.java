@@ -19,12 +19,10 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.frames;
+package eu.delving.sip.base;
 
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.RecMapping;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
@@ -32,7 +30,10 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,26 +41,33 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * This frame shows the entire builder that is responsible for transforming the input to output,
- * as well as the constants and dictionaries that it may have.
+ * This panel provides an interface for building and testing global functions
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class FunctionFrame extends FrameBase {
+public class FunctionPanel extends JPanel {
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 18);
+    private SipModel sipModel;
     private FunctionListModel functionListModel = new FunctionListModel();
     private JList functionList = new JList(functionListModel);
     private JTextArea inputArea = new JTextArea();
     private JTextArea codeArea = new JTextArea();
     private JTextArea outputArea = new JTextArea();
 
-    public FunctionFrame(JDesktopPane desktop, SipModel swipModel) {
-        super(desktop, swipModel, "Functions", false);
+    public FunctionPanel(SipModel sipModel) {
+        super(new BorderLayout());
         inputArea.setFont(MONOSPACED);
         codeArea.setFont(MONOSPACED);
         outputArea.setFont(MONOSPACED);
+        this.sipModel = sipModel;
+        JPanel center = new JPanel(new GridLayout(0, 1));
+        center.add(createInputPanel());
+        center.add(createCodePanel());
+        center.add(createOutputPanel());
+        add(center, BorderLayout.CENTER);
+        add(createListPanel(), BorderLayout.WEST);
         wireUp();
     }
 
@@ -94,20 +102,10 @@ public class FunctionFrame extends FrameBase {
         sipModel.getFunctionCompileModel().addListener(new ModelStateListener());
     }
 
-    @Override
-    protected void buildContent(Container content) {
-        JPanel center = new JPanel(new GridLayout(0, 1));
-        center.add(createInputPanel());
-        center.add(createCodePanel());
-        center.add(createOutputPanel());
-        content.add(center, BorderLayout.CENTER);
-        content.add(createListPanel(), BorderLayout.WEST);
-    }
-    
     private JPanel createListPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Functions"));
-        p.add(scroll(functionList));
+        p.add(Utility.scroll(functionList));
         p.add(new JButton(new CreateAction()), BorderLayout.SOUTH);
         return p;
     }
@@ -115,21 +113,21 @@ public class FunctionFrame extends FrameBase {
     private JPanel createInputPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Input Lines"));
-        p.add(scroll(inputArea));
+        p.add(Utility.scroll(inputArea));
         return p;
     }
 
     private JPanel createCodePanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Function Code"));
-        p.add(scroll(codeArea));
+        p.add(Utility.scroll(codeArea));
         return p;
     }
 
     private JPanel createOutputPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output Lines"));
-        p.add(scroll(outputArea));
+        p.add(Utility.scroll(outputArea));
         return p;
     }
     
@@ -141,14 +139,14 @@ public class FunctionFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            final String name = JOptionPane.showInputDialog(FunctionFrame.this, "Please enter the function name");
+            final String name = JOptionPane.showInputDialog(FunctionPanel.this, "Please enter the function name");
             if (name != null) {
                 if (!FUNCTION_NAME.matcher(name).matches()) {
-                    JOptionPane.showMessageDialog(FunctionFrame.this, "Sorry, the name must be of the form 'aaaaa' or 'aaaaAaaa'");
+                    JOptionPane.showMessageDialog(FunctionPanel.this, "Sorry, the name must be of the form 'aaaaa' or 'aaaaAaaa'");
                     return;
                 }
                 if (functionListModel.contains(name)) {
-                    JOptionPane.showMessageDialog(FunctionFrame.this, "Sorry, but this function name already exists");
+                    JOptionPane.showMessageDialog(FunctionPanel.this, "Sorry, but this function name already exists");
                     return;
                 }
                 Exec.work(new Runnable() {

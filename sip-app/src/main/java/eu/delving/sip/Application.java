@@ -26,7 +26,6 @@ import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.CodeFrame;
-import eu.delving.sip.frames.FunctionFrame;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.DataSetModel;
@@ -69,7 +68,6 @@ public class Application {
     private Timer resizeTimer;
     private EditHistory editHistory = new EditHistory();
     private CodeFrame codeFrame;
-    private FunctionFrame functionFrame;
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -79,17 +77,6 @@ public class Application {
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.drawImage(backgroundIcon.getImage(), 0, 0, desktop);
-                //g.setColor(Color.BLACK);
-                //drawText(g, 4, 4);
-                //g.setColor(Color.WHITE);
-                //drawText(g, 0, 0);
-            }
-
-            private void drawText(Graphics g, int x, int y) {
-                g.setFont(new Font("Arial", Font.BOLD, 120));
-                g.drawString("Delving", 490 + x, 400 + y);
-                g.setFont(new Font("Arial", Font.BOLD, 90));
-                g.drawString("SIP-Creator", 530 + x, 500 + y);
             }
         };
         desktop.setMinimumSize(new Dimension(MINIMUM_DESKTOP_SIZE));
@@ -120,7 +107,6 @@ public class Application {
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         codeFrame = new CodeFrame(desktop, sipModel);
-        functionFrame = new FunctionFrame(desktop, sipModel);
         allFrames = new AllFrames(desktop, sipModel, editHistory);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
@@ -217,10 +203,7 @@ public class Application {
     private JPanel createStatePanel() {
         refreshToggleButton();
         JPanel right = new JPanel(new BorderLayout(6, 6));
-        JPanel bp = new JPanel(new GridLayout(1,0));
-        bp.add(codeFrame.getToggle());
-        bp.add(functionFrame.getToggle());
-        right.add(bp, BorderLayout.WEST);
+        right.add(codeFrame.getToggle(), BorderLayout.WEST);
         right.add(feedback.getToggle(), BorderLayout.CENTER);
         right.add(harvestDialog.getToggle(), BorderLayout.EAST);
         JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));

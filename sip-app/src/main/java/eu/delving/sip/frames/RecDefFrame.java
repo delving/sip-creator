@@ -248,8 +248,8 @@ public class RecDefFrame extends FrameBase {
                 bookmarkTree.setModel(new BookmarksTreeModel());
             }
             treePanel.removeAll();
-            treePanel.add(scroll("Record Definition", recDefTree));
-            if (bookmarksPresent) treePanel.add(scroll("Bookmarks", bookmarkTree));
+            treePanel.add(Utility.scroll("Record Definition", recDefTree));
+            if (bookmarksPresent) treePanel.add(Utility.scroll("Bookmarks", bookmarkTree));
         }
     }
 

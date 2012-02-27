@@ -420,21 +420,4 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
-    public static JComponent scroll(JComponent content) {
-        JScrollPane scroll = new JScrollPane(content);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        return scroll;
-    }
-
-    public static JComponent scroll(String title, JComponent content) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder(title));
-        JScrollPane scroll = new JScrollPane(content);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        p.add(scroll);
-        return p;
-    }
-
 }
