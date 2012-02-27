@@ -196,60 +196,69 @@ public class RecDefNode {
         listener.nodeMappingChanged(this, nodeMapping);
     }
 
-    public void toCode(Out out, EditPath editPath) {
-        if (!hasNodeMappings()) return;
+    public void toElementCode(Out out, EditPath editPath) {
+        if (isAttr() || !hasNodeMappings()) return;
         if (editPath != null && !path.equals(editPath.getPath()) && !path.isAncestorOf(editPath.getPath())) return;
-        if (isAttr()) {
-            if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
-            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
-            nodeMapping.toLeafCode(out, editPath);
-        }
-        else if (nodeMappings.isEmpty()) {
+        if (nodeMappings.isEmpty()) {
             childrenToCode(out, editPath);
         }
-        else {
-            if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
-            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
-            toLoop(nodeMapping.getLocalPath(), out, editPath);
+        else for (NodeMapping nodeMapping : nodeMappings.values()) {
+            childrenInLoop(nodeMapping.getLocalPath(), out, editPath);
         }
     }
 
-    private void toLoop(Path path, Out out, EditPath editPath) {
-        if (path.isEmpty()) throw new RuntimeException();
+    private void childrenInLoop(Path path, Out out, EditPath editPath) {
+        if (path.isEmpty()) throw new RuntimeException("Empty path");
         if (path.size() == 1) {
             childrenToCode(out, editPath);
         }
-        else {
+        else { // path should never be empty
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
             out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
-            toLoop(path.chop(-1), out, editPath);
+            childrenInLoop(path.chop(-1), out, editPath);
             out._line("}");
         }
     }
 
     private void childrenToCode(Out out, EditPath editPath) {
-        boolean activeAttributes = false;
-        for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) activeAttributes = true;
-        if (activeAttributes) {
+        if (hasChildren()) {
+            startBuilderCall(out, editPath);
+            for (RecDefNode sub : children) sub.toElementCode(out, editPath);
+            out._line("}");
+        }
+        else if (nodeMappings.isEmpty()) {
+            startBuilderCall(out, editPath);
+            out.line("''");
+            out._line("}");
+        }
+        else for (NodeMapping nodeMapping : nodeMappings.values()) {
+            startBuilderCall(out, editPath);
+            nodeMapping.toElementCode(out, editPath);
+            out._line("}");
+        }
+    }
+
+    private boolean hasChildren() {
+        return !elem.elemList.isEmpty();
+    }
+
+    private void startBuilderCall(Out out, EditPath editPath) {
+        if (hasActiveAttributes()) {
             out.line_("%s (", getTag().toBuilderCall());
             for (RecDefNode sub : children) {
-                if (sub.isAttr() && sub.hasNodeMappings()) {
-                    for (NodeMapping nodeMapping : sub.nodeMappings.values()) nodeMapping.toLeafCode(out, editPath);
-                }
+                for (NodeMapping nodeMapping : sub.nodeMappings.values()) nodeMapping.toAttributeCode(out, editPath);
             }
             out._line(") {").in();
         }
         else {
             out.line_("%s {", getTag().toBuilderCall());
         }
-        for (RecDefNode sub : children) if (!sub.isAttr()) sub.toCode(out, editPath);
-        if (elem.elemList.isEmpty() && !nodeMappings.isEmpty()) {
-            if (nodeMappings.size() != 1) throw new RuntimeException("Not sure yet, might use +");
-            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
-            nodeMapping.toLeafCode(out, editPath);
-        }
-        out._line("}");
+    }
+
+    private boolean hasActiveAttributes() {
+        for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) return true;
+        return false;
     }
 
     public String toString() {

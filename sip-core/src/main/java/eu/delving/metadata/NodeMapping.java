@@ -125,19 +125,22 @@ public class NodeMapping implements Comparable<NodeMapping> {
         recDefNode.notifyNodeMappingChange(this);
     }
 
-    public void toLeafCode(Out out, EditPath editPath) {
-        String editedCode = editPath == null ? null : editPath.getEditedCode();
-        if (recDefNode.isAttr()) {
-            out.line_("%s : {", recDefNode.getTag().toBuilderCall());
-            toUserCode(out, editedCode);
-            out._line("}");
-        }
-        else if (recDefNode.isLeafElem()) {
-            toUserCode(out, editedCode);
-        }
-        else {
-            throw new RuntimeException("Should not call this");
-        }
+    public void toAttributeCode(Out out, EditPath editPath) {
+        if (!recDefNode.isAttr()) return;
+        String editedCode = getEditedCode(editPath);
+        out.line_("%s : {", recDefNode.getTag().toBuilderCall());
+        toUserCode(out, editedCode);
+        out._line("}");
+    }
+
+    public void toElementCode(Out out, EditPath editPath) {
+        if (recDefNode.isAttr() || !recDefNode.isLeafElem()) return;
+        String editedCode = getEditedCode(editPath);
+        toUserCode(out, editedCode);
+    }
+
+    private String getEditedCode(EditPath editPath) {
+        return editPath == null ? null : editPath.getEditedCode();
     }
 
     public String getUserCode(String editedCode) {
@@ -146,7 +149,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             toUserCode(out, editedCode);
         }
         else {
-            recDefNode.toCode(out, null);
+            recDefNode.toElementCode(out, null);
         }
         return out.toString();
     }

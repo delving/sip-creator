@@ -139,7 +139,7 @@ public class NodeBuilder extends BuilderSupport {
         if (result.list != null && !result.list.isEmpty()) {
             node.setValue(result.list.get(0));
             for (int walk = 1; walk<result.list.size(); walk++) {
-                new Node(node.parent(), node.name(), result.list.get(walk));
+                new Node(node.parent(), node.name(), node.attributes(), result.list.get(walk));
             }
         }
     }

@@ -99,7 +99,7 @@ public class RecDefTree implements RecDefNode.Listener {
         out.line_("use (MappingCategory) {");
         out.line_("input * { _input -> outputNode = output.");
         if (root.hasNodeMappings()) {
-            root.toCode(out, editPath);
+            root.toElementCode(out, editPath);
         }
         else {
             out.line("'no' { 'mapping' }");
