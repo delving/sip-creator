@@ -142,7 +142,12 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public String getUserCode(String editedCode) {
         Out out = new Out();
-        toUserCode(out, editedCode);
+        if (isUserCodeEditable()) {
+            toUserCode(out, editedCode);
+        }
+        else {
+            recDefNode.toCode(out, null);
+        }
         return out.toString();
     }
 
