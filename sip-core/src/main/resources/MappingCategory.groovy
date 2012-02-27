@@ -150,54 +150,6 @@ public class MappingCategory {
         return null
     }
 
-    static List extractYear(a) {
-        a = unwrap(a)
-        String text = a.text()
-        List result = new NodeList()
-        switch (text) {
-
-            case ~/$normalYear/:
-                result += (text =~ /$year/)[0]
-                break
-
-            case ~/$yearAD/:
-                result += (text =~ /$yr/)[0] + ' AD'
-                break
-
-            case ~/$yearBC/:
-                result += (text =~ /$yr/)[0] + ' BC'
-                break
-
-            case ~/$yearRange/:
-                def list = text =~ /$year/
-                if (list[0] == list[1]) {
-                    result += list[0]
-                }
-                else {
-                    result += list[0]
-                    result += list[1]
-                }
-                break
-
-            case ~/$yearRangeBrief/:
-                def list = text =~ /\d{1,4}/
-                result += list[0]
-                result += list[0][0] + list[0][1] + list[1]
-                break
-
-            case ~/$yr/:
-                result += text + ' AD'
-                break
-
-            default:
-                text.eachMatch(/$year/) {
-                    result += it
-                }
-                break
-        }
-        return result
-    }
-
     static List toId(a, spec) {
         a = unwrap(a)
         String identifier = a[0].toString()
@@ -234,20 +186,4 @@ public class MappingCategory {
         text = (text =~ / +/).replaceAll(' ')
         return text
     }
-
-    static year = /\d{4}/
-    static dateSlashA = /$year\/\d\d\/\d\d\//
-    static dateDashA = /$year-\d\d-\d\d/
-    static dateSlashB = /\d\d\/\d\d\/$year/
-    static dateDashB = /\d\d-\d\d-$year/
-    static ad = /(ad|AD|a\.d\.|A\.D\.)/
-    static bc = /(bc|BC|b\.c\.|B\.C\.)/
-    static yr = /\d{1,3}/
-    static yearAD = /$yr\s?$ad/
-    static yearBC = /$yr\s?$bc/
-    static normalYear = /($year|$dateSlashA|$dateSlashB|$dateDashA|$dateDashB)/
-    static yearRangeDash = /$normalYear-$normalYear/
-    static yearRangeTo = /$normalYear to $normalYear/
-    static yearRange = /($yearRangeDash|$yearRangeTo)/
-    static yearRangeBrief = /$year-\d\d/
 }

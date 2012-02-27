@@ -248,7 +248,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     private static final Hasher HASHER = new Hasher();
 
     private String getDictionaryName() {
-        return "Dict" + HASHER.getHashString(outputPath.toString()).substring(16);
+        return "Dictionary" + HASHER.getHashString(outputPath.toString()).substring(16);
     }
 
     /**
