@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<record-definition flat="true">
+
+    <namespaces>
+        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
+        <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
+        <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
+        <namespace prefix="icn" uri="http://www.icn.nl/" schema="http://www.icn.nl/schemas/ICN-V3.2.xsd"/>
+        <namespace prefix="delving" uri="http://www.delving.eu/" schema="http://www.delving.eu/schemas/delving-1.0.xsd"/>
+    </namespaces>
+
+
+    <root tag="record">
+        <elem tag="icn:creatorYearOfBirth"/>
+        <elem tag="icn:creatorYearOfDeath"/>
+        <elem tag="icn:creatorRole"/>
+        <elem tag="icn:technique"/>
+        <elem tag="icn:material"/>
+        <elem tag="icn:location"/>
+        <elem tag="icn:province"/>
+        <elem tag="icn:collectionPart"/>
+        <elem tag="icn:acquisitionMeans"/>
+        <elem tag="icn:collectionType"/>
+        <elem tag="icn:acquisitionYear"/>
+        <elem tag="icn:purchasePrice"/>
+        <elem tag="icn:acquiredWithHelpFrom"/>
+        <elem tag="icn:physicalState"/>
+        <elem tag="dc:contributor"/>
+        <elem tag="dc:coverage"/>
+        <elem tag="dc:creator"/>
+        <elem tag="dc:date"/>
+        <elem tag="dc:description"/>
+        <elem tag="dc:format"/>
+        <elem tag="dc:identifier"/>
+        <elem tag="dc:language"/>
+        <elem tag="dc:publisher"/>
+        <elem tag="dc:relation"/>
+        <elem tag="dc:rights"/>
+        <elem tag="dc:source"/>
+        <elem tag="dc:subject"/>
+        <elem tag="dc:title"/>
+        <elem tag="dc:type"/>
+        <elem tag="dcterms:alternative"/>
+        <elem tag="dcterms:conformsTo"/>
+        <elem tag="dcterms:created"/>
+        <elem tag="dcterms:extent"/>
+        <elem tag="dcterms:hasFormat"/>
+        <elem tag="dcterms:hasPart"/>
+        <elem tag="dcterms:hasVersion"/>
+        <elem tag="dcterms:isFormatOf"/>
+        <elem tag="dcterms:isPartOf"/>
+        <elem tag="dcterms:isReferencedBy"/>
+        <elem tag="dcterms:isReplacedBy"/>
+        <elem tag="dcterms:isRequiredBy"/>
+        <elem tag="dcterms:isVersionOf"/>
+        <elem tag="dcterms:issued"/>
+        <elem tag="dcterms:medium"/>
+        <elem tag="dcterms:provenance"/>
+        <elem tag="dcterms:references"/>
+        <elem tag="dcterms:replaces"/>
+        <elem tag="dcterms:requires"/>
+        <elem tag="dcterms:spatial"/>
+        <elem tag="dcterms:tableOfContents"/>
+        <elem tag="dcterms:temporal"/>
+        <elem tag="dcterms:rightsHolder"/>
+        <elem tag="europeana:collectionName"/>
+        <elem tag="europeana:collectionTitle"/>
+        <elem tag="europeana:country"/>
+        <elem tag="europeana:dataProvider"/>
+        <elem tag="europeana:isShownAt"/>
+        <elem tag="europeana:isShownBy"/>
+        <elem tag="europeana:language"/>
+        <elem tag="europeana:object"/>
+        <elem tag="europeana:provider"/>
+        <elem tag="europeana:rights"/>
+        <elem tag="europeana:source"/>
+        <elem tag="europeana:type"/>
+        <elem tag="europeana:unstored"/>
+        <elem tag="europeana:uri"/>
+        <elem tag="delving:year"/>
+        <elem tag="delving:thumbnail"/>
+        <elem tag="delving:deepZoomUrl"/>
+        <elem tag="delving:fullTextObjectUrl"/>
+        <elem tag="delving:fullText"/>
+    </root>
+
+    <options>
+        <option-list valuePath="/icn:technique"> <!-- no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs -->
+            <opt key="1">Schilderkunst</opt>
+            <opt key="2">Prentkunst</opt>
+            <opt key="3">Fotografie</opt>
+            <opt key="4">Tekeningen</opt>
+            <opt key="5">Beeldhouwkunst</opt>
+            <opt key="6">Textiel</opt>
+            <opt key="7">Film/Video/DVD</opt>
+            <opt key="8">Anders:</opt>
+        </option-list>
+        <option-list valuePath="/icn:acquisitionMeans">
+            <opt key="1">aankoop</opt>
+            <opt key="2">schenking</opt>
+            <opt key="3">bruikleen</opt>
+            <opt key="4">ruil</opt>
+            <opt key="5">opdracht</opt>
+            <opt key="6">opdracht derden</opt>
+            <opt key="7">opdracht museum</opt>
+            <opt key="8">legaat</opt>
+            <opt key="9">overdracht</opt>
+            <opt key="10">successieregeling</opt>
+            <opt key="11">vondst</opt>
+            <opt key="12">onbekend:</opt>
+        </option-list>
+        <option-list valuePath="/icn:collectionType">
+            <opt key="1">all</opt>
+            <opt key="2">portal</opt>
+            <opt key="3">mm</opt>
+        </option-list>
+    </options>
+
+    <search>
+        <searchField name="CREATOR" path="/icn:creator"/>
+        <searchField name="TITLE" path="/icn:title"/>
+        <searchField name="DESCRIPTION" path="/icn:description"/>
+        <searchField name="OWNER" path="/icn:dataProvider"/>
+        <searchField name="LANDING_PAGE" path="/icn:isShownAt"/>
+        <searchField name="THUMBNAIL" path="/icn:object"/>
+        <searchField name="THUMBNAIL" path="/icn:thumbnail"/>
+        <searchField name="SNIPPET" path="/icn:fullText"/>
+        <searchField name="SNIPPET" path="/icn:subject"/>
+        <searchField name="SNIPPET" path="/icn:alternative"/>
+        <searchField name="SNIPPET" path="/icn:collectionTitle"/>
+    </search>
+
+    <facts>
+        <fact name="spec" path="/icn:collectionName"/>
+        <fact name="name" path="/icn:collectionTitle"/>
+        <fact name="country" path="/icn:country"/>
+        <fact name="dataProvider" path="/icn:dataProvider"/>
+        <fact name="language" path="/icn:language"/>
+        <fact name="provider" path="/icn:provider"/>
+        <fact name="rights" path="/icn:rights"/>
+        <fact name="type" path="/icn:type"/>
+    </facts>
+
+    <converters>
+        <converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>
+        <converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfDeath"/>
+        <converter call=".toLocalId(spec)" path="/europeana:uri"/>
+        <converter multipleOutput="true" call=".extractYear()" path="/delving:year"/>
+    </converters>
+    
+    <docs>
+        <doc path="/dc:contributor">
+            <string name="Dublin Core definition">An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>
+            <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
+            <string name="Europeana note">The name of contributors to the original analog or born digital object.  This could be a person, an organisation or a service. </string>
+        </doc>
+        <!-- ... -->
+    </docs>
+
+    <bookmarks>
+        <category name="Mandatory ICN elements">
+           <doc>
+               <string>These elements must be included by any professional mapper. If that's too much work, maybe you can find employment in the food services industry</string>
+           </doc>
+           <ref path="/europeana:uri" name="uri" display="URI"> <!-- Do we use the "name" part?? -->
+            <doc>
+                <string>The URI should be set by the provider: example: http://id.vbm.se/thing/345634573. (dummy...)</string>
+                <string>Requirements: globally unique</string>
+              </doc>
+            </ref>
+            <ref path="/delving:thumbnail" name="thumbnail" display="Thumbnail">
+        </category>
+    </bookmarks>
+  
+</record-definition>
+
+
