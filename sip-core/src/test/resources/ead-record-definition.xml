@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<record-definition prefix="ead">
+<record-definition prefix="ead" flat="false">
     <namespaces>
         <namespace prefix="ead" uri="" schema=""/>
     </namespaces>

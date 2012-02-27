@@ -16,6 +16,12 @@
 
     <root tag="record">
 
+        <attrs>
+            <attr tag="rdf:about"/>
+            <attr tag="rdf:resource"/>
+        </attrs>
+
+
         <elems>
 
             <!-- Not yet. wait for it... /tw -->
@@ -23,8 +29,8 @@
         </elems>
 
         <elem tag="edm:ProvidedCHO">
-            <elem tag="owl:sameA"/>
-            <elem tag="rdf:typ"/>
+            <elem tag="owl:sameAs"/>
+            <elem tag="rdf:type"/>
             <elem tag="dc:contributor"/>
             <elem tag="dc:coverage"/>
             <elem tag="dc:creator"/>
