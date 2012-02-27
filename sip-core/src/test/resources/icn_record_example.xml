@@ -1,0 +1,151 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+
+<record xmlns:icn="http://www.w3.org/TR/html4/"
+        xmlns:dc="http://www.w3schools.com/furnisdasture"
+        xmlns:dcterms="http://www.w3schools.com/furnddditure"
+        xmlns:europeana="http://www.w3schools.com/furniaature"
+        xmlns:delving="http://www.w3schools.com/furnitddure">
+
+    <icn:creatorYearOfBirth>STRING</icn:creatorYearOfBirth>
+    <icn:creatorYearOfDeath>STRING</icn:creatorYearOfDeath>
+    <icn:creatorRole>STRING</icn:creatorRole>
+    <icn:technique>STRING</icn:technique>
+    <icn:material>STRING</icn:material>
+    <icn:location>STRING</icn:location>
+    <icn:province>STRING</icn:province>
+    <icn:collectionPart>STRING</icn:collectionPart>
+    <icn:acquisitionMeans>STRING</icn:acquisitionMeans>
+    <icn:collectionType>STRING</icn:collectionType>
+    <icn:acquisitionYear>STRING</icn:acquisitionYear>
+    <icn:purchasePrice>STRING</icn:purchasePrice>
+    <icn:acquiredWithHelpFrom>STRING</icn:acquiredWithHelpFrom>
+    <icn:physicalState>STRING</icn:physicalState>
+    <dc:contributor>STRING</dc:contributor>
+    <dc:coverage>STRING</dc:coverage>
+    <dc:creator>STRING</dc:creator>
+    <dc:date>STRING</dc:date>
+    <dc:description>STRING</dc:description>
+    <dc:format>STRING</dc:format>
+    <dc:identifier>STRING</dc:identifier>
+    <dc:language>STRING</dc:language>
+    <dc:publisher>STRING</dc:publisher>
+    <dc:relation>STRING</dc:relation>
+    <dc:rights>STRING</dc:rights>
+    <dc:source>STRING</dc:source>
+    <dc:subject>STRING</dc:subject>
+    <dc:title>STRING</dc:title>
+    <dc:type>STRING</dc:type>
+    <dcterms:alternative>STRING</dcterms:alternative>
+    <dcterms:conformsTo>STRING</dcterms:conformsTo>
+    <dcterms:created>STRING</dcterms:created>
+    <dcterms:extent>STRING</dcterms:extent>
+    <dcterms:hasFormat>STRING</dcterms:hasFormat>
+    <dcterms:hasPart>STRING</dcterms:hasPart>
+    <dcterms:hasVersion>STRING</dcterms:hasVersion>
+    <dcterms:isFormatOf>STRING</dcterms:isFormatOf>
+    <dcterms:isPartOf>STRING</dcterms:isPartOf>
+    <dcterms:isReferencedBy>STRING</dcterms:isReferencedBy>
+    <dcterms:isReplacedBy>STRING</dcterms:isReplacedBy>
+    <dcterms:isRequiredBy>STRING</dcterms:isRequiredBy>
+    <dcterms:isVersionOf>STRING</dcterms:isVersionOf>
+    <dcterms:issued>STRING</dcterms:issued>
+    <dcterms:medium>STRING</dcterms:medium>
+    <dcterms:provenance>STRING</dcterms:provenance>
+    <dcterms:references>STRING</dcterms:references>
+    <dcterms:replaces>STRING</dcterms:replaces>
+    <dcterms:requires>STRING</dcterms:requires>
+    <dcterms:spatial>STRING</dcterms:spatial>
+    <dcterms:tableOfContents>STRING</dcterms:tableOfContents>
+    <dcterms:temporal>STRING</dcterms:temporal>
+    <dcterms:rightsHolder>STRING</dcterms:rightsHolder>
+    <europeana:collectionName>STRING</europeana:collectionName>
+    <europeana:collectionTitle>STRING</europeana:collectionTitle>
+    <europeana:country>STRING</europeana:country>
+    <europeana:dataProvider>STRING</europeana:dataProvider>
+    <europeana:isShownAt>STRING</europeana:isShownAt>
+    <europeana:isShownBy>STRING</europeana:isShownBy>
+    <europeana:language>STRING</europeana:language>
+    <europeana:object>STRING</europeana:object>
+    <europeana:provider>STRING</europeana:provider>
+    <europeana:rights>STRING</europeana:rights>
+    <europeana:source>STRING</europeana:source>
+    <europeana:type>STRING</europeana:type>
+    <europeana:unstored>STRING</europeana:unstored>
+    <europeana:uri>STRING</europeana:uri>
+    <delving:year>STRING</delving:year>
+    <delving:thumbnail>STRING</delving:thumbnail>
+    <delving:deepZoomUrl>STRING</delving:deepZoomUrl>
+    <delving:fullTextObjectUrl>STRING</delving:fullTextObjectUrl>
+    <delving:fullText>STRING</delving:fullText>
+
+</record>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

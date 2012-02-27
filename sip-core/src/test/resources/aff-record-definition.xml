@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
-<record-definition prefix="aff">
+<record-definition prefix="aff" flat="false">
 
-    <!--todo: summary fields are not accounted for yet -->
 
     <namespaces>
-        <namespace prefix="aff" uri="http://www.delving.eu/aff" schema="http://www.delving.eu/aff_1.0.xsd"/>
+        <namespace prefix="aff" uri="http://www.delving.eu/schemas/aff" schema="http://www.delving.eu/schemas/aff_1.0.xsd"/>
     </namespaces>
 
     <elems>
@@ -18,7 +17,7 @@
         <!-- don't move around or/add more elems up here. keep it as it is below -->
     </elems>
 
-    <root tag="aff">
+    <root tag="record">
 
         <elem tag="admin" singular="true">
             <elem tag="ownerUri"/>
@@ -90,21 +89,21 @@
     </root>
 
     <options> <!-- keys should be uri's -->
-        <option-list keyPath="/aff/actors/actor/roleUri"> <!--valuePath="/aff/actors/actor/roleName"> -->
+        <option-list keyPath="/actors/actor/roleUri"> <!--valuePath="/aff/actors/actor/roleName"> -->
             <opt key="1">Creator</opt>
             <opt key="2">Artist</opt>
             <opt key="3">Photographer</opt>
             <!--todo: more values-->
         </option-list>
 
-        <option-list keypath="/aff/places/place/roleURI"> <!--valuePath="/aff/places/place/roleName"> -->
+        <option-list keypath="/places/place/roleURI"> <!--valuePath="/aff/places/place/roleName"> -->
             <opt key="1">Actors place of birth</opt>
             <opt key="2">Actor place of death</opt>
             <opt key="3">Production place</opt>
             <!--todo: more values-->
         </option-list>
 
-        <option-list keyPath="/aff/types/type/roleUri"> <!--valuePath="/aff/types/type/roleName"> -->
+        <option-list keyPath="/types/type/roleUri"> <!--valuePath="/aff/types/type/roleName"> -->
             <opt key="1">Classification</opt>
             <opt key="2">Subject</opt>
             <opt key="3">Technique</opt>
@@ -113,7 +112,7 @@
             <!--todo: more values-->
         </option-list>
 
-        <option-list keyPath="/aff/events/event/eventTypeUri"> <!--valuePath="aff/events/event/eventTypeName">  -->
+        <option-list keyPath="/events/event/eventTypeUri"> <!--valuePath="aff/events/event/eventTypeName">  -->
             <opt key="1">Production</opt>
             <opt key="2">Creation</opt>
             <opt key="3">etc</opt>
@@ -122,7 +121,7 @@
             <!--todo: CRM EVENTS, same as i LIDO-->
         </option-list>
 
-        <option-list keyPath="/aff/mediaFiles/mediaFile/localMediaTypeUri">
+        <option-list keyPath="/mediaFiles/mediaFile/localMediaTypeUri">
             <opt key="1">Thumbnail</opt>
             <opt key="2">Full image</opt>
             <opt key="3">Deep zoom image</opt>
@@ -133,38 +132,18 @@
         </option-list>
     </options>
 
-      <!--<facts>-->
-        <!--<fact path="/aff/admin/owner_uri" name="mets:"/>-->
-        <!--<fact path="/aff/admin/owner_name" name="mets:"/>-->
-        <!--<fact path="/aff/admin/provider_uri" name="mets:"/>-->
-        <!--<fact path="/aff/admin/provider_name" name="mets:"/>-->
-        <!--<fact path="/aff/admin/rights" name="mets:"/>-->
-        <!--<fact path="/aff/thing/language" name="mets:"/>-->
-    <!--</facts>-->
+      <facts>
+        <fact path="/admin/owner_uri" name="mets:"/>
+        <fact path="/admin/owner_name" name="mets:"/>
+        <fact path="/admin/provider_uri" name="mets:"/>
+        <fact path="/admin/provider_name" name="mets:"/>
+        <fact path="/admin/rights" name="mets:"/>
+        <fact path="/thing/language" name="mets:"/>
+    </facts>
 
 
     <docs>
-        <doc tag="admin">
-            <string name="Definition"></string>
-        </doc>
-        <doc tag="owner_uri">
-            <string name="Definition"></string>
-        </doc>
-        <doc tag="provider_uri">
-            <string name="Definition"></string>
-        </doc>
-        <doc tag="provider_name">
-            <string name="Definition"></string>
-        </doc>
-        <doc tag="rights">
-            <string name="Definition"></string>
-        </doc>
-        <doc tag="thing">
-            <string name="Definition"></string>
-        </doc>
-        <doc tag="title">
-            <string name="Definition"></string>
-        </doc>
+        <--! ... -->
     </docs>
 
 </record-definition>
