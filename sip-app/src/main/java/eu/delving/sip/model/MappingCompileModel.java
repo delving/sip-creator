@@ -301,7 +301,7 @@ public class MappingCompileModel {
         }
 
         private void setMappingCode() {
-            if (selectedNodeMapping != null) {
+            if (selectedNodeMapping != null && selectedNodeMapping.isUserCodeEditable()) {
                 String editedCode = documentToString(codeDocument);
                 if (!selectedNodeMapping.codeLooksLike(editedCode)) {
                     selectedNodeMapping.setGroovyCode(editedCode);
