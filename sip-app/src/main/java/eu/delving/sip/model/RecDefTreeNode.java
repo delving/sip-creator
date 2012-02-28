@@ -24,7 +24,6 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
-import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 import org.antlr.stringtemplate.StringTemplate;
 
@@ -184,9 +183,9 @@ public class RecDefTreeNode implements TreeNode {
     public RecDefNode getRecDefNode() {
         return recDefNode;
     }
-
-    public NodeMapping addStatsTreeNode(StatsTreeNode statsTreeNode) {
-        return this.recDefNode.addNodeMapping(new NodeMapping().setStatsTreeNode(statsTreeNode).setInputPath(statsTreeNode.getPath(false)));
+    
+    public void addNodeMapping(NodeMapping nodeMapping) {
+        this.recDefNode.addNodeMapping(nodeMapping);
     }
 
     public static class RecDefPath extends TreePath {

@@ -274,7 +274,7 @@ public class SipModel {
                     final RecMapping recMapping = dataSetModel.getRecMapping(prefix);
                     dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
                     for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
-                        nodeMapping.statsTreeNode = statsModel.findNodeForInputPath(nodeMapping.inputPath);
+                        statsModel.findNodesForInputPaths(nodeMapping);
                     }
                     mappingModel.setRecMapping(recMapping);
                     for (Map.Entry<String, String> entry : facts.entrySet()) {

@@ -1,4 +1,3 @@
-<html>
 <table>
 
 <tr><td>
@@ -39,4 +38,3 @@ $endif$
 $endif$
 
 </table>
-</html>

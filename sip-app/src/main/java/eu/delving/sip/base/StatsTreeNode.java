@@ -224,6 +224,10 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     }
 
     public String toHtml() {
+        return String.format("<html>%s</html>", toHtmlTable());
+    }
+
+    public String toHtmlTable() {
         if (html == null) {
             StringTemplate t = Utility.getTemplate("stats-brief");
             t.setAttribute("stats", fieldStatistics);

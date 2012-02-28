@@ -51,6 +51,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
     @XStreamAsAttribute
     public Path outputPath;
 
+    @XStreamAlias("tuplePaths")
+    public List<Path> tuplePaths;
+
     @XStreamAlias("dictionary")
     public Map<String, String> dictionary;
 
@@ -61,7 +64,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public RecDefNode recDefNode;
 
     @XStreamOmitField
-    public Object statsTreeNode;
+    public List statsTreeNodes;
 
     @Override
     public boolean equals(Object o) {
@@ -78,14 +81,35 @@ public class NodeMapping implements Comparable<NodeMapping> {
         this.outputPath = recDefNode.getPath();
     }
 
-    public NodeMapping setStatsTreeNode(Object statsTreeNode) {
-        this.statsTreeNode = statsTreeNode;
+    public NodeMapping setStatsTreeNodes(List statsTreeNodes, List<Path> inputPaths) {
+        if (statsTreeNodes.isEmpty()) throw new RuntimeException();
+        this.statsTreeNodes = statsTreeNodes;
+        setInputPaths(inputPaths);
         return this;
     }
 
     public NodeMapping setInputPath(Path inputPath) {
         this.inputPath = inputPath;
         return this;
+    }
+
+
+    public NodeMapping setInputPaths(List<Path> inputPaths) {
+        if (inputPaths.isEmpty()) throw new RuntimeException();
+        this.inputPath = inputPaths.get(0);
+        if (inputPath.size() > 1) {
+            tuplePaths = new ArrayList<Path>();
+            for (int walk = 1; walk < inputPaths.size(); walk++) tuplePaths.add(inputPaths.get(walk));
+        }
+        return this;
+    }
+
+
+    public List<Path> getInputPaths() {
+        List<Path> inputPaths = new ArrayList<Path>();
+        inputPaths.add(inputPath);
+        if (tuplePaths != null) inputPaths.addAll(tuplePaths);
+        return inputPaths;
     }
 
     public NodeMapping setOutputPath(Path outputPath) {
@@ -185,9 +209,27 @@ public class NodeMapping implements Comparable<NodeMapping> {
             toInnerLoop(path.chop(-1), out);
         }
         else {
-            Tag outer = path.getTag(0);
-            Tag inner = path.getTag(1);
-            out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
+            if (tuplePaths != null) {
+                // todo: review
+                StringBuilder tuple = new StringBuilder("(");
+                StringBuilder name = new StringBuilder();
+                Iterator<Path> walk = getInputPaths().iterator();
+                while (walk.hasNext()) {
+                    Path inputPath = walk.next();
+                    Tag outer = inputPath.getTag(0);
+                    Tag inner = inputPath.getTag(1);
+                    tuple.append(outer.toGroovyParam()).append(inner.toGroovyRef());
+                    name.append(inner.toGroovyParam());
+                    if (walk.hasNext()) tuple.append(" | ");
+                }
+                tuple.append(")");
+                out.line_("%s * { %s ->", tuple, name);
+            }
+            else {
+                Tag outer = path.getTag(0);
+                Tag inner = path.getTag(1);
+                out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
+            }
             toInnerLoop(path.chop(-1), out);
             out._line("}");
         }
@@ -264,6 +306,5 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public int compareTo(NodeMapping nodeMapping) {
         return this.inputPath.compareTo(nodeMapping.inputPath);
     }
-
 }
 

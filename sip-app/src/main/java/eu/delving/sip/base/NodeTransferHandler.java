@@ -35,6 +35,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Handle the dragging and dropping of nodes
@@ -43,7 +44,7 @@ import java.io.IOException;
  */
 
 public class NodeTransferHandler extends TransferHandler {
-    public static final DataFlavor FLAVOR = new DataFlavor(StatsTreeNode.class, "node");
+    public static final DataFlavor FLAVOR = new DataFlavor(NodeListHolder.class, "nodeListHolder");
     private SipModel sipModel;
 
     public NodeTransferHandler(SipModel sipModel) {
@@ -52,23 +53,7 @@ public class NodeTransferHandler extends TransferHandler {
 
     @Override
     public Icon getVisualRepresentation(Transferable transferable) {
-        StatsTreeNode node;
-        try {
-            node = (StatsTreeNode) transferable.getTransferData(FLAVOR);
-            if (node.getTag().isAttribute()) {
-                return Utility.ATTRIBUTE_ICON;
-            }
-            else if (node.getChildNodes().iterator().hasNext()) {
-                return Utility.COMPOSITE_ELEMENT_ICON;
-            }
-            else {
-                return Utility.VALUE_ELEMENT_ICON;
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return Utility.VALUE_ELEMENT_ICON;
     }
 
     @Override
@@ -101,11 +86,11 @@ public class NodeTransferHandler extends TransferHandler {
     public boolean importData(final TransferHandler.TransferSupport info) {
         if (!canImport(info)) return false;
         try {
-            final StatsTreeNode statsTreeNode = (StatsTreeNode) info.getTransferable().getTransferData(FLAVOR);
+            final NodeListHolder nodeListHolder = (NodeListHolder) info.getTransferable().getTransferData(FLAVOR);
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    sipModel.getCreateModel().setStatsTreeNode(statsTreeNode);
+                    sipModel.getCreateModel().setStatsTreeNodes(nodeListHolder.nodeList);
                     JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
                     TreePath treePath = location.getPath();
                     if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
@@ -125,7 +110,7 @@ public class NodeTransferHandler extends TransferHandler {
             throw new RuntimeException(e);
         }
     }
-    
+
     private class NodeTransferable implements Transferable {
         private Component component;
 
@@ -148,5 +133,9 @@ public class NodeTransferHandler extends TransferHandler {
             JTree tree = (JTree) component;
             return tree.getSelectionPath().getLastPathComponent();
         }
+    }
+
+    public static class NodeListHolder {
+        public List<StatsTreeNode> nodeList;
     }
 }

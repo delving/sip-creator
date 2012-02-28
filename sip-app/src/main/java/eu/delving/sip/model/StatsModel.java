@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.StatsTree;
@@ -128,17 +129,26 @@ public class StatsModel {
         return statsTreeModel;
     }
 
-    public StatsTreeNode findNodeForInputPath(Path path) {
-        if (!(statsTreeModel.getRoot() instanceof StatsTreeNode)) return null;
-        TreePath treePath = findNodeForInputPath(path, (StatsTreeNode) statsTreeModel.getRoot());
-        if (treePath == null) return null;
-        return (StatsTreeNode) treePath.getLastPathComponent();
+    public List<StatsTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
+        List<StatsTreeNode> nodes = new ArrayList<StatsTreeNode>();
+        if (!(statsTreeModel.getRoot() instanceof StatsTreeNode)) {
+            nodeMapping.statsTreeNodes = null;
+        }
+        else if (nodeMapping.statsTreeNodes == null) {
+            for (Path path : nodeMapping.getInputPaths()) {
+                TreePath treePath = findNodeForInputPath(path, (StatsTreeNode) statsTreeModel.getRoot());
+                if (treePath != null) nodes.add((StatsTreeNode)treePath.getLastPathComponent());
+            }
+            nodeMapping.statsTreeNodes = nodes.isEmpty() ? null : nodes;
+        }
+        else {
+            for (Object node : nodeMapping.statsTreeNodes) nodes.add((StatsTreeNode) node);
+        }
+        return nodes.isEmpty() ? null : nodes;
     }
 
     private TreePath findNodeForInputPath(Path path, StatsTreeNode node) {
-        if (node.getPath(false).equals(path)) {
-            return node.getTreePath();
-        }
+        if (node.getPath(false).equals(path)) return node.getTreePath();
         for (StatsTreeNode sub : node.getChildren()) {
             TreePath subPath = findNodeForInputPath(path, sub);
             if (subPath != null) return subPath;

@@ -46,6 +46,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
@@ -78,7 +80,7 @@ public class AnalysisFrame extends FrameBase {
         statisticsJTree.setCellRenderer(new StatsTreeNode.Renderer());
         statisticsJTree.setTransferHandler(sipModel.getNodeTransferHandler());
         statisticsJTree.setDragEnabled(true);
-        statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         wireUp();
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
@@ -116,23 +118,23 @@ public class AnalysisFrame extends FrameBase {
         statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
-                TreePath path = event.getPath();
-                StatsTreeNode node;
-                if (statisticsJTree.getSelectionModel().isPathSelected(path)) {
-                    node = (StatsTreeNode) path.getLastPathComponent();
+                final List<StatsTreeNode> nodeList = new ArrayList<StatsTreeNode>();
+                for (TreePath path : statisticsJTree.getSelectionModel().getSelectionPaths()) {
+                    nodeList.add((StatsTreeNode) path.getLastPathComponent());
+                }
+                if (nodeList.size() == 1) {
+                    StatsTreeNode node = nodeList.get(0);
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
                 }
                 else {
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
-                    node = null;
                 }
-                final StatsTreeNode nodeToSet = node;
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        sipModel.getCreateModel().setStatsTreeNode(nodeToSet);
+                        sipModel.getCreateModel().setStatsTreeNodes(nodeList);
                     }
                 });
             }

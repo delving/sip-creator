@@ -35,6 +35,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 /**
  * Choices have been made in the trees, now we actually make the mapping
@@ -57,8 +58,20 @@ public class CreateFrame extends FrameBase {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                StatsTreeNode statsTreeNode = createModel.getStatsTreeNode();
-                statsHtml.setHtml(statsTreeNode != null ? statsTreeNode.toHtml() : SELECT_STATS);
+                List<StatsTreeNode> statsTreeNodes = createModel.getStatsTreeNodes();
+                if (statsTreeNodes == null) {
+                    statsHtml.setHtml(SELECT_STATS);
+                }
+                else {
+                    StringBuilder out = new StringBuilder("<html><table>");
+                    for (StatsTreeNode node : statsTreeNodes) {
+                        out.append("<tr><td>");
+                        out.append(node.toHtmlTable());
+                        out.append("</td></tr>");
+                    }
+                    out.append("</table></html>");
+                    statsHtml.setHtml(out.toString());
+                }
                 createMappingAction.handleEnablement();
             }
 
@@ -123,7 +136,7 @@ public class CreateFrame extends FrameBase {
                 setEnabled(true);
                 putValue(Action.NAME, CREATE);
             }
-            else if (sipModel.getCreateModel().isComplete()) {
+            else if (sipModel.getCreateModel().getNodeMapping() != null) {
                 setEnabled(false);
                 putValue(Action.NAME, EXISTS);
             }
