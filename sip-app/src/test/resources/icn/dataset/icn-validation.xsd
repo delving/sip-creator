@@ -26,15 +26,15 @@
   <xs:element name="dataProvider" type="xs:string"/>
 
   <xs:element name="type">
-    <xs:simpleType>
-      <xs:restriction base="xs:string">
-        <xs:enumeration value="TEXT"></xs:enumeration>
-        <xs:enumeration value="IMAGE"></xs:enumeration>
-        <xs:enumeration value="SOUND"></xs:enumeration>
-        <xs:enumeration value="VIDEO"></xs:enumeration>
-        <xs:enumeration value="3D"></xs:enumeration>
-      </xs:restriction>
-    </xs:simpleType>
+    <!--<xs:simpleType>-->
+      <!--<xs:restriction base="xs:string">-->
+        <!--<xs:enumeration value="TEXT"></xs:enumeration>-->
+        <!--<xs:enumeration value="IMAGE"></xs:enumeration>-->
+        <!--<xs:enumeration value="SOUND"></xs:enumeration>-->
+        <!--<xs:enumeration value="VIDEO"></xs:enumeration>-->
+        <!--<xs:enumeration value="3D"></xs:enumeration>-->
+      <!--</xs:restriction>-->
+    <!--</xs:simpleType>-->
   </xs:element>
 
 
@@ -65,10 +65,10 @@
         <xs:group minOccurs="0" maxOccurs="unbounded" ref="dcGroup" />
         <xs:element ref="unstored" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element ref="object" minOccurs="0" maxOccurs="1"/>
-        <xs:element ref="provider" minOccurs="1" maxOccurs="1"/>
-        <xs:element ref="type" minOccurs="1" maxOccurs="1"/>
-        <xs:element ref="rights" minOccurs="1" maxOccurs="1"/>
-        <xs:element ref="dataProvider" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="provider" /> <!-- minOccurs="1" maxOccurs="1" -->
+        <xs:element ref="type" /> <!-- minOccurs="1" maxOccurs="1" -->
+        <xs:element ref="rights" /> <!-- minOccurs="1" maxOccurs="1" -->
+        <xs:element ref="dataProvider"/> <!-- minOccurs="1" maxOccurs="1" -->
         <xs:choice >
           <xs:sequence>
             <xs:element ref="isShownBy" minOccurs="1" maxOccurs="1" ></xs:element>
