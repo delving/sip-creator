@@ -32,11 +32,14 @@ import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.xml.MetadataParser;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Node;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.validation.Validator;
 import java.io.*;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -48,14 +51,13 @@ import java.util.TreeMap;
 
 public class Mockery {
     private static final String ORG = "organization";
-    private static final String SPEC = "test";
-    private static final String DIR = String.format("%s_%s", SPEC, ORG);
     private File root;
     private File dataSetDir;
     private Storage storage;
     private DataSetModel dataSetModel = new DataSetModel();
     private RecMapping recMapping;
     private Map<String, String> hints = new TreeMap<String, String>();
+    private String prefix;
 
     public Mockery() throws StorageException, MetadataException {
         File target = null, target1 = new File("sip-app/target"), target2 = new File("target");
@@ -66,18 +68,20 @@ public class Mockery {
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
         storage = new StorageImpl(root);
-        storage.createDataSet(SPEC, ORG);
-        dataSetDir = new File(root, DIR);
-        hints.put(Storage.RECORD_ROOT_PATH, "/bunch-of-chunks/chunk");
-        hints.put(Storage.UNIQUE_ELEMENT_PATH, "/bunch-of-chunks/chunk/identi-fire");
     }
 
-    public void preloadDataset() throws IOException, MetadataException, StorageException {
-        File sourceDir = new File(getClass().getResource("/dataset").getFile());
+    public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {
+        this.prefix = prefix;
+        storage.createDataSet(prefix, ORG);
+        dataSetDir = new File(root, String.format("%s_%s", prefix, ORG));
+        hints.clear();
+        hints.put(Storage.RECORD_ROOT_PATH, recordRootPath);
+        hints.put(Storage.UNIQUE_ELEMENT_PATH, uniqueElementPath);
+        File sourceDir = new File(getClass().getResource(String.format("/%s/dataset", prefix)).getFile());
         if (!sourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(sourceDir, dataSetDir);
-        dataSetModel.setDataSet(storage.getDataSets().get(DIR));
-        recMapping = RecMapping.create("lido", dataSetModel);
+        dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()));
+        recMapping = RecMapping.create(prefix, dataSetModel);
     }
 
     public Storage storage() {
@@ -88,6 +92,25 @@ public class Mockery {
         return dataSetModel;
     }
 
+    public Validator validator() throws StorageException {
+        return dataSetModel.getDataSet().getValidator(prefix);
+    }
+
+    public void createMapping() throws IOException {
+        List<String> lines = IOUtils.readLines(mappingList());
+        int index = 0;
+        while (index < lines.size()) {
+            if (lines.get(index).trim().isEmpty()) {
+                index++;
+            }
+            else {
+                String from = lines.get(index++);
+                String to = lines.get(index++);
+                map(from, to);
+            }
+        }
+    }
+
     public String mapping() throws UnsupportedEncodingException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         RecMapping.write(os, recMapping);
@@ -96,9 +119,9 @@ public class Mockery {
 
     public NodeMapping map(String fromString, String toString) {
         Path from = Path.create(fromString);
-        Path to = Path.create(toString).defaultPrefix("lido");
+        Path to = Path.create(toString).defaultPrefix(prefix);
         RecDefNode node = recMapping.getRecDefTree().getRecDefNode(to);
-        if (node == null) throw new RuntimeException("No node found for "+to);
+        if (node == null) throw new RuntimeException("No node found for " + to);
         NodeMapping mapping = new NodeMapping().setInputPath(from);
         node.addNodeMapping(mapping);
         return mapping;
@@ -116,15 +139,6 @@ public class Mockery {
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
         System.out.println(mappingRunner.getCode());
         return mappingRunner.runMapping(record);
-//        StringWriter writer = new StringWriter();
-//        XmlNodePrinter printer = new XmlNodePrinter(writer);
-//        printer.print(node);
-//        return String.format(
-//                "<?xml version =\"1.0\" encoding=\"UTF-8\"?>\n" +
-//                        "<lido:lidoWrap xmlns:lido=\"http://www.lido-schema.org\">\n" +
-//                        "%s</lido:lidoWrap>\n",
-//                writer.toString()
-//        );
     }
 
     public File[] files() {
@@ -144,15 +158,15 @@ public class Mockery {
     }
 
     private URL sampleResource() {
-        return getClass().getResource("/non-lido-example.xml");
+        return getClass().getResource(String.format("/%s/example-input.xml", prefix));
+    }
+
+    private InputStream mappingList() throws IOException {
+        return getClass().getResource(String.format("/%s/mapping-list.txt", prefix)).openStream();
     }
 
     public File sampleInputFile() throws IOException {
         return new File(sampleResource().getFile());
-    }
-
-    public InputStream sampleInputStream() throws IOException {
-        return sampleResource().openStream();
     }
 
     private void delete(File file) {

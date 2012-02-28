@@ -221,7 +221,7 @@ public class TestCodeGeneration {
             public RecDefTree createRecDef(String prefix) {
                 if (!"lido".equals(prefix)) throw new RuntimeException();
                 try {
-                    URL url = getClass().getResource("/lido-recdef.xml");
+                    URL url = getClass().getResource("/test-code-generation-recdef.xml");
                     InputStream inputStream = url.openStream();
                     return RecDefTree.create(RecDef.read(inputStream));
                 }
