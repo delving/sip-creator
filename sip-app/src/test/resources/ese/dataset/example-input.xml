@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<Medialab>
+  <Record>
+    <OBS_GUID>ec019259-6bd5-4946-acf9-00009b202184</OBS_GUID>
+    <Inventarisnummer>NK2825</Inventarisnummer>
+    <Vervaardiger>onbekend;; Cleve, M. I van</Vervaardiger>
+    <Titel>Landschap met boeren koeien melkend</Titel>
+    <Omschrijving>Landschap met boeren koeien melkend</Omschrijving>
+    <Vervaardigingsdatum>1550=1599</Vervaardigingsdatum>
+    <VervaardigingsdatumOpmerking></VervaardigingsdatumOpmerking>
+    <Vervaardigingsplaats></Vervaardigingsplaats>
+    <Acquisitienaam>Stichting Nederlands Kunstbezit</Acquisitienaam>
+    <Hoogte>49</Hoogte>
+    <Breedte>86</Breedte>
+    <Diameter_Diepte></Diameter_Diepte>
+    <Specifieke_Objectnaam>schilderij</Specifieke_Objectnaam>
+    <Trefwoorden>genre, landschap, schilderkunst</Trefwoorden>
+    <Algemene_Objectnaam>oude kunst</Algemene_Objectnaam>
+    <Materiaal>olieverf, paneel</Materiaal>
+    <Techniek></Techniek>
+    <Standplaats>Depot ICN</Standplaats>
+    <VervaardigerRol>rol: , Verv. naam: Cleve, M. I vanrol: m, Verv. naam: onbekend</VervaardigerRol>
+    <Afbeelding>http://www.oogle.com/NK/NK2825.jpg</Afbeelding>
+  </Record>
+  <Record>
+    <OBS_GUID>a38b3f5d-3c09-4ea2-8357-00101094cd82</OBS_GUID>
+    <Inventarisnummer>SZ73414</Inventarisnummer>
+    <Vervaardiger>Siewert, F.</Vervaardiger>
+    <Titel>Molen</Titel>
+    <Omschrijving>Molen </Omschrijving>
+    <Vervaardigingsdatum></Vervaardigingsdatum>
+    <VervaardigingsdatumOpmerking></VervaardigingsdatumOpmerking>
+    <Vervaardigingsplaats></Vervaardigingsplaats>
+    <Acquisitienaam>BKR</Acquisitienaam>
+    <Hoogte>53.5</Hoogte>
+    <Breedte>74</Breedte>
+    <Diameter_Diepte></Diameter_Diepte>
+    <Specifieke_Objectnaam>aquarel</Specifieke_Objectnaam>
+    <Trefwoorden>werk op papier</Trefwoorden>
+    <Algemene_Objectnaam>moderne kunst</Algemene_Objectnaam>
+    <Materiaal>aquarel, inkt</Materiaal>
+    <Techniek>gewassen</Techniek>
+    <Standplaats>niet-museale instelling</Standplaats>
+    <VervaardigerRol>rol: , Verv. naam: Siewert, F.</VervaardigerRol>
+    <Afbeelding>http://www.oogle.com/K/K66091.jpg</Afbeelding>
+  </Record>
+  <Record>
+    <OBS_GUID>868e9ee9-a3cf-43dc-a1e7-00102d69807f</OBS_GUID>
+    <Inventarisnummer>K66092</Inventarisnummer>
+    <Vervaardiger>Tsang, J.</Vervaardiger>
+    <Titel>Science fiction</Titel>
+    <Omschrijving>Science fiction </Omschrijving>
+    <Vervaardigingsdatum>1965</Vervaardigingsdatum>
+    <VervaardigingsdatumOpmerking></VervaardigingsdatumOpmerking>
+    <Vervaardigingsplaats></Vervaardigingsplaats>
+    <Acquisitienaam>onbekend/in bewerking</Acquisitienaam>
+    <Hoogte>24</Hoogte>
+    <Breedte>30.3</Breedte>
+    <Diameter_Diepte></Diameter_Diepte>
+    <Specifieke_Objectnaam>collage</Specifieke_Objectnaam>
+    <Trefwoorden>werk op papier</Trefwoorden>
+    <Algemene_Objectnaam>moderne kunst</Algemene_Objectnaam>
+    <Materiaal>inkt, oost-indische inkt, papier</Materiaal>
+    <Techniek>pentekening</Techniek>
+    <Standplaats>Depot ICN</Standplaats>
+    <VervaardigerRol>rol: i, Verv. naam: Tsang, J.</VervaardigerRol>
+    <Afbeelding>http://www.oogle.com//K/K66092.jpg</Afbeelding>
+  </Record>
+</Medialab>

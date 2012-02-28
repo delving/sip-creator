@@ -1,0 +1,6 @@
+/input/OBS_GUID
+/record/europeana:uri
+
+/input/Afbeelding
+/record/europeana:isShownBy
+
