@@ -21,6 +21,7 @@
     <Standplaats>Depot ICN</Standplaats>
     <VervaardigerRol>rol: , Verv. naam: Cleve, M. I vanrol: m, Verv. naam: onbekend</VervaardigerRol>
     <Afbeelding>http://www.oogle.com/NK/NK2825.jpg</Afbeelding>
+    <type>IMAGE</type>
   </Record>
   <Record>
     <OBS_GUID>a38b3f5d-3c09-4ea2-8357-00101094cd82</OBS_GUID>
@@ -43,6 +44,7 @@
     <Standplaats>niet-museale instelling</Standplaats>
     <VervaardigerRol>rol: , Verv. naam: Siewert, F.</VervaardigerRol>
     <Afbeelding>http://www.oogle.com/K/K66091.jpg</Afbeelding>
+    <type>IMAGE</type>
   </Record>
   <Record>
     <OBS_GUID>868e9ee9-a3cf-43dc-a1e7-00102d69807f</OBS_GUID>
@@ -65,5 +67,6 @@
     <Standplaats>Depot ICN</Standplaats>
     <VervaardigerRol>rol: i, Verv. naam: Tsang, J.</VervaardigerRol>
     <Afbeelding>http://www.oogle.com//K/K66092.jpg</Afbeelding>
+    <type>IMAGE</type>
   </Record>
 </Medialab>

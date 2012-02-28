@@ -2,7 +2,7 @@
 <xs:schema  xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:dcterms="http://purl.org/dc/terms/"
             xmlns:dc="http://purl.org/dc/elements/1.1/"
-            xmlns:delving="http://www.delving.eu/"
+            xmlns:delving="http://www.delving.eu/schemas/"
             xmlns:icn="http://www.icn.nl/"
             xmlns="http://www.europeana.eu/schemas/ese/"
             targetNamespace="http://www.europeana.eu/schemas/ese/"
@@ -14,7 +14,8 @@
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/03/xml.xsd"/>
     <xs:import namespace="http://purl.org/dc/elements/1.1/" schemaLocation="http://www.dublincore.org/schemas/xmls/qdc/dc.xsd"/>
     <xs:import namespace="http://purl.org/dc/terms/" schemaLocation="http://www.dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
-    <!--<xs:import namespace="http://www.delving.eu/" schemaLocation="http://www.delving.eu/schemas/delving-1.0.xsd"/>-->
+    <xs:import namespace="http://www.delving.eu/schemas/" schemaLocation="../delving-1.0.xsd"/>
+    <xs:import namespace="http://www.icn.nl/" schemaLocation="../ICN-V3.2.xsd"/>
 
     <xs:element name="isShownBy" type="xs:anyURI"/>
     <xs:element name="rights" type="xs:anyURI"/>
@@ -105,6 +106,22 @@
             <xs:element ref="icn:province"/>
             <xs:element ref="icn:collectionPart"/>
             <xs:element ref="icn:acquisitionMeans">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="aankoop"/>
+                        <xs:enumeration value="schenking"/>
+                        <xs:enumeration value="bruikleen"/>
+                        <xs:enumeration value="ruil"/>
+                        <xs:enumeration value="opdracht"/>
+                        <xs:enumeration value="opdracht derden"/>
+                        <xs:enumeration value="opdracht museum"/>
+                        <xs:enumeration value="legaat"/>
+                        <xs:enumeration value="overdracht"/>
+                        <xs:enumeration value="successieregeling"/>
+                        <xs:enumeration value="vondst"/>
+                        <xs:enumeration value="onbekend:"/>
+                    </xs:restriction>
+                </xs:simpleType>
            </xs:element>
             <xs:element ref="icn:collectionType"/>
             <xs:element ref="icn:acquisitionYear"/>
@@ -117,7 +134,7 @@
     <xs:group name="delvingGroup">
         <xs:choice>
             <xs:element ref="delving:year"/>
-            <xs:element ref="delving:thumbnail" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="delving:thumbnail" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="delving:deepZoomUrl"/>
             <xs:element ref="delving:fullTextObjectUrl"/>
             <xs:element ref="delving:fullText"/>
@@ -135,10 +152,10 @@
                 <xs:group minOccurs="0" maxOccurs="unbounded" ref="delvingGroup" />
                 <xs:element ref="unstored" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="object" minOccurs="0" maxOccurs="1"/>
-                <xs:element ref="provider" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="type" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="rights" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="dataProvider" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="provider" /> <!-- minOccurs="1" maxOccurs="1" -->
+                <xs:element ref="type" /> <!-- minOccurs="1" maxOccurs="1" -->
+                <xs:element ref="rights" />  <!-- minOccurs="1" maxOccurs="1" -->
+                <xs:element ref="dataProvider" /> <!-- minOccurs="1" maxOccurs="1" -->
                 <xs:choice >
                     <xs:sequence>
                         <xs:element ref="isShownBy" minOccurs="1" maxOccurs="1" ></xs:element>
@@ -150,11 +167,11 @@
                     </xs:sequence>
                 </xs:choice>
                 <!-- NOT part of ESE 3.4, only ICN -->
-                <xs:element ref="uri" minOccurs="1" maxOccurs="1"/> <!-- UNIQUE ?? -->
-                <xs:element ref="language" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="country" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="uri" /> <!-- UNIQUE ?? -->
+                <xs:element ref="language" /> <!-- minOccurs="1" maxOccurs="1" -->
+                <xs:element ref="country" /> <!-- minOccurs="1" maxOccurs="1" -->
                 <xs:element ref="collectionName"/>
-                <xs:element ref="collectionTitle" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="collectionTitle" /> <!-- minOccurs="1" maxOccurs="1" -->
                 <xs:element ref="source"/>
                 <!-- -->
 

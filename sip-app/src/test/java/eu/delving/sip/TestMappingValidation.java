@@ -71,15 +71,15 @@ public class TestMappingValidation {
         mock.delete();
     }
 
-    @Test
-    public void testLido() throws Exception {
-        mock.prepareDataset(
-                "lido",
-                "/bunch-of-chunks/chunk",
-                "/bunch-of-chunks/chunk/identi-fire"
-        );
-        runFullCycle(2);
-    }
+//    @Test
+//    public void testLido() throws Exception {
+//        mock.prepareDataset(
+//                "lido",
+//                "/bunch-of-chunks/chunk",
+//                "/bunch-of-chunks/chunk/identi-fire"
+//        );
+//        runFullCycle(2);
+//    }
 
     @Test
     public void testEse() throws Exception {
