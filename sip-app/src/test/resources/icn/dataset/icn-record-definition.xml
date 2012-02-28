@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+
 <record-definition flat="true">
 
     <namespaces>
@@ -8,7 +9,6 @@
         <namespace prefix="icn" uri="http://www.icn.nl/" schema="http://www.icn.nl/schemas/ICN-V3.2.xsd"/>
         <namespace prefix="delving" uri="http://www.delving.eu/" schema="http://www.delving.eu/schemas/delving-1.0.xsd"/>
     </namespaces>
-
 
     <root tag="record">
         <elem tag="icn:creatorYearOfBirth"/>
@@ -25,63 +25,67 @@
         <elem tag="icn:purchasePrice"/>
         <elem tag="icn:acquiredWithHelpFrom"/>
         <elem tag="icn:physicalState"/>
-        <elem tag="dc:contributor"/>
-        <elem tag="dc:coverage"/>
-        <elem tag="dc:creator"/>
-        <elem tag="dc:date"/>
-        <elem tag="dc:description"/>
-        <elem tag="dc:format"/>
-        <elem tag="dc:identifier"/>
-        <elem tag="dc:language"/>
-        <elem tag="dc:publisher"/>
-        <elem tag="dc:relation"/>
-        <elem tag="dc:rights"/>
-        <elem tag="dc:source"/>
-        <elem tag="dc:subject"/>
-        <elem tag="dc:title"/>
-        <elem tag="dc:type"/>
-        <elem tag="dcterms:alternative"/>
-        <elem tag="dcterms:conformsTo"/>
-        <elem tag="dcterms:created"/>
-        <elem tag="dcterms:extent"/>
-        <elem tag="dcterms:hasFormat"/>
-        <elem tag="dcterms:hasPart"/>
-        <elem tag="dcterms:hasVersion"/>
-        <elem tag="dcterms:isFormatOf"/>
-        <elem tag="dcterms:isPartOf"/>
-        <elem tag="dcterms:isReferencedBy"/>
-        <elem tag="dcterms:isReplacedBy"/>
-        <elem tag="dcterms:isRequiredBy"/>
-        <elem tag="dcterms:isVersionOf"/>
-        <elem tag="dcterms:issued"/>
-        <elem tag="dcterms:medium"/>
-        <elem tag="dcterms:provenance"/>
-        <elem tag="dcterms:references"/>
-        <elem tag="dcterms:replaces"/>
-        <elem tag="dcterms:requires"/>
-        <elem tag="dcterms:spatial"/>
-        <elem tag="dcterms:tableOfContents"/>
-        <elem tag="dcterms:temporal"/>
-        <elem tag="dcterms:rightsHolder"/>
-        <elem tag="europeana:collectionName"/>
-        <elem tag="europeana:collectionTitle"/>
-        <elem tag="europeana:country"/>
-        <elem tag="europeana:dataProvider"/>
-        <elem tag="europeana:isShownAt"/>
-        <elem tag="europeana:isShownBy"/>
-        <elem tag="europeana:language"/>
-        <elem tag="europeana:object"/>
-        <elem tag="europeana:provider"/>
-        <elem tag="europeana:rights"/>
-        <elem tag="europeana:source"/>
-        <elem tag="europeana:type"/>
-        <elem tag="europeana:unstored"/>
-        <elem tag="europeana:uri"/>
+        <elem tag="dc:contributor"/>            <!-- ESE 3.4 -->
+        <elem tag="dc:coverage"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:creator"/>                <!-- ESE 3.4 -->
+        <elem tag="dc:date"/>                   <!-- ESE 3.4 -->
+        <elem tag="dc:description"/>            <!-- ESE 3.4 -->
+        <elem tag="dc:format"/>                 <!-- ESE 3.4 -->
+        <elem tag="dc:identifier"/>             <!-- ESE 3.4 -->
+        <elem tag="dc:language"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:publisher"/>              <!-- ESE 3.4 -->
+        <elem tag="dc:relation"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:rights"/>                 <!-- ESE 3.4 -->
+        <elem tag="dc:source"/>                 <!-- ESE 3.4 -->
+        <elem tag="dc:subject"/>                <!-- ESE 3.4 -->
+        <elem tag="dc:title"/>                  <!-- ESE 3.4 -->
+        <elem tag="dc:type"/>                   <!-- ESE 3.4 -->
+        <elem tag="dcterms:alternative"/>       <!-- ESE 3.4 -->
+        <elem tag="dcterms:conformsTo"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:created"/>           <!-- ESE 3.4 -->
+        <elem tag="dcterms:extent"/>            <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasFormat"/>         <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasPart"/>           <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasVersion"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isFormatOf"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isPartOf"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:isReferencedBy"/>    <!-- ESE 3.4 -->
+        <elem tag="dcterms:isReplacedBy"/>      <!-- ESE 3.4 -->
+        <elem tag="dcterms:isRequiredBy"/>      <!-- ESE 3.4 -->
+        <elem tag="dcterms:isVersionOf"/>       <!-- ESE 3.4 -->
+        <elem tag="dcterms:issued"/>            <!-- ESE 3.4 -->
+        <elem tag="dcterms:medium"/>            <!-- ESE 3.4 -->
+        <elem tag="dcterms:provenance"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:references"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:replaces"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:requires"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:spatial"/>           <!-- ESE 3.4 -->
+        <elem tag="dcterms:tableOfContents"/>   <!-- ESE 3.4 -->
+        <elem tag="dcterms:temporal"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:rightsHolder"/>      <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:object"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
+        <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
+        <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office -->
+        <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office -->
+        <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office-->
+        <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:source"/>          <!-- NOT part of ESE 3.4 -->
         <elem tag="delving:year"/>
         <elem tag="delving:thumbnail"/>
         <elem tag="delving:deepZoomUrl"/>
         <elem tag="delving:fullTextObjectUrl"/>
         <elem tag="delving:fullText"/>
+
+        <!--<elem tag="europeana:userTag"/>-->         <!-- ESE 3.4, NOT part of ICN, not accepted by the office  -->
+        <!--<elem tag="europeana:year"/>-->            <!-- ESE 3.4, NOT part of ICN, not accepted by the office  -->
+
     </root>
 
     <options>
@@ -147,7 +151,7 @@
         <converter call=".toLocalId(spec)" path="/europeana:uri"/>
         <converter multipleOutput="true" call=".extractYear()" path="/delving:year"/>
     </converters>
-    
+
     <docs>
         <doc path="/dc:contributor">
             <string name="Dublin Core definition">An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>
@@ -159,19 +163,18 @@
 
     <bookmarks>
         <category name="Mandatory ICN elements">
-           <doc>
-               <string>These elements must be included by any professional mapper. If that's too much work, maybe you can find employment in the food services industry</string>
-           </doc>
-           <ref path="/europeana:uri" name="uri" display="URI"> <!-- Do we use the "name" part?? -->
             <doc>
-                <string>The URI should be set by the provider: example: http://id.vbm.se/thing/345634573. (dummy...)</string>
-                <string>Requirements: globally unique</string>
-              </doc>
-            </ref>
-            <ref path="/delving:thumbnail" name="thumbnail" display="Thumbnail">
+                <string>These elements must be included in any ESE delivery to Europeana</string>
+            </doc>
+            <ref path="/europeana:provider" display="Provider"/>
+            <ref path="/europeana:dataProvider" display="Data provider"/>
+            <ref path="/europeana:rights" display="Rights"/>
+            <ref path="/europeana:type" display="Type"/>
+            <ref path="/europeana:isShownBy" display="Is Shown By"/>
+            <ref path="/europeana:isShownAt" display="Is Shown At"/>
         </category>
     </bookmarks>
-  
+
 </record-definition>
 
 

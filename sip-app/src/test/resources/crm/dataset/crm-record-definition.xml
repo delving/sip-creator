@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<record-definition prefix="crm" flat="false">
+<record-definition prefix="crm" flat="false"
+        >
     <namespaces>
         <namespace prefix="crm" uri="http://www.cidoc-crm.org/rdfs/cidoc-crm" schema=""/>
         <namespace prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#" schema=""/>
@@ -12,6 +13,11 @@
             <attr tag="rdf:resource"/>
 
         </attrs>
+        <elems>
+
+
+
+        </elems>
 
         <elem tag="E1.CRM_Entity">
             <elem tag="E2.Temporal_Entity">
