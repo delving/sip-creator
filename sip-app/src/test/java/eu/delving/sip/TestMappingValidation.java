@@ -21,7 +21,6 @@
 
 package eu.delving.sip;
 
-import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
@@ -43,7 +42,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import javax.swing.tree.DefaultTreeModel;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -80,10 +78,20 @@ public class TestMappingValidation {
                 "/bunch-of-chunks/chunk",
                 "/bunch-of-chunks/chunk/identi-fire"
         );
-        runFullCycle();
+        runFullCycle(2);
     }
 
-    private void runFullCycle() throws StorageException, IOException, XMLStreamException, MetadataParser.AbortException, MappingException {
+    @Test
+    public void testIcn() throws Exception {
+        mock.prepareDataset(
+                "icn",
+                "/Medialab/Record",
+                "/Medialab/Record/OBS_GUID"
+        );
+        runFullCycle(3);
+    }
+
+    private void runFullCycle(int expectedRecords) throws Exception {
         assertEquals(4, mock.fileCount());
         dataSet().externalToImported(mock.sampleInputFile(), null);
         assertEquals(5, mock.fileCount());
@@ -93,7 +101,7 @@ public class TestMappingValidation {
         assertEquals(6, mock.fileCount());
         assertEquals(ANALYZED_IMPORT, dataSet().getState());
 
-        assertEquals("2", mock.hints().get(Storage.RECORD_COUNT));
+        assertEquals(String.valueOf(expectedRecords), mock.hints().get(Storage.RECORD_COUNT));
         dataSet().setHints(mock.hints());
         assertEquals(7, mock.fileCount());
         assertEquals(DELIMITED, dataSet().getState());
@@ -117,11 +125,7 @@ public class TestMappingValidation {
 
         MetadataParser parser = mock.parser();
         MetadataRecord record = parser.nextRecord();
-        assertNotNull(parser.nextRecord());
-        assertNull(parser.nextRecord());
-
         Node node = mock.runMapping(record);
-
         System.out.println(XmlSerializer.toXml(node));
 
         Source source = new DOMSource(node);

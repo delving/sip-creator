@@ -383,7 +383,7 @@ public class StorageImpl extends StorageBase implements Storage {
                 return schema.newValidator();
             }
             catch (SAXException e) {
-                throw new StorageException("Unable to create schema validator for " + prefix);
+                throw new StorageException("Unable to create schema validator for " + prefix, e);
             }
         }
 

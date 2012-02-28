@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-
-<record-definition flat="true">
+<record-definition prefix="icn" flat="true">
 
     <namespaces>
         <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
@@ -89,7 +88,7 @@
     </root>
 
     <options>
-        <option-list valuePath="/icn:technique"> <!-- no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs -->
+        <option-list path="/record/technique"> <!-- no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs -->
             <opt key="1">Schilderkunst</opt>
             <opt key="2">Prentkunst</opt>
             <opt key="3">Fotografie</opt>
@@ -99,7 +98,7 @@
             <opt key="7">Film/Video/DVD</opt>
             <opt key="8">Anders:</opt>
         </option-list>
-        <option-list valuePath="/icn:acquisitionMeans">
+        <option-list path="/record/acquisitionMeans">
             <opt key="1">aankoop</opt>
             <opt key="2">schenking</opt>
             <opt key="3">bruikleen</opt>
@@ -113,7 +112,7 @@
             <opt key="11">vondst</opt>
             <opt key="12">onbekend:</opt>
         </option-list>
-        <option-list valuePath="/icn:collectionType">
+        <option-list path="/record/collectionType">
             <opt key="1">all</opt>
             <opt key="2">portal</opt>
             <opt key="3">mm</opt>
@@ -134,26 +133,26 @@
         <searchField name="SNIPPET" path="/icn:collectionTitle"/>
     </search>
 
-    <facts>
-        <fact name="spec" path="/icn:collectionName"/>
-        <fact name="name" path="/icn:collectionTitle"/>
-        <fact name="country" path="/icn:country"/>
-        <fact name="dataProvider" path="/icn:dataProvider"/>
-        <fact name="language" path="/icn:language"/>
-        <fact name="provider" path="/icn:provider"/>
-        <fact name="rights" path="/icn:rights"/>
-        <fact name="type" path="/icn:type"/>
-    </facts>
+    <!--<facts>-->
+        <!--<fact name="spec" path="/icn:collectionName"/>-->
+        <!--<fact name="name" path="/icn:collectionTitle"/>-->
+        <!--<fact name="country" path="/icn:country"/>-->
+        <!--<fact name="dataProvider" path="/icn:dataProvider"/>-->
+        <!--<fact name="language" path="/icn:language"/>-->
+        <!--<fact name="provider" path="/icn:provider"/>-->
+        <!--<fact name="rights" path="/icn:rights"/>-->
+        <!--<fact name="type" path="/icn:type"/>-->
+    <!--</facts>-->
 
-    <converters>
-        <converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>
-        <converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfDeath"/>
-        <converter call=".toLocalId(spec)" path="/europeana:uri"/>
-        <converter multipleOutput="true" call=".extractYear()" path="/delving:year"/>
-    </converters>
-
+    <!--<converters>-->
+        <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>-->
+        <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfDeath"/>-->
+        <!--<converter call=".toLocalId(spec)" path="/europeana:uri"/>-->
+        <!--<converter multipleOutput="true" call=".extractYear()" path="/delving:year"/>-->
+    <!--</converters>-->
+    
     <docs>
-        <doc path="/dc:contributor">
+        <doc path="/record/dc:contributor">
             <string name="Dublin Core definition">An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>
             <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
             <string name="Europeana note">The name of contributors to the original analog or born digital object.  This could be a person, an organisation or a service. </string>
@@ -162,17 +161,17 @@
     </docs>
 
     <bookmarks>
-        <category name="Mandatory ICN elements">
-            <doc>
-                <string>These elements must be included in any ESE delivery to Europeana</string>
-            </doc>
-            <ref path="/europeana:provider" display="Provider"/>
-            <ref path="/europeana:dataProvider" display="Data provider"/>
-            <ref path="/europeana:rights" display="Rights"/>
-            <ref path="/europeana:type" display="Type"/>
-            <ref path="/europeana:isShownBy" display="Is Shown By"/>
-            <ref path="/europeana:isShownAt" display="Is Shown At"/>
-        </category>
+        <!--<category name="Mandatory ICN elements">-->
+            <!--<doc>-->
+                <!--<string>These elements must be included in any ESE delivery to Europeana</string>-->
+            <!--</doc>-->
+            <!--<ref path="/europeana:provider" display="Provider"/>-->
+            <!--<ref path="/europeana:dataProvider" display="Data provider"/>-->
+            <!--<ref path="/europeana:rights" display="Rights"/>-->
+            <!--<ref path="/europeana:type" display="Type"/>-->
+            <!--<ref path="/europeana:isShownBy" display="Is Shown By"/>-->
+            <!--<ref path="/europeana:isShownAt" display="Is Shown At"/>-->
+        <!--</category>-->
     </bookmarks>
 
 </record-definition>

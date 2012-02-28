@@ -94,6 +94,8 @@ public class RecDef {
 
     public List<OptionList> options;
 
+    public List<SearchField> search;
+
     public List<Doc> docs;
 
     public List<Category> bookmarks;
@@ -230,6 +232,7 @@ public class RecDef {
         public List<Opt> opts;
 
         public void resolve(RecDef recDef) {
+            if (path == null) throw new RuntimeException("No path for OptionList: "+opts);
             path.defaultPrefix(recDef.prefix);
             if (path.peek().isAttribute()) {
                 recDef.findAttr(path).options = opts;
@@ -253,6 +256,21 @@ public class RecDef {
             this.content = content;
             return this;
         }
+
+        public String toString() {
+            return String.format("%s: %s", key, content);
+        }
+    }
+
+    @XStreamAlias("searchField")
+    public static class SearchField {
+
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamAsAttribute
+        public Path path;
+
     }
 
     @XStreamAlias("doc")
@@ -260,6 +278,9 @@ public class RecDef {
 
         @XStreamAsAttribute
         public Tag tag;
+
+        @XStreamAsAttribute
+        public Path path;
 
         @XStreamImplicit
         public List<String> lines;
@@ -294,11 +315,26 @@ public class RecDef {
         }
 
         public void resolve(RecDef recDef) {
-            if (lines == null) throw new RuntimeException("Lines is null for " + tag);
-            tag = tag.defaultPrefix(recDef.prefix);
-            Elem elem = recDef.root.findElem(tag);
-            Attr attr = recDef.root.findAttr(tag);
-            if (elem == null && attr == null) throw new RuntimeException("Cannot find tag " + tag);
+            if (recDef.prefix == null) throw new RuntimeException("No prefix found");
+            Elem elem;
+            Attr attr;
+            if (path != null) {
+                if (lines == null) throw new RuntimeException("Lines is null for " + path);
+                path = path.defaultPrefix(recDef.prefix);
+                elem = recDef.root.findElem(path, 0);
+                attr = recDef.root.findAttr(path, 0);
+                if (elem == null && attr == null) throw new RuntimeException("Cannot find path " + path);
+            }
+            else if (tag != null) {
+                if (lines == null) throw new RuntimeException("Lines is null for " + tag);
+                tag = tag.defaultPrefix(recDef.prefix);
+                elem = recDef.root.findElem(tag);
+                attr = recDef.root.findAttr(tag);
+                if (elem == null && attr == null) throw new RuntimeException("Cannot find tag " + tag);
+            }
+            else {
+                throw new RuntimeException("Neither path nor tag available: "+lines);
+            }
             if (elem != null) elem.doc = this;
             if (attr != null) attr.doc = this;
         }
@@ -427,7 +463,7 @@ public class RecDef {
         public void print(StringBuilder out, int level) {
             if (doc != null) {
                 indent(out, level).append("/*\n");
-                indent(out, level + 1).append(String.format("\"%s\"\n", doc.tag));
+                indent(out, level + 1).append(String.format("\"%s\"\n", doc.path));
                 for (String line : doc.lines) {
                     indent(out, level + 1).append(line).append('\n');
                 }
