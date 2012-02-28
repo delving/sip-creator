@@ -201,6 +201,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
             if (dictionary != null) {
                 out.line("from%s(%s)", getDictionaryName(), inner.toGroovyParam());
             }
+            else if (tuplePaths != null) {
+                out.line(getTupleUsage());
+            }
             else {
                 out.line("\"${%s}\"", inner.toGroovyParam());
             }
@@ -210,20 +213,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         }
         else {
             if (tuplePaths != null) {
-                // todo: review
-                StringBuilder tuple = new StringBuilder("(");
-                StringBuilder name = new StringBuilder();
-                Iterator<Path> walk = getInputPaths().iterator();
-                while (walk.hasNext()) {
-                    Path inputPath = walk.next();
-                    Tag outer = inputPath.getTag(0);
-                    Tag inner = inputPath.getTag(1);
-                    tuple.append(outer.toGroovyParam()).append(inner.toGroovyRef());
-                    name.append(inner.toGroovyParam());
-                    if (walk.hasNext()) tuple.append(" | ");
-                }
-                tuple.append(")");
-                out.line_("%s * { %s ->", tuple, name);
+                out.line_("%s * { %s ->", getTupleExpression(), getTupleName());
             }
             else {
                 Tag outer = path.getTag(0);
@@ -279,6 +269,49 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public String toString() {
         return String.format("[%s] => [%s]", inputPath.getTail(), outputPath.getTail());
+    }
+    
+    private String getTupleUsage() {
+        String name = getTupleName();
+        int size = tuplePaths.size() + 1;
+        StringBuilder usage = new StringBuilder("\"");
+        for (int walk=0; walk<size; walk++) {
+            usage.append(String.format("${%s[%d]}", name, walk));
+            if (walk < size - 1) usage.append(" ");
+        }
+        Iterator<Path> walk = getInputPaths().iterator();
+        while (walk.hasNext()) {
+            Path inputPath = walk.next();
+            Tag outer = inputPath.getTag(0);
+            Tag inner = inputPath.getTag(1);
+            usage.append(outer.toGroovyParam()).append(inner.toGroovyRef());
+            if (walk.hasNext()) usage.append(" | ");
+        }
+        usage.append("\"");
+        return usage.toString();
+    }
+    
+    private String getTupleName() {
+        StringBuilder name = new StringBuilder();
+        for (Path inputPath : getInputPaths()) {
+            Tag inner = inputPath.peek();
+            name.append(inner.toGroovyParam());
+        }
+        return name.toString();
+    }
+    
+    private String getTupleExpression() {
+        StringBuilder tuple = new StringBuilder("(");
+        Iterator<Path> walk = getInputPaths().iterator();
+        while (walk.hasNext()) {
+            Path inputPath = walk.next();
+            Tag outer = inputPath.getTag(0);
+            Tag inner = inputPath.getTag(1);
+            tuple.append(outer.toGroovyParam()).append(inner.toGroovyRef());
+            if (walk.hasNext()) tuple.append(" | ");
+        }
+        tuple.append(")");
+        return tuple.toString();
     }
 
     private NodeMapping getAncestorNodeMapping() {
