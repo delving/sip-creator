@@ -1,0 +1,31 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.icn.nl/"
+           targetNamespace="http://www.icn.nl/"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <xs:annotation>
+        <xs:documentation xml:lang="en">
+        Bulle
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/03/xml.xsd"></xs:import>
+
+    <xs:element name="record" type="xs:string"/>
+    <xs:element name="creatorYearOfBirth" type="xs:string"/>
+    <xs:element name="creatorYearOfDeath" type="xs:string"/>
+    <xs:element name="creatorRole" type="xs:string"/>
+    <xs:element name="technique" type="xs:string"/>
+    <xs:element name="material" type="xs:string"/>
+    <xs:element name="location" type="xs:string"/>
+    <xs:element name="province" type="xs:string"/>
+    <xs:element name="collectionPart" type="xs:string"/>
+    <xs:element name="acquisitionMeans" type="xs:string"/>
+    <xs:element name="collectionType" type="xs:string"/>
+    <xs:element name="acquisitionYear" type="xs:string"/>
+    <xs:element name="purchasePrice" type="xs:string"/>
+    <xs:element name="acquiredWithHelpFrom" type="xs:string"/>
+    <xs:element name="physicalState" type="xs:string"/>
+
+</xs:schema>
