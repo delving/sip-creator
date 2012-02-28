@@ -82,14 +82,25 @@ public class TestMappingValidation {
     }
 
     @Test
-    public void testIcn() throws Exception {
+    public void testEse() throws Exception {
         mock.prepareDataset(
-                "icn",
+                "ese",
                 "/Medialab/Record",
                 "/Medialab/Record/OBS_GUID"
         );
         runFullCycle(3);
     }
+
+//    @Test
+//    public void testIcn() throws Exception {
+//        mock.prepareDataset(
+//                "icn",
+//                "/Medialab/Record",
+//                "/Medialab/Record/OBS_GUID"
+//        );
+//        runFullCycle(3);
+//    }
+
 
     private void runFullCycle(int expectedRecords) throws Exception {
         assertEquals(4, mock.fileCount());
