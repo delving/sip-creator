@@ -105,24 +105,7 @@
             <xs:element ref="icn:location"/>
             <xs:element ref="icn:province"/>
             <xs:element ref="icn:collectionPart"/>
-            <xs:element ref="icn:acquisitionMeans">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="aankoop"/>
-                        <xs:enumeration value="schenking"/>
-                        <xs:enumeration value="bruikleen"/>
-                        <xs:enumeration value="ruil"/>
-                        <xs:enumeration value="opdracht"/>
-                        <xs:enumeration value="opdracht derden"/>
-                        <xs:enumeration value="opdracht museum"/>
-                        <xs:enumeration value="legaat"/>
-                        <xs:enumeration value="overdracht"/>
-                        <xs:enumeration value="successieregeling"/>
-                        <xs:enumeration value="vondst"/>
-                        <xs:enumeration value="onbekend:"/>
-                    </xs:restriction>
-                </xs:simpleType>
-           </xs:element>
+            <xs:element ref="icn:acquisitionMeans"/>
             <xs:element ref="icn:collectionType"/>
             <xs:element ref="icn:acquisitionYear"/>
             <xs:element ref="icn:purchasePrice"/>
