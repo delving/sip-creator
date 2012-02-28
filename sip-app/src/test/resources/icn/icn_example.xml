@@ -1,10 +1,6 @@
 <?xml version ="1.0" encoding="UTF-8"?>
 
-<record xmlns:icn="http://www.w3.org/TR/html4/"
-        xmlns:dc="http://www.w3schools.com/furnisdasture"
-        xmlns:dcterms="http://www.w3schools.com/furnddditure"
-        xmlns:europeana="http://www.w3schools.com/furniaature"
-        xmlns:delving="http://www.w3schools.com/furnitddure">
+<record>
 
     <icn:creatorYearOfBirth>STRING</icn:creatorYearOfBirth>
     <icn:creatorYearOfDeath>STRING</icn:creatorYearOfDeath>
