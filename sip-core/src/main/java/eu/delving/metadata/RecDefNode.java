@@ -123,7 +123,7 @@ public class RecDefNode {
         if (options != null) {
             for (RecDef.Opt option : options) {
                 String member = option.content;
-                if (member.endsWith(":")) {
+                if (member.endsWith(":" )) {
                     int colon = value.indexOf(':');
                     if (colon > 0) {
                         if (member.equals(value.substring(0, colon + 1))) {
@@ -203,12 +203,21 @@ public class RecDefNode {
             childrenToCode(out, editPath);
         }
         else for (NodeMapping nodeMapping : nodeMappings.values()) {
-            childrenInLoop(nodeMapping.getLocalPath(), out, editPath);
+            if (nodeMapping.tuplePaths == null) {
+                childrenInLoop(nodeMapping.getLocalPath(), out, editPath);
+            }
+            else {
+                out.line_("%s * { %s ->", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
+                startBuilderCall(out, editPath);
+                nodeMapping.toElementCode(out, editPath);
+                out._line("}" );
+                out._line("}" );
+            }
         }
     }
 
     private void childrenInLoop(Path path, Out out, EditPath editPath) {
-        if (path.isEmpty()) throw new RuntimeException("Empty path");
+        if (path.isEmpty()) throw new RuntimeException("Empty path" );
         if (path.size() == 1) {
             childrenToCode(out, editPath);
         }
@@ -217,7 +226,7 @@ public class RecDefNode {
             Tag inner = path.getTag(1);
             out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
             childrenInLoop(path.chop(-1), out, editPath);
-            out._line("}");
+            out._line("}" );
         }
     }
 
@@ -225,17 +234,20 @@ public class RecDefNode {
         if (hasChildren()) {
             startBuilderCall(out, editPath);
             for (RecDefNode sub : children) sub.toElementCode(out, editPath);
-            out._line("}");
+            out._line("}" );
         }
         else if (nodeMappings.isEmpty()) {
             startBuilderCall(out, editPath);
-            out.line("''");
-            out._line("}");
+            out.line("''" );
+            out._line("}" );
         }
-        else for (NodeMapping nodeMapping : nodeMappings.values()) {
-            startBuilderCall(out, editPath);
-            nodeMapping.toElementCode(out, editPath);
-            out._line("}");
+        else {
+            for (NodeMapping nodeMapping : nodeMappings.values()) {
+                if (nodeMapping.tuplePaths != null) throw new RuntimeException("Can't deal with tuples here" );
+                startBuilderCall(out, editPath);
+                nodeMapping.toElementCode(out, editPath);
+                out._line("}" );
+            }
         }
     }
 
@@ -249,7 +261,7 @@ public class RecDefNode {
             for (RecDefNode sub : children) {
                 for (NodeMapping nodeMapping : sub.nodeMappings.values()) nodeMapping.toAttributeCode(out, editPath);
             }
-            out._line(") {").in();
+            out._line(") {" ).in();
         }
         else {
             out.line_("%s {", getTag().toBuilderCall());
@@ -268,11 +280,11 @@ public class RecDefNode {
         }
         else {
             StringBuilder out = new StringBuilder(name);
-            out.append(" <- ");
+            out.append(" <- " );
             Iterator<Path> walk = nodeMappings.keySet().iterator();
             while (walk.hasNext()) {
                 out.append(walk.next().getTail());
-                if (walk.hasNext()) out.append(", ");
+                if (walk.hasNext()) out.append(", " );
             }
             return out.toString();
         }

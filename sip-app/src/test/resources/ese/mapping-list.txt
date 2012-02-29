@@ -13,9 +13,9 @@
 /input/dataProvider
 /europeana:record/europeana:dataProvider
 
-
 /input/Afbeelding
 /europeana:record/europeana:isShownBy
 
-
+/input/Hoogte /input/Breedte
+/europeana:record/dc:format
 

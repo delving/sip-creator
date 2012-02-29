@@ -128,6 +128,7 @@ public class AnalysisFrame extends FrameBase {
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
                 }
                 else {
+                    // todo: check that the selected nodes all have paths length 2, so a tuple can be made of them?
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
                 }

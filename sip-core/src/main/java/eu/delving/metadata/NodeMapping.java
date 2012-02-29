@@ -93,17 +93,15 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return this;
     }
 
-
     public NodeMapping setInputPaths(List<Path> inputPaths) {
         if (inputPaths.isEmpty()) throw new RuntimeException();
         this.inputPath = inputPaths.get(0);
-        if (inputPath.size() > 1) {
+        if (inputPaths.size() > 1) {
             tuplePaths = new ArrayList<Path>();
             for (int walk = 1; walk < inputPaths.size(); walk++) tuplePaths.add(inputPaths.get(walk));
         }
         return this;
     }
-
 
     public List<Path> getInputPaths() {
         List<Path> inputPaths = new ArrayList<Path>();
@@ -255,7 +253,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public Path getLocalPath() {
-        NodeMapping ancestor = getAncestorNodeMapping();
+        NodeMapping ancestor = getAncestorNodeMapping(inputPath);
         if (ancestor.inputPath.isAncestorOf(inputPath)) {
             Path contained = inputPath.minusAncestor(ancestor.inputPath);
             return contained.prefixWith(ancestor.inputPath.peek());
@@ -272,6 +270,30 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return variables;
     }
 
+    public String getTupleName() {
+        StringBuilder name = new StringBuilder();
+        for (Path inputPath : getInputPaths()) {
+            Tag inner = inputPath.peek();
+            name.append(inner.toGroovyParam());
+        }
+        return name.toString();
+    }
+
+    public String getTupleExpression() {
+        StringBuilder tuple = new StringBuilder("(" );
+        Iterator<Path> walk = getInputPaths().iterator();
+        while (walk.hasNext()) {
+            Path inputPath = walk.next();
+            if (inputPath.size() != 2) throw new RuntimeException("To build a tuple expression, all paths must be of length 2: " + inputPath);
+            Tag outer = inputPath.getTag(0);
+            Tag inner = inputPath.getTag(1);
+            tuple.append(outer.toGroovyParam()).append(inner.toGroovyRef());
+            if (walk.hasNext()) tuple.append(" | " );
+        }
+        tuple.append(")" );
+        return tuple.toString();
+    }
+
     public String toString() {
         return String.format("[%s] => [%s]", inputPath.getTail(), outputPath.getTail());
     }
@@ -284,45 +306,14 @@ public class NodeMapping implements Comparable<NodeMapping> {
             usage.append(String.format("${%s[%d]}", name, walk));
             if (walk < size - 1) usage.append(" " );
         }
-        Iterator<Path> walk = getInputPaths().iterator();
-        while (walk.hasNext()) {
-            Path inputPath = walk.next();
-            Tag outer = inputPath.getTag(0);
-            Tag inner = inputPath.getTag(1);
-            usage.append(outer.toGroovyParam()).append(inner.toGroovyRef());
-            if (walk.hasNext()) usage.append(" | " );
-        }
         usage.append("\"" );
         return usage.toString();
     }
 
-    private String getTupleName() {
-        StringBuilder name = new StringBuilder();
-        for (Path inputPath : getInputPaths()) {
-            Tag inner = inputPath.peek();
-            name.append(inner.toGroovyParam());
-        }
-        return name.toString();
-    }
-
-    private String getTupleExpression() {
-        StringBuilder tuple = new StringBuilder("(" );
-        Iterator<Path> walk = getInputPaths().iterator();
-        while (walk.hasNext()) {
-            Path inputPath = walk.next();
-            Tag outer = inputPath.getTag(0);
-            Tag inner = inputPath.getTag(1);
-            tuple.append(outer.toGroovyParam()).append(inner.toGroovyRef());
-            if (walk.hasNext()) tuple.append(" | " );
-        }
-        tuple.append(")" );
-        return tuple.toString();
-    }
-
-    private NodeMapping getAncestorNodeMapping() {
+    private NodeMapping getAncestorNodeMapping(Path path) {
         for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
             for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
-                if (nodeMapping.inputPath.isAncestorOf(inputPath)) return nodeMapping;
+                if (nodeMapping.inputPath.isAncestorOf(path)) return nodeMapping;
             }
         }
         return new NodeMapping().setInputPath(Path.create("input" )).setOutputPath(outputPath.chop(1));
