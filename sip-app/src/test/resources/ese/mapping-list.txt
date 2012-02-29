@@ -1,8 +1,21 @@
 /input/OBS_GUID
-/record/dc:identifier
+/europeana:record/dc:identifier
 
-/input/Afbeelding
-/record/europeana:isShownBy
+/input/Provider
+/europeana:record/europeana:provider
 
 /input/type
-/record/europeana:type
+/europeana:record/europeana:type
+
+/input/Rights
+/europeana:record/europeana:rights
+
+/input/dataProvider
+/europeana:record/europeana:dataProvider
+
+
+/input/Afbeelding
+/europeana:record/europeana:isShownBy
+
+
+
