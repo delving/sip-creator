@@ -34,5 +34,6 @@
 /input/sticker/recordWrap/recordSource/legalBodyName/appellationValue
 /lido/administrativeMetadata/recordWrap/recordSource/legalBodyName/appellationValue
 
-/input/sticker/recordWrap/recordType/term
+/facts/provider
 /lido/administrativeMetadata/recordWrap/recordType/term
+

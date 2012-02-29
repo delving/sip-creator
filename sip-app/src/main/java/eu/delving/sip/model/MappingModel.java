@@ -25,6 +25,7 @@ import eu.delving.metadata.*;
 
 import javax.swing.tree.TreePath;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -70,7 +71,11 @@ public class MappingModel implements RecDefNode.Listener {
         return getTreePath(path, getRecDefTreeRoot());
     }
 
-    public void setFact(String path, String value) {
+    public void setFacts(Map<String, String> map) {
+        for (Map.Entry<String,String> entry : map.entrySet()) setFact(entry.getKey(), entry.getValue());
+    }
+
+    private void setFact(String path, String value) {
         if (recMapping != null) {
             boolean changed;
             if (value == null) {

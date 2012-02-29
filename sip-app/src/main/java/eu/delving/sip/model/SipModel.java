@@ -277,9 +277,7 @@ public class SipModel {
                         statsModel.findNodesForInputPaths(nodeMapping);
                     }
                     mappingModel.setRecMapping(recMapping);
-                    for (Map.Entry<String, String> entry : facts.entrySet()) {
-                        mappingModel.setFact(entry.getKey(), entry.getValue());
-                    }
+                    mappingModel.setFacts(facts);
                     recordCompileModel.setValidator(dataSetModel.getValidator(prefix));
                     feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), prefix));
                     Exec.swing(new Runnable() {

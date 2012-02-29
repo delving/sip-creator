@@ -109,6 +109,7 @@ public class Mockery {
                 map(from, to);
             }
         }
+        recMapping.getFacts().putAll(dataSetModel.getDataSet().getDataSetFacts());
     }
 
     public String mapping() throws UnsupportedEncodingException {
@@ -118,13 +119,18 @@ public class Mockery {
     }
 
     public NodeMapping map(String fromString, String toString) {
-        Path from = Path.create(fromString);
-        Path to = Path.create(toString).defaultPrefix(prefix);
-        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(to);
-        if (node == null) throw new RuntimeException("No node found for " + to);
-        NodeMapping mapping = new NodeMapping().setInputPath(from);
-        node.addNodeMapping(mapping);
-        return mapping;
+        if (fromString.startsWith("/")) {
+            Path from = Path.create(fromString);
+            Path to = Path.create(toString).defaultPrefix(prefix);
+            RecDefNode node = recMapping.getRecDefTree().getRecDefNode(to);
+            if (node == null) throw new RuntimeException("No node found for " + to);
+            NodeMapping mapping = new NodeMapping().setInputPath(from);
+            node.addNodeMapping(mapping);
+            return mapping;
+        }
+        else {
+            throw new RuntimeException();
+        }
     }
 
     public MetadataParser parser() throws StorageException, XMLStreamException {

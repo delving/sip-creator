@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,14 +61,18 @@ public class MappingRunner {
     private Script script;
     private GroovyCodeResource groovyCodeResource;
     private RecMapping recMapping;
+    private GroovyNode factsNode = new GroovyNode(null, "facts");
     private String code;
     private int counter = 0;
 
     public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath) {
         this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
-        this.code = recMapping.getRecDefTree().toCode(recMapping.getFacts(), recMapping.getFunctions(), editPath);
+        this.code = recMapping.getRecDefTree().toCode(recMapping.getFunctions(), editPath);
         script = groovyCodeResource.createMappingScript(code);
+        for (Map.Entry<String,String> entry : recMapping.getFacts().entrySet()) {
+            new GroovyNode(factsNode, entry.getKey(), entry.getValue());
+        }
     }
 
     public RecDefTree getRecDefTree() {
@@ -79,7 +84,6 @@ public class MappingRunner {
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
-
         if ((counter % 50) == 0) {
             groovyCodeResource.flush();
         }
@@ -87,14 +91,12 @@ public class MappingRunner {
             throw new RuntimeException("Null input metadata record");
         }
         counter += 1;
-//        long now = System.currentTimeMillis();
         try {
             Binding binding = new Binding();
             DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getNamespaces());
             binding.setVariable("output", builder);
-            List<GroovyNode> input = new ArrayList<GroovyNode>(1);
-            input.add(metadataRecord.getRootNode());
-            binding.setVariable("input", input);
+            binding.setVariable("input", wrap(metadataRecord.getRootNode()));
+            binding.setVariable("_facts", wrap(factsNode));
             script.setBinding(binding);
             return (Node) script.run();
         }
@@ -123,9 +125,12 @@ public class MappingRunner {
                 throw new MappingException(metadataRecord, "Unexpected: " + e.toString(), e);
             }
         }
-//        finally {
-//            System.out.println("Mapping time: "+ (System.currentTimeMillis() - now));
-//        }
+    }
+
+    private List<GroovyNode> wrap(GroovyNode node) {
+        List<GroovyNode> array = new ArrayList<GroovyNode>(1);
+        array.add(node);
+        return array;
     }
 
     // a dirty hack which parses the exception's stack trace.  any better strategy welcome, but it works.

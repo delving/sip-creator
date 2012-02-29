@@ -62,7 +62,7 @@ public class StatsModel {
         Path recordRoot = null;
         Path uniqueElement = null;
         if (statistics != null) {
-            statsTree = statistics.createAnalysisTree();
+            statsTree = statistics.createAnalysisTree(sipModel.getDataSetFacts().getFacts());
             if (statistics.isSourceFormat()) {
                 recordRoot = Storage.RECORD_ROOT;
                 uniqueElement = Storage.UNIQUE_ELEMENT;

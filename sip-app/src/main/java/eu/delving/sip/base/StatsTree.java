@@ -62,16 +62,18 @@ public class StatsTree implements Serializable {
     }
 
     public static StatsTree create(String rootTag) {
-        return new StatsTree(new StatsTreeNode(Tag.element(rootTag)));
+        return new StatsTree(new StatsTreeNode(rootTag, "<h3>Root</h3>"));
     }
 
-    public static StatsTree create(List<FieldStatistics> fieldStatisticsList) {
+    public static StatsTree create(List<FieldStatistics> fieldStatisticsList, Map<String,String> facts) {
         StatsTreeNode root = createSubtree(fieldStatisticsList, Path.empty(), null);
         if (root == null) {
-            root = new StatsTreeNode(Tag.element("No statistics"));
+            root = new StatsTreeNode("No statistics", "<h3>No statistics</h3>");
         }
         if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
-            root = root.extractChild();
+            StatsTreeNode factNode = new StatsTreeNode(Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
+            root.getChildren().add(0, factNode);
+            for (Map.Entry<String,String> entry : facts.entrySet()) new StatsTreeNode(factNode, entry);
         }
         return new StatsTree(root);
     }
@@ -93,35 +95,25 @@ public class StatsTree implements Serializable {
     private static int setRecordRoot(StatsTreeNode node, Path recordRoot, List<StatsTreeNode> changedNodes) {
         if (node.setRecordRoot(recordRoot)) {
             changedNodes.add(node);
-            if (node.isRecordRoot()) {
-                return node.getStatistics().getTotal();
-            }
+            if (node.isRecordRoot()) return node.getStatistics().getTotal();
         }
         int total = 0;
         for (StatsTreeNode child : node.getChildNodes()) {
             int subtotal = setRecordRoot(child, recordRoot, changedNodes);
-            if (subtotal > 0) {
-                total = subtotal;
-            }
+            if (subtotal > 0) total = subtotal;
         }
         return total;
     }
 
     private static void setUniqueElement(StatsTreeNode node, Path uniqueElement, List<StatsTreeNode> changedNodes) {
-        if (node.setUniqueElement(uniqueElement)) {
-            changedNodes.add(node);
-        }
+        if (node.setUniqueElement(uniqueElement)) changedNodes.add(node);
         if (uniqueElement == null || !node.isUniqueElement()) {
-            for (StatsTreeNode child : node.getChildNodes()) {
-                setUniqueElement(child, uniqueElement, changedNodes);
-            }
+            for (StatsTreeNode child : node.getChildNodes()) setUniqueElement(child, uniqueElement, changedNodes);
         }
     }
 
     private static void getVariables(StatsTreeNode node, boolean withinRecord, List<StatsTreeNode> variables) {
-        if (withinRecord && node.hasStatistics() && !node.getTag().isAttribute()) {
-            variables.add(node);
-        }
+        if (withinRecord && node.hasStatistics() && !node.getTag().isAttribute()) variables.add(node);
         for (StatsTreeNode child : node.getChildren()) {
             getVariables(child, withinRecord || node.isRecordRoot(), variables);
         }
@@ -135,16 +127,12 @@ public class StatsTree implements Serializable {
                 Tag tag = fieldStatistics.getPath().getTag(path.size());
                 if (tag != null) {
                     List<FieldStatistics> list = statisticsMap.get(tag);
-                    if (list == null) {
-                        statisticsMap.put(tag, list = new ArrayList<FieldStatistics>());
-                    }
+                    if (list == null) statisticsMap.put(tag, list = new ArrayList<FieldStatistics>());
                     list.add(fieldStatistics);
                 }
             }
         }
-        if (statisticsMap.isEmpty()) {
-            return null;
-        }
+        if (statisticsMap.isEmpty()) return null;
         Tag tag = path.peek();
         StatsTreeNode node = tag == null ? null : new StatsTreeNode(parent, tag);
         for (Map.Entry<Tag, List<FieldStatistics>> entry : statisticsMap.entrySet()) {
@@ -152,27 +140,16 @@ public class StatsTree implements Serializable {
             childPath.push(entry.getKey());
             FieldStatistics fieldStatisticsForChild = null;
             for (FieldStatistics fieldStatistics : entry.getValue()) {
-                if (fieldStatistics.getPath().equals(childPath)) {
-                    fieldStatisticsForChild = fieldStatistics;
-                }
+                if (fieldStatistics.getPath().equals(childPath)) fieldStatisticsForChild = fieldStatistics;
             }
             StatsTreeNode child = createSubtree(fieldStatisticsList, childPath, node);
             if (child != null) {
-                if (node == null) {
-                    node = child;
-                }
-                else {
-                    node.add(child);
-                }
+                if (node == null) node = child;
                 child.setStatistics(fieldStatisticsForChild);
             }
             else if (fieldStatisticsForChild != null) {
-                if (node == null) {
-                    node = new StatsTreeNode(node, fieldStatisticsForChild);
-                }
-                else {
-                    node.add(new StatsTreeNode(node, fieldStatisticsForChild));
-                }
+                StatsTreeNode fresh = new StatsTreeNode(node, fieldStatisticsForChild);
+                if (node == null) node = fresh;
             }
         }
         return node;

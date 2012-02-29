@@ -21,6 +21,7 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
 import java.io.Serializable;
@@ -40,6 +41,7 @@ import java.util.Stack;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
+@XStreamAlias("path")
 public class Path implements Comparable<Path>, Serializable {
     private Stack<Tag> stack = new Stack<Tag>();
     private String string;

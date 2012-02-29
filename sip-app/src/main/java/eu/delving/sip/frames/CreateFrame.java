@@ -66,7 +66,7 @@ public class CreateFrame extends FrameBase {
                     StringBuilder out = new StringBuilder("<html><table>");
                     for (StatsTreeNode node : statsTreeNodes) {
                         out.append("<tr><td>");
-                        out.append(node.toHtmlTable());
+                        out.append(node.toHtmlChunk());
                         out.append("</td></tr>");
                     }
                     out.append("</table></html>");
