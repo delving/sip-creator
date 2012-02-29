@@ -98,7 +98,7 @@
             <opt key="7">Film/Video/DVD</opt>
             <opt key="8">Anders:</opt>
         </option-list>
-        <option-list valuePath="/record/acquisitionMeans">
+        <option-list path="/record/acquisitionMeans">
             <opt key="1">aankoop</opt>
             <opt key="2">schenking</opt>
             <opt key="3">bruikleen</opt>
@@ -112,7 +112,7 @@
             <opt key="11">vondst</opt>
             <opt key="12">onbekend:</opt>
         </option-list>
-        <option-list valuePath="/record/collectionType">
+        <option-list path="/record/collectionType">
             <opt key="1">all</opt>
             <opt key="2">portal</opt>
             <opt key="3">mm</opt>

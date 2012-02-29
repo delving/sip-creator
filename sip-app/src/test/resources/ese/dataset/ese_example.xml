@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<europeana:metadata   xmlns:europeana="http://www.europeana.eu/schemas/ese/"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns:dcterms="http://purl.org/dc/terms/">
+	<europeana::record>
+		<dc:identifier>02-Lemba-Lakkous-Lady\.tif</dc:identifier>
+		<dc:title>Stone figurine</dc:title>
+		<dc:subject xml:lang="en">Excavations (Archaeology)--Cyprus--Lempa</dc:subject>
+		<dc:subject>Cyprus--Antiquities</dc:subject>
+		<dc:description xml:lang="en">Stone vessel from Choirokoitia with embossed decoration of the Aceramic Neolithic Ι period</dc:description>
+		<dc:publisher>Cyprus Archaeological Museum</dc:publisher>
+		<dc:type>Image</dc:type>
+		<dc:format>Image/tiff</dc:format>
+		<dcterms:temporal>mid 3rd millenium B.C.</dcterms:temporal>
+		<dc:rights>Cyprus Archaeological Museum</dc:rights>
+		<dc:title>Λίθινο ειδώλιο</dc:title>
+		<dc:description>Λίθινο ειδώλιο από τη θέση Λέμπα – Λάκκοι, Χαλκολιθικής περιόδου (μέσα 3ης χιλιετίας π. Χ.)</dc:description>
+		<europeana:provider>Cyprus Library</europeana:provider>
+		<europeana:type>IMAGE</europeana:type>
+		<europeana:rights>http://creativecommons.org/licenses/by/3.0/nl/</europeana:rights>
+        <europeana:dataProvider>Cyprus Archaeological Museum</europeana:dataProvider>
+		<europeana:isShownBy>http://www.mcw.gov.cy/mcw/da/da.nsf/All/8308A7AB9CA6CB5EC22574CC003FF5E1/$file/02-Lemba-Lakkous-Lady.jpg?OpenElement</europeana:isShownBy>
+	</europeana::record>
+
+</europeana::metadata>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<record-definition prefix="ese" flat="true">
+<record-definition prefix="europeana" flat="true">
 
     <namespaces>
         <namespace prefix="ese" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-3.4.xsd"/>
@@ -49,8 +49,8 @@
         <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
         <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
-        <elem tag="europeana:object"/>          <!-- ESE 3.4 -->
-        <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
+        <!--<elem tag="europeana:object"/>          &lt;!&ndash; ESE 3.4 &ndash;&gt;-->
+        <!--<elem tag="europeana:provider"/>        &lt;!&ndash; ESE 3.4 &ndash;&gt;-->
         <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
         <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
