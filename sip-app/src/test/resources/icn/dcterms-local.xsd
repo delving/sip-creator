@@ -1,5 +1,4 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://purl.org/dc/terms/" targetNamespace="http://purl.org/dc/terms/" elementFormDefault="qualified" attributeFormDefault="unqualified">
-<xs:annotation>
 
 <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/03/xml.xsd"></xs:import>
 <xs:element name="title"/>
