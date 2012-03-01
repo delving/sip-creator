@@ -1,5 +1,5 @@
 /input/OBS_GUID
-/record/europeana:uri
+/record/delving:uri
 
 /input/Afbeelding
 /record/europeana:isShownBy

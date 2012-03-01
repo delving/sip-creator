@@ -5,8 +5,8 @@
         <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
         <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
         <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
-        <namespace prefix="icn" uri="http://www.icn.nl/" schema="ICN-V3.2.xsd"/>
-        <namespace prefix="delving" uri="http://www.delving.eu/schemas/" schema="delving-1.0.xsd"/>
+        <namespace prefix="icn" uri="http://www.icn.nl/schemas/icn/" schema="ICN-V1.0.xsd"/>
+        <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
     </namespaces>
 
     <root tag="record">
@@ -24,6 +24,7 @@
         <elem tag="icn:purchasePrice"/>
         <elem tag="icn:acquiredWithHelpFrom"/>
         <elem tag="icn:physicalState"/>
+
         <elem tag="dc:contributor"/>            <!-- ESE 3.4 -->
         <elem tag="dc:coverage"/>               <!-- ESE 3.4 -->
         <elem tag="dc:creator"/>                <!-- ESE 3.4 -->
@@ -39,6 +40,7 @@
         <elem tag="dc:subject"/>                <!-- ESE 3.4 -->
         <elem tag="dc:title"/>                  <!-- ESE 3.4 -->
         <elem tag="dc:type"/>                   <!-- ESE 3.4 -->
+
         <elem tag="dcterms:alternative"/>       <!-- ESE 3.4 -->
         <elem tag="dcterms:conformsTo"/>        <!-- ESE 3.4 -->
         <elem tag="dcterms:created"/>           <!-- ESE 3.4 -->
@@ -62,6 +64,7 @@
         <elem tag="dcterms:tableOfContents"/>   <!-- ESE 3.4 -->
         <elem tag="dcterms:temporal"/>          <!-- ESE 3.4 -->
         <elem tag="dcterms:rightsHolder"/>      <!-- NOT part of ESE 3.4 -->
+
         <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
         <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
@@ -70,20 +73,21 @@
         <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
         <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office -->
-        <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office -->
-        <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office-->
-        <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
-        <elem tag="europeana:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
-        <elem tag="europeana:source"/>          <!-- NOT part of ESE 3.4 -->
+
+        <!-- moved from europeana to delving -->
+        <elem tag="delving:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
+        <elem tag="delving:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
+        <elem tag="delving:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
+        <elem tag="delving:collectionName"/>  <!-- NOT part of ESE 3.4 -->
+        <elem tag="delving:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
+        <elem tag="delving:source"/>          <!-- NOT part of ESE 3.4 -->
+
+        <!-- original delving namespace -->
         <elem tag="delving:year"/>
         <elem tag="delving:thumbnail"/>
         <elem tag="delving:deepZoomUrl"/>
         <elem tag="delving:fullTextObjectUrl"/>
         <elem tag="delving:fullText"/>
-
-        <!--<elem tag="europeana:userTag"/>-->         <!-- ESE 3.4, NOT part of ICN, not accepted by the office  -->
-        <!--<elem tag="europeana:year"/>-->            <!-- ESE 3.4, NOT part of ICN, not accepted by the office  -->
 
     </root>
 
