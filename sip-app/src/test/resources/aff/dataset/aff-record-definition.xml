@@ -3,7 +3,7 @@
 
 
     <namespaces>
-        <namespace prefix="aff" uri="http://www.delving.eu/schemas/aff" schema="http://www.delving.eu/schemas/aff_1.0.xsd"/>
+        <namespace prefix="aff" uri="http://schemas.delving.eu/aff/" schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
     </namespaces>
 
     <elems>
@@ -89,21 +89,22 @@
     </root>
 
     <options> <!-- keys should be uri's -->
-        <option-list keyPath="/actors/actor/roleUri"> <!--valuePath="/aff/actors/actor/roleName"> -->
+
+        <option-list path="/record/actors/actor/roleUri"> <!--valuePath="/aff/actors/actor/roleName"> -->
             <opt key="1">Creator</opt>
             <opt key="2">Artist</opt>
             <opt key="3">Photographer</opt>
             <!--todo: more values-->
         </option-list>
 
-        <option-list keypath="/places/place/roleURI"> <!--valuePath="/aff/places/place/roleName"> -->
+        <option-list path="/record/places/place/placeName"> <!--valuePath="/aff/places/place/roleName"> -->
             <opt key="1">Actors place of birth</opt>
             <opt key="2">Actor place of death</opt>
             <opt key="3">Production place</opt>
             <!--todo: more values-->
         </option-list>
 
-        <option-list keyPath="/types/type/roleUri"> <!--valuePath="/aff/types/type/roleName"> -->
+        <option-list path="/record/types/type/roleUri"> <!--valuePath="/aff/types/type/roleName"> -->
             <opt key="1">Classification</opt>
             <opt key="2">Subject</opt>
             <opt key="3">Technique</opt>
@@ -112,7 +113,7 @@
             <!--todo: more values-->
         </option-list>
 
-        <option-list keyPath="/events/event/eventTypeUri"> <!--valuePath="aff/events/event/eventTypeName">  -->
+        <option-list path="/record/events/event/eventTypeUri"> <!--valuePath="aff/events/event/eventTypeName">  -->
             <opt key="1">Production</opt>
             <opt key="2">Creation</opt>
             <opt key="3">etc</opt>
@@ -121,7 +122,7 @@
             <!--todo: CRM EVENTS, same as i LIDO-->
         </option-list>
 
-        <option-list keyPath="/mediaFiles/mediaFile/localMediaTypeUri">
+        <option-list path="/record/mediaFiles/mediaFile/localMediaTypeUri">
             <opt key="1">Thumbnail</opt>
             <opt key="2">Full image</opt>
             <opt key="3">Deep zoom image</opt>
@@ -132,18 +133,23 @@
         </option-list>
     </options>
 
-      <facts>
-        <fact path="/admin/owner_uri" name="mets:"/>
-        <fact path="/admin/owner_name" name="mets:"/>
-        <fact path="/admin/provider_uri" name="mets:"/>
-        <fact path="/admin/provider_name" name="mets:"/>
-        <fact path="/admin/rights" name="mets:"/>
-        <fact path="/thing/language" name="mets:"/>
-    </facts>
+      <!--&lt;!&ndash;<facts>&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/owner_uri" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/owner_name" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/provider_uri" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/provider_name" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/rights" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/thing/language" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
+    <!--&lt;!&ndash;</facts>&ndash;&gt;-->
 
-
+    <bookmarks>
+    </bookmarks>
     <docs>
-        <--! ... -->
+        <doc path="/record/admin/providerName">
+                 <string name="Dublin Core definition">An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>
+                 <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
+                 <string name="Europeana note">The name of contributors to the original analog or born digital object.  This could be a person, an organisation or a service. </string>
+        </doc>
     </docs>
 
 </record-definition>

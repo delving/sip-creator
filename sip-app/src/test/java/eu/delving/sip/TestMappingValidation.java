@@ -81,15 +81,15 @@ public class TestMappingValidation {
         runFullCycle(2);
     }
 
-//    @Test
-//    public void testEse() throws Exception {
-//        mock.prepareDataset(
-//                "ese",
-//                "/Medialab/Record",
-//                "/Medialab/Record/OBS_GUID"
-//        );
-//        runFullCycle(3);
-//    }
+    @Test
+    public void testEse() throws Exception {
+        mock.prepareDataset(
+                "ese",
+                "/Medialab/Record",
+                "/Medialab/Record/OBS_GUID"
+        );
+        runFullCycle(3);
+    }
 
     @Test
     public void testIcn() throws Exception {
@@ -101,6 +101,15 @@ public class TestMappingValidation {
         runFullCycle(3);
     }
 
+    @Test
+    public void testAff() throws Exception {
+        mock.prepareDataset(
+                "aff",
+                "/lido:lidoWrap/lido:lido",
+                "/lido:lidoWrap/lido:lido/lido:lidoRecID"
+        );
+        runFullCycle(2);
+    }
 
     private void runFullCycle(int expectedRecords) throws Exception {
         assertEquals(4, mock.fileCount());

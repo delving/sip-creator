@@ -1,9 +1,9 @@
-name=AFF Test
-provider=Testmaister
+name=Aff Test
+provider=Testmeister
 country=netherlands
 dataProvider=Sourcer
 language=nl
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
-spec=lido
+spec=aff
 
