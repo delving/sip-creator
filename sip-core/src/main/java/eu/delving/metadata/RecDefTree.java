@@ -23,7 +23,6 @@ package eu.delving.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class takes a RecDef instance and wraps itself around, ensuring
@@ -79,17 +78,10 @@ public class RecDefTree implements RecDefNode.Listener {
         return nodeMappings;
     }
 
-    public String toCode(Map<String, String> facts, List<MappingFunction> mappingFunctions, EditPath editPath) {
+    public String toCode(List<MappingFunction> mappingFunctions, EditPath editPath) {
         Out out = new Out();
         out.line("// SIP-Creator Generated Mapping Code");
         out.line("// ----------------------------------");
-        out.line("// Facts:");
-        for (Map.Entry<String, String> factEntry : facts.entrySet()) {
-            out.line(String.format("String %s = '''%s'''",
-                    factEntry.getKey(),
-                    StringUtil.sanitizeGroovy(factEntry.getValue())
-            ));
-        }
         out.line("// Functions:");
         for (MappingFunction function : mappingFunctions) function.toCode(out);
         out.line("// Dictionaries:");

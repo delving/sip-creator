@@ -91,6 +91,7 @@ public interface Storage {
 
     String HARVEST_TAG = "delving-harvest";
     String ENVELOPE_TAG = "delving-sip-source";
+    String FACTS_TAG = "facts";
     String UNIQUE_TAG = "_id";
     String RECORD_TAG = "input";
     String RECORD_ROOT_PATH = "recordRootPath";

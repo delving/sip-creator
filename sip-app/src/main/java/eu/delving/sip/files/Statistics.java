@@ -46,9 +46,7 @@ public class Statistics implements Serializable {
         this.namespaces = namespaces;
         this.fieldStatisticsList = fieldStatisticsList;
         Collections.sort(this.fieldStatisticsList);
-        for (FieldStatistics fieldStatistics : this.fieldStatisticsList) {
-            fieldStatistics.finish();
-        }
+        for (FieldStatistics fieldStatistics : this.fieldStatisticsList) fieldStatistics.finish();
     }
 
     public boolean isSourceFormat() {
@@ -59,19 +57,12 @@ public class Statistics implements Serializable {
         return namespaces;
     }
 
-    public StatsTree createAnalysisTree() {
-        return StatsTree.create(fieldStatisticsList);
+    public StatsTree createAnalysisTree(Map<String,String> facts) {
+        return StatsTree.create(fieldStatisticsList, facts);
     }
 
     public int size() {
         return fieldStatisticsList.size();
     }
 
-    public long getElementCount() {
-        long total = 0L;
-        for (FieldStatistics stats : fieldStatisticsList) {
-            total += stats.getTotal();
-        }
-        return total;
-    }
 }

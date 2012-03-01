@@ -115,7 +115,7 @@ public class RecMapping {
     }
 
     public String toCode(EditPath editPath) {
-        return recDefTree.toCode(facts, functions, editPath);
+        return recDefTree.toCode(functions, editPath);
     }
 
     public String toString() {

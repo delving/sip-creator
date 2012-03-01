@@ -48,42 +48,42 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     private Tag tag;
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
-    private String html;
+    private String htmlChunk;
 
-    StatsTreeNode(Tag tag) {
-        this.tag = tag;
+    StatsTreeNode(String name, String htmlChunk) {
+        this.tag = Tag.create(name);
+        this.htmlChunk = htmlChunk;
     }
 
     StatsTreeNode(StatsTreeNode parent, Tag tag) {
-        this.parent = parent;
+        if ((this.parent = parent) != null) parent.children.add(this);
         this.tag = tag;
     }
 
+    StatsTreeNode(StatsTreeNode parent, Map.Entry<String, String> entry) {
+        this(parent, Tag.create(entry.getKey()));
+        StringTemplate template = Utility.getTemplate("fact-brief");
+        template.setAttribute("fact", entry);
+        this.htmlChunk = template.toString();
+    }
+
     StatsTreeNode(StatsTreeNode parent, FieldStatistics fieldStatistics) {
-        this.parent = parent;
-        this.fieldStatistics = fieldStatistics;
-        this.tag = fieldStatistics.getPath().peek();
+        this(parent, fieldStatistics.getPath().peek());
+        setStatistics(fieldStatistics);
     }
 
     public void setStatistics(FieldStatistics fieldStatistics) {
         this.fieldStatistics = fieldStatistics;
+        StringTemplate template = Utility.getTemplate("stats-brief");
+        template.setAttribute("stats", fieldStatistics);
+        this.htmlChunk = template.toString();
     }
     
-    public StatsTreeNode extractChild() {
-        if (getChildren().size() != 1) throw new IllegalStateException("One child expected");
-        children.get(0).parent = null;
-        return children.get(0);
-    }
-
-    public Set<String> getVariableNames() {
-        Set<String> names = new TreeSet<String>();
-        for (StatsTreeNode child : getChildNodes()) {
-            if (child.getTag().isAttribute()) {
-                names.add(child.getTag().toString());
-            }
-        }
-        return names;
-    }
+//    public StatsTreeNode extractChild() {
+//        if (getChildren().size() != 1) throw new IllegalStateException("One child expected");
+//        children.get(0).parent = null;
+//        return children.get(0);
+//    }
 
     public List<StatsTreeNode> getChildren() {
         return children;
@@ -172,16 +172,14 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     }
 
     private void compilePathList(List<StatsTreeNode> list, boolean fromRoot) {
-        if (parent != null && (fromRoot || !parent.recordRoot)) {
-            parent.compilePathList(list, fromRoot);
-        }
+        if (parent != null && (fromRoot || !parent.recordRoot)) parent.compilePathList(list, fromRoot);
         list.add(this);
     }
 
-    public void add(StatsTreeNode child) {
-        children.add(child);
-    }
-
+//    public void add(StatsTreeNode child) {
+//        children.add(child);
+//    }
+//
     @Override
     public TreeNode getChildAt(int index) {
         return children.get(index);
@@ -224,16 +222,11 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     }
 
     public String toHtml() {
-        return String.format("<html>%s</html>", toHtmlTable());
+        return String.format("<html>%s</html>", toHtmlChunk());
     }
 
-    public String toHtmlTable() {
-        if (html == null) {
-            StringTemplate t = Utility.getTemplate("stats-brief");
-            t.setAttribute("stats", fieldStatistics);
-            html = t.toString();
-        }
-        return html;
+    public String toHtmlChunk() {
+        return htmlChunk;
     }
 
     public String toString() {

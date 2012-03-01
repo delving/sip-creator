@@ -120,7 +120,7 @@ public class AnalysisFrame extends FrameBase {
             public void valueChanged(TreeSelectionEvent event) {
                 final List<StatsTreeNode> nodeList = new ArrayList<StatsTreeNode>();
                 for (TreePath path : statisticsJTree.getSelectionModel().getSelectionPaths()) {
-                    nodeList.add((StatsTreeNode) path.getLastPathComponent());
+                    if (path.getPathCount() > 2) nodeList.add((StatsTreeNode) path.getLastPathComponent());
                 }
                 if (nodeList.size() == 1) {
                     StatsTreeNode node = nodeList.get(0);
@@ -128,6 +128,7 @@ public class AnalysisFrame extends FrameBase {
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
                 }
                 else {
+                    // todo: check that the selected nodes all have paths length 2, so a tuple can be made of them?
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
                 }

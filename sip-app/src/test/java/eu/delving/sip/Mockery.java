@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Validator;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -60,11 +61,11 @@ public class Mockery {
     private String prefix;
 
     public Mockery() throws StorageException, MetadataException {
-        File target = null, target1 = new File("sip-app/target"), target2 = new File("target");
+        File target = null, target1 = new File("sip-app/target" ), target2 = new File("target" );
         if (target1.exists()) target = target1;
         if (target2.exists()) target = target2;
         if (target == null) throw new RuntimeException("target directory not found: " + target);
-        root = new File(target, "storage");
+        root = new File(target, "storage" );
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
         storage = new StorageImpl(root);
@@ -109,20 +110,22 @@ public class Mockery {
                 map(from, to);
             }
         }
+        recMapping.getFacts().putAll(dataSetModel.getDataSet().getDataSetFacts());
     }
 
     public String mapping() throws UnsupportedEncodingException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         RecMapping.write(os, recMapping);
-        return os.toString("UTF-8");
+        return os.toString("UTF-8" );
     }
 
     public NodeMapping map(String fromString, String toString) {
-        Path from = Path.create(fromString);
-        Path to = Path.create(toString).defaultPrefix(prefix);
-        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(to);
-        if (node == null) throw new RuntimeException("No node found for " + to);
-        NodeMapping mapping = new NodeMapping().setInputPath(from);
+        List<Path> inputPaths = new ArrayList<Path>();
+        for (String s : fromString.split(" ")) inputPaths.add(Path.create(s));
+        Path outputPath = Path.create(toString).defaultPrefix(prefix);
+        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(outputPath);
+        if (node == null) throw new RuntimeException("No node found for " + outputPath);
+        NodeMapping mapping = new NodeMapping().setInputPaths(inputPaths);
         node.addNodeMapping(mapping);
         return mapping;
     }

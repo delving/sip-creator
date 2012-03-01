@@ -71,15 +71,15 @@ public class TestMappingValidation {
         mock.delete();
     }
 
-//    @Test
-//    public void testLido() throws Exception {
-//        mock.prepareDataset(
-//                "lido",
-//                "/bunch-of-chunks/chunk",
-//                "/bunch-of-chunks/chunk/identi-fire"
-//        );
-//        runFullCycle(2);
-//    }
+    @Test
+    public void testLido() throws Exception {
+        mock.prepareDataset(
+                "lido",
+                "/bunch-of-chunks/chunk",
+                "/bunch-of-chunks/chunk/identi-fire"
+        );
+        runFullCycle(2);
+    }
 
 //    @Test
 //    public void testEse() throws Exception {
@@ -126,8 +126,8 @@ public class TestMappingValidation {
         assertEquals(9, mock.fileCount());
         Statistics statistics = dataSet().getLatestStatistics();
         assertTrue(statistics.isSourceFormat());
-        StatsTree tree = statistics.createAnalysisTree();
-        assertEquals(Tag.element(Storage.RECORD_TAG), tree.getRoot().getTag());
+        StatsTree tree = statistics.createAnalysisTree(dataSet().getDataSetFacts());
+        assertEquals(Tag.element(Storage.ENVELOPE_TAG), tree.getRoot().getTag());
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
         mock.createMapping();
@@ -165,7 +165,7 @@ public class TestMappingValidation {
                             Assert.fail("Unexpected state " + dataSet().getState());
                     }
                     dataSet().setStatistics(statistics);
-                    statsTree = statistics.createAnalysisTree();
+                    statsTree = statistics.createAnalysisTree(dataSet().getDataSetFacts());
                     analysisTreeModel = new DefaultTreeModel(statsTree.getRoot());
                     int recordCount = StatsTree.setRecordRoot(analysisTreeModel, recordRoot);
                     mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));

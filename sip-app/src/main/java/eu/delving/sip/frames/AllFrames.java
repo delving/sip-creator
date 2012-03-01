@@ -78,7 +78,6 @@ public class AllFrames {
         this.sipModel = sipModel;
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
-        FrameBase status = new FactsFrame(desktop, sipModel);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
         FrameBase analysis = new AnalysisFrame(desktop, sipModel, statistics);
         addSpaceBarCreate(create, analysis);
@@ -89,7 +88,6 @@ public class AllFrames {
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
         FrameBase output = new OutputFrame(desktop, sipModel);
         this.frames = new FrameBase[]{
-                status,
                 analysis,
                 create,
                 recDef,
@@ -101,9 +99,8 @@ public class AllFrames {
         };
         this.views = new Arrangement[]{
                 view(FIRST_CONTACT,
-                        block(analysis, 0, 0, 1, 3),
-                        block(statistics, 1, 0, 1, 2),
-                        block(status, 1, 2)
+                        block(analysis, 0, 0),
+                        block(statistics, 1, 0)
                 ),
                 view(QUICK_MAPPING,
                         block(analysis, 0, 0),
@@ -138,7 +135,7 @@ public class AllFrames {
                         block(input, 0, 0),
                         block(fieldMapping, 0, 0),
                         block(output, 0, 0),
-                        block(status, 0, 0)
+                        block(recMapping, 0, 0)
                 ),
                 view(CLEAR)
         };
