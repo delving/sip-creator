@@ -12,7 +12,7 @@
     <xs:import namespace="http://schemas.delving.eu/" schemaLocation="http://schemas.delving.eu/delving-V1.0.xsd"/>
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/03/xml.xsd"/>
     <xs:import namespace="http://purl.org/dc/elements/1.1/" schemaLocation="http://www.dublincore.org/schemas/xmls/qdc/dc.xsd"/>
-    <xs:import namespace="http://purl.org/dc/terms/" schemaLocation="http://127.0.0.1/~tw/dcterms-local.xsd"/>
+    <xs:import namespace="http://purl.org/dc/terms/" schemaLocation="http://schemas.delving.eu/dcterms-local.xsd"/>
     <xs:import namespace="http://www.europeana.eu/schemas/ese/" schemaLocation="http://schemas.delving.eu/ESE-local.xsd"/>
 
 
