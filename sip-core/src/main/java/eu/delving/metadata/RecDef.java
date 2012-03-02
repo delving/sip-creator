@@ -228,17 +228,30 @@ public class RecDef {
         @XStreamAsAttribute
         public Path path;
 
+        @XStreamAsAttribute
+        public Path keyPath;
+
         @XStreamImplicit
         public List<Opt> opts;
 
         public void resolve(RecDef recDef) {
             if (path == null) throw new RuntimeException("No path for OptionList: "+opts);
+            resolve(recDef, path, false);
+            resolve(recDef, keyPath, true);
+        }
+
+        private void resolve(RecDef recDef, Path path, boolean asKey) {
+            if (path == null) return;
             path.defaultPrefix(recDef.prefix);
             if (path.peek().isAttribute()) {
-                recDef.findAttr(path).options = opts;
+                Attr attr = recDef.findAttr(path);
+                attr.options = opts;
+                attr.optionsAsKey = asKey;
             }
             else {
-                recDef.findElem(path).options = opts;
+                Elem elem = recDef.findElem(path);
+                elem.options = opts;
+                elem.optionsAsKey = asKey;
             }
         }
     }
@@ -362,6 +375,9 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Opt> options;
+
+        @XStreamOmitField
+        public boolean optionsAsKey;
     }
 
     @XStreamAlias("elem")
@@ -393,6 +409,9 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Opt> options;
+
+        @XStreamOmitField
+        public boolean optionsAsKey;
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
