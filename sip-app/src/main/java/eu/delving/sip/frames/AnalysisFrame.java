@@ -28,6 +28,7 @@ import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
@@ -119,8 +120,16 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
                 final List<StatsTreeNode> nodeList = new ArrayList<StatsTreeNode>();
-                for (TreePath path : statisticsJTree.getSelectionModel().getSelectionPaths()) {
-                    if (path.getPathCount() > 2) nodeList.add((StatsTreeNode) path.getLastPathComponent());
+                Object root = statisticsJTree.getModel().getRoot();
+                boolean useRoot = true;
+                if (root instanceof StatsTreeNode) {
+                    useRoot = !((StatsTreeNode) root).getTag().toString().equals(Storage.ENVELOPE_TAG);
+                }
+                TreePath[] selectionPaths = statisticsJTree.getSelectionModel().getSelectionPaths();
+                if (selectionPaths != null) {
+                    for (TreePath path : selectionPaths) {
+                        if (useRoot || path.getPathCount() > 2) nodeList.add((StatsTreeNode) path.getLastPathComponent());
+                    }
                 }
                 if (nodeList.size() == 1) {
                     StatsTreeNode node = nodeList.get(0);

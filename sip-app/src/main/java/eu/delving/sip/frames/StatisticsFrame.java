@@ -25,7 +25,9 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Histogram;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
+import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -51,6 +53,27 @@ public class StatisticsFrame extends FrameBase {
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Statistics", false);
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
+        sipModel.getCreateModel().addListener(new CreateModel.Listener() {
+            @Override
+            public void statsTreeNodeSet(CreateModel createModel) {
+                List<StatsTreeNode> nodes = createModel.getStatsTreeNodes();
+                if (nodes != null && nodes.size() == 1) {
+                    setStatistics(nodes.get(0).getStatistics());
+                }
+            }
+
+            @Override
+            public void recDefTreeNodeSet(CreateModel createModel) {
+            }
+
+            @Override
+            public void nodeMappingSet(CreateModel createModel) {
+            }
+
+            @Override
+            public void nodeMappingChanged(CreateModel createModel) {
+            }
+        });
     }
 
     public void setStatistics(FieldStatistics fieldStatistics) {
