@@ -1,6 +1,12 @@
-/input/OBS_GUID
+/input/creator.date_of_birth
+/record/icn:creatorYearOfBirth
+
+/input/creator.date_of_death
+/record/icn:creatorYearOfDeath
+
+/input/priref
 /record/europeana:uri
 
-/input/Afbeelding
-/record/europeana:isShownBy
+/input/description
+/record/dc:description
 
