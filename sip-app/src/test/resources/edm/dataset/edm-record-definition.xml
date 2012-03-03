@@ -21,7 +21,6 @@
             <attr tag="rdf:resource"/>
         </attrs>
 
-
         <elems>
 
             <!-- Not yet. wait for it... /tw -->
@@ -97,7 +96,6 @@
             <elem tag="edm:rights"/>
             <elem tag="dcterms:hasPart"/>
             <elem tag="edm:isNextInSequence"/>
-
         </elem>
 
         <elem tag="ore:Aggregation">

@@ -1,0 +1,6 @@
+/facts/rights
+/record/admin/rights
+
+/input/lido:lidoRecID
+/record/thing/thingId
+

@@ -75,12 +75,12 @@
         <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
 
         <!-- moved from europeana to delving -->
-        <elem tag="delving:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
-        <elem tag="delving:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
-        <elem tag="delving:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
-        <elem tag="delving:collectionName"/>  <!-- NOT part of ESE 3.4 -->
-        <elem tag="delving:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
-        <elem tag="delving:source"/>          <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
+        <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
+        <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
+        <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:source"/>          <!-- NOT part of ESE 3.4 -->
 
         <!-- original delving namespace -->
         <elem tag="delving:year"/>

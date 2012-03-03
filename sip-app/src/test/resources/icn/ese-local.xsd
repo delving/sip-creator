@@ -27,4 +27,13 @@
         </xs:simpleType>
     </xs:element>
 
+
+    <xs:element name="uri"/>
+    <xs:element name="language"/>
+    <xs:element name="country"/>
+    <xs:element name="collectionName"/>
+    <xs:element name="collectionTitle"/>
+    <xs:element name="source"/>
+
+
 </xs:schema>
