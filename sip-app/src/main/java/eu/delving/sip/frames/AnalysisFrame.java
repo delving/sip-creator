@@ -28,7 +28,6 @@ import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
@@ -63,8 +62,9 @@ public class AnalysisFrame extends FrameBase {
     private JButton selectRecordRootButton = new JButton("Select Record Root ");
     private JButton selectUniqueElementButton = new JButton("Select Unique Element");
     private JTree statisticsJTree;
-    private DataSetState dataSetState;
+    private boolean delimited = false;
     private StatisticsFrame statisticsFrame;
+    private Expander expander = new Expander();
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
         super(desktop, sipModel, "Analysis", false);
@@ -77,7 +77,7 @@ public class AnalysisFrame extends FrameBase {
             }
         };
         statisticsJTree.setToolTipText("?");
-        statisticsJTree.getModel().addTreeModelListener(new Expander());
+        statisticsJTree.getModel().addTreeModelListener(expander);
         statisticsJTree.setCellRenderer(new StatsTreeNode.Renderer());
         statisticsJTree.setTransferHandler(sipModel.getNodeTransferHandler());
         statisticsJTree.setDragEnabled(true);
@@ -87,27 +87,63 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void dataSetChanged(DataSet dataSet) {
                 dataSetStateChanged(dataSet, dataSet.getState());
-                dataSetState = dataSet.getState();
             }
 
             @Override
             public void dataSetRemoved() {
-                dataSetState = ABSENT;
+                reactToState(ABSENT);
             }
 
             @Override
             public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                AnalysisFrame.this.dataSetState = dataSetState;
-// todo: when the analysis was done on the source format, we don't want these enabled!
-//                selectUniqueElementButton.setEnabled(??);
-//                selectRecordRootButton.setEnabled(??);
+                reactToState(dataSetState);
             }
         });
+    }
+
+    private void reactToState(DataSetState state) {
+        if (state.ordinal() < DataSetState.ANALYZED_IMPORT.ordinal()) sipModel.getStatsModel().setStatistics(null);
+        boolean newDelimited = state.ordinal() >= DataSetState.ANALYZED_SOURCE.ordinal();
+        if (newDelimited != delimited) {
+            delimited = newDelimited;
+            getContentPane().removeAll();
+            buildContent(getContentPane());
+            getContentPane().validate();
+            expander.treeStructureChanged(null);
+        }
     }
 
     @Override
     protected void buildContent(Container content) {
         content.add(createPanel());
+    }
+
+    private JPanel createPanel() {
+        return delimited ? createSourcePanel() : createImportedPanel();
+    }
+
+    private JPanel createImportedPanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.setBorder(BorderFactory.createTitledBorder("Imported Data Analysis"));
+        p.add(Utility.scroll(statisticsJTree), BorderLayout.CENTER);
+        p.add(createSelectButtonPanel(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createSourcePanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.setBorder(BorderFactory.createTitledBorder("Source Data Analysis"));
+        p.add(Utility.scroll(statisticsJTree), BorderLayout.CENTER);
+        return p;
+    }
+
+    private JPanel createSelectButtonPanel() {
+        JPanel bp = new JPanel(new GridLayout(1, 0, 5, 5));
+        selectRecordRootButton.setEnabled(false);
+        bp.add(selectRecordRootButton);
+        selectUniqueElementButton.setEnabled(false);
+        bp.add(selectUniqueElementButton);
+        return bp;
     }
 
     private void onDoubleClick() {
@@ -120,26 +156,35 @@ public class AnalysisFrame extends FrameBase {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
                 final List<StatsTreeNode> nodeList = new ArrayList<StatsTreeNode>();
-                Object root = statisticsJTree.getModel().getRoot();
-                boolean useRoot = true;
-                if (root instanceof StatsTreeNode) {
-                    useRoot = !((StatsTreeNode) root).getTag().toString().equals(Storage.ENVELOPE_TAG);
-                }
                 TreePath[] selectionPaths = statisticsJTree.getSelectionModel().getSelectionPaths();
                 if (selectionPaths != null) {
                     for (TreePath path : selectionPaths) {
-                        if (useRoot || path.getPathCount() > 2) nodeList.add((StatsTreeNode) path.getLastPathComponent());
+                        if (!delimited || path.getPathCount() > 2)
+                            nodeList.add((StatsTreeNode) path.getLastPathComponent());
                     }
                 }
                 if (nodeList.size() == 1) {
                     StatsTreeNode node = nodeList.get(0);
-                    selectRecordRootButton.setEnabled(node.couldBeRecordRoot() && adjustable());
-                    selectUniqueElementButton.setEnabled(node.couldBeUniqueElement() && adjustable());
+                    selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
+                    selectUniqueElementButton.setEnabled(node.couldBeUniqueElement());
                 }
                 else {
-                    // todo: check that the selected nodes all have paths length 2, so a tuple can be made of them?
                     selectRecordRootButton.setEnabled(false);
                     selectUniqueElementButton.setEnabled(false);
+                    if (!nodeList.isEmpty()) {
+                        Path parentPath = null;
+                        for (StatsTreeNode node : nodeList) {
+                            if (parentPath == null) {
+                                parentPath = node.getPath(true).chop(1);
+                            }
+                            else {
+                                if (!parentPath.equals(node.getPath(true).chop(1))) {
+                                    statisticsJTree.clearSelection();
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
                 Exec.work(new Runnable() {
                     @Override
@@ -190,27 +235,6 @@ public class AnalysisFrame extends FrameBase {
                 sipModel.getStatsModel().setUniqueElement(node.getPath(true));
             }
         });
-    }
-
-    private boolean adjustable() {
-        return dataSetState == null || dataSetState.ordinal() <= DataSetState.SOURCED.ordinal();
-    }
-
-    private JPanel createPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Document Structure"));
-        p.add(Utility.scroll(statisticsJTree), BorderLayout.CENTER);
-        p.add(createSelectButtonPanel(), BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel createSelectButtonPanel() {
-        JPanel bp = new JPanel(new GridLayout(1, 0, 5, 5));
-        selectRecordRootButton.setEnabled(false);
-        bp.add(selectRecordRootButton);
-        selectUniqueElementButton.setEnabled(false);
-        bp.add(selectUniqueElementButton);
-        return bp;
     }
 
     private class Expander implements TreeModelListener {
