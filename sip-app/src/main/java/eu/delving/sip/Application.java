@@ -216,7 +216,6 @@ public class Application {
         statusPanel.setReaction(DataSetState.IMPORTED, new AnalysisPerformer());
         statusPanel.setReaction(DataSetState.ANALYZED_IMPORT, allFrames.prepareForDelimiting());
         statusPanel.setReaction(DataSetState.DELIMITED, new ConvertPerformer());
-        statusPanel.setReaction(DataSetState.SOURCED, new AnalysisPerformer());
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
         statusPanel.setReaction(DataSetState.VALIDATED, uploadAction);
@@ -284,6 +283,7 @@ public class Application {
                     sipModel.getDataSetModel().getDataSet().getSpec()
             ));
             sipModel.convertSource(listener);
+            new AnalysisPerformer().run();
         }
     }
 

@@ -26,6 +26,8 @@ import eu.delving.sip.files.DataSetState;
 import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The bottom of the main screen, below the desktop pane
@@ -35,12 +37,14 @@ import java.awt.event.ActionEvent;
 
 public class StatusPanel extends JPanel {
 
-    private StateAction[] actions = new StateAction[DataSetState.values().length];
+    private List<StateAction> actions = new ArrayList<StateAction>();
 
     public StatusPanel() {
         super(new GridLayout(1, 0, 5, 5));
         setBorder(BorderFactory.createTitledBorder("Actions"));
-        for (int walk = 0; walk < actions.length; walk++) actions[walk] = new StateAction(DataSetState.values()[walk]);
+        for (DataSetState state : DataSetState.values()) {
+            if (state != DataSetState.SOURCED) actions.add(new StateAction(state));
+        }
         for (StateAction action : actions) {
             JButton button = new JButton(action);
             button.setToolTipText(action.state.toHtml());
@@ -53,11 +57,11 @@ public class StatusPanel extends JPanel {
     }
 
     public void setReaction(DataSetState state, Runnable work) {
-        actions[state.ordinal()].setWork(work);
+        for (StateAction stateAction : actions) if (stateAction.state == state) stateAction.setWork(work);
     }
 
     public void setReaction(DataSetState state, Action action) {
-        actions[state.ordinal()].setAction(action);
+        for (StateAction stateAction : actions) if (stateAction.state == state) stateAction.setAction(action);
     }
 
     private class StateAction extends AbstractAction {

@@ -133,12 +133,7 @@ public class ImportAction extends AbstractAction {
     }
 
     public boolean selectInputFile(File file) {
-        if (!file.exists()) {
-            return false;
-        }
-        if (!sipModel.hasDataSet()) {
-            return false;
-        }
+        if (!file.exists() || !sipModel.hasDataSet()) return false;
         String spec = sipModel.getDataSetModel().getDataSet().getSpec();
         int doImport = JOptionPane.showConfirmDialog(
                 parent,
@@ -226,36 +221,35 @@ public class ImportAction extends AbstractAction {
 
         private void performHarvest(final String harvestUrl, final String harvestPrefix, final String harvestSpec) {
 
-            harvestPool.submit(new Harvestor(sipModel.getDataSetModel().getDataSet().getSpec(),
-                    new Harvestor.Context() {
+            harvestPool.submit(new Harvestor(sipModel.getDataSetModel().getDataSet().getSpec(), new Harvestor.Context() {
 
-                        @Override
-                        public File outputFile() {
-                            try {
-                                return sipModel.getDataSetModel().getDataSet().importedOutput();
-                            }
-                            catch (StorageException e) {
-                                e.printStackTrace();
-                                sipModel.getFeedback().alert(e.getMessage());
-                            }
-                            return null;
-                        }
-
-                        @Override
-                        public String harvestUrl() {
-                            return harvestUrl;
-                        }
-
-                        @Override
-                        public String harvestPrefix() {
-                            return harvestPrefix;
-                        }
-
-                        @Override
-                        public String harvestSpec() {
-                            return harvestSpec;
-                        }
+                @Override
+                public File outputFile() {
+                    try {
+                        return sipModel.getDataSetModel().getDataSet().importedOutput();
                     }
+                    catch (StorageException e) {
+                        e.printStackTrace();
+                        sipModel.getFeedback().alert(e.getMessage());
+                    }
+                    return null;
+                }
+
+                @Override
+                public String harvestUrl() {
+                    return harvestUrl;
+                }
+
+                @Override
+                public String harvestPrefix() {
+                    return harvestPrefix;
+                }
+
+                @Override
+                public String harvestSpec() {
+                    return harvestSpec;
+                }
+            }
             ));
         }
     }
