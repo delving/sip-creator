@@ -134,15 +134,25 @@ public class CreateFrame extends FrameBase {
         public void handleEnablement() {
             if (sipModel.getCreateModel().canCreate()) {
                 setEnabled(true);
+                StringBuilder tooltip = new StringBuilder("<html><table cellpadding=10><tr><td><h3>From:</h3><ul>");
+                for (StatsTreeNode node : sipModel.getCreateModel().getStatsTreeNodes()) {
+                    tooltip.append("<li>").append(node.getPath(false).toString()).append("</li>");
+                }
+                tooltip.append("</ul><h3>To:</h3><ul>");
+                tooltip.append("<li>").append(sipModel.getCreateModel().getRecDefTreeNode().getRecDefPath().getTagPath().toString()).append("</li>");
+                tooltip.append("</ul></td></tr></table></html>");
                 putValue(Action.NAME, CREATE);
+                putValue(Action.SHORT_DESCRIPTION, tooltip.toString());
             }
             else if (sipModel.getCreateModel().getNodeMapping() != null) {
                 setEnabled(false);
                 putValue(Action.NAME, EXISTS);
+                putValue(Action.SHORT_DESCRIPTION, "<html>The mapping has already been created.");
             }
             else {
                 setEnabled(false);
                 putValue(Action.NAME, SELECT);
+                putValue(Action.SHORT_DESCRIPTION, "<html>Choose values from the input and output.");
             }
         }
     }
