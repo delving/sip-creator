@@ -203,9 +203,9 @@ public class Application {
     private JPanel createStatePanel() {
         refreshToggleButton();
         JPanel right = new JPanel(new BorderLayout(6, 6));
-        right.add(codeFrame.getToggle(), BorderLayout.WEST);
+        right.add(new JButton(codeFrame.getAction()), BorderLayout.WEST);
         right.add(feedback.getToggle(), BorderLayout.CENTER);
-        right.add(harvestDialog.getToggle(), BorderLayout.EAST);
+        right.add(new JButton(harvestDialog.getAction()), BorderLayout.EAST);
         JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
@@ -226,7 +226,7 @@ public class Application {
     }
 
     private void refreshToggleButton() {
-        harvestDialog.getToggle().setText(String.format("%d harvests", harvestPool.getSize()));
+        harvestDialog.getAction().putValue(Action.NAME, String.format("%d harvests", harvestPool.getSize()));
     }
 
     private JMenuBar createMenuBar() {

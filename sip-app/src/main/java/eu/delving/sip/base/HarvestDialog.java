@@ -59,7 +59,6 @@ public class HarvestDialog extends FrameBase {
                     }
                 }
         );
-        setLayout(new BorderLayout());
         content.add(new JScrollPane(harvestList), BorderLayout.CENTER);
         content.add(cancel, BorderLayout.SOUTH);
         setPlacement(new Placement() {

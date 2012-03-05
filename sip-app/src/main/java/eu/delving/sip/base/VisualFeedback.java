@@ -26,6 +26,8 @@ import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ItemEvent;
@@ -144,7 +146,12 @@ public class VisualFeedback implements Feedback {
 
         public LogFrame(JDesktopPane desktop, SipModel sipModel) {
             super(desktop, sipModel, "Feedback", false);
-            setClosable(false);
+            addInternalFrameListener(new InternalFrameAdapter() {
+                @Override
+                public void internalFrameClosing(InternalFrameEvent internalFrameEvent) {
+                    toggle.setSelected(false);
+                }
+            });
         }
 
         @Override

@@ -50,7 +50,6 @@ public abstract class FrameBase extends JInternalFrame {
     protected JComponent focusOwner;
     protected SipModel sipModel;
     protected PopupAction action;
-    protected JToggleButton toggle;
     private boolean initialized;
     private Timer positionTimer;
 
@@ -77,18 +76,6 @@ public abstract class FrameBase extends JInternalFrame {
         this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title);
-        this.toggle = new JToggleButton(title);
-        this.toggle.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                    openFrame();
-                }
-                else {
-                    closeFrame();
-                }
-            }
-        });
         this.desktopPane = parent instanceof FrameBase ? ((FrameBase) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
         positionTimer = new Timer(DEFAULT_MOVE_INTERVAL,
                 new ActionListener() {
@@ -141,10 +128,6 @@ public abstract class FrameBase extends JInternalFrame {
         return placement;
     }
 
-    public SipModel getSipModel() {
-        return sipModel;
-    }
-
     protected abstract void buildContent(Container content);
 
     public void init() {
@@ -160,11 +143,6 @@ public abstract class FrameBase extends JInternalFrame {
         return action;
     }
 
-    public JToggleButton getToggle() {
-        setClosable(false);
-        return toggle;
-    }
-
     private class PopupAction extends AbstractAction {
 
         public PopupAction(String title) {
@@ -173,7 +151,11 @@ public abstract class FrameBase extends JInternalFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            openFrame();
+            if (isShowing()) {
+                closeFrame();
+            } else {
+                openFrame();
+            }
         }
     }
 
@@ -260,7 +242,6 @@ public abstract class FrameBase extends JInternalFrame {
     public void closeFrame() {
         try {
             setClosed(true);
-            if (toggle.isSelected()) toggle.setSelected(false);
         }
         catch (PropertyVetoException e) {
             e.printStackTrace();  // nobody should be vetoing this
