@@ -35,7 +35,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Choices have been made in the trees, now we actually make the mapping
@@ -58,7 +58,7 @@ public class CreateFrame extends FrameBase {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                List<StatsTreeNode> statsTreeNodes = createModel.getStatsTreeNodes();
+                SortedSet<StatsTreeNode> statsTreeNodes = createModel.getStatsTreeNodes();
                 if (statsTreeNodes == null) {
                     statsHtml.setHtml(SELECT_STATS);
                 }
@@ -115,7 +115,7 @@ public class CreateFrame extends FrameBase {
     private class CreateMappingAction extends AbstractAction {
         private static final String CREATE = "<html><h3>Create mapping</h3></html>";
         private static final String SELECT = "<html><h3>Select source and target</h3></html>";
-        private static final String EXISTS = "<html><h3>Mapping exists</h3></html>";
+        private static final String EXISTS = "<html><h3>Mapping has been created</h3></html>";
 
         private CreateMappingAction() {
             super(SELECT);

@@ -64,7 +64,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public RecDefNode recDefNode;
 
     @XStreamOmitField
-    public List statsTreeNodes;
+    public SortedSet statsTreeNodes;
 
     @Override
     public boolean equals(Object o) {
@@ -81,7 +81,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         this.outputPath = recDefNode.getPath();
     }
 
-    public NodeMapping setStatsTreeNodes(List statsTreeNodes, List<Path> inputPaths) {
+    public NodeMapping setStatsTreeNodes(SortedSet statsTreeNodes, List<Path> inputPaths) {
         if (statsTreeNodes.isEmpty()) throw new RuntimeException();
         this.statsTreeNodes = statsTreeNodes;
         setInputPaths(inputPaths);
@@ -107,6 +107,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         List<Path> inputPaths = new ArrayList<Path>();
         inputPaths.add(inputPath);
         if (tuplePaths != null) inputPaths.addAll(tuplePaths);
+        Collections.sort(inputPaths);
         return inputPaths;
     }
 

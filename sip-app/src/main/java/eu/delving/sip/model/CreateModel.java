@@ -27,9 +27,7 @@ import eu.delving.metadata.RecDef;
 import eu.delving.sip.base.StatsTreeNode;
 
 import javax.swing.tree.TreePath;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -40,7 +38,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CreateModel {
     private SipModel sipModel;
-    private List<StatsTreeNode> statsTreeNodes;
+    private SortedSet<StatsTreeNode> statsTreeNodes;
     private RecDefTreeNode recDefTreeNode;
     private NodeMapping nodeMapping;
     private boolean settingNodeMapping;
@@ -49,7 +47,7 @@ public class CreateModel {
         this.sipModel = sipModel;
     }
 
-    public void setStatsTreeNodes(List<StatsTreeNode> statsTreeNodes) {
+    public void setStatsTreeNodes(SortedSet<StatsTreeNode> statsTreeNodes) {
         if (statsTreeNodes != null && statsTreeNodes.isEmpty()) statsTreeNodes = null;
         this.statsTreeNodes = statsTreeNodes;
         setNodeMapping(null);
@@ -82,7 +80,7 @@ public class CreateModel {
         for (Listener listener : listeners) listener.nodeMappingSet(this);
     }
 
-    public List<StatsTreeNode> getStatsTreeNodes() {
+    public SortedSet<StatsTreeNode> getStatsTreeNodes() {
         return statsTreeNodes;
     }
 
@@ -95,7 +93,18 @@ public class CreateModel {
     }
 
     public boolean canCreate() {
-        return recDefTreeNode != null && statsTreeNodes != null && nodeMapping == null;
+        if (recDefTreeNode == null || statsTreeNodes == null) return false;
+        if (nodeMapping == null) {
+            nextNodeMapping: for (NodeMapping mapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
+                Iterator<Path> pathIterator = mapping.getInputPaths().iterator();
+                for (Path inputPath : mapping.getInputPaths()) {
+                    if (!pathIterator.hasNext() || !inputPath.equals(pathIterator.next())) continue nextNodeMapping;
+                }
+                nodeMapping = mapping;
+                break;
+            }
+        }
+        return nodeMapping == null;
     }
 
     public void createMapping() {
@@ -108,8 +117,8 @@ public class CreateModel {
     }
 
     public boolean isDictionaryPossible() {
-        if (nodeMapping == null || nodeMapping.statsTreeNodes.size() != 1) return false;
-        StatsTreeNode statsTreeNode = (StatsTreeNode) nodeMapping.statsTreeNodes.get(0);
+        if (nodeMapping == null || nodeMapping.statsTreeNodes == null || nodeMapping.statsTreeNodes.size() != 1) return false;
+        StatsTreeNode statsTreeNode = (StatsTreeNode) nodeMapping.statsTreeNodes.iterator().next();
         Set<String> values = statsTreeNode.getStatistics().getHistogramValues();
         List<RecDef.Opt> options = recDefTreeNode.getRecDefNode().getOptions();
         return values != null && options != null && nodeMapping.dictionary == null;
@@ -142,7 +151,7 @@ public class CreateModel {
         }
     }
 
-    private List<Path> createInputPaths(List<StatsTreeNode> statsTreeNodes) {
+    private List<Path> createInputPaths(SortedSet<StatsTreeNode> statsTreeNodes) {
         List<Path> inputPaths = new ArrayList<Path>();
         for (StatsTreeNode node : statsTreeNodes) inputPaths.add(node.getPath(false));
         return inputPaths;

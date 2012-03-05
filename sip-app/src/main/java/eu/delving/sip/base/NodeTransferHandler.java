@@ -35,7 +35,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Handle the dragging and dropping of nodes
@@ -90,7 +90,7 @@ public class NodeTransferHandler extends TransferHandler {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    sipModel.getCreateModel().setStatsTreeNodes(nodeListHolder.nodeList);
+                    sipModel.getCreateModel().setStatsTreeNodes(nodeListHolder.nodeSet);
                     JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
                     TreePath treePath = location.getPath();
                     if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
@@ -136,6 +136,6 @@ public class NodeTransferHandler extends TransferHandler {
     }
 
     public static class NodeListHolder {
-        public List<StatsTreeNode> nodeList;
+        public SortedSet<StatsTreeNode> nodeSet;
     }
 }

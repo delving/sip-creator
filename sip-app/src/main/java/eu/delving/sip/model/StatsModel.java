@@ -36,9 +36,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -129,8 +127,8 @@ public class StatsModel {
         return statsTreeModel;
     }
 
-    public List<StatsTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
-        List<StatsTreeNode> nodes = new ArrayList<StatsTreeNode>();
+    public SortedSet<StatsTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
+        SortedSet<StatsTreeNode> nodes = new TreeSet<StatsTreeNode>();
         if (!(statsTreeModel.getRoot() instanceof StatsTreeNode)) {
             nodeMapping.statsTreeNodes = null;
         }

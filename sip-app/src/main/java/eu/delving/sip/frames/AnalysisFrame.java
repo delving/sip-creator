@@ -46,8 +46,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
@@ -155,7 +155,7 @@ public class AnalysisFrame extends FrameBase {
         statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
-                final List<StatsTreeNode> nodeList = new ArrayList<StatsTreeNode>();
+                final SortedSet<StatsTreeNode> nodeList = new TreeSet<StatsTreeNode>();
                 TreePath[] selectionPaths = statisticsJTree.getSelectionModel().getSelectionPaths();
                 if (selectionPaths != null) {
                     for (TreePath path : selectionPaths) {
@@ -164,7 +164,7 @@ public class AnalysisFrame extends FrameBase {
                     }
                 }
                 if (nodeList.size() == 1) {
-                    StatsTreeNode node = nodeList.get(0);
+                    StatsTreeNode node = nodeList.iterator().next();
                     selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
                     selectUniqueElementButton.setEnabled(node.couldBeUniqueElement());
                 }

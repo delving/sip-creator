@@ -46,7 +46,7 @@ public class RecDefNode {
     private RecDef.Elem elem;
     private RecDef.Attr attr;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
-    private Map<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
+    private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
 
     public interface Listener {

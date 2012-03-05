@@ -37,6 +37,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Show statistics in an html panel, with special tricks for separately threading the html generation
@@ -56,9 +57,9 @@ public class StatisticsFrame extends FrameBase {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                List<StatsTreeNode> nodes = createModel.getStatsTreeNodes();
+                SortedSet<StatsTreeNode> nodes = createModel.getStatsTreeNodes();
                 if (nodes != null && nodes.size() == 1) {
-                    setStatistics(nodes.get(0).getStatistics());
+                    setStatistics(nodes.iterator().next().getStatistics());
                 }
             }
 
