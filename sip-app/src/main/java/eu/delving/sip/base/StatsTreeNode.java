@@ -78,7 +78,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         template.setAttribute("stats", fieldStatistics);
         this.htmlChunk = template.toString();
     }
-    
+
 //    public StatsTreeNode extractChild() {
 //        if (getChildren().size() != 1) throw new IllegalStateException("One child expected");
 //        children.get(0).parent = null;
@@ -172,14 +172,16 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     }
 
     private void compilePathList(List<StatsTreeNode> list, boolean fromRoot) {
-        if (parent != null && (fromRoot || !parent.recordRoot)) parent.compilePathList(list, fromRoot);
-        list.add(this);
+        if (fromRoot) {
+            if (parent != null) parent.compilePathList(list, fromRoot);
+            list.add(this);
+        }
+        else if (parent != null) { // only take nodes with parents
+            parent.compilePathList(list, fromRoot);
+            list.add(this);
+        }
     }
 
-//    public void add(StatsTreeNode child) {
-//        children.add(child);
-//    }
-//
     @Override
     public TreeNode getChildAt(int index) {
         return children.get(index);
