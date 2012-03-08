@@ -130,9 +130,18 @@ public class NodeMapping implements Comparable<NodeMapping> {
         for (String unusedKey : unused) dictionary.remove(unusedKey);
     }
 
+    // todo: also check if the code is any different from the default
+
     public boolean codeLooksLike(String codeString) {
-        if (groovyCode == null) return false;
-        Iterator<String> walk = groovyCode.iterator();
+        Iterator<String> walk;
+        if (groovyCode == null) { // then generate the default code
+            Out out = new Out();
+            toInnerLoop(getLocalPath(), out);
+            walk = Arrays.asList(out.toString().split("\n")).iterator();
+        }
+        else {
+            walk = groovyCode.iterator();
+        }
         for (String line : codeString.split("\n" )) {
             line = line.trim();
             if (line.isEmpty()) continue;
