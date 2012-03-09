@@ -26,11 +26,13 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import org.antlr.stringtemplate.StringTemplate;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -258,6 +260,17 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
                 }
                 else {
                     setIcon(Utility.VALUE_ELEMENT_ICON);
+                }
+                if (node.isRecordRoot() || node.isUniqueElement()) {
+                    setOpaque(!sel);
+                    setBackground(sel ? Color.WHITE : Color.YELLOW);
+                    setForeground(sel ? Color.YELLOW : Color.BLACK);
+                    setText(String.format("%s << %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
+                    setBorder(BorderFactory.createEtchedBorder());
+                }
+                else {
+                    setOpaque(false);
+                    setBorder(null);
                 }
             }
             return component;

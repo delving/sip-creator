@@ -93,16 +93,13 @@ public class StatsTree implements Serializable {
     }
 
     private static int setRecordRoot(StatsTreeNode node, Path recordRoot, List<StatsTreeNode> changedNodes) {
-        if (node.setRecordRoot(recordRoot)) {
-            changedNodes.add(node);
-            if (node.isRecordRoot()) return node.getStatistics().getTotal();
-        }
-        int total = 0;
+        if (node.setRecordRoot(recordRoot)) changedNodes.add(node);
+        int childTotal = 0;
         for (StatsTreeNode child : node.getChildNodes()) {
             int subtotal = setRecordRoot(child, recordRoot, changedNodes);
-            if (subtotal > 0) total = subtotal;
+            if (subtotal > 0) childTotal = subtotal;
         }
-        return total;
+        return node.isRecordRoot() ? node.getStatistics().getTotal() : childTotal;
     }
 
     private static void setUniqueElement(StatsTreeNode node, Path uniqueElement, List<StatsTreeNode> changedNodes) {
