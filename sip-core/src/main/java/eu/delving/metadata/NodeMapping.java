@@ -305,7 +305,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public String toString() {
-        return String.format("%s < %s%s", outputPath.getTail(), inputPath.getTail(), tuplePaths == null ? "" : " +"+tuplePaths.size());
+        return String.format("<html>%s &larr; %s%s", outputPath.getTail(), inputPath.getTail(), tuplePaths == null ? "" : " +"+tuplePaths.size());
     }
 
     private String getTupleUsage() {
