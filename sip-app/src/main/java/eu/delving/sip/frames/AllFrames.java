@@ -23,7 +23,6 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -73,7 +72,12 @@ public class AllFrames {
         }
     }
 
-    public AllFrames(JDesktopPane desktop, final SipModel sipModel, EditHistory editHistory) {
+    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
+        analysis.getActionMap().put(CREATE, create.getAction());
+        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
+    }
+
+    public AllFrames(JDesktopPane desktop, final SipModel sipModel) {
         this.desktop = desktop;
         this.sipModel = sipModel;
         CreateFrame create = new CreateFrame(desktop, sipModel);
@@ -85,7 +89,7 @@ public class AllFrames {
         addSpaceBarCreate(create, recDef);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase recMapping = new RecMappingFrame(desktop, sipModel);
-        FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel, editHistory);
+        FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel);
         FrameBase output = new OutputFrame(desktop, sipModel);
         this.frames = new FrameBase[]{
                 analysis,
@@ -139,11 +143,6 @@ public class AllFrames {
                 ),
                 view(CLEAR)
         };
-    }
-
-    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
-        analysis.getActionMap().put(CREATE, create.getAction());
-        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
     public Runnable prepareForNothing() {

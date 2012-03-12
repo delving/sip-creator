@@ -27,7 +27,6 @@ import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.CodeFrame;
 import eu.delving.sip.menus.DataSetMenu;
-import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
@@ -66,7 +65,6 @@ public class Application {
     private HarvestPool harvestPool;
     private StatusPanel statusPanel = new StatusPanel();
     private Timer resizeTimer;
-    private EditHistory editHistory = new EditHistory();
     private CodeFrame codeFrame;
 
     private Application(final File storageDirectory) throws StorageException {
@@ -107,7 +105,7 @@ public class Application {
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         codeFrame = new CodeFrame(desktop, sipModel);
-        allFrames = new AllFrames(desktop, sipModel, editHistory);
+        allFrames = new AllFrames(desktop, sipModel);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new ImportAction(desktop, sipModel, harvestPool);
@@ -233,7 +231,6 @@ public class Application {
         JMenuBar bar = new JMenuBar();
         bar.add(createFileMenu());
         bar.add(dataSetMenu);
-        bar.add(editHistory.getEditMenu());
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
         return bar;

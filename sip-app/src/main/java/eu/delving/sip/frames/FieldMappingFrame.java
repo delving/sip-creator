@@ -26,7 +26,6 @@ import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.FunctionPanel;
 import eu.delving.sip.base.Utility;
-import eu.delving.sip.menus.EditHistory;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
@@ -34,10 +33,10 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +48,9 @@ import java.util.List;
  */
 
 public class FieldMappingFrame extends FrameBase {
+    private final Action REVERT_ACTION = new RevertAction();
+    private final Action UNDO_ACTION = new UndoAction();
+    private final Action REDO_ACTION = new RedoAction();
     private JTextArea groovyCodeArea;
     private JTextArea outputArea;
     private JEditorPane helpView;
@@ -56,11 +58,10 @@ public class FieldMappingFrame extends FrameBase {
     private JComboBox contextVarBox = new JComboBox(contextVarModel);
     private DictionaryPanel dictionaryPanel;
     private FunctionPanel functionPanel;
-    private EditHistory editHistory;
+    private UndoManager undoManager = new UndoManager();
 
-    public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel, final EditHistory editHistory) {
+    public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(desktop, sipModel, "Field Mapping", false);
-        this.editHistory = editHistory;
         try {
             helpView = new JEditorPane(getClass().getResource("/groovy-help.html"));
         }
@@ -72,21 +73,38 @@ public class FieldMappingFrame extends FrameBase {
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         groovyCodeArea.setFont(new Font("Monospaced", Font.BOLD, 12));
         groovyCodeArea.setTabSize(3);
-        groovyCodeArea.getDocument().addUndoableEditListener(editHistory);
-        groovyCodeArea.addFocusListener(new FocusListener() {
+        groovyCodeArea.getDocument().addUndoableEditListener(undoManager);
+        groovyCodeArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void focusGained(FocusEvent focusEvent) {
-                editHistory.setTarget(groovyCodeArea);
+            public void insertUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
             }
 
             @Override
-            public void focusLost(FocusEvent focusEvent) {
-                editHistory.setTarget(null);
+            public void removeUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
             }
         });
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
+        attachAction(UNDO_ACTION);
+        attachAction(REDO_ACTION);
         Utility.attachUrlLauncher(outputArea);
         wireUp();
+    }
+
+    private void attachAction(Action action) {
+        groovyCodeArea.getInputMap().put((KeyStroke) action.getValue(Action.ACCELERATOR_KEY), action.getValue(Action.NAME));
+        groovyCodeArea.getActionMap().put(action.getValue(Action.NAME), action);
+    }
+
+    private void handleEnablement() {
+        UNDO_ACTION.setEnabled(undoManager.canUndo());
+        REDO_ACTION.setEnabled(undoManager.canRedo());
     }
 
     @Override
@@ -121,9 +139,19 @@ public class FieldMappingFrame extends FrameBase {
         JPanel north = new JPanel(new BorderLayout());
         north.add(new JLabel("Context variables:"), BorderLayout.WEST);
         north.add(contextVarBox, BorderLayout.CENTER);
-        north.add(new JButton(new RevertAction()), BorderLayout.EAST);
+        north.add(createNorthEast(), BorderLayout.EAST);
         p.add(north, BorderLayout.NORTH);
         p.add(Utility.scroll(groovyCodeArea), BorderLayout.CENTER);
+        return p;
+    }
+    
+    private JPanel createNorthEast() {
+        JPanel pp = new JPanel(new GridLayout(1, 0));
+        pp.add(new JButton(UNDO_ACTION));
+        pp.add(new JButton(REDO_ACTION));
+        JPanel p = new JPanel(new GridLayout(1, 0));
+        p.add(new JButton(REVERT_ACTION));
+        p.add(pp);
         return p;
     }
 
@@ -222,7 +250,7 @@ public class FieldMappingFrame extends FrameBase {
                 public void run() {
                     switch (state) {
                         case ORIGINAL:
-                            editHistory.discardAllEdits();
+                            undoManager.discardAllEdits();
                             // fall through
                         case SAVED:
                             groovyCodeArea.setBackground(new Color(1.0f, 1.0f, 1.0f));
@@ -256,6 +284,30 @@ public class FieldMappingFrame extends FrameBase {
                     }
                 });
             }
+        }
+    }
+
+    private class UndoAction extends AbstractAction {
+        private UndoAction() {
+            super("Undo");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            undoManager.undo();
+        }
+    }
+
+    private class RedoAction extends AbstractAction {
+        private RedoAction() {
+            super("Redo");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            undoManager.redo();
         }
     }
 
