@@ -144,15 +144,22 @@ public class FieldMappingFrame extends FrameBase {
         p.add(Utility.scroll(groovyCodeArea), BorderLayout.CENTER);
         return p;
     }
-    
+
     private JPanel createNorthEast() {
         JPanel pp = new JPanel(new GridLayout(1, 0));
-        pp.add(new JButton(UNDO_ACTION));
-        pp.add(new JButton(REDO_ACTION));
+        pp.add(createActionButton(UNDO_ACTION));
+        pp.add(createActionButton(REDO_ACTION));
         JPanel p = new JPanel(new GridLayout(1, 0));
         p.add(new JButton(REVERT_ACTION));
         p.add(pp);
         return p;
+    }
+
+    private JButton createActionButton(Action action) {
+        KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        JButton button = new JButton(action);
+        button.setText(button.getText()+ " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + "-" + KeyEvent.getKeyText(stroke.getKeyCode()));
+        return button;
     }
 
     private JPanel createOutputPanel() {
@@ -266,7 +273,7 @@ public class FieldMappingFrame extends FrameBase {
             });
         }
     }
-    
+
     private class RevertAction extends AbstractAction {
         private RevertAction() {
             super("Revert to Original");
