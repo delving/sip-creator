@@ -35,6 +35,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.IOException;
@@ -120,6 +121,7 @@ public class FieldMappingFrame extends FrameBase {
         JPanel north = new JPanel(new BorderLayout());
         north.add(new JLabel("Context variables:"), BorderLayout.WEST);
         north.add(contextVarBox, BorderLayout.CENTER);
+        north.add(new JButton(new RevertAction()), BorderLayout.EAST);
         p.add(north, BorderLayout.NORTH);
         p.add(Utility.scroll(groovyCodeArea), BorderLayout.CENTER);
         return p;
@@ -234,6 +236,26 @@ public class FieldMappingFrame extends FrameBase {
                     }
                 }
             });
+        }
+    }
+    
+    private class RevertAction extends AbstractAction {
+        private RevertAction() {
+            super("Revert to Original");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            int answer = JOptionPane.showConfirmDialog(FieldMappingFrame.this, "Discard edited code and revert to the original?", "", JOptionPane.OK_CANCEL_OPTION);
+            if (answer == JOptionPane.OK_OPTION) {
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getCreateModel().revertToOriginal();
+                        sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
+                    }
+                });
+            }
         }
     }
 

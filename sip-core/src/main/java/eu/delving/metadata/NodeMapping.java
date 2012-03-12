@@ -153,7 +153,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public void setGroovyCode(String groovyCode) {
         this.groovyCode = null;
-        for (String line : groovyCode.split("\n" )) addCodeLine(line);
+        if (groovyCode != null) for (String line : groovyCode.split("\n" )) addCodeLine(line);
         recDefNode.notifyNodeMappingChange(this);
     }
 
@@ -175,10 +175,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return editPath == null ? null : editPath.getEditedCode();
     }
 
-    public String getUserCode(String editedCode) {
+    public String getOriginalCode() {
         Out out = new Out();
         if (isUserCodeEditable()) {
-            toUserCode(out, editedCode);
+            toUserCode(out, null);
         }
         else {
             recDefNode.toElementCode(out, null);

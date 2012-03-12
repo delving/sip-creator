@@ -92,6 +92,10 @@ public class CreateModel {
         return nodeMapping;
     }
 
+    public void revertToOriginal() {
+        if (nodeMapping != null) nodeMapping.setGroovyCode(null);
+    }
+
     public boolean canCreate() {
         if (recDefTreeNode == null || statsTreeNodes == null) return false;
         if (nodeMapping == null) {
@@ -117,7 +121,7 @@ public class CreateModel {
     }
 
     public boolean isDictionaryPossible() {
-        if (nodeMapping == null || nodeMapping.statsTreeNodes == null || nodeMapping.statsTreeNodes.size() != 1) return false;
+        if (nodeMapping == null || recDefTreeNode == null|| nodeMapping.statsTreeNodes == null || nodeMapping.statsTreeNodes.size() != 1) return false;
         StatsTreeNode statsTreeNode = (StatsTreeNode) nodeMapping.statsTreeNodes.iterator().next();
         Set<String> values = statsTreeNode.getStatistics().getHistogramValues();
         List<RecDef.Opt> options = recDefTreeNode.getRecDefNode().getOptions();
