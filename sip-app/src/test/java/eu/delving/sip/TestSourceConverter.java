@@ -60,7 +60,7 @@ public class TestSourceConverter {
             "<b:shh>deathly quiet",
             "</b:shh>",
             "<a:unique>0404040404</a:unique>",
-            "<c:long>",
+            "<c:long lang=\"stupid\">",
             "this is very much ",
             "a multi-line field ",
             "it even contains       strange spaces",
@@ -104,11 +104,13 @@ public class TestSourceConverter {
                 "<a:boo>very scary</a:boo>",
                 "<b:shh>deathly quiet</b:shh>",
                 "<a:unique>0404040404</a:unique>",
-                "<c:long>this is very much a multi-line field it even contains strange spaces</c:long>",
+                "<c:long lang=\"stupid\">this is very much</c:long>",
+                "<c:long lang=\"stupid\">a multi-line field</c:long>",
+                "<c:long lang=\"stupid\">it even contains strange spaces</c:long>",
                 "</input>",
                 "</delving-sip-source>",
         };
-        Assert.assertArrayEquals("Unexpected output", expect, lines);
+        Assert.assertEquals("Unexpected output", StringUtils.join(expect,'\n'), StringUtils.join(lines,'\n'));
     }
 
     @Test

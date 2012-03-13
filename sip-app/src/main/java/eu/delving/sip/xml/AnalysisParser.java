@@ -113,13 +113,11 @@ public class AnalysisParser implements Runnable {
                             }
                             break;
                         case XMLEvent.CHARACTERS:
-                            text.append(input.getText());
-                            break;
                         case XMLEvent.CDATA:
                             text.append(input.getText());
                             break;
                         case XMLEvent.END_ELEMENT:
-                            recordValue(ValueFilter.filter(text.toString()));
+                            recordValue(text.toString().trim());
                             text.setLength(0);
                             path.pop();
                             break;

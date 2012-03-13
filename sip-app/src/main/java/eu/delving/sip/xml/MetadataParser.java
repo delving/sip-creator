@@ -117,12 +117,9 @@ public class MetadataParser {
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (node != null) {
-                        String valueString = ValueFilter.filter(value.toString());
+                        String valueString = value.toString().trim();
                         value.setLength(0);
-                        if (!valueString.isEmpty()) {
-                            // todo: perhaps check if there is already an array of children in there.
-                            node.setValue(valueString);
-                        }
+                        if (!valueString.isEmpty()) node.setValue(valueString);
                         if (path.equals(Storage.RECORD_ROOT)) {
                             if (node.parent() != null) {
                                 throw new RuntimeException("Expected to be at root node");

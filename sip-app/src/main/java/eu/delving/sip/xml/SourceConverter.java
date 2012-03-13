@@ -29,12 +29,10 @@ import eu.delving.metadata.UniquenessException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.xml.stream.*;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.events.*;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,9 +63,9 @@ public class SourceConverter {
     private int recordCount, totalRecords;
     private ProgressListener progressListener;
     private Path path = Path.empty();
-    private StringBuilder uniqueBuilder;
     private String unique;
     private List<XMLEvent> eventBuffer = new ArrayList<XMLEvent>();
+    private List<String> lines = new ArrayList<String>();
     private boolean finished = false;
     private final Uniqueness uniqueness = new Uniqueness();
 
@@ -86,6 +84,7 @@ public class SourceConverter {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+        StartElement start = null;
         try {
             while (!finished) {
                 XMLEvent event = in.nextEvent();
@@ -94,25 +93,21 @@ public class SourceConverter {
                         out.add(eventFactory.createStartDocument());
                         out.add(eventFactory.createCharacters("\n"));
                         List<Namespace> nslist = new ArrayList<Namespace>();
-                        for (Map.Entry<String, String> entry : namespaces.entrySet())
+                        for (Map.Entry<String, String> entry : namespaces.entrySet()) {
                             nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
+                        }
                         out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
                         out.add(eventFactory.createCharacters("\n"));
                         break;
                     case XMLEvent.START_ELEMENT:
-                        StartElement start = event.asStartElement();
+                        lines.clear();
+                        start = event.asStartElement();
                         path.push(Tag.element(start.getName()));
-                        if (!eventBuffer.isEmpty()) {
-                            if (unique == null && path.equals(uniqueElementPath)) uniqueBuilder = new StringBuilder();
-                            eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
-                        }
-                        else if (path.equals(recordRootPath)) {
-                            eventBuffer.add(eventFactory.createCharacters("\n")); // nonempty: flag that record has started
-                            handleRecordAttributes(start);
-                            if (progressListener != null) progressListener.setProgress(recordCount);
-                        }
+                        handleStartElement(start);
+                        if (progressListener != null) progressListener.setProgress(recordCount);
                         break;
                     case XMLEvent.END_ELEMENT:
+                        EndElement end = event.asEndElement();
                         if (!eventBuffer.isEmpty()) {
                             if (path.equals(recordRootPath)) {
                                 if (unique == null) {
@@ -122,14 +117,31 @@ public class SourceConverter {
                                 recordCount++;
                             }
                             else {
-                                if (uniqueBuilder != null && path.equals(uniqueElementPath)) {
-                                    unique = uniqueBuilder.toString();
+                                if (path.equals(uniqueElementPath)) {
+                                    unique = StringUtils.join(lines, ' ');
                                     if (uniqueness.isRepeated(unique)) {
                                         throw new UniquenessException(uniqueElementPath, recordCount);
                                     }
-                                    uniqueBuilder = null;
                                 }
-                                eventBuffer.add(event);
+                                switch (lines.size()) {
+                                    case 0:
+                                        break;
+                                    case 1:
+                                        eventBuffer.add(eventFactory.createCharacters(lines.get(0)));
+                                        break;
+                                    default:
+                                        Iterator<String> walk = lines.iterator();
+                                        while (walk.hasNext()) {
+                                            eventBuffer.add(eventFactory.createCharacters(walk.next()));
+                                            if (walk.hasNext()) {
+                                                eventBuffer.add(end);
+                                                eventBuffer.add(eventFactory.createCharacters("\n"));
+                                                handleStartElement(start);
+                                            }
+                                        }
+                                        break;
+                                }
+                                eventBuffer.add(end);
                                 eventBuffer.add(eventFactory.createCharacters("\n"));
                             }
                         }
@@ -144,13 +156,7 @@ public class SourceConverter {
                         break;
                     case XMLEvent.CHARACTERS:
                     case XMLEvent.CDATA:
-                        if (!eventBuffer.isEmpty()) {
-                            String string = ValueFilter.filter(event.asCharacters().getData());
-                            if (!string.isEmpty()) {
-                                if (uniqueBuilder != null) uniqueBuilder.append(string);
-                                eventBuffer.add(eventFactory.createCharacters(string));
-                            }
-                        }
+                        if (!eventBuffer.isEmpty()) extractLines(event.asCharacters().getData());
                         break;
                 }
             }
@@ -159,6 +165,16 @@ public class SourceConverter {
             if (progressListener != null) progressListener.finished(finished);
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
+        }
+    }
+
+    private void handleStartElement(StartElement start) {
+        if (!eventBuffer.isEmpty()) {
+            eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
+        }
+        else if (path.equals(recordRootPath)) {
+            eventBuffer.add(eventFactory.createCharacters("\n")); // nonempty: flag that record has started
+            handleRecordAttributes(start);
         }
     }
 
@@ -173,7 +189,6 @@ public class SourceConverter {
         out.add(eventFactory.createEndElement("", "", RECORD_TAG));
         out.add(eventFactory.createCharacters("\n"));
         eventBuffer.clear();
-        uniqueBuilder = null;
     }
 
     private void handleRecordAttributes(StartElement start) {
@@ -197,4 +212,16 @@ public class SourceConverter {
         eventBuffer.add(eventFactory.createEndElement(attr.getName(), null));
         eventBuffer.add(eventFactory.createCharacters("\n"));
     }
+
+    private void extractLines(String value) {
+        for (String line : value.split(" *[\n\r]+ *")) {
+            if (line.isEmpty()) continue;
+            StringBuilder out = new StringBuilder(line.length());
+            for (char c : line.toCharArray()) out.append(Character.isWhitespace(c) ? ' ' : c);
+            String clean = out.toString().replaceAll(" +", " ").trim();
+            if (!clean.isEmpty()) lines.add(clean);
+        }
+    }
+
+
 }

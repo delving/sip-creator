@@ -24,7 +24,6 @@ package eu.delving.sip.base;
 import com.ctc.wstx.stax.WstxInputFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.xml.ValueFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -249,7 +248,7 @@ public class Harvestor implements Runnable {
                 case XMLEvent.CHARACTERS:
                 case XMLEvent.CDATA:
                     if (!recordEvents.isEmpty()) {
-                        String string = ValueFilter.filter(event.asCharacters().getData());
+                        String string = event.asCharacters().getData().trim();
                         if (!string.isEmpty()) {
                             recordEvents.add(eventFactory.createCharacters(string));
                         }
