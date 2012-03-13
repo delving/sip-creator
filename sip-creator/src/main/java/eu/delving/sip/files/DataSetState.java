@@ -21,8 +21,6 @@
 
 package eu.delving.sip.files;
 
-import org.apache.commons.lang.WordUtils;
-
 /**
  * The different states that a data set can be in.
  *
@@ -30,31 +28,33 @@ import org.apache.commons.lang.WordUtils;
  */
 
 public enum DataSetState {
-    ABSENT("There is currently no dataset selected", "Press here to clear the screen"),
-    EMPTY("This dataset is currently empty", "Press here to import data into it"),
-    IMPORTED("There is data imported for this dataset", "Press here to analyze the imported data"),
-    ANALYZED_IMPORT("The dataset is analyzed", "Press here to show analysis frames"),
-    DELIMITED("The delimiters have been set", "Press here to convert the data to source format"),
-    SOURCED("The source data is available", "Press here to analyze the source"),
-    ANALYZED_SOURCE("The source data has been analyzed", "Press here to show mapping frames"),
-    MAPPING("There is a mapping present", "Press here to try and transform and validate the data"),
-    VALIDATED("This dataset has been validated", "Press here to initiate upload to Culture Hub");
+    ABSENT("Clear", "There is currently no dataset selected", "Press here to clear the screen"),
+    EMPTY("Import", "This dataset is currently empty", "Press here to import data into it"),
+    IMPORTED("Analyze Imp", "There is data imported for this dataset", "Press here to analyze the imported data"),
+    ANALYZED_IMPORT("Delimit", "The dataset is analyzed", "Press here to show analysis frames"),
+    DELIMITED("Convert", "The delimiters have been set", "Press here to convert the data to source format"),
+    SOURCED("Analyze Src","The source data is available", "Press here to analyze the source"),
+    ANALYZED_SOURCE("Map", "The source data has been analyzed", "Press here to show mapping frames"),
+    MAPPING("Validate", "There is a mapping present", "Press here to try and transform and validate the data"),
+    VALIDATED("Upload", "This dataset has been validated", "Press here to initiate upload to Culture Hub");
 
-    private String [] description;
+    private String[] description;
 
     DataSetState(String... description) {
         this.description = description;
     }
-    
+
     public String toTitle() {
-        return WordUtils.capitalize(toString().replaceAll("_", " ").toLowerCase());
+        return description[0];
+//        return WordUtils.capitalize(toString().replaceAll("_", " ").toLowerCase());
     }
 
-    public String toToolTip() {
+    public String toHtml() {
         StringBuilder out = new StringBuilder("<html><strong>&quot;");
         out.append(toTitle());
         out.append("&quot;</strong><br>");
-        for (String line : description) {
+        for (int walk = 1; walk < description.length; walk++) {
+            String line = description[walk];
             out.append("<p>").append(line).append("</p>");
         }
         return out.toString();
