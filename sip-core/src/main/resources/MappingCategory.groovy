@@ -171,7 +171,25 @@ public class MappingCategory {
         return ["$spec/$hash"]
     }
 
-    static List toLocalId(a, spec) {
+    static String toLegacyId(String identifier, spec) {
+      if (!spec) {
+        throw new MissingPropertyException("spec", String.class)
+      }
+      if (!identifier) {
+        throw new MissingPropertyException("Identifier passed to toId", String.class)
+      }
+      def oldIdentifier = "[" + identifier + "]"
+      def uriBytes =  oldIdentifier.getBytes("UTF-8");
+      def digest = java.security.MessageDigest.getInstance("SHA-1")
+      def hash = new StringBuilder()
+      for (Byte b in digest.digest(uriBytes)) {
+        hash.append('0123456789ABCDEF'[(b & 0xF0) >> 4])
+        hash.append('0123456789ABCDEF'[b & 0x0F])
+      }
+      return "$spec/$hash"
+    }
+
+  static List toLocalId(a, spec) {
         a = unwrap(a)
         String identifier = a[0].toString()
         if (!spec) throw new MissingPropertyException("spec", String.class)
