@@ -88,14 +88,10 @@ public class MetadataRecordFactory {
                         value.append(input.getText());
                         break;
                     case XMLEvent.END_ELEMENT:
-                        if (node == null) {
-                            throw new RuntimeException("Node cannot be null");
-                        }
-                        String valueString = value.toString().replaceAll("\n", " ").replaceAll(" +", " ").trim();
+                        if (node == null) throw new RuntimeException("Node cannot be null");
+                        String valueString = value.toString().trim();
                         value.setLength(0);
-                        if (valueString.length() > 0) {
-                            node.setValue(valueString);
-                        }
+                        if (valueString.length() > 0) node.setValue(valueString);
                         node = node.parent();
                         break;
                     case XMLEvent.END_DOCUMENT: {
