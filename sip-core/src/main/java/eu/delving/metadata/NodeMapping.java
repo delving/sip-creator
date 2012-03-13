@@ -130,8 +130,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
         for (String unusedKey : unused) dictionary.remove(unusedKey);
     }
 
-    // todo: also check if the code is any different from the default
-
     public boolean codeLooksLike(String codeString) {
         Iterator<String> walk;
         if (groovyCode == null) { // then generate the default code
@@ -142,18 +140,16 @@ public class NodeMapping implements Comparable<NodeMapping> {
         else {
             walk = groovyCode.iterator();
         }
-        for (String line : codeString.split("\n" )) {
-            line = line.trim();
-            if (line.isEmpty()) continue;
-            if (!walk.hasNext()) return false;
-            if (!walk.next().equals(line)) return false;
-        }
-        return !walk.hasNext();
+        return isSimilar(codeString, walk);
     }
 
     public void setGroovyCode(String groovyCode) {
         this.groovyCode = null;
-        if (groovyCode != null) for (String line : groovyCode.split("\n" )) addCodeLine(line);
+        if (groovyCode != null) {
+            if (!isSimilar(getGeneratedCode(), Arrays.asList(groovyCode.split("\n")).iterator())) {
+                for (String line : groovyCode.split("\n")) addCodeLine(line);
+            }
+        }
         recDefNode.notifyNodeMappingChange(this);
     }
 
@@ -162,7 +158,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         String editedCode = getEditedCode(editPath);
         out.line_("%s : {", recDefNode.getTag().toBuilderCall());
         toUserCode(out, editedCode);
-        out._line("}" );
+        out._line("}");
     }
 
     public void toElementCode(Out out, EditPath editPath) {
@@ -175,7 +171,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return editPath == null ? null : editPath.getEditedCode();
     }
 
-    public String getOriginalCode() {
+    public String getGeneratedCode() {
         Out out = new Out();
         if (isUserCodeEditable()) {
             toUserCode(out, null);
@@ -188,6 +184,16 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public boolean isUserCodeEditable() {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
+    }
+
+    private boolean isSimilar(String codeString, Iterator<String> walk) {
+        for (String line : codeString.split("\n" )) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+            if (!walk.hasNext()) return false;
+            if (!walk.next().equals(line)) return false;
+        }
+        return !walk.hasNext();
     }
 
     private void toUserCode(Out out, String editedCode) {

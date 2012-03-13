@@ -178,7 +178,7 @@ public class MappingCompileModel {
                     return "// no code";
                 }
                 else {
-                    return selectedNodeMapping.getOriginalCode();
+                    return selectedNodeMapping.getGeneratedCode();
                 }
             default:
                 throw new RuntimeException();
