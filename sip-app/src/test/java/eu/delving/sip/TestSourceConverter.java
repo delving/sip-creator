@@ -66,6 +66,10 @@ public class TestSourceConverter {
             "it even contains       strange spaces",
             "</c:long>",
             "</we-are-in-record>",
+            "<we-are-in-record>",
+            "<a:boo>this one has no unique identifier</a:boo>",
+            "<b:shh>so it will simply be discarded</b:shh>",
+            "</we-are-in-record>",
             "</sub-root>",
             "</the-root>",
     };

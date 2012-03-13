@@ -110,11 +110,13 @@ public class SourceConverter {
                         EndElement end = event.asEndElement();
                         if (!eventBuffer.isEmpty()) {
                             if (path.equals(recordRootPath)) {
-                                if (unique == null) {
-                                    throw new IOException(String.format("Record %d has no unique value at %s", recordCount, uniqueElementPath));
+                                if (unique != null) {
+                                    outputRecord(out);
+                                    recordCount++;
                                 }
-                                outputRecord(out);
-                                recordCount++;
+                                else {
+                                    eventBuffer.clear(); // discard the record
+                                }
                             }
                             else {
                                 if (path.equals(uniqueElementPath)) {
