@@ -171,7 +171,9 @@ public class MappingCategory {
         return ["$spec/$hash"]
     }
 
-    static String toLegacyId(String identifier, spec) {
+    static List toLegacyId(a, spec) {
+      a = unwrap(a)
+      String identifier = a[0].toString()
       if (!spec) {
         throw new MissingPropertyException("spec", String.class)
       }
@@ -186,7 +188,7 @@ public class MappingCategory {
         hash.append('0123456789ABCDEF'[(b & 0xF0) >> 4])
         hash.append('0123456789ABCDEF'[b & 0x0F])
       }
-      return "$spec/$hash"
+      return ["$spec/$hash"]
     }
 
   static List toLocalId(a, spec) {
