@@ -168,8 +168,6 @@ public class CultureHubClient {
 
         void uploadStarted(File file);
 
-        void uploadFinished(File file, boolean aborted);
-
         ProgressListener getProgressListener();
 
         void finished(boolean success);

@@ -183,11 +183,6 @@ public class UploadAction extends AbstractAction {
                     }
 
                     @Override
-                    public void uploadFinished(File file, boolean aborted) {
-                        sipModel.getFeedback().say(String.format(aborted ? "Aborted upload of %s" : "Uploaded %s", file.getName()));
-                    }
-
-                    @Override
                     public ProgressListener getProgressListener() {
                         ProgressListener listener = sipModel.getFeedback().progressListener("Uploading");
                         listener.setProgressMessage(String.format(
