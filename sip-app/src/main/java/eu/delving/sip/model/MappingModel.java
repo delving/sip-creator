@@ -72,24 +72,7 @@ public class MappingModel implements RecDefNode.Listener {
     }
 
     public void setFacts(Map<String, String> map) {
-        for (Map.Entry<String,String> entry : map.entrySet()) setFact(entry.getKey(), entry.getValue());
-    }
-
-    private void setFact(String path, String value) {
-        if (recMapping != null) {
-            boolean changed;
-            if (value == null) {
-                changed = recMapping.getFacts().containsKey(path);
-                recMapping.getFacts().remove(path);
-            }
-            else {
-                changed = recMapping.getFacts().containsKey(path) && !recMapping.getFacts().get(path).equals(value);
-                recMapping.getFacts().put(path, value);
-            }
-            if (changed) {
-                for (ChangeListener changeListener : changeListeners) changeListener.factChanged(this, path);
-            }
-        }
+        recMapping.getFacts().putAll(map);
     }
 
     public void notifyFunctionChanged(MappingFunction mappingFunction) {
@@ -121,8 +104,6 @@ public class MappingModel implements RecDefNode.Listener {
     }
 
     public interface ChangeListener {
-
-        void factChanged(MappingModel mappingModel, String name);
 
         void functionChanged(MappingModel mappingModel, MappingFunction function);
 

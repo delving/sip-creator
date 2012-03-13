@@ -115,28 +115,22 @@ public class SipModel {
         });
         mappingModel.addChangeListener(new MappingModel.ChangeListener() {
             @Override
-            public void factChanged(MappingModel mappingModel, String name) {
-            }
-
-            @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+                clearValidation(mappingModel.getRecMapping());
             }
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                LOG.info("node mapping changed");
                 clearValidation(mappingModel.getRecMapping());
             }
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                LOG.info("node mapping added");
                 clearValidation(mappingModel.getRecMapping());
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                LOG.info("node mapping removed");
                 clearValidation(mappingModel.getRecMapping());
             }
         });

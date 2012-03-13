@@ -22,6 +22,8 @@
 package eu.delving.sip.base;
 
 import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
@@ -36,7 +38,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -76,11 +77,12 @@ public class FunctionPanel extends JPanel {
         functionList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                if (listSelectionEvent.getValueIsAdjusting()) return;
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        String name = (String) functionList.getSelectedValue();
-                        sipModel.getFunctionCompileModel().setFunctionName(name);
+                        MappingFunction function = (MappingFunction) functionList.getSelectedValue();
+                        if (function != null) sipModel.getFunctionCompileModel().setFunction(function);
                     }
                 });
             }
@@ -99,14 +101,45 @@ public class FunctionPanel extends JPanel {
                 });
             }
         });
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void functionChanged(final MappingModel mappingModel, final MappingFunction function) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mappingModel.getRecMapping().getFunctions().size() != functionListModel.getSize()) {
+                            functionListModel.setList(mappingModel.getRecMapping());
+                        }
+                        int newIndex = functionListModel.indexOf(function.name);
+                        int currentIndex = functionList.getSelectedIndex();
+                        if (newIndex != currentIndex) functionList.setSelectedIndex(newIndex);
+                    }
+                });
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
         sipModel.getFunctionCompileModel().addListener(new ModelStateListener());
     }
 
     private JPanel createListPanel() {
+        JPanel bp = new JPanel(new GridLayout(0, 1));
+        bp.add(new JButton(new CreateAction()));
+        bp.add(new JButton(new RemoveAction()));
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Functions"));
         p.add(Utility.scroll(functionList));
-        p.add(new JButton(new CreateAction()), BorderLayout.SOUTH);
+        p.add(bp, BorderLayout.SOUTH);
         return p;
     }
 
@@ -130,7 +163,7 @@ public class FunctionPanel extends JPanel {
         p.add(Utility.scroll(outputArea));
         return p;
     }
-    
+
     private class CreateAction extends AbstractAction {
 
         private CreateAction() {
@@ -145,14 +178,15 @@ public class FunctionPanel extends JPanel {
                     JOptionPane.showMessageDialog(FunctionPanel.this, "Sorry, the name must be of the form 'aaaaa' or 'aaaaAaaa'");
                     return;
                 }
-                if (functionListModel.contains(name)) {
+                final RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+                if (recMapping.hasFunction(name)) {
                     JOptionPane.showMessageDialog(FunctionPanel.this, "Sorry, but this function name already exists");
                     return;
                 }
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        MappingFunction mappingFunction = sipModel.getMappingModel().getRecMapping().getFunction(name.trim());
+                        MappingFunction mappingFunction = recMapping.createFunction(name);
                         sipModel.getMappingModel().notifyFunctionChanged(mappingFunction);
                     }
                 });
@@ -160,34 +194,60 @@ public class FunctionPanel extends JPanel {
         }
     }
 
+    private class RemoveAction extends AbstractAction {
+        private RemoveAction() {
+            super("Remove selected function");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            final MappingFunction selected = (MappingFunction) functionList.getSelectedValue();
+            if (selected != null) {
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getMappingModel().getRecMapping().removeFunction(selected);
+                        sipModel.getMappingModel().notifyFunctionChanged(selected);
+                    }
+                });
+            }
+        }
+    }
+
     private class FunctionListModel extends AbstractListModel {
-        private List<String> names = new ArrayList<String>();
+        private List<MappingFunction> functions = new ArrayList<MappingFunction>();
 
         public void setList(RecMapping recMapping) {
-            if (!names.isEmpty()) {
+            if (!functions.isEmpty()) {
                 int size = getSize();
-                names.clear();
+                functions.clear();
                 fireIntervalRemoved(this, 0, size);
             }
-            if (recMapping != null) for (MappingFunction function : recMapping.getFunctions()) names.add(function.name);
-            Collections.sort(names);
-            if (!names.isEmpty()) {
-                fireIntervalAdded(this, 0, getSize());
-            }
+            if (recMapping != null) functions.addAll(recMapping.getFunctions());
+            if (!functions.isEmpty()) fireIntervalAdded(this, 0, getSize());
         }
 
         @Override
         public int getSize() {
-            return names.size();
+            return functions.size();
         }
 
         @Override
         public Object getElementAt(int i) {
-            return names.get(i);
+            return functions.get(i);
         }
 
         public boolean contains(String name) {
-            return names.contains(name);
+            return indexOf(name) >= 0;
+        }
+
+        public int indexOf(String name) {
+            int index = 0;
+            for (MappingFunction function : functions) {
+                if (function.name.equals(name)) return index;
+                index++;
+            }
+            return -1;
         }
     }
 

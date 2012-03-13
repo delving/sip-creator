@@ -34,11 +34,11 @@ import java.util.*;
 /**
  * A record mapping describes how an input format is transformed into an output format in the form of a Groovy builder,
  * which is dynamically generated.
- *
+ * <p/>
  * There are some givens, recorded in the facts, and then a set of node mappings, each identified with a path,
  * and containing mapping information such as a dictionary or a Groovy code snippet to do more elaborate
  * transformations.
- *
+ * <p/>
  * The recDefTree is an instance of the output record definition, which is not shared with any other record
  * mappings.  It is used to generate the Groovy builder code based on its hierarchical structure, which
  * is "decorated" with the various NodeMapping instances from this mapping.
@@ -56,7 +56,7 @@ public class RecMapping {
     Map<String, String> facts = new HashMap<String, String>();
 
     @XStreamAlias("functions")
-    List<MappingFunction> functions = new ArrayList<MappingFunction>();
+    SortedSet<MappingFunction> functions = new TreeSet<MappingFunction>();
 
     @XStreamAlias("node-mappings")
     List<NodeMapping> nodeMappings;
@@ -76,14 +76,6 @@ public class RecMapping {
         return prefix;
     }
 
-    public String getFact(String fieldName) {
-        String value = facts.get(fieldName);
-        if (value == null) {
-            facts.put(fieldName, value = "");
-        }
-        return value;
-    }
-
     public boolean setFact(String fieldName, String value) {
         String existing = facts.get(fieldName);
         if (existing == null || !value.equals(existing)) {
@@ -99,15 +91,23 @@ public class RecMapping {
         return facts;
     }
 
-    public List<MappingFunction> getFunctions() {
+    public SortedSet<MappingFunction> getFunctions() {
         return functions;
     }
+
+    public boolean hasFunction(String name) {
+        return fetch(name) != null;
+    }
+
+    public MappingFunction createFunction(String name) {
+        if (hasFunction(name)) throw new RuntimeException("Function already exists: "+name);
+        MappingFunction function = new MappingFunction(name);
+        functions.add(function);
+        return function;
+    }
     
-    public MappingFunction getFunction(String name) {
-        for (MappingFunction existing : functions) if (existing.name.equals(name)) return existing;
-        MappingFunction fresh = new MappingFunction(name);
-        functions.add(fresh);
-        return fresh;
+    public void removeFunction(MappingFunction function) {
+        functions.remove(function);
     }
 
     public RecDefTree getRecDefTree() {
@@ -120,6 +120,11 @@ public class RecMapping {
 
     public String toString() {
         return stream().toXML(this);
+    }
+
+    private MappingFunction fetch(String name) {
+        for (MappingFunction existing : functions) if (existing.name.equals(name)) return existing;
+        return null;
     }
 
     private void resolve() {
@@ -139,7 +144,7 @@ public class RecMapping {
     public static RecMapping create(String prefix, RecDefModel recDefModel) throws MetadataException {
         return new RecMapping(prefix, recDefModel.createRecDef(prefix));
     }
-    
+
     public static RecMapping read(File file, RecDefModel recDefModel) throws MetadataException {
         InputStream is = null;
         try {
@@ -170,7 +175,7 @@ public class RecMapping {
         recMapping.resolve();
         return recMapping;
     }
-    
+
     public static void write(File file, RecMapping recMapping) {
         OutputStream os = null;
         try {

@@ -65,10 +65,6 @@ public class RecMappingFrame extends FrameBase {
         });
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
-            public void factChanged(MappingModel mappingModel, String name) {
-            }
-
-            @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             }
 

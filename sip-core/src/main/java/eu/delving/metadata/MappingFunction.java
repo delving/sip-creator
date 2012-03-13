@@ -26,8 +26,6 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -44,7 +42,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
 
     @XStreamAlias("sample-input")
     public List<String> sampleInput;
-    
+
     @XStreamAlias("groovy-code")
     public List<String> groovyCode;
 
@@ -56,24 +54,13 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public void setSampleInput(String sampleInput) {
-        this.sampleInput = Arrays.asList(sampleInput.split("\n"));
+        this.sampleInput = null;
+        for (String line : sampleInput.split("\n")) addSampleLine(line);
     }
 
     public void setGroovyCode(String groovyCode) {
         this.groovyCode = null;
         for (String line : groovyCode.split("\n")) addCodeLine(line);
-    }
-
-    public boolean isCodeLike(String codeString) {
-        if (groovyCode == null) return false;
-        Iterator<String> walk = groovyCode.iterator();
-        for (String line : codeString.split("\n")) {
-            line = line.trim();
-            if (line.isEmpty()) continue;
-            if (!walk.hasNext()) return false;
-            if (!walk.next().equals(line)) return false;
-        }
-        return !walk.hasNext();
     }
 
     public String getSampleInputString() {
@@ -95,7 +82,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
         toCode(out, editedCode);
         return out.toString();
     }
-    
+
     public void toCode(Out out) {
         toCode(out, null);
     }
@@ -124,9 +111,27 @@ public class MappingFunction implements Comparable<MappingFunction> {
         if (!line.isEmpty()) groovyCode.add(line);
     }
 
+    private void addSampleLine(String line) {
+        if (sampleInput == null) sampleInput = new ArrayList<String>();
+        line = line.trim();
+        if (!line.isEmpty()) sampleInput.add(line);
+    }
 
     public String toString() {
-        return name + "(it)";
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MappingFunction function = (MappingFunction) o;
+        return !(name != null ? !name.equals(function.name) : function.name != null);
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 
     @Override

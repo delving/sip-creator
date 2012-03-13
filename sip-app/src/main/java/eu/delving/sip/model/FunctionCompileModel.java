@@ -95,10 +95,8 @@ public class FunctionCompileModel {
         });
     }
 
-    public void setFunctionName(String functionName) {
-        if (mappingModel.hasRecMapping()) {
-            this.mappingFunction = mappingModel.getRecMapping().getFunction(functionName);
-        }
+    public void setFunction(MappingFunction mappingFunction) {
+        this.mappingFunction = mappingFunction;
         Exec.swing(new DocumentSetter(inputDocument, getSampleInput(), true));
         Exec.swing(new DocumentSetter(codeDocument, getOriginalCode(), true));
         notifyStateChange(State.ORIGINAL);
