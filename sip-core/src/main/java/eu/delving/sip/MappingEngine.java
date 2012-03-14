@@ -42,8 +42,7 @@ public class MappingEngine {
     private MetadataRecordFactory metadataRecordFactory;
     private MappingRunner mappingRunner;
 
-    public MappingEngine(String mapping, ClassLoader classLoader, RecDefModel recDefModel)
-            throws FileNotFoundException, MetadataException {
+    public MappingEngine(String mapping, ClassLoader classLoader, RecDefModel recDefModel) throws FileNotFoundException, MetadataException {
         RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
         mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
@@ -56,13 +55,14 @@ public class MappingEngine {
     }
 
     public IndexDocument toIndexDocument(String originalRecord) throws MappingException, SAXException {
+        if (!mappingRunner.getRecDefTree().getRecDef().flat) throw new RuntimeException("Recdef must be flat to produce an IndexDocument");
         try {
             MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
             Node outputRecord = mappingRunner.runMapping(metadataRecord);
             return IndexDocument.fromNode(outputRecord, mappingRunner.getRecDefTree());
         }
         catch (DiscardRecordException e) {
-            return null;
+            throw new MappingException(null, "Discarded record should have been marked before upload!", e);
         }
         catch (XMLStreamException e) {
             throw new MappingException(null, "XML Streaming problem!", e);

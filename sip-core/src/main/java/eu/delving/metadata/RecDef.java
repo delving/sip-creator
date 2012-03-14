@@ -82,6 +82,9 @@ public class RecDef {
     @XStreamAsAttribute
     public String prefix;
 
+    @XStreamAsAttribute
+    public boolean flat;
+
     public List<Namespace> namespaces;
 
     public List<Attr> attrs;

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * This is an object which contains the output of mapping/validation followed by
+ * This is an object which contains the output of mapping followed by
  * some path munging, so that it can be used as food for the indexing machine.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
@@ -51,14 +51,8 @@ public class IndexDocument {
                 case Node.TEXT_NODE:
                     throw new RuntimeException("Text Nodes not implemented");
                 case Node.ELEMENT_NODE:
-                    NodeList grandKid = kid.getChildNodes();
-                    if (grandKid.getLength() != 1) throw new RuntimeException("Expected only one grandchild node");
-                    Node textNode = grandKid.item(0);
-                    if (textNode.getNodeType() != Node.TEXT_NODE) throw new RuntimeException("Expected text grandchild node");
-                    Path path = Path.empty().extend(Tag.element(recordDefinition.getRecDef().prefix, "record"));
-                    path = path.extend(Tag.element(kid.getPrefix(), kid.getLocalName()));
-                    RecDefNode recDefNode = recordDefinition.getRecDefNode(path);
-                    if (recDefNode == null) throw new RuntimeException("No recdef node for "+path);
+                    Node textNode = getTextNode(kid);
+                    RecDefNode recDefNode = getRecDefNode(recordDefinition, kid);
                     doc.put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), textNode.getNodeValue());
                     SummaryField summaryField = recDefNode.getSummaryField();
                     if (summaryField != null) doc.put(summaryField.tag, textNode.getNodeValue());
@@ -68,6 +62,23 @@ public class IndexDocument {
             }
         }
         return doc;
+    }
+
+    private static RecDefNode getRecDefNode(RecDefTree recordDefinition, Node kid) {
+        Path path = Path.empty().
+                extend(Tag.element(recordDefinition.getRecDef().prefix, "record")).
+                extend(Tag.element(kid.getPrefix(), kid.getLocalName()));
+        RecDefNode recDefNode = recordDefinition.getRecDefNode(path);
+        if (recDefNode == null) throw new RuntimeException("No recdef node for " + path);
+        return recDefNode;
+    }
+
+    private static Node getTextNode(Node parent) {
+        NodeList kids = parent.getChildNodes();
+        if (kids.getLength() != 1) throw new RuntimeException("Expected only one grandchild node");
+        Node textNode = kids.item(0);
+        if (textNode.getNodeType() != Node.TEXT_NODE) throw new RuntimeException("Expected text grandchild node");
+        return textNode;
     }
 
     private IndexDocument() {
