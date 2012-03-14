@@ -40,7 +40,7 @@ import java.util.TreeSet;
  */
 
 public class Uniqueness {
-    private static final int HOLD_THRESHOLD = 100000;
+    private static final int HOLD_THRESHOLD = 50000;
     private static final int TEXT_SIZE_LIMIT = 120;
     private Set<String> all = new HashSet<String>(HOLD_THRESHOLD * 3 / 2);
     private File tempFile;

@@ -19,8 +19,9 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.test;
 
+import eu.delving.metadata.Path;
 import junit.framework.Assert;
 import org.junit.Test;
 

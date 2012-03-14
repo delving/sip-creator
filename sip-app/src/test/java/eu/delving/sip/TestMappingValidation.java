@@ -71,25 +71,26 @@ public class TestMappingValidation {
         mock.delete();
     }
 
-//    @Test
-//    public void testLido() throws Exception {
-//        mock.prepareDataset(
-//                "lido",
-//                "/bunch-of-chunks/chunk",
-//                "/bunch-of-chunks/chunk/identi-fire"
-//        );
-//        runFullCycle(2);
-//    }
-//
-//    @Test
-//    public void testEse() throws Exception {
-//        mock.prepareDataset(
-//                "ese",
-//                "/Medialab/Record",
-//                "/Medialab/Record/OBS_GUID"
-//        );
-//        runFullCycle(3);
-//    }
+//    @Ignore
+    @Test
+    public void testLido() throws Exception {
+        mock.prepareDataset(
+                "lido",
+                "/bunch-of-chunks/chunk",
+                "/bunch-of-chunks/chunk/identi-fire"
+        );
+        runFullCycle(2);
+    }
+
+    @Test
+    public void testEse() throws Exception {
+        mock.prepareDataset(
+                "ese",
+                "/Medialab/Record",
+                "/Medialab/Record/OBS_GUID"
+        );
+        runFullCycle(3);
+    }
 
     @Test
     public void testIcn() throws Exception {
@@ -101,15 +102,15 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
-//    @Test
-//    public void testAff() throws Exception {
-//        mock.prepareDataset(
-//                "aff",
-//                "/lido:lidoWrap/lido:lido",
-//                "/lido:lidoWrap/lido:lido/lido:lidoRecID"
-//        );
-//        runFullCycle(2);
-//    }
+    @Test
+    public void testAff() throws Exception {
+        mock.prepareDataset(
+                "aff",
+                "/lido:lidoWrap/lido:lido",
+                "/lido:lidoWrap/lido:lido/lido:lidoRecID"
+        );
+        runFullCycle(2);
+    }
 
     private void runFullCycle(int expectedRecords) throws Exception {
         assertEquals(4, mock.fileCount());
@@ -145,6 +146,8 @@ public class TestMappingValidation {
 
         MetadataParser parser = mock.parser();
         MetadataRecord record = parser.nextRecord();
+        System.out.println(XmlSerializer.toXml(record.getRootNode()));
+
         Node node = mock.runMapping(record);
         System.out.println(XmlSerializer.toXml(node));
 

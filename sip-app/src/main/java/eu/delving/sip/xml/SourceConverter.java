@@ -64,6 +64,8 @@ public class SourceConverter {
     private ProgressListener progressListener;
     private Path path = Path.empty();
     private String unique;
+    private StartElement start;
+    private boolean recordEvents;
     private List<XMLEvent> eventBuffer = new ArrayList<XMLEvent>();
     private List<String> lines = new ArrayList<String>();
     private boolean finished = false;
@@ -84,7 +86,6 @@ public class SourceConverter {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-        StartElement start = null;
         try {
             while (!finished) {
                 XMLEvent event = in.nextEvent();
@@ -100,36 +101,35 @@ public class SourceConverter {
                         out.add(eventFactory.createCharacters("\n"));
                         break;
                     case XMLEvent.START_ELEMENT:
-                        lines.clear();
+                        boolean followsStart = start != null;
                         start = event.asStartElement();
                         path.push(Tag.element(start.getName()));
-                        handleStartElement(start);
+                        handleStartElement(followsStart);
                         if (progressListener != null) progressListener.setProgress(recordCount);
                         break;
                     case XMLEvent.END_ELEMENT:
                         EndElement end = event.asEndElement();
-                        if (!eventBuffer.isEmpty()) {
+                        if (recordEvents) {
                             if (path.equals(recordRootPath)) {
                                 if (unique != null) {
                                     outputRecord(out);
                                     recordCount++;
                                 }
                                 else {
-                                    eventBuffer.clear(); // discard the record
+                                    clearEvents();
                                 }
                             }
                             else {
                                 if (path.equals(uniqueElementPath)) {
                                     unique = StringUtils.join(lines, ' ');
-                                    if (uniqueness.isRepeated(unique)) {
-                                        throw new UniquenessException(uniqueElementPath, recordCount);
-                                    }
+                                    if (uniqueness.isRepeated(unique)) throw new UniquenessException(uniqueElementPath, recordCount);
                                 }
                                 switch (lines.size()) {
                                     case 0:
                                         break;
                                     case 1:
                                         eventBuffer.add(eventFactory.createCharacters(lines.get(0)));
+                                        lines.clear();
                                         break;
                                     default:
                                         Iterator<String> walk = lines.iterator();
@@ -138,15 +138,17 @@ public class SourceConverter {
                                             if (walk.hasNext()) {
                                                 eventBuffer.add(end);
                                                 eventBuffer.add(eventFactory.createCharacters("\n"));
-                                                handleStartElement(start);
+                                                handleStartElement(false);
                                             }
                                         }
+                                        lines.clear();
                                         break;
                                 }
                                 eventBuffer.add(end);
                                 eventBuffer.add(eventFactory.createCharacters("\n"));
                             }
                         }
+                        start = null;
                         path.pop();
                         break;
                     case XMLEvent.END_DOCUMENT:
@@ -158,7 +160,7 @@ public class SourceConverter {
                         break;
                     case XMLEvent.CHARACTERS:
                     case XMLEvent.CDATA:
-                        if (!eventBuffer.isEmpty()) extractLines(event.asCharacters().getData());
+                        if (recordEvents) extractLines(event.asCharacters().getData());
                         break;
                 }
             }
@@ -170,12 +172,14 @@ public class SourceConverter {
         }
     }
 
-    private void handleStartElement(StartElement start) {
-        if (!eventBuffer.isEmpty()) {
+    private void handleStartElement(boolean followsStart) {
+        if (recordEvents) {
+            if (followsStart) eventBuffer.add(eventFactory.createCharacters("\n"));
             eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
         }
         else if (path.equals(recordRootPath)) {
-            eventBuffer.add(eventFactory.createCharacters("\n")); // nonempty: flag that record has started
+            recordEvents = true;
+//            eventBuffer.add(eventFactory.createCharacters("\n")); // nonempty: flag that record has started
             handleRecordAttributes(start);
         }
     }
@@ -190,7 +194,7 @@ public class SourceConverter {
         for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
         out.add(eventFactory.createEndElement("", "", RECORD_TAG));
         out.add(eventFactory.createCharacters("\n"));
-        eventBuffer.clear();
+        clearEvents();
     }
 
     private void handleRecordAttributes(StartElement start) {
@@ -225,5 +229,8 @@ public class SourceConverter {
         }
     }
 
-
+    private void clearEvents() {
+        recordEvents = false;
+        eventBuffer.clear();
+    }
 }

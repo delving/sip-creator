@@ -19,10 +19,11 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.test;
 
 import com.thoughtworks.xstream.XStream;
 import eu.delving.groovy.*;
+import eu.delving.metadata.*;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.w3c.dom.Node;
@@ -198,7 +199,7 @@ public class TestCodeGeneration {
             @Override
             public List<FactDefinition> getFactDefinitions() {
                 try {
-                    InputStream inputStream = getClass().getResource("/facts-definition-list.xml").openStream();
+                    InputStream inputStream = getClass().getResource("/codegen/facts-definition-list.xml").openStream();
                     XStream stream = new XStream();
                     stream.processAnnotations(FactDefinition.class);
                     Reader reader = new InputStreamReader(inputStream, "UTF-8");
@@ -221,7 +222,7 @@ public class TestCodeGeneration {
             public RecDefTree createRecDef(String prefix) {
                 if (!"lido".equals(prefix)) throw new RuntimeException();
                 try {
-                    URL url = getClass().getResource("/test-code-generation-recdef.xml");
+                    URL url = getClass().getResource("/codegen/test-code-generation-recdef.xml");
                     InputStream inputStream = url.openStream();
                     return RecDefTree.create(RecDef.read(inputStream));
                 }

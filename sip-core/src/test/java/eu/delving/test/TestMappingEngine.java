@@ -19,9 +19,10 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip;
+package eu.delving.test;
 
 import eu.delving.groovy.MappingException;
+import eu.delving.sip.MappingEngine;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
