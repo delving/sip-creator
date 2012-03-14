@@ -26,7 +26,9 @@ import eu.delving.metadata.*;
 import eu.delving.sip.IndexDocument;
 import eu.delving.sip.MappingEngine;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -61,6 +63,7 @@ public class TestMappingEngine {
         mappingEngine = new MappingEngine(mapping, classLoader(), new MockRecDefModel());
     }
 
+    @Ignore
     @Test
     public void validateNode() throws IOException, SAXException, MappingException, XMLStreamException {
         Node node = mappingEngine.toNode(string("/flat/test-input.xml"));
@@ -72,6 +75,7 @@ public class TestMappingEngine {
     public void indexDocument() throws IOException, SAXException, MappingException, XMLStreamException {
         IndexDocument indexDocument = mappingEngine.toIndexDocument(string("/flat/test-input.xml"));
         System.out.println(indexDocument);
+        Assert.assertFalse(indexDocument.getMap().isEmpty());
     }
 
     private class MockRecDefModel implements RecDefModel {

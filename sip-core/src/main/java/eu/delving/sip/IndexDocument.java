@@ -22,6 +22,7 @@
 package eu.delving.sip;
 
 import eu.delving.metadata.RecDefTree;
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -41,12 +42,26 @@ public class IndexDocument {
     private Map<String, List<Value>> map = new TreeMap<String, List<Value>>();
 
     public static IndexDocument fromNode(Node inputNode, RecDefTree recordDefinition) {
+//        traverse(inputNode, 0);
         IndexDocument doc = new IndexDocument();
-        NodeList childNodes = inputNode.getChildNodes();
-        for (int walk=0; walk<childNodes.getLength(); walk++) {
-            Node child = childNodes.item(walk);
-            System.out.println(child);
-            // todo: traverse the node tree building the doc
+        NodeList kids = inputNode.getChildNodes();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.ATTRIBUTE_NODE:
+                    throw new RuntimeException("Attributes not implemented");
+                case Node.TEXT_NODE:
+                    throw new RuntimeException("Text Nodes not implemented");
+                case Node.ELEMENT_NODE:
+                    NodeList grandKid = kid.getChildNodes();
+                    if (grandKid.getLength() != 1) throw new RuntimeException("Expected only one grandchild node");
+                    Node textNode = grandKid.item(0);
+                    if (textNode.getNodeType() != Node.TEXT_NODE) throw new RuntimeException("Expected text grandchild node");
+                    doc.put(kid.getNodeName(), textNode.getNodeValue());
+                    break;
+                default:
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
+            }
         }
 //        for (Object nodeObject : traversal) {
 //            Node node = (Node) nodeObject;
@@ -64,6 +79,28 @@ public class IndexDocument {
 //            }
 //        }
         return doc;
+    }
+
+    private static void traverse(Node node, int level) {
+        NodeList childNodes = node.getChildNodes();
+        for (int walk = 0; walk < childNodes.getLength(); walk++) {
+            Node child = childNodes.item(walk);
+            String type = "?";
+            switch (child.getNodeType()) {
+                case Node.ATTRIBUTE_NODE:
+                    type = "attr";
+                    break;
+                case Node.ELEMENT_NODE:
+                    type = "elem";
+                    break;
+                case Node.TEXT_NODE:
+                    type = "text";
+                    break;
+            }
+            String string = String.format("%d: %s: %s = %s", level, type, child.getNodeName(), child.getNodeValue());
+            System.out.println(StringUtils.leftPad(string, level + 1, '\t'));
+            traverse(child, level + 1);
+        }
     }
 
 //    private static String mungePath(QName qname, FieldDefinition fieldDefinition) {
