@@ -21,8 +21,7 @@
 
 package eu.delving.sip;
 
-import eu.delving.metadata.RecDefTree;
-import org.apache.commons.lang.StringUtils;
+import eu.delving.metadata.*;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -42,7 +41,6 @@ public class IndexDocument {
     private Map<String, List<Value>> map = new TreeMap<String, List<Value>>();
 
     public static IndexDocument fromNode(Node inputNode, RecDefTree recordDefinition) {
-//        traverse(inputNode, 0);
         IndexDocument doc = new IndexDocument();
         NodeList kids = inputNode.getChildNodes();
         for (int walk = 0; walk < kids.getLength(); walk++) {
@@ -57,65 +55,20 @@ public class IndexDocument {
                     if (grandKid.getLength() != 1) throw new RuntimeException("Expected only one grandchild node");
                     Node textNode = grandKid.item(0);
                     if (textNode.getNodeType() != Node.TEXT_NODE) throw new RuntimeException("Expected text grandchild node");
-                    doc.put(kid.getNodeName(), textNode.getNodeValue());
+                    Path path = Path.empty().extend(Tag.element(recordDefinition.getRecDef().prefix, "record"));
+                    path = path.extend(Tag.element(kid.getPrefix(), kid.getLocalName()));
+                    RecDefNode recDefNode = recordDefinition.getRecDefNode(path);
+                    if (recDefNode == null) throw new RuntimeException("No recdef node for "+path);
+                    doc.put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), textNode.getNodeValue());
+                    SummaryField summaryField = recDefNode.getSummaryField();
+                    if (summaryField != null) doc.put(summaryField.tag, textNode.getNodeValue());
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
             }
         }
-//        for (Object nodeObject : traversal) {
-//            Node node = (Node) nodeObject;
-//            if (node.value() instanceof List) continue; // not a field
-//            if (node.value() instanceof Node) {
-//                throw new RuntimeException("Expected a text value");
-//            }
-//            FieldDefinition definition = getFieldDefinition(qname, recordDefinition);
-//            String fieldType = definition == null ? null : definition.fieldType;
-//            String value = node.text();
-//            if (fieldType == null) fieldType = "text";
-//            doc.put(String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldType), value);
-//            if (definition != null) {
-//                if (definition.summaryField != null) doc.put(definition.summaryField.tag, value);
-//            }
-//        }
         return doc;
     }
-
-    private static void traverse(Node node, int level) {
-        NodeList childNodes = node.getChildNodes();
-        for (int walk = 0; walk < childNodes.getLength(); walk++) {
-            Node child = childNodes.item(walk);
-            String type = "?";
-            switch (child.getNodeType()) {
-                case Node.ATTRIBUTE_NODE:
-                    type = "attr";
-                    break;
-                case Node.ELEMENT_NODE:
-                    type = "elem";
-                    break;
-                case Node.TEXT_NODE:
-                    type = "text";
-                    break;
-            }
-            String string = String.format("%d: %s: %s = %s", level, type, child.getNodeName(), child.getNodeValue());
-            System.out.println(StringUtils.leftPad(string, level + 1, '\t'));
-            traverse(child, level + 1);
-        }
-    }
-
-//    private static String mungePath(QName qname, FieldDefinition fieldDefinition) {
-//        if (fieldDefinition == null || fieldDefinition.fieldType == null) {
-//            return String.format("%s_%s_text", qname.getPrefix(), qname.getLocalPart());
-//        }
-//        else {
-//            return String.format("%s_%s_%s", qname.getPrefix(), qname.getLocalPart(), fieldDefinition.fieldType);
-//        }
-//    }
-//
-//    private static RecDefNode getFieldDefinition(QName qname, RecordDefinition recordDefinition) {
-//        Path path = new Path().extend(Tag.element("record")).extend(Tag.element(qname.getPrefix(), qname.getLocalPart()));
-//        return recordDefinition.getFieldDefinition(path);
-//    }
 
     private IndexDocument() {
     }
@@ -163,5 +116,27 @@ public class IndexDocument {
         out.append("}\n");
         return out.toString();
     }
+
+//    private static void traverse(Node node, int level) {
+//        NodeList childNodes = node.getChildNodes();
+//        for (int walk = 0; walk < childNodes.getLength(); walk++) {
+//            Node child = childNodes.item(walk);
+//            String type = "?";
+//            switch (child.getNodeType()) {
+//                case Node.ATTRIBUTE_NODE:
+//                    type = "attr";
+//                    break;
+//                case Node.ELEMENT_NODE:
+//                    type = "elem";
+//                    break;
+//                case Node.TEXT_NODE:
+//                    type = "text";
+//                    break;
+//            }
+//            String string = String.format("%d: %s: %s = %s", level, type, child.getNodeName(), child.getNodeValue());
+//            System.out.println(StringUtils.leftPad(string, level + 1, '\t'));
+//            traverse(child, level + 1);
+//        }
+//    }
 }
 

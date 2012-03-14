@@ -25,10 +25,6 @@ package eu.delving.metadata;
  * The fields that will be considered common to all record definitions are marked by this
  * in the record definition.
  *
- * todo: this enum has yet to be integrated into the new RecDef, and it should be done
- * todo: in the form of path -> enum entries so that the list of fields is easy to
- * todo: read and modify and can point to anywhere in the RecDef.
- * 
  * The following summary fields cannot be set in the Record Definition TYPE, HUB_ID, VISIBILITY, OWNER.
  *
  * @author Gerald de Jong <gerald@delving.eu>

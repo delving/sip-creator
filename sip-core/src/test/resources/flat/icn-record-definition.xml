@@ -10,8 +10,8 @@
     </namespaces>
 
     <root tag="record">
-        <elem tag="icn:creatorYearOfBirth"/>
-        <elem tag="icn:creatorYearOfDeath"/>
+        <elem tag="icn:creatorYearOfBirth" fieldType="gumby"/>
+        <elem tag="icn:creatorYearOfDeath" summaryField="DESCRIPTION"/>
         <elem tag="icn:creatorRole"/>
         <elem tag="icn:technique"/>
         <elem tag="icn:material"/>

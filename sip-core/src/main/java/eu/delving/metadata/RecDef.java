@@ -403,6 +403,9 @@ public class RecDef {
         public boolean singular;
 
         @XStreamAsAttribute
+        public String fieldType;
+
+        @XStreamAsAttribute
         public SummaryField summaryField;
 
         @XStreamImplicit

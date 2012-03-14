@@ -75,6 +75,16 @@ public class RecDefNode {
         this.attr = attr;
     }
 
+    public String getFieldType() {
+        if (elem != null && elem.fieldType != null) return elem.fieldType;
+        return "text";
+    }
+
+    public SummaryField getSummaryField() {
+        if (elem != null && elem.summaryField != null) return elem.summaryField;
+        return null;
+    }
+
     public boolean isAttr() {
         return attr != null;
     }
