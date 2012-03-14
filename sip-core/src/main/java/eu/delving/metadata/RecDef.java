@@ -30,9 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class defines the structure of a record definition, and it involves a lot of recursion.
@@ -99,21 +97,11 @@ public class RecDef {
     public List<Doc> docs;
 
     public List<Category> bookmarks;
-
-    private Attr findAttr(Path path) {
-        Attr found = root.findAttr(path, 0);
-        if (found == null) {
-            throw new RuntimeException("No attribute found for path " + path);
-        }
-        return found;
-    }
-
-    private Elem findElem(Path path) {
-        Elem found = root.findElem(path, 0);
-        if (found == null) {
-            throw new RuntimeException("No element found for path " + path);
-        }
-        return found;
+    
+    public Map<String,String> getNamespacesMap() {
+        Map<String, String> ns = new HashMap<String, String>();
+        if (namespaces != null) for (Namespace namespace : namespaces) ns.put(namespace.prefix, namespace.uri);
+        return ns;
     }
 
     public Attr attr(Tag tag) {
@@ -162,6 +150,22 @@ public class RecDef {
     private void collectPaths(Attr attr, Path path, List<Path> paths) {
         path = path.extend(attr.tag);
         paths.add(path);
+    }
+
+    private Attr findAttr(Path path) {
+        Attr found = root.findAttr(path, 0);
+        if (found == null) {
+            throw new RuntimeException("No attribute found for path " + path);
+        }
+        return found;
+    }
+
+    private Elem findElem(Path path) {
+        Elem found = root.findElem(path, 0);
+        if (found == null) {
+            throw new RuntimeException("No element found for path " + path);
+        }
+        return found;
     }
 
     @XStreamAlias("category")

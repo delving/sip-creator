@@ -45,6 +45,7 @@ public class IndexDocument {
         NodeList childNodes = inputNode.getChildNodes();
         for (int walk=0; walk<childNodes.getLength(); walk++) {
             Node child = childNodes.item(walk);
+            System.out.println(child);
             // todo: traverse the node tree building the doc
         }
 //        for (Object nodeObject : traversal) {

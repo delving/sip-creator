@@ -29,13 +29,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.validation.Validator;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.StringReader;
-import java.util.Map;
 
 /**
  * Wrapping the mapping mechanism for easy access from Scala
@@ -46,39 +41,25 @@ import java.util.Map;
 public class MappingEngine {
     private MetadataRecordFactory metadataRecordFactory;
     private MappingRunner mappingRunner;
-    private Validator validator;
-    private long compileTime, parseTime, mapTime, validateTime, outputTime;
 
-    public MappingEngine(String mapping, Map<String, String> namespaces, ClassLoader classLoader, RecDefModel recDefModel, Validator validator) throws FileNotFoundException, MetadataException {
-        RecMapping recordMapping = RecMapping.read(new StringReader(mapping), recDefModel);
+    public MappingEngine(String mapping, ClassLoader classLoader, RecDefModel recDefModel)
+            throws FileNotFoundException, MetadataException {
+        RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
-        long now = System.currentTimeMillis();
-        mappingRunner = new MappingRunner(groovyCodeResource, recordMapping, null);
-        compileTime += System.currentTimeMillis() - now;
-        metadataRecordFactory = new MetadataRecordFactory(namespaces);
-        this.validator = validator;
+        mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
+        metadataRecordFactory = new MetadataRecordFactory(recMapping.getRecDefTree().getRecDef().getNamespacesMap());
     }
 
-    public IndexDocument executeMapping(String originalRecord) throws MappingException, SAXException {
-        return executeMapping(originalRecord, -1);
+    public Node toNode(String originalRecord) throws XMLStreamException, MappingException {
+        MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
+        return mappingRunner.runMapping(metadataRecord);
     }
 
-    public IndexDocument executeMapping(String originalRecord, int recordNumber) throws MappingException, SAXException {
+    public IndexDocument toIndexDocument(String originalRecord) throws MappingException, SAXException {
         try {
-            long now = System.currentTimeMillis();
             MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
-            parseTime += System.currentTimeMillis() - now;
-            now = System.currentTimeMillis();
             Node outputRecord = mappingRunner.runMapping(metadataRecord);
-            mapTime += System.currentTimeMillis() - now;
-            now = System.currentTimeMillis();
-            Source source = new DOMSource(outputRecord);
-            validator.validate(source);
-            validateTime += System.currentTimeMillis() - now;
-            now = System.currentTimeMillis();
-            IndexDocument indexDocument = IndexDocument.fromNode(outputRecord, mappingRunner.getRecDefTree());
-            outputTime += System.currentTimeMillis() - now;
-            return indexDocument;
+            return IndexDocument.fromNode(outputRecord, mappingRunner.getRecDefTree());
         }
         catch (DiscardRecordException e) {
             return null;
@@ -86,19 +67,5 @@ public class MappingEngine {
         catch (XMLStreamException e) {
             throw new MappingException(null, "XML Streaming problem!", e);
         }
-        catch (IOException e) {
-            throw new MappingException(null, "XML Streaming problem!", e);
-        }
     }
-
-    public String toString() {
-        return "MappingEngine {\n" +
-                "\tCompile Time  : " + compileTime + "\n" +
-                "\tParse Time    : " + parseTime + "\n" +
-                "\tMap Time      : " + mapTime + "\n" +
-                "\tValidate Time : " + validateTime + "\n" +
-                "\tOutput Time   : " + outputTime + "\n" +
-                "}\n";
-    }
-
 }

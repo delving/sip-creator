@@ -22,15 +22,28 @@
 package eu.delving.test;
 
 import eu.delving.groovy.MappingException;
+import eu.delving.metadata.*;
+import eu.delving.sip.IndexDocument;
 import eu.delving.sip.MappingEngine;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A unit test of the mapping engine
@@ -43,19 +56,78 @@ public class TestMappingEngine {
     MappingEngine mappingEngine;
 
     @Before
-    public void createMappingEngine() throws IOException {
-        Map<String, String> namespaces = new HashMap<String, String>();
-        String mapping = IOUtils.toString(getClass().getResourceAsStream("/engine/test-mapping.xml"), "UTF-8");
-//        mappingEngine = new MappingEngine(mapping, namespaces, getClass().getClassLoader(), recDefModel, validator);
+    public void createMappingEngine() throws IOException, MetadataException {
+        String mapping = string("/flat/mapping_icn.xml");
+        mappingEngine = new MappingEngine(mapping, classLoader(), new MockRecDefModel());
     }
 
     @Test
-    public void flatMapping() throws IOException, SAXException, MappingException {
-        String inputRecord = IOUtils.toString(getClass().getResourceAsStream("/engine/test-input.xml" ), "UTF-8");
-        String outputRecord = IOUtils.toString(getClass().getResourceAsStream("/engine/test-output.txt" ), "UTF-8");
-        System.out.println(inputRecord);
-        System.out.println(outputRecord);
-//        IndexDocument doc = mappingEngine.executeMapping(inputRecord);
-//        Assert.assertEquals(outputRecord, doc.toString());
+    public void validateNode() throws IOException, SAXException, MappingException, XMLStreamException {
+        Node node = mappingEngine.toNode(string("/flat/test-input.xml"));
+        Source source = new DOMSource(node);
+        validator("/flat/icn-validation.xsd").validate(source);
+    }
+
+    @Test
+    public void indexDocument() throws IOException, SAXException, MappingException, XMLStreamException {
+        IndexDocument indexDocument = mappingEngine.toIndexDocument(string("/flat/test-input.xml"));
+        System.out.println(indexDocument);
+    }
+
+    private class MockRecDefModel implements RecDefModel {
+
+        @Override
+        public List<FactDefinition> getFactDefinitions() {
+            try {
+                return FactDefinition.read(file("/flat/fact-definition-list.xml"));
+            }
+            catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public Set<String> getPrefixes() throws MetadataException {
+            Set<String> prefixes = new TreeSet<String>();
+            prefixes.add("icn");
+            return prefixes;
+        }
+
+        @Override
+        public RecDefTree createRecDef(String prefix) throws MetadataException {
+            return RecDefTree.create(RecDef.read(stream("/flat/icn-record-definition.xml")));
+        }
+    }
+    
+    private Validator validator(String resourcePath) {
+        try {
+            SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+            Schema schema = factory.newSchema(file(resourcePath));
+            return schema.newValidator();
+        }
+        catch (SAXException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private ClassLoader classLoader() {
+        return getClass().getClassLoader();
+    }
+
+    private String string(String resourcePath) {
+        try {
+            return IOUtils.toString(stream(resourcePath), "UTF-8");
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private InputStream stream(String resourcePath) {
+        return getClass().getResourceAsStream(resourcePath);
+    }
+
+    private File file(String resourcePath) {
+        return new File(getClass().getResource(resourcePath).getFile());
     }
 }
