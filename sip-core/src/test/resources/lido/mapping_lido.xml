@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="lido">
+    <facts>
+        <entry>
+            <string>spec</string>
+            <string>lido</string>
+        </entry>
+        <entry>
+            <string>dataProvider</string>
+            <string>Sourcer</string>
+        </entry>
+        <entry>
+            <string>name</string>
+            <string>AFF Test</string>
+        </entry>
+        <entry>
+            <string>rights</string>
+            <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
+        </entry>
+        <entry>
+            <string>provider</string>
+            <string>Testmaister</string>
+        </entry>
+        <entry>
+            <string>language</string>
+            <string>nl</string>
+        </entry>
+        <entry>
+            <string>type</string>
+            <string>IMAGE</string>
+        </entry>
+        <entry>
+            <string>country</string>
+            <string>netherlands</string>
+        </entry>
+    </facts>
+    <functions/>
+    <node-mappings>
+        <node-mapping inputPath="/input/identi-fire" outputPath="/lido:lido/lido:lidoRecID"/>
+        <node-mapping inputPath="/input/identi-fire/@type" outputPath="/lido:lido/lido:lidoRecID/@lido:type"/>
+        <node-mapping inputPath="/input/story" outputPath="/lido:lido/lido:descriptiveMetadata"/>
+        <node-mapping inputPath="/input/story/@xml:lang" outputPath="/lido:lido/lido:descriptiveMetadata/@xml:lang"/>
+        <node-mapping inputPath="/input/story/objectClassificationWrap/objectWorkTypeWrap/objectWorkType" outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectClassificationWrap/lido:objectWorkTypeWrap/lido:objectWorkType"/>
+        <node-mapping inputPath="/input/story/objectIdentificationWrap/titleWrap/titleSet/appellationValue" outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue"/>
+        <node-mapping inputPath="/input/sticker" outputPath="/lido:lido/lido:administrativeMetadata"/>
+        <node-mapping inputPath="/input/sticker/@xml:lang" outputPath="/lido:lido/lido:administrativeMetadata/@xml:lang"/>
+        <node-mapping inputPath="/input/sticker/recordWrap" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordID" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordID"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordID/@type" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordID/@lido:type"/>
+        <node-mapping inputPath="/facts/provider" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordType/lido:term"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordSource/legalBodyName/appellationValue" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordSource/lido:legalBodyName/lido:appellationValue"/>
+    </node-mappings>
+</rec-mapping>

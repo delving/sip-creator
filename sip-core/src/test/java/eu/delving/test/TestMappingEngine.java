@@ -22,13 +22,12 @@
 package eu.delving.test;
 
 import eu.delving.groovy.MappingException;
+import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
 import eu.delving.sip.IndexDocument;
 import eu.delving.sip.MappingEngine;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -55,35 +54,50 @@ import java.util.TreeSet;
 
 public class TestMappingEngine {
 
-    MappingEngine mappingEngine;
-
-    @Before
-    public void createMappingEngine() throws IOException, MetadataException {
-        String mapping = string("/flat/mapping_icn.xml");
-        mappingEngine = new MappingEngine(mapping, classLoader(), new MockRecDefModel());
-    }
-
-    @Ignore
     @Test
-    public void validateNode() throws IOException, SAXException, MappingException, XMLStreamException {
-        Node node = mappingEngine.toNode(string("/flat/test-input.xml"));
+    public void validateTreeNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        MappingEngine mappingEngine = new MappingEngine(mapping("lido"), classLoader(), new MockRecDefModel("lido"));
+        Node node = mappingEngine.toNode(input("lido"));
+        System.out.println(XmlSerializer.toXml(node));
         Source source = new DOMSource(node);
-        validator("/flat/icn-validation.xsd").validate(source);
+        validator("lido").validate(source);
     }
 
     @Test
-    public void indexDocument() throws IOException, SAXException, MappingException, XMLStreamException {
-        IndexDocument indexDocument = mappingEngine.toIndexDocument(string("/flat/test-input.xml"));
+    public void validateFlatNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"));
+        Node node = mappingEngine.toNode(input("icn"));
+        Source source = new DOMSource(node);
+        validator("icn").validate(source);
+    }
+
+    @Test
+    public void indexDocument() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"));
+        IndexDocument indexDocument = mappingEngine.toIndexDocument(input("icn"));
         System.out.println(indexDocument);
         Assert.assertFalse(indexDocument.getMap().isEmpty());
     }
 
+    private String input(String prefix) {
+        return string(String.format("/%s/test-input.xml", prefix));
+    }
+    
+    private String mapping(String prefix) {
+        return string(String.format("/%s/mapping_%s.xml", prefix, prefix));
+    }
+
     private class MockRecDefModel implements RecDefModel {
+        private String prefix;
+
+        private MockRecDefModel(String prefix) {
+            this.prefix = prefix;
+        }
 
         @Override
         public List<FactDefinition> getFactDefinitions() {
             try {
-                return FactDefinition.read(file("/flat/fact-definition-list.xml"));
+                return FactDefinition.read(file(String.format("/%s/fact-definition-list.xml", prefix)));
             }
             catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -99,14 +113,15 @@ public class TestMappingEngine {
 
         @Override
         public RecDefTree createRecDef(String prefix) throws MetadataException {
-            return RecDefTree.create(RecDef.read(stream("/flat/icn-record-definition.xml")));
+            if (!this.prefix.equals(prefix)) throw new RuntimeException();
+            return RecDefTree.create(RecDef.read(stream(String.format("/%s/%s-record-definition.xml", prefix, prefix))));
         }
     }
     
-    private Validator validator(String resourcePath) {
+    private Validator validator(String prefix) {
         try {
             SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-            Schema schema = factory.newSchema(file(resourcePath));
+            Schema schema = factory.newSchema(file(String.format("/%s/%s-validation.xsd", prefix, prefix)));
             return schema.newValidator();
         }
         catch (SAXException e) {

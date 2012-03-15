@@ -78,7 +78,12 @@ public class MetadataRecordFactory {
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                 QName attributeName = input.getAttributeName(walk);
-                                node.attributes().put(attributeName.getLocalPart(), input.getAttributeValue(walk));
+                                if (attributeName.getPrefix() == null || attributeName.getPrefix().isEmpty()) {
+                                    node.attributes().put(attributeName.getLocalPart(), input.getAttributeValue(walk));
+                                }
+                                else {
+                                    node.attributes().put(String.format("%s:%s", attributeName.getPrefix(), attributeName.getLocalPart()), input.getAttributeValue(walk));
+                                }
                             }
                         }
                         value.setLength(0);
