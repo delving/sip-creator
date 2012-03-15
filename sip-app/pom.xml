@@ -31,7 +31,7 @@
     <artifactId>sip-app</artifactId>
     <packaging>jar</packaging>
     <name>SIP-App</name>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <inceptionYear>2008</inceptionYear>
 
     <organization>
@@ -66,7 +66,7 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>0.5.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -127,11 +127,6 @@
             <groupId>org.apache.amber</groupId>
             <artifactId>oauth2-client</artifactId>
         </dependency>
-        <!-- todo: remove the following when DataSetClient is removed -->
-        <dependency>
-            <groupId>org.ostermiller</groupId>
-            <artifactId>utils</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -139,7 +134,7 @@
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>sip-core</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.jnlp</groupId>
@@ -147,12 +142,9 @@
             <version>1.5.0</version>
             <scope>provided</scope>
         </dependency>
-
-        <!--todo: move this dependency when it gets used for real-->
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>stringtemplate</artifactId>
-            <version>3.0</version>
         </dependency>
     </dependencies>
 </project>
