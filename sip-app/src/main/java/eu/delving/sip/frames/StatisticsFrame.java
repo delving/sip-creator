@@ -52,7 +52,7 @@ public class StatisticsFrame extends FrameBase {
     private RandomSampleModel randomSampleModel = new RandomSampleModel();
 
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Statistics", false);
+        super(Which.STATISTICS, desktop, sipModel, "Statistics", false);
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override

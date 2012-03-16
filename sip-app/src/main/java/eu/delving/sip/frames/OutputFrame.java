@@ -46,7 +46,7 @@ import java.awt.Dimension;
 public class OutputFrame extends FrameBase {
 
     public OutputFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(desktop, sipModel, "Output", false);
+        super(Which.OUTPUT, desktop, sipModel, "Output", false);
         sipModel.getRecordCompileModel().setEnabled(false);
     }
 

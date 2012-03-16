@@ -61,7 +61,7 @@ public class FieldMappingFrame extends FrameBase {
     private UndoManager undoManager = new UndoManager();
 
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Field Mapping", false);
+        super(Which.FIELD_MAPPING, desktop, sipModel, "Field Mapping", false);
         try {
             helpView = new JEditorPane(getClass().getResource("/groovy-help.html"));
         }

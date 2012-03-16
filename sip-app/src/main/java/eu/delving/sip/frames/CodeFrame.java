@@ -47,7 +47,7 @@ public class CodeFrame extends FrameBase {
     private JTextArea codeArea = new JTextArea();
 
     public CodeFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Mapping Code", false);
+        super(Which.CODE, desktop, sipModel, "Mapping Code", false);
         codeArea.setFont(new Font("Monospaced", Font.BOLD, 10));
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override

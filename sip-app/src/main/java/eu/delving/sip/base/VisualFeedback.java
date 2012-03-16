@@ -145,7 +145,7 @@ public class VisualFeedback implements Feedback {
     private class LogFrame extends FrameBase {
 
         public LogFrame(JDesktopPane desktop, SipModel sipModel) {
-            super(desktop, sipModel, "Feedback", false);
+            super(Which.LOG, desktop, sipModel, "Feedback", false);
             addInternalFrameListener(new InternalFrameAdapter() {
                 @Override
                 public void internalFrameClosing(InternalFrameEvent internalFrameEvent) {

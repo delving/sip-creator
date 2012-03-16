@@ -72,7 +72,7 @@ public class RecDefFrame extends FrameBase {
     });
 
     public RecDefFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Record Definition", false);
+        super(Which.REC_DEF, desktop, sipModel, "Record Definition", false);
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {

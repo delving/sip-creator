@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<frame-arrangements>
+    <arrangement name="First Contact">
+        <frame where="0011" which="ANALYSIS"/>
+        <frame where="1011" which="STATISTICS"/>
+    </arrangement>
+    <arrangement name="Quick Mapping">
+        <frame where="0011" which="ANALYSIS"/>
+        <frame where="1011" which="CREATE"/>
+        <frame where="2011" which="REC_DEF"/>
+    </arrangement>
+    <arrangement name="Big Picture">
+        <frame where="0011" which="INPUT"/>
+        <frame where="1011" which="OUTPUT"/>
+    </arrangement>
+    <arrangement name="Code Tweaking">
+        <frame where="0011" which="REC_MAPPING"/>
+        <frame where="1031" which="FIELD_MAPPING"/>
+        <frame where="4011" which="INPUT"/>
+    </arrangement>
+    <arrangement name="Deep Delving">
+        <frame where="0011" which="FIELD_MAPPING"/>
+    </arrangement>
+    <arrangement name="Decadent Display">
+        <frame where="0023" which="ANALYSIS"/>
+        <frame where="2013" which="CREATE"/>
+        <frame where="3023" which="REC_DEF"/>
+        <frame where="5024" which="INPUT"/>
+        <frame where="2335" which="FIELD_MAPPING"/>
+        <frame where="5424" which="OUTPUT"/>
+        <frame where="0325" which="REC_MAPPING"/>
+    </arrangement>
+</frame-arrangements>

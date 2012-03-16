@@ -21,6 +21,10 @@
 
 package eu.delving.sip.frames;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
@@ -29,9 +33,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static eu.delving.sip.base.FrameBase.INSETS;
-import static eu.delving.sip.frames.AllFrames.View.*;
 
 /**
  * Hold on to all the frames and manage their arrangemenbt
@@ -40,39 +47,18 @@ import static eu.delving.sip.frames.AllFrames.View.*;
  */
 
 public class AllFrames {
-    private final String CREATE = "create";
-    private final String VIEW_PREF = "currentView";
+    private final String VIEW_PREF_PATTERN = "view_%s";
+    private final String CURRENT_VIEW_PREF = "currentView";
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
     private FrameBase[] frames;
-    private Arrangement[] views;
+    private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
-    private int viewIndex = 1;
-    private View current = CLEAR;
+    private String currentView = "";
     private SipModel sipModel;
 
-    public enum View {
-        CLEAR("Clear"),
-        FIRST_CONTACT("First contact"),
-        QUICK_MAPPING("Quick mapping"),
-        BIG_PICTURE("Big Picture"),
-        CODE_TWEAKING("Code tweaking"),
-        DEEP_DELVING("Deep delving"),
-        DECADENT_DISPLAY("Decadant Display"),
-        PROJECTOR("Projector");
-
-        private String name;
-
-        View(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
     private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
+        final String CREATE = "create";
         analysis.getActionMap().put(CREATE, create.getAction());
         analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
@@ -101,55 +87,34 @@ public class AllFrames {
                 fieldMapping,
                 output
         };
-        this.views = new Arrangement[]{
-                view(FIRST_CONTACT,
-                        block(analysis, 0, 0),
-                        block(statistics, 1, 0)
-                ),
-                view(QUICK_MAPPING,
-                        block(analysis, 0, 0),
-                        block(create, 1, 0),
-                        block(recDef, 2, 0)
-                ),
-                view(BIG_PICTURE,
-                        block(input, 0, 0),
-                        block(output, 1, 0)
-                ),
-                view(CODE_TWEAKING,
-                        block(recMapping, 0, 0),
-                        block(fieldMapping, 1, 0, 3, 1),
-                        block(input, 4, 0)
-                ),
-                view(DEEP_DELVING,
-                        block(fieldMapping, 0, 0)
-                ),
-                view(DECADENT_DISPLAY,
-                        block(analysis, 0, 0, 2, 3),
-                        block(create, 2, 0, 1, 3),
-                        block(recDef, 3, 0, 2, 3),
-                        block(input, 5, 0, 2, 4),
-                        block(fieldMapping, 2, 3, 3, 5),
-                        block(output, 5, 4, 2, 4),
-                        block(recMapping, 0, 3, 2, 5)
-                ),
-                view(PROJECTOR,
-                        block(analysis, 0, 0),
-                        block(create, 0, 0),
-                        block(statistics, 0, 0),
-                        block(input, 0, 0),
-                        block(fieldMapping, 0, 0),
-                        block(output, 0, 0),
-                        block(recMapping, 0, 0)
-                ),
-                view(CLEAR)
-        };
+        try {
+            InputStream inputStream = getClass().getResource("/frame-arrangements.xml").openStream();
+            addFrameArrangements(inputStream);
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Initializing views");
+        }
+    }
+
+    private void addFrameArrangements(InputStream inputStream) {
+        XStream stream = new XStream();
+        stream.processAnnotations(FrameArrangements.class);
+        FrameArrangements views = (FrameArrangements) stream.fromXML(inputStream);
+        int viewIndex = 0;
+        for (XArrangement view : views.arrangements) {
+            Arrangement arrangement = new Arrangement(view, viewIndex++);
+            for (XFrame frame : view.frames) {
+                arrangement.blocks.add(block(frame.getX(), frame.getY(), frame.getW(), frame.getH(), frame.which));
+            }
+            arrangements.add(arrangement);
+        }
     }
 
     public Runnable prepareForNothing() {
         return new Runnable() {
             @Override
             public void run() {
-                select(View.CLEAR);
+                selectView("");
             }
         };
     }
@@ -158,7 +123,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                select(component.getSize().width > 1600 ? DECADENT_DISPLAY : QUICK_MAPPING);
+                selectView(component.getSize().width > 1600 ? "Decadent Display" : "Quick Mapping");
             }
         };
     }
@@ -167,7 +132,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                select(component.getSize().width > 1600 ? DECADENT_DISPLAY : BIG_PICTURE);
+                selectView(component.getSize().width > 1600 ? "Decadent Display" : "Big Picture");
             }
         };
     }
@@ -176,7 +141,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                select(View.FIRST_CONTACT);
+                selectView("First Contact");
             }
         };
     }
@@ -185,7 +150,7 @@ public class AllFrames {
         Exec.swingLater(new Runnable() {
             @Override
             public void run() {
-                select(View.valueOf(sipModel.getPreferences().get(VIEW_PREF, CLEAR.toString())));
+                selectView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
             }
         });
     }
@@ -202,7 +167,7 @@ public class AllFrames {
 
     public JMenu getViewMenu() {
         JMenu menu = new JMenu("View");
-        for (Action action : views) {
+        for (Action action : arrangements) {
             menu.add(action);
         }
         return menu;
@@ -212,7 +177,7 @@ public class AllFrames {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBorder(BorderFactory.createTitledBorder("Views"));
-        for (Arrangement a : views) {
+        for (Arrangement a : arrangements) {
             JButton b = new JButton(a);
             b.setHorizontalTextPosition(JButton.CENTER);
             b.setVerticalTextPosition(JButton.BOTTOM);
@@ -224,34 +189,29 @@ public class AllFrames {
         return p;
     }
 
-    private void select(View view) {
-        if (current == view) return;
-        for (Arrangement arrangement : views) {
-            if (arrangement.view == view) {
+    private FrameBase frame(FrameBase.Which which) {
+        for (FrameBase frame : frames) if (frame.getWhich() == which) return frame;
+        throw new RuntimeException(which + " not found");
+    }
+
+    private void selectView(String viewName) {
+        if (currentView.equals(viewName)) return;
+        for (Arrangement arrangement : arrangements) {
+            if (arrangement.toString().equals(viewName)) {
                 arrangement.actionPerformed(null);
-                sipModel.getFeedback().say(String.format("Selecting view %s", view.getName()));
+                sipModel.getFeedback().say(String.format("Selecting view %s", arrangement));
                 return;
             }
         }
-        for (FrameBase frame : frames) {
-            frame.closeFrame();
-        }
-        current = CLEAR;
+        for (FrameBase frame : frames) frame.closeFrame();
+        currentView = "";
     }
 
-    private Arrangement view(View view, Block... blocks) {
-        return new Arrangement(view, viewIndex++, blocks);
+    private Block block(int x, int y, int w, int h, FrameBase.Which which) {
+        return new Block(frame(which), x, y, w, h);
     }
 
-    private Block block(FrameBase frame, int x, int y) {
-        return block(frame, x, y, 1, 1);
-    }
-
-    private Block block(FrameBase frame, int x, int y, int w, int h) {
-        return new Block(frame, x, y, w, h);
-    }
-
-    private class Situation implements FrameBase.Placement {
+    private static class Situation implements FrameBase.Placement {
         private Point location;
         private Dimension size;
 
@@ -269,7 +229,7 @@ public class AllFrames {
         }
     }
 
-    private class Block {
+    private static class Block {
         FrameBase frame;
         int x, y, w, h;
 
@@ -308,12 +268,10 @@ public class AllFrames {
     }
 
     private class Arrangement extends AbstractAction {
-        View view;
-        Block[] blocks;
+        List<Block> blocks = new ArrayList<Block>();
 
-        Arrangement(View view, int viewIndex, Block[] blocks) {
-            super(view.getName());
-            this.view = view;
+        Arrangement(XArrangement view, int viewIndex) {
+            super(view.name);
             putValue(
                     Action.ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -341,12 +299,15 @@ public class AllFrames {
             for (Block block : blocks) {
                 block.frame.openFrame();
             }
-            sipModel.getPreferences().put(VIEW_PREF, (current = view).toString());
+            sipModel.getPreferences().put(CURRENT_VIEW_PREF, currentView = toString());
         }
 
+        public String toString() {
+            return (String) this.getValue(Action.NAME);
+        }
     }
 
-    private class ViewIcon implements Icon {
+    private static class ViewIcon implements Icon {
         private Arrangement a;
         private Dimension size;
 
@@ -378,6 +339,50 @@ public class AllFrames {
         @Override
         public int getIconHeight() {
             return size.height + 4;
+        }
+    }
+
+    @XStreamAlias("frame-arrangements")
+    public static class FrameArrangements {
+        @XStreamImplicit
+        List<XArrangement> arrangements;
+    }
+
+    @XStreamAlias("arrangement")
+    public static class XArrangement {
+        @XStreamAsAttribute
+        String name;
+
+        @XStreamImplicit
+        List<XFrame> frames;
+    }
+
+    @XStreamAlias("frame")
+    public static class XFrame {
+        @XStreamAsAttribute
+        String where;
+
+        @XStreamAsAttribute
+        FrameBase.Which which;
+
+        public int getX() {
+            return locVal(0);
+        }
+
+        public int getY() {
+            return locVal(1);
+        }
+
+        public int getW() {
+            return locVal(2);
+        }
+
+        public int getH() {
+            return locVal(3);
+        }
+
+        private int locVal(int index) {
+            return where.charAt(index) - '0';
         }
     }
 }

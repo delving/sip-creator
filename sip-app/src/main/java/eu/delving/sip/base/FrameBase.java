@@ -43,6 +43,7 @@ public abstract class FrameBase extends JInternalFrame {
     public static Insets INSETS = new Insets(2, /* top */ 8, /* left */ 14, /* bottom */ 10 /* right */);
     private static final int DEFAULT_MOVE_INTERVAL = 1000;
     private static final int MARGIN = 12;
+    private Which which;
     private Placement placement;
     protected JDesktopPane desktopPane;
     protected JComponent parent;
@@ -53,13 +54,27 @@ public abstract class FrameBase extends JInternalFrame {
     private boolean initialized;
     private Timer positionTimer;
 
+    public enum Which {
+        ANALYSIS,
+        CREATE,
+        REC_DEF,
+        STATISTICS,
+        INPUT,
+        REC_MAPPING,
+        FIELD_MAPPING,
+        OUTPUT,
+        CODE,
+        LOG,
+        HARVEST,
+    }
+
     public interface Placement {
         Point getLocation();
 
         Dimension getSize();
     }
 
-    public FrameBase(final JComponent parent, SipModel sipModel, String title, boolean modal) {
+    public FrameBase(Which which, final JComponent parent, SipModel sipModel, String title, boolean modal) {
         super(
                 title,
                 true, // resizable
@@ -67,6 +82,7 @@ public abstract class FrameBase extends JInternalFrame {
                 true, // maximizable
                 false // iconifiable
         );
+        this.which = which;
         try {
             setClosed(true);
         }
@@ -107,6 +123,10 @@ public abstract class FrameBase extends JInternalFrame {
                     }
                 }
         );
+    }
+
+    public Which getWhich() {
+        return which;
     }
 
     // override this

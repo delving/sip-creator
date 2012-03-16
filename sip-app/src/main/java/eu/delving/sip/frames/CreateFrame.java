@@ -51,7 +51,7 @@ public class CreateFrame extends FrameBase {
     private CreateMappingAction createMappingAction = new CreateMappingAction();
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Create", false);
+        super(Which.CREATE, desktop, sipModel, "Create", false);
         statsHtml.setHtml(SELECT_STATS);
         recDefHtml.setHtml(SELECT_RECDEF);
         createMappingAction.setEnabled(false);

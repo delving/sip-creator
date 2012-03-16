@@ -74,7 +74,7 @@ public class InputFrame extends FrameBase {
     }
 
     public InputFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Input", false);
+        super(Which.INPUT, desktop, sipModel, "Input", false);
         sipModel.addParseListener(new SipModel.ParseListener() {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {

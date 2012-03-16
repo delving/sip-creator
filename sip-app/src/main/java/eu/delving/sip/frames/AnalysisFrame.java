@@ -67,7 +67,7 @@ public class AnalysisFrame extends FrameBase {
     private Expander expander = new Expander();
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
-        super(desktop, sipModel, "Analysis", false);
+        super(Which.ANALYSIS, desktop, sipModel, "Analysis", false);
         this.statisticsFrame = statisticsFrame;
         statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel()) {
             @Override

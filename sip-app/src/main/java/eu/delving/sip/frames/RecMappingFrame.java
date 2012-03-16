@@ -56,7 +56,7 @@ public class RecMappingFrame extends FrameBase {
     private RemoveNodeMappingAction removeAction = new RemoveNodeMappingAction();
 
     public RecMappingFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(desktop, sipModel, "Node Mappings", false);
+        super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings", false);
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
