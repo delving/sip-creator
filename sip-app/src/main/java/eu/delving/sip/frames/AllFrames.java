@@ -28,11 +28,14 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
+import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -88,8 +91,9 @@ public class AllFrames {
                 output
         };
         try {
-            InputStream inputStream = getClass().getResource("/frame-arrangements.xml").openStream();
-            addFrameArrangements(inputStream);
+            File file = sipModel.getStorage().getFrameArrangementFile();
+            if (!file.exists()) FileUtils.copyFile(new File(getClass().getResource("/frame-arrangements.xml").getFile()), file);
+            addFrameArrangements(new FileInputStream(file));
         }
         catch (IOException e) {
             throw new RuntimeException("Initializing views");

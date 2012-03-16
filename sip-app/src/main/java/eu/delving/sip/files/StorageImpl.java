@@ -89,6 +89,11 @@ public class StorageImpl extends StorageBase implements Storage {
         return new DataSetImpl(directory);
     }
 
+    @Override
+    public File getFrameArrangementFile() {
+        return new File(home, "frame-arrangements.xml");
+    }
+
     public class DataSetImpl implements DataSet, Serializable {
 
         private File here;

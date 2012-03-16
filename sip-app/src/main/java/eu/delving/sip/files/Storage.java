@@ -23,6 +23,7 @@ package eu.delving.sip.files;
 
 import eu.delving.metadata.Path;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -38,6 +39,8 @@ public interface Storage {
     Map<String, DataSet> getDataSets();
 
     DataSet createDataSet(String spec, String organization) throws StorageException;
+
+    File getFrameArrangementFile();
 
     enum FileType {
         IMPORTED("imported.xml.gz"),
