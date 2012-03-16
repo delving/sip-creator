@@ -113,7 +113,7 @@ public class AllFrames {
             arrangement.source = view;
         }
     }
-
+    
     public Runnable prepareForNothing() {
         return new Runnable() {
             @Override
@@ -174,6 +174,8 @@ public class AllFrames {
         for (Action action : arrangements) {
             menu.add(action);
         }
+        menu.addSeparator();
+        menu.add(new EditAction());
         return menu;
     }
 
@@ -316,6 +318,18 @@ public class AllFrames {
                     }
                 }
             });
+        }
+    }
+    
+    private class EditAction extends AbstractAction {
+        public EditAction() {
+            super("Edit Frame Arrangements");
+        }
+
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            for (FrameBase frame : frames) frame.toggleEditMenu();
         }
     }
 

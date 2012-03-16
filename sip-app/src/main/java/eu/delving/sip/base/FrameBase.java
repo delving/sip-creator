@@ -126,8 +126,6 @@ public abstract class FrameBase extends JInternalFrame {
                     }
                 }
         );
-// todo: make it an action in the main menu to add these       addEditMenu();
-//        addEditMenu();
     }
 
     public void setArrangementSource(AllFrames.XArrangement arrangement, Runnable arrange) {
@@ -135,12 +133,18 @@ public abstract class FrameBase extends JInternalFrame {
         this.arrange = arrange;
     }
 
-    public void addEditMenu() {
-        JMenuBar bar = new JMenuBar();
-        JMenu menu = new JMenu("Edit");
-        menu.add(new EditAction());
-        bar.add(menu);
-        setJMenuBar(bar);
+    public void toggleEditMenu() {
+        if (getJMenuBar() == null) {
+            JMenuBar bar = new JMenuBar();
+            JMenu menu = new JMenu("Edit");
+            menu.add(new EditAction());
+            bar.add(menu);
+            setJMenuBar(bar);
+        }
+        else {
+            setJMenuBar(null);
+        }
+        validateTree();
     }
 
     public Which getWhich() {
@@ -191,7 +195,8 @@ public abstract class FrameBase extends JInternalFrame {
         public void actionPerformed(ActionEvent actionEvent) {
             if (isShowing()) {
                 closeFrame();
-            } else {
+            }
+            else {
                 openFrame();
             }
         }
