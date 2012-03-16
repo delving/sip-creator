@@ -59,6 +59,7 @@ public abstract class FrameBase extends JInternalFrame {
     private AllFrames.XArrangement arrangement;
     private List<AdjustAction> adjustActions = new ArrayList<AdjustAction>();
     private Runnable arrange;
+    private String title;
 
     public enum Which {
         ANALYSIS,
@@ -88,6 +89,7 @@ public abstract class FrameBase extends JInternalFrame {
                 true, // maximizable
                 false // iconifiable
         );
+        this.title = title;
         this.which = which;
         try {
             setClosed(true);
@@ -138,7 +140,6 @@ public abstract class FrameBase extends JInternalFrame {
     public void setArrangementSource(AllFrames.XArrangement arrangement, Runnable arrange) {
         this.arrangement = arrangement;
         this.arrange = arrange;
-        for (AdjustAction action : adjustActions) action.setName();
     }
 
     public void toggleEditMenu() {
@@ -148,9 +149,17 @@ public abstract class FrameBase extends JInternalFrame {
             for (AdjustAction action : adjustActions) menu.add(action);
             bar.add(menu);
             setJMenuBar(bar);
+            AllFrames.XFrame frame = frame();
+            if (frame != null && getJMenuBar() != null) {
+                setTitle(String.format("%s ( X=%c Y=%c W=%c H=%c )", title, frame.where.charAt(0), frame.where.charAt(1), frame.where.charAt(2), frame.where.charAt(3)));
+            }
+            else {
+                setTitle(title);
+            }
         }
         else {
             setJMenuBar(null);
+            setTitle(title);
         }
         validateTree();
     }
@@ -457,17 +466,11 @@ public abstract class FrameBase extends JInternalFrame {
         private int direction;
 
         private AdjustAction(int position, int direction) {
+            super("XYWH".charAt(position) + (direction > 0 ? "+" : "-"));
             this.position = position;
             this.direction = direction;
         }
         
-        private void setName() {
-            AllFrames.XFrame frame = frame();
-            if (frame == null) return;
-            String name = String.format("%c%s (%c)","XYWH".charAt(position), (direction > 0 ? "+" : "-"), frame.where.charAt(position));
-            putValue(Action.NAME, name);
-        }
-
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             AllFrames.XFrame frame = frame();
@@ -498,13 +501,13 @@ public abstract class FrameBase extends JInternalFrame {
             arrange.run();
         }
 
-        private AllFrames.XFrame frame() {
-            AllFrames.XFrame frame = null;
-            for (AllFrames.XFrame maybe : arrangement.frames) {
-                if (maybe.which == which) frame = maybe;
-            }
-            return frame;
-        }
     }
 
+    private AllFrames.XFrame frame() {
+        AllFrames.XFrame frame = null;
+        for (AllFrames.XFrame maybe : arrangement.frames) {
+            if (maybe.which == which) frame = maybe;
+        }
+        return frame;
+    }
 }
