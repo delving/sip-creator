@@ -107,10 +107,9 @@ public class AllFrames {
         int viewIndex = 0;
         for (XArrangement view : views.arrangements) {
             Arrangement arrangement = new Arrangement(view, viewIndex++);
-            for (XFrame frame : view.frames) {
-                arrangement.blocks.add(block(frame.getX(), frame.getY(), frame.getW(), frame.getH(), frame.which));
-            }
+            for (XFrame frame : view.frames) arrangement.blocks.add(new Block(frame));
             arrangements.add(arrangement);
+            arrangement.source = view;
         }
     }
 
@@ -180,7 +179,7 @@ public class AllFrames {
     public JPanel getButtonPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBorder(BorderFactory.createTitledBorder("Views"));
+        p.setBorder(BorderFactory.createTitledBorder("Arrangements"));
         for (Arrangement a : arrangements) {
             JButton b = new JButton(a);
             b.setHorizontalTextPosition(JButton.CENTER);
@@ -211,10 +210,6 @@ public class AllFrames {
         currentView = "";
     }
 
-    private Block block(int x, int y, int w, int h, FrameBase.Which which) {
-        return new Block(frame(which), x, y, w, h);
-    }
-
     private static class Situation implements FrameBase.Placement {
         private Point location;
         private Dimension size;
@@ -233,16 +228,13 @@ public class AllFrames {
         }
     }
 
-    private static class Block {
+    private class Block {
+        XFrame original;
         FrameBase frame;
-        int x, y, w, h;
 
-        private Block(FrameBase frame, int x, int y, int w, int h) {
-            this.frame = frame;
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
+        private Block(XFrame frame) {
+            this.original = frame;
+            this.frame = frame(frame.which);
         }
 
         Situation situate(Dimension all, int rows, int cols, boolean useInsets) {
@@ -250,37 +242,37 @@ public class AllFrames {
             int hx = all.height / rows - (all.height % 2);
             if (useInsets) {
                 return new Situation(
-                        new Point(x * wx - INSETS.left, y * hx - INSETS.top),
-                        new Dimension(w * wx + INSETS.left + INSETS.right, h * hx + INSETS.top + INSETS.bottom)
+                        new Point(original.getX() * wx - INSETS.left, original.getY() * hx - INSETS.top),
+                        new Dimension(original.getW() * wx + INSETS.left + INSETS.right, original.getH() * hx + INSETS.top + INSETS.bottom)
                 );
             }
             else {
                 return new Situation(
-                        new Point(x * wx, y * hx),
-                        new Dimension(w * wx, h * hx)
+                        new Point(original.getX() * wx, original.getY() * hx),
+                        new Dimension(original.getW() * wx, original.getH() * hx)
                 );
             }
         }
 
         int rows(int max) {
-            return Math.max(max, y + h);
+            return Math.max(max, original.getY() + original.getH());
         }
 
         int cols(int max) {
-            return Math.max(max, x + w);
+            return Math.max(max, original.getX() + original.getW());
         }
     }
 
     private class Arrangement extends AbstractAction {
         List<Block> blocks = new ArrayList<Block>();
+        public XArrangement source;
 
-        Arrangement(XArrangement view, int viewIndex) {
-            super(view.name);
+        Arrangement(XArrangement source, int viewIndex) {
+            super(source.name);
             putValue(
                     Action.ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
             );
-            this.blocks = blocks;
             putValue(Action.SMALL_ICON, new ViewIcon(this, SMALL_ICON_SIZE));
             putValue(Action.LARGE_ICON_KEY, new ViewIcon(this, LARGE_ICON_SIZE));
         }
@@ -293,17 +285,14 @@ public class AllFrames {
                 rows = block.rows(rows);
                 cols = block.cols(cols);
             }
-            for (FrameBase frame : frames) {
-                frame.closeFrame();
-            }
+            for (FrameBase frame : frames) frame.closeFrame();
             for (Block block : blocks) {
                 Situation situation = block.situate(desktop.getSize(), rows, cols, true);
                 block.frame.setPlacement(situation);
             }
-            for (Block block : blocks) {
-                block.frame.openFrame();
-            }
+            for (Block block : blocks) block.frame.openFrame();
             sipModel.getPreferences().put(CURRENT_VIEW_PREF, currentView = toString());
+            for (FrameBase base : frames) base.setArrangementSource(source, this);
         }
 
         public String toString() {
@@ -355,19 +344,19 @@ public class AllFrames {
     @XStreamAlias("arrangement")
     public static class XArrangement {
         @XStreamAsAttribute
-        String name;
+        public String name;
 
         @XStreamImplicit
-        List<XFrame> frames;
+        public List<XFrame> frames;
     }
 
     @XStreamAlias("frame")
     public static class XFrame {
         @XStreamAsAttribute
-        String where;
+        public String where;
 
         @XStreamAsAttribute
-        FrameBase.Which which;
+        public FrameBase.Which which;
 
         public int getX() {
             return locVal(0);

@@ -21,6 +21,7 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -53,6 +54,8 @@ public abstract class FrameBase extends JInternalFrame {
     protected PopupAction action;
     private boolean initialized;
     private Timer positionTimer;
+    private AllFrames.XArrangement arrangement;
+    private Action arrangeAction;
 
     public enum Which {
         ANALYSIS,
@@ -123,6 +126,20 @@ public abstract class FrameBase extends JInternalFrame {
                     }
                 }
         );
+// todo: make it an action in the main menu to add these       addEditMenu();
+    }
+
+    public void setArrangementSource(AllFrames.XArrangement arrangement, Action action) {
+        this.arrangement = arrangement;
+        this.arrangeAction = action;
+    }
+
+    public void addEditMenu() {
+        JMenuBar bar = new JMenuBar();
+        JMenu menu = new JMenu("Edit");
+        menu.add(new EditAction());
+        bar.add(menu);
+        setJMenuBar(bar);
     }
 
     public Which getWhich() {
@@ -421,4 +438,25 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
+    private class EditAction extends AbstractAction {
+        private EditAction() {
+            super("Edit Positioning");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            AllFrames.XFrame frame = null;
+            for (AllFrames.XFrame maybe : arrangement.frames) {
+                if (maybe.which == which) frame = maybe;
+            }
+            if (frame != null) {
+                String where = JOptionPane.showInputDialog(FrameBase.this, "Position XYWH", frame.where);
+                if (where != null) {
+                    frame.where = where;
+                    // todo: save the frame-arrangements file
+                    arrangeAction.actionPerformed(actionEvent);
+                }
+            }
+        }
+    }
 }
