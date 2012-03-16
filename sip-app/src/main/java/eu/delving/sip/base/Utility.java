@@ -42,18 +42,18 @@ import java.net.URL;
 
 public class Utility {
 
-    public static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-expanded-icon.png"));
-    public static final Icon BOOKMARK_ICON = new ImageIcon(Icon.class.getResource("/icons/bookmark-icon.png"));
-    public static final Icon VALUE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/value-element-icon.png"));
-    public static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(Icon.class.getResource("/icons/composite-element-icon.png"));
-    public static final Icon DOWNLOAD_ICON = new ImageIcon(Icon.class.getResource("/icons/download-icon.png"));
-    public static final Icon UPLOAD_ICON = new ImageIcon(Icon.class.getResource("/icons/upload-icon.png"));
-    public static final Icon ATTRIBUTE_ICON = new ImageIcon(Icon.class.getResource("/icons/attribute-icon.png"));
-    public static final Icon IMPORT_ICON = new ImageIcon(Icon.class.getResource("/icons/import-icon.png"));
-    public static final Icon VALIDATE_ICON = new ImageIcon(Icon.class.getResource("/icons/validate-icon.png"));
-    public static final Icon RELEASE_ICON = new ImageIcon(Icon.class.getResource("/icons/release-icon.png"));
-    public static final Icon REWIND_ICON = new ImageIcon(Icon.class.getResource("/icons/rewind-icon.png"));
-    public static final Icon PLAY_ICON = new ImageIcon(Icon.class.getResource("/icons/play-icon.png"));
+    public static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Utility.class.getResource("/icons/bookmark-expanded-icon.png"));
+    public static final Icon BOOKMARK_ICON = new ImageIcon(Utility.class.getResource("/icons/bookmark-icon.png"));
+    public static final Icon VALUE_ELEMENT_ICON = new ImageIcon(Utility.class.getResource("/icons/value-element-icon.png"));
+    public static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(Utility.class.getResource("/icons/composite-element-icon.png"));
+    public static final Icon DOWNLOAD_ICON = new ImageIcon(Utility.class.getResource("/icons/download-icon.png"));
+    public static final Icon UPLOAD_ICON = new ImageIcon(Utility.class.getResource("/icons/upload-icon.png"));
+    public static final Icon ATTRIBUTE_ICON = new ImageIcon(Utility.class.getResource("/icons/attribute-icon.png"));
+    public static final Icon IMPORT_ICON = new ImageIcon(Utility.class.getResource("/icons/import-icon.png"));
+    public static final Icon VALIDATE_ICON = new ImageIcon(Utility.class.getResource("/icons/validate-icon.png"));
+    public static final Icon RELEASE_ICON = new ImageIcon(Utility.class.getResource("/icons/release-icon.png"));
+    public static final Icon REWIND_ICON = new ImageIcon(Utility.class.getResource("/icons/rewind-icon.png"));
+    public static final Icon PLAY_ICON = new ImageIcon(Utility.class.getResource("/icons/play-icon.png"));
 
     private static final StringTemplateGroup STRING_TEMPLATE = new StringTemplateGroup("Templates");
 
@@ -144,7 +144,7 @@ public class Utility {
             return bs.getCodeBase();
         }
         catch (UnavailableServiceException ue) {
-            return null;
+            throw new RuntimeException("Unable to use JNLP service", ue);
         }
     }
 
