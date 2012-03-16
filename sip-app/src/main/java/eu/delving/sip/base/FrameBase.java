@@ -55,7 +55,7 @@ public abstract class FrameBase extends JInternalFrame {
     private boolean initialized;
     private Timer positionTimer;
     private AllFrames.XArrangement arrangement;
-    private Action arrangeAction;
+    private Runnable arrange;
 
     public enum Which {
         ANALYSIS,
@@ -127,11 +127,12 @@ public abstract class FrameBase extends JInternalFrame {
                 }
         );
 // todo: make it an action in the main menu to add these       addEditMenu();
+//        addEditMenu();
     }
 
-    public void setArrangementSource(AllFrames.XArrangement arrangement, Action action) {
+    public void setArrangementSource(AllFrames.XArrangement arrangement, Runnable arrange) {
         this.arrangement = arrangement;
-        this.arrangeAction = action;
+        this.arrange = arrange;
     }
 
     public void addEditMenu() {
@@ -453,8 +454,7 @@ public abstract class FrameBase extends JInternalFrame {
                 String where = JOptionPane.showInputDialog(FrameBase.this, "Position XYWH", frame.where);
                 if (where != null) {
                     frame.where = where;
-                    // todo: save the frame-arrangements file
-                    arrangeAction.actionPerformed(actionEvent);
+                    arrange.run();
                 }
             }
         }

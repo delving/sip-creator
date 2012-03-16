@@ -52,6 +52,7 @@ public class AllFrames {
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
     private FrameBase[] frames;
+    private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
     private String currentView = "";
@@ -103,9 +104,9 @@ public class AllFrames {
     private void addFrameArrangements(InputStream inputStream) {
         XStream stream = new XStream();
         stream.processAnnotations(FrameArrangements.class);
-        FrameArrangements views = (FrameArrangements) stream.fromXML(inputStream);
+        frameArrangements = (FrameArrangements) stream.fromXML(inputStream);
         int viewIndex = 0;
-        for (XArrangement view : views.arrangements) {
+        for (XArrangement view : frameArrangements.arrangements) {
             Arrangement arrangement = new Arrangement(view, viewIndex++);
             for (XFrame frame : view.frames) arrangement.blocks.add(new Block(frame));
             arrangements.add(arrangement);
@@ -263,7 +264,7 @@ public class AllFrames {
         }
     }
 
-    private class Arrangement extends AbstractAction {
+    private class Arrangement extends AbstractAction implements Runnable {
         List<Block> blocks = new ArrayList<Block>();
         public XArrangement source;
 
@@ -297,6 +298,24 @@ public class AllFrames {
 
         public String toString() {
             return (String) this.getValue(Action.NAME);
+        }
+
+        @Override
+        public void run() {
+            actionPerformed(null);
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    XStream stream = new XStream();
+                    stream.processAnnotations(FrameArrangements.class);
+                    try {
+                        stream.toXML(frameArrangements, new FileOutputStream(sipModel.getStorage().getFrameArrangementFile()));
+                    }
+                    catch (FileNotFoundException e) {
+                        // eat it.
+                    }
+                }
+            });
         }
     }
 
