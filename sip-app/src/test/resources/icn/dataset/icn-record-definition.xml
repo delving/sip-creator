@@ -92,7 +92,7 @@
     </root>
 
     <options>
-        <option-list path="/record/technique"> <!-- no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs -->
+        <option-list valuePath="/record/technique"> <!-- no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs -->
             <opt key="1">Schilderkunst</opt>
             <opt key="2">Prentkunst</opt>
             <opt key="3">Fotografie</opt>

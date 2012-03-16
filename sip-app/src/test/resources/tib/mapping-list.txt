@@ -1,8 +1,8 @@
 /input/creator.date_of_birth
-/record/icn:creatorYearOfBirth
+/record/tib:creatorBirthYear
 
 /input/creator.date_of_death
-/record/icn:creatorYearOfDeath
+/record/tib:creatorDeathYear
 
 /input/priref
 /record/europeana:uri

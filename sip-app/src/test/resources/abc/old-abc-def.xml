@@ -1,102 +1,101 @@
 <?xml version="1.0"?>
-<record-definition prefix="abm">
+<!--
+  ~ Copyright 2011 Delving B.V.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<record-definition prefix="abc">
     <namespaces>
-        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/"
-                   schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
-        <namespace prefix="dcterms" uri="http://purl.org/dc/terms/"
-                   schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
-        <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/"
-                   schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
-        <namespace prefix="ese" uri="http://www.europeana.eu/schemas/ese/"
-                   schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
-        <namespace prefix="abm" uri="http://abmu.org/abm" schema="http://abmu.org/abm.xsd"/>
+        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
+        <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
+        <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
+        <namespace prefix="ese" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
+        <namespace prefix="icn" uri="http://www.icn.nl/" schema="http://www.icn.nl/schemas/ICN-V3.2.xsd"/>
+        <namespace prefix="abc" uri="http://www.ab-c.nl/" schema="http://www.ab-c.nl/schemas/ABC-V3.2.xsd"/>
+
     </namespaces>
+    <!--
+    sortable            => default false; action index also with sort_ prefix in fieldname
+    searchField         => add content of field to each field specified in the list
+    fulldoc             => default true; when set to false the field will no be displayed in the full view
+    briefdoc            => default false; if true store with prefix summ_; if false store with prefix md_* (this means that the fieldContents are not stored)
+    housekeeping        => default false; this field can never be mapped and its value is only used in back-end processes
+    facetPrefix         => this is the prefix used during Solr Query construction for multivalued search
+                           If facetPrefix is non-empty store this field with prefix facet_ to enable its use as facet.
+    facetName           => this is the name used for the facet
+    fieldType           => default text; this value is used to determine the fieldType for the Solr search Engine
+
+    Validation
+
+    multivalued         => default = true; check if field name appears multiple times.
+
+
+    -->
     <root localName="record">
+         <!-- Category AB-C -->
+        <field prefix="abc" localName="titel" summaryField="TITLE"/>
+        <field prefix="abc" localName="birthDate"/>
+        <field prefix="abc" localName="deathDate"/>
+        <field prefix="abc" localName="beginjaar"/>
+        <field prefix="abc" localName="eindjaar"/>
+        <field prefix="abc" localName="objectId"/>
+        <field prefix="abc" localName="dimensionValue"/>
+        <field prefix="abc" localName="dimensionUnit"/>
+        <field prefix="abc" localName="dimension"/>
+        <field prefix="abc" localName="technique"/>
+        <field prefix="abc" localName="material"/>
+        <field prefix="abc" localName="deepzoomUrl"/>
+        <field prefix="abc" localName="smallThumbnail"/>
+        <field prefix="abc" localName="largeThumbnail" summaryField="THUMBNAIL"/>
+        <field prefix="abc" localName="description" summaryField="DESCRIPTION"/>
+        <field prefix="abc" localName="name"/>
+        <field prefix="abc" localName="school"/>
+        <field prefix="abc" localName="onderwerp"/>
+        <field prefix="abc" localName="collection" /> <!--facetName="collectie" facetPrefix="col" sortable="true"-->
+        <field prefix="abc" localName="objectName" /> <!--facetName="object" facetPrefix="obj" sortable="true"-->
+        <field prefix="abc" localName="kunstenaar" summaryField="CREATOR"/> <!--facetName="kunstenaar" facetPrefix="knst" sortable="true"-->
+        <field prefix="abc" localName="production" /> <!--facetName="periode" facetPrefix="per" sortable="true"-->
 
+        <!--  Vervaardiger Velden -->
+        <field prefix="abc" localName="vName"/>
+        <field prefix="abc" localName="vOccuppation"/>
+        <field prefix="abc" localName="vNationality"/>
+        <field prefix="abc" localName="vBirthDate"/>
+        <field prefix="abc" localName="vBirthPlace"/>
+        <field prefix="abc" localName="vDeathDate"/>
+        <field prefix="abc" localName="vDeathPlace"/>
+        <field prefix="abc" localName="vBiography"/>
 
-        <!-- fulldoc default true -->
-        <field prefix="abm" localName="municipality" fieldType="text"/>
-        <field prefix="abm" localName="aboutPerson"/>
-        <field prefix="abm" localName="county"/>
-        <field prefix="abm" localName="namedPlace"/>
-        <field prefix="abm" localName="landedProperty"/>
-        <field prefix="abm" localName="contentProvider"/>
-        <field prefix="abm" localName="address"/>
-        <field prefix="abm" localName="digitised"/>
-        <field prefix="abm" localName="lat"/>
-        <field prefix="abm" localName="long"/>
-        <field prefix="abm" localName="type"/>
-        <field prefix="abm" localName="geo"/>
-
-
-        <field prefix="dc" localName="contributor"/>
-        <field prefix="dc" localName="coverage"/>
-        <field prefix="dc" localName="creator"/>
-        <field prefix="dc" localName="date"/>
-        <!--removed extract year it doesn't belong here -->
-        <field prefix="dc" localName="description" summaryField="DESCRIPTION"/>
-        <field prefix="dc" localName="format"/>
-        <field prefix="dc" localName="identifier"/>
-        <field prefix="dc" localName="language"/>
-        <field prefix="dc" localName="publisher"/>
-        <field prefix="dc" localName="relation"/>
-        <field prefix="dc" localName="rights"/>
-        <field prefix="dc" localName="source"/>
-        <field prefix="dc" localName="subject"/>
-        <field prefix="dc" localName="title" summaryField="TITLE"/>
-        <field prefix="dc" localName="type"/>
-
-
-        <field prefix="dcterms" localName="alternative"/>
-        <field prefix="dcterms" localName="conformsTo"/>
-        <field prefix="dcterms" localName="created"/>
-        <field prefix="dcterms" localName="extent"/>
-        <field prefix="dcterms" localName="hasFormat"/>
-        <field prefix="dcterms" localName="hasPart"/>
-        <field prefix="dcterms" localName="hasVersion"/>
-        <field prefix="dcterms" localName="isFormatOf"/>
-        <field prefix="dcterms" localName="isPartOf"/>
-        <field prefix="dcterms" localName="isReferencedBy"/>
-        <field prefix="dcterms" localName="isReplacedBy"/>
-        <field prefix="dcterms" localName="isRequiredBy"/>
-        <field prefix="dcterms" localName="isVersionOf"/>
-        <field prefix="dcterms" localName="issued"/>
-        <field prefix="dcterms" localName="medium"/>
-        <field prefix="dcterms" localName="provenance"/>
-        <field prefix="dcterms" localName="references"/>
-        <field prefix="dcterms" localName="rightsHolder"/>
-        <field prefix="dcterms" localName="replaces"/>
-        <field prefix="dcterms" localName="requires"/>
-        <field prefix="dcterms" localName="spatial"/>
-        <field prefix="dcterms" localName="tableOfContents"/>
-        <field prefix="dcterms" localName="temporal"/>
-
-
-
+        <!--Europeana Fields-->
         x<field prefix="europeana" localName="collectionName" factName="spec"/>
-        x<field prefix="europeana" localName="collectionTitle" factName="name"/>
+        x<field prefix="europeana" localName="collectionTitle" factName="name" summaryField="SNIPPET"/>
         x<field prefix="europeana" localName="country" factName="country"/>
-        x<field prefix="europeana" localName="dataProvider" factName="dataProvider" summaryField="OWNER"/>
+        x<field prefix="europeana" localName="dataProvider" factName="dataProvider" fieldType="string" summaryField="OWNER"/>
         x<field prefix="europeana" localName="isShownAt" fieldType="string"/>
         x<field prefix="europeana" localName="isShownBy" fieldType="string" summaryField="THUMBNAIL"/>
         x<field prefix="europeana" localName="language" fieldType="string" factName="language"/>
-        <field prefix="europeana" localName="object"/>
-        x<field prefix="europeana" localName="provider" factName="provider"/>
-        x<field prefix="europeana" localName="rights" factName="rights"/>
-        x<field prefix="europeana" localName="source"/>
-        <!-- to be deleted is unused -->
+        x<field prefix="europeana" localName="object" fieldType="string"/>
+        x<field prefix="europeana" localName="provider" factName="provider" fieldType="string"/>
+        x<field prefix="europeana" localName="rights" factName="rights" fieldType="string"/>
+        x<field prefix="europeana" localName="source"/> <!-- to be deleted is unused -->
         x<field prefix="europeana" localName="type" fieldType="string" factName="type"/>
         x<field prefix="europeana" localName="unstored" fieldType="text"/>
-        x<field prefix="europeana" localName="uri" identifierField="true" fieldType="string">
-            <converter call=".toId(spec)"/>
-        </field>
-        <field prefix="europeana" localName="userTag"/>
-        <field prefix="europeana" localName="hasDigitalObject"/>
-        x <field prefix="europeana" localName="year" fieldType="string">
-            <converter multipleOutput="true" call=".extractYear()"/>
+        x<field prefix="europeana" localName="uri" identifierField="true" fieldType="string"/>
+        x<field prefix="europeana" localName="year"  fieldType="string">
+                <converter multipleOutput="true" call=".extractYear()"/>
         </field>
     </root>
-
     <validation>
         assert record.'europeana:collectionTitle'
         assert record.'europeana:country'
@@ -106,6 +105,6 @@
         assert record.'europeana:rights'
         assert record.'europeana:type'
         assert record.'europeana:uri'
-        assert record.'europeana:isShownAt' || record.'europeana:isShownBy'
+        assert isUnique(record.'europeana:uri')
     </validation>
 </record-definition>

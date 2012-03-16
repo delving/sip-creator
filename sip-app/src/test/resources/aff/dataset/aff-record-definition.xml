@@ -65,7 +65,13 @@
 
         <elem tag="places" singular="true">
             <elem tag="place" elems="localId, localUri, roleUri, roleName, sourceName, sourceUri, displayDate">
+                <elem tag="placeType"/>
                 <elem tag="placeName"/>
+                <elem tag="admin1"/>
+                <elem tag="admin2"/>
+                <elem tag="admin3"/>
+                <elem tag="admin4"/>
+                <elem tag="country"/>
                 <elem tag="lat"/>
                 <elem tag="long"/>
             </elem>

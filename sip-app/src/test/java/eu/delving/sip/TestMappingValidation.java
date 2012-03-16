@@ -92,10 +92,20 @@ public class TestMappingValidation {
         runFullCycle(3);
     }
 
+//    @Test
+//    public void testIcn() throws Exception {
+//        mock.prepareDataset(
+//                "icn",
+//                "/recordList/record",
+//                "/recordList/record/priref"
+//        );
+//        runFullCycle(4);
+//    }
+
     @Test
-    public void testIcn() throws Exception {
+    public void testTib() throws Exception {
         mock.prepareDataset(
-                "icn",
+                "tib",
                 "/recordList/record",
                 "/recordList/record/priref"
         );

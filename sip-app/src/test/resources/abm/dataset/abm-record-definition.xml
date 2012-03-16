@@ -1,29 +1,28 @@
 <?xml version="1.0"?>
-<record-definition prefix="icn" flat="true">
+<record-definition prefix="abm" flat="true">
 
     <namespaces>
         <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
         <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
         <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
-        <namespace prefix="icn" uri="http://www.icn.nl/schemas/icn/" schema="ICN-V1.0.xsd"/>
+        <namespace prefix="abm" uri="http://abmu.org/abm" schema="http://abmu.org/abm.xsd"/>
         <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
     </namespaces>
 
     <root tag="record">
-        <elem tag="icn:creatorYearOfBirth"/>
-        <elem tag="icn:creatorYearOfDeath"/>
-        <elem tag="icn:creatorRole"/>
-        <elem tag="icn:technique"/>
-        <elem tag="icn:material"/>
-        <elem tag="icn:location"/>
-        <elem tag="icn:province"/>
-        <elem tag="icn:collectionPart"/>
-        <elem tag="icn:acquisitionMeans"/>
-        <elem tag="icn:collectionType"/>
-        <elem tag="icn:acquisitionYear"/>
-        <elem tag="icn:purchasePrice"/>
-        <elem tag="icn:acquiredWithHelpFrom"/>
-        <elem tag="icn:physicalState"/>
+        <elem tag="abm:municipality"/>
+        <elem tag="abm:aboutPerson"/>
+        <elem tag="abm:county"/>
+        <elem tag="abm:namedPlace"/>
+        <elem tag="abm:landedProperty"/>
+        <elem tag="abm:contentProvider"/>
+        <elem tag="abm:address"/>
+        <elem tag="abm:digitised"/>
+        <elem tag="abm:lat"/>
+        <elem tag="abm:long"/>
+        <elem tag="abm:type"/>
+        <elem tag="abm:geo"/>
+
 
         <elem tag="dc:contributor"/>            <!-- ESE 3.4 -->
         <elem tag="dc:coverage"/>               <!-- ESE 3.4 -->
@@ -73,68 +72,23 @@
         <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
         <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
-
-        <!-- moved from europeana to delving -->
         <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
         <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
         <elem tag="europeana:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
         <elem tag="europeana:source"/>          <!-- NOT part of ESE 3.4 -->
-
-        <!-- original delving namespace -->
-        <elem tag="delving:year"/>
-        <elem tag="delving:thumbnail"/>
-        <elem tag="delving:deepZoomUrl"/>
-        <elem tag="delving:fullTextObjectUrl"/>
-        <elem tag="delving:fullText"/>
-
+        <!-- new -->
+        <elem tag="europeana:userTag"/>
+        <elem tag="europeana:hasDigitalObject"/>
+        <elem tag="europeana:year"/>
     </root>
 
-    <options>
-        <option-list valuePath="/record/technique"> <!-- no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs -->
-            <opt key="1">Schilderkunst</opt>
-            <opt key="2">Prentkunst</opt>
-            <opt key="3">Fotografie</opt>
-            <opt key="4">Tekeningen</opt>
-            <opt key="5">Beeldhouwkunst</opt>
-            <opt key="6">Textiel</opt>
-            <opt key="7">Film/Video/DVD</opt>
-            <opt key="8">Anders:</opt>
-        </option-list>
-        <option-list path="/record/acquisitionMeans">
-            <opt key="1">aankoop</opt>
-            <opt key="2">schenking</opt>
-            <opt key="3">bruikleen</opt>
-            <opt key="4">ruil</opt>
-            <opt key="5">opdracht</opt>
-            <opt key="6">opdracht derden</opt>
-            <opt key="7">opdracht museum</opt>
-            <opt key="8">legaat</opt>
-            <opt key="9">overdracht</opt>
-            <opt key="10">successieregeling</opt>
-            <opt key="11">vondst</opt>
-            <opt key="12">onbekend:</opt>
-        </option-list>
-        <option-list path="/record/collectionType">
-            <opt key="1">all</opt>
-            <opt key="2">portal</opt>
-            <opt key="3">mm</opt>
-        </option-list>
-    </options>
-
     <search>
-        <searchField name="CREATOR" path="/icn:creator"/>
-        <searchField name="TITLE" path="/icn:title"/>
-        <searchField name="DESCRIPTION" path="/icn:description"/>
-        <searchField name="OWNER" path="/icn:dataProvider"/>
-        <searchField name="LANDING_PAGE" path="/icn:isShownAt"/>
-        <searchField name="THUMBNAIL" path="/icn:object"/>
-        <searchField name="THUMBNAIL" path="/icn:thumbnail"/>
-        <searchField name="SNIPPET" path="/icn:fullText"/>
-        <searchField name="SNIPPET" path="/icn:subject"/>
-        <searchField name="SNIPPET" path="/icn:alternative"/>
-        <searchField name="SNIPPET" path="/icn:collectionTitle"/>
+        <searchField name="DESCRIPTION" path="/record/dc:description"/>
+        <searchField name="TITLE" path="/record//dc:title"/>
+        <searchField name="OWNER" path="/record/europeana:dataProvider"/>
+        <searchField name="THUMBNAIL" path="/record/europeana:isShownBy"/>
     </search>
 
     <!--<facts>-->

@@ -20,3 +20,4 @@
     <xs:element name="fullText" type="xs:string"/>
 
 </xs:schema>
+

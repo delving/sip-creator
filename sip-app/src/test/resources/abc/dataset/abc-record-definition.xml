@@ -10,59 +10,39 @@
     </namespaces>
 
     <root tag="record">
-        <elem tag="abm:municipality"/>
-        <elem tag="abm:aboutPerson"/>
-        <elem tag="abm:county"/>
-        <elem tag="abm:namedPlace"/>
-        <elem tag="abm:landedProperty"/>
-        <elem tag="abm:contentProvider"/>
-        <elem tag="abm:address"/>
-        <elem tag="abm:digitised"/>
-        <elem tag="abm:lat"/>
-        <elem tag="abm:long"/>
-        <elem tag="abm:type"/>
-        <elem tag="abm:geo"/>
+        <!-- Category AB-C -->
+        <elem tag="abc:titel" summaryField="TITLE"/>
+        <elem tag="abc:birthDate"/>
+        <elem tag="abc:deathDate"/>
+        <elem tag="abc:beginjaar"/>
+        <elem tag="abc:eindjaar"/>
+        <elem tag="abc:objectId"/>
+        <elem tag="abc:dimensionValue"/>
+        <elem tag="abc:dimensionUnit"/>
+        <elem tag="abc:dimension"/>
+        <elem tag="abc:technique"/>
+        <elem tag="abc:material"/>
+        <elem tag="abc:deepzoomUrl"/>
+        <elem tag="abc:smallThumbnail"/>
+        <elem tag="abc:largeThumbnail" summaryField="THUMBNAIL"/>
+        <elem tag="abc:description" summaryField="DESCRIPTION"/>
+        <elem tag="abc:name"/>
+        <elem tag="abc:school"/>
+        <elem tag="abc:onderwerp"/>
+        <elem tag="abc:collection" /> <!--facetName="collectie" facetPrefix="col" sortable="true"-->
+        <elem tag="abc:objectName" /> <!--facetName="object" facetPrefix="obj" sortable="true"-->
+        <elem tag="abc:kunstenaar" summaryField="CREATOR"/> <!--facetName="kunstenaar" facetPrefix="knst" sortable="true"-->
+        <elem tag="abc:production" /> <!--facetName="periode" facetPrefix="per" sortable="true"-->
 
-
-        <elem tag="dc:contributor"/>            <!-- ESE 3.4 -->
-        <elem tag="dc:coverage"/>               <!-- ESE 3.4 -->
-        <elem tag="dc:creator"/>                <!-- ESE 3.4 -->
-        <elem tag="dc:date"/>                   <!-- ESE 3.4 -->
-        <elem tag="dc:description"/>            <!-- ESE 3.4 -->
-        <elem tag="dc:format"/>                 <!-- ESE 3.4 -->
-        <elem tag="dc:identifier"/>             <!-- ESE 3.4 -->
-        <elem tag="dc:language"/>               <!-- ESE 3.4 -->
-        <elem tag="dc:publisher"/>              <!-- ESE 3.4 -->
-        <elem tag="dc:relation"/>               <!-- ESE 3.4 -->
-        <elem tag="dc:rights"/>                 <!-- ESE 3.4 -->
-        <elem tag="dc:source"/>                 <!-- ESE 3.4 -->
-        <elem tag="dc:subject"/>                <!-- ESE 3.4 -->
-        <elem tag="dc:title"/>                  <!-- ESE 3.4 -->
-        <elem tag="dc:type"/>                   <!-- ESE 3.4 -->
-
-        <elem tag="dcterms:alternative"/>       <!-- ESE 3.4 -->
-        <elem tag="dcterms:conformsTo"/>        <!-- ESE 3.4 -->
-        <elem tag="dcterms:created"/>           <!-- ESE 3.4 -->
-        <elem tag="dcterms:extent"/>            <!-- ESE 3.4 -->
-        <elem tag="dcterms:hasFormat"/>         <!-- ESE 3.4 -->
-        <elem tag="dcterms:hasPart"/>           <!-- ESE 3.4 -->
-        <elem tag="dcterms:hasVersion"/>        <!-- ESE 3.4 -->
-        <elem tag="dcterms:isFormatOf"/>        <!-- ESE 3.4 -->
-        <elem tag="dcterms:isPartOf"/>          <!-- ESE 3.4 -->
-        <elem tag="dcterms:isReferencedBy"/>    <!-- ESE 3.4 -->
-        <elem tag="dcterms:isReplacedBy"/>      <!-- ESE 3.4 -->
-        <elem tag="dcterms:isRequiredBy"/>      <!-- ESE 3.4 -->
-        <elem tag="dcterms:isVersionOf"/>       <!-- ESE 3.4 -->
-        <elem tag="dcterms:issued"/>            <!-- ESE 3.4 -->
-        <elem tag="dcterms:medium"/>            <!-- ESE 3.4 -->
-        <elem tag="dcterms:provenance"/>        <!-- ESE 3.4 -->
-        <elem tag="dcterms:references"/>        <!-- ESE 3.4 -->
-        <elem tag="dcterms:replaces"/>          <!-- ESE 3.4 -->
-        <elem tag="dcterms:requires"/>          <!-- ESE 3.4 -->
-        <elem tag="dcterms:spatial"/>           <!-- ESE 3.4 -->
-        <elem tag="dcterms:tableOfContents"/>   <!-- ESE 3.4 -->
-        <elem tag="dcterms:temporal"/>          <!-- ESE 3.4 -->
-        <elem tag="dcterms:rightsHolder"/>      <!-- NOT part of ESE 3.4 -->
+        <!--  Vervaardiger Velden -->
+        <elem tag="abc:vName"/>
+        <elem tag="abc:vOccuppation"/>
+        <elem tag="abc:vNationality"/>
+        <elem tag="abc:vBirthDate"/>
+        <elem tag="abc:vBirthPlace"/>
+        <elem tag="abc:vDeathDate"/>
+        <elem tag="abc:vDeathPlace"/>
+        <elem tag="abc:vBiography"/>
 
         <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
         <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
@@ -78,15 +58,15 @@
         <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
         <elem tag="europeana:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
         <elem tag="europeana:source"/>          <!-- NOT part of ESE 3.4 -->
-        <!-- new -->
-        <elem tag="europeana:userTag"/>
-        <elem tag="europeana:hasDigitalObject"/>
         <elem tag="europeana:year"/>
     </root>
 
     <search>
-        <searchField name="DESCRIPTION" path="/record/dc:description"/>
-        <searchField name="TITLE" path="/record//dc:title"/>
+        <searchField name="TITLE" path="/record/abc:title"/>
+        <searchField name="THUMBNAIL" path="/record/abc:largeThumbnail"/>
+        <searchField name="DESCRIPTION" path="/record/abc:description"/>
+        <searchField name="CREATOR" path="/record/abc:kunstenaar"/>
+        <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
         <searchField name="OWNER" path="/record/europeana:dataProvider"/>
         <searchField name="THUMBNAIL" path="/record/europeana:isShownBy"/>
     </search>

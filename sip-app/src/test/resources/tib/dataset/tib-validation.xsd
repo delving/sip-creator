@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:icn="http://www.icn.nl/schemas/icn/"
+           xmlns:tib="http://www.tib.nl/schemas/tib/"
            xmlns:delving="http://schemas.delving.eu/"
            xmlns:dc="http://purl.org/dc/elements/1.1/"
            xmlns:dcterms="http://purl.org/dc/terms/"
            xmlns:europeana="http://www.europeana.eu/schemas/ese/"
-           targetNamespace="http://www.icn.nl/schemas/icn/"
+           targetNamespace="http://www.tib.nl/schemas/tib/"
            blockDefault="#all">
 
     <xs:import namespace="http://schemas.delving.eu/" schemaLocation="http://schemas.delving.eu/delving-V1.0.xsd"/>
@@ -64,27 +64,44 @@
     </xs:group>
 
 
-    <xs:element name="record" type="icn:recordType" block="substitution"/>
+    <xs:element name="record" type="tib:recordType" block="substitution"/>
 
     <xs:complexType name="recordType">
         <xs:sequence>
-            <xs:element name="creatorYearOfBirth" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="creatorYearOfDeath" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="creatorRole" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="technique" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="material" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="location" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="province" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="collectionPart" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="acquisitionMeans" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="collectionType" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="acquisitionYear" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="purchasePrice" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="acquiredWithHelpFrom" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="physicalState" minOccurs="0" maxOccurs="unbounded"/>
 
-            <xs:group minOccurs="0" maxOccurs="unbounded" ref="icn:dcGroup" />
-            <xs:group minOccurs="0" maxOccurs="unbounded" ref="icn:dctermsGroup" />
+            <xs:element name="citName" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="citOldId" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="thumbLarge" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="thumbSmall" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="collection" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="creatorRole" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="productionPeriod" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="productionStart" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="productionEnd" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="creatorBirthYear" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="creatorDeathYear" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="formatted" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="year" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="dimension" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="objectNumber" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="objectSoort" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="material" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="place" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="technique" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="date" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="collectionPart" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="person" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="region" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="event" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="theme" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pageStart" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pageEnd" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pages" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="vindplaats" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="location" minOccurs="0" maxOccurs="unbounded"/>
+
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="tib:dcGroup" />
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="tib:dctermsGroup" />
 
             <xs:element ref="europeana:isShownBy" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="europeana:rights" minOccurs="0" maxOccurs="1"/>
@@ -101,12 +118,13 @@
             <xs:element ref="europeana:collectionName" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="europeana:collectionTitle" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="europeana:source" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="europeana:year" minOccurs="0" maxOccurs="unbounded"/>
 
             <xs:element ref="delving:year" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="delving:thumbnail" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:deepZoomUrl" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:fullTextObjectUrl" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:fullText" minOccurs="0" maxOccurs="unbounded"/>
+
         </xs:sequence>
     </xs:complexType>
 
