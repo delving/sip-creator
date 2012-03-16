@@ -171,9 +171,7 @@ public class AllFrames {
 
     public JMenu getViewMenu() {
         JMenu menu = new JMenu("View");
-        for (Action action : arrangements) {
-            menu.add(action);
-        }
+        for (Action action : arrangements) menu.add(action);
         menu.addSeparator();
         menu.add(new EditAction());
         return menu;
@@ -269,6 +267,7 @@ public class AllFrames {
     private class Arrangement extends AbstractAction implements Runnable {
         List<Block> blocks = new ArrayList<Block>();
         public XArrangement source;
+        private ViewIcon small, large;
 
         Arrangement(XArrangement source, int viewIndex) {
             super(source.name);
@@ -276,8 +275,10 @@ public class AllFrames {
                     Action.ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
             );
-            putValue(Action.SMALL_ICON, new ViewIcon(this, SMALL_ICON_SIZE));
-            putValue(Action.LARGE_ICON_KEY, new ViewIcon(this, LARGE_ICON_SIZE));
+            small = new ViewIcon(this, SMALL_ICON_SIZE);
+            putValue(Action.SMALL_ICON, small);
+            large = new ViewIcon(this, LARGE_ICON_SIZE);
+            putValue(Action.LARGE_ICON_KEY, large);
         }
 
         @Override
@@ -305,6 +306,8 @@ public class AllFrames {
         @Override
         public void run() {
             actionPerformed(null);
+            small.refresh();
+            large.refresh();
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
@@ -336,6 +339,7 @@ public class AllFrames {
     private static class ViewIcon implements Icon {
         private Arrangement a;
         private Dimension size;
+        private Component component;
 
         private ViewIcon(Arrangement a, Dimension size) {
             this.a = a;
@@ -344,6 +348,7 @@ public class AllFrames {
 
         @Override
         public void paintIcon(Component component, Graphics graphics, int x, int y) {
+            this.component = component;
             Graphics2D g = (Graphics2D) graphics;
             int rows = 0;
             int cols = 0;
@@ -355,6 +360,7 @@ public class AllFrames {
                 Situation situation = block.situate(size, rows, cols, false);
                 g.drawRect(x + situation.getLocation().x + 1, y + situation.getLocation().y + 1, situation.getSize().width, situation.getSize().height);
             }
+            
         }
 
         @Override
@@ -365,6 +371,10 @@ public class AllFrames {
         @Override
         public int getIconHeight() {
             return size.height + 4;
+        }
+        
+        public void refresh() {
+            component.repaint();
         }
     }
 

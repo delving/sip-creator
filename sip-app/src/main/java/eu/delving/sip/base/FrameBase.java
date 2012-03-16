@@ -33,6 +33,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The base of all windows within the SIP-Creator.
@@ -55,6 +57,7 @@ public abstract class FrameBase extends JInternalFrame {
     private boolean initialized;
     private Timer positionTimer;
     private AllFrames.XArrangement arrangement;
+    private List<AdjustAction> adjustActions = new ArrayList<AdjustAction>();
     private Runnable arrange;
 
     public enum Which {
@@ -95,6 +98,10 @@ public abstract class FrameBase extends JInternalFrame {
         this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title);
+        for (int pos = 0; pos<4; pos++) {
+            adjustActions.add(new AdjustAction(pos, 1));
+            adjustActions.add(new AdjustAction(pos, -1));
+        }
         this.desktopPane = parent instanceof FrameBase ? ((FrameBase) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
         positionTimer = new Timer(DEFAULT_MOVE_INTERVAL,
                 new ActionListener() {
@@ -131,13 +138,14 @@ public abstract class FrameBase extends JInternalFrame {
     public void setArrangementSource(AllFrames.XArrangement arrangement, Runnable arrange) {
         this.arrangement = arrangement;
         this.arrange = arrange;
+        for (AdjustAction action : adjustActions) action.setName();
     }
 
     public void toggleEditMenu() {
         if (getJMenuBar() == null) {
             JMenuBar bar = new JMenuBar();
             JMenu menu = new JMenu("Edit");
-            menu.add(new EditAction());
+            for (AdjustAction action : adjustActions) menu.add(action);
             bar.add(menu);
             setJMenuBar(bar);
         }
@@ -444,24 +452,59 @@ public abstract class FrameBase extends JInternalFrame {
         }
     }
 
-    private class EditAction extends AbstractAction {
-        private EditAction() {
-            super("Edit Positioning");
+    private class AdjustAction extends AbstractAction {
+        private int position;
+        private int direction;
+
+        private AdjustAction(int position, int direction) {
+            this.position = position;
+            this.direction = direction;
+        }
+        
+        private void setName() {
+            AllFrames.XFrame frame = frame();
+            if (frame == null) return;
+            String name = String.format("%c%s (%c)","XYWH".charAt(position), (direction > 0 ? "+" : "-"), frame.where.charAt(position));
+            putValue(Action.NAME, name);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            AllFrames.XFrame frame = frame();
+            if (frame == null) return;
+            StringBuilder out = new StringBuilder();
+            for (int walk=0; walk<4; walk++) {
+                char ch = frame.where.charAt(walk);
+                if (position == walk) {
+                    switch(ch) {
+                        case '0':
+                            out.append((direction < 0 && position <= 1) ? ch : (char)(ch + direction));
+                            break;
+                        case '1':
+                            out.append((direction < 0 && position > 1) ? ch : (char)(ch + direction));
+                            break;
+                        case '9':
+                            out.append((direction > 0) ? ch : (char)(ch + direction));
+                            break;
+                        default :
+                            out.append((char)(ch + direction));
+                    }
+                }
+                else {
+                    out.append(frame.where.charAt(walk));
+                }
+            }
+            frame.where = out.toString();
+            arrange.run();
+        }
+
+        private AllFrames.XFrame frame() {
             AllFrames.XFrame frame = null;
             for (AllFrames.XFrame maybe : arrangement.frames) {
                 if (maybe.which == which) frame = maybe;
             }
-            if (frame != null) {
-                String where = JOptionPane.showInputDialog(FrameBase.this, "Position XYWH", frame.where);
-                if (where != null) {
-                    frame.where = where;
-                    arrange.run();
-                }
-            }
+            return frame;
         }
     }
+
 }
