@@ -288,6 +288,7 @@ public class SipModel {
                 catch (final Exception e) {
                     completion.complete(false);
                     feedback.alert(String.format("Unable to switch to data set %s", dataSet.getSpec()), e);
+                    // todo: find out how this can repeat endlessly!
                     dataSetModel.clearDataSet();
                 }
             }
