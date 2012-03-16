@@ -34,6 +34,11 @@
     <xs:element name="collectionName"/>
     <xs:element name="collectionTitle"/>
     <xs:element name="source"/>
+    <!--for abm -->
+    <xs:element name="europeana:userTag"/>
+    <xs:element name="europeana:hasDigitalObject"/>
+    <xs:element name="europeana:year"/>
+
 
 
 </xs:schema>
