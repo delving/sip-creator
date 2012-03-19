@@ -87,6 +87,10 @@ public class RecDef {
 
     public List<Namespace> namespaces;
 
+    public List<Role> roles;
+
+    public List<View> views;
+
     public List<Attr> attrs;
 
     public List<Elem> elems;
@@ -368,6 +372,53 @@ public class RecDef {
 
         @XStreamAsAttribute
         public String uri;
+    }
+
+    @XStreamAlias("role")
+    public static class Role {
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamAsAttribute
+        public String i18n;
+    }
+
+    @XStreamAlias("view")
+    public static class View {
+
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamImplicit
+        public List<Row> rows;
+    }
+
+    @XStreamAlias("row")
+    public static class Row {
+        @XStreamImplicit
+        public List<Column> columns;
+    }
+
+    @XStreamAlias("column")
+    public static class Column {
+
+        @XStreamAsAttribute
+        public String id;
+
+        @XStreamImplicit
+        public List<FieldRef> refs;
+    }
+
+    @XStreamAlias("field-ref")
+    public static class FieldRef {
+        @XStreamAsAttribute
+        public Path path;
+
+        @XStreamAsAttribute
+        public String i18n;
+
+        @XStreamAsAttribute
+        public String roles;
     }
 
     @XStreamAlias("attr")

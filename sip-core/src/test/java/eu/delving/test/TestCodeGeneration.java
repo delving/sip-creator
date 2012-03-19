@@ -71,6 +71,14 @@ public class TestCodeGeneration {
 
     @Test
     public void cornucopia() throws MappingException {
+        Assert.assertNotNull(recMapping.getRecDefTree().getRecDef().roles);
+        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().roles.size());
+        Assert.assertNotNull(recMapping.getRecDefTree().getRecDef().views);
+        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().views.size());
+        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().views.get(0).rows.size());
+        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().views.get(0).rows.get(0).columns.size());
+        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().views.get(0).rows.get(0).columns.get(0).refs.size());
+
         recMapping.setFact("dogExists", "true");
 
         node("/lido/@sortorder").addNodeMapping(mapping("/input/leadup/@orderofsort"));

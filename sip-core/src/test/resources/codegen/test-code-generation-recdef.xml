@@ -4,6 +4,20 @@
         <namespace prefix="lido" uri="http://www.lido-schema.org" schema=""/>
     </namespaces>
 
+    <roles>
+        <role name="admin" i18n="roles.administrator"/>
+    </roles>
+
+    <views>
+        <view name="gumby">
+            <row>
+                <column id="pokey">
+                    <field-ref path="/path/to/price" i18n="prompts.price" role="admin"/>
+                </column>
+            </row>
+        </view>
+    </views>
+
     <attrs>
         <attr tag="relatedencoding"/>
         <attr tag="type"/>
