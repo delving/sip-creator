@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  */
 
 public class StorageFinder {
-    private static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "SIPCreatorWorkspace");
+    private static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "DelvingSIPCreator");
     private static final Pattern HPU_HUMAN = Pattern.compile("([A-Za-z0-9.-]+):([0-9]+)/([A-Za-z0-9]+)");
     private static final Pattern HPU_DIRECTORY = Pattern.compile("([A-Za-z0-9_-]+)__([0-9]+)___([A-Za-z0-9]+)");
 
