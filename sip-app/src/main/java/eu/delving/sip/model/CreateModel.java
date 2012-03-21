@@ -123,6 +123,7 @@ public class CreateModel {
     public boolean isDictionaryPossible() {
         if (nodeMapping == null || recDefTreeNode == null|| nodeMapping.statsTreeNodes == null || nodeMapping.statsTreeNodes.size() != 1) return false;
         StatsTreeNode statsTreeNode = (StatsTreeNode) nodeMapping.statsTreeNodes.iterator().next();
+        if (statsTreeNode.getStatistics() == null) return false;
         Set<String> values = statsTreeNode.getStatistics().getHistogramValues();
         List<RecDef.Opt> options = recDefTreeNode.getRecDefNode().getOptions();
         return values != null && options != null && nodeMapping.dictionary == null;

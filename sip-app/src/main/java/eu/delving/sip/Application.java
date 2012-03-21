@@ -63,7 +63,7 @@ public class Application {
     private VisualFeedback feedback;
     private HarvestDialog harvestDialog;
     private HarvestPool harvestPool;
-    private StatusPanel statusPanel = new StatusPanel();
+    private StatusPanel statusPanel;
     private Timer resizeTimer;
     private CodeFrame codeFrame;
 
@@ -97,6 +97,7 @@ public class Application {
         });
         feedback = new VisualFeedback(desktop);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
+        statusPanel = new StatusPanel(sipModel.getDataSetModel());
         harvestPool = new HarvestPool(sipModel);
         harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
         feedback.setSipModel(sipModel);
@@ -214,6 +215,7 @@ public class Application {
         statusPanel.setReaction(DataSetState.IMPORTED, new AnalysisPerformer());
         statusPanel.setReaction(DataSetState.ANALYZED_IMPORT, allFrames.prepareForDelimiting());
         statusPanel.setReaction(DataSetState.DELIMITED, new ConvertPerformer());
+        statusPanel.setReaction(DataSetState.SOURCED, new AnalysisPerformer());
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
         statusPanel.setReaction(DataSetState.VALIDATED, uploadAction);
@@ -280,7 +282,6 @@ public class Application {
                     sipModel.getDataSetModel().getDataSet().getSpec()
             ));
             sipModel.convertSource(listener);
-            new AnalysisPerformer().run();
         }
     }
 

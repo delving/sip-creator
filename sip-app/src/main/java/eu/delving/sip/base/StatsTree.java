@@ -71,7 +71,7 @@ public class StatsTree implements Serializable {
             root = new StatsTreeNode("No statistics", "<h3>No statistics</h3>");
         }
         if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
-            StatsTreeNode factNode = new StatsTreeNode(Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
+            StatsTreeNode factNode = new StatsTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
             root.getChildren().add(0, factNode);
             for (Map.Entry<String,String> entry : facts.entrySet()) new StatsTreeNode(factNode, entry);
         }

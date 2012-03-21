@@ -21,7 +21,9 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.DataSetModel;
 
 import javax.swing.*;
 import java.awt.GridLayout;
@@ -39,11 +41,13 @@ public class StatusPanel extends JPanel {
 
     private List<StateAction> actions = new ArrayList<StateAction>();
 
-    public StatusPanel() {
+    public StatusPanel(DataSetModel dataSetModel) {
         super(new GridLayout(1, 0, 5, 5));
         setBorder(BorderFactory.createTitledBorder("Actions"));
         for (DataSetState state : DataSetState.values()) {
-            if (state != DataSetState.SOURCED) actions.add(new StateAction(state));
+            StateAction action = new StateAction(state);
+            actions.add(action);
+            if (state == DataSetState.SOURCED) dataSetModel.addListener(new SourcedListener(action));
         }
         for (StateAction action : actions) {
             JButton button = new JButton(action);
@@ -95,6 +99,28 @@ public class StatusPanel extends JPanel {
         public void actionPerformed(ActionEvent actionEvent) {
             if (work != null) work.run();
             if (action != null) action.actionPerformed(null);
+        }
+    }
+    
+    private class SourcedListener implements DataSetModel.Listener {
+        private StateAction sourcedAction;
+
+        private SourcedListener(StateAction action) {
+            this.sourcedAction = action;
+        }
+
+        @Override
+        public void dataSetChanged(DataSet dataSet) {
+            dataSetStateChanged(dataSet, dataSet.getState());
+        }
+
+        @Override
+        public void dataSetRemoved() {
+        }
+
+        @Override
+        public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+            if (dataSetState == DataSetState.SOURCED) sourcedAction.actionPerformed(null);
         }
     }
 }

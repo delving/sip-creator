@@ -52,9 +52,14 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     private FieldStatistics fieldStatistics;
     private String htmlChunk;
 
-    StatsTreeNode(String name, String htmlChunk) {
+    StatsTreeNode(StatsTreeNode parent, String name, String htmlChunk) {
+        this.parent = parent;
         this.tag = Tag.create(name);
         this.htmlChunk = htmlChunk;
+    }
+
+    StatsTreeNode(String name, String htmlChunk) {
+        this(null, name, htmlChunk);
     }
 
     StatsTreeNode(StatsTreeNode parent, Tag tag) {
