@@ -166,8 +166,9 @@ public class SipModel {
     private void clearValidation(RecMapping recMapping) {
         try {
             if (dataSetModel.hasDataSet() && recMapping != null) {
-                dataSetModel.getDataSet().deleteValidation(recMapping.getPrefix());
-                feedback.say(String.format("Validation cleared for %s", recMapping.getPrefix()));
+                if (dataSetModel.getDataSet().deleteValidation(recMapping.getPrefix())) {
+                    feedback.say(String.format("Validation cleared for %s", recMapping.getPrefix()));
+                }
             }
         }
         catch (StorageException e) {

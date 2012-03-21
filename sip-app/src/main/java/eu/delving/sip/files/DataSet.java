@@ -68,7 +68,7 @@ public interface DataSet {
 
     void deleteConverted() throws StorageException;
 
-    void deleteValidation(String metadataPrefix) throws StorageException;
+    boolean deleteValidation(String metadataPrefix) throws StorageException;
 
     void deleteValidations() throws StorageException;
 

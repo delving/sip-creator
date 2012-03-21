@@ -249,8 +249,13 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public void deleteValidation(String metadataPrefix) throws StorageException {
-            for (File file : validationFiles(here, metadataPrefix)) delete(file);
+        public boolean deleteValidation(String metadataPrefix) throws StorageException {
+            boolean deleted = false;
+            for (File file : validationFiles(here, metadataPrefix)) {
+                delete(file);
+                deleted = true;
+            }
+            return deleted;
         }
 
         @Override
