@@ -4,3 +4,9 @@
 /input/lido:lidoRecID
 /record/thing/thingId
 
+/input/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventMaterialsTech
+/record/places/place
+
+/input/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventMaterialsTech/lido:materialsTech/lido:termMaterialsTech/lido:term
+/record/places/place/placeName
+
