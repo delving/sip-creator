@@ -104,8 +104,8 @@ public class RecDef {
     public List<Doc> docs;
 
     public List<Category> bookmarks;
-    
-    public Map<String,String> getNamespacesMap() {
+
+    public Map<String, String> getNamespacesMap() {
         Map<String, String> ns = new HashMap<String, String>();
         if (namespaces != null) for (Namespace namespace : namespaces) ns.put(namespace.prefix, namespace.uri);
         return ns;
@@ -246,7 +246,7 @@ public class RecDef {
         public List<Opt> opts;
 
         public void resolve(RecDef recDef) {
-            if (path == null) throw new RuntimeException("No path for OptionList: "+opts);
+            if (path == null) throw new RuntimeException("No path for OptionList: " + opts);
             resolve(recDef, path, false);
             resolve(recDef, keyPath, true);
         }
@@ -357,7 +357,7 @@ public class RecDef {
                 if (elem == null && attr == null) throw new RuntimeException("Cannot find tag " + tag);
             }
             else {
-                throw new RuntimeException("Neither path nor tag available: "+lines);
+                throw new RuntimeException("Neither path nor tag available: " + lines);
             }
             if (elem != null) elem.doc = this;
             if (attr != null) attr.doc = this;
