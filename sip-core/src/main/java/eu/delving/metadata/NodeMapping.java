@@ -85,6 +85,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
         statsTreeNodes = null;
     }
 
+    public boolean hasTuple() {
+        return tuplePaths != null;
+    }
+
     public boolean hasStatsTreeNodes() {
         return statsTreeNodes != null;
     }
@@ -121,6 +125,15 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public NodeMapping setInputPaths(List<Path> inputPaths) {
         if (inputPaths.isEmpty()) throw new RuntimeException();
+        Path parent = null;
+        for (Path input : inputPaths) {
+            if (parent == null) {
+                parent = input.getParent();
+            }
+            else if (!parent.equals(input.getParent())) {
+                throw new RuntimeException(String.format("Input path %s should all be from the same parent %s", input, parent));
+            }
+        }
         this.inputPath = inputPaths.get(0);
         if (inputPaths.size() > 1) {
             tuplePaths = new ArrayList<Path>();
@@ -322,14 +335,14 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public String getTupleExpression() {
+        if (tuplePaths == null) return null;
         StringBuilder tuple = new StringBuilder("(");
         Iterator<Path> walk = getInputPaths().iterator();
         while (walk.hasNext()) {
             Path inputPath = walk.next();
-            if (inputPath.size() != 2)
-                throw new RuntimeException("To build a tuple expression, all paths must be of length 2: " + inputPath);
-            Tag outer = inputPath.getTag(0);
-            Tag inner = inputPath.getTag(1);
+            if (inputPath.size() < 2) throw new RuntimeException("Path too short");
+            Tag outer = inputPath.getTag(-2);
+            Tag inner = inputPath.getTag(-1);
             tuple.append(outer.toGroovyParam()).append(inner.toGroovyRef());
             if (walk.hasNext()) tuple.append(" | ");
         }
@@ -342,6 +355,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     private String getTupleUsage() {
+        if (tuplePaths == null) return null;
         String name = getTupleName();
         int size = tuplePaths.size() + 1;
         StringBuilder usage = new StringBuilder("\"");
@@ -378,5 +392,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public int compareTo(NodeMapping nodeMapping) {
         return this.inputPath.compareTo(nodeMapping.inputPath);
     }
+
 }
 

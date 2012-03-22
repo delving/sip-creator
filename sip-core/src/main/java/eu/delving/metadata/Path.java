@@ -161,7 +161,8 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     public Tag getTag(int level) {
-        return level < stack.size() ? stack.get(level) : null;
+        if (level < 0) level = size() + level;
+        return level < size() ? stack.get(level) : null;
     }
 
     public Tag peek() {
@@ -170,6 +171,12 @@ public class Path implements Comparable<Path>, Serializable {
 
     public String getTail() {
         return stack.isEmpty() ? "?" : stack.peek().toString();
+    }
+
+    public Path getParent() {
+        Path parent = new Path(this);
+        parent.stack.pop();
+        return parent;
     }
 
     public boolean isEmpty() {
