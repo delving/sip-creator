@@ -26,7 +26,6 @@
             <xs:element name="providerUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="providerName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="rights" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="checksum" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -61,7 +60,7 @@
             <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="language" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="displayMeasurement" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="displayDimensions" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="displayYear" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="landingPage" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
@@ -125,7 +124,7 @@
             <xs:element name="localURL" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="localMediaTypeUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="localMimeType" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="delvingMediaURI" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- <xs:element name="delvingMediaURI" type="xs:string" minOccurs="0" maxOccurs="unbounded"/> -->
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="collectionType">

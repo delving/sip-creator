@@ -25,7 +25,6 @@
             <elem tag="providerUri"/>
             <elem tag="providerName"/>
             <elem tag="rights"/>
-            <elem tag="checksum"/> <!--  hidden="true" -->
         </elem>
 
         <elem tag="collection" singular="true">
@@ -41,7 +40,7 @@
             <elem tag="title"/>
             <elem tag="description"/>
             <elem tag="language"/>
-            <elem tag="displayMeasurement"/>
+            <elem tag="displayDimensions"/>
             <elem tag="displayYear"/>
             <elem tag="landingPage"/>
             <!-- what about facets ?? <elem tag="landingPage"/> ?? -->
@@ -52,7 +51,7 @@
                 <elem tag="localURL"/>
                 <elem tag="localMediaTypeUri"/>
                 <elem tag="localMimeType"/>
-                <elem tag="delvingMediaURI"/> <!--  hidden="true" -->
+                <!-- <elem tag="delvingMediaURI"/> -->
             </elem>
         </elem>
 
