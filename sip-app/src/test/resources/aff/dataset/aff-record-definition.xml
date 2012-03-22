@@ -34,56 +34,25 @@
 
         <elem tag="admin" elem="rights" singular="true">
             <elem tag="ownerUri"/>
-            <elem tag="ownerName"/>
-            <elem tag="ownerCountry"/>
+            <elem tag="displayOwner"/>
+            <elem tag="displayOwnerCountry"/>
             <elem tag="providerUri"/>
-            <elem tag="providerName"/>
+            <elem tag="displayProvider"/>
         </elem>
 
         <elem tag="collection" attr="localId" singular="true">
             <elem tag="collectionUri"/>
-            <elem tag="collectionName"/>
+            <elem tag="displayCollection"/>
         </elem>
 
         <elem tag="thing" elem="rights" attr="localId, localUri" singular="true">
             <elem tag="displayWorkType"/>
             <elem tag="displayTitle"/>
-            <elem tag="description"/>
+            <elem tag="displayDescription"/>
             <elem tag="language"/>
             <elem tag="displayDimensions"/>
             <elem tag="displayYear"/>
             <elem tag="landingPage"/>
-        </elem>
-
-        <elem tag="mediaFiles">
-            <elem tag="mediaFile">
-                <elem tag="localURL"/>
-                <elem tag="localMediaTypeUri"/>
-                <elem tag="localMimeType"/>
-                <!-- <elem tag="delvingMediaURI"/> -->
-            </elem>
-        </elem>
-
-        <elem tag="actors" singular="true">
-            <elem tag="actor" elems="localId, localUri, roleUri, roleName, sourceName, sourceUri, displayDate">
-                <elem tag="firstName"/>
-                <elem tag="lastName"/>
-            </elem>
-        </elem>
-
-        <elem tag="places" singular="true">
-            <elem tag="place" elems="localId, localUri, roleUri, roleName, sourceName, sourceUri, displayDate">
-                <elem tag="placeType"/>
-                <elem tag="placeName"/>
-                <elem tag="admin1"/>
-                <elem tag="admin2"/>
-                <elem tag="admin3"/>
-                <elem tag="admin4"/>
-                <elem tag="country"/>
-                <elem tag="lat"/>
-                <elem tag="long"/>
-            </elem>
-=
         </elem>
 
         <elem tag="types" singular="true">
@@ -97,7 +66,7 @@
         <elem tag="events" singular="true">
             <elem tag="event">
                 <elem tag="eventTypeUri"/>
-                <elem tag="eventTypeName"/>
+                <elem tag="displayEventType"/>
                 <elem tag="displayEvent"/>
                 <elem tag="displayDate"/>
                 <elem tag="date"/>
@@ -107,6 +76,7 @@
                     <elem tag="placeInRoleUri"/>
                     <elem tag="displayPlace"/>
                     <elem tag="displayPlaceType"/>
+                    <elem tag="displayPlaceAdmin"/>
                 </elem>
 
                 <elem tag="eventActor" elems="localId, localUri, sourceName, sourceUri">
