@@ -43,7 +43,7 @@ import java.net.URL;
 
 public class Utility {
 
-    public static Color DELIMITER_HILITE = Color.YELLOW;
+    public static Color DELIMITER_HILITE = new Color(255,255,200);
     public static Color MAPPED_HILITE = new Color(220,255,220);
 
     public static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Utility.class.getResource("/icons/bookmark-expanded-icon.png"));
