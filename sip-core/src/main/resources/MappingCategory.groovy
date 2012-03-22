@@ -91,9 +91,9 @@ public class MappingCategory {
     static Object or(List a, List b) { // operator |
         a = unwrap(a)
         b = unwrap(b)
-        List tupleList = new NodeList()
+        List tupleList = new ArrayList()
         int max = Math.min(a.size(), b.size());
-        for (Integer index: 0..(max - 1)) {
+        if (max > 1) for (Integer index: 0..(max - 1)) {
             if (a[index] instanceof List) {
                 tupleList.add(a[index] += b[index]);
             }
