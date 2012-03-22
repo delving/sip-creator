@@ -28,7 +28,6 @@
         <elem tag="country"/>
         <elem tag="lat"/>
         <elem tag="long"/>
-        <!-- don't move around or/add more elems up here. keep it as it is below -->
     </elems>
 
     <root tag="record">
@@ -54,8 +53,6 @@
             <elem tag="displayDimensions"/>
             <elem tag="displayYear"/>
             <elem tag="landingPage"/>
-<<<<<<< HEAD
-            <!-- what about facets ?? <elem tag="landingPage"/> ?? -->
         </elem>
 
         <elem tag="mediaFiles">
@@ -86,8 +83,7 @@
                 <elem tag="lat"/>
                 <elem tag="long"/>
             </elem>
-=======
->>>>>>> AFF new def with places and actors wrapped in an event
+=
         </elem>
 
         <elem tag="types" singular="true">
@@ -99,12 +95,6 @@
         </elem>
 
         <elem tag="events" singular="true">
-<<<<<<< HEAD
-            <elem tag="event" elems="displayDate">
-                <elem tag="eventTypeUri"/>
-                <elem tag="evenTypeName"/>
-                <elem tag="eventName"/>
-=======
             <elem tag="event">
                 <elem tag="eventTypeUri"/>
                 <elem tag="eventTypeName"/>
@@ -124,7 +114,6 @@
                     <elem tag="actorsInRoleUri"/>
                     <elem tag="displayActor"/>
                 </elem>
->>>>>>> AFF new def with places and actors wrapped in an event
             </elem>
         </elem>
 
