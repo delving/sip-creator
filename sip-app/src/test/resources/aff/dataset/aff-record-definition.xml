@@ -19,7 +19,6 @@
         <elem tag="date" elems="earliestDate, latestDate"/>
         <elem tag="earliestDate"/>
         <elem tag="latestDate"/>
-
         <elem tag="displayPlaceAdmin" elems="admin1, admin2, admin3, admin4, country, lat, long"/>
         <elem tag="admin1"/>
         <elem tag="admin2"/>
@@ -32,7 +31,7 @@
 
     <root tag="record">
 
-        <elem tag="admin" elem="rights" singular="true">
+        <elem tag="admin" elems="rights" singular="true">
             <elem tag="ownerUri"/>
             <elem tag="displayOwner"/>
             <elem tag="displayOwnerCountry"/>
@@ -40,12 +39,12 @@
             <elem tag="displayProvider"/>
         </elem>
 
-        <elem tag="collection" attr="localId" singular="true">
+        <elem tag="collection" attrs="localId" singular="true">
             <elem tag="collectionUri"/>
             <elem tag="displayCollection"/>
         </elem>
 
-        <elem tag="thing" elem="rights" attr="localId, localUri" singular="true">
+        <elem tag="thing" elems="rights" attrs="localId, localUri" singular="true">
             <elem tag="displayWorkType"/>
             <elem tag="displayTitle"/>
             <elem tag="displayDescription"/>
@@ -56,7 +55,7 @@
         </elem>
 
         <elem tag="types" singular="true">
-            <elem tag="type" elems="localId, localUri, sourceName, sourceUri">
+            <elem tag="type" attrs="localId, localUri, sourceName, sourceUri">
                 <elem tag="displayType"/>
                 <elem tag="categoryUri"/>
                 <elem tag="displayCategory"/>
@@ -71,7 +70,7 @@
                 <elem tag="displayDate"/>
                 <elem tag="date"/>
 
-                <elem tag="eventPlace" elems="localId, localUri, sourceName, sourceUri">
+                <elem tag="eventPlace" attrs="localId, localUri, sourceName, sourceUri">
                     <elem tag="displayPlaceInRole"/>
                     <elem tag="placeInRoleUri"/>
                     <elem tag="displayPlace"/>
@@ -79,9 +78,9 @@
                     <elem tag="displayPlaceAdmin"/>
                 </elem>
 
-                <elem tag="eventActor" elems="localId, localUri, sourceName, sourceUri">
+                <elem tag="eventActor" attrs="localId, localUri, sourceName, sourceUri">
                     <elem tag="displayActorInRole"/>
-                    <elem tag="actorsInRoleUri"/>
+                    <elem tag="actorInRoleUri"/>
                     <elem tag="displayActor"/>
                 </elem>
             </elem>
@@ -145,8 +144,8 @@
     </options>
 
     <facts>
-        <fact-ref path="/record/admin/ownerName" name="dataProvider"/>
-        <fact-ref path="/record/admin/providerName" name="provider"/>
+        <fact-ref path="/record/admin/displayOwner" name="dataProvider"/>
+        <fact-ref path="/record/admin/diplayProvider" name="provider"/>
         <fact-ref path="/record/admin/rights" name="rights"/>
         <fact-ref path="/record/thing/language" name="language"/>
     </facts>
@@ -154,7 +153,7 @@
     <bookmarks>
     </bookmarks>
     <docs>
-        <doc path="/record/admin/providerName">
+        <doc path="/record/admin/displayProvider">
             <string name="Dublin Core definition">An entity responsible for making contributions to the content of the
                 resource. Examples of a Contributor include a person, an organization or a service. Typically, the name
                 of a Contributor should be used to indicate the entity.

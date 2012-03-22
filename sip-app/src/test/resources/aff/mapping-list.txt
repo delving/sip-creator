@@ -1,9 +1,7 @@
 /input/lido:lidoRecID
-/record/thing/thingId
+/record/thing/displayTitle
 
-/input/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventMaterialsTech
-/record/places/place
+/input/lido:lidoRecID
+/record/thing/@localId
 
-/input/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventMaterialsTech/lido:materialsTech/lido:termMaterialsTech/lido:term
-/record/places/place/placeName
 
