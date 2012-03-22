@@ -134,14 +134,14 @@
     </search>
 
     <!--<facts>-->
-        <!--<fact name="spec" path="/icn:collectionName"/>-->
-        <!--<fact name="name" path="/icn:collectionTitle"/>-->
-        <!--<fact name="country" path="/icn:country"/>-->
-        <!--<fact name="dataProvider" path="/icn:dataProvider"/>-->
-        <!--<fact name="language" path="/icn:language"/>-->
-        <!--<fact name="provider" path="/icn:provider"/>-->
-        <!--<fact name="rights" path="/icn:rights"/>-->
-        <!--<fact name="type" path="/icn:type"/>-->
+        <!--<fact name="spec" path="/record/icn:collectionName"/>-->
+        <!--<fact name="name" path="/record/icn:collectionTitle"/>-->
+        <!--<fact name="country" path="/record/icn:country"/>-->
+        <!--<fact name="dataProvider" path="/record/icn:dataProvider"/>-->
+        <!--<fact name="language" path="/record/icn:language"/>-->
+        <!--<fact name="provider" path="/record/icn:provider"/>-->
+        <!--<fact name="rights" path="/record/icn:rights"/>-->
+        <!--<fact name="type" path="/record/icn:type"/>-->
     <!--</facts>-->
 
     <!--<converters>-->

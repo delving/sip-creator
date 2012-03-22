@@ -7,43 +7,54 @@
                    schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
     </namespaces>
 
+    <attrs>
+        <attr tag="localId"/>
+        <attr tag="localUri"/>
+        <attr tag="sourceUri"/>
+        <attr tag="sourceName"/>
+    </attrs>
+
     <elems>
-        <elem tag="localId"/>
-        <elem tag="localUri"/>
-        <elem tag="sourceUri"/>
-        <elem tag="sourceName"/>
-        <elem tag="roleUri"/>
-        <elem tag="roleName"/>
-        <elem tag="displayDate"/>
+        <elem tag="rights"/>
+        <elem tag="date" elems="earliestDate, latestDate"/>
+        <elem tag="earliestDate"/>
+        <elem tag="latestDate"/>
+
+        <elem tag="displayPlaceAdmin" elems="admin1, admin2, admin3, admin4, country, lat, long"/>
+        <elem tag="admin1"/>
+        <elem tag="admin2"/>
+        <elem tag="admin3"/>
+        <elem tag="admin4"/>
+        <elem tag="country"/>
+        <elem tag="lat"/>
+        <elem tag="long"/>
         <!-- don't move around or/add more elems up here. keep it as it is below -->
     </elems>
 
     <root tag="record">
 
-        <elem tag="admin" singular="true">
+        <elem tag="admin" elem="rights" singular="true">
             <elem tag="ownerUri"/>
             <elem tag="ownerName"/>
+            <elem tag="ownerCountry"/>
             <elem tag="providerUri"/>
             <elem tag="providerName"/>
-            <elem tag="rights"/>
         </elem>
 
-        <elem tag="collection" singular="true">
-            <elem tag="collectionId"/>
+        <elem tag="collection" attr="localId" singular="true">
             <elem tag="collectionUri"/>
             <elem tag="collectionName"/>
         </elem>
 
-        <elem tag="thing" singular="true">
-            <elem tag="thingId"/>
-            <elem tag="thingUri"/>
-            <elem tag="workType"/>
-            <elem tag="title"/>
+        <elem tag="thing" elem="rights" attr="localId, localUri" singular="true">
+            <elem tag="displayWorkType"/>
+            <elem tag="displayTitle"/>
             <elem tag="description"/>
             <elem tag="language"/>
             <elem tag="displayDimensions"/>
             <elem tag="displayYear"/>
             <elem tag="landingPage"/>
+<<<<<<< HEAD
             <!-- what about facets ?? <elem tag="landingPage"/> ?? -->
         </elem>
 
@@ -75,68 +86,103 @@
                 <elem tag="lat"/>
                 <elem tag="long"/>
             </elem>
+=======
+>>>>>>> AFF new def with places and actors wrapped in an event
         </elem>
 
         <elem tag="types" singular="true">
-            <elem tag="type" elems="localId, localUri, roleUri, roleName, sourceName, sourceUri">
-                <elem tag="typeName"/>
+            <elem tag="type" elems="localId, localUri, sourceName, sourceUri">
+                <elem tag="displayType"/>
+                <elem tag="categoryUri"/>
+                <elem tag="displayCategory"/>
             </elem>
         </elem>
 
-        <!-- other events, not part of Actors and places -->
         <elem tag="events" singular="true">
+<<<<<<< HEAD
             <elem tag="event" elems="displayDate">
                 <elem tag="eventTypeUri"/>
                 <elem tag="evenTypeName"/>
                 <elem tag="eventName"/>
+=======
+            <elem tag="event">
+                <elem tag="eventTypeUri"/>
+                <elem tag="eventTypeName"/>
+                <elem tag="displayEvent"/>
+                <elem tag="displayDate"/>
+                <elem tag="date"/>
+
+                <elem tag="eventPlace" elems="localId, localUri, sourceName, sourceUri">
+                    <elem tag="displayPlaceInRole"/>
+                    <elem tag="placeInRoleUri"/>
+                    <elem tag="displayPlace"/>
+                    <elem tag="displayPlaceType"/>
+                </elem>
+
+                <elem tag="eventActor" elems="localId, localUri, sourceName, sourceUri">
+                    <elem tag="displayActorInRole"/>
+                    <elem tag="actorsInRoleUri"/>
+                    <elem tag="displayActor"/>
+                </elem>
+>>>>>>> AFF new def with places and actors wrapped in an event
             </elem>
         </elem>
 
+        <elem tag="mediaFiles" singular="true">
+             <elem tag="mediaFile">
+                 <elem tag="localURL"/>
+                 <elem tag="localMediaTypeUri"/>
+                 <elem tag="localMimeType"/>
+                 <!-- <elem tag="delvingMediaURI"/> -->
+             </elem>
+         </elem>
+
     </root>
+
 
     <options> <!-- keys should be uri's -->
 
-        <option-list path="/record/actors/actor/roleUri"> <!--valuePath="/aff/actors/actor/roleName"> -->
-            <opt key="1">Creator</opt>
-            <opt key="2">Artist</opt>
-            <opt key="3">Photographer</opt>
-            <!--todo: more values-->
-        </option-list>
+        <!--<option-list path="/record/actors/actor/roleUri"> &lt;!&ndash;valuePath="/aff/actors/actor/roleName"> &ndash;&gt;-->
+            <!--<opt key="1">Creator</opt>-->
+            <!--<opt key="2">Artist</opt>-->
+            <!--<opt key="3">Photographer</opt>-->
+            <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
+        <!--</option-list>-->
 
-        <option-list path="/record/places/place/placeName"> <!--valuePath="/aff/places/place/roleName"> -->
-            <opt key="1">Actors place of birth</opt>
-            <opt key="2">Actor place of death</opt>
-            <opt key="3">Production place</opt>
-            <!--todo: more values-->
-        </option-list>
+        <!--<option-list path="/record/places/place/placeName"> &lt;!&ndash;valuePath="/aff/places/place/roleName"> &ndash;&gt;-->
+            <!--<opt key="1">Actors place of birth</opt>-->
+            <!--<opt key="2">Actor place of death</opt>-->
+            <!--<opt key="3">Production place</opt>-->
+            <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
+        <!--</option-list>-->
 
-        <option-list path="/record/types/type/roleUri"> <!--valuePath="/aff/types/type/roleName"> -->
-            <opt key="1">Classification</opt>
-            <opt key="2">Subject</opt>
-            <opt key="3">Technique</opt>
-            <opt key="4">Material</opt>
-            <opt key="5">Colour</opt>
-            <!--todo: more values-->
-        </option-list>
+        <!--<option-list path="/record/types/type/roleUri"> &lt;!&ndash;valuePath="/aff/types/type/roleName"> &ndash;&gt;-->
+            <!--<opt key="1">Classification</opt>-->
+            <!--<opt key="2">Subject</opt>-->
+            <!--<opt key="3">Technique</opt>-->
+            <!--<opt key="4">Material</opt>-->
+            <!--<opt key="5">Colour</opt>-->
+            <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
+        <!--</option-list>-->
 
-        <option-list path="/record/events/event/eventTypeUri"> <!--valuePath="aff/events/event/eventTypeName">  -->
-            <opt key="1">Production</opt>
-            <opt key="2">Creation</opt>
-            <opt key="3">etc</opt>
-            <opt key="4">etc</opt>
-            <opt key="5">etc</opt>
-            <!--todo: CRM EVENTS, same as i LIDO-->
-        </option-list>
+        <!--<option-list path="/record/events/event/eventTypeUri"> &lt;!&ndash;valuePath="aff/events/event/eventTypeName">  &ndash;&gt;-->
+            <!--<opt key="1">Production</opt>-->
+            <!--<opt key="2">Creation</opt>-->
+            <!--<opt key="3">etc</opt>-->
+            <!--<opt key="4">etc</opt>-->
+            <!--<opt key="5">etc</opt>-->
+            <!--&lt;!&ndash;todo: CRM EVENTS, same as i LIDO&ndash;&gt;-->
+        <!--</option-list>-->
 
-        <option-list path="/record/mediaFiles/mediaFile/localMediaTypeUri">
-            <opt key="1">Thumbnail</opt>
-            <opt key="2">Full image</opt>
-            <opt key="3">Deep zoom image</opt>
-            <opt key="4">Document</opt>
-            <opt key="5">Video</opt>
-            <opt key="5">Sound</opt>
-            <opt key="6">etc</opt>
-        </option-list>
+        <!--<option-list path="/record/mediaFiles/mediaFile/localMediaTypeUri">-->
+            <!--<opt key="1">Thumbnail</opt>-->
+            <!--<opt key="2">Full image</opt>-->
+            <!--<opt key="3">Deep zoom image</opt>-->
+            <!--<opt key="4">Document</opt>-->
+            <!--<opt key="5">Video</opt>-->
+            <!--<opt key="5">Sound</opt>-->
+            <!--<opt key="6">etc</opt>-->
+        <!--</option-list>-->
     </options>
 
     <facts>

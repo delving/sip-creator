@@ -23,6 +23,7 @@
         <xs:sequence>
             <xs:element name="ownerUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="ownerName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="ownerCountry" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="providerUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="providerName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="rights" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
