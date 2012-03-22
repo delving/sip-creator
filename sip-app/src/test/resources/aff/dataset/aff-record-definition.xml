@@ -3,7 +3,8 @@
 
 
     <namespaces>
-        <namespace prefix="aff" uri="http://schemas.delving.eu/aff/" schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
+        <namespace prefix="aff" uri="http://schemas.delving.eu/aff/"
+                   schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
     </namespaces>
 
     <elems>
@@ -47,7 +48,7 @@
         </elem>
 
         <elem tag="mediaFiles">
-	        <elem tag="mediaFile">
+            <elem tag="mediaFile">
                 <elem tag="localURL"/>
                 <elem tag="localMediaTypeUri"/>
                 <elem tag="localMimeType"/>
@@ -85,9 +86,9 @@
         <!-- other events, not part of Actors and places -->
         <elem tag="events" singular="true">
             <elem tag="event" elems="displayDate">
-               <elem tag="eventTypeUri"/>
-               <elem tag="evenTypeName"/>
-               <elem tag="eventName"/>
+                <elem tag="eventTypeUri"/>
+                <elem tag="evenTypeName"/>
+                <elem tag="eventName"/>
             </elem>
         </elem>
 
@@ -138,22 +139,25 @@
         </option-list>
     </options>
 
-      <!--&lt;!&ndash;<facts>&ndash;&gt;-->
-        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/owner_uri" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
-        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/owner_name" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
-        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/provider_uri" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
-        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/provider_name" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
-        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/admin/rights" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
-        <!--&lt;!&ndash;&lt;!&ndash;<fact path="/thing/language" name="mets:"/>&ndash;&gt;&ndash;&gt;-->
-    <!--&lt;!&ndash;</facts>&ndash;&gt;-->
+    <facts>
+        <fact-ref path="/record/admin/ownerName" name="dataProvider"/>
+        <fact-ref path="/record/admin/providerName" name="provider"/>
+        <fact-ref path="/record/admin/rights" name="rights"/>
+        <fact-ref path="/record/thing/language" name="language"/>
+    </facts>
 
     <bookmarks>
     </bookmarks>
     <docs>
         <doc path="/record/admin/providerName">
-                 <string name="Dublin Core definition">An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>
-                 <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
-                 <string name="Europeana note">The name of contributors to the original analog or born digital object.  This could be a person, an organisation or a service. </string>
+            <string name="Dublin Core definition">An entity responsible for making contributions to the content of the
+                resource. Examples of a Contributor include a person, an organization or a service. Typically, the name
+                of a Contributor should be used to indicate the entity.
+            </string>
+            <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
+            <string name="Europeana note">The name of contributors to the original analog or born digital object. This
+                could be a person, an organisation or a service.
+            </string>
         </doc>
     </docs>
 

@@ -99,6 +99,8 @@ public class RecDef {
 
     public List<OptionList> options;
 
+    public List<FactRef> facts;
+
     public List<SearchField> search;
 
     public List<Doc> docs;
@@ -265,6 +267,16 @@ public class RecDef {
                 elem.optionsAsKey = asKey;
             }
         }
+    }
+
+    @XStreamAlias("fact-ref")
+    public static class FactRef {
+
+        @XStreamAsAttribute
+        public Path path;
+
+        @XStreamAsAttribute
+        public String name;
     }
 
     @XStreamAlias("opt")

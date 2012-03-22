@@ -34,10 +34,7 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.MetadataParser;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -71,7 +68,6 @@ public class TestMappingValidation {
         mock.delete();
     }
 
-//    @Ignore
     @Test
     public void testLido() throws Exception {
         mock.prepareDataset(
@@ -92,15 +88,16 @@ public class TestMappingValidation {
         runFullCycle(3);
     }
 
-//    @Test
-//    public void testIcn() throws Exception {
-//        mock.prepareDataset(
-//                "icn",
-//                "/recordList/record",
-//                "/recordList/record/priref"
-//        );
-//        runFullCycle(4);
-//    }
+    @Ignore
+    @Test
+    public void testIcn() throws Exception {
+        mock.prepareDataset(
+                "icn",
+                "/recordList/record",
+                "/recordList/record/priref"
+        );
+        runFullCycle(4);
+    }
 
     @Test
     public void testTib() throws Exception {

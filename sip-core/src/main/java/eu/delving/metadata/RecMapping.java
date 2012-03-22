@@ -59,7 +59,7 @@ public class RecMapping {
     SortedSet<MappingFunction> functions = new TreeSet<MappingFunction>();
 
     @XStreamAlias("node-mappings")
-    List<NodeMapping> nodeMappings;
+    List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
 
     @XStreamOmitField
     RecDefTree recDefTree;
@@ -100,12 +100,12 @@ public class RecMapping {
     }
 
     public MappingFunction createFunction(String name) {
-        if (hasFunction(name)) throw new RuntimeException("Function already exists: "+name);
+        if (hasFunction(name)) throw new RuntimeException("Function already exists: " + name);
         MappingFunction function = new MappingFunction(name);
         functions.add(function);
         return function;
     }
-    
+
     public void removeFunction(MappingFunction function) {
         functions.remove(function);
     }
@@ -128,21 +128,37 @@ public class RecMapping {
     }
 
     private void resolve() {
-        Iterator<NodeMapping> walk = nodeMappings.iterator();
-        while (walk.hasNext()) {
-            NodeMapping nodeMapping = walk.next();
-            RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath);
-            if (node != null) {
-                node.addNodeMapping(nodeMapping);
+        if (nodeMappings.isEmpty()) {
+            if (recDefTree.getRecDef().facts != null) {
+                for (RecDef.FactRef factRef : recDefTree.getRecDef().facts) {
+                    Path path = factRef.path.defaultPrefix(recDefTree.getRecDef().prefix);
+                    RecDefNode recDefNode = recDefTree.getRecDefNode(path);
+                    if (recDefNode != null) {
+                        NodeMapping nodeMapping = new NodeMapping().setInputPath(Path.empty().extend(Tag.create("facts")).extend(Tag.create(factRef.name)));
+                        recDefNode.addNodeMapping(nodeMapping);
+                    }
+                }
             }
-            else {
-                walk.remove();
+        }
+        else {
+            Iterator<NodeMapping> walk = nodeMappings.iterator();
+            while (walk.hasNext()) {
+                NodeMapping nodeMapping = walk.next();
+                RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath);
+                if (node != null) {
+                    node.addNodeMapping(nodeMapping);
+                }
+                else {
+                    walk.remove();
+                }
             }
         }
     }
 
     public static RecMapping create(String prefix, RecDefModel recDefModel) throws MetadataException {
-        return new RecMapping(prefix, recDefModel.createRecDef(prefix));
+        RecMapping recMapping = new RecMapping(prefix, recDefModel.createRecDef(prefix));
+        recMapping.resolve();
+        return recMapping;
     }
 
     public static RecMapping read(File file, RecDefModel recDefModel) throws MetadataException {
