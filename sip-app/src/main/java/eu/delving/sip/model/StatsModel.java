@@ -130,23 +130,29 @@ public class StatsModel {
     public SortedSet<StatsTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
         SortedSet<StatsTreeNode> nodes = new TreeSet<StatsTreeNode>();
         if (!(statsTreeModel.getRoot() instanceof StatsTreeNode)) {
-            nodeMapping.statsTreeNodes = null;
+            nodeMapping.clearStatsTreeNodes();
         }
-        else if (nodeMapping.statsTreeNodes == null) {
+        else if (!nodeMapping.hasStatsTreeNodes()) {
             for (Path path : nodeMapping.getInputPaths()) {
                 TreePath treePath = findNodeForInputPath(path, (StatsTreeNode) statsTreeModel.getRoot());
                 if (treePath != null) nodes.add((StatsTreeNode)treePath.getLastPathComponent());
             }
-            nodeMapping.statsTreeNodes = nodes.isEmpty() ? null : nodes;
+            if (nodes.isEmpty()) {
+                nodeMapping.clearStatsTreeNodes();
+            }
+            else {
+                StatsTreeNode.setStatsTreeNodes(nodes, nodeMapping);
+            }
         }
         else {
-            for (Object node : nodeMapping.statsTreeNodes) nodes.add((StatsTreeNode) node);
+            for (Object node : nodeMapping.getStatsTreeNodes()) nodes.add((StatsTreeNode) node);
         }
         return nodes.isEmpty() ? null : nodes;
     }
 
     private TreePath findNodeForInputPath(Path path, StatsTreeNode node) {
-        if (node.getPath(false).equals(path)) return node.getTreePath();
+        Path nodePath = node.getPath(false);
+        if (nodePath.equals(path)) return node.getTreePath();
         for (StatsTreeNode sub : node.getChildren()) {
             TreePath subPath = findNodeForInputPath(path, sub);
             if (subPath != null) return subPath;

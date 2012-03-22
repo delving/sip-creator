@@ -22,6 +22,7 @@
 package eu.delving.sip.base;
 
 import eu.delving.metadata.FieldStatistics;
+import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import org.antlr.stringtemplate.StringTemplate;
@@ -38,6 +39,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
 
+import static eu.delving.sip.base.Utility.DELIMITER_HILITE;
+import static eu.delving.sip.base.Utility.MAPPED_HILITE;
+
 /**
  * A node of the analysis tree
  *
@@ -51,6 +55,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
     private String htmlChunk;
+    private List<NodeMapping> mappedIn = new ArrayList<NodeMapping>();
 
     StatsTreeNode(StatsTreeNode parent, String name, String htmlChunk) {
         this.parent = parent;
@@ -85,12 +90,6 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         template.setAttribute("stats", fieldStatistics);
         this.htmlChunk = template.toString();
     }
-
-//    public StatsTreeNode extractChild() {
-//        if (getChildren().size() != 1) throw new IllegalStateException("One child expected");
-//        children.get(0).parent = null;
-//        return children.get(0);
-//    }
 
     public List<StatsTreeNode> getChildren() {
         return children;
@@ -250,6 +249,19 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         }
     }
 
+    public static void setStatsTreeNodes(SortedSet<StatsTreeNode> nodes, NodeMapping nodeMapping) {
+        List<Path> inputPaths = new ArrayList<Path>();
+        for (StatsTreeNode node : nodes) inputPaths.add(node.getPath(false));
+        nodeMapping.setStatsTreeNodes(nodes, inputPaths);
+        for (StatsTreeNode node : nodes) node.mappedIn.add(nodeMapping);
+    }
+
+    public static void removeStatsTreeNodes(NodeMapping nodeMapping) {
+        if (nodeMapping.hasStatsTreeNodes()) for (Object nodeObject : nodeMapping.getStatsTreeNodes()) {
+            ((StatsTreeNode) nodeObject).mappedIn.remove(nodeMapping);
+        }
+    }
+
     public static class Renderer extends DefaultTreeCellRenderer {
 
         @Override
@@ -267,11 +279,10 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
                     setIcon(Utility.VALUE_ELEMENT_ICON);
                 }
                 if (node.isRecordRoot() || node.isUniqueElement()) {
-                    setOpaque(!sel);
-                    setBackground(sel ? Color.WHITE : Color.YELLOW);
-                    setForeground(sel ? Color.YELLOW : Color.BLACK);
-                    setText(String.format("%s << %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
-                    setBorder(BorderFactory.createEtchedBorder());
+                    markDelimiters(sel, node);
+                }
+                else if (!node.mappedIn.isEmpty()) {
+                    markNodeMappings(sel, node);
                 }
                 else {
                     setOpaque(false);
@@ -279,6 +290,28 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
                 }
             }
             return component;
+        }
+
+        private void markDelimiters(boolean selected, StatsTreeNode node) {
+            setOpaque(!selected);
+            setBackground(selected ? Color.WHITE : DELIMITER_HILITE);
+            setForeground(selected ? DELIMITER_HILITE : Color.BLACK);
+            setBorder(BorderFactory.createEtchedBorder());
+            setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
+        }
+        
+        private void markNodeMappings(boolean selected, StatsTreeNode node) {
+            setOpaque(!selected);
+            setBackground(selected ? Color.WHITE : MAPPED_HILITE);
+            setForeground(selected ? MAPPED_HILITE : Color.BLACK);
+            setBorder(BorderFactory.createEtchedBorder());
+            StringBuilder commaList = new StringBuilder();
+            Iterator<NodeMapping> walk = node.mappedIn.iterator();
+            while (walk.hasNext()) {
+                commaList.append(walk.next().outputPath.getTail());
+                if (walk.hasNext()) commaList.append(", ");
+            }
+            setText(String.format("<html><b>%s</b> &rarr; %s", node.toString(), commaList.toString()));
         }
     }
 

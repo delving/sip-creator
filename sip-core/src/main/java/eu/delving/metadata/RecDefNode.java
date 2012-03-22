@@ -284,20 +284,7 @@ public class RecDefNode {
     }
 
     public String toString() {
-        String name = isAttr() ? attr.tag.toString().substring(1) : elem.tag.toString();
-        if (nodeMappings.isEmpty()) {
-            return name;
-        }
-        else {
-            StringBuilder out = new StringBuilder(name);
-            out.append(" <- " );
-            Iterator<Path> walk = nodeMappings.keySet().iterator();
-            while (walk.hasNext()) {
-                out.append(walk.next().getTail());
-                if (walk.hasNext()) out.append(", " );
-            }
-            return out.toString();
-        }
+        return isAttr() ? attr.tag.toString().substring(1) : elem.tag.toString();
     }
 
 }

@@ -113,16 +113,15 @@ public class CreateModel {
 
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
-        NodeMapping created = new NodeMapping().
-                setStatsTreeNodes(statsTreeNodes, createInputPaths(statsTreeNodes)).
-                setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
+        NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
+        StatsTreeNode.setStatsTreeNodes(statsTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
         setNodeMapping(created);
     }
 
     public boolean isDictionaryPossible() {
-        if (nodeMapping == null || recDefTreeNode == null|| nodeMapping.statsTreeNodes == null || nodeMapping.statsTreeNodes.size() != 1) return false;
-        StatsTreeNode statsTreeNode = (StatsTreeNode) nodeMapping.statsTreeNodes.iterator().next();
+        if (nodeMapping == null || recDefTreeNode == null|| !nodeMapping.hasOneStatsTreeNode()) return false;
+        StatsTreeNode statsTreeNode = (StatsTreeNode) nodeMapping.getSingleStatsTreeNode();
         if (statsTreeNode.getStatistics() == null) return false;
         Set<String> values = statsTreeNode.getStatistics().getHistogramValues();
         List<RecDef.Opt> options = recDefTreeNode.getRecDefNode().getOptions();
@@ -154,12 +153,6 @@ public class CreateModel {
             nodeMapping.dictionary = null;
             fireNodeMappingChanged();
         }
-    }
-
-    private List<Path> createInputPaths(SortedSet<StatsTreeNode> statsTreeNodes) {
-        List<Path> inputPaths = new ArrayList<Path>();
-        for (StatsTreeNode node : statsTreeNodes) inputPaths.add(node.getPath(false));
-        return inputPaths;
     }
 
     // observable

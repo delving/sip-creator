@@ -42,7 +42,7 @@ import java.util.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-@XStreamAlias("node-mapping" )
+@XStreamAlias("node-mapping")
 public class NodeMapping implements Comparable<NodeMapping> {
 
     @XStreamAsAttribute
@@ -51,24 +51,29 @@ public class NodeMapping implements Comparable<NodeMapping> {
     @XStreamAsAttribute
     public Path outputPath;
 
-    @XStreamAlias("tuplePaths" )
+    @XStreamAlias("tuplePaths")
     public List<Path> tuplePaths;
 
-    @XStreamAlias("dictionary" )
+    @XStreamAlias("dictionary")
     public Map<String, String> dictionary;
 
-    @XStreamAlias("groovy-code" )
+    @XStreamAlias("groovy-code")
     public List<String> groovyCode;
 
     @XStreamOmitField
     public RecDefNode recDefNode;
 
     @XStreamOmitField
-    public SortedSet statsTreeNodes;
+    private SortedSet statsTreeNodes;
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof NodeMapping && ((NodeMapping) o).inputPath.equals(inputPath);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NodeMapping that = (NodeMapping) o;
+        if (inputPath != null ? !inputPath.equals(that.inputPath) : that.inputPath != null) return false;
+        if (outputPath != null ? !outputPath.equals(that.outputPath) : that.outputPath != null) return false;
+        return true;
     }
 
     @Override
@@ -76,11 +81,32 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return inputPath.hashCode();
     }
 
+    public void clearStatsTreeNodes() {
+        statsTreeNodes = null;
+    }
+
+    public boolean hasStatsTreeNodes() {
+        return statsTreeNodes != null;
+    }
+
+    public boolean hasOneStatsTreeNode() {
+        return hasStatsTreeNodes() && statsTreeNodes.size() == 1;
+    }
+
+    public Object getSingleStatsTreeNode() {
+        return statsTreeNodes.iterator().next();
+    }
+
+    public SortedSet getStatsTreeNodes() {
+        return statsTreeNodes;
+    }
+
     public void attachTo(RecDefNode recDefNode) {
         this.recDefNode = recDefNode;
         this.outputPath = recDefNode.getPath();
     }
 
+    // this method should be called from exactly ONE place!
     public NodeMapping setStatsTreeNodes(SortedSet statsTreeNodes, List<Path> inputPaths) {
         if (statsTreeNodes.isEmpty()) throw new RuntimeException();
         this.statsTreeNodes = statsTreeNodes;
@@ -124,7 +150,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public void setDictionaryDomain(Collection<String> domainValues) {
         if (dictionary == null) dictionary = new TreeMap<String, String>();
-        for (String key : domainValues) if (!dictionary.containsKey(key)) dictionary.put(key, "" );
+        for (String key : domainValues) if (!dictionary.containsKey(key)) dictionary.put(key, "");
         Set<String> unused = new HashSet<String>(dictionary.keySet());
         unused.removeAll(domainValues);
         for (String unusedKey : unused) dictionary.remove(unusedKey);
@@ -187,7 +213,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     private boolean isSimilar(String codeString, Iterator<String> walk) {
-        for (String line : codeString.split("\n" )) {
+        for (String line : codeString.split("\n")) {
             line = line.trim();
             if (line.isEmpty()) continue;
             if (!walk.hasNext()) return false;
@@ -235,7 +261,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
                 out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
             }
             toInnerLoop(path.chop(-1), out);
-            out._line("}" );
+            out._line("}");
         }
     }
 
@@ -252,20 +278,20 @@ public class NodeMapping implements Comparable<NodeMapping> {
                     walk.hasNext() ? "," : ""
             ));
         }
-        out._line("]" );
+        out._line("]");
         out.line_("def from%s = { value ->", name);
-        out.line_("if (value) {" );
+        out.line_("if (value) {");
         out.line("def v = %s[value.sanitize()];", name);
-        out.line_("if (v) {" );
-        out.line_("if (v.endsWith(':')) {" );
-        out.line("return \"${v} ${value}\"" );
-        out._line("} else {" ).in();
-        out.line("return v" );
-        out._line("}" );
-        out._line("}" );
-        out._line("}" );
-        out.line("return ''" );
-        out._line("}" );
+        out.line_("if (v) {");
+        out.line_("if (v.endsWith(':')) {");
+        out.line("return \"${v} ${value}\"");
+        out._line("} else {").in();
+        out.line("return v");
+        out._line("}");
+        out._line("}");
+        out._line("}");
+        out.line("return ''");
+        out._line("}");
     }
 
     public Path getLocalPath() {
@@ -296,33 +322,34 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public String getTupleExpression() {
-        StringBuilder tuple = new StringBuilder("(" );
+        StringBuilder tuple = new StringBuilder("(");
         Iterator<Path> walk = getInputPaths().iterator();
         while (walk.hasNext()) {
             Path inputPath = walk.next();
-            if (inputPath.size() != 2) throw new RuntimeException("To build a tuple expression, all paths must be of length 2: " + inputPath);
+            if (inputPath.size() != 2)
+                throw new RuntimeException("To build a tuple expression, all paths must be of length 2: " + inputPath);
             Tag outer = inputPath.getTag(0);
             Tag inner = inputPath.getTag(1);
             tuple.append(outer.toGroovyParam()).append(inner.toGroovyRef());
-            if (walk.hasNext()) tuple.append(" | " );
+            if (walk.hasNext()) tuple.append(" | ");
         }
-        tuple.append(")" );
+        tuple.append(")");
         return tuple.toString();
     }
 
     public String toString() {
-        return String.format("<html>%s &larr; %s%s", outputPath.getTail(), inputPath.getTail(), tuplePaths == null ? "" : " +"+tuplePaths.size());
+        return String.format("<html>%s &larr; %s%s", outputPath.getTail(), inputPath.getTail(), tuplePaths == null ? "" : " +" + tuplePaths.size());
     }
 
     private String getTupleUsage() {
         String name = getTupleName();
         int size = tuplePaths.size() + 1;
-        StringBuilder usage = new StringBuilder("\"" );
+        StringBuilder usage = new StringBuilder("\"");
         for (int walk = 0; walk < size; walk++) {
             usage.append(String.format("${%s[%d]}", name, walk));
-            if (walk < size - 1) usage.append(" " );
+            if (walk < size - 1) usage.append(" ");
         }
-        usage.append("\"" );
+        usage.append("\"");
         return usage.toString();
     }
 
@@ -332,7 +359,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
                 if (nodeMapping.inputPath.isAncestorOf(path)) return nodeMapping;
             }
         }
-        return new NodeMapping().setInputPath(Path.create("input" )).setOutputPath(outputPath.chop(1));
+        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.chop(1));
     }
 
     private static final Hasher HASHER = new Hasher();

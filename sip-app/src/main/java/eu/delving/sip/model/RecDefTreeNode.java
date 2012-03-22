@@ -27,18 +27,23 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Utility;
 import org.antlr.stringtemplate.StringTemplate;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
+
+import static eu.delving.sip.base.Utility.MAPPED_HILITE;
 
 /**
  * Represent an element in the JTree
@@ -212,6 +217,8 @@ public class RecDefTreeNode implements TreeNode {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            setOpaque(false);
+            setBorder(null);
             Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             if (value instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) value;
@@ -224,12 +231,30 @@ public class RecDefTreeNode implements TreeNode {
                 else {
                     setIcon(Utility.VALUE_ELEMENT_ICON);
                 }
+                if (!node.recDefNode.getNodeMappings().isEmpty()) {
+                    markNodeMappings(sel, node);
+                }
             }
             else {
                 setIcon(Utility.COMPOSITE_ELEMENT_ICON);
             }
             return component;
         }
+
+        private void markNodeMappings(boolean selected, RecDefTreeNode node) {
+            setOpaque(!selected);
+            setBackground(selected ? Color.WHITE : MAPPED_HILITE);
+            setForeground(selected ? MAPPED_HILITE : Color.BLACK);
+            setBorder(BorderFactory.createEtchedBorder());
+            StringBuilder commaList = new StringBuilder();
+            Iterator<NodeMapping> walk = node.recDefNode.getNodeMappings().values().iterator();
+            while (walk.hasNext()) {
+                commaList.append(walk.next().inputPath.getTail());
+                if (walk.hasNext()) commaList.append(", ");
+            }
+            setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), commaList.toString()));
+        }
+
     }
 
 

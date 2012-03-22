@@ -268,9 +268,6 @@ public class SipModel {
                     dataSetModel.setDataSet(dataSet);
                     final RecMapping recMapping = dataSetModel.getRecMapping(prefix);
                     dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-                    for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
-                        statsModel.findNodesForInputPaths(nodeMapping);
-                    }
                     mappingModel.setRecMapping(recMapping);
                     mappingModel.setFacts(facts);
                     recordCompileModel.setValidator(dataSetModel.getValidator(prefix));
@@ -281,6 +278,9 @@ public class SipModel {
                             dataSetFacts.set(facts);
                             statsModel.set(hints);
                             statsModel.setStatistics(statistics);
+                            for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
+                                statsModel.findNodesForInputPaths(nodeMapping);
+                            }
                             seekFirstRecord();
                         }
                     });

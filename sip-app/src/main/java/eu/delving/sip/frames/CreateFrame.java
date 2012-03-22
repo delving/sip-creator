@@ -46,8 +46,8 @@ import java.util.SortedSet;
 public class CreateFrame extends FrameBase {
     private static final String SELECT_STATS = "<html><center><h1>Select</h1></center></html>";
     private static final String SELECT_RECDEF = "<html><center><h1>Select</h1></center></html>";
-    private HtmlPanel statsHtml = new HtmlPanel("Input");
-    private HtmlPanel recDefHtml = new HtmlPanel("Output");
+    private HtmlPanel statsHtml = new HtmlPanel("Source Statistics");
+    private HtmlPanel recDefHtml = new HtmlPanel("Target Documentation");
     private CreateMappingAction createMappingAction = new CreateMappingAction();
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {

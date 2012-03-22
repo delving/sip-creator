@@ -27,6 +27,7 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
@@ -208,7 +209,8 @@ public class RecMappingFrame extends FrameBase {
             if (nodeMapping != null) {
                 TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
                 if (treePath != null) {
-                    ((RecDefTreeNode) treePath.getLastPathComponent()).getRecDefNode().removeNodeMapping(nodeMapping.inputPath);
+                    nodeMapping = ((RecDefTreeNode) treePath.getLastPathComponent()).getRecDefNode().removeNodeMapping(nodeMapping.inputPath);
+                    StatsTreeNode.removeStatsTreeNodes(nodeMapping);
                     sipModel.getCreateModel().setNodeMapping(null);
                     new ListUpdater().run();
                 }
