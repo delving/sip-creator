@@ -42,25 +42,6 @@ import java.util.TreeMap;
 public class StatsTree implements Serializable {
     private StatsTreeNode root;
 
-    public static int setRecordRoot(DefaultTreeModel model, Path recordRoot) {
-        StatsTreeNode node = (StatsTreeNode) model.getRoot();
-        List<StatsTreeNode> changedNodes = new ArrayList<StatsTreeNode>();
-        int count = setRecordRoot(node, recordRoot, changedNodes);
-        for (StatsTreeNode changedNode : changedNodes) {
-            model.nodeChanged(changedNode);
-        }
-        return count;
-    }
-
-    public static void setUniqueElement(DefaultTreeModel model, Path uniqueElement) {
-        StatsTreeNode node = (StatsTreeNode) model.getRoot();
-        List<StatsTreeNode> changedNodes = new ArrayList<StatsTreeNode>();
-        setUniqueElement(node, uniqueElement, changedNodes);
-        for (StatsTreeNode changedNode : changedNodes) {
-            model.nodeChanged(changedNode);
-        }
-    }
-
     public static StatsTree create(String rootTag) {
         return new StatsTree(new StatsTreeNode(rootTag, "<h3>Root</h3>"));
     }
@@ -78,6 +59,10 @@ public class StatsTree implements Serializable {
         return new StatsTree(root);
     }
 
+    public void setTreeModel(DefaultTreeModel treeModel) {
+        root.setTreeModel(treeModel);
+    }
+
     public StatsTreeNode getRoot() {
         return root;
     }
@@ -90,23 +75,6 @@ public class StatsTree implements Serializable {
 
     private StatsTree(StatsTreeNode root) {
         this.root = root;
-    }
-
-    private static int setRecordRoot(StatsTreeNode node, Path recordRoot, List<StatsTreeNode> changedNodes) {
-        if (node.setRecordRoot(recordRoot)) changedNodes.add(node);
-        int childTotal = 0;
-        for (StatsTreeNode child : node.getChildNodes()) {
-            int subtotal = setRecordRoot(child, recordRoot, changedNodes);
-            if (subtotal > 0) childTotal = subtotal;
-        }
-        return node.isRecordRoot() ? node.getStatistics().getTotal() : childTotal;
-    }
-
-    private static void setUniqueElement(StatsTreeNode node, Path uniqueElement, List<StatsTreeNode> changedNodes) {
-        if (node.setUniqueElement(uniqueElement)) changedNodes.add(node);
-        if (uniqueElement == null || !node.isUniqueElement()) {
-            for (StatsTreeNode child : node.getChildNodes()) setUniqueElement(child, uniqueElement, changedNodes);
-        }
     }
 
     private static void getVariables(StatsTreeNode node, boolean withinRecord, List<StatsTreeNode> variables) {

@@ -49,7 +49,8 @@ public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
     private StatsTree statsTree = StatsTree.create("Select a data set from the File menu, or download one");
-    private DefaultTreeModel statsTreeModel = new DefaultTreeModel(statsTree.getRoot());
+    private StatsTreeNode root;
+    private DefaultTreeModel statsTreeModel = new DefaultTreeModel(root = statsTree.getRoot());
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -73,19 +74,21 @@ public class StatsModel {
         else {
             statsTree = StatsTree.create("Analysis not yet performed");
         }
+        statsTree.setTreeModel(statsTreeModel);
         statsTreeModel.setRoot(statsTree.getRoot());
+        root = statsTree.getRoot();
         setDelimiters(recordRoot, uniqueElement);
     }
 
     private void setDelimiters(Path recordRoot, Path uniqueElement) {
         if (recordRoot != null) {
-            int recordCount = StatsTree.setRecordRoot(statsTreeModel, recordRoot);
+            int recordCount = root.setRecordRoot(recordRoot);
             hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
             List<StatsTreeNode> variables = new ArrayList<StatsTreeNode>();
             statsTree.getVariables(variables);
         }
         if (uniqueElement != null) {
-            StatsTree.setUniqueElement(statsTreeModel, uniqueElement);
+            root.setUniqueElement(uniqueElement);
         }
     }
 
@@ -98,7 +101,7 @@ public class StatsModel {
     }
 
     public void setRecordRoot(Path recordRoot) {
-        int recordCount = StatsTree.setRecordRoot(statsTreeModel, recordRoot);
+        int recordCount = root.setRecordRoot(recordRoot);
         hintsModel.set(Storage.RECORD_ROOT_PATH, recordRoot.toString());
         hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         fireRecordRootSet();
@@ -114,7 +117,7 @@ public class StatsModel {
     }
 
     public void setUniqueElement(Path uniqueElement) {
-        StatsTree.setUniqueElement(statsTreeModel, uniqueElement);
+        root.setUniqueElement(uniqueElement);
         hintsModel.set(Storage.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
         fireUniqueElementSet();
     }

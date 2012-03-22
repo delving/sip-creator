@@ -31,6 +31,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.Color;
@@ -56,6 +57,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     private FieldStatistics fieldStatistics;
     private String htmlChunk;
     private List<NodeMapping> mappedIn = new ArrayList<NodeMapping>();
+    private DefaultTreeModel treeModel;
 
     StatsTreeNode(StatsTreeNode parent, String name, String htmlChunk) {
         this.parent = parent;
@@ -121,16 +123,23 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         return path;
     }
 
-    public boolean setRecordRoot(Path recordRoot) {
+    public int setRecordRoot(Path recordRoot) {
         boolean oldValue = this.recordRoot;
         this.recordRoot = recordRoot != null && getPath(true).equals(recordRoot);
-        return this.recordRoot || this.recordRoot != oldValue;
+        if (this.recordRoot || this.recordRoot != oldValue) treeModel.nodeChanged(this);
+        int childTotal = 0;
+        for (StatsTreeNode child : children) {
+            int subtotal = child.setRecordRoot(recordRoot);
+            if (subtotal > 0) childTotal = subtotal;
+        }
+        return this.recordRoot ? getStatistics().getTotal() : childTotal;
     }
 
-    public boolean setUniqueElement(Path uniqueElement) {
+    public void setUniqueElement(Path uniqueElement) {
         boolean oldValue = this.uniqueElement;
         this.uniqueElement = uniqueElement != null && getPath(true).equals(uniqueElement);
-        return this.uniqueElement != oldValue;
+        if (this.uniqueElement != oldValue) treeModel.nodeChanged(this);
+        for (StatsTreeNode child : children) child.setUniqueElement(uniqueElement);
     }
 
     public boolean isRecordRoot() {
@@ -251,15 +260,33 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     public static void setStatsTreeNodes(SortedSet<StatsTreeNode> nodes, NodeMapping nodeMapping) {
         List<Path> inputPaths = new ArrayList<Path>();
-        for (StatsTreeNode node : nodes) inputPaths.add(node.getPath(false));
+        for (StatsTreeNode node : nodes) {
+            inputPaths.add(node.getPath(false));
+            node.addMappedIn(nodeMapping);
+        }
         nodeMapping.setStatsTreeNodes(nodes, inputPaths);
-        for (StatsTreeNode node : nodes) node.mappedIn.add(nodeMapping);
+    }
+
+    private void addMappedIn(NodeMapping nodeMapping) {
+        this.mappedIn.add(nodeMapping);
+        this.treeModel.nodeChanged(this);
     }
 
     public static void removeStatsTreeNodes(NodeMapping nodeMapping) {
-        if (nodeMapping.hasStatsTreeNodes()) for (Object nodeObject : nodeMapping.getStatsTreeNodes()) {
-            ((StatsTreeNode) nodeObject).mappedIn.remove(nodeMapping);
+        if (nodeMapping.hasStatsTreeNodes()) {
+            for (Object nodeObject : nodeMapping.getStatsTreeNodes()) {
+                ((StatsTreeNode) nodeObject).removeMappedIn(nodeMapping);
+            }
         }
+    }
+
+    private void removeMappedIn(NodeMapping nodeMapping) {
+        if (this.mappedIn.remove(nodeMapping)) this.treeModel.nodeChanged(this);
+    }
+
+    public void setTreeModel(DefaultTreeModel treeModel) {
+        this.treeModel = treeModel;
+        for (StatsTreeNode child : children) child.setTreeModel(treeModel);
     }
 
     public static class Renderer extends DefaultTreeCellRenderer {
@@ -299,7 +326,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
             setBorder(BorderFactory.createEtchedBorder());
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
         }
-        
+
         private void markNodeMappings(boolean selected, StatsTreeNode node) {
             setOpaque(!selected);
             setBackground(selected ? Color.WHITE : MAPPED_HILITE);

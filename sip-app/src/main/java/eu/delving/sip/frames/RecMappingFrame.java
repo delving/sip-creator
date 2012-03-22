@@ -209,7 +209,8 @@ public class RecMappingFrame extends FrameBase {
             if (nodeMapping != null) {
                 TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
                 if (treePath != null) {
-                    nodeMapping = ((RecDefTreeNode) treePath.getLastPathComponent()).getRecDefNode().removeNodeMapping(nodeMapping.inputPath);
+                    RecDefTreeNode node = (RecDefTreeNode) treePath.getLastPathComponent();
+                    nodeMapping = node.getRecDefNode().removeNodeMapping(nodeMapping.inputPath);
                     StatsTreeNode.removeStatsTreeNodes(nodeMapping);
                     sipModel.getCreateModel().setNodeMapping(null);
                     new ListUpdater().run();

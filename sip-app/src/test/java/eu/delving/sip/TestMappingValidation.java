@@ -56,7 +56,6 @@ public class TestMappingValidation {
     private Logger log = Logger.getLogger(getClass());
     private Mockery mock;
     private StatsTree statsTree;
-    private DefaultTreeModel analysisTreeModel;
 
     @Before
     public void createStorage() throws StorageException, IOException, MetadataException {
@@ -185,8 +184,8 @@ public class TestMappingValidation {
                     }
                     dataSet().setStatistics(statistics);
                     statsTree = statistics.createAnalysisTree(dataSet().getDataSetFacts());
-                    analysisTreeModel = new DefaultTreeModel(statsTree.getRoot());
-                    int recordCount = StatsTree.setRecordRoot(analysisTreeModel, recordRoot);
+                    statsTree.getRoot().setTreeModel(new DefaultTreeModel(statsTree.getRoot()));
+                    int recordCount = statsTree.getRoot().setRecordRoot(recordRoot);
                     mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));
                 }
                 catch (StorageException e) {

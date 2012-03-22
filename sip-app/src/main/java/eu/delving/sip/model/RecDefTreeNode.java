@@ -193,6 +193,15 @@ public class RecDefTreeNode implements TreeNode {
         this.recDefNode.addNodeMapping(nodeMapping);
     }
 
+    public RecDefTreeNode getRecDefTreeNode(RecDefNode node) {
+        if (recDefNode == node) return this;
+        for (RecDefTreeNode child : children) {
+            RecDefTreeNode found = child.getRecDefTreeNode(node);
+            if (found != null) return found;
+        }
+        return null;
+    }
+
     public static class RecDefPath extends TreePath {
 
         RecDefPath(RecDefTreeNode elemNode) {
