@@ -19,7 +19,8 @@
         <elem tag="date" elems="earliestDate, latestDate"/>
         <elem tag="earliestDate"/>
         <elem tag="latestDate"/>
-        <elem tag="placeAdmin" elems="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
+        <elem tag="placeAdmin"
+              elems="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
         <elem tag="displayAdmin1"/>
         <elem tag="displayAdmin2"/>
         <elem tag="displayAdmin3"/>
@@ -72,7 +73,7 @@
         </elem>
 
         <elem tag="events" singular="true">
-            <elem tag="event" elems="date" >
+            <elem tag="event" elems="date">
                 <elem tag="eventTypeUri"/>
                 <elem tag="displayEventType"/>
                 <elem tag="displayEvent"/>
@@ -106,17 +107,17 @@
     <options> <!-- keys should be uri's -->
 
         <!--<option-list path="/record/actors/actor/roleUri"> &lt;!&ndash;valuePath="/aff/actors/actor/roleName"> &ndash;&gt;-->
-            <!--<opt key="1">Creator</opt>-->
-            <!--<opt key="2">Artist</opt>-->
-            <!--<opt key="3">Photographer</opt>-->
-            <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
+        <!--<opt key="1">Creator</opt>-->
+        <!--<opt key="2">Artist</opt>-->
+        <!--<opt key="3">Photographer</opt>-->
+        <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
         <!--</option-list>-->
 
         <!--<option-list path="/record/places/place/placeName"> &lt;!&ndash;valuePath="/aff/places/place/roleName"> &ndash;&gt;-->
-            <!--<opt key="1">Actors place of birth</opt>-->
-            <!--<opt key="2">Actor place of death</opt>-->
-            <!--<opt key="3">Production place</opt>-->
-            <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
+        <!--<opt key="1">Actors place of birth</opt>-->
+        <!--<opt key="2">Actor place of death</opt>-->
+        <!--<opt key="3">Production place</opt>-->
+        <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
         <!--</option-list>-->
 
         <option-list path="/record/medias/mediaType">
@@ -135,12 +136,12 @@
         </option-list>
 
         <!--<option-list path="/record/events/event/eventTypeUri"> &lt;!&ndash;valuePath="aff/events/event/eventTypeName">  &ndash;&gt;-->
-            <!--<opt key="1">Production</opt>-->
-            <!--<opt key="2">Creation</opt>-->
-            <!--<opt key="3">etc</opt>-->
-            <!--<opt key="4">etc</opt>-->
-            <!--<opt key="5">etc</opt>-->
-            <!--&lt;!&ndash;todo: CRM EVENTS, same as i LIDO&ndash;&gt;-->
+        <!--<opt key="1">Production</opt>-->
+        <!--<opt key="2">Creation</opt>-->
+        <!--<opt key="3">etc</opt>-->
+        <!--<opt key="4">etc</opt>-->
+        <!--<opt key="5">etc</opt>-->
+        <!--&lt;!&ndash;todo: CRM EVENTS, same as i LIDO&ndash;&gt;-->
         <!--</option-list>-->
 
     </options>
@@ -169,5 +170,37 @@
             </string>
         </doc>
     </docs>
+
+    <views>
+        <view name="full">
+            <row>
+                <column id="description">
+                    <cell>
+                        <field path="/record/delving:summaryFields/delving:description" label="metadata.dc.description"/>
+                    </cell>
+                </column>
+                <column id="fields">
+                    <cell>
+                        <enumeration type="concatenated" separator=", " label="random"
+                                     path="/record/delving:summaryFields/delving:title, /record/icn:data/icn:general/icn:material"/>
+                    </cell>
+                    <cell>
+                        <field path="/record/icn:data/icn:acquisition/icn:cost" label="metadata.icn.purchasePrice"
+                               role="administrator, own"/>
+                    </cell>
+                    <cell>
+                        <field path="/record/icn:data/icn:acquisition/@type" label="metadata.icn.purchaseType"/>
+                    </cell>
+                </column>
+                <column id="complexFields">
+                    <cell>
+                        <list path="/record/icn:places/icn:place">
+                            <field path="@name" label="metadata.icn.placeName"/>
+                        </list>
+                    </cell>
+                </column>
+            </row>
+        </view>
+    </views>
 
 </record-definition>

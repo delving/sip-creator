@@ -418,19 +418,48 @@ public class RecDef {
         public String id;
 
         @XStreamImplicit
-        public List<FieldRef> refs;
+        public List<Cell> cells;
     }
 
-    @XStreamAlias("field-ref")
-    public static class FieldRef {
+    @XStreamAlias("cell")
+    public static class Cell {
+        public FieldEntry field;
+        public EnumEntry enumeration;
+        public ListEntry list;
+    }
+
+    @XStreamAlias("field")
+    public static class FieldEntry {
         @XStreamAsAttribute
-        public Path path;
+        public String path;
 
         @XStreamAsAttribute
-        public String i18n;
+        public String label;
 
         @XStreamAsAttribute
-        public String roles;
+        public String role;
+    }
+
+    @XStreamAlias("enumeration")
+    public static class EnumEntry {
+        @XStreamAsAttribute
+        public String type;
+
+        @XStreamAsAttribute
+        public String label;
+
+        @XStreamAsAttribute
+        public String path;
+    }
+
+    @XStreamAlias("list")
+    public static class ListEntry {
+
+        @XStreamAsAttribute
+        public String path;
+
+        @XStreamImplicit
+        public List<FieldEntry> fields;
     }
 
     @XStreamAlias("attr")
