@@ -2,142 +2,171 @@
 <xs:schema attributeFormDefault="unqualified"
            elementFormDefault="qualified"
            xmlns:aff="http://schemas.delving.eu/aff/"
-           targetNamespace="http://schemas.delving.eu/aff/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           targetNamespace="http://schemas.delving.eu/aff/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xs:element name="record" type="aff:recordType"/>
 
     <xs:complexType name="recordType">
         <xs:sequence>
-            <xs:element name="admin" type="aff:adminType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="collection" type="aff:collectionType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="thing" type="aff:thingType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="mediaFiles" type="aff:mediaFilesType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="actors" type="aff:actorsType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="places" type="aff:placesType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="types" type="aff:typesType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="events" type="aff:eventsType" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="aff:adminType" name="admin"  minOccurs="0" maxOccurs="1"/>
+            <xs:element type="aff:thingType" name="thing" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="aff:collectionType" name="collections"  minOccurs="0" maxOccurs="1"/>
+            <xs:element type="aff:classificationType" name="classifications" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="aff:subjectType" name="subjects" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="aff:materialType" name="materials" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="aff:techniqueType" name="techniques" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="aff:eventsType" name="events" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="aff:mediaType" name="medias" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="adminType">
         <xs:sequence>
-            <xs:element name="ownerUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="ownerName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="ownerCountry" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="providerUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="providerName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="rights" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="xs:string" name="ownerUri"/>
+            <xs:element type="xs:string" name="displayOwner"/>
+            <xs:element type="xs:string" name="displayOwnerCountry"/>
+            <xs:element type="xs:string" name="providerUri"/>
+            <xs:element type="xs:string" name="displayProvider"/>
+            <xs:element type="xs:string" name="rights"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="placeType">
+    <xs:complexType name="collectionType">
         <xs:sequence>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element name="localId" minOccurs="0" maxOccurs="1"/>
-                <xs:element name="localUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="roleUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="roleName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="sourceName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="sourceUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="displayDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="placeType" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="placeName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="admin1" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="admin2" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="admin3" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="admin4" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="country" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="lat" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="long" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:choice>
+            <xs:element type="xs:string" name="collectionUri"/>
+            <xs:element type="xs:string" name="displayCollection"/>
         </xs:sequence>
+        <xs:attribute type="xs:string" name="localId"/>
     </xs:complexType>
 
     <xs:complexType name="thingType">
         <xs:sequence>
-            <xs:element name="thingId" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="thingUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="workType" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="language" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="displayDimensions" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="displayYear" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="landingPage" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="xs:string" name="displayWorkType" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="displayTitle" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="displayDescription" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="language" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="displayDimensions" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="xs:string" name="displayYear" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="landingPage" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="partOfLocalUri" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="rights" minOccurs="0" maxOccurs="1"/>
         </xs:sequence>
+        <xs:attribute type="xs:string" name="localId"/>
+        <xs:attribute type="xs:string" name="localUri"/>
     </xs:complexType>
 
+    <xs:complexType name="subjectType">
+         <xs:sequence>
+             <xs:element type="xs:string" name="displaySubject"/>
+         </xs:sequence>
+         <xs:attribute type="xs:string" name="localId"/>
+         <xs:attribute type="xs:string" name="localUri"/>
+         <xs:attribute type="xs:string" name="sourceName"/>
+         <xs:attribute type="xs:string" name="sourceUri"/>
+     </xs:complexType>
 
-    <xs:complexType name="actorsType">
-        <xs:sequence>
-            <xs:element type="aff:actorType" name="actor"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="typeType">
-        <xs:sequence>
-            <xs:element name="localId" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="localUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="roleUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="roleName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="sourceName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="sourceUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="typeName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="actorType">
-        <xs:sequence>
-            <xs:element name="localId" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="localUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="roleUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="roleName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="sourceName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="sourceUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="displayDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="firstName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="lastName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
+    <xs:complexType name="classificationType">
+         <xs:sequence>
+             <xs:element type="xs:string" name="displayClassification"/>
+         </xs:sequence>
+         <xs:attribute type="xs:string" name="localId"/>
+         <xs:attribute type="xs:string" name="localUri"/>
+         <xs:attribute type="xs:string" name="sourceName"/>
+         <xs:attribute type="xs:string" name="sourceUri"/>
+     </xs:complexType>
+
+    <xs:complexType name="materialType">
+         <xs:sequence>
+             <xs:element type="xs:string" name="displayMaterial"/>
+         </xs:sequence>
+         <xs:attribute type="xs:string" name="localId"/>
+         <xs:attribute type="xs:string" name="localUri"/>
+         <xs:attribute type="xs:string" name="sourceName"/>
+         <xs:attribute type="xs:string" name="sourceUri"/>
+     </xs:complexType>
+
+    <xs:complexType name="techniqueType">
+         <xs:sequence>
+             <xs:element type="xs:string" name="displayTechnique"/>
+         </xs:sequence>
+         <xs:attribute type="xs:string" name="localId"/>
+         <xs:attribute type="xs:string" name="localUri"/>
+         <xs:attribute type="xs:string" name="sourceName"/>
+         <xs:attribute type="xs:string" name="sourceUri"/>
+     </xs:complexType>
+
     <xs:complexType name="eventsType">
         <xs:sequence>
             <xs:element type="aff:eventType" name="event"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="placesType">
-        <xs:sequence>
-            <xs:element type="aff:placeType" name="place" minOccurs="1" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="typesType">
-        <xs:sequence>
-            <xs:element type="aff:typeType" name="type" maxOccurs="unbounded" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+
     <xs:complexType name="eventType">
         <xs:sequence>
-            <xs:element name="displayDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="eventTypeUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="evenTypeName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="eventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="xs:string" name="eventTypeUri"/>
+            <xs:element type="xs:string" name="displayEventType"/>
+            <xs:element type="xs:string" name="displayEvent"/>
+            <xs:element type="xs:string" name="displayDate"/>
+            <xs:element type="aff:dateType" name="date"/>
+            <xs:element type="aff:eventPlaceType" name="eventPlace"/>
+            <xs:element type="aff:eventActorType" name="eventActor"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="mediaFileType">
+
+    <xs:complexType name="eventActorType">
         <xs:sequence>
-            <xs:element name="localURL" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="localMediaTypeUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="localMimeType" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <!-- <xs:element name="delvingMediaURI" type="xs:string" minOccurs="0" maxOccurs="unbounded"/> -->
+            <xs:element type="xs:string" name="displayActorInRole"/>
+            <xs:element type="xs:string" name="actorInRoleUri"/>
+            <xs:element type="xs:string" name="displayActor"/>
         </xs:sequence>
+        <xs:attribute type="xs:string" name="localId"/>
+        <xs:attribute type="xs:string" name="localUri"/>
+        <xs:attribute type="xs:string" name="sourceName"/>
+        <xs:attribute type="xs:string" name="sourceUri"/>
     </xs:complexType>
-    <xs:complexType name="collectionType">
+
+    <xs:complexType name="mediaType">
         <xs:sequence>
-            <xs:element name="collectionID" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="collectionUri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="collectionName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="xs:string" name="mediaURL"/>
+            <xs:element type="xs:string" name="mediaType"/>
+            <xs:element type="xs:string" name="mediaMimeType"/>
+            <!--<xs:element type="xs:string" name="delvingMediaURI"/> -->
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="mediaFilesType">
+
+    <xs:complexType name="dateType">
         <xs:sequence>
-            <xs:element type="aff:mediaFileType" name="mediaFile" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="xs:string" name="earliestDate"/>
+            <xs:element type="xs:string" name="latestDate"/>
         </xs:sequence>
     </xs:complexType>
+
+    <xs:complexType name="placeAdminType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="displayAdmin1"/>
+            <xs:element type="xs:string" name="displayAdmin2"/>
+            <xs:element type="xs:string" name="displayAdmin3"/>
+            <xs:element type="xs:string" name="displayAdmin4"/>
+            <xs:element type="xs:string" name="displayCountry"/>
+            <xs:element type="xs:string" name="lat"/>
+            <xs:element type="xs:string" name="long"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="eventPlaceType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="displayPlaceInRole"/>
+            <xs:element type="xs:string" name="placeInRoleUri"/>
+            <xs:element type="xs:string" name="displayPlace"/>
+            <xs:element type="xs:string" name="displayPlaceType"/>
+            <xs:element type="aff:placeAdminType" name="displayPlaceAdmin"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="localId"/>
+        <xs:attribute type="xs:string" name="localUri"/>
+        <xs:attribute type="xs:string" name="sourceName"/>
+        <xs:attribute type="xs:string" name="sourceUri"/>
+    </xs:complexType>
+
+
 </xs:schema>

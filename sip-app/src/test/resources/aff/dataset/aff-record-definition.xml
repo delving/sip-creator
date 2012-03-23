@@ -19,12 +19,12 @@
         <elem tag="date" elems="earliestDate, latestDate"/>
         <elem tag="earliestDate"/>
         <elem tag="latestDate"/>
-        <elem tag="displayPlaceAdmin" elems="admin1, admin2, admin3, admin4, country, lat, long"/>
-        <elem tag="admin1"/>
-        <elem tag="admin2"/>
-        <elem tag="admin3"/>
-        <elem tag="admin4"/>
-        <elem tag="country"/>
+        <elem tag="placeAdmin" elems="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
+        <elem tag="displayAdmin1"/>
+        <elem tag="displayAdmin2"/>
+        <elem tag="displayAdmin3"/>
+        <elem tag="displayAdmin4"/>
+        <elem tag="displayCountry"/>
         <elem tag="lat"/>
         <elem tag="long"/>
     </elems>
@@ -39,11 +39,6 @@
             <elem tag="displayProvider"/>
         </elem>
 
-        <elem tag="collection" attrs="localId" singular="true">
-            <elem tag="collectionUri"/>
-            <elem tag="displayCollection"/>
-        </elem>
-
         <elem tag="thing" elems="rights" attrs="localId, localUri" singular="true">
             <elem tag="displayWorkType"/>
             <elem tag="displayTitle"/>
@@ -52,30 +47,42 @@
             <elem tag="displayDimensions"/>
             <elem tag="displayYear"/>
             <elem tag="landingPage"/>
+            <elem tag="partOfLocalUri"/>
         </elem>
 
-        <elem tag="types" singular="true">
-            <elem tag="type" attrs="localId, localUri, sourceName, sourceUri">
-                <elem tag="displayType"/>
-                <elem tag="categoryUri"/>
-                <elem tag="displayCategory"/>
-            </elem>
+        <elem tag="collections" attrs="localId" singular="true">
+            <elem tag="collectionUri"/>
+            <elem tag="displayCollection"/>
+        </elem>
+
+        <elem tag="classifications" attrs="localId, localUri, sourceName, sourceUri">
+            <elem tag="displayClassification"/>
+        </elem>
+
+        <elem tag="subjects" attrs="localId, localUri, sourceName, sourceUri">
+            <elem tag="displaySubject"/>
+        </elem>
+
+        <elem tag="materials" attrs="localId, localUri, sourceName, sourceUri">
+            <elem tag="displayMaterial"/>
+        </elem>
+
+        <elem tag="techniques" attrs="localId, localUri, sourceName, sourceUri">
+            <elem tag="displayTechnique"/>
         </elem>
 
         <elem tag="events" singular="true">
-            <elem tag="event">
+            <elem tag="event" elems="date" >
                 <elem tag="eventTypeUri"/>
                 <elem tag="displayEventType"/>
                 <elem tag="displayEvent"/>
                 <elem tag="displayDate"/>
-                <elem tag="date"/>
 
-                <elem tag="eventPlace" attrs="localId, localUri, sourceName, sourceUri">
+                <elem tag="eventPlace" elems="placeAdmin" attrs="localId, localUri, sourceName, sourceUri">
                     <elem tag="displayPlaceInRole"/>
                     <elem tag="placeInRoleUri"/>
                     <elem tag="displayPlace"/>
                     <elem tag="displayPlaceType"/>
-                    <elem tag="displayPlaceAdmin"/>
                 </elem>
 
                 <elem tag="eventActor" attrs="localId, localUri, sourceName, sourceUri">
@@ -86,14 +93,12 @@
             </elem>
         </elem>
 
-        <elem tag="mediaFiles" singular="true">
-             <elem tag="mediaFile">
-                 <elem tag="localURL"/>
-                 <elem tag="localMediaTypeUri"/>
-                 <elem tag="localMimeType"/>
-                 <!-- <elem tag="delvingMediaURI"/> -->
-             </elem>
-         </elem>
+        <elem tag="medias">
+            <elem tag="mediaURL"/>
+            <elem tag="mediaType"/>
+            <elem tag="mediaMimeType"/>
+            <!-- <elem tag="delvingMediaURI"/> -->
+        </elem>
 
     </root>
 
@@ -114,14 +119,20 @@
             <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
         <!--</option-list>-->
 
-        <!--<option-list path="/record/types/type/roleUri"> &lt;!&ndash;valuePath="/aff/types/type/roleName"> &ndash;&gt;-->
-            <!--<opt key="1">Classification</opt>-->
-            <!--<opt key="2">Subject</opt>-->
-            <!--<opt key="3">Technique</opt>-->
-            <!--<opt key="4">Material</opt>-->
-            <!--<opt key="5">Colour</opt>-->
-            <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
-        <!--</option-list>-->
+        <option-list path="/record/medias/mediaType">
+            <opt key="THUMBNAIL">Thumbnail</opt>
+            <opt key="FULL_IMAGE">Full image</opt>
+            <opt key="DEEP_ZOOM">Deep zoom image</opt>
+            <opt key="DOCUMENT">Document</opt>
+            <opt key="VIDEO">Video</opt>
+            <opt key="SOUND">Sound</opt>
+        </option-list>
+
+        <option-list path="/record/medias/mediaMimeType">
+            <opt key="jpeg">jpeg</opt>
+            <opt key="tiff">TIFF</opt>
+            <opt key="png">PNG</opt>
+        </option-list>
 
         <!--<option-list path="/record/events/event/eventTypeUri"> &lt;!&ndash;valuePath="aff/events/event/eventTypeName">  &ndash;&gt;-->
             <!--<opt key="1">Production</opt>-->
@@ -132,20 +143,14 @@
             <!--&lt;!&ndash;todo: CRM EVENTS, same as i LIDO&ndash;&gt;-->
         <!--</option-list>-->
 
-        <!--<option-list path="/record/mediaFiles/mediaFile/localMediaTypeUri">-->
-            <!--<opt key="1">Thumbnail</opt>-->
-            <!--<opt key="2">Full image</opt>-->
-            <!--<opt key="3">Deep zoom image</opt>-->
-            <!--<opt key="4">Document</opt>-->
-            <!--<opt key="5">Video</opt>-->
-            <!--<opt key="5">Sound</opt>-->
-            <!--<opt key="6">etc</opt>-->
-        <!--</option-list>-->
     </options>
 
     <facts>
-        <fact-ref path="/record/admin/displayOwner" name="dataProvider"/>
-        <fact-ref path="/record/admin/diplayProvider" name="provider"/>
+        <fact-ref path="/record/admin/ownerUri" name="dataOwnerUri"/>
+        <fact-ref path="/record/admin/displayOwner" name="dataOwnerName"/>
+        <fact-ref path="/record/admin/displayOwnerCountry" name="dataOwnerCountry"/>
+        <fact-ref path="/record/admin/providerUri" name="dataProviderUri"/>
+        <fact-ref path="/record/admin/displayProvider" name="dataProviderName"/>
         <fact-ref path="/record/admin/rights" name="rights"/>
         <fact-ref path="/record/thing/language" name="language"/>
     </facts>

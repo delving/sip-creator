@@ -1,7 +1,5 @@
 /input/lido:lidoRecID
 /record/thing/displayTitle
 
-/input/lido:lidoRecID
-/record/thing/@localId
 
 
