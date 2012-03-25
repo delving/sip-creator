@@ -42,7 +42,10 @@ public enum SummaryField {
     TYPE("recordType"),
     HUB_ID("hubId"),
     VISIBILITY,
-    OWNER;
+    OWNER,
+    PROVIDER,
+    DATA_PROVIDER("dataProvider"),
+    SPEC;
 
     private static final String NS = "delving_";
 
