@@ -12,7 +12,9 @@
         <view name="gumby">
             <row>
                 <column id="pokey">
-                    <field-ref path="/path/to/price" i18n="prompts.price" role="admin"/>
+                    <cell>
+                        <field path="/path/to/price" i18n="prompts.price" role="admin"/>
+                    </cell>
                 </column>
             </row>
         </view>
