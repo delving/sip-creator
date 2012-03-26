@@ -142,9 +142,10 @@ public class RecDef {
 
     private void resolve() {
         root.resolve(Path.empty(), this);
-        for (Doc doc : docs) doc.resolve(this);
-        for (Category category : bookmarks) category.resolve(this);
-        for (OptionList optionList : options) optionList.resolve(this);
+        if (search != null) for (SearchField searchField : search) searchField.resolve(this);
+        if (docs != null) for (Doc doc : docs) doc.resolve(this);
+        if (bookmarks != null) for (Category category : bookmarks) category.resolve(this);
+        if (options != null) for (OptionList optionList : options) optionList.resolve(this);
     }
 
     private void collectPaths(Elem elem, Path path, List<Path> paths) {
@@ -305,6 +306,11 @@ public class RecDef {
         @XStreamAsAttribute
         public Path path;
 
+        public void resolve(RecDef recDef) {
+            if (path.peek().isAttribute()) throw new RuntimeException("Attribute here?");
+            Elem elem = recDef.findElem(path.defaultPrefix(recDef.prefix));
+            elem.searchField = this;
+        }
     }
 
     @XStreamAlias("doc")
@@ -448,6 +454,9 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
+
+        @XStreamOmitField
+        public SearchField searchField;
 
         @Override
         public String toString() {

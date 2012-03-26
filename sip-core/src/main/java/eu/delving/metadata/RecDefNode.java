@@ -75,6 +75,14 @@ public class RecDefNode {
         this.attr = attr;
     }
 
+    public boolean hasSearchField() {
+        return elem != null && elem.searchField != null;
+    }
+
+    public String getSearchField() {
+        return elem.searchField.name;
+    }
+
     public String getFieldType() {
         if (elem != null && elem.fieldType != null) return elem.fieldType;
         return "text";
