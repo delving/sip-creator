@@ -12,6 +12,7 @@
         <attr tag="localUri"/>
         <attr tag="sourceUri"/>
         <attr tag="sourceName"/>
+        <attr tag="eventTypeUri"/>
     </attrs>
 
     <elems>
@@ -73,8 +74,7 @@
         </elem>
 
         <elem tag="events" singular="true">
-            <elem tag="event" elems="date">
-                <elem tag="eventTypeUri"/>
+            <elem tag="event" elems="date" attrs="eventTypeUri">
                 <elem tag="displayEventType"/>
                 <elem tag="displayEvent"/>
                 <elem tag="displayDate"/>
@@ -104,21 +104,13 @@
     </root>
 
 
-    <options> <!-- keys should be uri's -->
+    <options>
 
-        <!--<option-list path="/record/actors/actor/roleUri"> &lt;!&ndash;valuePath="/aff/actors/actor/roleName"> &ndash;&gt;-->
-        <!--<opt key="1">Creator</opt>-->
-        <!--<opt key="2">Artist</opt>-->
-        <!--<opt key="3">Photographer</opt>-->
-        <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
-        <!--</option-list>-->
-
-        <!--<option-list path="/record/places/place/placeName"> &lt;!&ndash;valuePath="/aff/places/place/roleName"> &ndash;&gt;-->
-        <!--<opt key="1">Actors place of birth</opt>-->
-        <!--<opt key="2">Actor place of death</opt>-->
-        <!--<opt key="3">Production place</opt>-->
-        <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
-        <!--</option-list>-->
+        <option-list keyPath="/record/events/event/@eventTypeUri" valuePath="/record/events/event/displayEventType"> <!-->  -->
+            <opt key="http://www.cidoc-crm.org/rdfs/E12._Production">Production</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E65.Creation">Creation</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E8.Acquisition">Acquisition</opt>
+        </option-list>
 
         <option-list path="/record/medias/mediaType">
             <opt key="THUMBNAIL">Thumbnail</opt>
@@ -135,14 +127,6 @@
             <opt key="png">PNG</opt>
         </option-list>
 
-        <!--<option-list path="/record/events/event/eventTypeUri"> &lt;!&ndash;valuePath="aff/events/event/eventTypeName">  &ndash;&gt;-->
-        <!--<opt key="1">Production</opt>-->
-        <!--<opt key="2">Creation</opt>-->
-        <!--<opt key="3">etc</opt>-->
-        <!--<opt key="4">etc</opt>-->
-        <!--<opt key="5">etc</opt>-->
-        <!--&lt;!&ndash;todo: CRM EVENTS, same as i LIDO&ndash;&gt;-->
-        <!--</option-list>-->
 
     </options>
 
