@@ -74,6 +74,8 @@ public class TestMappingEngine {
     @Test
     public void indexDocument() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"));
+        Node node = mappingEngine.toNode(input("icn"));
+        System.out.println(XmlSerializer.toXml(node));
         IndexDocument indexDocument = mappingEngine.toIndexDocument(input("icn"));
         System.out.println(indexDocument);
         Assert.assertFalse(indexDocument.getMap().isEmpty());

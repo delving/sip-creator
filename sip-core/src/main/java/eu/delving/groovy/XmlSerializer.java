@@ -21,15 +21,15 @@
 
 package eu.delving.groovy;
 
-import org.w3c.dom.DOMConfiguration;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Here we handle turning a DOM node into an XML Document
@@ -42,6 +42,15 @@ public class XmlSerializer {
     public static String toXml(Node node) {
         if (node == null) return "<?xml?>";
         DOMImplementation domImplementation = node.getOwnerDocument().getImplementation();
+        Map<String,String> namespaces = new TreeMap<String, String>();
+        gatherNamespaces(node, namespaces);
+        Element element = (Element) node;
+        for (Map.Entry<String,String> entry : namespaces.entrySet()) {
+            if (entry.getValue().equals(element.getNamespaceURI())) continue;
+            String xmlns = String.format("xmlns:%s", entry.getKey());
+            if (element.getAttributeNode(xmlns) == null) element.setAttributeNS("http://www.w3.org/2000/xmlns/", xmlns, entry.getValue());
+        }
+        // todo : add them to node
         if (domImplementation.hasFeature("LS", "3.0") && domImplementation.hasFeature("Core", "2.0")) {
             DOMImplementationLS domImplementationLS = (DOMImplementationLS) domImplementation.getFeature("LS", "3.0");
             LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
@@ -61,6 +70,15 @@ public class XmlSerializer {
         }
         else {
             throw new RuntimeException("DOM 3.0 LS and/or DOM 2.0 Core not supported.");
+        }
+    }
+
+    private static void gatherNamespaces(Node node, Map<String,String> namespaces) {
+        if (node.getNamespaceURI() != null) namespaces.put(node.getPrefix(), node.getNamespaceURI());
+        NodeList list = node.getChildNodes();
+        for (int walk=0; walk<list.getLength(); walk++) {
+            Node sub = list.item(walk);
+            gatherNamespaces(sub, namespaces);
         }
     }
     
