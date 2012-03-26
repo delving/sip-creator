@@ -59,6 +59,7 @@ public class RecDefFrame extends FrameBase {
     private JTree bookmarkTree;
     private JTextField filterField = new JTextField();
     private JPanel treePanel = new JPanel(new GridLayout(0, 1));
+    private JCheckBox autoFoldBox = new JCheckBox("Auto-Folding");
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -114,9 +115,11 @@ public class RecDefFrame extends FrameBase {
     }
 
     private JPanel createFilterPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Filter"));
-        p.add(filterField);
+        JPanel p = new JPanel(new BorderLayout(10, 10));
+        p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        p.add(new JLabel("Filter:", JLabel.RIGHT), BorderLayout.WEST);
+        p.add(filterField, BorderLayout.CENTER);
+        p.add(autoFoldBox, BorderLayout.EAST);
         return p;
     }
 
@@ -134,7 +137,7 @@ public class RecDefFrame extends FrameBase {
         public void run() {
             if (nodeObject instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) nodeObject;
-                showPath(node);
+                if (autoFoldBox.isSelected()) showPath(node);
                 sipModel.getCreateModel().setRecDefTreeNode(node);
             }
             else {
