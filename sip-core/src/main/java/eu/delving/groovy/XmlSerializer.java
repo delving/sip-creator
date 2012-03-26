@@ -50,7 +50,6 @@ public class XmlSerializer {
             String xmlns = String.format("xmlns:%s", entry.getKey());
             if (element.getAttributeNode(xmlns) == null) element.setAttributeNS("http://www.w3.org/2000/xmlns/", xmlns, entry.getValue());
         }
-        // todo : add them to node
         if (domImplementation.hasFeature("LS", "3.0") && domImplementation.hasFeature("Core", "2.0")) {
             DOMImplementationLS domImplementationLS = (DOMImplementationLS) domImplementation.getFeature("LS", "3.0");
             LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
