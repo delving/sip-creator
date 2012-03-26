@@ -31,6 +31,7 @@ import org.xml.sax.SAXException;
 import javax.xml.stream.XMLStreamException;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
+import java.util.Map;
 
 /**
  * Wrapping the mapping mechanism for easy access from Scala
@@ -42,11 +43,11 @@ public class MappingEngine {
     private MetadataRecordFactory metadataRecordFactory;
     private MappingRunner mappingRunner;
 
-    public MappingEngine(String mapping, ClassLoader classLoader, RecDefModel recDefModel) throws FileNotFoundException, MetadataException {
+    public MappingEngine(String mapping, ClassLoader classLoader, RecDefModel recDefModel, Map<String,String> namespaces) throws FileNotFoundException, MetadataException {
         RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
         mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
-        metadataRecordFactory = new MetadataRecordFactory(recMapping.getRecDefTree().getRecDef().getNamespacesMap());
+        metadataRecordFactory = new MetadataRecordFactory(namespaces);
     }
 
     public Node toNode(String originalRecord) throws XMLStreamException, MappingException {
@@ -55,7 +56,6 @@ public class MappingEngine {
     }
 
     public IndexDocument toIndexDocument(String originalRecord) throws MappingException, SAXException {
-        if (!mappingRunner.getRecDefTree().getRecDef().flat) throw new RuntimeException("Recdef must be flat to produce an IndexDocument");
         try {
             MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
             Node outputRecord = mappingRunner.runMapping(metadataRecord);

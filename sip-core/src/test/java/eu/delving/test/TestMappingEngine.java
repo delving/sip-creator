@@ -42,9 +42,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * A unit test of the mapping engine
@@ -56,7 +54,9 @@ public class TestMappingEngine {
 
     @Test
     public void validateTreeNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("lido"), classLoader(), new MockRecDefModel("lido"));
+        MappingEngine mappingEngine = new MappingEngine(mapping("lido"), classLoader(), new MockRecDefModel("lido"), namespaces(
+                "lido", "http://www.lido-schema.org"
+        ));
         Node node = mappingEngine.toNode(input("lido"));
         System.out.println(XmlSerializer.toXml(node));
         Source source = new DOMSource(node);
@@ -65,15 +65,25 @@ public class TestMappingEngine {
 
     @Test
     public void validateFlatNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"));
+        MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"), namespaces(
+                "dc", "http://purl.org/dc/elements/1.1/",
+                "dcterms", "http://purl.org/dc/terms/",
+                "europeana", "http://www.europeana.eu/schemas/ese/",
+                "icn", "http://www.icn.nl/schemas/icn/"
+        ));
         Node node = mappingEngine.toNode(input("icn"));
         Source source = new DOMSource(node);
         validator("icn").validate(source);
     }
 
     @Test
-    public void indexDocument() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"));
+    public void indexDocumentFromFlat() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"), namespaces(
+                "dc", "http://purl.org/dc/elements/1.1/",
+                "dcterms", "http://purl.org/dc/terms/",
+                "europeana", "http://www.europeana.eu/schemas/ese/",
+                "icn", "http://www.icn.nl/schemas/icn/"
+        ));
         Node node = mappingEngine.toNode(input("icn"));
         System.out.println(XmlSerializer.toXml(node));
         IndexDocument indexDocument = mappingEngine.toIndexDocument(input("icn"));
@@ -81,10 +91,28 @@ public class TestMappingEngine {
         Assert.assertFalse(indexDocument.getMap().isEmpty());
     }
 
+    @Test
+    public void indexDocumentFromAFF() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
+                "lido", "http://www.lido-schema.org"
+        ));
+        Node node = mappingEngine.toNode(input("aff"));
+        System.out.println(XmlSerializer.toXml(node));
+        IndexDocument indexDocument = mappingEngine.toIndexDocument(input("aff"));
+        System.out.println(indexDocument);
+        Assert.assertFalse(indexDocument.getMap().isEmpty());
+    }
+
+    private Map<String, String> namespaces(String... arg) {
+        Map<String, String> map = new TreeMap<String, String>();
+        for (int walk = 0; walk < arg.length; walk += 2) map.put(arg[walk], arg[walk + 1]);
+        return map;
+    }
+
     private String input(String prefix) {
         return string(String.format("/%s/test-input.xml", prefix));
     }
-    
+
     private String mapping(String prefix) {
         return string(String.format("/%s/mapping_%s.xml", prefix, prefix));
     }
@@ -119,7 +147,7 @@ public class TestMappingEngine {
             return RecDefTree.create(RecDef.read(stream(String.format("/%s/%s-record-definition.xml", prefix, prefix))));
         }
     }
-    
+
     private Validator validator(String prefix) {
         try {
             SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
@@ -130,7 +158,7 @@ public class TestMappingEngine {
             throw new RuntimeException(e);
         }
     }
-    
+
     private ClassLoader classLoader() {
         return getClass().getClassLoader();
     }

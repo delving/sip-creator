@@ -22,6 +22,7 @@
 package eu.delving.sip;
 
 import eu.delving.metadata.*;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -41,6 +42,53 @@ public class IndexDocument {
     private Map<String, List<Value>> map = new TreeMap<String, List<Value>>();
 
     public static IndexDocument fromNode(Node inputNode, RecDefTree recordDefinition) {
+        if (recordDefinition.getRecDef().flat) {
+            return fromFlatRecord(inputNode, recordDefinition);
+        }
+        else if (recordDefinition.getRecDef().prefix.equals("aff")) {
+            return fromAFFRecord(inputNode, recordDefinition);
+        }
+        else {
+            throw new RuntimeException("Only flat or aff record definitions can be used to create an IndexDocument");
+        }
+    }
+
+    private static IndexDocument fromAFFRecord(Node inputNode, RecDefTree recordDefinition) {
+        traverse(inputNode, 0);
+        IndexDocument doc = new IndexDocument();
+        fromAFFRecord((Element)inputNode, recordDefinition, doc);
+        return doc;
+    }
+
+    private static void fromAFFRecord(Element element, RecDefTree recordDefinition, IndexDocument doc) {
+        NodeList kids = element.getChildNodes();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.ATTRIBUTE_NODE:
+                    throw new RuntimeException("Attributes not implemented");
+                case Node.TEXT_NODE:
+                    throw new RuntimeException("Text Nodes not implemented");
+                case Node.ELEMENT_NODE:
+                    RecDefNode recDefNode = getRecDefNode(recordDefinition, (Element)kid);
+                    if (recDefNode.isLeafElem()) {
+                        Node textNode = getTextNode(kid);
+                        if (textNode == null) throw new RuntimeException("No text subnode for content of "+recDefNode);
+                        doc.put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), textNode.getNodeValue());
+                        SummaryField summaryField = recDefNode.getSummaryField();
+                        if (summaryField != null) doc.put(summaryField.tag, textNode.getNodeValue());
+                    }
+                    else {
+                        fromAFFRecord((Element) kid, recordDefinition, doc);
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
+            }
+        }
+    }
+
+    private static IndexDocument fromFlatRecord(Node inputNode, RecDefTree recordDefinition) {
         IndexDocument doc = new IndexDocument();
         NodeList kids = inputNode.getChildNodes();
         for (int walk = 0; walk < kids.getLength(); walk++) {
@@ -52,7 +100,7 @@ public class IndexDocument {
                     throw new RuntimeException("Text Nodes not implemented");
                 case Node.ELEMENT_NODE:
                     Node textNode = getTextNode(kid);
-                    RecDefNode recDefNode = getRecDefNode(recordDefinition, kid);
+                    RecDefNode recDefNode = getRecDefNode(recordDefinition, (Element)kid);
                     doc.put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), textNode.getNodeValue());
                     SummaryField summaryField = recDefNode.getSummaryField();
                     if (summaryField != null) doc.put(summaryField.tag, textNode.getNodeValue());
@@ -64,10 +112,14 @@ public class IndexDocument {
         return doc;
     }
 
-    private static RecDefNode getRecDefNode(RecDefTree recordDefinition, Node kid) {
-        Path path = Path.empty().
-                extend(Tag.element(recordDefinition.getRecDef().prefix, "record")).
-                extend(Tag.element(kid.getPrefix(), kid.getLocalName()));
+    private static RecDefNode getRecDefNode(RecDefTree recordDefinition, Element element) {
+        Path path = Path.empty().extend(Tag.element(recordDefinition.getRecDef().prefix, "record"));
+        List<Element> elements = new ArrayList<Element>();
+        while (element.getParentNode() != null) {
+            elements.add(0, element);
+            element = (Element)element.getParentNode();
+        }
+        for (Element el :elements) path = path.extend(Tag.element(el.getPrefix(), el.getLocalName()));
         RecDefNode recDefNode = recordDefinition.getRecDefNode(path);
         if (recDefNode == null) throw new RuntimeException("No recdef node for " + path);
         return recDefNode;
@@ -128,26 +180,27 @@ public class IndexDocument {
         return out.toString();
     }
 
-//    private static void traverse(Node node, int level) {
-//        NodeList childNodes = node.getChildNodes();
-//        for (int walk = 0; walk < childNodes.getLength(); walk++) {
-//            Node child = childNodes.item(walk);
-//            String type = "?";
-//            switch (child.getNodeType()) {
-//                case Node.ATTRIBUTE_NODE:
-//                    type = "attr";
-//                    break;
-//                case Node.ELEMENT_NODE:
-//                    type = "elem";
-//                    break;
-//                case Node.TEXT_NODE:
-//                    type = "text";
-//                    break;
-//            }
-//            String string = String.format("%d: %s: %s = %s", level, type, child.getNodeName(), child.getNodeValue());
-//            System.out.println(StringUtils.leftPad(string, level + 1, '\t'));
-//            traverse(child, level + 1);
-//        }
-//    }
+    private static void traverse(Node node, int level) {
+        NodeList childNodes = node.getChildNodes();
+        for (int walk = 0; walk < childNodes.getLength(); walk++) {
+            Node child = childNodes.item(walk);
+            String type = "?";
+            switch (child.getNodeType()) {
+                case Node.ATTRIBUTE_NODE:
+                    type = "attr";
+                    break;
+                case Node.ELEMENT_NODE:
+                    type = "elem";
+                    break;
+                case Node.TEXT_NODE:
+                    type = "text";
+                    break;
+            }
+            for (int count = 0; count < level; count++) System.out.print('\t');
+            String string = String.format("%d: %s: %s = %s", level, type, child.getNodeName(), child.getNodeValue());
+            System.out.println(string);
+            traverse(child, level + 1);
+        }
+    }
 }
 

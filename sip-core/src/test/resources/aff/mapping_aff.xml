@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="aff">
+    <facts>
+        <entry>
+            <string>spec</string>
+            <string>aff</string>
+        </entry>
+        <entry>
+            <string>dataProviderUri</string>
+            <string>http://www.thuisinbrabant.nl/</string>
+        </entry>
+        <entry>
+            <string>name</string>
+            <string>Aff Test</string>
+        </entry>
+        <entry>
+            <string>rights</string>
+            <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
+        </entry>
+        <entry>
+            <string>dataProviderName</string>
+            <string>Thuis in Brabant</string>
+        </entry>
+        <entry>
+            <string>dataOwnerUri</string>
+            <string>http://www.schijndel.nl/museum/nl/index.html</string>
+        </entry>
+        <entry>
+            <string>language</string>
+            <string>nl</string>
+        </entry>
+        <entry>
+            <string>dataOwnerName</string>
+            <string>Museum Jan Heestershuis</string>
+        </entry>
+        <entry>
+            <string>type</string>
+            <string>IMAGE</string>
+        </entry>
+        <entry>
+            <string>dataOwnerCountry</string>
+            <string>nl</string>
+        </entry>
+    </facts>
+    <functions/>
+    <node-mappings>
+        <node-mapping inputPath="/facts/dataOwnerUri" outputPath="/aff:record/aff:admin/aff:ownerUri"/>
+        <node-mapping inputPath="/facts/dataOwnerName" outputPath="/aff:record/aff:admin/aff:displayOwner"/>
+        <node-mapping inputPath="/facts/dataOwnerCountry" outputPath="/aff:record/aff:admin/aff:displayOwnerCountry"/>
+        <node-mapping inputPath="/facts/dataProviderUri" outputPath="/aff:record/aff:admin/aff:providerUri"/>
+        <node-mapping inputPath="/facts/dataProviderName" outputPath="/aff:record/aff:admin/aff:displayProvider"/>
+        <node-mapping inputPath="/facts/rights" outputPath="/aff:record/aff:admin/aff:rights"/>
+        <node-mapping inputPath="/input/lido:lidoRecID" outputPath="/aff:record/aff:thing/aff:displayTitle"/>
+        <node-mapping inputPath="/facts/language" outputPath="/aff:record/aff:thing/aff:language"/>
+    </node-mappings>
+</rec-mapping>
