@@ -238,17 +238,17 @@ public class RecDef {
     public static class OptionList {
 
         @XStreamAsAttribute
-        public Path path;
+        public Path keyPath;
 
         @XStreamAsAttribute
-        public Path keyPath;
+        public Path valuePath;
 
         @XStreamImplicit
         public List<Opt> opts;
 
         public void resolve(RecDef recDef) {
-            if (path == null) throw new RuntimeException("No path for OptionList: " + opts);
-            resolve(recDef, path, false);
+            if (valuePath == null) throw new RuntimeException("No path for OptionList: " + opts);
+            resolve(recDef, valuePath, false);
             resolve(recDef, keyPath, true);
         }
 

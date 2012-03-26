@@ -57,13 +57,13 @@
     </root>
 
     <options>
-        <option-list path="/record/europeana:type"> <!-- no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs -->
-            <opt key="1">TEXT</opt>
-            <opt key="2">IMAGE</opt>
-            <opt key="3">SOUND</opt>
-            <opt key="4">VIDEO</opt>
-            <opt key="5">3D</opt>
-        </option-list>
+        <!--<option-list path="/record/europeana:type"> &lt;!&ndash; no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs &ndash;&gt;-->
+            <!--<opt key="1">TEXT</opt>-->
+            <!--<opt key="2">IMAGE</opt>-->
+            <!--<opt key="3">SOUND</opt>-->
+            <!--<opt key="4">VIDEO</opt>-->
+            <!--<opt key="5">3D</opt>-->
+        <!--</option-list>-->
     </options>
 
     <search>

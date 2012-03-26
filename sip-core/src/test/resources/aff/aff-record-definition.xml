@@ -124,20 +124,20 @@
         <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
         <!--</option-list>-->
 
-        <option-list path="/record/medias/mediaType">
-            <opt key="THUMBNAIL">Thumbnail</opt>
-            <opt key="FULL_IMAGE">Full image</opt>
-            <opt key="DEEP_ZOOM">Deep zoom image</opt>
-            <opt key="DOCUMENT">Document</opt>
-            <opt key="VIDEO">Video</opt>
-            <opt key="SOUND">Sound</opt>
-        </option-list>
+        <!--<option-list path="/record/medias/mediaType">-->
+            <!--<opt key="THUMBNAIL">Thumbnail</opt>-->
+            <!--<opt key="FULL_IMAGE">Full image</opt>-->
+            <!--<opt key="DEEP_ZOOM">Deep zoom image</opt>-->
+            <!--<opt key="DOCUMENT">Document</opt>-->
+            <!--<opt key="VIDEO">Video</opt>-->
+            <!--<opt key="SOUND">Sound</opt>-->
+        <!--</option-list>-->
 
-        <option-list path="/record/medias/mediaMimeType">
-            <opt key="jpeg">jpeg</opt>
-            <opt key="tiff">TIFF</opt>
-            <opt key="png">PNG</opt>
-        </option-list>
+        <!--<option-list path="/record/medias/mediaMimeType">-->
+            <!--<opt key="jpeg">jpeg</opt>-->
+            <!--<opt key="tiff">TIFF</opt>-->
+            <!--<opt key="png">PNG</opt>-->
+        <!--</option-list>-->
 
         <!--<option-list path="/record/events/event/eventTypeUri"> &lt;!&ndash;valuePath="aff/events/event/eventTypeName">  &ndash;&gt;-->
         <!--<opt key="1">Production</opt>-->
