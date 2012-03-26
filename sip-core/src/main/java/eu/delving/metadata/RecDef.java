@@ -89,8 +89,6 @@ public class RecDef {
 
     public List<Role> roles;
 
-    public List<View> views;
-
     public List<Attr> attrs;
 
     public List<Elem> elems;
@@ -393,73 +391,6 @@ public class RecDef {
 
         @XStreamAsAttribute
         public String i18n;
-    }
-
-    @XStreamAlias("view")
-    public static class View {
-
-        @XStreamAsAttribute
-        public String name;
-
-        @XStreamImplicit
-        public List<Row> rows;
-    }
-
-    @XStreamAlias("row")
-    public static class Row {
-        @XStreamImplicit
-        public List<Column> columns;
-    }
-
-    @XStreamAlias("column")
-    public static class Column {
-
-        @XStreamAsAttribute
-        public String id;
-
-        @XStreamImplicit
-        public List<Cell> cells;
-    }
-
-    @XStreamAlias("cell")
-    public static class Cell {
-        public FieldEntry field;
-        public EnumEntry enumeration;
-        public ListEntry list;
-    }
-
-    @XStreamAlias("field")
-    public static class FieldEntry {
-        @XStreamAsAttribute
-        public String path;
-
-        @XStreamAsAttribute
-        public String label;
-
-        @XStreamAsAttribute
-        public String role;
-    }
-
-    @XStreamAlias("enumeration")
-    public static class EnumEntry {
-        @XStreamAsAttribute
-        public String type;
-
-        @XStreamAsAttribute
-        public String label;
-
-        @XStreamAsAttribute
-        public String path;
-    }
-
-    @XStreamAlias("list")
-    public static class ListEntry {
-
-        @XStreamAsAttribute
-        public String path;
-
-        @XStreamImplicit
-        public List<FieldEntry> fields;
     }
 
     @XStreamAlias("attr")

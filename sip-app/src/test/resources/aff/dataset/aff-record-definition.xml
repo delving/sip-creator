@@ -171,36 +171,4 @@
         </doc>
     </docs>
 
-    <views>
-        <view name="full">
-            <row>
-                <column id="description">
-                    <cell>
-                        <field path="/record/delving:summaryFields/delving:description" label="metadata.dc.description"/>
-                    </cell>
-                </column>
-                <column id="fields">
-                    <cell>
-                        <enumeration type="concatenated" separator=", " label="random"
-                                     path="/record/delving:summaryFields/delving:title, /record/icn:data/icn:general/icn:material"/>
-                    </cell>
-                    <cell>
-                        <field path="/record/icn:data/icn:acquisition/icn:cost" label="metadata.icn.purchasePrice"
-                               role="administrator, own"/>
-                    </cell>
-                    <cell>
-                        <field path="/record/icn:data/icn:acquisition/@type" label="metadata.icn.purchaseType"/>
-                    </cell>
-                </column>
-                <column id="complexFields">
-                    <cell>
-                        <list path="/record/icn:places/icn:place">
-                            <field path="@name" label="metadata.icn.placeName"/>
-                        </list>
-                    </cell>
-                </column>
-            </row>
-        </view>
-    </views>
-
 </record-definition>

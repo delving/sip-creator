@@ -8,18 +8,6 @@
         <role name="admin" i18n="roles.administrator"/>
     </roles>
 
-    <views>
-        <view name="gumby">
-            <row>
-                <column id="pokey">
-                    <cell>
-                        <field path="/path/to/price" i18n="prompts.price" role="admin"/>
-                    </cell>
-                </column>
-            </row>
-        </view>
-    </views>
-
     <attrs>
         <attr tag="relatedencoding"/>
         <attr tag="type"/>
