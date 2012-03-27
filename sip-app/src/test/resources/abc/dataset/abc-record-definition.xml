@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
-<record-definition prefix="abm" flat="true">
+<record-definition prefix="abc" flat="true">
 
     <namespaces>
         <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
         <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
         <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
-        <namespace prefix="abm" uri="http://abmu.org/abm" schema="http://abmu.org/abm.xsd"/>
+        <namespace prefix="abc" uri="http://abmu.org/abm" schema="http://abmu.org/abm.xsd"/>
         <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
     </namespaces>
 
@@ -61,26 +61,17 @@
         <elem tag="europeana:year"/>
     </root>
 
-    <searchFields>
-        <searchField name="TITLE" path="/record/abc:title"/>
-        <searchField name="THUMBNAIL" path="/record/abc:largeThumbnail"/>
-        <searchField name="DESCRIPTION" path="/record/abc:description"/>
-        <searchField name="CREATOR" path="/record/abc:kunstenaar"/>
-        <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
-        <searchField name="OWNER" path="/record/europeana:dataProvider"/>
-        <searchField name="THUMBNAIL" path="/record/europeana:isShownBy"/>
-    </searchFields>
+    <facts>
+        <fact-ref name="spec" path="/record/europeana:collectionName"/>
+        <fact-ref name="name" path="/record/europeana:collectionTitle"/>
+        <fact-ref name="country" path="/record/europeana:country"/>
+        <fact-ref name="dataProvider" path="/record/europeana:dataProvider"/>
+        <fact-ref name="language" path="/record/europeana:language"/>
+        <fact-ref name="provider" path="/record/europeana:provider"/>
+        <fact-ref name="rights" path="/record/europeana:rights"/>
+        <fact-ref name="type" path="/record/europeana:type"/>
+    </facts>
 
-    <!--<facts>-->
-        <!--<fact name="spec" path="/icn:collectionName"/>-->
-        <!--<fact name="name" path="/icn:collectionTitle"/>-->
-        <!--<fact name="country" path="/icn:country"/>-->
-        <!--<fact name="dataProvider" path="/icn:dataProvider"/>-->
-        <!--<fact name="language" path="/icn:language"/>-->
-        <!--<fact name="provider" path="/icn:provider"/>-->
-        <!--<fact name="rights" path="/icn:rights"/>-->
-        <!--<fact name="type" path="/icn:type"/>-->
-    <!--</facts>-->
 
     <!--<converters>-->
         <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>-->
@@ -88,29 +79,10 @@
         <!--<converter call=".toLocalId(spec)" path="/europeana:uri"/>-->
         <!--<converter multipleOutput="true" call=".extractYear()" path="/delving:year"/>-->
     <!--</converters>-->
-    
+
     <docs>
-        <doc path="/record/dc:contributor">
-            <string name="Dublin Core definition">An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>
-            <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
-            <string name="Europeana note">The name of contributors to the original analog or born digital object.  This could be a person, an organisation or a service. </string>
-        </doc>
-        <!-- ... -->
     </docs>
 
-    <bookmarks>
-        <!--<category name="Mandatory ICN elements">-->
-            <!--<doc>-->
-                <!--<string>These elements must be included in any ESE delivery to Europeana</string>-->
-            <!--</doc>-->
-            <!--<ref path="/europeana:provider" display="Provider"/>-->
-            <!--<ref path="/europeana:dataProvider" display="Data provider"/>-->
-            <!--<ref path="/europeana:rights" display="Rights"/>-->
-            <!--<ref path="/europeana:type" display="Type"/>-->
-            <!--<ref path="/europeana:isShownBy" display="Is Shown By"/>-->
-            <!--<ref path="/europeana:isShownAt" display="Is Shown At"/>-->
-        <!--</category>-->
-    </bookmarks>
 
 </record-definition>
 

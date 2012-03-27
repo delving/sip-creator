@@ -1,12 +1,10 @@
-name=Aff Test
-dataOwnerUri=http://www.schijndel.nl/museum/nl/index.html
-dataOwnerName=Museum Jan Heestershuis
-dataOwnerCountry=nl
-dataProviderUri=http://www.thuisinbrabant.nl/
-dataProviderName=Thuis in Brabant
+name=ABC Test
+spec=abc
+country=netherlands
+dataProvider=Sourcer
 language=nl
+provider=Testmeister
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
-spec=aff
 
 

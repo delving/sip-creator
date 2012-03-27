@@ -3,5 +3,5 @@
 /record/europeana:uri
 
 /input/description
-/record/dc:description
+/record/abc:description
 

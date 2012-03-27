@@ -1,9 +1,8 @@
-name=ESE Test
-provider=Testmeister
+name=ICN Test
+spec=ese
 country=netherlands
-dataProvider=ese_Sourcer
+dataProvider=Sourcer
 language=nl
+provider=Testmeister
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
-spec=ese
-
