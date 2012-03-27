@@ -14,6 +14,8 @@
         <attr tag="sourceName"/>
         <attr tag="eventTypeUri"/>
         <attr tag="hubRecordId"/>
+        <attr tag="conceptTypeUri"/>
+        <attr tag="ResourceTypeUri"/>
     </attrs>
 
     <elems>
@@ -44,6 +46,11 @@
             <elem tag="displayProviderHub"/>
         </elem>
 
+        <elem tag="collection" attrs="localId" singular="true">
+            <elem tag="collectionUri"/>
+            <elem tag="displayCollection"/>
+        </elem>
+
         <elem tag="thing" elems="rights" attrs="localId, localUri, hubRecordId" singular="true">
             <elem tag="displayWorkType"/>
             <elem tag="displayTitle"/>
@@ -55,25 +62,11 @@
             <elem tag="partOfLocalUri"/>
         </elem>
 
-        <elem tag="collections" attrs="localId" singular="true">
-            <elem tag="collectionUri"/>
-            <elem tag="displayCollection"/>
-        </elem>
-
-        <elem tag="classifications" attrs="localId, localUri, sourceName, sourceUri">
-            <elem tag="displayClassification"/>
-        </elem>
-
-        <elem tag="subjects" attrs="localId, localUri, sourceName, sourceUri">
-            <elem tag="displaySubject"/>
-        </elem>
-
-        <elem tag="materials" attrs="localId, localUri, sourceName, sourceUri">
-            <elem tag="displayMaterial"/>
-        </elem>
-
-        <elem tag="techniques" attrs="localId, localUri, sourceName, sourceUri">
-            <elem tag="displayTechnique"/>
+        <elem tag="concepts" singular="true">
+            <elem tag="concept" attrs="conceptTypeUri">
+                <elem tag="displayConceptType"/>
+                <elem tag="displayConcept" attrs="localId, localUri, sourceName, sourceUri"/>
+            </elem>
         </elem>
 
         <elem tag="events" singular="true">
@@ -97,11 +90,13 @@
             </elem>
         </elem>
 
-        <elem tag="medias">
-            <elem tag="mediaURL"/>
-            <elem tag="mediaType"/>
-            <elem tag="mediaMimeType"/>
+        <elem tag="resources">
+            <elem tag="resource" attrs="ResourceTypeUri">
+                <elem tag="displayResourceType"/>
+                <elem tag="resourceURL"/>
+                <elem tag="resourceMimeType"/>
             <!-- <elem tag="delvingMediaURI"/> -->
+            </elem>
         </elem>
 
     </root>
@@ -110,10 +105,9 @@
     <options>
 
         <option-list path="/record/events/event" key="@eventTypeUri" value="displayEventType">
-            <opt key="http://www.cidoc-crm.org/rdfs/E12.Production">Production</opt>
-            <opt key="http://www.cidoc-crm.org/rdfs/E65.Creation">Creation</opt>
-            <opt key="http://www.cidoc-crm.org/rdfs/E8.Acquisition">Acquisition</opt>
-
+            <opt default="true" key="http://www.cidoc-crm.org/rdfs/E12.Production">Production</opt>
+            <opt default="true" key="http://www.cidoc-crm.org/rdfs/E65.Creation">Creation</opt>
+            <opt default="true" key="http://www.cidoc-crm.org/rdfs/E8.Acquisition">Acquisition</opt>
             <opt key="http://www.cidoc-crm.org/rdfs/E16.Measurement">Measurement</opt>
             <opt key="http://www.cidoc-crm.org/rdfs/E67.Birth">Birth</opt>
             <opt key="http://www.cidoc-crm.org/rdfs/E69.Death">Death</opt>
@@ -133,19 +127,21 @@
             <opt key="http://id.culturecloud.eu/events/#Exhibition">Exhibition</opt>
             <opt key="http://id.culturecloud.eu/events/#Finding">Finding</opt>
             <opt key="http://id.culturecloud.eu/events/#Loss">Loss</opt>
-            <opt key="http://id.culturecloud.eu/events/#Planning"></opt>
             <opt key="http://id.culturecloud.eu/events/#Provenance">Provenance</opt>
             <opt key="http://id.culturecloud.eu/events/#Use">Use</opt>
-
-
-
-
-
         </option-list>
 
-        <!--<option-list path="/record/medias/mediaType">-->
-            <!--<opt key="THUMBNAIL">Thumbnail</opt>-->
-            <!--<opt key="FULL_IMAGE">Full image</opt>-->
+        <option-list path="/record/concepts/concept" key="@conceptTypeUri" value="displayConceptType">
+            <opt default="true" key="http://id.culturecloud.eu/concepts/#Classification">Classification</opt>
+            <opt default="true" key="http://id.culturecloud.eu/concepts/#Subject">Subject</opt>
+            <opt default="true" key="http://id.culturecloud.eu/concepts/#Material">Material</opt>
+            <opt default="true" key="http://id.culturecloud.eu/concepts/#Technique">Technique</opt>
+            <opt key="http://id.culturecloud.eu/concepts/#wtf">Wtf</opt>
+        </option-list>
+
+        <!--<option-list path="/record/resources/resource/resourceType" valuePath="/record/resources/resource/resourceType">-->
+            <!--<opt default="true" key="THUMBNAIL">Thumbnail</opt>-->
+            <!--<opt default="true" key="FULL_IMAGE">Full image</opt>-->
             <!--<opt key="DEEP_ZOOM">Deep zoom image</opt>-->
             <!--<opt key="DOCUMENT">Document</opt>-->
             <!--<opt key="VIDEO">Video</opt>-->
@@ -159,7 +155,12 @@
         <!--</option-list>-->
 
 
+
     </options>
+
+    <bookmarks>
+
+    </bookmarks>
 
     <facts>
         <fact-ref path="/record/admin/dataOwnerUri" name="dataOwnerUri"/>
@@ -172,3 +173,20 @@
     </facts>
 
 </record-definition>
+
+
+        <!--<elem tag="classifications" attrs="localId, localUri, sourceName, sourceUri">-->
+            <!--<elem tag="displayClassification"/>-->
+        <!--</elem>-->
+
+        <!--<elem tag="subjects" attrs="localId, localUri, sourceName, sourceUri">-->
+            <!--<elem tag="displaySubject"/>-->
+        <!--</elem>-->
+
+        <!--<elem tag="materials" attrs="localId, localUri, sourceName, sourceUri">-->
+            <!--<elem tag="displayMaterial"/>-->
+        <!--</elem>-->
+
+        <!--<elem tag="techniques" attrs="localId, localUri, sourceName, sourceUri">-->
+            <!--<elem tag="displayTechnique"/>-->
+        <!--</elem>-->
