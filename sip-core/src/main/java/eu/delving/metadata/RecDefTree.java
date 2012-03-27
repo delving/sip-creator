@@ -69,7 +69,7 @@ public class RecDefTree implements RecDefNode.Listener {
         return root;
     }
 
-    public RecDefNode getRecDefNode(Path path) {
+    public RecDefNode getRecDefNode(Path path) { // todo: add opt to nodeMapping
         return root.getNode(path);
     }
 

@@ -84,7 +84,7 @@ public class RecDefNode {
             }
         }
     }
-    
+
     public boolean hasSearchField() {
         return elem != null && elem.searchField != null;
     }
@@ -161,6 +161,10 @@ public class RecDefNode {
         return false;
     }
 
+    public boolean hasConstant() {
+        return optKey != null || optValue != null;
+    }
+
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {
         nodeMappings.addAll(this.nodeMappings.values());
         for (RecDefNode sub : children) sub.collectNodeMappings(nodeMappings);
@@ -233,7 +237,18 @@ public class RecDefNode {
     private void childrenToCode(Out out, EditPath editPath) {
         if (hasChildren()) {
             startBuilderCall(out, editPath);
-            for (RecDefNode sub : children) sub.toElementCode(out, editPath);
+            for (RecDefNode sub : children) {
+                if (sub.isAttr()) continue;
+                if (sub.optKey != null) {
+                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
+                }
+                else if (sub.optValue != null) {
+                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
+                }
+                else {
+                    sub.toElementCode(out, editPath);
+                }
+            }
             out._line("}");
         }
         else if (nodeMappings.isEmpty()) {
@@ -266,8 +281,28 @@ public class RecDefNode {
     private void startBuilderCall(Out out, EditPath editPath) {
         if (hasActiveAttributes()) {
             out.line_("%s (", getTag().toBuilderCall());
+            boolean comma = false;
             for (RecDefNode sub : children) {
-                for (NodeMapping nodeMapping : sub.nodeMappings.values()) nodeMapping.toAttributeCode(out, editPath);
+                if (!sub.isAttr()) continue;
+                if (sub.optKey != null) {
+                    if (comma) out.line(",");
+                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
+                    comma = true;
+                }
+                else if (sub.optValue != null) {
+                    if (comma) out.line(",");
+                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
+                    comma = true;
+                }
+                else {
+                    for (NodeMapping nodeMapping : sub.nodeMappings.values()) {
+                        if (sub.isAttr()) {
+                            if (comma) out.line(",");
+                            nodeMapping.toAttributeCode(out, editPath);
+                            comma = true;
+                        }
+                    }
+                }
             }
             out._line(") {").in();
         }
@@ -277,7 +312,7 @@ public class RecDefNode {
     }
 
     private boolean hasActiveAttributes() {
-        for (RecDefNode sub : children) if (sub.isAttr() && sub.hasNodeMappings()) return true;
+        for (RecDefNode sub : children) if (sub.isAttr() && (sub.hasNodeMappings() || sub.hasConstant())) return true;
         return false;
     }
 
