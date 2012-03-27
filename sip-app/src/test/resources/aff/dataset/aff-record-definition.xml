@@ -19,10 +19,10 @@
     <elems>
         <elem tag="rights"/>
         <elem tag="date" elems="earliestDate, latestDate"/>
-        <elem tag="earliestDate"/>
-        <elem tag="latestDate"/>
+            <elem tag="earliestDate"/>
+            <elem tag="latestDate"/>
         <elem tag="placeAdmin"
-              elems="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
+            elems="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
         <elem tag="displayAdmin1"/>
         <elem tag="displayAdmin2"/>
         <elem tag="displayAdmin3"/>

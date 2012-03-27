@@ -128,7 +128,7 @@
         <summaryField name="TITLE" path="/icn:title"/>
         <summaryField name="DESCRIPTION" path="/icn:description"/>
         <summaryField name="OWNER" path="/icn:dataProvider"/>
-        <summaryield name="LANDING_PAGE" path="/icn:isShownAt"/>
+        <summaryField name="LANDING_PAGE" path="/icn:isShownAt"/>
         <summaryField name="THUMBNAIL" path="/icn:object"/>
         <summaryField name="THUMBNAIL" path="/icn:thumbnail"/>
         <summaryField name="SNIPPET" path="/icn:fullText"/>

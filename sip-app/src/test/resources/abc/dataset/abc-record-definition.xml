@@ -5,13 +5,13 @@
         <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
         <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
         <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
-        <namespace prefix="abc" uri="http://abmu.org/abm" schema="http://abmu.org/abm.xsd"/>
+        <namespace prefix="abc" uri="http://www.ab-c.nl/" schema="http://www.ab-c.nl/schemas/ABC-V3.2.xsd"/>
         <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
     </namespaces>
 
     <root tag="record">
         <!-- Category AB-C -->
-        <elem tag="abc:titel" summaryField="TITLE"/>
+        <elem tag="abc:titel"/>
         <elem tag="abc:birthDate"/>
         <elem tag="abc:deathDate"/>
         <elem tag="abc:beginjaar"/>
@@ -24,15 +24,15 @@
         <elem tag="abc:material"/>
         <elem tag="abc:deepzoomUrl"/>
         <elem tag="abc:smallThumbnail"/>
-        <elem tag="abc:largeThumbnail" summaryField="THUMBNAIL"/>
-        <elem tag="abc:description" summaryField="DESCRIPTION"/>
+        <elem tag="abc:largeThumbnail"/>
+        <elem tag="abc:description"/>
         <elem tag="abc:name"/>
         <elem tag="abc:school"/>
         <elem tag="abc:onderwerp"/>
-        <elem tag="abc:collection" /> <!--facetName="collectie" facetPrefix="col" sortable="true"-->
-        <elem tag="abc:objectName" /> <!--facetName="object" facetPrefix="obj" sortable="true"-->
-        <elem tag="abc:kunstenaar" summaryField="CREATOR"/> <!--facetName="kunstenaar" facetPrefix="knst" sortable="true"-->
-        <elem tag="abc:production" /> <!--facetName="periode" facetPrefix="per" sortable="true"-->
+        <elem tag="abc:collection" />
+        <elem tag="abc:objectName" />
+        <elem tag="abc:kunstenaar"/>
+        <elem tag="abc:production" />
 
         <!--  Vervaardiger Velden -->
         <elem tag="abc:vName"/>
@@ -44,41 +44,32 @@
         <elem tag="abc:vDeathPlace"/>
         <elem tag="abc:vBiography"/>
 
-        <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
-        <elem tag="europeana:object"/>          <!-- ESE 3.4 -->
-        <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
-        <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
-        <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
-        <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
-        <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
-        <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
-        <elem tag="europeana:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
-        <elem tag="europeana:source"/>          <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:dataProvider"/>
+        <elem tag="europeana:isShownAt"/>
+        <elem tag="europeana:isShownBy"/>
+        <elem tag="europeana:object"/>
+        <elem tag="europeana:provider"/>
+        <elem tag="europeana:rights"/>
+        <elem tag="europeana:type"/>
+        <elem tag="europeana:unstored"/>
+        <elem tag="europeana:uri"/>
+        <elem tag="europeana:language"/>
+        <elem tag="europeana:country"/>
+        <elem tag="europeana:collectionName"/>
+        <elem tag="europeana:collectionTitle"/>
+        <elem tag="europeana:source"/>
         <elem tag="europeana:year"/>
     </root>
 
-
-
-
-
-
-        <field prefix="europeana" localName="collectionTitle" factName="name" summaryField="SNIPPET"/>
-        <field prefix="europeana" localName="dataProvider" factName="dataProvider" fieldType="string" summaryField="OWNER"/>
-        <field prefix="europeana" localName="isShownBy" fieldType="string" summaryField="THUMBNAIL"/>
-        <field prefix="europeana" localName="provider" factName="provider" fieldType="string"/>
-
-
-
-                <converter multipleOutput="true" call=".extractYear()"/>
-
-
-
-
-
+    <searchFields>
+        <searchField name="TITLE" path="/record/abc:titel"/>
+        <searchField name="THUMBNAIL" path="/record/abc:largeThumbnail"/>
+        <searchField name="DESCRIPTION" path="/record/abc:description"/>
+        <searchField name="CREATOR" path="/record/abc:kunstenaar"/>
+        <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
+        <searchField name="OWNER" path="/record/europeana:dataProvider" fieldType="string"/>
+        <searchField name="THUMBNAIL" path="/record/europeana:isShownBy" fieldType="string"/>
+    </searchFields>
 
     <facts>
         <fact-ref name="spec" path="/record/europeana:collectionName"/>
@@ -91,16 +82,9 @@
         <fact-ref name="type" path="/record/europeana:type"/>
     </facts>
 
-
     <!--<converters>-->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>-->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfDeath"/>-->
-        <!--<converter call=".toLocalId(spec)" path="/europeana:uri"/>-->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/delving:year"/>-->
+       <!--<converter multipleOutput="true" call=".extractYear()" path="/record/europeana:year"/>-->
     <!--</converters>-->
-
-    <docs>
-    </docs>
 
 
 </record-definition>
