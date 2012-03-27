@@ -103,9 +103,9 @@
 
     </root>
 
-    <search>
+    <searchFields>
         <searchField name="dolving_gumby" path="/record/admin/displayProvider"/>
-    </search>
+    </searchFields>
 
 
     <options> <!-- keys should be uri's -->

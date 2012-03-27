@@ -99,7 +99,7 @@ public class RecDef {
 
     public List<FactRef> facts;
 
-    public List<SearchField> search;
+    public List<SearchField> searchFields;
 
     public List<Doc> docs;
 
@@ -142,7 +142,7 @@ public class RecDef {
 
     private void resolve() {
         root.resolve(Path.empty(), this);
-        if (search != null) for (SearchField searchField : search) searchField.resolve(this);
+        if (searchFields != null) for (SearchField searchField : searchFields) searchField.resolve(this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (bookmarks != null) for (Category category : bookmarks) category.resolve(this);
         if (options != null) for (OptionList optionList : options) optionList.resolve(this);

@@ -66,9 +66,9 @@
         <!--</option-list>-->
     </options>
 
-    <search>
+    <searchFields>
         <searchField name="CREATOR" path="/dc:creator"/>
-    </search>
+    </searchFields>
 
     <!--<facts>-->
         <!--<fact name="spec" path="/icn:collectionName"/>-->

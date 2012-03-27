@@ -61,7 +61,7 @@
         <elem tag="europeana:year"/>
     </root>
 
-    <search>
+    <searchFields>
         <searchField name="TITLE" path="/record/abc:title"/>
         <searchField name="THUMBNAIL" path="/record/abc:largeThumbnail"/>
         <searchField name="DESCRIPTION" path="/record/abc:description"/>
@@ -69,7 +69,7 @@
         <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
         <searchField name="OWNER" path="/record/europeana:dataProvider"/>
         <searchField name="THUMBNAIL" path="/record/europeana:isShownBy"/>
-    </search>
+    </searchFields>
 
     <!--<facts>-->
         <!--<fact name="spec" path="/icn:collectionName"/>-->
