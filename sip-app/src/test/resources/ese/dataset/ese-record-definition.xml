@@ -9,6 +9,7 @@
     </namespaces>
 
     <root tag="record">
+
         <elem tag="dc:contributor"/>            
         <elem tag="dc:coverage"/>               
         <elem tag="dc:creator"/>                
@@ -54,63 +55,22 @@
         <elem tag="europeana:dataProvider"/>    <!-- required -->
         <elem tag="europeana:isShownBy"/>       <!-- required or below-->
         <elem tag="europeana:isShownAt"/>       <!-- required or above-->
+
     </root>
 
+
+
     <options>
-        <!--<option-list path="/record/europeana:type"> &lt;!&ndash; no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs &ndash;&gt;-->
-            <!--<opt key="1">TEXT</opt>-->
-            <!--<opt key="2">IMAGE</opt>-->
-            <!--<opt key="3">SOUND</opt>-->
-            <!--<opt key="4">VIDEO</opt>-->
-            <!--<opt key="5">3D</opt>-->
-        <!--</option-list>-->
     </options>
 
-    <search>
-        <searchField name="CREATOR" path="/dc:creator"/>
-    </search>
+    <summaryFields>
+    </summaryFields>
 
-    <!--<facts>-->
-        <!--<fact name="spec" path="/icn:collectionName"/>-->
-        <!--<fact name="name" path="/icn:collectionTitle"/>-->
-        <!--<fact name="country" path="/icn:country"/>-->
-        <!--<fact name="dataProvider" path="/icn:dataProvider"/>-->
-        <!--<fact name="language" path="/icn:language"/>-->
-        <!--<fact name="provider" path="/icn:provider"/>-->
-        <!--<fact name="rights" path="/icn:rights"/>-->
-        <!--<fact name="type" path="/icn:type"/>-->
-    <!--</facts>-->
+    <docs>
+    </docs>
 
-    <!--<converters>-->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>-->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfDeath"/>-->
-        <!--<converter call=".toLocalId(spec)" path="/dc:identifier"/> -->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/delving:year"/>-->
-    <!--</converters>-->
-    
-        <docs>
-        <!--<doc path="/record/dc:contributor">-->
-            <!--<string name="Dublin Core definition">An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>-->
-            <!--<string name="Europeana definition">An entity responsible for making contributions to the resource</string>-->
-            <!--<string name="Europeana note">The name of contributors to the original analog or born digital object.  This could be a person, an organisation or a service. </string>-->
-        </docs>
-
-    <!--</docs>-->
-
-      <bookmarks>
-        <!--<category name="Mandatory ICN elements">-->
-            <!--<doc>-->
-                <!--<string>These elements must be included in any ESE delivery to Europeana</string>-->
-            <!--</doc>-->
-            <!--<ref path="/europeana:provider" display="Provider"/>-->
-            <!--<ref path="/europeana:dataProvider" display="Data provider"/>-->
-            <!--<ref path="/europeana:rights" display="Rights"/>-->
-            <!--<ref path="/europeana:type" display="Type"/>-->
-            <!--<ref path="/europeana:isShownBy" display="Is Shown By"/>-->
-            <!--<ref path="/europeana:isShownAt" display="Is Shown At"/>-->
-        <!--</category>-->
+    <bookmarks>
     </bookmarks>
-
 
 </record-definition>
 

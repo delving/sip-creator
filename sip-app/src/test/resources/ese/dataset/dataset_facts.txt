@@ -1,7 +1,7 @@
 name=ESE Test
 provider=Testmeister
 country=netherlands
-dataProvider=Sourcer
+dataProvider=ese_Sourcer
 language=nl
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE

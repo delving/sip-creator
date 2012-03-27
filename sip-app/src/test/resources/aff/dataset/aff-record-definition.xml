@@ -13,15 +13,16 @@
         <attr tag="sourceUri"/>
         <attr tag="sourceName"/>
         <attr tag="eventTypeUri"/>
+        <attr tag="hubRecordId"/>
     </attrs>
 
     <elems>
         <elem tag="rights"/>
         <elem tag="date" elems="earliestDate, latestDate"/>
-        <elem tag="earliestDate"/>
-        <elem tag="latestDate"/>
-        <elem tag="placeAdmin"
-              elems="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
+            <elem tag="earliestDate"/>
+            <elem tag="latestDate"/>
+        <elem tag="placeAdmin"/>
+            <elems tag="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
         <elem tag="displayAdmin1"/>
         <elem tag="displayAdmin2"/>
         <elem tag="displayAdmin3"/>
@@ -39,9 +40,11 @@
             <elem tag="displayOwnerCountry"/>
             <elem tag="providerUri"/>
             <elem tag="displayProvider"/>
+            <elem tag="providerHub"/>
+            <elem tag="displayProviderHub"/>
         </elem>
 
-        <elem tag="thing" elems="rights" attrs="localId, localUri" singular="true">
+        <elem tag="thing" elems="rights" attrs="localId, localUri, hubRecordId" singular="true">
             <elem tag="displayWorkType"/>
             <elem tag="displayTitle"/>
             <elem tag="displayDescription"/>
@@ -105,12 +108,11 @@
 
 
     <options>
-
-        <option-list keyPath="/record/events/event/@eventTypeUri" valuePath="/record/events/event/displayEventType"> <!-->  -->
-            <opt key="http://www.cidoc-crm.org/rdfs/E12._Production">Production</opt>
-            <opt key="http://www.cidoc-crm.org/rdfs/E65.Creation">Creation</opt>
-            <opt key="http://www.cidoc-crm.org/rdfs/E8.Acquisition">Acquisition</opt>
-        </option-list>
+     <option-list keyPath="/record/events/event/@eventTypeUri" valuePath="/record/events/event/displayEventType"> <!-->  -->
+        <opt key="http://www.cidoc-crm.org/rdfs/E12._Production">Production</opt>
+        <opt key="http://www.cidoc-crm.org/rdfs/E65.Creation">Creation</opt>
+        <opt key="http://www.cidoc-crm.org/rdfs/E8.Acquisition">Acquisition</opt>
+     </option-list>
 
         <!--<option-list path="/record/medias/mediaType">-->
             <!--<opt key="THUMBNAIL">Thumbnail</opt>-->

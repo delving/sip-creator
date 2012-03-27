@@ -11,7 +11,7 @@
 
     <root tag="record">
         <!-- Category AB-C -->
-        <elem tag="abc:titel" summaryField="TITLE"/>
+        <elem tag="abc:titel"/>
         <elem tag="abc:birthDate"/>
         <elem tag="abc:deathDate"/>
         <elem tag="abc:beginjaar"/>
@@ -24,14 +24,14 @@
         <elem tag="abc:material"/>
         <elem tag="abc:deepzoomUrl"/>
         <elem tag="abc:smallThumbnail"/>
-        <elem tag="abc:largeThumbnail" summaryField="THUMBNAIL"/>
-        <elem tag="abc:description" summaryField="DESCRIPTION"/>
+        <elem tag="abc:largeThumbnail"/>
+        <elem tag="abc:description"/>
         <elem tag="abc:name"/>
         <elem tag="abc:school"/>
         <elem tag="abc:onderwerp"/>
         <elem tag="abc:collection" /> <!--facetName="collectie" facetPrefix="col" sortable="true"-->
         <elem tag="abc:objectName" /> <!--facetName="object" facetPrefix="obj" sortable="true"-->
-        <elem tag="abc:kunstenaar" summaryField="CREATOR"/> <!--facetName="kunstenaar" facetPrefix="knst" sortable="true"-->
+        <elem tag="abc:kunstenaar"/> <!--facetName="kunstenaar" facetPrefix="knst" sortable="true"-->
         <elem tag="abc:production" /> <!--facetName="periode" facetPrefix="per" sortable="true"-->
 
         <!--  Vervaardiger Velden -->
@@ -61,26 +61,26 @@
         <elem tag="europeana:year"/>
     </root>
 
-    <search>
-        <searchField name="TITLE" path="/record/abc:title"/>
-        <searchField name="THUMBNAIL" path="/record/abc:largeThumbnail"/>
-        <searchField name="DESCRIPTION" path="/record/abc:description"/>
-        <searchField name="CREATOR" path="/record/abc:kunstenaar"/>
-        <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
-        <searchField name="OWNER" path="/record/europeana:dataProvider"/>
-        <searchField name="THUMBNAIL" path="/record/europeana:isShownBy"/>
-    </search>
+    <summaryFields>
+        <summaryField name="TITLE" path="/record/abc:title"/>
+        <summaryField name="THUMBNAIL" path="/record/abc:largeThumbnail"/>
+        <summaryField name="DESCRIPTION" path="/record/abc:description"/>
+        <summaryField name="CREATOR" path="/record/abc:kunstenaar"/>
+        <summaryField name="SNIPPET" path="/record/europeana:collectionTitle"/>
+        <summaryField name="OWNER" path="/record/europeana:dataProvider"/>
+        <summaryField name="THUMBNAIL" path="/record/europeana:isShownBy"/>
+    </summaryFields>
 
-    <!--<facts>-->
-        <!--<fact name="spec" path="/icn:collectionName"/>-->
-        <!--<fact name="name" path="/icn:collectionTitle"/>-->
-        <!--<fact name="country" path="/icn:country"/>-->
-        <!--<fact name="dataProvider" path="/icn:dataProvider"/>-->
-        <!--<fact name="language" path="/icn:language"/>-->
-        <!--<fact name="provider" path="/icn:provider"/>-->
-        <!--<fact name="rights" path="/icn:rights"/>-->
-        <!--<fact name="type" path="/icn:type"/>-->
-    <!--</facts>-->
+    <facts>
+        <fact name="spec" path="/europeana:collectionName"/>
+        <fact name="name" path="/europeana:collectionTitle"/>
+        <fact name="country" path="/europeana:country"/>
+        <fact name="dataProvider" path="/europeana:dataProvider"/>
+        <fact name="language" path="/europeana:language"/>
+        <fact name="provider" path="/europeana:provider"/>
+        <fact name="rights" path="/europeana:rights"/>
+        <fact name="type" path="/europeana:type"/>
+    </facts>
 
     <!--<converters>-->
         <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>-->
@@ -99,17 +99,7 @@
     </docs>
 
     <bookmarks>
-        <!--<category name="Mandatory ICN elements">-->
-            <!--<doc>-->
-                <!--<string>These elements must be included in any ESE delivery to Europeana</string>-->
-            <!--</doc>-->
-            <!--<ref path="/europeana:provider" display="Provider"/>-->
-            <!--<ref path="/europeana:dataProvider" display="Data provider"/>-->
-            <!--<ref path="/europeana:rights" display="Rights"/>-->
-            <!--<ref path="/europeana:type" display="Type"/>-->
-            <!--<ref path="/europeana:isShownBy" display="Is Shown By"/>-->
-            <!--<ref path="/europeana:isShownAt" display="Is Shown At"/>-->
-        <!--</category>-->
+
     </bookmarks>
 
 </record-definition>
