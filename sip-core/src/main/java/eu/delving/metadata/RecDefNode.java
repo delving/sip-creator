@@ -85,6 +85,10 @@ public class RecDefNode {
         }
     }
 
+    public String getOptRootKey() {
+        return optRoot != null ? optRoot.key : null;
+    }
+
     public boolean hasSearchField() {
         return elem != null && elem.searchField != null;
     }
@@ -146,10 +150,10 @@ public class RecDefNode {
         return isAttr() ? null : elem.options;
     }
 
-    public RecDefNode getNode(Path soughtPath) {
-        if (getPath().equals(soughtPath)) return this;
+    public RecDefNode getNode(Path soughtPath, String optKey) {
+        if (getPath().equals(soughtPath) && (optKey == null || optRoot == null || optKey.equals(optRoot.key))) return this;
         for (RecDefNode sub : children) {
-            RecDefNode found = sub.getNode(soughtPath);
+            RecDefNode found = sub.getNode(soughtPath, optKey);
             if (found != null) return found;
         }
         return null;

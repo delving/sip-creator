@@ -135,7 +135,7 @@ public class IndexDocument {
             element = (Element)element.getParentNode();
         }
         for (Element el :elements) path = path.extend(Tag.element(el.getPrefix(), el.getLocalName()));
-        RecDefNode recDefNode = recordDefinition.getRecDefNode(path);
+        RecDefNode recDefNode = recordDefinition.getRecDefNode(path, null);
         if (recDefNode == null) throw new RuntimeException("No recdef node for " + path);
         return recDefNode;
     }

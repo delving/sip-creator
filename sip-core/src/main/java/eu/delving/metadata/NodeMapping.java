@@ -51,6 +51,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
     @XStreamAsAttribute
     public Path outputPath;
 
+    @XStreamAsAttribute
+    public String optKey;
+
     @XStreamAlias("tuplePaths")
     public List<Path> tuplePaths;
 
@@ -150,8 +153,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return inputPaths;
     }
 
-    public NodeMapping setOutputPath(Path outputPath) {
+    public NodeMapping setOutputPath(Path outputPath, String optKey) {
         this.outputPath = outputPath;
+        this.optKey = optKey;
         return this;
     }
 
@@ -351,7 +355,17 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public String toString() {
-        return String.format("<html>%s &larr; %s%s", outputPath.getTail(), inputPath.getTail(), tuplePaths == null ? "" : " +" + tuplePaths.size());
+        String input = inputPath.getTail();
+        if (tuplePaths != null) {
+            StringBuilder out = new StringBuilder();
+            Iterator<Path> walk = getInputPaths().iterator();
+            while (walk.hasNext()) {
+                out.append(walk.next().getTail());
+                if (walk.hasNext()) out.append(", ");
+            }
+            input = out.toString();
+        }
+        return String.format("<html>%s &larr; %s", outputPath.getTail(), input);
     }
 
     private String getTupleUsage() {
@@ -373,7 +387,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
                 if (nodeMapping.inputPath.isAncestorOf(path)) return nodeMapping;
             }
         }
-        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.chop(1));
+        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.chop(1), null);
     }
 
     private static final Hasher HASHER = new Hasher();

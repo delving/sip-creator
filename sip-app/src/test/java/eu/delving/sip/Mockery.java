@@ -123,7 +123,7 @@ public class Mockery {
         List<Path> inputPaths = new ArrayList<Path>();
         for (String s : fromString.split(" ")) inputPaths.add(Path.create(s));
         Path outputPath = Path.create(toString).defaultPrefix(prefix);
-        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(outputPath);
+        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(outputPath, null);
         if (node == null) throw new RuntimeException("No node found for " + outputPath);
         NodeMapping mapping = new NodeMapping().setInputPaths(inputPaths);
         node.addNodeMapping(mapping);

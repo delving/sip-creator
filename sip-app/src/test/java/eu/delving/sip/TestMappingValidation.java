@@ -68,6 +68,7 @@ public class TestMappingValidation {
     }
 
 
+    @Ignore
     @Test
     public void testAbc() throws Exception {
         mock.prepareDataset(

@@ -113,7 +113,7 @@ public class CreateModel {
 
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
-        NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
+        NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath(), recDefTreeNode.getRecDefNode().getOptRootKey());
         StatsTreeNode.setStatsTreeNodes(statsTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
         setNodeMapping(created);
