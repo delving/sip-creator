@@ -390,7 +390,7 @@ public class DictionaryPanel extends JPanel {
             fireIntervalRemoved(this, 0, size);
             if (recDefNode != null && recDefNode.hasOptions()) {
                 values.add(0, COPY_VERBATIM);
-                values.addAll(recDefNode.getOptions());
+//                values.addAll(recDefNode.getOptions());
                 fireIntervalAdded(this, 0, values.size());
             }
         }

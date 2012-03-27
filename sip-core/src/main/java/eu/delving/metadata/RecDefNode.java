@@ -45,6 +45,7 @@ public class RecDefNode {
     private Path path;
     private RecDef.Elem elem;
     private RecDef.Attr attr;
+    private RecDef.Opt optRoot, optKey, optValue;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
@@ -58,23 +59,32 @@ public class RecDefNode {
     }
 
     public static RecDefNode create(Listener listener, RecDef recDef) {
-        return new RecDefNode(listener, null, recDef.root);
+        return new RecDefNode(listener, null, recDef.root, null, null, null, null); // only root element
     }
 
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem) {
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, RecDef.Opt optRoot, RecDef.Opt optKey, RecDef.Opt optValue) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
-        for (RecDef.Attr sub : elem.attrList) children.add(new RecDefNode(listener, this, sub));
-        for (RecDef.Elem sub : elem.elemList) children.add(new RecDefNode(listener, this, sub));
-    }
-
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Attr attr) {
-        this.listener = listener;
-        this.parent = parent;
         this.attr = attr;
+        this.optRoot = optRoot;
+        if (optKey != null && optKey.parent.key.equals(getTag())) this.optKey = optKey;
+        if (optValue != null && optValue.parent.value.equals(getTag())) this.optValue = optValue;
+        if (elem != null) {
+            for (RecDef.Attr sub : elem.attrList) {
+                children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot));
+            }
+            for (RecDef.Elem sub : elem.elemList) {
+                if (sub.options == null) {
+                    children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot));
+                }
+                else for (RecDef.Opt subOpt : sub.options.opts) { // a child for each option
+                    children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null));
+                }
+            }
+        }
     }
-
+    
     public boolean hasSearchField() {
         return elem != null && elem.searchField != null;
     }
@@ -132,34 +142,8 @@ public class RecDefNode {
         return getOptions() != null;
     }
 
-    public List<RecDef.Opt> getOptions() {
-        return isAttr() ? attr.options : elem.options;
-    }
-
-    public boolean allowOption(String value) {
-        List<RecDef.Opt> options = getOptions();
-        if (options != null) {
-            for (RecDef.Opt option : options) {
-                String member = option.content;
-                if (member.endsWith(":")) {
-                    int colon = value.indexOf(':');
-                    if (colon > 0) {
-                        if (member.equals(value.substring(0, colon + 1))) {
-                            return true;
-                        }
-                    }
-                    else {
-                        if (member.equals(value) || member.substring(0, member.length() - 1).equals(value)) {
-                            return true;
-                        }
-                    }
-                }
-                else if (member.equals(value)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    public RecDef.OptionList getOptions() {
+        return isAttr() ? null : elem.options;
     }
 
     public RecDefNode getNode(Path soughtPath) {
@@ -298,7 +282,11 @@ public class RecDefNode {
     }
 
     public String toString() {
-        return isAttr() ? attr.tag.toString() : elem.tag.toString();
+        String name = isAttr() ? attr.tag.toString() : elem.tag.toString();
+        if (optRoot != null) name += String.format(" (%s)", optRoot.content);
+        if (optKey != null) name += " {Key}";
+        if (optValue != null) name += " {Value}";
+        return name;
     }
 
 }

@@ -19,10 +19,10 @@
     <elems>
         <elem tag="rights"/>
         <elem tag="date" elems="earliestDate, latestDate"/>
-            <elem tag="earliestDate"/>
-            <elem tag="latestDate"/>
-        <elem tag="placeAdmin"/>
-            <elems tag="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
+        <elem tag="earliestDate"/>
+        <elem tag="latestDate"/>
+        <elem tag="placeAdmin"
+              elems="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
         <elem tag="displayAdmin1"/>
         <elem tag="displayAdmin2"/>
         <elem tag="displayAdmin3"/>
@@ -108,11 +108,12 @@
 
 
     <options>
-     <option-list keyPath="/record/events/event/@eventTypeUri" valuePath="/record/events/event/displayEventType"> <!-->  -->
-        <opt key="http://www.cidoc-crm.org/rdfs/E12._Production">Production</opt>
-        <opt key="http://www.cidoc-crm.org/rdfs/E65.Creation">Creation</opt>
-        <opt key="http://www.cidoc-crm.org/rdfs/E8.Acquisition">Acquisition</opt>
-     </option-list>
+
+        <option-list path="/record/events/event" key="@eventTypeUri" value="displayEventType">
+            <opt key="http://www.cidoc-crm.org/rdfs/E12._Production">Production</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E65.Creation">Creation</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E8.Acquisition">Acquisition</opt>
+        </option-list>
 
         <!--<option-list path="/record/medias/mediaType">-->
             <!--<opt key="THUMBNAIL">Thumbnail</opt>-->

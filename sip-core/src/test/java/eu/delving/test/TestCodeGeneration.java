@@ -97,7 +97,7 @@ public class TestCodeGeneration {
         System.out.println("attr="+attr2attr);
 
         RecDefNode optionsNode = node("/lido/administrativeMetadata/recordWrap/recordID/@type");
-        List<RecDef.Opt> options = optionsNode.getOptions();
+        RecDef.OptionList options = optionsNode.getOptions();
         Assert.assertNotNull(options);
         NodeMapping dictionaryMapping = optionsNode.addNodeMapping(mapping("/input/leadup/@orderofsort"));
         dictionaryMapping.dictionary = new TreeMap<String, String>();

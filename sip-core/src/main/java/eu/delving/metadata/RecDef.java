@@ -162,17 +162,13 @@ public class RecDef {
 
     private Attr findAttr(Path path) {
         Attr found = root.findAttr(path, 0);
-        if (found == null) {
-            throw new RuntimeException("No attribute found for path " + path);
-        }
+        if (found == null) throw new RuntimeException("No attribute found for path " + path);
         return found;
     }
 
     private Elem findElem(Path path) {
         Elem found = root.findElem(path, 0);
-        if (found == null) {
-            throw new RuntimeException("No element found for path " + path);
-        }
+        if (found == null) throw new RuntimeException("No element found for path " + path);
         return found;
     }
 
@@ -234,40 +230,6 @@ public class RecDef {
         }
     }
 
-    @XStreamAlias("option-list")
-    public static class OptionList {
-
-        @XStreamAsAttribute
-        public Path keyPath;
-
-        @XStreamAsAttribute
-        public Path valuePath;
-
-        @XStreamImplicit
-        public List<Opt> opts;
-
-        public void resolve(RecDef recDef) {
-            if (valuePath == null) throw new RuntimeException("No path for OptionList: " + opts);
-            resolve(recDef, valuePath, false);
-            resolve(recDef, keyPath, true);
-        }
-
-        private void resolve(RecDef recDef, Path path, boolean asKey) {
-            if (path == null) return;
-            path.defaultPrefix(recDef.prefix);
-            if (path.peek().isAttribute()) {
-                Attr attr = recDef.findAttr(path);
-                attr.options = opts;
-                attr.optionsAsKey = asKey;
-            }
-            else {
-                Elem elem = recDef.findElem(path);
-                elem.options = opts;
-                elem.optionsAsKey = asKey;
-            }
-        }
-    }
-
     @XStreamAlias("fact-ref")
     public static class FactRef {
 
@@ -278,6 +240,33 @@ public class RecDef {
         public String name;
     }
 
+    @XStreamAlias("option-list")
+    public static class OptionList {
+
+        @XStreamAsAttribute
+        public Path path;
+
+        @XStreamAsAttribute
+        public Tag key;
+
+        @XStreamAsAttribute
+        public Tag value;
+
+        @XStreamImplicit
+        public List<Opt> opts;
+
+        public void resolve(RecDef recDef) {
+            for (Opt opt: opts) opt.parent = this;
+            if (path == null) throw new RuntimeException("No path for OptionList: " + opts);
+            if (path.peek().isAttribute()) throw new RuntimeException("An option list may not be connected to an attribute: " + path);
+            path.defaultPrefix(recDef.prefix);
+            key = key.defaultPrefix(recDef.prefix);
+            value = value.defaultPrefix(recDef.prefix);
+            Elem elem = recDef.findElem(path);
+            elem.options = this;
+        }
+    }
+
     @XStreamAlias("opt")
     @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"content"})
     public static class Opt {
@@ -286,6 +275,9 @@ public class RecDef {
         public String key;
 
         public String content;
+        
+        @XStreamOmitField
+        public OptionList parent;
 
         public Opt setContent(String content) {
             this.content = content;
@@ -408,12 +400,10 @@ public class RecDef {
 
         @XStreamOmitField
         public Doc doc;
-
-        @XStreamOmitField
-        public List<Opt> options;
-
-        @XStreamOmitField
-        public boolean optionsAsKey;
+        
+        public String toString() {
+            return tag.toString();
+        }
     }
 
     @XStreamAlias("elem")
@@ -447,10 +437,7 @@ public class RecDef {
         public Doc doc;
 
         @XStreamOmitField
-        public List<Opt> options;
-
-        @XStreamOmitField
-        public boolean optionsAsKey;
+        public OptionList options;
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
@@ -508,13 +495,15 @@ public class RecDef {
             path.push(tag);
             tag = tag.defaultPrefix(recDef.prefix);
             if (attrs != null) {
-                for (String localName : attrs.split(DELIM))
+                for (String localName : attrs.split(DELIM)) {
                     attrList.add(recDef.attr(Tag.attribute(recDef.prefix, localName)));
+                }
                 attrs = null;
             }
             if (elems != null) {
-                for (String localName : elems.split(DELIM))
+                for (String localName : elems.split(DELIM)) {
                     elemList.add(recDef.elem(Tag.element(recDef.prefix, localName)));
+                }
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
@@ -532,7 +521,7 @@ public class RecDef {
             }
             if (options != null) {
                 indent(out, level).append("// ");
-                for (Opt opt : options) out.append(String.format("%s=%s, ", opt.key, opt.content));
+                for (Opt opt : options.opts) out.append(String.format("%s=%s, ", opt.key, opt.content));
                 out.append("\n");
             }
             indent(out, level).append("lido.");

@@ -14,7 +14,7 @@ $endif$
 $if (options)$
     <tr><td>
         <ul>
-            $options:{ opt |
+            $options.opts:{ opt |
                 <li>$opt.key$ - $opt.content$</li>
             }$
         </ul>
