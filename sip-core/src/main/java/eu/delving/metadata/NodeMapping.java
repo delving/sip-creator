@@ -365,7 +365,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             }
             input = out.toString();
         }
-        return String.format("<html>%s &larr; %s", outputPath.getTail(), input);
+        return String.format("<html>%s &larr; %s", recDefNode.toString(), input);
     }
 
     private String getTupleUsage() {

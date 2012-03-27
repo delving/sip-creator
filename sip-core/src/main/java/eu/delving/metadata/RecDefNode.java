@@ -89,6 +89,10 @@ public class RecDefNode {
         return optRoot != null ? optRoot.key : null;
     }
 
+    public String getOptRootValue() {
+        return optRoot != null ? optRoot.content : "";
+    }
+
     public boolean hasSearchField() {
         return elem != null && elem.searchField != null;
     }
@@ -322,9 +326,8 @@ public class RecDefNode {
 
     public String toString() {
         String name = isAttr() ? attr.tag.toString() : elem.tag.toString();
-        if (optRoot != null) name += String.format(" (%s)", optRoot.content);
-        if (optKey != null) name += " {Key}";
-        if (optValue != null) name += " {Value}";
+        if (optRoot != null) name += String.format("[%s]", optRoot.content);
+        if (optKey != null || optValue != null) name += "{Constant}";
         return name;
     }
 
