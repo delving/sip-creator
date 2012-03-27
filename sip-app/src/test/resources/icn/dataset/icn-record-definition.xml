@@ -123,7 +123,7 @@
         <!--</option-list>-->
     </options>
 
-    <search>
+    <searchFields>
         <searchField name="CREATOR" path="/icn:creator"/>
         <searchField name="TITLE" path="/icn:title"/>
         <searchField name="DESCRIPTION" path="/icn:description"/>
@@ -135,7 +135,7 @@
         <searchField name="SNIPPET" path="/icn:subject"/>
         <searchField name="SNIPPET" path="/icn:alternative"/>
         <searchField name="SNIPPET" path="/icn:collectionTitle"/>
-    </search>
+    </searchFields>
 
     <!--<facts>-->
         <!--<fact name="spec" path="/icn:collectionName"/>-->

@@ -84,12 +84,12 @@
         <elem tag="europeana:year"/>
     </root>
 
-    <search>
+    <searchFields>
         <searchField name="DESCRIPTION" path="/record/dc:description"/>
         <searchField name="TITLE" path="/record//dc:title"/>
         <searchField name="OWNER" path="/record/europeana:dataProvider"/>
         <searchField name="THUMBNAIL" path="/record/europeana:isShownBy"/>
-    </search>
+    </searchFields>
 
     <!--<facts>-->
         <!--<fact name="spec" path="/icn:collectionName"/>-->

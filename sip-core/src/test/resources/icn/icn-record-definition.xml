@@ -123,7 +123,7 @@
         <!--</option-list>-->
     </options>
 
-    <search>
+    <searchFields>
         <searchField name="CREATOR" path="/record/dc:creator"/>
         <searchField name="TITLE" path="/record/dc:title"/>
         <searchField name="DESCRIPTION" path="/record/dc:description"/>
@@ -133,7 +133,7 @@
         <searchField name="SNIPPET" path="/record/dc:subject"/>
         <searchField name="SNIPPET" path="/record/dcterms:alternative"/>
         <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
-    </search>
+    </searchFields>
 
     <!--<facts>-->
         <!--<fact name="spec" path="/icn:collectionName"/>-->

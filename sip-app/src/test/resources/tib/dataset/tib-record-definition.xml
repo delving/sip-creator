@@ -123,7 +123,7 @@
         <!--</option-list>-->
     </options>
 
-    <search>
+    <searchFields>
         <searchField name="THUMBNAIL" path="/record/tib:thumbLarge"/>
         <searchField name="SNIPPET" path="/record/delving:fullText"/>
         <searchField name="CREATOR" path="/record/dc:creator"/>
@@ -131,7 +131,7 @@
         <searchField name="TITLE" path="/record/dc:title"/>
         <searchField name="OWNER" path="/record/europeana:dataProvider"/>
         <searchField name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
-    </search>
+    </searchFields>
 
     <!--<facts>-->
         <!--<fact name="spec" path="/record/icn:collectionName"/>-->
