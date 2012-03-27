@@ -35,12 +35,12 @@
     <root tag="record">
 
         <elem tag="admin" elems="rights" singular="true">
-            <elem tag="ownerUri"/>
-            <elem tag="displayOwner"/>
+            <elem tag="dataOwnerUri"/>
+            <elem tag="displayDataOwner"/>
             <elem tag="displayOwnerCountry"/>
-            <elem tag="providerUri"/>
-            <elem tag="displayProvider"/>
-            <elem tag="providerHub"/>
+            <elem tag="dataProviderUri"/>
+            <elem tag="displayDataProvider"/>
+            <elem tag="providerHubUri"/>
             <elem tag="displayProviderHub"/>
         </elem>
 
@@ -110,9 +110,37 @@
     <options>
 
         <option-list path="/record/events/event" key="@eventTypeUri" value="displayEventType">
-            <opt key="http://www.cidoc-crm.org/rdfs/E12._Production">Production</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E12.Production">Production</opt>
             <opt key="http://www.cidoc-crm.org/rdfs/E65.Creation">Creation</opt>
             <opt key="http://www.cidoc-crm.org/rdfs/E8.Acquisition">Acquisition</opt>
+
+            <opt key="http://www.cidoc-crm.org/rdfs/E16.Measurement">Measurement</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E67.Birth">Birth</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E69.Death">Death</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E6.Destruction">Destruction</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E9.Move">Move</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E10.Transfer_of_Custody">Transfer of Custody</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E14.Condition_Assessment">Condition Assessment</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E66.Formation">Formation</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E85.Joining">Joining</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/E86.Leaving">Leaving</opt>
+            <opt key="http://www.cidoc-crm.org/rdfs/F30.Publication Event">Publication Event</opt> <!-- FRBRoo -->
+            <opt key="http://www.cidoc-crm.org/rdfs/F31.Performance">Performance</opt> <!-- FRBRoo -->
+            <opt key="http://id.culturecloud.eu/events/#Collecting">Collecting</opt>
+            <opt key="http://id.culturecloud.eu/events/#Commissioning">Commissioning</opt>
+            <opt key="http://id.culturecloud.eu/events/#Designing">Designing</opt>
+            <opt key="http://id.culturecloud.eu/events/#Excavation">Excavation</opt>
+            <opt key="http://id.culturecloud.eu/events/#Exhibition">Exhibition</opt>
+            <opt key="http://id.culturecloud.eu/events/#Finding">Finding</opt>
+            <opt key="http://id.culturecloud.eu/events/#Loss">Loss</opt>
+            <opt key="http://id.culturecloud.eu/events/#Planning"></opt>
+            <opt key="http://id.culturecloud.eu/events/#Provenance">Provenance</opt>
+            <opt key="http://id.culturecloud.eu/events/#Use">Use</opt>
+
+
+
+
+
         </option-list>
 
         <!--<option-list path="/record/medias/mediaType">-->
@@ -134,28 +162,13 @@
     </options>
 
     <facts>
-        <fact-ref path="/record/admin/ownerUri" name="dataOwnerUri"/>
-        <fact-ref path="/record/admin/displayOwner" name="dataOwnerName"/>
-        <fact-ref path="/record/admin/displayOwnerCountry" name="dataOwnerCountry"/>
-        <fact-ref path="/record/admin/providerUri" name="dataProviderUri"/>
-        <fact-ref path="/record/admin/displayProvider" name="dataProviderName"/>
-        <fact-ref path="/record/admin/rights" name="rights"/>
-        <fact-ref path="/record/thing/language" name="language"/>
+        <fact-ref path="/record/admin/dataOwnerUri" name="dataOwnerUri"/>
+        <fact-ref path="/record/admin/displayDataOwner" name="displayDataOwner"/>
+        <fact-ref path="/record/admin/displayOwnerCountry" name="displayOwnerCountry"/>
+        <fact-ref path="/record/admin/dataProviderUri" name="dataProviderUri"/>
+        <fact-ref path="/record/admin/displayDataProvider" name="displayDataProvider"/>
+        <fact-ref path="/record/admin/providerHubUri" name="providerHubUri"/>
+        <fact-ref path="/record/admin/displayProviderHub" name="displayProviderHub"/>
     </facts>
-
-    <bookmarks>
-    </bookmarks>
-    <docs>
-        <doc path="/record/admin/displayProvider">
-            <string name="Dublin Core definition">An entity responsible for making contributions to the content of the
-                resource. Examples of a Contributor include a person, an organization or a service. Typically, the name
-                of a Contributor should be used to indicate the entity.
-            </string>
-            <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
-            <string name="Europeana note">The name of contributors to the original analog or born digital object. This
-                could be a person, an organisation or a service.
-            </string>
-        </doc>
-    </docs>
 
 </record-definition>

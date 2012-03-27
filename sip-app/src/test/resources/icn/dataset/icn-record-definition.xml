@@ -123,19 +123,19 @@
         <!--</option-list>-->
     </options>
 
-    <summaryFields>
-        <summaryField name="CREATOR" path="/icn:creator"/>
-        <summaryField name="TITLE" path="/icn:title"/>
-        <summaryField name="DESCRIPTION" path="/icn:description"/>
-        <summaryField name="OWNER" path="/icn:dataProvider"/>
-        <summaryField name="LANDING_PAGE" path="/icn:isShownAt"/>
-        <summaryField name="THUMBNAIL" path="/icn:object"/>
-        <summaryField name="THUMBNAIL" path="/icn:thumbnail"/>
-        <summaryField name="SNIPPET" path="/icn:fullText"/>
-        <summaryField name="SNIPPET" path="/icn:subject"/>
-        <summaryField name="SNIPPET" path="/icn:alternative"/>
-        <summaryField name="SNIPPET" path="/icn:collectionTitle"/>
-    </summaryFields>
+    <searchFields>
+        <searchField name="CREATOR" path="/record/dc:creator"/>
+        <searchField name="TITLE" path="/record/dc:title"/>
+        <searchField name="DESCRIPTION" path="/record/dc:description"/>
+        <searchField name="OWNER" path="/record/europeana:dataProvider"/>
+        <searchField name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+        <searchField name="THUMBNAIL" path="/record/europeana:object"/>
+        <searchField name="THUMBNAIL" path="/record/delving:thumbnail"/>
+        <searchField name="SNIPPET" path="/record/delving:fullText"/>
+        <searchField name="SNIPPET" path="/record/dc:subject"/>
+        <searchField name="SNIPPET" path="/record/dcterms:alternative"/>
+        <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
+    </searchFields>
 
     <!--<facts>-->
         <!--<fact name="spec" path="/icn:collectionName"/>-->

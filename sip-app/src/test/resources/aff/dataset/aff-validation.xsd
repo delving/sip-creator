@@ -23,14 +23,17 @@
 
     <xs:complexType name="adminType">
         <xs:sequence>
-            <xs:element type="xs:string" name="ownerUri"/>
-            <xs:element type="xs:string" name="displayOwner"/>
-            <xs:element type="xs:string" name="displayOwnerCountry"/>
-            <xs:element type="xs:string" name="providerUri"/>
-            <xs:element type="xs:string" name="displayProvider"/>
-            <xs:element type="xs:string" name="rights"/>
+            <xs:element name="dataOwnerUri"/>
+            <xs:element name="displayDataOwner"/>
+            <xs:element name="displayOwnerCountry"/>
+            <xs:element name="dataProviderUri"/>
+            <xs:element name="displayDataProvider"/>
+            <xs:element name="providerHubUri"/>
+            <xs:element name="displayProviderHub"/>
         </xs:sequence>
     </xs:complexType>
+
+
 
     <xs:complexType name="collectionType">
         <xs:sequence>

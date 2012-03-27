@@ -67,8 +67,6 @@ public class TestMappingValidation {
         mock.delete();
     }
 
-
-    @Ignore
     @Test
     public void testAbc() throws Exception {
         mock.prepareDataset(
@@ -79,7 +77,6 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
-    @Ignore
     @Test
     public void testLido() throws Exception {
         mock.prepareDataset(
@@ -90,7 +87,6 @@ public class TestMappingValidation {
         runFullCycle(2);
     }
 
-    @Ignore
     @Test
     public void testEse() throws Exception {
         mock.prepareDataset(
@@ -101,7 +97,6 @@ public class TestMappingValidation {
         runFullCycle(3);
     }
 
-    @Ignore
     @Test
     public void testIcn() throws Exception {
         mock.prepareDataset(
@@ -112,7 +107,6 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
-    @Ignore
     @Test
     public void testTib() throws Exception {
         mock.prepareDataset(
@@ -123,7 +117,6 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
-    @Ignore
     @Test
     public void testAff() throws Exception {
         mock.prepareDataset(

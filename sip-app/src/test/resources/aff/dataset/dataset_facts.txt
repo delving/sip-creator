@@ -1,10 +1,15 @@
-name=ABC Test
-spec=abc
-country=netherlands
-dataProvider=Sourcer
+name=Aff Test
+dataOwnerUri=http://www.schijndel.nl/museum/nl/index.html
+displayDataOwner=Museum Jan Heestershuis
+displayOwnerCountry=Netherlands
+dataProviderUri=http://www.erfgoedbrabant.nl/
+displayDataProvider=Erfgoed Brabant
+providerHubUri=http://www.thuisinbrabant.nl/
+displayProviderHub=Thuis in Brabant
 language=nl
-provider=Testmeister
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
+spec=aff
+
 
 
