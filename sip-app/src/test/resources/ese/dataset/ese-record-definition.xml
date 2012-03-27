@@ -56,10 +56,6 @@
         <elem tag="europeana:isShownAt"/>       <!-- required or above-->
     </root>
 
-    <options>
-    </options>
-
-
     <facts>
         <fact-ref name="spec" path="/record/europeana:collectionName"/>
         <fact-ref name="name" path="/record/europeana:collectionTitle"/>

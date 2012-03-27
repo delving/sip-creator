@@ -68,7 +68,6 @@ public class TestMappingValidation {
     }
 
 
-    @Ignore
     @Test
     public void testAbc() throws Exception {
         mock.prepareDataset(
@@ -90,6 +89,7 @@ public class TestMappingValidation {
         runFullCycle(2);
     }
 
+    @Ignore
     @Test
     public void testEse() throws Exception {
         mock.prepareDataset(

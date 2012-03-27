@@ -61,6 +61,25 @@
         <elem tag="europeana:year"/>
     </root>
 
+
+
+
+
+
+        <field prefix="europeana" localName="collectionTitle" factName="name" summaryField="SNIPPET"/>
+        <field prefix="europeana" localName="dataProvider" factName="dataProvider" fieldType="string" summaryField="OWNER"/>
+        <field prefix="europeana" localName="isShownBy" fieldType="string" summaryField="THUMBNAIL"/>
+        <field prefix="europeana" localName="provider" factName="provider" fieldType="string"/>
+
+
+
+                <converter multipleOutput="true" call=".extractYear()"/>
+
+
+
+
+
+
     <facts>
         <fact-ref name="spec" path="/record/europeana:collectionName"/>
         <fact-ref name="name" path="/record/europeana:collectionTitle"/>

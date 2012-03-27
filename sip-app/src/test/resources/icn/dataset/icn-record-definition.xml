@@ -123,19 +123,19 @@
         <!--</option-list>-->
     </options>
 
-    <searchFields>
-        <searchField name="CREATOR" path="/icn:creator"/>
-        <searchField name="TITLE" path="/icn:title"/>
-        <searchField name="DESCRIPTION" path="/icn:description"/>
-        <searchField name="OWNER" path="/icn:dataProvider"/>
-        <searchField name="LANDING_PAGE" path="/icn:isShownAt"/>
-        <searchField name="THUMBNAIL" path="/icn:object"/>
-        <searchField name="THUMBNAIL" path="/icn:thumbnail"/>
-        <searchField name="SNIPPET" path="/icn:fullText"/>
-        <searchField name="SNIPPET" path="/icn:subject"/>
-        <searchField name="SNIPPET" path="/icn:alternative"/>
-        <searchField name="SNIPPET" path="/icn:collectionTitle"/>
-    </searchFields>
+    <summaryFields>
+        <summaryField name="CREATOR" path="/icn:creator"/>
+        <summaryField name="TITLE" path="/icn:title"/>
+        <summaryField name="DESCRIPTION" path="/icn:description"/>
+        <summaryField name="OWNER" path="/icn:dataProvider"/>
+        <summaryield name="LANDING_PAGE" path="/icn:isShownAt"/>
+        <summaryField name="THUMBNAIL" path="/icn:object"/>
+        <summaryField name="THUMBNAIL" path="/icn:thumbnail"/>
+        <summaryField name="SNIPPET" path="/icn:fullText"/>
+        <summaryField name="SNIPPET" path="/icn:subject"/>
+        <summaryField name="SNIPPET" path="/icn:alternative"/>
+        <summaryField name="SNIPPET" path="/icn:collectionTitle"/>
+    </summaryFields>
 
     <!--<facts>-->
         <!--<fact name="spec" path="/icn:collectionName"/>-->
