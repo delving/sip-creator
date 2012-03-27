@@ -44,14 +44,14 @@
         <elem tag="abc:vDeathPlace"/>
         <elem tag="abc:vBiography"/>
 
-        <elem tag="europeana:dataProvider"/>
-        <elem tag="europeana:isShownAt"/>
         <elem tag="europeana:isShownBy"/>
+        <elem tag="europeana:rights"/>
+        <elem tag="europeana:isShownAt"/>
+        <elem tag="europeana:unstored"/>
         <elem tag="europeana:object"/>
         <elem tag="europeana:provider"/>
-        <elem tag="europeana:rights"/>
+        <elem tag="europeana:dataProvider"/>
         <elem tag="europeana:type"/>
-        <elem tag="europeana:unstored"/>
         <elem tag="europeana:uri"/>
         <elem tag="europeana:language"/>
         <elem tag="europeana:country"/>
@@ -59,6 +59,7 @@
         <elem tag="europeana:collectionTitle"/>
         <elem tag="europeana:source"/>
         <elem tag="europeana:year"/>
+
     </root>
 
     <searchFields>
