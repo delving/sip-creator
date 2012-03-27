@@ -252,7 +252,7 @@ public class RecDefFrame extends FrameBase {
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
             if (root != null) {
                 recDefTree.setModel(new FilterTreeModel(root));
-                showPath(root);
+//                showPath(root);
             }
             else {
                 recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));

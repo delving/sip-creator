@@ -32,8 +32,6 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -64,7 +62,7 @@ public class AnalysisFrame extends FrameBase {
     private JTree statisticsJTree;
     private boolean delimited = false;
     private StatisticsFrame statisticsFrame;
-    private Expander expander = new Expander();
+//    private Expander expander = new Expander();
 
     public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
         super(Which.ANALYSIS, desktop, sipModel, "Analysis", false);
@@ -77,7 +75,7 @@ public class AnalysisFrame extends FrameBase {
             }
         };
         statisticsJTree.setToolTipText("?");
-        statisticsJTree.getModel().addTreeModelListener(expander);
+//        statisticsJTree.getModel().addTreeModelListener(expander);
         statisticsJTree.setCellRenderer(new StatsTreeNode.Renderer());
         statisticsJTree.setTransferHandler(sipModel.getNodeTransferHandler());
         statisticsJTree.setDragEnabled(true);
@@ -109,7 +107,7 @@ public class AnalysisFrame extends FrameBase {
             getContentPane().removeAll();
             buildContent(getContentPane());
             getContentPane().validate();
-            expander.treeStructureChanged(null);
+//            expander.treeStructureChanged(null);
         }
     }
 
@@ -237,42 +235,42 @@ public class AnalysisFrame extends FrameBase {
         });
     }
 
-    private class Expander implements TreeModelListener {
-
-        @Override
-        public void treeNodesChanged(TreeModelEvent e) {
-        }
-
-        @Override
-        public void treeNodesInserted(TreeModelEvent e) {
-        }
-
-        @Override
-        public void treeNodesRemoved(TreeModelEvent e) {
-        }
-
-        @Override
-        public void treeStructureChanged(TreeModelEvent e) {
-            Timer timer = new Timer(500, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    expandEmptyNodes((StatsTreeNode) statisticsJTree.getModel().getRoot());
-                }
-            });
-            timer.setRepeats(false);
-            timer.start();
-        }
-
-        private void expandEmptyNodes(StatsTreeNode node) {
-            if (!node.isLeaf()) {
-                TreePath path = node.getTreePath();
-                statisticsJTree.expandPath(path);
-            }
-            for (StatsTreeNode childNode : node.getChildNodes()) {
-                expandEmptyNodes(childNode);
-            }
-        }
-    }
+//    private class Expander implements TreeModelListener {
+//
+//        @Override
+//        public void treeNodesChanged(TreeModelEvent e) {
+//        }
+//
+//        @Override
+//        public void treeNodesInserted(TreeModelEvent e) {
+//        }
+//
+//        @Override
+//        public void treeNodesRemoved(TreeModelEvent e) {
+//        }
+//
+//        @Override
+//        public void treeStructureChanged(TreeModelEvent e) {
+//            Timer timer = new Timer(500, new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    expandEmptyNodes((StatsTreeNode) statisticsJTree.getModel().getRoot());
+//                }
+//            });
+//            timer.setRepeats(false);
+//            timer.start();
+//        }
+//
+//        private void expandEmptyNodes(StatsTreeNode node) {
+//            if (!node.isLeaf()) {
+//                TreePath path = node.getTreePath();
+//                statisticsJTree.expandPath(path);
+//            }
+//            for (StatsTreeNode childNode : node.getChildNodes()) {
+//                expandEmptyNodes(childNode);
+//            }
+//        }
+//    }
 
     @Override
     public Dimension getMinimumSize() {
