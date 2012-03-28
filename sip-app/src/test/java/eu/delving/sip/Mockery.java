@@ -78,9 +78,14 @@ public class Mockery {
         hints.clear();
         hints.put(Storage.RECORD_ROOT_PATH, recordRootPath);
         hints.put(Storage.UNIQUE_ELEMENT_PATH, uniqueElementPath);
-        File sourceDir = new File(getClass().getResource(String.format("/%s/dataset", prefix)).getFile());
-        if (!sourceDir.isDirectory()) throw new RuntimeException();
-        FileUtils.copyDirectory(sourceDir, dataSetDir);
+        File factsSourceDir = new File(getClass().getResource(String.format("/test/%s/dataset", prefix)).getFile());
+        if (!factsSourceDir.isDirectory()) throw new RuntimeException();
+        FileUtils.copyDirectory(factsSourceDir, dataSetDir);
+        File factDefinitionList = new File(getClass().getResource("/definitions/global/fact-definition-list.xml").getFile());
+        FileUtils.copyFileToDirectory(factDefinitionList, dataSetDir);
+        File definitionSourceDir = new File(getClass().getResource(String.format("/definitions/%s", prefix)).getFile());
+        if (!definitionSourceDir.isDirectory()) throw new RuntimeException();
+        FileUtils.copyDirectory(definitionSourceDir, dataSetDir);
         dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()));
         recMapping = RecMapping.create(prefix, dataSetModel);
     }
@@ -161,11 +166,11 @@ public class Mockery {
     }
 
     private URL sampleResource() {
-        return getClass().getResource(String.format("/%s/example-input.xml", prefix));
+        return getClass().getResource(String.format("/test/%s/example-input.xml", prefix));
     }
 
     private InputStream mappingList() throws IOException {
-        return getClass().getResource(String.format("/%s/mapping-list.txt", prefix)).openStream();
+        return getClass().getResource(String.format("/test/%s/mapping-list.txt", prefix)).openStream();
     }
 
     public File sampleInputFile() throws IOException {
