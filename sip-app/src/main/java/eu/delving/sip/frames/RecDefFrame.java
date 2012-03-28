@@ -138,7 +138,7 @@ public class RecDefFrame extends FrameBase {
             if (nodeObject instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) nodeObject;
                 if (autoFoldBox.isSelected()) showPath(node);
-                sipModel.getCreateModel().setRecDefTreeNode(node);
+                sipModel.getCreateModel().setRecDefTreeNode(node.getRecDefNode().hasConstant() ? null : node);
             }
             else {
                 sipModel.getCreateModel().setRecDefTreeNode(null);
@@ -235,12 +235,12 @@ public class RecDefFrame extends FrameBase {
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                ((DefaultTreeModel)recDefTree.getModel()).nodeChanged(mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node));
+                ((DefaultTreeModel) recDefTree.getModel()).nodeChanged(mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node));
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                ((DefaultTreeModel)recDefTree.getModel()).nodeChanged(mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node));
+                ((DefaultTreeModel) recDefTree.getModel()).nodeChanged(mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node));
             }
         });
     }

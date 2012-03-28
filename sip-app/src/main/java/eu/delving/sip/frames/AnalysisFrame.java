@@ -22,12 +22,14 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
+import eu.delving.metadata.Tag;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.StatsTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
@@ -81,22 +83,6 @@ public class AnalysisFrame extends FrameBase {
         statisticsJTree.setDragEnabled(true);
         statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         wireUp();
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
-            @Override
-            public void dataSetChanged(DataSet dataSet) {
-                dataSetStateChanged(dataSet, dataSet.getState());
-            }
-
-            @Override
-            public void dataSetRemoved() {
-                reactToState(ABSENT);
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                reactToState(dataSetState);
-            }
-        });
     }
 
     private void reactToState(DataSetState state) {
@@ -150,15 +136,33 @@ public class AnalysisFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void dataSetChanged(DataSet dataSet) {
+                dataSetStateChanged(dataSet, dataSet.getState());
+            }
+
+            @Override
+            public void dataSetRemoved() {
+                reactToState(ABSENT);
+            }
+
+            @Override
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                reactToState(dataSetState);
+            }
+        });
         statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
                 final SortedSet<StatsTreeNode> nodeList = new TreeSet<StatsTreeNode>();
                 TreePath[] selectionPaths = statisticsJTree.getSelectionModel().getSelectionPaths();
-                if (selectionPaths != null) {
+                if (selectionPaths != null && delimited) {
                     for (TreePath path : selectionPaths) {
-                        if (!delimited || path.getPathCount() > 2)
-                            nodeList.add((StatsTreeNode) path.getLastPathComponent());
+                        StatsTreeNode node = (StatsTreeNode)path.getLastPathComponent();
+                        if (node.getTag().equals(Tag.attribute(Storage.FACTS_TAG))) continue;
+                        if (node.getTag().equals(Tag.attribute(Storage.ENVELOPE_TAG))) continue;
+                        nodeList.add(node);
                     }
                 }
                 if (nodeList.size() == 1) {
