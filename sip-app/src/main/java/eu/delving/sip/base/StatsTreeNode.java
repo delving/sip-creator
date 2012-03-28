@@ -336,7 +336,12 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
             Iterator<NodeMapping> walk = node.mappedIn.iterator();
             while (walk.hasNext()) {
                 NodeMapping nodeMapping = walk.next();
-                commaList.append(nodeMapping.recDefNode.toString());
+                if (nodeMapping.recDefNode == null) {
+                    commaList.append("null");
+                }
+                else {
+                    commaList.append(nodeMapping.recDefNode.toString());
+                }
                 if (walk.hasNext()) commaList.append(", ");
             }
             setText(String.format("<html><b>%s</b> &rarr; %s", node.toString(), commaList.toString()));
