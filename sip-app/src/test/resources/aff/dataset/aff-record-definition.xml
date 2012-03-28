@@ -15,6 +15,8 @@
         <attr tag="eventTypeUri"/>
         <attr tag="hubRecordId"/>
         <attr tag="conceptTypeUri"/>
+        <attr tag="actorInRoleUri"/>
+        <attr tag="placeInRoleUri"/>
         <attr tag="ResourceTypeUri"/>
     </attrs>
 
@@ -36,6 +38,21 @@
 
     <root tag="record">
 
+
+
+
+
+
+
+        <!-- DISCUSS THE URI_MAKER WITH GERALD!!!! USE FUNCTIONS TO CREATE URIS AND "STORE" THEM IN A TAG IN THE SOURCE ANALYSIS FRAME.
+        The created URIs should be exportable in xml/sql etc, AdLib update, SOFIE-Update etc-->
+
+
+
+
+
+
+
         <elem tag="admin" elems="rights" singular="true">
             <elem tag="dataOwnerUri"/>
             <elem tag="displayDataOwner"/>
@@ -51,7 +68,8 @@
             <elem tag="displayCollection"/>
         </elem>
 
-        <elem tag="thing" elems="rights" attrs="localId, localUri, hubRecordId" singular="true">
+        <elem tag="thing" elems="rights" attrs="localId, hubRecordId" singular="true">
+            <elem tag="thingUri"/>
             <elem tag="displayWorkType"/>
             <elem tag="displayTitle"/>
             <elem tag="displayDescription"/>
@@ -59,7 +77,8 @@
             <elem tag="displayDimensions"/>
             <elem tag="displayYear"/>
             <elem tag="landingPage"/>
-            <elem tag="partOfLocalUri"/>
+            <elem tag="isPartOfUri"/>
+            <elem tag="hasPartUri"/>
         </elem>
 
         <elem tag="concepts" singular="true">
@@ -75,16 +94,15 @@
                 <elem tag="displayEvent"/>
                 <elem tag="displayDate"/>
 
-                <elem tag="eventPlace" elems="placeAdmin" attrs="localId, localUri, sourceName, sourceUri">
+                <!-- make ADMIN1 -> 4 into options!!!!!!! -->
+                <elem tag="eventPlace" elems="placeAdmin" attrs="placeInRoleUri, localId, localUri, sourceName, sourceUri">
                     <elem tag="displayPlaceInRole"/>
-                    <elem tag="placeInRoleUri"/>
                     <elem tag="displayPlace"/>
                     <elem tag="displayPlaceType"/>
                 </elem>
 
-                <elem tag="eventActor" attrs="localId, localUri, sourceName, sourceUri">
+                <elem tag="eventActor" attrs="actorInRoleUri, localId, localUri, sourceName, sourceUri">
                     <elem tag="displayActorInRole"/>
-                    <elem tag="actorInRoleUri"/>
                     <elem tag="displayActor"/>
                 </elem>
             </elem>
@@ -153,8 +171,6 @@
             <!--<opt key="tiff">TIFF</opt>-->
             <!--<opt key="png">PNG</opt>-->
         <!--</option-list>-->
-
-
 
     </options>
 

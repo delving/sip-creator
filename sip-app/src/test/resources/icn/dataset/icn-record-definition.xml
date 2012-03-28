@@ -65,14 +65,14 @@
         <elem tag="dcterms:temporal"/>          <!-- ESE 3.4 -->
         <elem tag="dcterms:rightsHolder"/>      <!-- NOT part of ESE 3.4 -->
 
-        <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
         <elem tag="europeana:object"/>          <!-- ESE 3.4 -->
         <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
-        <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
 
         <!-- moved from europeana to delving -->
         <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
@@ -92,35 +92,6 @@
     </root>
 
     <options>
-        <!--<option-list valuePath="/record/technique"> &lt;!&ndash; no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs &ndash;&gt;-->
-            <!--<opt key="1">Schilderkunst</opt>-->
-            <!--<opt key="2">Prentkunst</opt>-->
-            <!--<opt key="3">Fotografie</opt>-->
-            <!--<opt key="4">Tekeningen</opt>-->
-            <!--<opt key="5">Beeldhouwkunst</opt>-->
-            <!--<opt key="6">Textiel</opt>-->
-            <!--<opt key="7">Film/Video/DVD</opt>-->
-            <!--<opt key="8">Anders:</opt>-->
-        <!--</option-list>-->
-        <!--<option-list path="/record/acquisitionMeans">-->
-            <!--<opt key="1">aankoop</opt>-->
-            <!--<opt key="2">schenking</opt>-->
-            <!--<opt key="3">bruikleen</opt>-->
-            <!--<opt key="4">ruil</opt>-->
-            <!--<opt key="5">opdracht</opt>-->
-            <!--<opt key="6">opdracht derden</opt>-->
-            <!--<opt key="7">opdracht museum</opt>-->
-            <!--<opt key="8">legaat</opt>-->
-            <!--<opt key="9">overdracht</opt>-->
-            <!--<opt key="10">successieregeling</opt>-->
-            <!--<opt key="11">vondst</opt>-->
-            <!--<opt key="12">onbekend:</opt>-->
-        <!--</option-list>-->
-        <!--<option-list path="/record/collectionType">-->
-            <!--<opt key="1">all</opt>-->
-            <!--<opt key="2">portal</opt>-->
-            <!--<opt key="3">mm</opt>-->
-        <!--</option-list>-->
     </options>
 
     <searchFields>
@@ -137,16 +108,16 @@
         <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
     </searchFields>
 
-    <!--<facts>-->
-        <!--<fact name="spec" path="/icn:collectionName"/>-->
-        <!--<fact name="name" path="/icn:collectionTitle"/>-->
-        <!--<fact name="country" path="/icn:country"/>-->
-        <!--<fact name="dataProvider" path="/icn:dataProvider"/>-->
-        <!--<fact name="language" path="/icn:language"/>-->
-        <!--<fact name="provider" path="/icn:provider"/>-->
-        <!--<fact name="rights" path="/icn:rights"/>-->
-        <!--<fact name="type" path="/icn:type"/>-->
-    <!--</facts>-->
+    <facts>
+        <fact-ref name="spec" path="/record/europeana:collectionName"/>
+        <fact-ref name="name" path="/record/europeana:collectionTitle"/>
+        <fact-ref name="country" path="/record/europeana:country"/>
+        <fact-ref name="dataProvider" path="/record/europeana:dataProvider"/>
+        <fact-ref name="language" path="/record/europeana:language"/>
+        <fact-ref name="provider" path="/record/europeana:provider"/>
+        <fact-ref name="rights" path="/record/europeana:rights"/>
+        <fact-ref name="type" path="/record/europeana:type"/>
+    </facts>
 
     <!--<converters>-->
         <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>-->
