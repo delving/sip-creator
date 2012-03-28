@@ -5,9 +5,10 @@
         <frame where="1011" which="STATISTICS"/>
     </arrangement>
     <arrangement name="Quick Mapping">
-        <frame where="0011" which="ANALYSIS"/>
-        <frame where="1011" which="CREATE"/>
-        <frame where="2011" which="REC_DEF"/>
+        <frame where="0013" which="ANALYSIS"/>
+        <frame where="1012" which="CREATE"/>
+        <frame where="1211" which="REC_MAPPING"/>
+        <frame where="2013" which="REC_DEF"/>
     </arrangement>
     <arrangement name="Big Picture">
         <frame where="0011" which="INPUT"/>
