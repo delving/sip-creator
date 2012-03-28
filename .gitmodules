@@ -1,0 +1,3 @@
+[submodule "sip-app/src/test/resources/definitions"]
+	path = sip-app/src/test/resources/definitions
+	url = git@github.com:delving/definitions.git
