@@ -25,24 +25,22 @@
         <elem tag="icn:acquiredWithHelpFrom"/>
         <elem tag="icn:physicalState"/>
 
-        <elem tag="dc:contributor"/>            <!-- ESE 3.4 -->
-        <elem tag="dc:coverage"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:title"/>                  <!-- ESE 3.4 -->
         <elem tag="dc:creator"/>                <!-- ESE 3.4 -->
-        <elem tag="dc:date"/>                   <!-- ESE 3.4 -->
+        <elem tag="dc:subject"/>                <!-- ESE 3.4 -->
         <elem tag="dc:description"/>            <!-- ESE 3.4 -->
+        <elem tag="dc:publisher"/>              <!-- ESE 3.4 -->
+        <elem tag="dc:contributor"/>            <!-- ESE 3.4 -->
+        <elem tag="dc:date"/>                   <!-- ESE 3.4 -->
+        <elem tag="dc:type"/>                   <!-- ESE 3.4 -->
         <elem tag="dc:format"/>                 <!-- ESE 3.4 -->
         <elem tag="dc:identifier"/>             <!-- ESE 3.4 -->
-        <elem tag="dc:language"/>               <!-- ESE 3.4 -->
-        <elem tag="dc:publisher"/>              <!-- ESE 3.4 -->
-        <elem tag="dc:relation"/>               <!-- ESE 3.4 -->
-        <elem tag="dc:rights"/>                 <!-- ESE 3.4 -->
         <elem tag="dc:source"/>                 <!-- ESE 3.4 -->
-        <elem tag="dc:subject"/>                <!-- ESE 3.4 -->
-        <elem tag="dc:title"/>                  <!-- ESE 3.4 -->
-        <elem tag="dc:type"/>                   <!-- ESE 3.4 -->
+        <elem tag="dc:language"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:relation"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:coverage"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:rights"/>                 <!-- ESE 3.4 -->
 
-        <elem tag="dcterms:alternative"/>       <!-- ESE 3.4 -->
-        <elem tag="dcterms:conformsTo"/>        <!-- ESE 3.4 -->
         <elem tag="dcterms:created"/>           <!-- ESE 3.4 -->
         <elem tag="dcterms:extent"/>            <!-- ESE 3.4 -->
         <elem tag="dcterms:hasFormat"/>         <!-- ESE 3.4 -->
@@ -56,14 +54,16 @@
         <elem tag="dcterms:isVersionOf"/>       <!-- ESE 3.4 -->
         <elem tag="dcterms:issued"/>            <!-- ESE 3.4 -->
         <elem tag="dcterms:medium"/>            <!-- ESE 3.4 -->
-        <elem tag="dcterms:provenance"/>        <!-- ESE 3.4 -->
         <elem tag="dcterms:references"/>        <!-- ESE 3.4 -->
         <elem tag="dcterms:replaces"/>          <!-- ESE 3.4 -->
         <elem tag="dcterms:requires"/>          <!-- ESE 3.4 -->
-        <elem tag="dcterms:spatial"/>           <!-- ESE 3.4 -->
         <elem tag="dcterms:tableOfContents"/>   <!-- ESE 3.4 -->
+        <elem tag="dcterms:alternative"/>       <!-- ESE 3.4 -->
+        <elem tag="dcterms:spatial"/>           <!-- ESE 3.4 -->
         <elem tag="dcterms:temporal"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:provenance"/>        <!-- ESE 3.4 -->
         <elem tag="dcterms:rightsHolder"/>      <!-- NOT part of ESE 3.4 -->
+
 
         <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->

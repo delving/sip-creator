@@ -18,6 +18,7 @@
 
     <xs:group name="dcGroup">
         <xs:choice >
+            <xs:element ref="dc:title" minOccurs="0" maxOccurs="unbounded" />
             <xs:element ref="dc:creator" minOccurs="0" maxOccurs="unbounded" />
             <xs:element ref="dc:subject" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dc:description" minOccurs="0" maxOccurs="unbounded"/>
@@ -37,7 +38,6 @@
 
     <xs:group name="dctermsGroup">
         <xs:choice>
-            <xs:element ref="dcterms:conformsTo" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dcterms:created" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dcterms:extent" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dcterms:hasFormat" minOccurs="0" maxOccurs="unbounded"/>
