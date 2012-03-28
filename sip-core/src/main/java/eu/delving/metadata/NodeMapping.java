@@ -355,6 +355,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public String toString() {
+        if (recDefNode == null) return "No RecDefNode";
         String input = inputPath.getTail();
         if (tuplePaths != null) {
             StringBuilder out = new StringBuilder();

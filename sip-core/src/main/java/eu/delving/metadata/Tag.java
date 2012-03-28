@@ -93,9 +93,7 @@ public class Tag implements Comparable<Tag>, Serializable {
     }
 
     private Tag(boolean attribute, String prefix, String localName) {
-        if (prefix != null && prefix.isEmpty()) {
-            prefix = null;
-        }
+        if (prefix != null && prefix.isEmpty()) prefix = null;
         if (localName.indexOf(':') >= 0) throw new RuntimeException("localName has a colon: " + localName);
         this.attribute = attribute;
         this.prefix = prefix;

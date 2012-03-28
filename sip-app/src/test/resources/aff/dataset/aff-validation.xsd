@@ -11,6 +11,7 @@
         <xs:sequence>
             <xs:element type="aff:adminType" name="admin"  minOccurs="0" maxOccurs="1"/>
             <xs:element type="aff:thingType" name="thing" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="aff:relationType" name="relations"  minOccurs="0" maxOccurs="1"/>
             <xs:element type="aff:collectionType" name="collections"  minOccurs="0" maxOccurs="1"/>
             <xs:element type="aff:classificationType" name="classifications" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element type="aff:subjectType" name="subjects" minOccurs="0" maxOccurs="unbounded"/>
@@ -33,7 +34,33 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="collectionType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="collectionUri"/>
+            <xs:element type="xs:string" name="displayCollection"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="localId"/>
+        <xs:attribute type="xs:string" name="isPartOfLocalId"/>
+        <xs:attribute type="xs:string" name="isPartOfUri"/>
+    </xs:complexType>
 
+
+    <xs:complexType name="thingType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="thingUri" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="displayWorkType" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="displayTitle" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="displayDescription" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="language" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="displayDimensions" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="xs:string" name="displayYear" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="rights" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="landingPage" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="hubRecordId" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="xs:string" name="hubRecordUrl" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="localId"/>
+    </xs:complexType>
 
     <xs:complexType name="collectionType">
         <xs:sequence>
@@ -41,23 +68,10 @@
             <xs:element type="xs:string" name="displayCollection"/>
         </xs:sequence>
         <xs:attribute type="xs:string" name="localId"/>
+        <xs:attribute type="xs:string" name="isPartOfLocalId"/>
+        <xs:attribute type="xs:string" name="isPartOfUri"/>
     </xs:complexType>
 
-    <xs:complexType name="thingType">
-        <xs:sequence>
-            <xs:element type="xs:string" name="displayWorkType" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="xs:string" name="displayTitle" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="xs:string" name="displayDescription" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="xs:string" name="language" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="xs:string" name="displayDimensions" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element type="xs:string" name="displayYear" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="xs:string" name="landingPage" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="xs:string" name="partOfLocalUri" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="xs:string" name="rights" minOccurs="0" maxOccurs="1"/>
-        </xs:sequence>
-        <xs:attribute type="xs:string" name="localId"/>
-        <xs:attribute type="xs:string" name="localUri"/>
-    </xs:complexType>
 
     <xs:complexType name="subjectType">
          <xs:sequence>
