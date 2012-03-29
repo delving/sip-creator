@@ -254,15 +254,15 @@
     </root>
 
 
-    <options>
+    <discriminators>
         <!--<option-list path="/lido/administrativeMetadata/recordWrap">-->
-            <!--<opt key="1">Item</opt>-->
-            <!--<opt key="2">Collection</opt>-->
-            <!--<opt key="3">Series</opt>-->
-            <!--<opt key="4">Group</opt>-->
-            <!--<opt key="5">Fonds</opt>-->
+            <!--<discriminator key="1">Item</discriminator>-->
+            <!--<discriminator key="2">Collection</discriminator>-->
+            <!--<discriminator key="3">Series</discriminator>-->
+            <!--<discriminator key="4">Group</discriminator>-->
+            <!--<discriminator key="5">Fonds</discriminator>-->
         <!--</option-list>-->
-    </options>
+    </discriminators>
 
 
     <bookmarks>
@@ -292,16 +292,16 @@
                 </doc>
             </ref>
             <ref path="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="technique" display="Technique">
-                <options>
-                    <opt key="1">Schilderkunst</opt>
-                    <opt key="2">Prentkunst</opt>
-                    <opt key="3">Fotografie</opt>
-                    <opt key="4">Tekeningen</opt>
-                    <opt key="5">Beeldhouwkunst</opt>
-                    <opt key="6">Textiel</opt>
-                    <opt key="7">Film/Video/DVD</opt>
-                    <opt key="8">Anders:</opt>
-                </options>
+                <discriminators>
+                    <discriminator key="1">Schilderkunst</discriminator>
+                    <discriminator key="2">Prentkunst</discriminator>
+                    <discriminator key="3">Fotografie</discriminator>
+                    <discriminator key="4">Tekeningen</discriminator>
+                    <discriminator key="5">Beeldhouwkunst</discriminator>
+                    <discriminator key="6">Textiel</discriminator>
+                    <discriminator key="7">Film/Video/DVD</discriminator>
+                    <discriminator key="8">Anders:</discriminator>
+                </discriminators>
             </ref>
             <ref path="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="iconclass" display="Iconclass"/>
             <ref path="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term" name="aat" display="AAT"/>
@@ -351,9 +351,9 @@
                     <string>The option key is mapped into event - eventType - conceptID  </string>
                     <string>The option value is mapped into event - eventType - term  </string>
                 </doc>
-                <options>
-                    <opt key="http://www.cidoc-crm.org/rdfs/crm_e8">Acquisition</opt>
-                </options>
+                <discriminators>
+                    <discriminator key="http://www.cidoc-crm.org/rdfs/crm_e8">Acquisition</discriminator>
+                </discriminators>
             </ref>
 
             <ref path="/lido/descriptiveMetadata/eventWrap/eventSet/event/eventMethod/term" name="meansOfAcquisition" display="Means of acquisition">
@@ -363,20 +363,20 @@
                     <string>The option value is mapped into event - eventMethod - term</string>
                     <string>URIs for the option keys will be provided by CultureCloud</string>
                 </doc>
-                <options>
-                    <opt key="9">aankoop</opt>
-                    <opt key="10">schenking</opt>
-                    <opt key="11">bruikleen</opt>
-                    <opt key="12">ruil</opt>
-                    <opt key="13">opdracht</opt>
-                    <opt key="14">opdracht derden</opt>
-                    <opt key="15">opdracht museum</opt>
-                    <opt key="16">legaat</opt>
-                    <opt key="17">overdracht</opt>
-                    <opt key="18">successieregeling</opt>
-                    <opt key="19">vondst</opt>
-                    <opt key="20">onbekend</opt>
-                </options>
+                <discriminators>
+                    <discriminator key="9">aankoop</discriminator>
+                    <discriminator key="10">schenking</discriminator>
+                    <discriminator key="11">bruikleen</discriminator>
+                    <discriminator key="12">ruil</discriminator>
+                    <discriminator key="13">opdracht</discriminator>
+                    <discriminator key="14">opdracht derden</discriminator>
+                    <discriminator key="15">opdracht museum</discriminator>
+                    <discriminator key="16">legaat</discriminator>
+                    <discriminator key="17">overdracht</discriminator>
+                    <discriminator key="18">successieregeling</discriminator>
+                    <discriminator key="19">vondst</discriminator>
+                    <discriminator key="20">onbekend</discriminator>
+                </discriminators>
             </ref>
             <ref path="/lido/lidoRecID" name="acquiredWithHelpFrom" display="Acquired with help from">
                 <doc>
@@ -389,13 +389,13 @@
                 <doc>
                     <string>To be continued...</string>
                 </doc>
-                <options>
-                    <opt key="21">stateOwned</opt>
-                    <opt key="22">notStateOwned</opt>
-                    <opt key="23">trustedToState</opt>
-                    <opt key="24">borrowedFrom</opt>
-                    <opt key="25">unknown</opt>
-                </options>
+                <discriminators>
+                    <discriminator key="21">stateOwned</discriminator>
+                    <discriminator key="22">notStateOwned</discriminator>
+                    <discriminator key="23">trustedToState</discriminator>
+                    <discriminator key="24">borrowedFrom</discriminator>
+                    <discriminator key="25">unknown</discriminator>
+                </discriminators>
             </ref>
             <ref path="/lido/lidoRecID" name="chargesByState" display="Charges by state ????"/>
 
@@ -406,12 +406,12 @@
                     <string>The option key is mapped into event - eventType - conceptID  </string>
                     <string>The option value is mapped into event - eventType - term  </string>
                </doc>
-                <options>
-                    <opt key="http://www.cidoc-crm.org/rdfs/crm_e10">sale</opt>
-                    <opt key="http://www.cidoc-crm.org/rdfs/crm_e6">destruction</opt>
-                    <opt key="http://www.cidoc-crm.org/rdfs/crm_e10">donation</opt>
-                    <opt key="http://www.cidoc-crm.org/rdfs/crm_e10">exchange</opt>
-                </options>
+                <discriminators>
+                    <discriminator key="http://www.cidoc-crm.org/rdfs/crm_e10">sale</discriminator>
+                    <discriminator key="http://www.cidoc-crm.org/rdfs/crm_e6">destruction</discriminator>
+                    <discriminator key="http://www.cidoc-crm.org/rdfs/crm_e10">donation</discriminator>
+                    <discriminator key="http://www.cidoc-crm.org/rdfs/crm_e10">exchange</discriminator>
+                </discriminators>
             </ref>
             <ref path="/lido/lidoRecID" name="yearOfDisposal" display="Year of disposal">
                 <doc>

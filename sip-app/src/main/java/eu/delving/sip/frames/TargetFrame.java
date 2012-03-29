@@ -186,7 +186,7 @@ public class TargetFrame extends FrameBase {
                     StringTemplate t = Utility.getTemplate(ref.isAttr() ? "bookmark-attribute" : "bookmark-element");
                     t.setAttribute("name", ref.display);
                     t.setAttribute("doc", ref.doc);
-                    t.setAttribute("options", ref.options);
+                    t.setAttribute("discriminators", ref.discriminators);
                     return t.toString();
                 }
                 else {

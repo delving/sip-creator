@@ -45,7 +45,7 @@ public class RecDefNode {
     private Path path;
     private RecDef.Elem elem;
     private RecDef.Attr attr;
-    private RecDef.Opt optRoot, optKey, optValue;
+    private RecDef.Discriminator discriminatorRoot, discriminatorKey, discriminatorValue;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
@@ -62,35 +62,35 @@ public class RecDefNode {
         return new RecDefNode(listener, null, recDef.root, null, null, null, null); // only root element
     }
 
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, RecDef.Opt optRoot, RecDef.Opt optKey, RecDef.Opt optValue) {
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, RecDef.Discriminator discriminatorRoot, RecDef.Discriminator discriminatorKey, RecDef.Discriminator discriminatorValue) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
         this.attr = attr;
-        this.optRoot = optRoot;
-        if (optKey != null && optKey.parent.key.equals(getTag())) this.optKey = optKey;
-        if (optValue != null && optValue.parent.value.equals(getTag())) this.optValue = optValue;
+        this.discriminatorRoot = discriminatorRoot;
+        if (discriminatorKey != null && discriminatorKey.parent.key.equals(getTag())) this.discriminatorKey = discriminatorKey;
+        if (discriminatorValue != null && discriminatorValue.parent.value.equals(getTag())) this.discriminatorValue = discriminatorValue;
         if (elem != null) {
             for (RecDef.Attr sub : elem.attrList) {
-                children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot));
+                children.add(new RecDefNode(listener, this, null, sub, null, discriminatorRoot, discriminatorRoot));
             }
             for (RecDef.Elem sub : elem.elemList) {
                 if (sub.options == null) {
-                    children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot));
+                    children.add(new RecDefNode(listener, this, sub, null, null, discriminatorRoot, discriminatorRoot));
                 }
-                else for (RecDef.Opt subOpt : sub.options.opts) { // a child for each option
-                    children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null));
+                else for (RecDef.Discriminator subDiscriminator : sub.options.discriminators) { // a child for each option
+                    children.add(new RecDefNode(listener, this, sub, null, subDiscriminator, null, null));
                 }
             }
         }
     }
 
     public String getOptRootKey() {
-        return optRoot != null ? optRoot.key : null;
+        return discriminatorRoot != null ? discriminatorRoot.key : null;
     }
 
     public String getOptRootValue() {
-        return optRoot != null ? optRoot.content : "";
+        return discriminatorRoot != null ? discriminatorRoot.content : "";
     }
 
     public boolean hasSearchField() {
@@ -150,12 +150,12 @@ public class RecDefNode {
         return getOptions() != null;
     }
 
-    public RecDef.OptionList getOptions() {
+    public RecDef.DiscriminatorList getOptions() {
         return isAttr() ? null : elem.options;
     }
 
     public RecDefNode getNode(Path soughtPath, String optKey) {
-        if (getPath().equals(soughtPath) && (optKey == null || optRoot == null || optKey.equals(optRoot.key))) return this;
+        if (getPath().equals(soughtPath) && (optKey == null || discriminatorRoot == null || optKey.equals(discriminatorRoot.key))) return this;
         for (RecDefNode sub : children) {
             RecDefNode found = sub.getNode(soughtPath, optKey);
             if (found != null) return found;
@@ -170,7 +170,7 @@ public class RecDefNode {
     }
 
     public boolean hasConstant() {
-        return optKey != null || optValue != null;
+        return discriminatorKey != null || discriminatorValue != null;
     }
 
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {
@@ -247,11 +247,11 @@ public class RecDefNode {
             startBuilderCall(out, editPath);
             for (RecDefNode sub : children) {
                 if (sub.isAttr()) continue;
-                if (sub.optKey != null) {
-                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
+                if (sub.discriminatorKey != null) {
+                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.discriminatorKey.key);
                 }
-                else if (sub.optValue != null) {
-                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
+                else if (sub.discriminatorValue != null) {
+                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.discriminatorValue.content);
                 }
                 else {
                     sub.toElementCode(out, editPath);
@@ -292,14 +292,14 @@ public class RecDefNode {
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
-                if (sub.optKey != null) {
+                if (sub.discriminatorKey != null) {
                     if (comma) out.line(",");
-                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
+                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.discriminatorKey.key);
                     comma = true;
                 }
-                else if (sub.optValue != null) {
+                else if (sub.discriminatorValue != null) {
                     if (comma) out.line(",");
-                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
+                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.discriminatorValue.content);
                     comma = true;
                 }
                 else {
@@ -326,8 +326,8 @@ public class RecDefNode {
 
     public String toString() {
         String name = isAttr() ? attr.tag.toString() : elem.tag.toString();
-        if (optRoot != null) name += String.format("[%s]", optRoot.content);
-        if (optKey != null || optValue != null) name += "{Constant}";
+        if (discriminatorRoot != null) name += String.format("[%s]", discriminatorRoot.content);
+        if (discriminatorKey != null || discriminatorValue != null) name += "{Constant}";
         return name;
     }
 

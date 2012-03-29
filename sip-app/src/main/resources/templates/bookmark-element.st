@@ -6,11 +6,11 @@ $if (doc)$
         <tr><td><p>$line$</p></td></tr>
     }$
 $endif$
-$if (options)$
+$if (discriminators)$
     <tr><td>
         <ul>
-            $options:{ opt |
-                <li>$opt.key$ - $opt.content$</li>
+            $options:{ discriminator |
+                <li>$discriminator.key$ - $discriminator.content$</li>
             }$
         </ul>
     </td></tr>

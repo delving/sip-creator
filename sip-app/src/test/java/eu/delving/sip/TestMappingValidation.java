@@ -78,7 +78,6 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
-    @Ignore
     @Test
     public void testLido() throws Exception {
         mock.prepareDataset(
@@ -121,7 +120,6 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
-    @Ignore
     @Test
     public void testAff() throws Exception {
         mock.prepareDataset(

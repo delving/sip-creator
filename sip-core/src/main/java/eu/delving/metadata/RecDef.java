@@ -95,7 +95,7 @@ public class RecDef {
 
     public Elem root;
 
-    public List<OptionList> options;
+    public List<DiscriminatorList> discriminators;
 
     public List<FactRef> facts;
 
@@ -145,7 +145,7 @@ public class RecDef {
         if (searchFields != null) for (SearchField searchField : searchFields) searchField.resolve(this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (bookmarks != null) for (Category category : bookmarks) category.resolve(this);
-        if (options != null) for (OptionList optionList : options) optionList.resolve(this);
+        if (discriminators != null) for (DiscriminatorList discriminatorList : discriminators) discriminatorList.resolve(this);
     }
 
     private void collectPaths(Elem elem, Path path, List<Path> paths) {
@@ -201,7 +201,7 @@ public class RecDef {
         @XStreamAsAttribute
         public String display;
 
-        public List<Opt> options;
+        public List<Discriminator> discriminators;
 
         public List<String> doc;
 
@@ -240,8 +240,8 @@ public class RecDef {
         public String name;
     }
 
-    @XStreamAlias("option-list")
-    public static class OptionList {
+    @XStreamAlias("discriminator-list")
+    public static class DiscriminatorList {
 
         @XStreamAsAttribute
         public Path path;
@@ -253,11 +253,11 @@ public class RecDef {
         public Tag value;
 
         @XStreamImplicit
-        public List<Opt> opts;
+        public List<Discriminator> discriminators;
 
         public void resolve(RecDef recDef) {
-            for (Opt opt: opts) opt.parent = this;
-            if (path == null) throw new RuntimeException("No path for OptionList: " + opts);
+            for (Discriminator discriminator : discriminators) discriminator.parent = this;
+            if (path == null) throw new RuntimeException("No path for DiscriminatorList: " + discriminators);
             if (path.peek().isAttribute()) throw new RuntimeException("An option list may not be connected to an attribute: " + path);
             path.defaultPrefix(recDef.prefix);
             key = key.defaultPrefix(recDef.prefix);
@@ -267,9 +267,9 @@ public class RecDef {
         }
     }
 
-    @XStreamAlias("opt")
+    @XStreamAlias("discriminator")
     @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"content"})
-    public static class Opt {
+    public static class Discriminator {
 
         @XStreamAsAttribute
         public String key;
@@ -277,9 +277,9 @@ public class RecDef {
         public String content;
         
         @XStreamOmitField
-        public OptionList parent;
+        public DiscriminatorList parent;
 
-        public Opt setContent(String content) {
+        public Discriminator setContent(String content) {
             this.content = content;
             return this;
         }
@@ -437,7 +437,7 @@ public class RecDef {
         public Doc doc;
 
         @XStreamOmitField
-        public OptionList options;
+        public DiscriminatorList options;
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
@@ -521,7 +521,7 @@ public class RecDef {
             }
             if (options != null) {
                 indent(out, level).append("// ");
-                for (Opt opt : options.opts) out.append(String.format("%s=%s, ", opt.key, opt.content));
+                for (Discriminator discriminator : options.discriminators) out.append(String.format("%s=%s, ", discriminator.key, discriminator.content));
                 out.append("\n");
             }
             indent(out, level).append("lido.");

@@ -125,7 +125,7 @@ public class CreateModel {
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
         if (sourceTreeNode.getStatistics() == null) return false;
         Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
-        RecDef.OptionList options = recDefTreeNode.getRecDefNode().getOptions();
+        RecDef.DiscriminatorList options = recDefTreeNode.getRecDefNode().getOptions();
         return values != null && options != null && nodeMapping.dictionary == null;
     }
 
