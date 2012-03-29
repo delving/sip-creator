@@ -60,6 +60,7 @@ public class FunctionCompileModel {
     private MappingModel mappingModel;
     private Document inputDocument = new PlainDocument();
     private Document codeDocument = new PlainDocument();
+    private Document docDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
     private TriggerTimer triggerTimer = new TriggerTimer();
     private GroovyCodeResource groovyCodeResource;
@@ -85,6 +86,12 @@ public class FunctionCompileModel {
                 trigger(RUN_DELAY);
             }
         });
+        this.docDocument.addDocumentListener(new DocChangeListener() {
+            @Override
+            public void run() {
+                trigger(RUN_DELAY);
+            }
+        });
         this.codeDocument.addDocumentListener(new DocChangeListener() {
             @Override
             public void run() {
@@ -98,6 +105,7 @@ public class FunctionCompileModel {
     public void setFunction(MappingFunction mappingFunction) {
         this.mappingFunction = mappingFunction;
         Exec.swing(new DocumentSetter(inputDocument, getSampleInput(), true));
+        Exec.swing(new DocumentSetter(docDocument, getDocInput(), true));
         Exec.swing(new DocumentSetter(codeDocument, getOriginalCode(), true));
         notifyStateChange(State.ORIGINAL);
         trigger(COMPILE_DELAY);
@@ -111,6 +119,10 @@ public class FunctionCompileModel {
         return codeDocument;
     }
 
+    public Document getDocDocument() {
+        return docDocument;
+    }
+
     public Document getOutputDocument() {
         return outputDocument;
     }
@@ -120,6 +132,11 @@ public class FunctionCompileModel {
     private String getSampleInput() {
         if (mappingFunction == null) return "no input";
         return mappingFunction.getSampleInputString();
+    }
+
+    private String getDocInput() {
+        if (mappingFunction == null) return "no doc";
+        return mappingFunction.getDocumentation();
     }
 
     private String getOriginalCode() {
@@ -181,6 +198,7 @@ public class FunctionCompileModel {
                 }
                 else {
                     mappingFunction.setSampleInput(documentToString(inputDocument));
+                    mappingFunction.setDocumentation(documentToString(docDocument));
                     mappingFunction.setGroovyCode(documentToString(codeDocument));
                     mappingModel.notifyFunctionChanged(mappingFunction);
                     notifyStateChange(State.ORIGINAL);

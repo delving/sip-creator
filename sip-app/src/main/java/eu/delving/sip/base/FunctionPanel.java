@@ -37,6 +37,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -49,20 +50,31 @@ import java.util.regex.Pattern;
 
 public class FunctionPanel extends JPanel {
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 18);
+    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
     private SipModel sipModel;
     private FunctionListModel functionListModel = new FunctionListModel();
-    private JList functionList = new JList(functionListModel);
+    private JList functionList;
     private DefaultListModel factsModel = new DefaultListModel();
     private JList factsList = new JList(factsModel);
     private JTextArea inputArea = new JTextArea();
+    private JTextArea docArea = new JTextArea();
     private JTextArea codeArea = new JTextArea();
     private JTextArea outputArea = new JTextArea();
 
     public FunctionPanel(SipModel sipModel) {
         super(new BorderLayout());
+        functionList = new JList(functionListModel) {
+            @Override
+            public String getToolTipText(MouseEvent evt) {
+                int index = functionList.locationToIndex(evt.getPoint());
+                MappingFunction mappingFunction = (MappingFunction) functionListModel.getElementAt(index);
+                return (mappingFunction.documentation == null ? "No documentation" : mappingFunction.documentation);
+            }
+
+        };
         inputArea.setFont(MONOSPACED);
         codeArea.setFont(MONOSPACED);
+        docArea.setFont(MONOSPACED);
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
         this.sipModel = sipModel;
@@ -92,6 +104,7 @@ public class FunctionPanel extends JPanel {
         });
         inputArea.setDocument(sipModel.getFunctionCompileModel().getInputDocument());
         codeArea.setDocument(sipModel.getFunctionCompileModel().getCodeDocument());
+        docArea.setDocument(sipModel.getFunctionCompileModel().getDocDocument());
         outputArea.setDocument(sipModel.getFunctionCompileModel().getOutputDocument());
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
@@ -159,17 +172,11 @@ public class FunctionPanel extends JPanel {
         return p;
     }
     
-    private static JPanel scrollPanel(String title, JComponent component) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder(title));
-        p.add(Utility.scroll(component), BorderLayout.CENTER);
-        return p;
-    }
-
     private JPanel createCodePanel() {
-        JPanel p = new JPanel(new BorderLayout());
+        JPanel p = new JPanel(new GridLayout(1,0));
         p.setBorder(BorderFactory.createTitledBorder("Function Code"));
-        p.add(Utility.scroll(codeArea));
+        p.add(scrollPanel("Function Code", codeArea));
+        p.add(scrollPanel("Documentation", docArea));
         return p;
     }
 
@@ -177,6 +184,13 @@ public class FunctionPanel extends JPanel {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output Lines"));
         p.add(Utility.scroll(outputArea));
+        return p;
+    }
+
+    private static JPanel scrollPanel(String title, JComponent component) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder(title));
+        p.add(Utility.scroll(component), BorderLayout.CENTER);
         return p;
     }
 

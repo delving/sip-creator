@@ -43,6 +43,9 @@ public class MappingFunction implements Comparable<MappingFunction> {
     @XStreamAlias("sample-input")
     public List<String> sampleInput;
 
+    @XStreamAlias("documentation")
+    public String documentation;
+
     @XStreamAlias("groovy-code")
     public List<String> groovyCode;
 
@@ -51,6 +54,14 @@ public class MappingFunction implements Comparable<MappingFunction> {
 
     public MappingFunction(String name) {
         this.name = name;
+    }
+
+    public String getDocumentation() {
+        return documentation;
+    }
+
+    public void setDocumentation(String documentation) {
+        this.documentation = documentation;
     }
 
     public void setSampleInput(String sampleInput) {
