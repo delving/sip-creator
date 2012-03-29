@@ -62,9 +62,9 @@ public abstract class FrameBase extends JInternalFrame {
     private String title;
 
     public enum Which {
-        ANALYSIS,
+        SOURCE,
         CREATE,
-        REC_DEF,
+        TARGET,
         STATISTICS,
         INPUT,
         REC_MAPPING,

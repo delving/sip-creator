@@ -24,7 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
-import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.base.SourceTreeNode;
 
 import javax.swing.tree.TreePath;
 import java.util.*;
@@ -38,7 +38,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CreateModel {
     private SipModel sipModel;
-    private SortedSet<StatsTreeNode> statsTreeNodes;
+    private SortedSet<SourceTreeNode> sourceTreeNodes;
     private RecDefTreeNode recDefTreeNode;
     private NodeMapping nodeMapping;
     private boolean settingNodeMapping;
@@ -47,9 +47,9 @@ public class CreateModel {
         this.sipModel = sipModel;
     }
 
-    public void setStatsTreeNodes(SortedSet<StatsTreeNode> statsTreeNodes) {
-        if (statsTreeNodes != null && statsTreeNodes.isEmpty()) statsTreeNodes = null;
-        this.statsTreeNodes = statsTreeNodes;
+    public void setSourceTreeNodes(SortedSet<SourceTreeNode> sourceTreeNodes) {
+        if (sourceTreeNodes != null && sourceTreeNodes.isEmpty()) sourceTreeNodes = null;
+        this.sourceTreeNodes = sourceTreeNodes;
         setNodeMapping(null);
         for (Listener listener : listeners) listener.statsTreeNodeSet(this);
     }
@@ -72,7 +72,7 @@ public class CreateModel {
         this.nodeMapping = nodeMapping;
         if (nodeMapping != null) {
             settingNodeMapping = true;
-            setStatsTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping));
+            setSourceTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping));
             TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
             if (treePath != null) setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
             settingNodeMapping = false;
@@ -80,8 +80,8 @@ public class CreateModel {
         for (Listener listener : listeners) listener.nodeMappingSet(this);
     }
 
-    public SortedSet<StatsTreeNode> getStatsTreeNodes() {
-        return statsTreeNodes;
+    public SortedSet<SourceTreeNode> getSourceTreeNodes() {
+        return sourceTreeNodes;
     }
 
     public RecDefTreeNode getRecDefTreeNode() {
@@ -97,7 +97,7 @@ public class CreateModel {
     }
 
     public boolean canCreate() {
-        if (recDefTreeNode == null || statsTreeNodes == null) return false;
+        if (recDefTreeNode == null || sourceTreeNodes == null) return false;
         if (nodeMapping == null) {
             nextNodeMapping: for (NodeMapping mapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
                 Iterator<Path> pathIterator = mapping.getInputPaths().iterator();
@@ -115,16 +115,16 @@ public class CreateModel {
         if (!canCreate()) throw new RuntimeException("Should have checked");
         NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath(), recDefTreeNode.getRecDefNode().getOptRootKey());
         created.recDefNode = recDefTreeNode.getRecDefNode();
-        StatsTreeNode.setStatsTreeNodes(statsTreeNodes, created);
+        SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
         setNodeMapping(created);
     }
 
     public boolean isDictionaryPossible() {
         if (nodeMapping == null || recDefTreeNode == null|| !nodeMapping.hasOneStatsTreeNode()) return false;
-        StatsTreeNode statsTreeNode = (StatsTreeNode) nodeMapping.getSingleStatsTreeNode();
-        if (statsTreeNode.getStatistics() == null) return false;
-        Set<String> values = statsTreeNode.getStatistics().getHistogramValues();
+        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
+        if (sourceTreeNode.getStatistics() == null) return false;
+        Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
         RecDef.OptionList options = recDefTreeNode.getRecDefNode().getOptions();
         return values != null && options != null && nodeMapping.dictionary == null;
     }

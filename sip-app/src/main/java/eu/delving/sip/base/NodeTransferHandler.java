@@ -90,7 +90,7 @@ public class NodeTransferHandler extends TransferHandler {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    sipModel.getCreateModel().setStatsTreeNodes(nodeListHolder.nodeSet);
+                    sipModel.getCreateModel().setSourceTreeNodes(nodeListHolder.nodeSet);
                     JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
                     TreePath treePath = location.getPath();
                     if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
@@ -136,6 +136,6 @@ public class NodeTransferHandler extends TransferHandler {
     }
 
     public static class NodeListHolder {
-        public SortedSet<StatsTreeNode> nodeSet;
+        public SortedSet<SourceTreeNode> nodeSet;
     }
 }

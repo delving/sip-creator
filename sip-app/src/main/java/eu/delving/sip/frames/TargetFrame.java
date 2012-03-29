@@ -54,12 +54,12 @@ import java.util.regex.Pattern;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class RecDefFrame extends FrameBase {
+public class TargetFrame extends FrameBase {
     private JTree recDefTree;
     private JTree bookmarkTree;
     private JTextField filterField = new JTextField();
     private JPanel treePanel = new JPanel(new GridLayout(0, 1));
-    private JCheckBox autoFoldBox = new JCheckBox("Auto-Folding");
+    private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -71,8 +71,8 @@ public class RecDefFrame extends FrameBase {
         }
     });
 
-    public RecDefFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.REC_DEF, desktop, sipModel, "Record Definition", false);
+    public TargetFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(Which.TARGET, desktop, sipModel, "Target", false);
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {

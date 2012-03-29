@@ -24,8 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.StatsTree;
-import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -36,7 +35,10 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -48,9 +50,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
-    private StatsTree statsTree = StatsTree.create("Select a data set from the File menu, or download one");
-    private StatsTreeNode root;
-    private DefaultTreeModel statsTreeModel = new DefaultTreeModel(root = statsTree.getRoot());
+    private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
+    private SourceTreeNode root;
+    private DefaultTreeModel statsTreeModel = new DefaultTreeModel(root = sourceTree);
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -61,7 +63,7 @@ public class StatsModel {
         Path recordRoot = null;
         Path uniqueElement = null;
         if (statistics != null) {
-            statsTree = statistics.createAnalysisTree(sipModel.getDataSetFacts().getFacts());
+            sourceTree = SourceTreeNode.create(statistics.getFieldStatisticsList(), sipModel.getDataSetFacts().getFacts());
             if (statistics.isSourceFormat()) {
                 recordRoot = Storage.RECORD_ROOT;
                 uniqueElement = Storage.UNIQUE_ELEMENT;
@@ -72,11 +74,11 @@ public class StatsModel {
             }
         }
         else {
-            statsTree = StatsTree.create("Analysis not yet performed");
+            sourceTree = SourceTreeNode.create("Analysis not yet performed");
         }
-        statsTree.setTreeModel(statsTreeModel);
-        statsTreeModel.setRoot(statsTree.getRoot());
-        root = statsTree.getRoot();
+        sourceTree.setTreeModel(statsTreeModel);
+        statsTreeModel.setRoot(sourceTree);
+        root = sourceTree;
         setDelimiters(recordRoot, uniqueElement);
     }
 
@@ -84,8 +86,6 @@ public class StatsModel {
         if (recordRoot != null) {
             int recordCount = root.setRecordRoot(recordRoot);
             hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
-            List<StatsTreeNode> variables = new ArrayList<StatsTreeNode>();
-            statsTree.getVariables(variables);
         }
         if (uniqueElement != null) {
             root.setUniqueElement(uniqueElement);
@@ -130,33 +130,33 @@ public class StatsModel {
         return statsTreeModel;
     }
 
-    public SortedSet<StatsTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
-        SortedSet<StatsTreeNode> nodes = new TreeSet<StatsTreeNode>();
-        if (!(statsTreeModel.getRoot() instanceof StatsTreeNode)) {
+    public SortedSet<SourceTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
+        SortedSet<SourceTreeNode> nodes = new TreeSet<SourceTreeNode>();
+        if (!(statsTreeModel.getRoot() instanceof SourceTreeNode)) {
             nodeMapping.clearStatsTreeNodes();
         }
         else if (!nodeMapping.hasStatsTreeNodes()) {
             for (Path path : nodeMapping.getInputPaths()) {
-                TreePath treePath = findNodeForInputPath(path, (StatsTreeNode) statsTreeModel.getRoot());
-                if (treePath != null) nodes.add((StatsTreeNode)treePath.getLastPathComponent());
+                TreePath treePath = findNodeForInputPath(path, (SourceTreeNode) statsTreeModel.getRoot());
+                if (treePath != null) nodes.add((SourceTreeNode)treePath.getLastPathComponent());
             }
             if (nodes.isEmpty()) {
                 nodeMapping.clearStatsTreeNodes();
             }
             else {
-                StatsTreeNode.setStatsTreeNodes(nodes, nodeMapping);
+                SourceTreeNode.setStatsTreeNodes(nodes, nodeMapping);
             }
         }
         else {
-            for (Object node : nodeMapping.getStatsTreeNodes()) nodes.add((StatsTreeNode) node);
+            for (Object node : nodeMapping.getStatsTreeNodes()) nodes.add((SourceTreeNode) node);
         }
         return nodes.isEmpty() ? null : nodes;
     }
 
-    private TreePath findNodeForInputPath(Path path, StatsTreeNode node) {
+    private TreePath findNodeForInputPath(Path path, SourceTreeNode node) {
         Path nodePath = node.getPath(false);
         if (nodePath.equals(path)) return node.getTreePath();
-        for (StatsTreeNode sub : node.getChildren()) {
+        for (SourceTreeNode sub : node.getChildren()) {
             TreePath subPath = findNodeForInputPath(path, sub);
             if (subPath != null) return subPath;
         }

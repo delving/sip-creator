@@ -25,7 +25,7 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Histogram;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.SipModel;
@@ -57,7 +57,7 @@ public class StatisticsFrame extends FrameBase {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                SortedSet<StatsTreeNode> nodes = createModel.getStatsTreeNodes();
+                SortedSet<SourceTreeNode> nodes = createModel.getSourceTreeNodes();
                 if (nodes != null && nodes.size() == 1) {
                     setStatistics(nodes.iterator().next().getStatistics());
                 }

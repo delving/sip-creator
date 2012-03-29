@@ -24,7 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.HtmlPanel;
-import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
@@ -58,13 +58,13 @@ public class CreateFrame extends FrameBase {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                SortedSet<StatsTreeNode> statsTreeNodes = createModel.getStatsTreeNodes();
-                if (statsTreeNodes == null) {
+                SortedSet<SourceTreeNode> sourceTreeNodes = createModel.getSourceTreeNodes();
+                if (sourceTreeNodes == null) {
                     statsHtml.setHtml(SELECT_STATS);
                 }
                 else {
                     StringBuilder out = new StringBuilder("<html><table>");
-                    for (StatsTreeNode node : statsTreeNodes) {
+                    for (SourceTreeNode node : sourceTreeNodes) {
                         out.append("<tr><td>");
                         out.append(node.toHtmlChunk());
                         out.append("</td></tr>");
@@ -135,7 +135,7 @@ public class CreateFrame extends FrameBase {
             if (sipModel.getCreateModel().canCreate()) {
                 setEnabled(true);
                 StringBuilder tooltip = new StringBuilder("<html><table cellpadding=10><tr><td><h3>From:</h3><ul>");
-                for (StatsTreeNode node : sipModel.getCreateModel().getStatsTreeNodes()) {
+                for (SourceTreeNode node : sipModel.getCreateModel().getSourceTreeNodes()) {
                     tooltip.append("<li>").append(node.getPath(false).toString()).append("</li>");
                 }
                 tooltip.append("</ul><h3>To:</h3><ul>");

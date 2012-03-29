@@ -26,7 +26,7 @@ import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.base.StatsTree;
+import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
@@ -55,7 +55,7 @@ import static org.junit.Assert.*;
 public class TestMappingValidation {
     private Logger log = Logger.getLogger(getClass());
     private Mockery mock;
-    private StatsTree statsTree;
+    private SourceTreeNode sourceTree;
 
     @Before
     public void createStorage() throws StorageException, IOException, MetadataException {
@@ -66,6 +66,7 @@ public class TestMappingValidation {
     public void deleteStorage() {
         mock.delete();
     }
+
     @Ignore
     @Test
     public void testAbc() throws Exception {
@@ -76,6 +77,7 @@ public class TestMappingValidation {
         );
         runFullCycle(4);
     }
+
     @Ignore
     @Test
     public void testLido() throws Exception {
@@ -154,8 +156,8 @@ public class TestMappingValidation {
         assertEquals(9, mock.fileCount());
         Statistics statistics = dataSet().getLatestStatistics();
         assertTrue(statistics.isSourceFormat());
-        StatsTree tree = statistics.createAnalysisTree(dataSet().getDataSetFacts());
-        assertEquals(Tag.element(Storage.ENVELOPE_TAG), tree.getRoot().getTag());
+        SourceTreeNode tree = SourceTreeNode.create(statistics.getFieldStatisticsList(), dataSet().getDataSetFacts());
+        assertEquals(Tag.element(Storage.ENVELOPE_TAG), tree.getTag());
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
         mock.createMapping();
@@ -195,9 +197,9 @@ public class TestMappingValidation {
                             Assert.fail("Unexpected state " + dataSet().getState());
                     }
                     dataSet().setStatistics(statistics);
-                    statsTree = statistics.createAnalysisTree(dataSet().getDataSetFacts());
-                    statsTree.getRoot().setTreeModel(new DefaultTreeModel(statsTree.getRoot()));
-                    int recordCount = statsTree.getRoot().setRecordRoot(recordRoot);
+                    sourceTree = SourceTreeNode.create(statistics.getFieldStatisticsList(), dataSet().getDataSetFacts());
+                    sourceTree.setTreeModel(new DefaultTreeModel(sourceTree));
+                    int recordCount = sourceTree.setRecordRoot(recordRoot);
                     mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));
                 }
                 catch (StorageException e) {

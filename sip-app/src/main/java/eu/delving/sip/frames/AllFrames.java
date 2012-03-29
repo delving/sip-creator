@@ -70,18 +70,18 @@ public class AllFrames {
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
-        FrameBase analysis = new AnalysisFrame(desktop, sipModel, statistics);
-        addSpaceBarCreate(create, analysis);
-        RecDefFrame recDef = new RecDefFrame(desktop, sipModel);
-        addSpaceBarCreate(create, recDef);
+        FrameBase source = new SourceFrame(desktop, sipModel, statistics);
+        addSpaceBarCreate(create, source);
+        TargetFrame target = new TargetFrame(desktop, sipModel);
+        addSpaceBarCreate(create, target);
         FrameBase input = new InputFrame(desktop, sipModel);
         FrameBase recMapping = new RecMappingFrame(desktop, sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel);
         FrameBase output = new OutputFrame(desktop, sipModel);
         this.frames = new FrameBase[]{
-                analysis,
+                source,
                 create,
-                recDef,
+                target,
                 statistics,
                 input,
                 recMapping,
@@ -90,15 +90,23 @@ public class AllFrames {
         };
         try {
             File file = sipModel.getStorage().getFrameArrangementFile();
-            if (!file.exists()) {
-                List<String> lines = IOUtils.readLines(getClass().getResource("/frame-arrangements.xml").openStream());
-                IOUtils.writeLines(lines, "\n", new FileOutputStream(file));
+            if (!file.exists()) createDefaultFrameArrangements(file);
+            try {
+                addFrameArrangements(new FileInputStream(file));
             }
-            addFrameArrangements(new FileInputStream(file));
+            catch (Exception e) {
+                createDefaultFrameArrangements(file);
+                addFrameArrangements(new FileInputStream(file));
+            }
         }
         catch (IOException e) {
             throw new RuntimeException("Initializing views", e);
         }
+    }
+
+    private void createDefaultFrameArrangements(File file) throws IOException {
+        List<String> lines = IOUtils.readLines(getClass().getResource("/frame-arrangements.xml").openStream());
+        IOUtils.writeLines(lines, "\n", new FileOutputStream(file));
     }
 
     private void addFrameArrangements(InputStream inputStream) {

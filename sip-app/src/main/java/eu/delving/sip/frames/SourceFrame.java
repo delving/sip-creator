@@ -25,7 +25,7 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.StatsTreeNode;
+import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
@@ -58,30 +58,28 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class AnalysisFrame extends FrameBase {
-    private JButton selectRecordRootButton = new JButton("Select Record Root ");
-    private JButton selectUniqueElementButton = new JButton("Select Unique Element");
-    private JTree statisticsJTree;
+public class SourceFrame extends FrameBase {
+    private JButton recordRootButton = new JButton("Select Record Root ");
+    private JButton uniqueElementButton = new JButton("Select Unique Element");
+    private JTree sourceTree;
     private boolean delimited = false;
     private StatisticsFrame statisticsFrame;
-//    private Expander expander = new Expander();
 
-    public AnalysisFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
-        super(Which.ANALYSIS, desktop, sipModel, "Analysis", false);
+    public SourceFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
+        super(Which.SOURCE, desktop, sipModel, "Source", false);
         this.statisticsFrame = statisticsFrame;
-        statisticsJTree = new JTree(sipModel.getStatsModel().getStatsTreeModel()) {
+        sourceTree = new JTree(sipModel.getStatsModel().getStatsTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {
-                TreePath treePath = statisticsJTree.getPathForLocation(evt.getX(), evt.getY());
-                return treePath != null ? ((StatsTreeNode) treePath.getLastPathComponent()).toHtml() : "";
+                TreePath treePath = sourceTree.getPathForLocation(evt.getX(), evt.getY());
+                return treePath != null ? ((SourceTreeNode) treePath.getLastPathComponent()).toHtml() : "";
             }
         };
-        statisticsJTree.setToolTipText("?");
-//        statisticsJTree.getModel().addTreeModelListener(expander);
-        statisticsJTree.setCellRenderer(new StatsTreeNode.Renderer());
-        statisticsJTree.setTransferHandler(sipModel.getNodeTransferHandler());
-        statisticsJTree.setDragEnabled(true);
-        statisticsJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        sourceTree.setToolTipText("?");
+        sourceTree.setCellRenderer(new SourceTreeNode.Renderer());
+        sourceTree.setTransferHandler(sipModel.getNodeTransferHandler());
+        sourceTree.setDragEnabled(true);
+        sourceTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         wireUp();
     }
 
@@ -93,7 +91,6 @@ public class AnalysisFrame extends FrameBase {
             getContentPane().removeAll();
             buildContent(getContentPane());
             getContentPane().validate();
-//            expander.treeStructureChanged(null);
         }
     }
 
@@ -108,25 +105,25 @@ public class AnalysisFrame extends FrameBase {
 
     private JPanel createImportedPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Imported Data Analysis"));
-        p.add(Utility.scroll(statisticsJTree), BorderLayout.CENTER);
+        p.setBorder(BorderFactory.createTitledBorder("Analysis of imported data"));
+        p.add(Utility.scroll(sourceTree), BorderLayout.CENTER);
         p.add(createSelectButtonPanel(), BorderLayout.SOUTH);
         return p;
     }
 
     private JPanel createSourcePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Source Data Analysis"));
-        p.add(Utility.scroll(statisticsJTree), BorderLayout.CENTER);
+        p.setBorder(BorderFactory.createTitledBorder("Source data"));
+        p.add(Utility.scroll(sourceTree), BorderLayout.CENTER);
         return p;
     }
 
     private JPanel createSelectButtonPanel() {
         JPanel bp = new JPanel(new GridLayout(1, 0, 5, 5));
-        selectRecordRootButton.setEnabled(false);
-        bp.add(selectRecordRootButton);
-        selectUniqueElementButton.setEnabled(false);
-        bp.add(selectUniqueElementButton);
+        recordRootButton.setEnabled(false);
+        bp.add(recordRootButton);
+        uniqueElementButton.setEnabled(false);
+        bp.add(uniqueElementButton);
         return bp;
     }
 
@@ -152,36 +149,36 @@ public class AnalysisFrame extends FrameBase {
                 reactToState(dataSetState);
             }
         });
-        statisticsJTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+        sourceTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent event) {
-                final SortedSet<StatsTreeNode> nodeList = new TreeSet<StatsTreeNode>();
-                TreePath[] selectionPaths = statisticsJTree.getSelectionModel().getSelectionPaths();
+                final SortedSet<SourceTreeNode> nodeList = new TreeSet<SourceTreeNode>();
+                TreePath[] selectionPaths = sourceTree.getSelectionModel().getSelectionPaths();
                 if (selectionPaths != null && delimited) {
                     for (TreePath path : selectionPaths) {
-                        StatsTreeNode node = (StatsTreeNode)path.getLastPathComponent();
+                        SourceTreeNode node = (SourceTreeNode)path.getLastPathComponent();
                         if (node.getTag().equals(Tag.attribute(Storage.FACTS_TAG))) continue;
                         if (node.getTag().equals(Tag.attribute(Storage.ENVELOPE_TAG))) continue;
                         nodeList.add(node);
                     }
                 }
                 if (nodeList.size() == 1) {
-                    StatsTreeNode node = nodeList.iterator().next();
-                    selectRecordRootButton.setEnabled(node.couldBeRecordRoot());
-                    selectUniqueElementButton.setEnabled(node.couldBeUniqueElement());
+                    SourceTreeNode node = nodeList.iterator().next();
+                    recordRootButton.setEnabled(node.couldBeRecordRoot());
+                    uniqueElementButton.setEnabled(node.couldBeUniqueElement());
                 }
                 else {
-                    selectRecordRootButton.setEnabled(false);
-                    selectUniqueElementButton.setEnabled(false);
+                    recordRootButton.setEnabled(false);
+                    uniqueElementButton.setEnabled(false);
                     if (!nodeList.isEmpty()) {
                         Path parentPath = null;
-                        for (StatsTreeNode node : nodeList) {
+                        for (SourceTreeNode node : nodeList) {
                             if (parentPath == null) {
                                 parentPath = node.getPath(true).chop(1);
                             }
                             else {
                                 if (!parentPath.equals(node.getPath(true).chop(1))) {
-                                    statisticsJTree.clearSelection();
+                                    sourceTree.clearSelection();
                                     return;
                                 }
                             }
@@ -191,12 +188,12 @@ public class AnalysisFrame extends FrameBase {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        sipModel.getCreateModel().setStatsTreeNodes(nodeList);
+                        sipModel.getCreateModel().setSourceTreeNodes(nodeList);
                     }
                 });
             }
         });
-        statisticsJTree.addMouseListener(new MouseListener() {
+        sourceTree.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
             }
@@ -218,63 +215,26 @@ public class AnalysisFrame extends FrameBase {
             public void mouseExited(MouseEvent mouseEvent) {
             }
         });
-        selectRecordRootButton.addActionListener(new ActionListener() {
+        recordRootButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TreePath path = statisticsJTree.getSelectionPath();
-                StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
+                TreePath path = sourceTree.getSelectionPath();
+                SourceTreeNode node = (SourceTreeNode) path.getLastPathComponent();
                 Path recordRoot = node.getPath(true);
                 if (recordRoot != null) {
                     sipModel.getStatsModel().setRecordRoot(recordRoot);
                 }
             }
         });
-        selectUniqueElementButton.addActionListener(new ActionListener() {
+        uniqueElementButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TreePath path = statisticsJTree.getSelectionPath();
-                StatsTreeNode node = (StatsTreeNode) path.getLastPathComponent();
+                TreePath path = sourceTree.getSelectionPath();
+                SourceTreeNode node = (SourceTreeNode) path.getLastPathComponent();
                 sipModel.getStatsModel().setUniqueElement(node.getPath(true));
             }
         });
     }
-
-//    private class Expander implements TreeModelListener {
-//
-//        @Override
-//        public void treeNodesChanged(TreeModelEvent e) {
-//        }
-//
-//        @Override
-//        public void treeNodesInserted(TreeModelEvent e) {
-//        }
-//
-//        @Override
-//        public void treeNodesRemoved(TreeModelEvent e) {
-//        }
-//
-//        @Override
-//        public void treeStructureChanged(TreeModelEvent e) {
-//            Timer timer = new Timer(500, new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    expandEmptyNodes((StatsTreeNode) statisticsJTree.getModel().getRoot());
-//                }
-//            });
-//            timer.setRepeats(false);
-//            timer.start();
-//        }
-//
-//        private void expandEmptyNodes(StatsTreeNode node) {
-//            if (!node.isLeaf()) {
-//                TreePath path = node.getTreePath();
-//                statisticsJTree.expandPath(path);
-//            }
-//            for (StatsTreeNode childNode : node.getChildNodes()) {
-//                expandEmptyNodes(childNode);
-//            }
-//        }
-//    }
 
     @Override
     public Dimension getMinimumSize() {

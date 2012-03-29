@@ -25,6 +25,7 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.files.Storage;
 import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.BorderFactory;
@@ -49,9 +50,9 @@ import static eu.delving.sip.base.Utility.MAPPED_HILITE;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
-    private StatsTreeNode parent;
-    private List<StatsTreeNode> children = new ArrayList<StatsTreeNode>();
+public class SourceTreeNode implements TreeNode, Comparable<SourceTreeNode> {
+    private SourceTreeNode parent;
+    private List<SourceTreeNode> children = new ArrayList<SourceTreeNode>();
     private Tag tag;
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
@@ -59,29 +60,48 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     private List<NodeMapping> mappedIn = new ArrayList<NodeMapping>();
     private DefaultTreeModel treeModel;
 
-    StatsTreeNode(StatsTreeNode parent, String name, String htmlChunk) {
+    public static SourceTreeNode create(String rootTag) {
+        return new SourceTreeNode(rootTag, "<h3>Root</h3>");
+    }
+
+    public static SourceTreeNode create(List<FieldStatistics> fieldStatisticsList, Map<String,String> facts) {
+        SourceTreeNode root = createSubtree(fieldStatisticsList, Path.empty(), null);
+        if (root == null) {
+            root = new SourceTreeNode("No statistics", "<h3>No statistics</h3>");
+        }
+        if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
+            SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
+            root.getChildren().add(0, factNode);
+            for (Map.Entry<String,String> entry : facts.entrySet()) new SourceTreeNode(factNode, entry);
+            // todo: derived fields?
+//            SourceTreeNode derivedNode = new SourceTreeNode(root, Storage.DERIVED_TAG, "<h3>Select a derived fields from here</h3>");
+        }
+        return root;
+    }
+
+    private SourceTreeNode(SourceTreeNode parent, String name, String htmlChunk) {
         this.parent = parent;
         this.tag = Tag.create(name);
         this.htmlChunk = htmlChunk;
     }
 
-    StatsTreeNode(String name, String htmlChunk) {
+    private SourceTreeNode(String name, String htmlChunk) {
         this(null, name, htmlChunk);
     }
 
-    StatsTreeNode(StatsTreeNode parent, Tag tag) {
+    private SourceTreeNode(SourceTreeNode parent, Tag tag) {
         if ((this.parent = parent) != null) parent.children.add(this);
         this.tag = tag;
     }
 
-    StatsTreeNode(StatsTreeNode parent, Map.Entry<String, String> entry) {
+    private SourceTreeNode(SourceTreeNode parent, Map.Entry<String, String> entry) {
         this(parent, Tag.create(entry.getKey()));
         StringTemplate template = Utility.getTemplate("fact-brief");
         template.setAttribute("fact", entry);
         this.htmlChunk = template.toString();
     }
 
-    StatsTreeNode(StatsTreeNode parent, FieldStatistics fieldStatistics) {
+    private SourceTreeNode(SourceTreeNode parent, FieldStatistics fieldStatistics) {
         this(parent, fieldStatistics.getPath().peek());
         setStatistics(fieldStatistics);
     }
@@ -93,7 +113,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         this.htmlChunk = template.toString();
     }
 
-    public List<StatsTreeNode> getChildren() {
+    public List<SourceTreeNode> getChildren() {
         return children;
     }
 
@@ -106,7 +126,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     }
 
     public TreePath getTreePath() {
-        List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
+        List<SourceTreeNode> list = new ArrayList<SourceTreeNode>();
         compilePathList(list, true);
         return new TreePath(list.toArray());
     }
@@ -116,10 +136,10 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     }
 
     public Path getPath(boolean fromRoot) {
-        List<StatsTreeNode> list = new ArrayList<StatsTreeNode>();
+        List<SourceTreeNode> list = new ArrayList<SourceTreeNode>();
         compilePathList(list, fromRoot);
         Path path = Path.empty();
-        for (StatsTreeNode node : list) path.push(node.getTag());
+        for (SourceTreeNode node : list) path.push(node.getTag());
         return path;
     }
 
@@ -128,7 +148,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         this.recordRoot = recordRoot != null && getPath(true).equals(recordRoot);
         if (this.recordRoot || this.recordRoot != oldValue) treeModel.nodeChanged(this);
         int childTotal = 0;
-        for (StatsTreeNode child : children) {
+        for (SourceTreeNode child : children) {
             int subtotal = child.setRecordRoot(recordRoot);
             if (subtotal > 0) childTotal = subtotal;
         }
@@ -139,7 +159,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         boolean oldValue = this.uniqueElement;
         this.uniqueElement = uniqueElement != null && getPath(true).equals(uniqueElement);
         if (this.uniqueElement != oldValue) treeModel.nodeChanged(this);
-        for (StatsTreeNode child : children) child.setUniqueElement(uniqueElement);
+        for (SourceTreeNode child : children) child.setUniqueElement(uniqueElement);
     }
 
     public boolean isRecordRoot() {
@@ -150,7 +170,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         return uniqueElement;
     }
 
-    public Iterable<? extends StatsTreeNode> getChildNodes() {
+    public Iterable<? extends SourceTreeNode> getChildNodes() {
         return children;
     }
 
@@ -160,7 +180,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     public boolean couldBeUniqueElement() {
         if (couldBeRecordRoot()) return false;
-        StatsTreeNode walk = parent;
+        SourceTreeNode walk = parent;
         while (walk != null) { // ancestor must be record root
             if (walk.isRecordRoot()) return true;
             walk = walk.parent;
@@ -179,14 +199,14 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
                 else if ((here.size() <= pathToShow.size() && !here.isAncestorOf(pathToShow)) && !tree.isCollapsed(getTreePath())) {
                     tree.collapsePath(getTreePath());
                 }
-                for (StatsTreeNode sub : children) sub.showPath(tree, pathToShow);
+                for (SourceTreeNode sub : children) sub.showPath(tree, pathToShow);
             }
         });
         timer.setRepeats(false);
         timer.start();
     }
 
-    private void compilePathList(List<StatsTreeNode> list, boolean fromRoot) {
+    private void compilePathList(List<SourceTreeNode> list, boolean fromRoot) {
         if (fromRoot) {
             if (parent != null) parent.compilePathList(list, fromRoot);
             list.add(this);
@@ -214,7 +234,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     @Override
     public int getIndex(TreeNode treeNode) {
-        StatsTreeNode qNameNode = (StatsTreeNode) treeNode;
+        SourceTreeNode qNameNode = (SourceTreeNode) treeNode;
         return children.indexOf(qNameNode);
     }
 
@@ -230,11 +250,11 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     @Override
     public Enumeration children() {
-        return new Vector<StatsTreeNode>(children).elements();
+        return new Vector<SourceTreeNode>(children).elements();
     }
 
     @Override
-    public int compareTo(StatsTreeNode other) {
+    public int compareTo(SourceTreeNode other) {
         return getPath(true).compareTo(other.getPath(true));
     }
 
@@ -258,9 +278,9 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         }
     }
 
-    public static void setStatsTreeNodes(SortedSet<StatsTreeNode> nodes, NodeMapping nodeMapping) {
+    public static void setStatsTreeNodes(SortedSet<SourceTreeNode> nodes, NodeMapping nodeMapping) {
         List<Path> inputPaths = new ArrayList<Path>();
-        for (StatsTreeNode node : nodes) {
+        for (SourceTreeNode node : nodes) {
             inputPaths.add(node.getPath(false));
             node.addMappedIn(nodeMapping);
         }
@@ -275,7 +295,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
     public static void removeStatsTreeNodes(NodeMapping nodeMapping) {
         if (nodeMapping.hasStatsTreeNodes()) {
             for (Object nodeObject : nodeMapping.getStatsTreeNodes()) {
-                ((StatsTreeNode) nodeObject).removeMappedIn(nodeMapping);
+                ((SourceTreeNode) nodeObject).removeMappedIn(nodeMapping);
             }
         }
     }
@@ -286,7 +306,43 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
 
     public void setTreeModel(DefaultTreeModel treeModel) {
         this.treeModel = treeModel;
-        for (StatsTreeNode child : children) child.setTreeModel(treeModel);
+        for (SourceTreeNode child : children) child.setTreeModel(treeModel);
+    }
+
+    private static SourceTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, SourceTreeNode parent) {
+        Map<Tag, List<FieldStatistics>> statisticsMap = new TreeMap<Tag, List<FieldStatistics>>();
+        for (FieldStatistics fieldStatistics : fieldStatisticsList) {
+            Path subPath = fieldStatistics.getPath().chop(path.size());
+            if (subPath.equals(path) && fieldStatistics.getPath().size() == path.size() + 1) {
+                Tag tag = fieldStatistics.getPath().getTag(path.size());
+                if (tag != null) {
+                    List<FieldStatistics> list = statisticsMap.get(tag);
+                    if (list == null) statisticsMap.put(tag, list = new ArrayList<FieldStatistics>());
+                    list.add(fieldStatistics);
+                }
+            }
+        }
+        if (statisticsMap.isEmpty()) return null;
+        Tag tag = path.peek();
+        SourceTreeNode node = tag == null ? null : new SourceTreeNode(parent, tag);
+        for (Map.Entry<Tag, List<FieldStatistics>> entry : statisticsMap.entrySet()) {
+            Path childPath = path.copy();
+            childPath.push(entry.getKey());
+            FieldStatistics fieldStatisticsForChild = null;
+            for (FieldStatistics fieldStatistics : entry.getValue()) {
+                if (fieldStatistics.getPath().equals(childPath)) fieldStatisticsForChild = fieldStatistics;
+            }
+            SourceTreeNode child = createSubtree(fieldStatisticsList, childPath, node);
+            if (child != null) {
+                if (node == null) node = child;
+                child.setStatistics(fieldStatisticsForChild);
+            }
+            else if (fieldStatisticsForChild != null) {
+                SourceTreeNode fresh = new SourceTreeNode(node, fieldStatisticsForChild);
+                if (node == null) node = fresh;
+            }
+        }
+        return node;
     }
 
     public static class Renderer extends DefaultTreeCellRenderer {
@@ -294,8 +350,8 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            if (value instanceof StatsTreeNode) {
-                StatsTreeNode node = (StatsTreeNode) value;
+            if (value instanceof SourceTreeNode) {
+                SourceTreeNode node = (SourceTreeNode) value;
                 if (node.getTag().isAttribute()) {
                     setIcon(Utility.ATTRIBUTE_ICON);
                 }
@@ -319,7 +375,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
             return component;
         }
 
-        private void markDelimiters(boolean selected, StatsTreeNode node) {
+        private void markDelimiters(boolean selected, SourceTreeNode node) {
             setOpaque(!selected);
             setBackground(selected ? Color.WHITE : DELIMITER_HILITE);
             setForeground(selected ? DELIMITER_HILITE : Color.BLACK);
@@ -327,7 +383,7 @@ public class StatsTreeNode implements TreeNode, Comparable<StatsTreeNode> {
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
         }
 
-        private void markNodeMappings(boolean selected, StatsTreeNode node) {
+        private void markNodeMappings(boolean selected, SourceTreeNode node) {
             setOpaque(!selected);
             setBackground(selected ? Color.WHITE : MAPPED_HILITE);
             setForeground(selected ? MAPPED_HILITE : Color.BLACK);
