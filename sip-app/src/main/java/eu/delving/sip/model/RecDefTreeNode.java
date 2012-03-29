@@ -51,7 +51,7 @@ import static eu.delving.sip.base.Utility.MAPPED_HILITE;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class RecDefTreeNode implements TreeNode {
+public class RecDefTreeNode implements FilterTreeNode {
     private RecDefTreeNode parent;
     private RecDefNode recDefNode;
     private RecDefPath recDefPath;

@@ -26,6 +26,7 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.Storage;
+import eu.delving.sip.model.FilterTreeNode;
 import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.BorderFactory;
@@ -40,6 +41,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static eu.delving.sip.base.Utility.DELIMITER_HILITE;
 import static eu.delving.sip.base.Utility.MAPPED_HILITE;
@@ -50,7 +52,7 @@ import static eu.delving.sip.base.Utility.MAPPED_HILITE;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class SourceTreeNode implements TreeNode, Comparable<SourceTreeNode> {
+public class SourceTreeNode implements Comparable<SourceTreeNode>, FilterTreeNode {
     private SourceTreeNode parent;
     private List<SourceTreeNode> children = new ArrayList<SourceTreeNode>();
     private Tag tag;
@@ -59,6 +61,7 @@ public class SourceTreeNode implements TreeNode, Comparable<SourceTreeNode> {
     private String htmlChunk;
     private List<NodeMapping> mappedIn = new ArrayList<NodeMapping>();
     private DefaultTreeModel treeModel;
+    private boolean passesFilter = true;
 
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
@@ -343,6 +346,29 @@ public class SourceTreeNode implements TreeNode, Comparable<SourceTreeNode> {
             }
         }
         return node;
+    }
+
+    @Override
+    public void filter(Pattern pattern) {
+        if (!passesFilter) {
+            boolean found = pattern.matcher(tag.toString()).find();
+            if (found) {
+                setPassesFilter(true);
+                for (SourceTreeNode mark = this.parent; mark != null; mark = mark.parent) mark.passesFilter = true;
+            }
+        }
+        for (SourceTreeNode sub : children) sub.filter(pattern);
+    }
+
+    @Override
+    public void setPassesFilter(boolean passesFilter) {
+        this.passesFilter = passesFilter;
+        for (SourceTreeNode sub : children) sub.setPassesFilter(passesFilter);
+    }
+
+    @Override
+    public boolean passesFilter() {
+        return passesFilter;
     }
 
     public static class Renderer extends DefaultTreeCellRenderer {

@@ -24,13 +24,13 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FilterTreeModel;
 import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
 import javax.swing.Timer;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
@@ -52,7 +52,7 @@ public class StatsModel {
     private FactModel hintsModel = new FactModel();
     private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
     private SourceTreeNode root;
-    private DefaultTreeModel statsTreeModel = new DefaultTreeModel(root = sourceTree);
+    private FilterTreeModel statsTreeModel = new FilterTreeModel(root = sourceTree);
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;

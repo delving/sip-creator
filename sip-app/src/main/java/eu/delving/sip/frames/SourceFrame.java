@@ -23,19 +23,16 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.SourceTreeNode;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.*;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
+import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
 
 import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
@@ -48,6 +45,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
@@ -63,7 +61,19 @@ public class SourceFrame extends FrameBase {
     private JButton uniqueElementButton = new JButton("Select Unique Element");
     private JTree sourceTree;
     private boolean delimited = false;
+    private JTextField filterField = new JTextField();
+    private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
     private StatisticsFrame statisticsFrame;
+    private Timer timer = new Timer(300, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Object model = sourceTree.getModel();
+            if (model instanceof FilterTreeModel) {
+                FilterTreeModel ftm = (FilterTreeModel) model;
+                ftm.setFilter(Pattern.compile(filterField.getText().trim(), Pattern.CASE_INSENSITIVE));
+            }
+        }
+    });
 
     public SourceFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
         super(Which.SOURCE, desktop, sipModel, "Source", false);
@@ -80,6 +90,7 @@ public class SourceFrame extends FrameBase {
         sourceTree.setTransferHandler(sipModel.getNodeTransferHandler());
         sourceTree.setDragEnabled(true);
         sourceTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        timer.setRepeats(false);
         wireUp();
     }
 
@@ -96,11 +107,21 @@ public class SourceFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(createPanel());
+        content.add(createFilterPanel(), BorderLayout.NORTH);
+        content.add(createPanel(), BorderLayout.CENTER);
     }
 
     private JPanel createPanel() {
         return delimited ? createSourcePanel() : createImportedPanel();
+    }
+
+    private JPanel createFilterPanel() {
+        JPanel p = new JPanel(new BorderLayout(10, 10));
+        p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        p.add(new JLabel("Filter:", JLabel.RIGHT), BorderLayout.WEST);
+        p.add(filterField, BorderLayout.CENTER);
+        p.add(autoFoldBox, BorderLayout.EAST);
+        return p;
     }
 
     private JPanel createImportedPanel() {
@@ -133,6 +154,29 @@ public class SourceFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sourceTree.getModel().addTreeModelListener(new TreeModelAdapter() {
+            @Override
+            public void treeStructureChanged(TreeModelEvent treeModelEvent) {
+                SourceTreeNode node = (SourceTreeNode) treeModelEvent.getTreePath().getLastPathComponent();
+                showPath(node);
+            }
+        });
+        filterField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                timer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                timer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                timer.restart();
+            }
+        });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {
@@ -157,6 +201,7 @@ public class SourceFrame extends FrameBase {
                 if (selectionPaths != null && delimited) {
                     for (TreePath path : selectionPaths) {
                         SourceTreeNode node = (SourceTreeNode)path.getLastPathComponent();
+                        if (autoFoldBox.isSelected()) showPath(node);
                         if (node.getTag().equals(Tag.attribute(Storage.FACTS_TAG))) continue;
                         if (node.getTag().equals(Tag.attribute(Storage.ENVELOPE_TAG))) continue;
                         nodeList.add(node);
@@ -234,6 +279,11 @@ public class SourceFrame extends FrameBase {
                 sipModel.getStatsModel().setUniqueElement(node.getPath(true));
             }
         });
+    }
+
+    private void showPath(SourceTreeNode node) {
+        SourceTreeNode root = (SourceTreeNode) sourceTree.getModel().getRoot();
+        root.showPath(sourceTree, node.getPath(true));
     }
 
     @Override

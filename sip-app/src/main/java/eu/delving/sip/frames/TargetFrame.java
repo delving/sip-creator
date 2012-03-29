@@ -23,6 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FilterTreeModel;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.BookmarksTreeModel;
@@ -30,22 +31,17 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 import org.antlr.stringtemplate.StringTemplate;
+import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.*;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -252,7 +248,12 @@ public class TargetFrame extends FrameBase {
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
             if (root != null) {
                 recDefTree.setModel(new FilterTreeModel(root));
-//                showPath(root);
+                recDefTree.getModel().addTreeModelListener(new TreeModelAdapter() {
+                    @Override
+                    public void treeStructureChanged(TreeModelEvent treeModelEvent) {
+                        showPath((RecDefTreeNode) recDefTree.getModel().getRoot());
+                    }
+                });
             }
             else {
                 recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
@@ -273,56 +274,4 @@ public class TargetFrame extends FrameBase {
         }
     }
 
-    private class FilterTreeModel extends DefaultTreeModel {
-
-        private FilterTreeModel(RecDefTreeNode root) {
-            super(root);
-        }
-
-        public void setFilter(Pattern pattern) {
-            node(root).setPassesFilter(false);
-            node(root).filter(pattern);
-            fireTreeStructureChanged(this, new TreeNode[]{root}, new int[]{}, new Object[]{});
-            showPath(node(root));
-        }
-
-        @Override
-        public Object getRoot() {
-            return root;
-        }
-
-        @Override
-        public Object getChild(Object nodeObject, int index) {
-            return filterChildren(nodeObject).get(index);
-        }
-
-        @Override
-        public int getChildCount(Object nodeObject) {
-            RecDefTreeNode node = node(nodeObject);
-            int count = 0;
-            for (RecDefTreeNode sub : node.getChildren()) if (sub.passesFilter()) count++;
-            return count;
-        }
-
-        @Override
-        public boolean isLeaf(Object nodeObject) {
-            RecDefTreeNode node = node(nodeObject);
-            return node.isLeaf();
-        }
-
-        @Override
-        public int getIndexOfChild(Object nodeObject, Object child) {
-            return filterChildren(nodeObject).indexOf(node(child));
-        }
-
-        private RecDefTreeNode node(Object nodeObject) {
-            return (RecDefTreeNode) nodeObject;
-        }
-
-        private List<RecDefTreeNode> filterChildren(Object nodeObject) {
-            List<RecDefTreeNode> filtered = new ArrayList<RecDefTreeNode>();
-            for (RecDefTreeNode sub : node(nodeObject).getChildren()) if (sub.passesFilter()) filtered.add(sub);
-            return filtered;
-        }
-    }
 }
