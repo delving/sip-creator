@@ -45,7 +45,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
@@ -70,7 +69,7 @@ public class SourceFrame extends FrameBase {
             Object model = sourceTree.getModel();
             if (model instanceof FilterTreeModel) {
                 FilterTreeModel ftm = (FilterTreeModel) model;
-                ftm.setFilter(Pattern.compile(filterField.getText().trim(), Pattern.CASE_INSENSITIVE));
+                ftm.setFilter(filterField.getText().trim());
             }
         }
     });

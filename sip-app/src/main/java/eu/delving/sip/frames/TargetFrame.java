@@ -42,7 +42,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.*;
-import java.util.regex.Pattern;
 
 /**
  * Render the record definition as a JTree
@@ -62,7 +61,7 @@ public class TargetFrame extends FrameBase {
             Object model = recDefTree.getModel();
             if (model instanceof FilterTreeModel) {
                 FilterTreeModel ftm = (FilterTreeModel) model;
-                ftm.setFilter(Pattern.compile(filterField.getText().trim(), Pattern.CASE_INSENSITIVE));
+                ftm.setFilter(filterField.getText().trim());
             }
         }
     });

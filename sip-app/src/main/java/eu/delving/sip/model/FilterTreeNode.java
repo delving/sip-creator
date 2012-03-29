@@ -22,6 +22,7 @@
 package eu.delving.sip.model;
 
 import javax.swing.tree.TreeNode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -31,13 +32,54 @@ import java.util.regex.Pattern;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface FilterTreeNode extends TreeNode {
+public abstract class FilterTreeNode implements TreeNode {
 
-    void filter(Pattern pattern);
+    private boolean passesFilter = true;
 
-    void setPassesFilter(boolean passesFilter);
+    public final void filter(String patternString) {
+        List<Pattern> patterns = createPatternsFromString(patternString);
+        setPassesFilter(patterns.size() > 1);
+        filter(patterns);
+    }
 
-    boolean passesFilter();
+    private void filter(List<Pattern> patterns) {
+        boolean found = false;
+        for (Pattern pattern : patterns) {
+            if (pattern.matcher(getStringToFilter()).find()) {
+                found = true;
+            }
+        }
+        boolean passes = patterns.size() == 1 ? found : !found;
+        if (passes != passesFilter) {
+            setPassesFilter(passes);
+            if (passes) {
+                for (FilterTreeNode ancestor = (FilterTreeNode) this.getParent(); ancestor != null; ancestor = (FilterTreeNode) ancestor.getParent()) {
+                    ancestor.passesFilter = true;
+                }
+            }
+        }
+        for (FilterTreeNode sub : getChildren()) sub.filter(patterns);
+    }
 
-    List<? extends FilterTreeNode> getChildren();
+    private List<Pattern> createPatternsFromString(String patternString) {
+        List<Pattern> patterns = new ArrayList<Pattern>();
+        for (String part : patternString.split(" *, *")) {
+            patterns.add(Pattern.compile(part, Pattern.CASE_INSENSITIVE));
+        }
+        return patterns;
+    }
+
+    public final void setPassesFilter(boolean passesFilter) {
+        this.passesFilter = passesFilter;
+        for (FilterTreeNode sub : getChildren()) sub.setPassesFilter(passesFilter);
+    }
+
+    public final boolean passesFilter() {
+        return passesFilter;
+    }
+
+    public abstract List<? extends FilterTreeNode> getChildren();
+
+    public abstract String getStringToFilter();
+
 }

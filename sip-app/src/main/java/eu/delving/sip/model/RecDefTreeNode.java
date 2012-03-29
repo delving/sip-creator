@@ -41,7 +41,6 @@ import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 import static eu.delving.sip.base.Utility.MAPPED_HILITE;
 
@@ -51,13 +50,12 @@ import static eu.delving.sip.base.Utility.MAPPED_HILITE;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class RecDefTreeNode implements FilterTreeNode {
+public class RecDefTreeNode extends FilterTreeNode {
     private RecDefTreeNode parent;
     private RecDefNode recDefNode;
     private RecDefPath recDefPath;
     private Vector<RecDefTreeNode> children = new Vector<RecDefTreeNode>();
     private String html;
-    private boolean passesFilter = true;
 
     public static TreeNode create(String message) {
         return new DefaultMutableTreeNode(message);
@@ -76,27 +74,6 @@ public class RecDefTreeNode implements FilterTreeNode {
         this.recDefNode = recDefNode;
         if (parent != null) parent.children.add(this);
         for (RecDefNode subRecDefNode : recDefNode.getChildren()) new RecDefTreeNode(this, subRecDefNode);
-    }
-
-    public void setPassesFilter(boolean passesFilter) {
-        this.passesFilter = passesFilter;
-        for (RecDefTreeNode sub : children) sub.setPassesFilter(passesFilter);
-    }
-
-    public void filter(Pattern pattern) {
-        if (!passesFilter) {
-            String tag = recDefNode.getTag().toString();
-            boolean found = pattern.matcher(tag).find();
-            if (found) {
-                setPassesFilter(true);
-                for (RecDefTreeNode mark = this.parent; mark != null; mark = mark.parent) mark.passesFilter = true;
-            }
-        }
-        for (RecDefTreeNode sub : children) sub.filter(pattern);
-    }
-
-    public boolean passesFilter() {
-        return passesFilter;
     }
 
     @Override
@@ -137,6 +114,11 @@ public class RecDefTreeNode implements FilterTreeNode {
 
     public Vector<RecDefTreeNode> getChildren() {
         return children;
+    }
+
+    @Override
+    public String getStringToFilter() {
+        return recDefNode.getTag().toString();
     }
 
     public String toHtml() {
@@ -188,7 +170,7 @@ public class RecDefTreeNode implements FilterTreeNode {
     public RecDefNode getRecDefNode() {
         return recDefNode;
     }
-    
+
     public void addNodeMapping(NodeMapping nodeMapping) {
         this.recDefNode.addNodeMapping(nodeMapping);
     }

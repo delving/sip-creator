@@ -6,7 +6,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
 * Generic filter tree model
@@ -20,9 +19,8 @@ public class FilterTreeModel extends DefaultTreeModel {
         super(root);
     }
 
-    public void setFilter(Pattern pattern) {
-        node(root).setPassesFilter(false);
-        node(root).filter(pattern);
+    public void setFilter(String patternString) {
+        node(root).filter(patternString);
         fireTreeStructureChanged(this, new TreeNode[]{root}, new int[]{}, new Object[]{});
     }
 
