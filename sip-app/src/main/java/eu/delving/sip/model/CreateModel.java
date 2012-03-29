@@ -125,7 +125,7 @@ public class CreateModel {
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
         if (sourceTreeNode.getStatistics() == null) return false;
         Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
-        RecDef.DiscriminatorList options = recDefTreeNode.getRecDefNode().getOptions();
+        RecDef.DiscriminatorList options = recDefTreeNode.getRecDefNode().getDiscriminators();
         return values != null && options != null && nodeMapping.dictionary == null;
     }
 
@@ -136,7 +136,7 @@ public class CreateModel {
     public void createDictionary() {
         if (!isDictionaryPossible()) throw new RuntimeException("Should have checked");
         List<String> options = new ArrayList<String>();
-//        for (RecDef.Opt opt : recDefTreeNode.getRecDefNode().getOptions()) options.add(opt.content); // todo: not key?
+//        for (RecDef.Opt opt : recDefTreeNode.getRecDefNode().getDiscriminators()) options.add(opt.content); // todo: not key?
         nodeMapping.setDictionaryDomain(options);
         fireNodeMappingChanged();
     }

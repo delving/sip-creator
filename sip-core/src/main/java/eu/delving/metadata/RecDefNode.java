@@ -75,10 +75,10 @@ public class RecDefNode {
                 children.add(new RecDefNode(listener, this, null, sub, null, discriminatorRoot, discriminatorRoot));
             }
             for (RecDef.Elem sub : elem.elemList) {
-                if (sub.options == null) {
+                if (sub.discriminatorList == null) {
                     children.add(new RecDefNode(listener, this, sub, null, null, discriminatorRoot, discriminatorRoot));
                 }
-                else for (RecDef.Discriminator subDiscriminator : sub.options.discriminators) { // a child for each option
+                else for (RecDef.Discriminator subDiscriminator : sub.discriminatorList.discriminators) { // a child for each option
                     children.add(new RecDefNode(listener, this, sub, null, subDiscriminator, null, null));
                 }
             }
@@ -146,12 +146,12 @@ public class RecDefNode {
         return isAttr() ? attr.doc : elem.doc;
     }
 
-    public boolean hasOptions() {
-        return getOptions() != null;
+    public boolean hasDiscriminators() {
+        return getDiscriminators() != null;
     }
 
-    public RecDef.DiscriminatorList getOptions() {
-        return isAttr() ? null : elem.options;
+    public RecDef.DiscriminatorList getDiscriminators() {
+        return isAttr() ? null : elem.discriminatorList;
     }
 
     public RecDefNode getNode(Path soughtPath, String optKey) {

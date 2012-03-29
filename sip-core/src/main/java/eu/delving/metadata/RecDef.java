@@ -263,7 +263,7 @@ public class RecDef {
             key = key.defaultPrefix(recDef.prefix);
             value = value.defaultPrefix(recDef.prefix);
             Elem elem = recDef.findElem(path);
-            elem.options = this;
+            elem.discriminatorList = this;
         }
     }
 
@@ -437,7 +437,7 @@ public class RecDef {
         public Doc doc;
 
         @XStreamOmitField
-        public DiscriminatorList options;
+        public DiscriminatorList discriminatorList;
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
@@ -519,9 +519,9 @@ public class RecDef {
                 }
                 indent(out, level).append("*/\n");
             }
-            if (options != null) {
+            if (discriminatorList != null) {
                 indent(out, level).append("// ");
-                for (Discriminator discriminator : options.discriminators) out.append(String.format("%s=%s, ", discriminator.key, discriminator.content));
+                for (Discriminator discriminator : discriminatorList.discriminators) out.append(String.format("%s=%s, ", discriminator.key, discriminator.content));
                 out.append("\n");
             }
             indent(out, level).append("lido.");
