@@ -87,9 +87,12 @@ public class TestCodeGeneration {
 
 
         RecDefNode termNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
-        NodeMapping term = termNode.addNodeMapping(mapping("/input/leadup/record/list/member/concept"));
+        NodeMapping concept = mapping("/input/leadup/record/list/member/concept");
+        concept.operation = "**";
+        NodeMapping term = termNode.addNodeMapping(concept);
         term.dictionary = new TreeMap<String, String>();
         term.dictionary.put("superhero", "Clay Man");
+        term.dictionary.put("savior", "Jesus!");
         term.dictionary.put("sidekick", "Clay Horse");
 
         RecDefNode prefNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term/@pref");
@@ -112,7 +115,7 @@ public class TestCodeGeneration {
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
         Node node = mappingRunner.runMapping(createInputRecord());
-        
+
         String xml = XmlSerializer.toXml(node);
         System.out.println(xml);
         Assert.assertEquals(EXPECT, xml);
@@ -136,6 +139,7 @@ public class TestCodeGeneration {
         member1.attributes().put("index", "23");
         n(member1, "name", "Gumby Dammit");
         n(member1, "concept", "superhero");
+        n(member1, "concept", "savior");
         member2 = n(list, "member");
         member2.attributes().put("index", "45");
         n(member2, "name", "O'Pokey");
