@@ -1,15 +1,11 @@
-name=Aff Test
-dataOwnerUri=http://www.schijndel.nl/museum/nl/index.html
-displayDataOwner=Museum Jan Heestershuis
-displayOwnerCountry=Netherlands
-dataProviderUri=http://www.erfgoedbrabant.nl/
-displayDataProvider=Erfgoed Brabant
-providerHubUri=http://www.thuisinbrabant.nl/
-displayProviderHub=Thuis in Brabant
+name=ICN Test
+provider=Testmeister
+country=netherlands
+dataProvider=Sourcer
 language=nl
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
-spec=aff
+spec=icn
 
 
 
