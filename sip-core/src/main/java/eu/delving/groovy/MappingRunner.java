@@ -68,7 +68,7 @@ public class MappingRunner {
     public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath) {
         this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
-        this.code = recMapping.getRecDefTree().toCode(recMapping.getFunctions(), editPath);
+        this.code = recMapping.getRecDefTree().toCode(recMapping.getFunctions(), recMapping.getFacts(), editPath);
         script = groovyCodeResource.createMappingScript(code);
         for (Map.Entry<String,String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());

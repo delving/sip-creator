@@ -53,6 +53,8 @@ public class FunctionPanel extends JPanel {
     private SipModel sipModel;
     private FunctionListModel functionListModel = new FunctionListModel();
     private JList functionList = new JList(functionListModel);
+    private DefaultListModel factsModel = new DefaultListModel();
+    private JList factsList = new JList(factsModel);
     private JTextArea inputArea = new JTextArea();
     private JTextArea codeArea = new JTextArea();
     private JTextArea outputArea = new JTextArea();
@@ -62,6 +64,7 @@ public class FunctionPanel extends JPanel {
         inputArea.setFont(MONOSPACED);
         codeArea.setFont(MONOSPACED);
         outputArea.setFont(MONOSPACED);
+        factsList.setFont(MONOSPACED);
         this.sipModel = sipModel;
         JPanel center = new JPanel(new GridLayout(0, 1));
         center.add(createInputPanel());
@@ -97,6 +100,12 @@ public class FunctionPanel extends JPanel {
                     @Override
                     public void run() {
                         functionListModel.setList(mappingModel.getRecMapping());
+                        factsModel.clear();
+                        if (mappingModel.hasRecMapping()) {
+                            for (String fact : mappingModel.getRecMapping().getFacts().keySet()) {
+                                factsModel.addElement(String.format("  %s  ", fact));
+                            }
+                        }
                     }
                 });
             }
@@ -144,9 +153,16 @@ public class FunctionPanel extends JPanel {
     }
 
     private JPanel createInputPanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.add(scrollPanel("Input Lines", inputArea), BorderLayout.CENTER);
+        p.add(scrollPanel("Available Facts", factsList), BorderLayout.EAST);
+        return p;
+    }
+    
+    private static JPanel scrollPanel(String title, JComponent component) {
         JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Input Lines"));
-        p.add(Utility.scroll(inputArea));
+        p.setBorder(BorderFactory.createTitledBorder(title));
+        p.add(Utility.scroll(component), BorderLayout.CENTER);
         return p;
     }
 

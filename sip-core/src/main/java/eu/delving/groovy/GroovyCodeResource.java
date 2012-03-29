@@ -30,6 +30,7 @@ import groovy.lang.Script;
 import java.io.*;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * This class is supposed to make it easy to build Groovy scripts from some bits of code which are
@@ -50,9 +51,14 @@ public class GroovyCodeResource {
         this.classLoader = classLoader;
     }
     
-    public Script createFunctionScript(MappingFunction function, String editedCode) {
-        String scriptCode = function.toCode(editedCode) + String.format("%s(param)\n", function.name);
-        return new GroovyShell(getGroovyClassLoader()).parse(scriptCode);
+    public Script createFunctionScript(MappingFunction function, Map<String,String> facts, String editedCode) {
+        StringBuilder scriptCode = new StringBuilder();
+        for (Map.Entry<String,String> entry : facts.entrySet()) {
+            scriptCode.append(String.format("String %s = '''%s'''\n", entry.getKey(), entry.getValue()));
+        }
+        scriptCode.append(function.toCode(editedCode));
+        scriptCode.append(String.format("%s(param)\n", function.name));
+        return new GroovyShell(getGroovyClassLoader()).parse(scriptCode.toString());
     }
 
     public Script createMappingScript(String code) {

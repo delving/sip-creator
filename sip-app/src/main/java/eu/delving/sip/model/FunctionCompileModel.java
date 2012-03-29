@@ -49,7 +49,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * todo
+ * Manage the compiling and running of functions
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
@@ -217,7 +217,7 @@ public class FunctionCompileModel {
         private Script script;
 
         public FunctionRunner() {
-            this.script = groovyCodeResource.createFunctionScript(mappingFunction, documentToString(codeDocument));
+            this.script = groovyCodeResource.createFunctionScript(mappingFunction, mappingModel.getRecMapping().getFacts(), documentToString(codeDocument));
         }
 
         public Object runFunction(Object argument) throws Problem {

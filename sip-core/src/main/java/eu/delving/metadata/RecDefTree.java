@@ -23,6 +23,7 @@ package eu.delving.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -79,10 +80,14 @@ public class RecDefTree implements RecDefNode.Listener {
         return nodeMappings;
     }
 
-    public String toCode(Set<MappingFunction> mappingFunctions, EditPath editPath) {
+    public String toCode(Set<MappingFunction> mappingFunctions, Map<String,String> facts, EditPath editPath) {
         Out out = new Out();
         out.line("// SIP-Creator Generated Mapping Code");
         out.line("// ----------------------------------");
+        out.line("// Facts:");
+        for (Map.Entry<String,String> entry : facts.entrySet()) {
+            out.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
+        }
         out.line("// Functions:");
         for (MappingFunction function : mappingFunctions) function.toCode(out);
         out.line("// Dictionaries:");
