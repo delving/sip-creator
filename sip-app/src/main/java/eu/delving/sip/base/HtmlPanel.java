@@ -24,7 +24,6 @@ package eu.delving.sip.base;
 import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -48,7 +47,7 @@ public class HtmlPanel extends JPanel {
         setBorder(BorderFactory.createTitledBorder(title));
         view.setContentType("text/html");
         view.setDocument(doc);
-        add(new JScrollPane(view));
+        add(Utility.scrollV(view));
         setPreferredSize(new Dimension(200, 200));
     }
 

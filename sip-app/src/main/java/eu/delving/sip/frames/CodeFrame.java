@@ -85,7 +85,7 @@ public class CodeFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(Utility.scroll(codeArea), BorderLayout.CENTER);
+        content.add(Utility.scrollVH(codeArea), BorderLayout.CENTER);
         setPlacement(new Placement() {
             @Override
             public Point getLocation() {

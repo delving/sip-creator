@@ -126,7 +126,7 @@ public class SourceFrame extends FrameBase {
     private JPanel createImportedPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Analysis of imported data"));
-        p.add(Utility.scroll(sourceTree), BorderLayout.CENTER);
+        p.add(Utility.scrollVH(sourceTree), BorderLayout.CENTER);
         p.add(createSelectButtonPanel(), BorderLayout.SOUTH);
         return p;
     }
@@ -134,7 +134,7 @@ public class SourceFrame extends FrameBase {
     private JPanel createSourcePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Source data"));
-        p.add(Utility.scroll(sourceTree), BorderLayout.CENTER);
+        p.add(Utility.scrollVH(sourceTree), BorderLayout.CENTER);
         return p;
     }
 

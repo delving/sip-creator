@@ -123,7 +123,7 @@ public class StatisticsFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Random Sample"));
         JList list = new JList(randomSampleModel);
-        p.add(Utility.scroll(list));
+        p.add(Utility.scrollV(list));
         return p;
     }
 
@@ -131,7 +131,7 @@ public class StatisticsFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Histogram"));
         JList list = new JList(histogramModel);
-        p.add(Utility.scroll(list));
+        p.add(Utility.scrollV(list));
         return p;
     }
 

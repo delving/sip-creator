@@ -85,7 +85,7 @@ public class OutputFrame extends FrameBase {
             public void changedUpdate(DocumentEvent documentEvent) {
             }
         });
-        p.add(Utility.scroll(area));
+        p.add(Utility.scrollVH(area));
         return p;
     }
 

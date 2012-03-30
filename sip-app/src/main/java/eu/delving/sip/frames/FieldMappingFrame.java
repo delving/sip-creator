@@ -130,7 +130,7 @@ public class FieldMappingFrame extends FrameBase {
         tabs.addTab("Field", createCodeOutputPanel());
         tabs.addTab("Functions", functionPanel);
         tabs.addTab("Dictionary", dictionaryPanel);
-        tabs.addTab("Help", Utility.scroll(helpView));
+        tabs.addTab("Help", Utility.scrollV(helpView));
         return tabs;
     }
 
@@ -143,7 +143,7 @@ public class FieldMappingFrame extends FrameBase {
 
     private JPanel createCodePanel() {
         JPanel p = new JPanel(new BorderLayout());
-        p.add(Utility.scroll("Groovy Code", groovyCodeArea), BorderLayout.CENTER);
+        p.add(Utility.scrollVH("Groovy Code", groovyCodeArea), BorderLayout.CENTER);
         p.add(createBesideCode(), BorderLayout.EAST);
         return p;
     }
@@ -156,7 +156,7 @@ public class FieldMappingFrame extends FrameBase {
         pp.add(new JButton(REVERT_ACTION));
         JPanel p = new JPanel(new BorderLayout());
         p.add(pp, BorderLayout.NORTH);
-        p.add(Utility.scroll("Context", contextVarList), BorderLayout.CENTER);
+        p.add(Utility.scrollV("Context", contextVarList), BorderLayout.CENTER);
         return p;
     }
 
@@ -170,7 +170,7 @@ public class FieldMappingFrame extends FrameBase {
     private JPanel createOutputPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output Record"));
-        p.add(Utility.scroll(outputArea), BorderLayout.CENTER);
+        p.add(Utility.scrollVH(outputArea), BorderLayout.CENTER);
         p.add(new JLabel("Note: URLs can be launched by double-clicking them.", JLabel.CENTER), BorderLayout.SOUTH);
         return p;
     }

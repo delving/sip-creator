@@ -156,7 +156,7 @@ public class VisualFeedback implements Feedback {
 
         @Override
         protected void buildContent(Container content) {
-            content.add(Utility.scroll(list), BorderLayout.CENTER);
+            content.add(Utility.scrollV(list), BorderLayout.CENTER);
         }
 
         public void openAtPosition() {

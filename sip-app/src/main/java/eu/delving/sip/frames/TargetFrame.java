@@ -22,10 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FilterTreeModel;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.*;
 import eu.delving.sip.model.BookmarksTreeModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
@@ -42,6 +39,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.*;
+import java.util.List;
 
 /**
  * Render the record definition as a JTree
@@ -52,6 +50,7 @@ import java.awt.event.*;
 public class TargetFrame extends FrameBase {
     private JTree recDefTree;
     private JTree bookmarkTree;
+    private HtmlPanel bookmarkDocPanel = new HtmlPanel("Documentation");
     private JTextField filterField = new JTextField();
     private JPanel treePanel = new JPanel(new GridLayout(0, 1));
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
@@ -133,7 +132,7 @@ public class TargetFrame extends FrameBase {
             if (nodeObject instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) nodeObject;
                 if (autoFoldBox.isSelected()) showPath(node);
-                sipModel.getCreateModel().setRecDefTreeNode(node.getRecDefNode().hasConstant() ? null : node);
+                sipModel.getCreateModel().setRecDefTreeNode(node);
             }
             else {
                 sipModel.getCreateModel().setRecDefTreeNode(null);
@@ -156,9 +155,22 @@ public class TargetFrame extends FrameBase {
             }
             else if (object instanceof RecDef.Ref) {
                 RecDef.Ref ref = (RecDef.Ref) object;
+                bookmarkDocPanel.setHtml(docToHtml(ref.doc));
                 recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(ref.path));
             }
         }
+    }
+
+    private String docToHtml(List<String> doc) {
+        StringBuilder html = new StringBuilder("<html><p>");
+        if (doc == null) {
+            html.append("No documentation");
+        }
+        else {
+            for (String line : doc) html.append(line).append('\n');
+        }
+        html.append("</p></html>");
+        return html.toString();
     }
 
     private void showPath(RecDefTreeNode node) {
@@ -268,8 +280,13 @@ public class TargetFrame extends FrameBase {
                 bookmarkTree.setModel(new BookmarksTreeModel());
             }
             treePanel.removeAll();
-            treePanel.add(Utility.scroll("Record Definition", recDefTree));
-            if (bookmarksPresent) treePanel.add(Utility.scroll("Bookmarks", bookmarkTree));
+            treePanel.add(Utility.scrollVH("Record Definition", recDefTree));
+            if (bookmarksPresent) {
+                JPanel p = new JPanel(new GridLayout(1, 0));
+                p.add(Utility.scrollVH("Bookmarks", bookmarkTree));
+                p.add(bookmarkDocPanel);
+                treePanel.add(p);
+            }
         }
     }
 

@@ -160,30 +160,30 @@ public class FunctionPanel extends JPanel {
         bp.add(new JButton(new RemoveAction()));
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Functions"));
-        p.add(Utility.scroll(functionList));
+        p.add(Utility.scrollV(functionList));
         p.add(bp, BorderLayout.SOUTH);
         return p;
     }
 
     private JPanel createInputPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(Utility.scroll("Input Lines", inputArea), BorderLayout.CENTER);
-        p.add(Utility.scroll("Available Facts", factsList), BorderLayout.EAST);
+        p.add(Utility.scrollVH("Input Lines", inputArea), BorderLayout.CENTER);
+        p.add(Utility.scrollV("Available Facts", factsList), BorderLayout.EAST);
         return p;
     }
     
     private JPanel createCodePanel() {
         JPanel p = new JPanel(new GridLayout(1,0));
         p.setBorder(BorderFactory.createTitledBorder("Function Code"));
-        p.add(Utility.scroll("Function Code", codeArea));
-        p.add(Utility.scroll("Documentation", docArea));
+        p.add(Utility.scrollVH("Function Code", codeArea));
+        p.add(Utility.scrollV("Documentation", docArea));
         return p;
     }
 
     private JPanel createOutputPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output Lines"));
-        p.add(Utility.scroll(outputArea));
+        p.add(Utility.scrollVH(outputArea));
         return p;
     }
 
