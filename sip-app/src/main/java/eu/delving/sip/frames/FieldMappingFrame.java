@@ -220,12 +220,17 @@ public class FieldMappingFrame extends FrameBase {
 
             @Override
             public void nodeMappingSet(CreateModel createModel) {
-                NodeMapping nodeMapping = createModel.getNodeMapping();
+                final NodeMapping nodeMapping = createModel.getNodeMapping();
                 contextVarModel.setList(nodeMapping);
                 sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                groovyCodeArea.setEditable(nodeMapping != null && nodeMapping.isUserCodeEditable());
-                boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
-                operatorBox.setSelectedIndex(all ? 0 : 1);
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        groovyCodeArea.setEditable(nodeMapping != null && nodeMapping.isUserCodeEditable());
+                        boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
+                        operatorBox.setSelectedIndex(all ? 0 : 1);
+                    }
+                });
             }
 
             @Override
