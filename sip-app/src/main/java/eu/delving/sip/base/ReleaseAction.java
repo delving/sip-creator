@@ -77,7 +77,12 @@ public class ReleaseAction extends AbstractAction {
                 if (successful) {
                     sipModel.getFeedback().say(String.format("Unlocked %s and removed it locally", dataSet));
                     try {
-                        sipModel.seekReset(); // release the file handle
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                sipModel.seekReset(); // release the file handle
+                            }
+                        });
                         sipModel.getDataSetModel().setDataSet(null);
                         dataSet.remove();
                     }
