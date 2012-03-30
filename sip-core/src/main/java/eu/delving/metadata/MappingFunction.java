@@ -21,12 +21,18 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * This class describes a utility function (closure) which is available in the
@@ -149,5 +155,22 @@ public class MappingFunction implements Comparable<MappingFunction> {
     public int compareTo(MappingFunction mappingFunction) {
         return this.name.compareTo(mappingFunction.name);
     }
+
+    @XStreamAlias("mapping-function-list")
+    public static class FunctionList {
+        @XStreamImplicit
+        public SortedSet<MappingFunction> functions = new TreeSet<MappingFunction>();
+    }
+    
+    public static FunctionList read(InputStream inputStream) {
+        return (FunctionList) stream().fromXML(inputStream);
+    }
+
+    private static XStream stream() {
+        XStream stream = new XStream(new PureJavaReflectionProvider());
+        stream.processAnnotations(FunctionList.class);
+        return stream;
+    }
+
 }
 

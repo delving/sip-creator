@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<mapping-function-list>
+    <mapping-function name="convertToIdentifier">
+        <sample-input>
+            <string>someidentifier</string>
+        </sample-input>
+        <documentation></documentation>
+        <groovy-code>
+            <string>def uriBytes = it.getBytes(&quot;UTF-8&quot;);</string>
+            <string>def digest = java.security.MessageDigest.getInstance(&quot;SHA-1&quot;)</string>
+            <string>def hash = new StringBuilder()</string>
+            <string>for (Byte b in digest.digest(uriBytes)) {</string>
+            <string>hash.append(&apos;0123456789ABCDEF&apos;[(b &amp; 0xF0) &gt;&gt; 4])</string>
+            <string>hash.append(&apos;0123456789ABCDEF&apos;[b &amp; 0x0F])</string>
+            <string>}</string>
+            <string>&quot;$spec/$hash&quot;.toString()</string>
+        </groovy-code>
+    </mapping-function>
+</mapping-function-list>

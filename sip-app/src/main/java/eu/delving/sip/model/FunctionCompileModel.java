@@ -104,6 +104,7 @@ public class FunctionCompileModel {
 
     public void setFunction(MappingFunction mappingFunction) {
         this.mappingFunction = mappingFunction;
+        functionRunner = null;
         Exec.swing(new DocumentSetter(inputDocument, getSampleInput(), true));
         Exec.swing(new DocumentSetter(docDocument, getDocInput(), true));
         Exec.swing(new DocumentSetter(codeDocument, getOriginalCode(), true));

@@ -105,6 +105,10 @@ public class RecMapping {
         functions.add(function);
         return function;
     }
+    
+    public void addFunction(MappingFunction function) {
+        functions.add(function);
+    }
 
     public void removeFunction(MappingFunction function) {
         functions.remove(function);

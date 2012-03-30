@@ -149,41 +149,4 @@ public class MappingCategory {
         }
         return null
     }
-
-    static List toId(a, spec) {
-        a = unwrap(a)
-        String identifier = a[0].toString()
-        if (!spec) throw new MissingPropertyException("spec", String.class)
-        if (!identifier) throw new MissingPropertyException("Identifier passed to toId", String.class)
-        def uriBytes = identifier.toString().getBytes("UTF-8");
-        def digest = java.security.MessageDigest.getInstance("SHA-1")
-        def hash = new StringBuilder()
-        for (Byte b in digest.digest(uriBytes)) {
-            hash.append('0123456789ABCDEF'[(b & 0xF0) >> 4])
-            hash.append('0123456789ABCDEF'[b & 0x0F])
-        }
-        return ["$spec/$hash"]
-    }
-
-    static List toLocalId(a, spec) {
-        a = unwrap(a)
-        String identifier = a[0].toString()
-        if (!spec) throw new MissingPropertyException("spec", String.class)
-        if (!identifier) throw new MissingPropertyException("Identifier passed to toId", String.class)
-        return ["$spec/$identifier"]
-    }
-
-    static String sanitize(GroovyNode node) {
-        return sanitize(node.toString())
-    }
-
-    static String sanitize(List list) {
-        return sanitize(list.toString())
-    }
-
-    static String sanitize(String text) { // same effect as in StringUtil.sanitizeGroovy, except apostrophe removal
-        text = (text =~ /\n/).replaceAll(' ')
-        text = (text =~ / +/).replaceAll(' ')
-        return text
-    }
 }
