@@ -52,6 +52,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public Path outputPath;
 
     @XStreamAsAttribute
+    public String operation;
+
+    @XStreamAsAttribute
     public String optKey;
 
     @XStreamAlias("tuplePaths")
@@ -84,6 +87,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return inputPath.hashCode();
     }
 
+    public String getOperation() {
+        return operation == null ? "*" : operation;
+    }
+    
     public void clearStatsTreeNodes() {
         statsTreeNodes = null;
     }
@@ -270,12 +277,12 @@ public class NodeMapping implements Comparable<NodeMapping> {
         }
         else {
             if (tuplePaths != null) {
-                out.line_("%s * { %s ->", getTupleExpression(), getTupleName());
+                out.line_("%s %s { %s ->", getTupleExpression(), getOperation(), getTupleName());
             }
             else {
                 Tag outer = path.getTag(0);
                 Tag inner = path.getTag(1);
-                out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
+                out.line_("%s%s %s { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), getOperation(), inner.toGroovyParam());
             }
             toInnerLoop(path.chop(-1), out);
             out._line("}");

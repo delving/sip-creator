@@ -227,7 +227,7 @@ public class RecDefNode {
             childrenToCode(out, editPath);
         }
         else if (nodeMapping.hasTuple() && path.size() == 2) {
-            out.line_("%s * { %s ->", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
+            out.line_("%s %s { %s ->", nodeMapping.getTupleExpression(), nodeMapping.getOperation(), nodeMapping.getTupleName());
             startBuilderCall(out, editPath);
             nodeMapping.toElementCode(out, editPath);
             out._line("}");
@@ -236,7 +236,7 @@ public class RecDefNode {
         else { // path should never be empty
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            out.line_("%s%s * { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), inner.toGroovyParam());
+            out.line_("%s%s %s { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), nodeMapping.getOperation(), inner.toGroovyParam());
             childrenInLoop(nodeMapping, path.chop(-1), out, editPath);
             out._line("}");
         }
@@ -272,7 +272,7 @@ public class RecDefNode {
                     out._line("}");
                 }
                 else {
-                    out.line_("%s * { %s -> // childrenToCode", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
+                    out.line_("%s %s { %s ->", nodeMapping.getTupleExpression(), nodeMapping.getOperation(), nodeMapping.getTupleName());
                     startBuilderCall(out, editPath);
                     nodeMapping.toElementCode(out, editPath);
                     out._line("}");
