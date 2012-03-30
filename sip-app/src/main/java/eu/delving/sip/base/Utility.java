@@ -53,6 +53,7 @@ public class Utility {
     public static final Icon DOWNLOAD_ICON = new ImageIcon(Utility.class.getResource("/icons/download-icon.png"));
     public static final Icon UPLOAD_ICON = new ImageIcon(Utility.class.getResource("/icons/upload-icon.png"));
     public static final Icon ATTRIBUTE_ICON = new ImageIcon(Utility.class.getResource("/icons/attribute-icon.png"));
+    public static final Icon UNMAPPABLE_ICON = new ImageIcon(Utility.class.getResource("/icons/unmappable-element-icon.png"));
     public static final Icon IMPORT_ICON = new ImageIcon(Utility.class.getResource("/icons/import-icon.png"));
     public static final Icon VALIDATE_ICON = new ImageIcon(Utility.class.getResource("/icons/validate-icon.png"));
     public static final Icon RELEASE_ICON = new ImageIcon(Utility.class.getResource("/icons/release-icon.png"));

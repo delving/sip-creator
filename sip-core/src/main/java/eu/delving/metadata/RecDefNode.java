@@ -128,6 +128,10 @@ public class RecDefNode {
         return isAttr() ? attr.systemField : elem.systemField;
     }
 
+    public boolean isUnmappable() {
+        return !isAttr() && elem.unmappable;
+    }
+
     public boolean isSingular() {
         return !isAttr() && elem.singular;
     }

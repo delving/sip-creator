@@ -132,6 +132,7 @@ public class TargetFrame extends FrameBase {
             if (nodeObject instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) nodeObject;
                 if (autoFoldBox.isSelected()) showPath(node);
+                if (node.getRecDefNode().isUnmappable()) return;
                 sipModel.getCreateModel().setRecDefTreeNode(node);
             }
             else {

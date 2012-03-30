@@ -401,6 +401,9 @@ public class RecDef {
         public boolean systemField;
 
         @XStreamAsAttribute
+        public boolean unmappable;
+
+        @XStreamAsAttribute
         public String fieldType;
 
         @XStreamAsAttribute

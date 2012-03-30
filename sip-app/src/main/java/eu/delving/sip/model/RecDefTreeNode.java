@@ -215,7 +215,10 @@ public class RecDefTreeNode extends FilterTreeNode {
             Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             if (value instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) value;
-                if (node.recDefNode.isAttr()) {
+                if (node.recDefNode.isUnmappable()) {
+                    setIcon(Utility.UNMAPPABLE_ICON);
+                }
+                else if (node.recDefNode.isAttr()) {
                     setIcon(Utility.ATTRIBUTE_ICON);
                 }
                 else if (node.hasChildElements()) {
