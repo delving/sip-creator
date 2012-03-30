@@ -73,7 +73,9 @@ public class RecDefTreeNode extends FilterTreeNode {
         this.parent = parent;
         this.recDefNode = recDefNode;
         if (parent != null) parent.children.add(this);
-        for (RecDefNode subRecDefNode : recDefNode.getChildren()) new RecDefTreeNode(this, subRecDefNode);
+        for (RecDefNode subRecDefNode : recDefNode.getChildren()) {
+            if (!subRecDefNode.hasConstant()) new RecDefTreeNode(this, subRecDefNode);
+        }
     }
 
     @Override

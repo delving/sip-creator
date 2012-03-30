@@ -45,9 +45,7 @@ public abstract class FilterTreeNode implements TreeNode {
     private void filter(List<Pattern> patterns) {
         boolean found = false;
         for (Pattern pattern : patterns) {
-            if (pattern.matcher(getStringToFilter()).find()) {
-                found = true;
-            }
+            if (pattern.matcher(getStringToFilter()).find()) found = true;
         }
         boolean passes = patterns.size() == 1 ? found : !found;
         if (passes != passesFilter) {
