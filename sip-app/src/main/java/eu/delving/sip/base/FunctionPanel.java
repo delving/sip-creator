@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 public class FunctionPanel extends JPanel {
     private static Color LIBRARY_COLOR = new Color(255,255,200);
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
+    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
     private SipModel sipModel;
     private FunctionListModel libraryListModel = new FunctionListModel();
     private JList libraryList = new MappingFunctionJList(libraryListModel);
