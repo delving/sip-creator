@@ -70,13 +70,13 @@ public class FunctionPanel extends JPanel {
 
     public FunctionPanel(SipModel sipModel) {
         super(new BorderLayout());
+        this.sipModel = sipModel;
         inputArea.setFont(MONOSPACED);
         codeArea.setFont(MONOSPACED);
         docArea.setFont(MONOSPACED);
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
         libraryList.setBackground(LIBRARY_COLOR);
-        this.sipModel = sipModel;
         JPanel center = new JPanel(new GridLayout(0, 1));
         center.add(createInputPanel());
         center.add(Utility.scrollV("Documentation", docArea));

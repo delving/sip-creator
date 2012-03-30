@@ -27,7 +27,6 @@ import eu.delving.metadata.Operator;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.FunctionPanel;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.MappingCompileModel;
@@ -64,7 +63,6 @@ public class FieldMappingFrame extends FrameBase {
     private ContextVarListModel contextVarModel = new ContextVarListModel();
     private JList contextVarList = new JList(contextVarModel);
     private DictionaryPanel dictionaryPanel;
-    private FunctionPanel functionPanel;
     private UndoManager undoManager = new UndoManager();
 
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
@@ -77,7 +75,6 @@ public class FieldMappingFrame extends FrameBase {
         }
         contextVarList.setPrototypeCellValue("somelongvariablename");
         dictionaryPanel = new DictionaryPanel(sipModel.getCreateModel());
-        functionPanel = new FunctionPanel(sipModel);
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         groovyCodeArea.setFont(new Font("Monospaced", Font.BOLD, 12));
         groovyCodeArea.setTabSize(3);
@@ -128,7 +125,6 @@ public class FieldMappingFrame extends FrameBase {
     private JComponent createTabs() {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Field", createCodeOutputPanel());
-        tabs.addTab("Functions", functionPanel);
         tabs.addTab("Dictionary", dictionaryPanel);
         tabs.addTab("Help", Utility.scrollV(helpView));
         return tabs;

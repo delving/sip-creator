@@ -27,13 +27,18 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.FunctionPanel;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.JDesktopPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import java.awt.*;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
 
 /**
  * This frame shows the entire builder that is responsible for transforming the input to output,
@@ -45,10 +50,12 @@ import java.awt.*;
 public class CodeFrame extends FrameBase {
     private static int MARG = 30;
     private JTextArea codeArea = new JTextArea();
+    private final FunctionPanel functionPanel;
 
     public CodeFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CODE, desktop, sipModel, "Mapping Code", false);
+        super(Which.CODE, desktop, sipModel, "Global Functions & Mapping Code", false);
         codeArea.setFont(new Font("Monospaced", Font.BOLD, 10));
+        codeArea.setEditable(false);
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
@@ -77,6 +84,7 @@ public class CodeFrame extends FrameBase {
             }
 
         });
+        functionPanel = new FunctionPanel(this.sipModel);
     }
 
     void refresh() {
@@ -85,7 +93,9 @@ public class CodeFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(Utility.scrollVH(codeArea), BorderLayout.CENTER);
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Global Functions", functionPanel);
+        tabs.addTab("Mapping Code", Utility.scrollVH(codeArea));
         setPlacement(new Placement() {
             @Override
             public Point getLocation() {
@@ -97,6 +107,7 @@ public class CodeFrame extends FrameBase {
                 return new Dimension(desktopPane.getSize().width - MARG * 2, desktopPane.getSize().height - MARG * 2);
             }
         });
+        content.add(tabs);
     }
 
     private class CodeUpdater implements Runnable {
