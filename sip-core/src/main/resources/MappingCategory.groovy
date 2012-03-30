@@ -149,4 +149,19 @@ public class MappingCategory {
         }
         return null
     }
+
+    static String sanitize(GroovyNode node) {
+        return sanitize(node.toString())
+    }
+
+    static String sanitize(List list) {
+        return sanitize(list.toString())
+    }
+
+    static String sanitize(String text) { // same effect as in StringUtil.sanitizeGroovy, except apostrophe removal
+        text = (text =~ /\n/).replaceAll(' ')
+        text = (text =~ / +/).replaceAll(' ')
+        return text
+    }
+
 }

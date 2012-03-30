@@ -121,6 +121,7 @@ public class FunctionPanel extends JPanel {
                             for (String fact : mappingModel.getRecMapping().getFacts().keySet()) {
                                 factsModel.addElement(String.format("  %s  ", fact));
                             }
+                            factsModel.addElement("  _uniqueIdentifier   ");
                         }
                     }
                 });

@@ -40,7 +40,14 @@
             <elem tag="displayProvider"/>
         </elem>
 
-        <elem tag="thing" elems="rights" attrs="localId, localUri" singular="true">
+        <elem tag="thing" elems="rights" attrs="localId" singular="true">
+            <elem tag="thingUri">
+                <node-mapping inputPath="/input/_id">
+                    <groovy-code>
+                        <string>"${spec}/${__id}"</string>
+                    </groovy-code>
+                </node-mapping>
+            </elem>
             <elem tag="displayWorkType"/>
             <elem tag="displayTitle" summaryField="TITLE"/>
             <elem tag="displayDescription"/>

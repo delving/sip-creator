@@ -409,6 +409,9 @@ public class RecDef {
         @XStreamImplicit
         public List<Elem> elemList = new ArrayList<Elem>();
 
+        @XStreamAlias("node-mapping")
+        public NodeMapping nodeMapping;
+
         @XStreamOmitField
         public Doc doc;
 

@@ -56,6 +56,7 @@ public class GroovyCodeResource {
         for (Map.Entry<String,String> entry : facts.entrySet()) {
             scriptCode.append(String.format("String %s = '''%s'''\n", entry.getKey(), entry.getValue()));
         }
+        scriptCode.append("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'\n");
         scriptCode.append(function.toCode(editedCode));
         scriptCode.append(String.format("%s(param)\n", function.name));
         return new GroovyShell(getGroovyClassLoader()).parse(scriptCode.toString());

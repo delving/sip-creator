@@ -92,6 +92,15 @@ public class TestMappingEngine {
     }
 
     @Test
+    public void tryAff() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
+                "lido", "http://www.lido-schema.org"
+        ));
+        Node node = mappingEngine.toNode(input("aff"));
+        System.out.println(XmlSerializer.toXml(node));
+    }
+
+    @Test
     public void indexDocumentFromAFF() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
                 "lido", "http://www.lido-schema.org"

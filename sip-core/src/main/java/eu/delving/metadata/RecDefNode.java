@@ -82,6 +82,11 @@ public class RecDefNode {
                     children.add(new RecDefNode(listener, this, sub, null, subDiscriminator, null, null));
                 }
             }
+            if (elem.nodeMapping != null) {
+                nodeMappings.put(elem.nodeMapping.inputPath, elem.nodeMapping);
+                elem.nodeMapping.recDefNode = this;
+                elem.nodeMapping.outputPath = getPath();
+            }
         }
     }
 

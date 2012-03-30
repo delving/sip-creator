@@ -88,6 +88,7 @@ public class RecDefTree implements RecDefNode.Listener {
         for (Map.Entry<String,String> entry : facts.entrySet()) {
             out.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
         }
+        out.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
         out.line("// Functions:");
         for (MappingFunction function : mappingFunctions) function.toCode(out);
         out.line("// Dictionaries:");
@@ -95,7 +96,9 @@ public class RecDefTree implements RecDefNode.Listener {
         out.line("// DSL Category wraps Builder call:");
         out.line("org.w3c.dom.Node outputNode");
         out.line_("use (MappingCategory) {");
-        out.line_("input * { _input -> outputNode = output.");
+        out.line_("input * { _input ->");
+        out.line("_uniqueIdentifier = _input._id[0].toString()");
+        out.line("outputNode = output.");
         if (root.hasNodeMappings()) {
             root.toElementCode(out, editPath);
         }
