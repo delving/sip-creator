@@ -79,7 +79,8 @@ public class FunctionPanel extends JPanel {
         this.sipModel = sipModel;
         JPanel center = new JPanel(new GridLayout(0, 1));
         center.add(createInputPanel());
-        center.add(createCodePanel());
+        center.add(Utility.scrollV("Documentation", docArea));
+        center.add(Utility.scrollV("Groovy Code", codeArea));
         center.add(createOutputPanel());
         add(center, BorderLayout.CENTER);
         add(createFunctionPanels(), BorderLayout.WEST);
@@ -190,14 +191,6 @@ public class FunctionPanel extends JPanel {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.add(Utility.scrollVH("Input Lines", inputArea), BorderLayout.CENTER);
         p.add(Utility.scrollV("Available Facts", factsList), BorderLayout.EAST);
-        return p;
-    }
-
-    private JPanel createCodePanel() {
-        JPanel p = new JPanel(new GridLayout(1, 0));
-        p.setBorder(BorderFactory.createTitledBorder("Function Code"));
-        p.add(Utility.scrollVH("Function Code", codeArea));
-        p.add(Utility.scrollV("Documentation", docArea));
         return p;
     }
 
