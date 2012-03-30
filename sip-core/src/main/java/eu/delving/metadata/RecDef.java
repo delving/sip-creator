@@ -368,6 +368,9 @@ public class RecDef {
         @XStreamConverter(Tag.AttributeConverter.class)
         public Tag tag;
 
+        @XStreamAsAttribute
+        public boolean systemField;
+
         @XStreamOmitField
         public Doc doc;
         
@@ -393,6 +396,9 @@ public class RecDef {
 
         @XStreamAsAttribute
         public boolean singular;
+
+        @XStreamAsAttribute
+        public boolean systemField;
 
         @XStreamAsAttribute
         public String fieldType;

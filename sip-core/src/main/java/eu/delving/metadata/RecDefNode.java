@@ -119,6 +119,10 @@ public class RecDefNode {
         return elem != null && elem.elemList.isEmpty();
     }
 
+    public boolean isSystemField() {
+        return isAttr() ? attr.systemField : elem.systemField;
+    }
+
     public boolean isSingular() {
         return !isAttr() && elem.singular;
     }
