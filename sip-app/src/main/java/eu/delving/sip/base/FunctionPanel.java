@@ -167,16 +167,16 @@ public class FunctionPanel extends JPanel {
 
     private JPanel createInputPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(scrollPanel("Input Lines", inputArea), BorderLayout.CENTER);
-        p.add(scrollPanel("Available Facts", factsList), BorderLayout.EAST);
+        p.add(Utility.scroll("Input Lines", inputArea), BorderLayout.CENTER);
+        p.add(Utility.scroll("Available Facts", factsList), BorderLayout.EAST);
         return p;
     }
     
     private JPanel createCodePanel() {
         JPanel p = new JPanel(new GridLayout(1,0));
         p.setBorder(BorderFactory.createTitledBorder("Function Code"));
-        p.add(scrollPanel("Function Code", codeArea));
-        p.add(scrollPanel("Documentation", docArea));
+        p.add(Utility.scroll("Function Code", codeArea));
+        p.add(Utility.scroll("Documentation", docArea));
         return p;
     }
 
@@ -184,13 +184,6 @@ public class FunctionPanel extends JPanel {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output Lines"));
         p.add(Utility.scroll(outputArea));
-        return p;
-    }
-
-    private static JPanel scrollPanel(String title, JComponent component) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder(title));
-        p.add(Utility.scroll(component), BorderLayout.CENTER);
         return p;
     }
 

@@ -88,7 +88,7 @@ public class TestCodeGeneration {
 
         RecDefNode termNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
         NodeMapping concept = mapping("/input/leadup/record/list/member/concept");
-        concept.operation = "**";
+        concept.operator = Operator.FIRST;
         NodeMapping term = termNode.addNodeMapping(concept);
         term.dictionary = new TreeMap<String, String>();
         term.dictionary.put("superhero", "Clay Man");

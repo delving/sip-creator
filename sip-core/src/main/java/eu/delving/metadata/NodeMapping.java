@@ -44,6 +44,7 @@ import java.util.*;
 
 @XStreamAlias("node-mapping")
 public class NodeMapping implements Comparable<NodeMapping> {
+    public static final String DEFAULT_OPERATION = "*";
 
     @XStreamAsAttribute
     public Path inputPath;
@@ -52,7 +53,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public Path outputPath;
 
     @XStreamAsAttribute
-    public String operation;
+    public Operator operator;
 
     @XStreamAsAttribute
     public String optKey;
@@ -87,8 +88,8 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return inputPath.hashCode();
     }
 
-    public String getOperation() {
-        return operation == null ? "*" : operation;
+    public Operator getOperator() {
+        return operator == null ? Operator.ALL : operator;
     }
     
     public void clearStatsTreeNodes() {
@@ -131,6 +132,10 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public NodeMapping setInputPath(Path inputPath) {
         this.inputPath = inputPath;
         return this;
+    }
+
+    public void notifyChanged() {
+        if (recDefNode != null) recDefNode.notifyNodeMappingChange(this);
     }
 
     public NodeMapping setInputPaths(List<Path> inputPaths) {
@@ -277,12 +282,12 @@ public class NodeMapping implements Comparable<NodeMapping> {
         }
         else {
             if (tuplePaths != null) {
-                out.line_("%s %s { %s ->", getTupleExpression(), getOperation(), getTupleName());
+                out.line_("%s %s { %s ->", getTupleExpression(), getOperator().getChar(), getTupleName());
             }
             else {
                 Tag outer = path.getTag(0);
                 Tag inner = path.getTag(1);
-                out.line_("%s%s %s { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), getOperation(), inner.toGroovyParam());
+                out.line_("%s%s %s { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), getOperator().getChar(), inner.toGroovyParam());
             }
             toInnerLoop(path.chop(-1), out);
             out._line("}");

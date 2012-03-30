@@ -21,13 +21,17 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.Operator;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.FunctionPanel;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.MappingCompileModel;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -36,6 +40,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,8 +60,9 @@ public class FieldMappingFrame extends FrameBase {
     private JTextArea groovyCodeArea;
     private JTextArea outputArea;
     private JEditorPane helpView;
+    private JComboBox operatorBox = new JComboBox(Operator.values());
     private ContextVarListModel contextVarModel = new ContextVarListModel();
-    private JComboBox contextVarBox = new JComboBox(contextVarModel);
+    private JList contextVarList = new JList(contextVarModel);
     private DictionaryPanel dictionaryPanel;
     private FunctionPanel functionPanel;
     private UndoManager undoManager = new UndoManager();
@@ -68,6 +75,7 @@ public class FieldMappingFrame extends FrameBase {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+        contextVarList.setPrototypeCellValue("somelongvariablename");
         dictionaryPanel = new DictionaryPanel(sipModel.getCreateModel());
         functionPanel = new FunctionPanel(sipModel);
         groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
@@ -135,23 +143,20 @@ public class FieldMappingFrame extends FrameBase {
 
     private JPanel createCodePanel() {
         JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Groovy Code"));
-        JPanel north = new JPanel(new BorderLayout());
-        north.add(new JLabel("Context variables:"), BorderLayout.WEST);
-        north.add(contextVarBox, BorderLayout.CENTER);
-        north.add(createNorthEast(), BorderLayout.EAST);
-        p.add(north, BorderLayout.NORTH);
-        p.add(Utility.scroll(groovyCodeArea), BorderLayout.CENTER);
+        p.add(Utility.scroll("Groovy Code", groovyCodeArea), BorderLayout.CENTER);
+        p.add(createBesideCode(), BorderLayout.EAST);
         return p;
     }
 
-    private JPanel createNorthEast() {
-        JPanel pp = new JPanel(new GridLayout(1, 0));
+    private JPanel createBesideCode() {
+        JPanel pp = new JPanel(new GridLayout(0, 1));
+        pp.add(operatorBox);
         pp.add(createActionButton(UNDO_ACTION));
         pp.add(createActionButton(REDO_ACTION));
-        JPanel p = new JPanel(new GridLayout(1, 0));
-        p.add(new JButton(REVERT_ACTION));
-        p.add(pp);
+        pp.add(new JButton(REVERT_ACTION));
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(pp, BorderLayout.NORTH);
+        p.add(Utility.scroll("Context", contextVarList), BorderLayout.CENTER);
         return p;
     }
 
@@ -171,6 +176,39 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private void wireUp() {
+        operatorBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
+                if (nodeMapping != null) {
+                    nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
+                    nodeMapping.notifyChanged();
+                }
+            }
+        });
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
+                    }
+                });
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
@@ -182,9 +220,12 @@ public class FieldMappingFrame extends FrameBase {
 
             @Override
             public void nodeMappingSet(CreateModel createModel) {
-                contextVarModel.setList(createModel.getNodeMapping());
-                sipModel.getFieldCompileModel().setNodeMapping(createModel.getNodeMapping());
-                groovyCodeArea.setEditable(createModel.getNodeMapping() != null && createModel.getNodeMapping().isUserCodeEditable());
+                NodeMapping nodeMapping = createModel.getNodeMapping();
+                contextVarModel.setList(nodeMapping);
+                sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
+                groovyCodeArea.setEditable(nodeMapping != null && nodeMapping.isUserCodeEditable());
+                boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
+                operatorBox.setSelectedIndex(all ? 0 : 1);
             }
 
             @Override
@@ -208,9 +249,8 @@ public class FieldMappingFrame extends FrameBase {
         });
     }
 
-    private class ContextVarListModel extends AbstractListModel implements ComboBoxModel {
+    private class ContextVarListModel extends AbstractListModel {
         private List<String> vars = new ArrayList<String>();
-        private String selected;
 
         public void setList(NodeMapping nodeMapping) {
             int size = getSize();
@@ -221,7 +261,6 @@ public class FieldMappingFrame extends FrameBase {
             if (nodeMapping != null) vars.addAll(nodeMapping.getContextVariables());
             size = getSize();
             if (size > 0) {
-                selected = vars.get(0);
                 fireIntervalAdded(this, 0, size);
             }
         }
@@ -234,16 +273,6 @@ public class FieldMappingFrame extends FrameBase {
         @Override
         public Object getElementAt(int i) {
             return vars.get(i);
-        }
-
-        @Override
-        public void setSelectedItem(Object item) {
-            this.selected = (String) item;
-        }
-
-        @Override
-        public Object getSelectedItem() {
-            return selected;
         }
     }
 

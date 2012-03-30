@@ -11,11 +11,11 @@ $if (doc)$
         <tr><td><p>$line$</p></td></tr>
     }$
 $endif$
-$if (discriminators)$
+$if (discriminatorList)$
     <tr><td>
         <ul>
-            $discriminators.descriminators:{ opt |
-                <li>$opt.key$ - $opt.content$</li>
+            $discriminatorList.discriminators:{ discriminator |
+                <li>$discriminator.key$ - $discriminator.content$</li>
             }$
         </ul>
     </td></tr>
