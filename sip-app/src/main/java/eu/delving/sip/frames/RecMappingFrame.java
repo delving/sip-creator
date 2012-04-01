@@ -27,11 +27,11 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;

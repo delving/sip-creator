@@ -171,12 +171,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return this;
     }
 
-    public void addCodeLine(String line) {
-        if (groovyCode == null) groovyCode = new ArrayList<String>();
-        line = line.trim();
-        if (!line.isEmpty()) groovyCode.add(line);
-    }
-
     public void setDictionaryDomain(Collection<String> domainValues) {
         if (dictionary == null) dictionary = new TreeMap<String, String>();
         for (String key : domainValues) if (!dictionary.containsKey(key)) dictionary.put(key, "");
@@ -199,12 +193,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     }
 
     public void setGroovyCode(String groovyCode) {
-        this.groovyCode = null;
-        if (groovyCode != null) {
-            if (!isSimilar(getGeneratedCode(), Arrays.asList(groovyCode.split("\n")).iterator())) {
-                for (String line : groovyCode.split("\n")) addCodeLine(line);
-            }
-        }
+        this.groovyCode = StringUtil.stringToLines(groovyCode);
         recDefNode.notifyNodeMappingChange(this);
     }
 

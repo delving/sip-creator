@@ -25,10 +25,10 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Histogram;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 
 import javax.swing.*;
 import java.awt.BorderLayout;

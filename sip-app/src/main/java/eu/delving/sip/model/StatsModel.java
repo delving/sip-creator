@@ -24,8 +24,6 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FilterTreeModel;
-import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;

@@ -22,11 +22,11 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.*;
-import eu.delving.sip.model.BookmarksTreeModel;
-import eu.delving.sip.model.MappingModel;
-import eu.delving.sip.model.RecDefTreeNode;
-import eu.delving.sip.model.SipModel;
+import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Utility;
+import eu.delving.sip.model.*;
+import eu.delving.sip.panels.HtmlPanel;
 import org.antlr.stringtemplate.StringTemplate;
 import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
 

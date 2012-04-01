@@ -23,11 +23,11 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.HtmlPanel;
-import eu.delving.sip.base.SourceTreeNode;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
+import eu.delving.sip.panels.HtmlPanel;
 
 import javax.swing.*;
 import java.awt.BorderLayout;

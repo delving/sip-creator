@@ -21,6 +21,7 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.frames.ProgressPopup;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;

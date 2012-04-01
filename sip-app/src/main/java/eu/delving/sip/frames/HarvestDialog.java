@@ -19,8 +19,11 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.base;
+package eu.delving.sip.frames;
 
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.HarvestPool;
+import eu.delving.sip.base.Harvestor;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;

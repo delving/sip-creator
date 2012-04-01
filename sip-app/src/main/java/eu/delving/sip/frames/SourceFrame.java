@@ -23,12 +23,16 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.DataSetModel;
+import eu.delving.sip.model.FilterTreeModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
 
 import javax.swing.*;

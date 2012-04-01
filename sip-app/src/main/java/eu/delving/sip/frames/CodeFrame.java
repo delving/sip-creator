@@ -27,10 +27,10 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.FunctionPanel;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.panels.FunctionPanel;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JTabbedPane;

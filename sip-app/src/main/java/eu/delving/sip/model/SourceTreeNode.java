@@ -19,14 +19,14 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.base;
+package eu.delving.sip.model;
 
 import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.Storage;
-import eu.delving.sip.model.FilterTreeNode;
 import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.BorderFactory;

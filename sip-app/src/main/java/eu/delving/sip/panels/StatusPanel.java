@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.base;
+package eu.delving.sip.panels;
 
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;

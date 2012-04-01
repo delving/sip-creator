@@ -24,6 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.metadata.RecDef;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

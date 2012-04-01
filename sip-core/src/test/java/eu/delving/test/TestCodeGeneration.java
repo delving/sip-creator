@@ -97,7 +97,7 @@ public class TestCodeGeneration {
 
         RecDefNode prefNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term/@pref");
         NodeMapping attr2attr = prefNode.addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
-        System.out.println("attr="+attr2attr);
+        System.out.println("attr=" + attr2attr);
 
         RecDefNode optionsNode = node("/lido/administrativeMetadata/recordWrap/recordID/@type");
 //        RecDef.DiscriminatorList discriminators = optionsNode.getDiscriminators();
@@ -108,7 +108,13 @@ public class TestCodeGeneration {
 
         RecDefNode actorNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
         NodeMapping mapping = actorNode.addNodeMapping(mapping("/input/leadup/record/list/member/name"));
-        mapping.addCodeLine("if (_name.contains(' ')) { return _name.split(' '); } else { return _name.text(); }");
+        mapping.setGroovyCode(
+                "if (_name.contains(' ')) {\n" +
+                        "return _name.split(' ');\n" +
+                        "} else {\n" +
+                        "return _name.text();\n" +
+                        "}"
+        );
         String code = recMapping.toCode(null);
         printWithLineNumbers(code);
 
@@ -149,44 +155,44 @@ public class TestCodeGeneration {
         ns.put("lido", "http://lidoland");
         return new MetadataRecordFactory(ns).fromGroovyNode(input, -1, 1);
     }
-    
+
     private static final String EXPECT =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"backward\">\n"+
-            "    <lido:descriptiveMetadata>\n"+
-            "        <lido:objectRelationWrap>\n"+
-            "            <lido:subjectWrap>\n"+
-            "                <lido:subjectSet lido:sortorder=\"23\">\n"+
-            "                    <lido:subject>\n"+
-            "                        <lido:subjectConcept>\n"+
-            "                            <lido:term lido:pref=\"23\">Clay Man</lido:term>\n"+
-            "                        </lido:subjectConcept>\n"+
-            "                        <lido:subjectActor>\n"+
-            "                            <lido:displayActor>Gumby</lido:displayActor>\n"+
-            "                            <lido:displayActor>Dammit</lido:displayActor>\n"+
-            "                        </lido:subjectActor>\n"+
-            "                    </lido:subject>\n"+
-            "                </lido:subjectSet>\n"+
-            "                <lido:subjectSet lido:sortorder=\"45\">\n"+
-            "                    <lido:subject>\n"+
-            "                        <lido:subjectConcept>\n"+
-            "                            <lido:term lido:pref=\"45\">Clay Horse</lido:term>\n"+
-            "                        </lido:subjectConcept>\n"+
-            "                        <lido:subjectActor>\n"+
-            "                            <lido:displayActor>O'Pokey</lido:displayActor>\n"+
-            "                            <lido:displayActor>McPokey</lido:displayActor>\n"+
-            "                        </lido:subjectActor>\n"+
-            "                    </lido:subject>\n"+
-            "                </lido:subjectSet>\n"+
-            "            </lido:subjectWrap>\n"+
-            "        </lido:objectRelationWrap>\n"+
-            "    </lido:descriptiveMetadata>\n"+
-            "    <lido:administrativeMetadata>\n"+
-            "        <lido:recordWrap>\n"+
-            "            <lido:recordID lido:type=\"reverse reverse\"/>\n"+
-            "        </lido:recordWrap>\n"+
-            "    </lido:administrativeMetadata>\n"+
-            "</lido:lido>\n";
+                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"backward\">\n" +
+                    "    <lido:descriptiveMetadata>\n" +
+                    "        <lido:objectRelationWrap>\n" +
+                    "            <lido:subjectWrap>\n" +
+                    "                <lido:subjectSet lido:sortorder=\"23\">\n" +
+                    "                    <lido:subject>\n" +
+                    "                        <lido:subjectConcept>\n" +
+                    "                            <lido:term lido:pref=\"23\">Clay Man</lido:term>\n" +
+                    "                        </lido:subjectConcept>\n" +
+                    "                        <lido:subjectActor>\n" +
+                    "                            <lido:displayActor>Gumby</lido:displayActor>\n" +
+                    "                            <lido:displayActor>Dammit</lido:displayActor>\n" +
+                    "                        </lido:subjectActor>\n" +
+                    "                    </lido:subject>\n" +
+                    "                </lido:subjectSet>\n" +
+                    "                <lido:subjectSet lido:sortorder=\"45\">\n" +
+                    "                    <lido:subject>\n" +
+                    "                        <lido:subjectConcept>\n" +
+                    "                            <lido:term lido:pref=\"45\">Clay Horse</lido:term>\n" +
+                    "                        </lido:subjectConcept>\n" +
+                    "                        <lido:subjectActor>\n" +
+                    "                            <lido:displayActor>O'Pokey</lido:displayActor>\n" +
+                    "                            <lido:displayActor>McPokey</lido:displayActor>\n" +
+                    "                        </lido:subjectActor>\n" +
+                    "                    </lido:subject>\n" +
+                    "                </lido:subjectSet>\n" +
+                    "            </lido:subjectWrap>\n" +
+                    "        </lido:objectRelationWrap>\n" +
+                    "    </lido:descriptiveMetadata>\n" +
+                    "    <lido:administrativeMetadata>\n" +
+                    "        <lido:recordWrap>\n" +
+                    "            <lido:recordID lido:type=\"reverse reverse\"/>\n" +
+                    "        </lido:recordWrap>\n" +
+                    "    </lido:administrativeMetadata>\n" +
+                    "</lido:lido>\n";
 
     private static GroovyNode n(GroovyNode parent, String name) {
         return new GroovyNode(parent, name);

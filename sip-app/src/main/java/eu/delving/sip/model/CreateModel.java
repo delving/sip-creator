@@ -24,7 +24,6 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
-import eu.delving.sip.base.SourceTreeNode;
 
 import javax.swing.tree.TreePath;
 import java.util.*;

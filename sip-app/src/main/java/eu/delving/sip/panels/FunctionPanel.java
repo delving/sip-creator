@@ -19,12 +19,14 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.base;
+package eu.delving.sip.panels;
 
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
+import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
@@ -74,13 +76,15 @@ public class FunctionPanel extends JPanel {
         inputArea.setFont(MONOSPACED);
         codeArea.setFont(MONOSPACED);
         docArea.setFont(MONOSPACED);
+        docArea.setLineWrap(true);
+        docArea.setWrapStyleWord(true);
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
         libraryList.setBackground(LIBRARY_COLOR);
         JPanel center = new JPanel(new GridLayout(0, 1));
         center.add(createInputPanel());
         center.add(Utility.scrollV("Documentation", docArea));
-        center.add(Utility.scrollV("Groovy Code", codeArea));
+        center.add(Utility.scrollVH("Groovy Code", codeArea));
         center.add(createOutputPanel());
         add(center, BorderLayout.CENTER);
         add(createFunctionPanels(), BorderLayout.WEST);
@@ -363,7 +367,7 @@ public class FunctionPanel extends JPanel {
         public String getToolTipText(MouseEvent evt) {
             int index = this.locationToIndex(evt.getPoint());
             MappingFunction mappingFunction = (MappingFunction) getModel().getElementAt(index);
-            return (mappingFunction.documentation == null ? "No documentation" : mappingFunction.documentation);
+            return mappingFunction.getDocumentation();
         }
     }
 

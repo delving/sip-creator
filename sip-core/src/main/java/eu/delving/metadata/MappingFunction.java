@@ -26,10 +26,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -50,7 +48,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
     public List<String> sampleInput;
 
     @XStreamAlias("documentation")
-    public String documentation;
+    public List<String> documentation;
 
     @XStreamAlias("groovy-code")
     public List<String> groovyCode;
@@ -63,25 +61,23 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public String getDocumentation() {
-        return documentation;
+        return StringUtil.linesToString(documentation);
     }
 
     public void setDocumentation(String documentation) {
-        this.documentation = documentation;
+        this.documentation = StringUtil.stringToLines(documentation);
     }
 
     public void setSampleInput(String sampleInput) {
-        this.sampleInput = null;
-        for (String line : sampleInput.split("\n")) addSampleLine(line);
+        this.sampleInput = StringUtil.stringToLines(sampleInput);
     }
 
     public void setGroovyCode(String groovyCode) {
-        this.groovyCode = null;
-        for (String line : groovyCode.split("\n")) addCodeLine(line);
+        this.groovyCode = StringUtil.stringToLines(groovyCode);
     }
 
     public String getSampleInputString() {
-        return StringUtils.join(sampleInput, '\n');
+        return StringUtil.linesToString(sampleInput);
     }
 
     public String getUserCode(String editedCode) {
@@ -120,18 +116,6 @@ public class MappingFunction implements Comparable<MappingFunction> {
         else {
             out.line("it");
         }
-    }
-
-    private void addCodeLine(String line) {
-        if (groovyCode == null) groovyCode = new ArrayList<String>();
-        line = line.trim();
-        if (!line.isEmpty()) groovyCode.add(line);
-    }
-
-    private void addSampleLine(String line) {
-        if (sampleInput == null) sampleInput = new ArrayList<String>();
-        line = line.trim();
-        if (!line.isEmpty()) sampleInput.add(line);
     }
 
     public String toString() {

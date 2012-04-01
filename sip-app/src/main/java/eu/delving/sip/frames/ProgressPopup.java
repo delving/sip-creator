@@ -19,7 +19,10 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.base;
+package eu.delving.sip.frames;
+
+import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.ProgressListener;
 
 import javax.swing.*;
 import java.awt.*;

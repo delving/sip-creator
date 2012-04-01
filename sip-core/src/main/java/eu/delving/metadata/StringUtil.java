@@ -21,6 +21,7 @@
 
 package eu.delving.metadata;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +34,19 @@ import java.util.List;
  */
 
 public class StringUtil {
-
+    
+    public static String linesToString(List<String> list) {
+        StringBuilder s = new StringBuilder();
+        if (list != null) for (String line : list) s.append(line.trim()).append('\n');
+        return s.toString();
+    }
+    
+    public static List<String> stringToLines(String string) {
+        List<String> lines = new ArrayList<String>();
+        if (string != null) for (String line : Arrays.asList(string.split("\n"))) lines.add(line.trim());
+        return lines;
+    }
+    
     public static void indentCode(String code, Out out) {
         indentCode(Arrays.asList(code.split("\n")), out);
     }

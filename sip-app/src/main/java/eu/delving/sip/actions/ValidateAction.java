@@ -19,8 +19,11 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.base;
+package eu.delving.sip.actions;
 
+import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;

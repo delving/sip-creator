@@ -1,6 +1,4 @@
-package eu.delving.sip.base;
-
-import eu.delving.sip.model.FilterTreeNode;
+package eu.delving.sip.model;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
