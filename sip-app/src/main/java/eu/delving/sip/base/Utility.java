@@ -63,7 +63,7 @@ public class Utility {
     private static final StringTemplateGroup STRING_TEMPLATE = new StringTemplateGroup("Templates");
 
     public static StringTemplate getTemplate(String name) {
-        return STRING_TEMPLATE.getInstanceOf("templates/" + name);
+        return STRING_TEMPLATE.getInstanceOf("st/" + name);
     }
 
     public static void attachUrlLauncher(JTextArea area) {
