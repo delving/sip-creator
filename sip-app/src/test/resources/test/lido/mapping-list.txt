@@ -1,5 +1,5 @@
 /input/identi-fire
-/lido/lidoRecID
+/lido/lidoRecID#23
 
 /input/identi-fire/@type
 /lido/lidoRecID/@type

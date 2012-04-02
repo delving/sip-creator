@@ -128,7 +128,7 @@ public class RecDefTreeNode extends FilterTreeNode {
             StringTemplate t = Utility.getTemplate(recDefNode.isAttr() ? "recdef-attribute" : "recdef-element");
             t.setAttribute("name", recDefNode.getTag());
             t.setAttribute("doc", recDefNode.getDoc());
-            t.setAttribute("discriminatorList", recDefNode.getDiscriminators());
+            t.setAttribute("optList", recDefNode.getDiscriminators());
             t.setAttribute("nodeMappings", recDefNode.getNodeMappings().values());
             html = t.toString();
         }

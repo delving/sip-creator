@@ -53,8 +53,8 @@ public class CreateModel {
         for (Listener listener : listeners) listener.statsTreeNodeSet(this);
     }
 
-    public void setRecDefTreePath(Path path, String discriminatorKey) {
-        TreePath treePath = sipModel.getMappingModel().getTreePath(path, discriminatorKey);
+    public void setRecDefTreePath(Path path) {
+        TreePath treePath = sipModel.getMappingModel().getTreePath(path);
         RecDefTreeNode node = ((RecDefTreeNode) (treePath.getLastPathComponent()));
         setRecDefTreeNode(node);
     }
@@ -72,7 +72,7 @@ public class CreateModel {
         if (nodeMapping != null) {
             settingNodeMapping = true;
             setSourceTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping));
-            TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath, nodeMapping.discriminatorKey);
+            TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
             if (treePath != null) setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
             settingNodeMapping = false;
         }
@@ -112,7 +112,7 @@ public class CreateModel {
     
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
-        NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath(), recDefTreeNode.getRecDefNode().getDiscriminatorRootKey());
+        NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
         created.recDefNode = recDefTreeNode.getRecDefNode();
         SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
@@ -120,7 +120,7 @@ public class CreateModel {
     }
 
     public void createMapping(NodeMapping nodeMapping) {
-        TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath, nodeMapping.discriminatorKey);
+        TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
         RecDefTreeNode recDefTreeNode = (RecDefTreeNode) treePath.getLastPathComponent();
         nodeMapping.recDefNode = recDefTreeNode.getRecDefNode();
         SourceTreeNode.setStatsTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping), nodeMapping);
@@ -133,7 +133,7 @@ public class CreateModel {
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
         if (sourceTreeNode.getStatistics() == null) return false;
         Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
-        RecDef.DiscriminatorList options = recDefTreeNode.getRecDefNode().getDiscriminators();
+        RecDef.OptList options = recDefTreeNode.getRecDefNode().getDiscriminators();
         return values != null && options != null && nodeMapping.dictionary == null;
     }
 

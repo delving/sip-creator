@@ -91,37 +91,37 @@
 
     </root>
 
-    <discriminators>
+    <opts>
         <!--<option-list path="/record/technique"> &lt;!&ndash; no keyPath needed in this definition, keys are dummys, Can be deleted but are needed in other rec-defs &ndash;&gt;-->
-            <!--<discriminator key="1">Schilderkunst</discriminator>-->
-            <!--<discriminator key="2">Prentkunst</discriminator>-->
-            <!--<discriminator key="3">Fotografie</discriminator>-->
-            <!--<discriminator key="4">Tekeningen</discriminator>-->
-            <!--<discriminator key="5">Beeldhouwkunst</discriminator>-->
-            <!--<discriminator key="6">Textiel</discriminator>-->
-            <!--<discriminator key="7">Film/Video/DVD</discriminator>-->
-            <!--<discriminator key="8">Anders:</discriminator>-->
+            <!--<opt key="1">Schilderkunst</opt>-->
+            <!--<opt key="2">Prentkunst</opt>-->
+            <!--<opt key="3">Fotografie</opt>-->
+            <!--<opt key="4">Tekeningen</opt>-->
+            <!--<opt key="5">Beeldhouwkunst</opt>-->
+            <!--<opt key="6">Textiel</opt>-->
+            <!--<opt key="7">Film/Video/DVD</opt>-->
+            <!--<opt key="8">Anders:</opt>-->
         <!--</option-list>-->
         <!--<option-list path="/record/acquisitionMeans">-->
-            <!--<discriminator key="1">aankoop</discriminator>-->
-            <!--<discriminator key="2">schenking</discriminator>-->
-            <!--<discriminator key="3">bruikleen</discriminator>-->
-            <!--<discriminator key="4">ruil</discriminator>-->
-            <!--<discriminator key="5">opdracht</discriminator>-->
-            <!--<discriminator key="6">opdracht derden</discriminator>-->
-            <!--<discriminator key="7">opdracht museum</discriminator>-->
-            <!--<discriminator key="8">legaat</discriminator>-->
-            <!--<discriminator key="9">overdracht</discriminator>-->
-            <!--<discriminator key="10">successieregeling</discriminator>-->
-            <!--<discriminator key="11">vondst</discriminator>-->
-            <!--<discriminator key="12">onbekend:</discriminator>-->
+            <!--<opt key="1">aankoop</opt>-->
+            <!--<opt key="2">schenking</opt>-->
+            <!--<opt key="3">bruikleen</opt>-->
+            <!--<opt key="4">ruil</opt>-->
+            <!--<opt key="5">opdracht</opt>-->
+            <!--<opt key="6">opdracht derden</opt>-->
+            <!--<opt key="7">opdracht museum</opt>-->
+            <!--<opt key="8">legaat</opt>-->
+            <!--<opt key="9">overdracht</opt>-->
+            <!--<opt key="10">successieregeling</opt>-->
+            <!--<opt key="11">vondst</opt>-->
+            <!--<opt key="12">onbekend:</opt>-->
         <!--</option-list>-->
         <!--<option-list path="/record/collectionType">-->
-            <!--<discriminator key="1">all</discriminator>-->
-            <!--<discriminator key="2">portal</discriminator>-->
-            <!--<discriminator key="3">mm</discriminator>-->
+            <!--<opt key="1">all</opt>-->
+            <!--<opt key="2">portal</opt>-->
+            <!--<opt key="3">mm</opt>-->
         <!--</option-list>-->
-    </discriminators>
+    </opts>
 
     <searchFields>
         <searchField name="CREATOR" path="/record/dc:creator"/>

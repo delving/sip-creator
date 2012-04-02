@@ -150,6 +150,7 @@ public class DOMBuilder extends BuilderSupport {
                 }
                 else {
                     node = createNode(name, object);
+                    setParent(getCurrent(), node);
                 }
             }
             break;
@@ -164,6 +165,7 @@ public class DOMBuilder extends BuilderSupport {
                     }
                     else {
                         node = createNode(name, (Map) object1, object2);
+                        setParent(getCurrent(), node);
                     }
                 }
                 else {
@@ -174,6 +176,7 @@ public class DOMBuilder extends BuilderSupport {
                     }
                     else if (object2 instanceof Map) {
                         node = createNode(name, (Map) object2, object1);
+                        setParent(getCurrent(), node);
                     }
                     else {
                         throw new MissingMethodException(name.toString(), getClass(), list.toArray(), false);
@@ -216,6 +219,9 @@ public class DOMBuilder extends BuilderSupport {
                     for (Object member : result.list) sb.append(member.toString());
                     out.put(entry.getKey().toString(), sb.toString());
                 }
+            }
+            else {
+                out.put(entry.getKey().toString(), entry.getValue().toString());
             }
         }
         return out;

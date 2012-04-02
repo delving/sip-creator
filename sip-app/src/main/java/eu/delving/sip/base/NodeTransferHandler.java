@@ -96,7 +96,7 @@ public class NodeTransferHandler extends TransferHandler {
                     TreePath treePath = location.getPath();
                     if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
                         RecDef.Ref ref = (RecDef.Ref) treePath.getLastPathComponent();
-                        sipModel.getCreateModel().setRecDefTreePath(ref.path, null); // todo: problem
+                        sipModel.getCreateModel().setRecDefTreePath(ref.path);
                     }
                     else if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
                         sipModel.getCreateModel().setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());

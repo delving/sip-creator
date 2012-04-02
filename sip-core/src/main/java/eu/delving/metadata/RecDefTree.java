@@ -70,8 +70,8 @@ public class RecDefTree implements RecDefNode.Listener {
         return root;
     }
 
-    public RecDefNode getRecDefNode(Path path, String optKey) {
-        return root.getNode(path, optKey);
+    public RecDefNode getRecDefNode(Path path) {
+        return root.getNode(path);
     }
 
     public List<NodeMapping> getNodeMappings() {

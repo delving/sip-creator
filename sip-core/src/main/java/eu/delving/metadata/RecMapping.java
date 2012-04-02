@@ -140,7 +140,7 @@ public class RecMapping {
             if (recDefTree.getRecDef().facts != null) {
                 for (RecDef.FactRef factRef : recDefTree.getRecDef().facts) {
                     Path path = factRef.path.defaultPrefix(recDefTree.getRecDef().prefix);
-                    RecDefNode recDefNode = recDefTree.getRecDefNode(path, null);
+                    RecDefNode recDefNode = recDefTree.getRecDefNode(path);
                     if (recDefNode != null) {
                         NodeMapping nodeMapping = new NodeMapping().setInputPath(Path.empty().extend(Tag.create("facts")).extend(Tag.create(factRef.name)));
                         recDefNode.addNodeMapping(nodeMapping);
@@ -152,7 +152,7 @@ public class RecMapping {
             Iterator<NodeMapping> walk = nodeMappings.iterator();
             while (walk.hasNext()) {
                 NodeMapping nodeMapping = walk.next();
-                RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath, nodeMapping.discriminatorKey);
+                RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath);
                 if (node != null) {
                     node.addNodeMapping(nodeMapping);
                 }

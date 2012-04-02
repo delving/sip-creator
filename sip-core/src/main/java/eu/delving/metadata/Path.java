@@ -27,6 +27,8 @@ import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A very frequently used class which stores a stack of Tag instances, which
@@ -43,6 +45,7 @@ import java.util.Stack;
 
 @XStreamAlias("path")
 public class Path implements Comparable<Path>, Serializable {
+    private static final Pattern PAT = Pattern.compile("/([^\\[/]*)(\\[([^\\]]*)\\])?");
     private Stack<Tag> stack = new Stack<Tag>();
     private String string;
 
@@ -62,7 +65,9 @@ public class Path implements Comparable<Path>, Serializable {
             if (!pathString.startsWith("/")) {
                 pathString = "/" + pathString;
             }
-            for (String part : pathString.substring(1).split("/")) {
+            Matcher matcher = PAT.matcher(pathString);
+            while (matcher.find()) {
+                String part = matcher.group(0).substring(1);
                 int at = part.indexOf("@");
                 if (at > 0) throw new IllegalArgumentException("@ must be at the beginning of an attribute name");
                 if (at == 0) {
@@ -157,7 +162,15 @@ public class Path implements Comparable<Path>, Serializable {
 
     @Override
     public int compareTo(Path path) {
-        return toString().compareTo(path.toString());
+        Iterator<Tag> us = stack.iterator();
+        Iterator<Tag> them = path.stack.iterator();
+        while (us.hasNext() && them.hasNext()) {
+            int cmp = us.next().compareTo(them.next());
+            if (cmp != 0) return cmp;
+        }
+        if (us.hasNext()) return -1;
+        if (them.hasNext()) return 1;
+        return 0;
     }
 
     public Tag getTag(int level) {

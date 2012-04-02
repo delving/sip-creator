@@ -45,7 +45,7 @@ public class RecDefNode {
     private Path path;
     private RecDef.Elem elem;
     private RecDef.Attr attr;
-    private RecDef.Discriminator discriminatorRoot, discriminatorKey, discriminatorValue;
+    private RecDef.Opt optRoot, optKey, optValue;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
@@ -62,25 +62,28 @@ public class RecDefNode {
         return new RecDefNode(listener, null, recDef.root, null, null, null, null); // only root element
     }
 
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, RecDef.Discriminator discriminatorRoot, RecDef.Discriminator discriminatorKey, RecDef.Discriminator discriminatorValue) {
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, RecDef.Opt optRoot, RecDef.Opt optKey, RecDef.Opt optValue) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
         this.attr = attr;
-        this.discriminatorRoot = discriminatorRoot;
-        if (discriminatorKey != null && discriminatorKey.parent.key.equals(getTag())) this.discriminatorKey = discriminatorKey;
-        if (discriminatorValue != null && discriminatorValue.parent.value.equals(getTag())) this.discriminatorValue = discriminatorValue;
+        this.optRoot = optRoot;
+        if (optKey != null && optKey.parent.key.equals(getTag()))
+            this.optKey = optKey;
+        if (optValue != null && optValue.parent.value.equals(getTag()))
+            this.optValue = optValue;
         if (elem != null) {
             for (RecDef.Attr sub : elem.attrList) {
-                children.add(new RecDefNode(listener, this, null, sub, null, discriminatorRoot, discriminatorRoot));
+                children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot));
             }
             for (RecDef.Elem sub : elem.elemList) {
-                if (sub.discriminatorList == null) {
-                    children.add(new RecDefNode(listener, this, sub, null, null, discriminatorRoot, discriminatorRoot));
+                if (sub.optList == null) {
+                    children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot));
                 }
-                else for (RecDef.Discriminator subDiscriminator : sub.discriminatorList.discriminators) { // a child for each option
-                    children.add(new RecDefNode(listener, this, sub, null, subDiscriminator, null, null));
-                }
+                else
+                    for (RecDef.Opt subOpt : sub.optList.opts) { // a child for each option
+                        children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null));
+                    }
             }
             if (elem.nodeMapping != null) {
                 nodeMappings.put(elem.nodeMapping.inputPath, elem.nodeMapping);
@@ -91,11 +94,11 @@ public class RecDefNode {
     }
 
     public String getDiscriminatorRootKey() {
-        return discriminatorRoot != null ? discriminatorRoot.key : null;
+        return optRoot != null ? optRoot.key : null;
     }
 
     public String getOptRootValue() {
-        return discriminatorRoot != null ? discriminatorRoot.content : "";
+        return optRoot != null ? optRoot.content : "";
     }
 
     public boolean hasSearchField() {
@@ -145,7 +148,8 @@ public class RecDefNode {
     }
 
     public Tag getTag() {
-        return isAttr() ? attr.tag : elem.tag;
+        Tag tag = isAttr() ? attr.tag : elem.tag;
+        return optRoot == null ? tag : tag.withOpt(optRoot.key);
     }
 
     public Path getPath() {
@@ -163,14 +167,14 @@ public class RecDefNode {
         return getDiscriminators() != null;
     }
 
-    public RecDef.DiscriminatorList getDiscriminators() {
-        return isAttr() ? null : elem.discriminatorList;
+    public RecDef.OptList getDiscriminators() {
+        return isAttr() ? null : elem.optList;
     }
 
-    public RecDefNode getNode(Path soughtPath, String discriminatorKey) {
-        if (getPath().equals(soughtPath) && (discriminatorKey == null || discriminatorRoot == null || discriminatorKey.equals(discriminatorRoot.key))) return this;
+    public RecDefNode getNode(Path soughtPath) {
+        if (getPath().equals(soughtPath)) return this;
         for (RecDefNode sub : children) {
-            RecDefNode found = sub.getNode(soughtPath, discriminatorKey);
+            RecDefNode found = sub.getNode(soughtPath);
             if (found != null) return found;
         }
         return null;
@@ -183,7 +187,7 @@ public class RecDefNode {
     }
 
     public boolean hasConstant() {
-        return discriminatorKey != null || discriminatorValue != null;
+        return optKey != null || optValue != null;
     }
 
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {
@@ -202,7 +206,7 @@ public class RecDefNode {
             listener.nodeMappingAdded(this, nodeMapping);
         }
         else {
-            throw new RuntimeException("Node mapping already exists for "+nodeMapping.inputPath);
+            throw new RuntimeException("Node mapping already exists for " + nodeMapping.inputPath);
         }
         return nodeMapping;
     }
@@ -249,7 +253,7 @@ public class RecDefNode {
         else { // path should never be empty
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
-            Operator operator = (path.size() == 2) ? nodeMapping.getOperator(): Operator.ALL;
+            Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
             out.line_("%s%s %s { %s -> ", outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam());
             childrenInLoop(nodeMapping, path.chop(-1), out, editPath);
             out._line("}");
@@ -261,11 +265,11 @@ public class RecDefNode {
             startBuilderCall(out, editPath);
             for (RecDefNode sub : children) {
                 if (sub.isAttr()) continue;
-                if (sub.discriminatorKey != null) {
-                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.discriminatorKey.key);
+                if (sub.optKey != null) {
+                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
                 }
-                else if (sub.discriminatorValue != null) {
-                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.discriminatorValue.content);
+                else if (sub.optValue != null) {
+                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
                 }
                 else {
                     sub.toElementCode(out, editPath);
@@ -306,14 +310,14 @@ public class RecDefNode {
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
-                if (sub.discriminatorKey != null) {
+                if (sub.optKey != null) {
                     if (comma) out.line(",");
-                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.discriminatorKey.key);
+                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
                     comma = true;
                 }
-                else if (sub.discriminatorValue != null) {
+                else if (sub.optValue != null) {
                     if (comma) out.line(",");
-                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.discriminatorValue.content);
+                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
                     comma = true;
                 }
                 else {
@@ -340,8 +344,8 @@ public class RecDefNode {
 
     public String toString() {
         String name = isAttr() ? attr.tag.toString() : elem.tag.toString();
-        if (discriminatorRoot != null) name += String.format("[%s]", discriminatorRoot.content);
-        if (discriminatorKey != null || discriminatorValue != null) name += "{Constant}";
+        if (optRoot != null) name += String.format("[%s]", optRoot.content);
+        if (optKey != null || optValue != null) name += "{Constant}";
         return name;
     }
 

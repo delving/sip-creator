@@ -140,7 +140,7 @@ public class RecMappingFrame extends FrameBase {
         public void run() {
             NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
             if (nodeMapping != null) {
-                TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath, nodeMapping.discriminatorKey);
+                TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
                 if (treePath != null) {
                     RecDefTreeNode node = (RecDefTreeNode) treePath.getLastPathComponent();
                     nodeMapping = node.getRecDefNode().removeNodeMapping(nodeMapping.inputPath);

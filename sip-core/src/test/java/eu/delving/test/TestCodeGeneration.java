@@ -100,8 +100,8 @@ public class TestCodeGeneration {
         System.out.println("attr=" + attr2attr);
 
         RecDefNode optionsNode = node("/lido/administrativeMetadata/recordWrap/recordID/@type");
-//        RecDef.DiscriminatorList discriminators = optionsNode.getDiscriminators();
-//        Assert.assertNotNull(discriminators);
+//        RecDef.OptList opts = optionsNode.getDiscriminators();
+//        Assert.assertNotNull(opts);
         NodeMapping dictionaryMapping = optionsNode.addNodeMapping(mapping("/input/leadup/@orderofsort"));
         dictionaryMapping.dictionary = new TreeMap<String, String>();
         dictionaryMapping.dictionary.put("backward", "reverse reverse");
@@ -207,7 +207,7 @@ public class TestCodeGeneration {
     }
 
     private static RecDefNode node(String path) {
-        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(Path.create(path).defaultPrefix("lido"), null);
+        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(Path.create(path).defaultPrefix("lido"));
         Assert.assertNotNull(node);
         return node;
     }

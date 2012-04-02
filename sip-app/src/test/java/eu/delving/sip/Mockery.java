@@ -61,11 +61,11 @@ public class Mockery {
     private String prefix;
 
     public Mockery() throws StorageException, MetadataException {
-        File target = null, target1 = new File("sip-app/target" ), target2 = new File("target" );
+        File target = null, target1 = new File("sip-app/target"), target2 = new File("target");
         if (target1.exists()) target = target1;
         if (target2.exists()) target = target2;
         if (target == null) throw new RuntimeException("target directory not found: " + target);
-        root = new File(target, "storage" );
+        root = new File(target, "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
         storage = new StorageImpl(root);
@@ -121,15 +121,17 @@ public class Mockery {
     public String mapping() throws UnsupportedEncodingException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         RecMapping.write(os, recMapping);
-        return os.toString("UTF-8" );
+        return os.toString("UTF-8");
     }
 
-    public NodeMapping map(String fromString, String toString) {
+    public NodeMapping map(String fromPath, String toPath) {
         List<Path> inputPaths = new ArrayList<Path>();
-        for (String s : fromString.split(" ")) inputPaths.add(Path.create(s));
-        Path outputPath = Path.create(toString).defaultPrefix(prefix);
-        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(outputPath, null);
-        if (node == null) throw new RuntimeException("No node found for " + outputPath);
+        for (String s : fromPath.split(" ")) inputPaths.add(Path.create(s));
+        Path outputPath = Path.create(toPath).defaultPrefix(prefix);
+        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(outputPath);
+        if (node == null) {
+            throw new RuntimeException("No node found for " + outputPath);
+        }
         NodeMapping mapping = new NodeMapping().setInputPaths(inputPaths);
         node.addNodeMapping(mapping);
         return mapping;
@@ -145,7 +147,6 @@ public class Mockery {
     public Node runMapping(MetadataRecord record) throws MappingException {
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
-        System.out.println(mappingRunner.getCode());
         return mappingRunner.runMapping(record);
     }
 

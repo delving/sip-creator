@@ -115,47 +115,47 @@
     </searchFields>
 
 
-    <discriminators> <!-- keys should be uri's -->
+    <opts> <!-- keys should be uri's -->
 
         <!--<option-list path="/record/actors/actor/roleUri"> &lt;!&ndash;valuePath="/aff/actors/actor/roleName"> &ndash;&gt;-->
-        <!--<discriminator key="1">Creator</discriminator>-->
-        <!--<discriminator key="2">Artist</discriminator>-->
-        <!--<discriminator key="3">Photographer</discriminator>-->
+        <!--<opt key="1">Creator</opt>-->
+        <!--<opt key="2">Artist</opt>-->
+        <!--<opt key="3">Photographer</opt>-->
         <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
         <!--</option-list>-->
 
         <!--<option-list path="/record/places/place/placeName"> &lt;!&ndash;valuePath="/aff/places/place/roleName"> &ndash;&gt;-->
-        <!--<discriminator key="1">Actors place of birth</discriminator>-->
-        <!--<discriminator key="2">Actor place of death</discriminator>-->
-        <!--<discriminator key="3">Production place</discriminator>-->
+        <!--<opt key="1">Actors place of birth</opt>-->
+        <!--<opt key="2">Actor place of death</opt>-->
+        <!--<opt key="3">Production place</opt>-->
         <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
         <!--</option-list>-->
 
         <!--<option-list path="/record/medias/mediaType">-->
-            <!--<discriminator key="THUMBNAIL">Thumbnail</discriminator>-->
-            <!--<discriminator key="FULL_IMAGE">Full image</discriminator>-->
-            <!--<discriminator key="DEEP_ZOOM">Deep zoom image</discriminator>-->
-            <!--<discriminator key="DOCUMENT">Document</discriminator>-->
-            <!--<discriminator key="VIDEO">Video</discriminator>-->
-            <!--<discriminator key="SOUND">Sound</discriminator>-->
+            <!--<opt key="THUMBNAIL">Thumbnail</opt>-->
+            <!--<opt key="FULL_IMAGE">Full image</opt>-->
+            <!--<opt key="DEEP_ZOOM">Deep zoom image</opt>-->
+            <!--<opt key="DOCUMENT">Document</opt>-->
+            <!--<opt key="VIDEO">Video</opt>-->
+            <!--<opt key="SOUND">Sound</opt>-->
         <!--</option-list>-->
 
         <!--<option-list path="/record/medias/mediaMimeType">-->
-            <!--<discriminator key="jpeg">jpeg</discriminator>-->
-            <!--<discriminator key="tiff">TIFF</discriminator>-->
-            <!--<discriminator key="png">PNG</discriminator>-->
+            <!--<opt key="jpeg">jpeg</opt>-->
+            <!--<opt key="tiff">TIFF</opt>-->
+            <!--<opt key="png">PNG</opt>-->
         <!--</option-list>-->
 
         <!--<option-list path="/record/events/event/eventTypeUri"> &lt;!&ndash;valuePath="aff/events/event/eventTypeName">  &ndash;&gt;-->
-        <!--<discriminator key="1">Production</discriminator>-->
-        <!--<discriminator key="2">Creation</discriminator>-->
-        <!--<discriminator key="3">etc</discriminator>-->
-        <!--<discriminator key="4">etc</discriminator>-->
-        <!--<discriminator key="5">etc</discriminator>-->
+        <!--<opt key="1">Production</opt>-->
+        <!--<opt key="2">Creation</opt>-->
+        <!--<opt key="3">etc</opt>-->
+        <!--<opt key="4">etc</opt>-->
+        <!--<opt key="5">etc</opt>-->
         <!--&lt;!&ndash;todo: CRM EVENTS, same as i LIDO&ndash;&gt;-->
         <!--</option-list>-->
 
-    </discriminators>
+    </opts>
 
     <facts>
         <fact-ref path="/record/admin/ownerUri" name="dataOwnerUri"/>

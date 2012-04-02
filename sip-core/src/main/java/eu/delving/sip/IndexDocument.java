@@ -128,14 +128,14 @@ public class IndexDocument {
     }
 
     private static RecDefNode getRecDefNode(RecDefTree recordDefinition, Element element) {
-        Path path = Path.empty().extend(Tag.element(recordDefinition.getRecDef().prefix, "record"));
+        Path path = Path.empty().extend(Tag.element(recordDefinition.getRecDef().prefix, "record", null));
         List<Element> elements = new ArrayList<Element>();
         while (element.getParentNode() != null) {
             elements.add(0, element);
             element = (Element)element.getParentNode();
         }
-        for (Element el :elements) path = path.extend(Tag.element(el.getPrefix(), el.getLocalName()));
-        RecDefNode recDefNode = recordDefinition.getRecDefNode(path, null);
+        for (Element el :elements) path = path.extend(Tag.element(el.getPrefix(), el.getLocalName(), null));
+        RecDefNode recDefNode = recordDefinition.getRecDefNode(path);
         if (recDefNode == null) throw new RuntimeException("No recdef node for " + path);
         return recDefNode;
     }

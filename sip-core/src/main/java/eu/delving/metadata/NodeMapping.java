@@ -54,9 +54,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
     @XStreamAsAttribute
     public Operator operator;
 
-    @XStreamAsAttribute
-    public String discriminatorKey;
-
     @XStreamAlias("tuplePaths")
     public List<Path> tuplePaths;
 
@@ -79,7 +76,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
         NodeMapping that = (NodeMapping) o;
         if (inputPath != null ? !inputPath.equals(that.inputPath) : that.inputPath != null) return false;
         if (outputPath != null ? !outputPath.equals(that.outputPath) : that.outputPath != null) return false;
-        if (discriminatorKey != null ? !discriminatorKey.equals(that.discriminatorKey) : that.discriminatorKey != null) return false;
         return true;
     }
 
@@ -165,9 +161,8 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return inputPaths;
     }
 
-    public NodeMapping setOutputPath(Path outputPath, String optKey) {
+    public NodeMapping setOutputPath(Path outputPath) {
         this.outputPath = outputPath;
-        this.discriminatorKey = optKey;
         return this;
     }
 
@@ -389,7 +384,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
                 if (nodeMapping.inputPath.isAncestorOf(path)) return nodeMapping;
             }
         }
-        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.chop(1), null);
+        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.chop(1));
     }
 
     private static final Hasher HASHER = new Hasher();

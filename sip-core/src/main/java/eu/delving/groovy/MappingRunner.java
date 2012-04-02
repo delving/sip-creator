@@ -98,6 +98,7 @@ public class MappingRunner {
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));
             script.setBinding(binding);
+            System.out.println(code); // todo: remove
             return (Node) script.run();
         }
         catch (DiscardRecordException e) {

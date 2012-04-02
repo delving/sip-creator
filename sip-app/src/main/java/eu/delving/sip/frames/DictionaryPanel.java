@@ -53,7 +53,7 @@ import java.util.Map;
  */
 
 public class DictionaryPanel extends JPanel {
-    public static final RecDef.Discriminator COPY_VERBATIM = new RecDef.Discriminator().setContent("<<< empty >>>");
+    public static final RecDef.Opt COPY_VERBATIM = new RecDef.Opt().setContent("<<< empty >>>");
     public static final String ASSIGN_SELECTED = "Assign Selected";
     public static final String ASSIGN_ALL = "Assign All";
     public static final String NO_DICTIONARY = "No dictionary for this mapping";
@@ -121,7 +121,7 @@ public class DictionaryPanel extends JPanel {
     }
 
     private String getChosenValue() {
-        RecDef.Discriminator value = (RecDef.Discriminator) valueBox.getSelectedItem();
+        RecDef.Opt value = (RecDef.Opt) valueBox.getSelectedItem();
         if (value == COPY_VERBATIM) return "";
         return value.content; // todo: key?
     }
@@ -365,8 +365,8 @@ public class DictionaryPanel extends JPanel {
     private class OptRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            RecDef.Discriminator discriminator = (RecDef.Discriminator)value;
-            return super.getListCellRendererComponent(list, discriminator.content, index, isSelected, cellHasFocus);
+            RecDef.Opt opt = (RecDef.Opt)value;
+            return super.getListCellRendererComponent(list, opt.content, index, isSelected, cellHasFocus);
         }
     }
 
@@ -381,7 +381,7 @@ public class DictionaryPanel extends JPanel {
     }
 
     private static class ValueModel extends AbstractListModel implements ComboBoxModel {
-        private List<RecDef.Discriminator> values = new ArrayList<RecDef.Discriminator>();
+        private List<RecDef.Opt> values = new ArrayList<RecDef.Opt>();
         private Object selectedItem = COPY_VERBATIM;
 
         public void setRecDefNode(RecDefNode recDefNode) {

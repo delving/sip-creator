@@ -151,7 +151,8 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
 
     public int setRecordRoot(Path recordRoot) {
         boolean oldValue = this.recordRoot;
-        this.recordRoot = recordRoot != null && getPath(true).equals(recordRoot);
+        Path ourPath = getPath(true);
+        this.recordRoot = recordRoot != null && ourPath.equals(recordRoot);
         if (this.recordRoot || this.recordRoot != oldValue) treeModel.nodeChanged(this);
         int childTotal = 0;
         for (SourceTreeNode child : children) {

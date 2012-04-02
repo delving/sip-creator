@@ -1,5 +1,11 @@
 /input/lido:lidoRecID
 /record/thing/thingUri
 
+/input/lido:category
+/record/events/event[http://www.cidoc-crm.org/rdfs/E65.Creation]
 
+/input/lido:category/lido:term
+/record/events/event[http://www.cidoc-crm.org/rdfs/E65.Creation]/displayEvent
 
+/input/lido:category/lido:term
+/record/events/event[http://www.cidoc-crm.org/rdfs/E65.Creation]/displayDate

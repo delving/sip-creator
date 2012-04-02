@@ -25,6 +25,8 @@ import eu.delving.metadata.Path;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import static junit.framework.Assert.*;
+
 /**
  * Make sure the path is working right
  *
@@ -38,9 +40,18 @@ public class TestPath {
         Path descendent = Path.create("/one/two/three/four");
         Path ancestor = Path.create("/one/two");
         Assert.assertTrue(ancestor.isAncestorOf(descendent));
-        Assert.assertFalse(ancestor.isAncestorOf(ancestor));
-        Assert.assertFalse(descendent.isAncestorOf(ancestor));
-        Assert.assertEquals(ancestor, descendent.chop(ancestor.size()));
-        Assert.assertEquals(Path.create("/three/four"), descendent.minusAncestor(ancestor));
+        assertFalse(ancestor.isAncestorOf(ancestor));
+        assertFalse(descendent.isAncestorOf(ancestor));
+        assertEquals(ancestor, descendent.chop(ancestor.size()));
+        assertEquals(Path.create("/three/four"), descendent.minusAncestor(ancestor));
+    }
+
+    @Test
+    public void opts() {
+        Path opt1 = Path.create("/one/two[the first]/gumby");
+        Path opt2 = Path.create("/one/two[the / second]/gumby");
+        assertFalse(opt1.equals(opt2));
+        Path opt3 = Path.create("/one/two/gumby");
+        assertTrue(opt2.compareTo(opt3) < 0);
     }
 }

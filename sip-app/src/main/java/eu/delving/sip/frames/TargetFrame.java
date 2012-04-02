@@ -157,7 +157,7 @@ public class TargetFrame extends FrameBase {
             else if (object instanceof RecDef.Ref) {
                 RecDef.Ref ref = (RecDef.Ref) object;
                 bookmarkDocPanel.setHtml(docToHtml(ref.doc));
-                recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(ref.path, null)); // todo: problem!
+                recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(ref.path));
             }
         }
     }
@@ -199,7 +199,7 @@ public class TargetFrame extends FrameBase {
                     StringTemplate t = Utility.getTemplate(ref.isAttr() ? "bookmark-attribute" : "bookmark-element");
                     t.setAttribute("name", ref.display);
                     t.setAttribute("doc", ref.doc);
-                    t.setAttribute("discriminators", ref.discriminators);
+                    t.setAttribute("opts", ref.opts);
                     return t.toString();
                 }
                 else {
