@@ -67,8 +67,8 @@ public class MappingModel implements RecDefNode.Listener {
         return recDefTreeRoot;
     }
 
-    public TreePath getTreePath(Path path) {
-        return getTreePath(path, getRecDefTreeRoot());
+    public TreePath getTreePath(Path path, String discriminatorKey) {
+        return getTreePath(path, discriminatorKey, getRecDefTreeRoot());
     }
 
     public void setFacts(Map<String, String> map) {
@@ -115,17 +115,18 @@ public class MappingModel implements RecDefNode.Listener {
 
     }
 
-    private TreePath getTreePath(Path path, RecDefTreeNode node) {
-        if (node.getRecDefPath().getTagPath().equals(path)) {
+    private TreePath getTreePath(Path path, String discriminatorKey, RecDefTreeNode node) {
+        Path nodePath = node.getRecDefPath().getTagPath();
+        String nodeDescriminator = node.getRecDefNode().getDiscriminatorRootKey();
+        if (nodePath.equals(path)  && (discriminatorKey == null || nodeDescriminator == null || discriminatorKey.equals(nodeDescriminator))) {
             return node.getRecDefPath();
         }
         for (RecDefTreeNode sub : node.getChildren()) {
-            TreePath subPath = getTreePath(path, sub);
+            TreePath subPath = getTreePath(path, discriminatorKey, sub);
             if (subPath != null) return subPath;
         }
         return null;
     }
-
 
     private List<SetListener> setListeners = new CopyOnWriteArrayList<SetListener>();
     private List<ChangeListener> changeListeners = new CopyOnWriteArrayList<ChangeListener>();

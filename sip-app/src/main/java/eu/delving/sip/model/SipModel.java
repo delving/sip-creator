@@ -140,6 +140,10 @@ public class SipModel {
         statsModel = new StatsModel(this);
         statsModel.addListener(new StatsModel.Listener() {
             @Override
+            public void mappingHints(List<NodeMapping> mappings) {
+            }
+
+            @Override
             public void recordRootSet(Path recordRootPath) {
                 deleteSourceFile();
                 clearValidation(mappingModel.getRecMapping());
@@ -276,6 +280,7 @@ public class SipModel {
                         @Override
                         public void run() {
                             dataSetFacts.set(facts);
+                            statsModel.setPrefix(requestedPrefix, dataSetModel);
                             statsModel.set(hints);
                             statsModel.setStatistics(statistics);
                             for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {

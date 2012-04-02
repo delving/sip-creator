@@ -56,7 +56,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public Operator operator;
 
     @XStreamAsAttribute
-    public String optKey;
+    public String discriminatorKey;
 
     @XStreamAlias("tuplePaths")
     public List<Path> tuplePaths;
@@ -167,7 +167,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     public NodeMapping setOutputPath(Path outputPath, String optKey) {
         this.outputPath = outputPath;
-        this.optKey = optKey;
+        this.discriminatorKey = optKey;
         return this;
     }
 

@@ -90,7 +90,7 @@ public class RecDefNode {
         }
     }
 
-    public String getOptRootKey() {
+    public String getDiscriminatorRootKey() {
         return discriminatorRoot != null ? discriminatorRoot.key : null;
     }
 
@@ -167,10 +167,10 @@ public class RecDefNode {
         return isAttr() ? null : elem.discriminatorList;
     }
 
-    public RecDefNode getNode(Path soughtPath, String optKey) {
-        if (getPath().equals(soughtPath) && (optKey == null || discriminatorRoot == null || optKey.equals(discriminatorRoot.key))) return this;
+    public RecDefNode getNode(Path soughtPath, String discriminatorKey) {
+        if (getPath().equals(soughtPath) && (discriminatorKey == null || discriminatorRoot == null || discriminatorKey.equals(discriminatorRoot.key))) return this;
         for (RecDefNode sub : children) {
-            RecDefNode found = sub.getNode(soughtPath, optKey);
+            RecDefNode found = sub.getNode(soughtPath, discriminatorKey);
             if (found != null) return found;
         }
         return null;

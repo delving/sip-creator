@@ -114,6 +114,10 @@ public class RecMapping {
         functions.remove(function);
     }
 
+    public List<NodeMapping> getNodeMappings() {
+        return nodeMappings;
+    }
+
     public RecDefTree getRecDefTree() {
         return recDefTree;
     }
@@ -148,7 +152,7 @@ public class RecMapping {
             Iterator<NodeMapping> walk = nodeMappings.iterator();
             while (walk.hasNext()) {
                 NodeMapping nodeMapping = walk.next();
-                RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath, nodeMapping.optKey);
+                RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath, nodeMapping.discriminatorKey);
                 if (node != null) {
                     node.addNodeMapping(nodeMapping);
                 }

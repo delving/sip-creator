@@ -118,6 +118,11 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
         return children;
     }
 
+    public void getPaths(Set<Path> sourcePaths) {
+        sourcePaths.add(getPath(false));
+        for (SourceTreeNode child : children) child.getPaths(sourcePaths);
+    }
+
     public boolean hasStatistics() {
         return fieldStatistics != null;
     }

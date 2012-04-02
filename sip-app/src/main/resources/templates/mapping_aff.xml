@@ -6,13 +6,9 @@
     <!--input paths in the source analysis.-->
 
     <node-mappings>
-        <node-mapping inputPath="/input/_id" outputPath="/aff:record/aff:thing/aff:thingUri">
-            <groovy-code>
-                <string>&quot;${__id} &quot;</string>
-            </groovy-code>
-        </node-mapping>
         <node-mapping inputPath="/facts/language" outputPath="/aff:record/aff:thing/aff:language"/>
         <node-mapping inputPath="/input/list" outputPath="/aff:record/aff:events/aff:event"
                       optKey="http://www.cidoc-crm.org/rdfs/E8.Acquisition"/>
+        <node-mapping inputPath="/input/list/Inhoud" outputPath="/aff:record/aff:thing/aff:displayDescription"/>
     </node-mappings>
 </rec-mapping>

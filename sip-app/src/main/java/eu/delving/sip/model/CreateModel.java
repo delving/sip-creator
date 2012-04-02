@@ -53,8 +53,8 @@ public class CreateModel {
         for (Listener listener : listeners) listener.statsTreeNodeSet(this);
     }
 
-    public void setRecDefTreePath(Path path) {
-        TreePath treePath = sipModel.getMappingModel().getTreePath(path);
+    public void setRecDefTreePath(Path path, String discriminatorKey) {
+        TreePath treePath = sipModel.getMappingModel().getTreePath(path, discriminatorKey);
         RecDefTreeNode node = ((RecDefTreeNode) (treePath.getLastPathComponent()));
         setRecDefTreeNode(node);
     }
@@ -72,7 +72,7 @@ public class CreateModel {
         if (nodeMapping != null) {
             settingNodeMapping = true;
             setSourceTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping));
-            TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
+            TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath, nodeMapping.discriminatorKey);
             if (treePath != null) setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
             settingNodeMapping = false;
         }
@@ -112,7 +112,7 @@ public class CreateModel {
 
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
-        NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath(), recDefTreeNode.getRecDefNode().getOptRootKey());
+        NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath(), recDefTreeNode.getRecDefNode().getDiscriminatorRootKey());
         created.recDefNode = recDefTreeNode.getRecDefNode();
         SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);

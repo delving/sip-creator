@@ -95,7 +95,8 @@ public class NodeTransferHandler extends TransferHandler {
                     JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
                     TreePath treePath = location.getPath();
                     if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
-                        sipModel.getCreateModel().setRecDefTreePath(((RecDef.Ref) treePath.getLastPathComponent()).path);
+                        RecDef.Ref ref = (RecDef.Ref) treePath.getLastPathComponent();
+                        sipModel.getCreateModel().setRecDefTreePath(ref.path, null); // todo: problem
                     }
                     else if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
                         sipModel.getCreateModel().setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());

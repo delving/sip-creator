@@ -73,6 +73,7 @@ public abstract class FrameBase extends JInternalFrame {
         CODE,
         LOG,
         HARVEST,
+        MAPPING_HINTS,
     }
 
     public interface Placement {
