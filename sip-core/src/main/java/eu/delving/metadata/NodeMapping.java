@@ -44,7 +44,6 @@ import java.util.*;
 
 @XStreamAlias("node-mapping")
 public class NodeMapping implements Comparable<NodeMapping> {
-    public static final String DEFAULT_OPERATION = "*";
 
     @XStreamAsAttribute
     public Path inputPath;
@@ -80,6 +79,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         NodeMapping that = (NodeMapping) o;
         if (inputPath != null ? !inputPath.equals(that.inputPath) : that.inputPath != null) return false;
         if (outputPath != null ? !outputPath.equals(that.outputPath) : that.outputPath != null) return false;
+        if (discriminatorKey != null ? !discriminatorKey.equals(that.discriminatorKey) : that.discriminatorKey != null) return false;
         return true;
     }
 

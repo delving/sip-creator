@@ -62,6 +62,7 @@ public class SipModel {
     private MappingCompileModel fieldCompileModel;
     private MetadataParser metadataParser;
     private StatsModel statsModel;
+    private MappingHintsModel mappingHintsModel;
     private DataSetModel dataSetModel = new DataSetModel();
     private FactModel dataSetFacts = new FactModel();
     private MappingModel mappingModel = new MappingModel();
@@ -99,11 +100,13 @@ public class SipModel {
         fieldCompileModel = new MappingCompileModel(MappingCompileModel.Type.FIELD, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel.getParseEar());
         parseListeners.add(fieldCompileModel.getParseEar());
+        mappingHintsModel = new MappingHintsModel(this);
         mappingModel.addSetListener(reportFileModel);
         mappingModel.addSetListener(recordCompileModel.getMappingModelSetListener());
         mappingModel.addChangeListener(recordCompileModel.getMappingModelChangeListener());
         mappingModel.addSetListener(fieldCompileModel.getMappingModelSetListener());
         mappingModel.addChangeListener(fieldCompileModel.getMappingModelChangeListener());
+        mappingModel.addChangeListener(mappingHintsModel);
         MappingSaveTimer saveTimer = new MappingSaveTimer(this);
         mappingModel.addSetListener(saveTimer);
         mappingModel.addChangeListener(saveTimer);
@@ -216,6 +219,10 @@ public class SipModel {
         return mappingModel;
     }
 
+    public MappingHintsModel getMappingHintsModel() {
+        return mappingHintsModel;
+    }
+
     public CreateModel getCreateModel() {
         return createModel;
     }
@@ -280,9 +287,15 @@ public class SipModel {
                         @Override
                         public void run() {
                             dataSetFacts.set(facts);
-                            statsModel.setPrefix(requestedPrefix, dataSetModel);
                             statsModel.set(hints);
                             statsModel.setStatistics(statistics);
+                            Exec.work(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mappingHintsModel.setPrefix(requestedPrefix, dataSetModel);
+                                    mappingHintsModel.setSourceTree(statsModel.getSourceTree());
+                                }
+                            });
                             for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
                                 statsModel.findNodesForInputPaths(nodeMapping);
                             }

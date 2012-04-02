@@ -109,7 +109,7 @@ public class CreateModel {
         }
         return nodeMapping == null;
     }
-
+    
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
         NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath(), recDefTreeNode.getRecDefNode().getDiscriminatorRootKey());
@@ -117,6 +117,15 @@ public class CreateModel {
         SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
         setNodeMapping(created);
+    }
+
+    public void createMapping(NodeMapping nodeMapping) {
+        TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath, nodeMapping.discriminatorKey);
+        RecDefTreeNode recDefTreeNode = (RecDefTreeNode) treePath.getLastPathComponent();
+        nodeMapping.recDefNode = recDefTreeNode.getRecDefNode();
+        SourceTreeNode.setStatsTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping), nodeMapping);
+        recDefTreeNode.addNodeMapping(nodeMapping);
+        setNodeMapping(nodeMapping);
     }
 
     public boolean isDictionaryPossible() {

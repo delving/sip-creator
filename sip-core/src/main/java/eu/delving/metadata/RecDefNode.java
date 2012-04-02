@@ -202,7 +202,7 @@ public class RecDefNode {
             listener.nodeMappingAdded(this, nodeMapping);
         }
         else {
-            throw new RuntimeException();
+            throw new RuntimeException("Node mapping already exists for "+nodeMapping.inputPath);
         }
         return nodeMapping;
     }

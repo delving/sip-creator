@@ -84,7 +84,7 @@ public class RecMappingFrame extends FrameBase {
     }
 
     private void updateList() {
-        Exec.swing(new ListUpdater());
+        Exec.swingAny(new ListUpdater());
     }
 
     @Override
@@ -146,7 +146,7 @@ public class RecMappingFrame extends FrameBase {
                     nodeMapping = node.getRecDefNode().removeNodeMapping(nodeMapping.inputPath);
                     SourceTreeNode.removeStatsTreeNodes(nodeMapping);
                     sipModel.getCreateModel().setNodeMapping(null);
-                    Exec.swing(new ListUpdater());
+                    updateList();
                 }
             }
         }

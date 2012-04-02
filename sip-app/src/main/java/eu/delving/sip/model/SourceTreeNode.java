@@ -297,11 +297,6 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
         nodeMapping.setStatsTreeNodes(nodes, inputPaths);
     }
 
-    private void addMappedIn(NodeMapping nodeMapping) {
-        this.mappedIn.add(nodeMapping);
-        this.treeModel.nodeChanged(this);
-    }
-
     public static void removeStatsTreeNodes(NodeMapping nodeMapping) {
         if (nodeMapping.hasStatsTreeNodes()) {
             for (Object nodeObject : nodeMapping.getStatsTreeNodes()) {
@@ -310,13 +305,18 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
         }
     }
 
-    private void removeMappedIn(NodeMapping nodeMapping) {
-        if (this.mappedIn.remove(nodeMapping)) this.treeModel.nodeChanged(this);
-    }
-
     public void setTreeModel(DefaultTreeModel treeModel) {
         this.treeModel = treeModel;
         for (SourceTreeNode child : children) child.setTreeModel(treeModel);
+    }
+
+    private void addMappedIn(NodeMapping nodeMapping) {
+        this.mappedIn.add(nodeMapping);
+        this.treeModel.nodeChanged(this);
+    }
+
+    private void removeMappedIn(NodeMapping nodeMapping) {
+        if (this.mappedIn.remove(nodeMapping)) this.treeModel.nodeChanged(this);
     }
 
     private static SourceTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, SourceTreeNode parent) {

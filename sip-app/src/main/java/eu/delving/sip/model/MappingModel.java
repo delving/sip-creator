@@ -41,7 +41,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 
 public class MappingModel implements RecDefNode.Listener {
-
     private RecMapping recMapping;
     private RecDefTreeNode recDefTreeRoot;
 

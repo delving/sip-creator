@@ -24,10 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.model.CreateModel;
-import eu.delving.sip.model.RecDefTreeNode;
-import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.SourceTreeNode;
+import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
 import eu.delving.sip.panels.NodeMappingPanel;
 
@@ -37,7 +34,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.SortedSet;
 
 /**
@@ -52,14 +49,28 @@ public class CreateFrame extends FrameBase {
     private CreateModel createModel;
     private HtmlPanel statsHtml = new HtmlPanel("Source Statistics");
     private HtmlPanel recDefHtml = new HtmlPanel("Target Documentation");
+    private NodeMappingPanel nodeMappingPanel = new NodeMappingPanel();
     private CreateMappingAction createMappingAction;
+    private CopyMappingAction copyMappingAction;
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.CREATE, desktop, sipModel, "Create", false);
         createModel = sipModel.getCreateModel();
         createMappingAction = new CreateMappingAction();
+        copyMappingAction = new CopyMappingAction();
         statsHtml.setHtml(SELECT_STATS);
         recDefHtml.setHtml(SELECT_RECDEF);
+        sipModel.getMappingHintsModel().addListener(new MappingHintsModel.Listener() {
+            @Override
+            public void mappingHintsChanged(final List<NodeMapping> list) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        nodeMappingPanel.setList(list);
+                    }
+                });
+            }
+        });
         createModel.addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
@@ -105,44 +116,46 @@ public class CreateFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.setLayout(new BorderLayout(8, 8));
-        content.add(createPanel(), BorderLayout.CENTER);
-        content.add(new JButton(createMappingAction), BorderLayout.SOUTH);
+        final JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Select", createSelectPanel());
+        tabs.addTab("Hints", createHintsPanel());
+        content.add(tabs);
     }
 
-    private JComponent createPanel() {
-        JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
-        p.add(statsHtml);
-        p.add(recDefHtml);
+    private JComponent createHintsPanel() {
+        JPanel p = new JPanel(new BorderLayout(8, 8));
+        p.add(nodeMappingPanel, BorderLayout.CENTER);
+        p.add(new JButton(copyMappingAction), BorderLayout.SOUTH);
         return p;
     }
-    
-    private class MappingHintFrame extends FrameBase implements ActionListener {
-        private NodeMappingPanel nodeMappingPanel = new NodeMappingPanel();
-        private JButton apply = new JButton("Apply selected mappings");
 
-        private MappingHintFrame() {
-            super(Which.MAPPING_HINTS, CreateFrame.this, CreateFrame.this.sipModel, "Mapping Hints", true);
-            setPlacement(CreateFrame.this.getPlacement());
-            nodeMappingPanel.setList(sipModel.getStatsModel().getCandidateMappings());
-            nodeMappingPanel.getNodeMappingList().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            apply.addActionListener(this);
-        }
+    private JComponent createSelectPanel() {
+        JPanel grid = new JPanel(new GridLayout(0, 1, 5, 5));
+        grid.add(statsHtml);
+        grid.add(recDefHtml);
+        JPanel p = new JPanel(new BorderLayout(8, 8));
+        p.add(grid, BorderLayout.CENTER);
+        p.add(new JButton(createMappingAction), BorderLayout.SOUTH);
+        return p;
+    }
 
-        @Override
-        protected void buildContent(Container content) {
-            content.add(nodeMappingPanel, BorderLayout.CENTER);
-            content.add(apply, BorderLayout.SOUTH);
+    private class CopyMappingAction extends AbstractAction {
+        private CopyMappingAction() {
+            super("<html><h3>Use selected mapping hint</h3></html>");
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Object[] selectedValues = nodeMappingPanel.getNodeMappingList().getSelectedValues();
-            for (Object valueObject : selectedValues) {
-                NodeMapping nodeMapping = (NodeMapping) valueObject;
-                System.out.println("SELECTED: "+nodeMapping);
+            Object selected = nodeMappingPanel.getNodeMappingList().getSelectedValue();
+            if (selected != null) {
+                final NodeMapping nodeMapping = (NodeMapping) selected;
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        createModel.createMapping(nodeMapping);
+                    }
+                });
             }
-            closeFrame();
         }
     }
 
@@ -150,27 +163,20 @@ public class CreateFrame extends FrameBase {
         private static final String CREATE = "<html><h3>Create mapping</h3></html>";
         private static final String EXISTS = "<html><h3>Mapping has been created</h3></html>";
         private static final String SELECT = "<html><h3>Select source and target</h3></html>";
-        private static final String HINT = "<html><h3>Select a mapping hint</h3></html>";
 
         private CreateMappingAction() {
-            super(createModel.canCreate() ? SELECT : HINT);
+            super(SELECT);
             setEnabled(!createModel.canCreate());
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (createModel.canCreate()) {
-                Exec.work(new Runnable() {
-                    @Override
-                    public void run() {
-                        createModel.createMapping();
-                    }
-                });
-            }
-            else {
-                MappingHintFrame mappingHintFrame = new MappingHintFrame();
-                mappingHintFrame.openFrame();
-            }
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    createModel.createMapping();
+                }
+            });
         }
 
         public void refresh() {
@@ -190,11 +196,6 @@ public class CreateFrame extends FrameBase {
                 setEnabled(false);
                 putValue(Action.NAME, EXISTS);
                 putValue(Action.SHORT_DESCRIPTION, "<html>The mapping has already been created.");
-            }
-            else if (!sipModel.getStatsModel().getCandidateMappings().isEmpty()) {
-                setEnabled(true);
-                putValue(Action.NAME, HINT);
-                putValue(Action.SHORT_DESCRIPTION, "<html>Choose values from the input and output.");
             }
             else {
                 setEnabled(false);

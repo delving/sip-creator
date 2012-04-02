@@ -23,8 +23,6 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.RecDefModel;
-import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
@@ -35,8 +33,10 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -51,8 +51,6 @@ public class StatsModel {
     private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
     private SourceTreeNode root;
     private FilterTreeModel statsTreeModel = new FilterTreeModel(root = sourceTree);
-    private List<NodeMapping> candidateMappings = new ArrayList<NodeMapping>();
-    private RecMapping mappingHints;
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -62,19 +60,11 @@ public class StatsModel {
     public void setStatistics(Statistics statistics) {
         Path recordRoot = null;
         Path uniqueElement = null;
-        candidateMappings.clear();
         if (statistics != null) {
             sourceTree = SourceTreeNode.create(statistics.getFieldStatisticsList(), sipModel.getDataSetFacts().getFacts());
             if (statistics.isSourceFormat()) {
                 recordRoot = Storage.RECORD_ROOT;
                 uniqueElement = Storage.UNIQUE_ELEMENT;
-                if (mappingHints != null) {
-                    Set<Path> sourcePaths = new HashSet<Path>();
-                    sourceTree.getPaths(sourcePaths);
-                    for (NodeMapping mapping : mappingHints.getNodeMappings()) {
-                        if (sourcePaths.contains(mapping.inputPath)) candidateMappings.add(mapping);
-                    }
-                }
             }
             else {
                 recordRoot = getRecordRoot();
@@ -88,18 +78,6 @@ public class StatsModel {
         statsTreeModel.setRoot(sourceTree);
         root = sourceTree;
         setDelimiters(recordRoot, uniqueElement);
-    }
-
-    public void setPrefix(String metadataPrefix, RecDefModel recDefModel) {
-        mappingHints = null;
-        URL resource = getClass().getResource("/templates/" + String.format(Storage.FileType.MAPPING.getPattern(), metadataPrefix));
-        if (resource == null) return;
-        try {
-            mappingHints = RecMapping.read(resource.openStream(), recDefModel);
-        }
-        catch (Exception e) {
-            // tolerated
-        }
     }
 
     public void set(Map<String, String> hints) {
@@ -136,6 +114,10 @@ public class StatsModel {
         return Path.create(hintsModel.get(Storage.UNIQUE_ELEMENT_PATH));
     }
 
+    public SourceTreeNode getSourceTree() {
+        return sourceTree;
+    }
+
     public TreeModel getStatsTreeModel() {
         return statsTreeModel;
     }
@@ -155,22 +137,12 @@ public class StatsModel {
             }
             else {
                 SourceTreeNode.setStatsTreeNodes(nodes, nodeMapping);
-                for (SourceTreeNode node : nodes) {
-                    Iterator<NodeMapping> walk = candidateMappings.iterator();
-                    while (walk.hasNext()) {
-                        if (walk.next().inputPath.equals(node.getPath(false))) walk.remove();
-                    }
-                }
             }
         }
         else {
             for (Object node : nodeMapping.getStatsTreeNodes()) nodes.add((SourceTreeNode) node);
         }
         return nodes.isEmpty() ? null : nodes;
-    }
-
-    public List<NodeMapping> getCandidateMappings() {
-        return candidateMappings;
     }
 
     private void setDelimiters(Path recordRoot, Path uniqueElement) {
