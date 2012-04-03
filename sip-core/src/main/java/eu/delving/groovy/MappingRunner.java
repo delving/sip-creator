@@ -31,6 +31,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
 import org.codehaus.groovy.syntax.SyntaxException;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -98,8 +99,7 @@ public class MappingRunner {
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));
             script.setBinding(binding);
-            System.out.println(code); // todo: remove
-            return (Node) script.run();
+            return stripEmptyElements(script.run());
         }
         catch (DiscardRecordException e) {
             throw e;
@@ -124,6 +124,31 @@ public class MappingRunner {
             }
             else {
                 throw new MappingException(metadataRecord, "Unexpected: " + e.toString(), e);
+            }
+        }
+    }
+
+    private Node stripEmptyElements(Object nodeObject) {
+        Node node = (Node) nodeObject;
+        stripEmpty(node);
+        return node;
+    }
+
+    private void stripEmpty(Node node) {
+        NodeList kids = node.getChildNodes();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.ATTRIBUTE_NODE:
+                    break;
+                case Node.TEXT_NODE:
+                    break;
+                case Node.ELEMENT_NODE:
+                    stripEmpty(kid);
+                    if (kid.getFirstChild() == null) node.removeChild(kid);
+                    break;
+                default:
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
             }
         }
     }

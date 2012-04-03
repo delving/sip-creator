@@ -40,7 +40,7 @@
         <node-mapping inputPath="/input/identi-fire/@type" outputPath="/lido:lido/lido:lidoRecID/@lido:type"/>
         <node-mapping inputPath="/input/story" outputPath="/lido:lido/lido:descriptiveMetadata"/>
         <node-mapping inputPath="/input/story/@xml:lang" outputPath="/lido:lido/lido:descriptiveMetadata/@xml:lang"/>
-        <node-mapping inputPath="/input/story/objectClassificationWrap/objectWorkTypeWrap/objectWorkType" outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectClassificationWrap/lido:objectWorkTypeWrap/lido:objectWorkType"/>
+        <node-mapping inputPath="/input/story/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term" outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectClassificationWrap/lido:objectWorkTypeWrap/lido:objectWorkType/lido:term"/>
         <node-mapping inputPath="/input/story/objectIdentificationWrap/titleWrap/titleSet/appellationValue" outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue"/>
         <node-mapping inputPath="/input/sticker" outputPath="/lido:lido/lido:administrativeMetadata"/>
         <node-mapping inputPath="/input/sticker/@xml:lang" outputPath="/lido:lido/lido:administrativeMetadata/@xml:lang"/>
