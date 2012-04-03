@@ -201,7 +201,7 @@ public class SourceFrame extends FrameBase {
             public void valueChanged(TreeSelectionEvent event) {
                 final SortedSet<SourceTreeNode> nodeList = new TreeSet<SourceTreeNode>();
                 TreePath[] selectionPaths = sourceTree.getSelectionModel().getSelectionPaths();
-                if (selectionPaths != null && delimited) {
+                if (selectionPaths != null) {
                     for (TreePath path : selectionPaths) {
                         SourceTreeNode node = (SourceTreeNode)path.getLastPathComponent();
                         if (autoFoldBox.isSelected()) showPath(node);
@@ -210,7 +210,7 @@ public class SourceFrame extends FrameBase {
                         nodeList.add(node);
                     }
                 }
-                if (nodeList.size() == 1) {
+                if (nodeList.size() == 1 && !delimited) {
                     SourceTreeNode node = nodeList.iterator().next();
                     recordRootButton.setEnabled(node.couldBeRecordRoot());
                     uniqueElementButton.setEnabled(node.couldBeUniqueElement());
