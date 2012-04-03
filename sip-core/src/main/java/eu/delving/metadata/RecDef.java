@@ -195,7 +195,7 @@ public class RecDef {
     public static class Ref {
 
         @XStreamAsAttribute
-        public Path path;
+        public Path outputPath;
 
         @XStreamAsAttribute
         public String display;
@@ -211,12 +211,12 @@ public class RecDef {
         public Attr attr;
 
         public void resolve(RecDef recDef) {
-            path.defaultPrefix(recDef.prefix);
-            if (path.peek().isAttribute()) {
-                this.attr = recDef.findAttr(path);
+            outputPath.defaultPrefix(recDef.prefix);
+            if (outputPath.peek().isAttribute()) {
+                this.attr = recDef.findAttr(outputPath);
             }
             else {
-                this.elem = recDef.findElem(path);
+                this.elem = recDef.findElem(outputPath);
             }
         }
 

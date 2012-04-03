@@ -156,7 +156,7 @@ public class TargetFrame extends FrameBase {
             else if (object instanceof RecDef.Ref) {
                 RecDef.Ref ref = (RecDef.Ref) object;
                 bookmarkDocPanel.setHtml(docToHtml(ref.doc));
-                recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(ref.path));
+                recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(ref.outputPath));
             }
         }
     }

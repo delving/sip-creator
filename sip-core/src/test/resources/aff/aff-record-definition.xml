@@ -114,49 +114,6 @@
         <searchField name="dolving_gumby" path="/record/admin/displayProvider"/>
     </searchFields>
 
-
-    <opts> <!-- keys should be uri's -->
-
-        <!--<option-list path="/record/actors/actor/roleUri"> &lt;!&ndash;valuePath="/aff/actors/actor/roleName"> &ndash;&gt;-->
-        <!--<opt key="1">Creator</opt>-->
-        <!--<opt key="2">Artist</opt>-->
-        <!--<opt key="3">Photographer</opt>-->
-        <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
-        <!--</option-list>-->
-
-        <!--<option-list path="/record/places/place/placeName"> &lt;!&ndash;valuePath="/aff/places/place/roleName"> &ndash;&gt;-->
-        <!--<opt key="1">Actors place of birth</opt>-->
-        <!--<opt key="2">Actor place of death</opt>-->
-        <!--<opt key="3">Production place</opt>-->
-        <!--&lt;!&ndash;todo: more values&ndash;&gt;-->
-        <!--</option-list>-->
-
-        <!--<option-list path="/record/medias/mediaType">-->
-            <!--<opt key="THUMBNAIL">Thumbnail</opt>-->
-            <!--<opt key="FULL_IMAGE">Full image</opt>-->
-            <!--<opt key="DEEP_ZOOM">Deep zoom image</opt>-->
-            <!--<opt key="DOCUMENT">Document</opt>-->
-            <!--<opt key="VIDEO">Video</opt>-->
-            <!--<opt key="SOUND">Sound</opt>-->
-        <!--</option-list>-->
-
-        <!--<option-list path="/record/medias/mediaMimeType">-->
-            <!--<opt key="jpeg">jpeg</opt>-->
-            <!--<opt key="tiff">TIFF</opt>-->
-            <!--<opt key="png">PNG</opt>-->
-        <!--</option-list>-->
-
-        <!--<option-list path="/record/events/event/eventTypeUri"> &lt;!&ndash;valuePath="aff/events/event/eventTypeName">  &ndash;&gt;-->
-        <!--<opt key="1">Production</opt>-->
-        <!--<opt key="2">Creation</opt>-->
-        <!--<opt key="3">etc</opt>-->
-        <!--<opt key="4">etc</opt>-->
-        <!--<opt key="5">etc</opt>-->
-        <!--&lt;!&ndash;todo: CRM EVENTS, same as i LIDO&ndash;&gt;-->
-        <!--</option-list>-->
-
-    </opts>
-
     <facts>
         <fact-ref path="/record/admin/ownerUri" name="dataOwnerUri"/>
         <fact-ref path="/record/admin/displayOwner" name="dataOwnerName"/>
@@ -167,8 +124,6 @@
         <fact-ref path="/record/thing/language" name="language"/>
     </facts>
 
-    <bookmarks>
-    </bookmarks>
     <docs>
         <doc path="/record/admin/displayProvider">
             <string name="Dublin Core definition">An entity responsible for making contributions to the content of the

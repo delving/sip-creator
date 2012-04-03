@@ -151,7 +151,7 @@ public class AnalysisParser implements Runnable {
                         renamedTo = dataSet.renameInvalidSource();
                         break;
                     default:
-                        throw new IllegalStateException("Unexpected state " + dataSet.getState());
+                        throw new IllegalStateException("Unexpected state " + dataSet.getState(), e);
                 }
                 listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
             }

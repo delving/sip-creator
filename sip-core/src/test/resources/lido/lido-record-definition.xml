@@ -253,16 +253,4 @@
 
     </root>
 
-
-    <opts>
-        <!--<option-list path="/lido/administrativeMetadata/recordWrap">-->
-            <!--<opt key="1">Item</opt>-->
-            <!--<opt key="2">Collection</opt>-->
-            <!--<opt key="3">Series</opt>-->
-            <!--<opt key="4">Group</opt>-->
-            <!--<opt key="5">Fonds</opt>-->
-        <!--</option-list>-->
-    </opts>
-
-
 </record-definition>

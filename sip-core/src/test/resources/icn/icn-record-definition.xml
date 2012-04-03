@@ -167,12 +167,12 @@
             <!--<doc>-->
                 <!--<string>These elements must be included in any ESE delivery to Europeana</string>-->
             <!--</doc>-->
-            <!--<ref path="/europeana:provider" display="Provider"/>-->
-            <!--<ref path="/europeana:dataProvider" display="Data provider"/>-->
-            <!--<ref path="/europeana:rights" display="Rights"/>-->
-            <!--<ref path="/europeana:type" display="Type"/>-->
-            <!--<ref path="/europeana:isShownBy" display="Is Shown By"/>-->
-            <!--<ref path="/europeana:isShownAt" display="Is Shown At"/>-->
+            <!--<ref outputPath="/europeana:provider" display="Provider"/>-->
+            <!--<ref outputPath="/europeana:dataProvider" display="Data provider"/>-->
+            <!--<ref outputPath="/europeana:rights" display="Rights"/>-->
+            <!--<ref outputPath="/europeana:type" display="Type"/>-->
+            <!--<ref outputPath="/europeana:isShownBy" display="Is Shown By"/>-->
+            <!--<ref outputPath="/europeana:isShownAt" display="Is Shown At"/>-->
         <!--</category>-->
     </bookmarks>
 

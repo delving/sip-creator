@@ -1,7 +1,5 @@
 package eu.delving.sip.model;
 
-import eu.delving.sip.base.Exec;
-
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -79,7 +77,6 @@ public class FilterTreeModel implements TreeModel {
     }
 
     public void refreshTree() {
-        Exec.checkSwing();
         TreeModelEvent event = new TreeModelEvent(this, new Object[] {root}, new int[]  {}, new Object[] {});
         Object[] ears = listeners.getListenerList();
         for (int walk = ears.length - 2; walk >= 0; walk -= 2) {
@@ -90,7 +87,6 @@ public class FilterTreeModel implements TreeModel {
     }
 
     public void refreshNode(Object nodeObject) {
-        Exec.checkSwing();
         FilterNode child = (FilterNode) nodeObject;
         FilterNode parent = (FilterNode)child.getParent();
         int index = getIndexOfChild(parent, child);
