@@ -130,7 +130,7 @@ public class MappingCompileModel {
 
     public void setNodeMapping(NodeMapping nodeMapping) {
         this.selectedNodeMapping = nodeMapping;
-        Exec.swing(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
+        Exec.swing(new DocumentSetter(docDocument, nodeMapping != null ? nodeMapping.getDocumentation() : "", false));
         Exec.swing(new DocumentSetter(codeDocument, getGeneratedCode(), false));
         notifyStateChange(State.ORIGINAL);
     }
