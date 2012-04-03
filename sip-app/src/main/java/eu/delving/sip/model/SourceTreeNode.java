@@ -25,6 +25,7 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.Storage;
 import org.antlr.stringtemplate.StringTemplate;
@@ -33,8 +34,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.Color;
 import java.awt.Component;
@@ -51,7 +50,7 @@ import static eu.delving.sip.base.Utility.MAPPED_HILITE;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceTreeNode> {
+public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeNode> {
     private SourceTreeNode parent;
     private List<SourceTreeNode> children = new ArrayList<SourceTreeNode>();
     private Tag tag;
@@ -59,7 +58,7 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
     private FieldStatistics fieldStatistics;
     private String htmlChunk;
     private List<NodeMapping> mappedIn = new ArrayList<NodeMapping>();
-    private DefaultTreeModel treeModel;
+    private FilterTreeModel treeModel;
 
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
@@ -105,6 +104,11 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
     private SourceTreeNode(SourceTreeNode parent, FieldStatistics fieldStatistics) {
         this(parent, fieldStatistics.getPath().peek());
         setStatistics(fieldStatistics);
+    }
+
+    public void setTreeModel(FilterTreeModel treeModel) {
+        this.treeModel = treeModel;
+        for (SourceTreeNode child : children) child.setTreeModel(treeModel);
     }
 
     public void setStatistics(FieldStatistics fieldStatistics) {
@@ -153,7 +157,7 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
         boolean oldValue = this.recordRoot;
         Path ourPath = getPath(true);
         this.recordRoot = recordRoot != null && ourPath.equals(recordRoot);
-        if (this.recordRoot || this.recordRoot != oldValue) treeModel.nodeChanged(this);
+        if (this.recordRoot || this.recordRoot != oldValue) treeModel.refreshNode(this);
         int childTotal = 0;
         for (SourceTreeNode child : children) {
             int subtotal = child.setRecordRoot(recordRoot);
@@ -165,7 +169,7 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
     public void setUniqueElement(Path uniqueElement) {
         boolean oldValue = this.uniqueElement;
         this.uniqueElement = uniqueElement != null && getPath(true).equals(uniqueElement);
-        if (this.uniqueElement != oldValue) treeModel.nodeChanged(this);
+        if (this.uniqueElement != oldValue) treeModel.refreshNode(this);
         for (SourceTreeNode child : children) child.setUniqueElement(uniqueElement);
     }
 
@@ -229,39 +233,13 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
     }
 
     @Override
-    public TreeNode getChildAt(int index) {
-        return children.get(index);
-    }
-
-    @Override
-    public int getChildCount() {
-        return children.size();
-    }
-
-    @Override
-    public TreeNode getParent() {
+    public Object getParent() {
         return parent;
-    }
-
-    @Override
-    public int getIndex(TreeNode treeNode) {
-        SourceTreeNode qNameNode = (SourceTreeNode) treeNode;
-        return children.indexOf(qNameNode);
-    }
-
-    @Override
-    public boolean getAllowsChildren() {
-        return !children.isEmpty();
     }
 
     @Override
     public boolean isLeaf() {
         return children.isEmpty();
-    }
-
-    @Override
-    public Enumeration children() {
-        return new Vector<SourceTreeNode>(children).elements();
     }
 
     @Override
@@ -289,7 +267,7 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
         }
     }
 
-    public static void setStatsTreeNodes(SortedSet<SourceTreeNode> nodes, NodeMapping nodeMapping) {
+    public static void setStatsTreeNodes(final SortedSet<SourceTreeNode> nodes, final NodeMapping nodeMapping) {
         List<Path> inputPaths = new ArrayList<Path>();
         for (SourceTreeNode node : nodes) {
             inputPaths.add(node.getPath(false));
@@ -298,7 +276,7 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
         nodeMapping.setStatsTreeNodes(nodes, inputPaths);
     }
 
-    public static void removeStatsTreeNodes(NodeMapping nodeMapping) {
+    public static void removeStatsTreeNodes(final NodeMapping nodeMapping) {
         if (nodeMapping.hasStatsTreeNodes()) {
             for (Object nodeObject : nodeMapping.getStatsTreeNodes()) {
                 ((SourceTreeNode) nodeObject).removeMappedIn(nodeMapping);
@@ -306,18 +284,27 @@ public class SourceTreeNode extends FilterTreeNode implements Comparable<SourceT
         }
     }
 
-    public void setTreeModel(DefaultTreeModel treeModel) {
-        this.treeModel = treeModel;
-        for (SourceTreeNode child : children) child.setTreeModel(treeModel);
-    }
-
     private void addMappedIn(NodeMapping nodeMapping) {
         this.mappedIn.add(nodeMapping);
-        this.treeModel.nodeChanged(this);
+        final FilterTreeModel treeModel = this.treeModel;
+        Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                treeModel.refreshNode(SourceTreeNode.this);
+            }
+        });
     }
 
     private void removeMappedIn(NodeMapping nodeMapping) {
-        if (this.mappedIn.remove(nodeMapping)) this.treeModel.nodeChanged(this);
+        final FilterTreeModel treeModel = this.treeModel;
+        if (this.mappedIn.remove(nodeMapping)) {
+            Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    treeModel.refreshNode(SourceTreeNode.this);
+                }
+            });
+        }
     }
 
     private static SourceTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, SourceTreeNode parent) {

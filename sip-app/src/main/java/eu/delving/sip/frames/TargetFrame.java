@@ -32,7 +32,6 @@ import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
@@ -218,7 +217,7 @@ public class TargetFrame extends FrameBase {
     }
 
     private void createRecDefTree(SipModel sipModel) {
-        recDefTree = new JTree(new DefaultTreeModel(RecDefTreeNode.create("Empty"))) {
+        recDefTree = new JTree(new FilterTreeModel(FilterNode.createMessageNode("Empty"))) {
             @Override
             public String getToolTipText(MouseEvent evt) {
                 TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
@@ -243,12 +242,22 @@ public class TargetFrame extends FrameBase {
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                ((DefaultTreeModel) recDefTree.getModel()).nodeChanged(mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node));
+                refreshNode(mappingModel, node);
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                ((DefaultTreeModel) recDefTree.getModel()).nodeChanged(mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node));
+                refreshNode(mappingModel, node);
+            }
+            
+            private void refreshNode(final MappingModel mappingModel, final RecDefNode node) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        RecDefTreeNode recDefTreeNode = mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node);
+                        ((FilterTreeModel) recDefTree.getModel()).refreshNode(recDefTreeNode);
+                    }
+                });
             }
         });
     }
@@ -268,7 +277,7 @@ public class TargetFrame extends FrameBase {
                 });
             }
             else {
-                recDefTree.setModel(new DefaultTreeModel(RecDefTreeNode.create("No record definition")));
+                recDefTree.setModel(new FilterTreeModel(FilterNode.createMessageNode("No record definition")));
             }
             boolean bookmarksPresent = false;
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();

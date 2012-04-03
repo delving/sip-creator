@@ -30,6 +30,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.FilterTreeModel;
 import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.MetadataParser;
@@ -38,7 +39,6 @@ import org.junit.*;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import javax.swing.tree.DefaultTreeModel;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -198,7 +198,7 @@ public class TestMappingValidation {
                     }
                     dataSet().setStatistics(statistics);
                     sourceTree = SourceTreeNode.create(statistics.getFieldStatisticsList(), dataSet().getDataSetFacts());
-                    sourceTree.setTreeModel(new DefaultTreeModel(sourceTree));
+                    sourceTree.setTreeModel(new FilterTreeModel(sourceTree));
                     int recordCount = sourceTree.setRecordRoot(recordRoot);
                     mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));
                 }

@@ -30,15 +30,12 @@ import org.antlr.stringtemplate.StringTemplate;
 import javax.swing.BorderFactory;
 import javax.swing.JTree;
 import javax.swing.Timer;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -50,16 +47,12 @@ import static eu.delving.sip.base.Utility.MAPPED_HILITE;
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class RecDefTreeNode extends FilterTreeNode {
+public class RecDefTreeNode extends FilterNode {
     private RecDefTreeNode parent;
     private RecDefNode recDefNode;
     private RecDefPath recDefPath;
     private Vector<RecDefTreeNode> children = new Vector<RecDefTreeNode>();
     private String html;
-
-    public static TreeNode create(String message) {
-        return new DefaultMutableTreeNode(message);
-    }
 
     public static RecDefTreeNode create(RecDefNode recDefNode) {
         return new RecDefTreeNode(null, recDefNode);
@@ -79,39 +72,13 @@ public class RecDefTreeNode extends FilterTreeNode {
     }
 
     @Override
-    public TreeNode getChildAt(int i) {
-        return children.get(i);
-    }
-
-    @Override
-    public int getChildCount() {
-        return children.size();
-    }
-
-    @Override
-    public TreeNode getParent() {
+    public Object getParent() {
         return parent;
-    }
-
-    @Override
-    public int getIndex(TreeNode treeNode) {
-        RecDefTreeNode node = (RecDefTreeNode) treeNode;
-        return children.indexOf(node);
-    }
-
-    @Override
-    public boolean getAllowsChildren() {
-        return true;
     }
 
     @Override
     public boolean isLeaf() {
         return recDefNode.getChildren().isEmpty();
-    }
-
-    @Override
-    public Enumeration children() {
-        return children.elements();
     }
 
     public Vector<RecDefTreeNode> getChildren() {

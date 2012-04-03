@@ -21,7 +21,6 @@
 
 package eu.delving.sip.model;
 
-import javax.swing.tree.TreeNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -32,8 +31,7 @@ import java.util.regex.Pattern;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public abstract class FilterTreeNode implements TreeNode {
-
+public abstract class FilterNode {
     private boolean passesFilter = true;
 
     public final void filter(String patternString) {
@@ -51,12 +49,39 @@ public abstract class FilterTreeNode implements TreeNode {
         if (passes != passesFilter) {
             setPassesFilter(passes);
             if (passes) {
-                for (FilterTreeNode ancestor = (FilterTreeNode) this.getParent(); ancestor != null; ancestor = (FilterTreeNode) ancestor.getParent()) {
-                    ancestor.passesFilter = true;
-                }
+                setAllAncestorsPassed();
             }
         }
-        for (FilterTreeNode sub : getChildren()) sub.filter(patterns);
+        else {
+            for (FilterNode sub : getChildren()) sub.filter(patterns);
+        }
+    }
+
+    public final void setPassesFilter(boolean passesFilter) {
+        this.passesFilter = passesFilter;
+        for (FilterNode sub : getChildren()) sub.setPassesFilter(passesFilter);
+    }
+
+    public final boolean passesFilter() {
+        return passesFilter;
+    }
+
+    public abstract boolean isLeaf();
+
+    public abstract Object getParent();
+
+    public abstract List<? extends FilterNode> getChildren();
+
+    public abstract String getStringToFilter();
+
+    public static FilterNode createMessageNode(String message) {
+        return new MessageNode(message);
+    }
+
+    private void setAllAncestorsPassed() {
+        for (FilterNode ancestor = (FilterNode) this.getParent(); ancestor != null; ancestor = (FilterNode) ancestor.getParent()) {
+            ancestor.passesFilter = true;
+        }
     }
 
     private List<Pattern> createPatternsFromString(String patternString) {
@@ -67,17 +92,36 @@ public abstract class FilterTreeNode implements TreeNode {
         return patterns;
     }
 
-    public final void setPassesFilter(boolean passesFilter) {
-        this.passesFilter = passesFilter;
-        for (FilterTreeNode sub : getChildren()) sub.setPassesFilter(passesFilter);
+    private static class MessageNode extends FilterNode {
+        private String message;
+
+        private MessageNode(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public boolean isLeaf() {
+            return true;
+        }
+
+        @Override
+        public Object getParent() {
+            return null;
+        }
+
+        @Override
+        public List<? extends FilterNode> getChildren() {
+            return new ArrayList<FilterNode>();
+        }
+
+        @Override
+        public String getStringToFilter() {
+            return message;
+        }
+
+        @Override
+        public String toString() {
+            return message;
+        }
     }
-
-    public final boolean passesFilter() {
-        return passesFilter;
-    }
-
-    public abstract List<? extends FilterTreeNode> getChildren();
-
-    public abstract String getStringToFilter();
-
 }

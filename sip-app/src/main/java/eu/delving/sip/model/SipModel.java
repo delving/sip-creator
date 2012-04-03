@@ -294,11 +294,11 @@ public class SipModel {
                                 public void run() {
                                     mappingHintsModel.setPrefix(requestedPrefix, dataSetModel);
                                     mappingHintsModel.setSourceTree(statsModel.getSourceTree());
+                                    for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
+                                        statsModel.findNodesForInputPaths(nodeMapping);
+                                    }
                                 }
                             });
-                            for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
-                                statsModel.findNodesForInputPaths(nodeMapping);
-                            }
                             seekFirstRecord();
                         }
                     });
