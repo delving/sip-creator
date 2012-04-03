@@ -21,6 +21,8 @@
 
 package eu.delving.metadata;
 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +36,17 @@ import java.util.List;
  */
 
 public class StringUtil {
-    
+
+    public static String documentToString(Document document) {
+        try {
+            int length = document.getLength();
+            return document.getText(0, length);
+        }
+        catch (BadLocationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static String linesToString(List<String> list) {
         StringBuilder s = new StringBuilder();
         if (list != null) for (String line : list) s.append(line.trim()).append('\n');

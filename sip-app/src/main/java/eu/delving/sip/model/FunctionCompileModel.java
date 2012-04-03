@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.StringUtil;
 import eu.delving.sip.base.Exec;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
@@ -159,18 +160,8 @@ public class FunctionCompileModel {
         return lines;
     }
 
-    private static String documentToString(Document document) {
-        try {
-            int length = document.getLength();
-            return document.getText(0, length);
-        }
-        catch (BadLocationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static List<String> toLines(Document document) {
-        return toLines(documentToString(document));
+        return toLines(StringUtil.documentToString(document));
     }
 
     private class RunJob implements Runnable {
@@ -198,9 +189,9 @@ public class FunctionCompileModel {
                     notifyStateChange(State.ERROR);
                 }
                 else {
-                    mappingFunction.setSampleInput(documentToString(inputDocument));
-                    mappingFunction.setDocumentation(documentToString(docDocument));
-                    mappingFunction.setGroovyCode(documentToString(codeDocument));
+                    mappingFunction.setSampleInput(StringUtil.documentToString(inputDocument));
+                    mappingFunction.setDocumentation(StringUtil.documentToString(docDocument));
+                    mappingFunction.setGroovyCode(StringUtil.documentToString(codeDocument));
                     mappingModel.notifyFunctionChanged(mappingFunction);
                     notifyStateChange(State.ORIGINAL);
                 }
@@ -236,7 +227,7 @@ public class FunctionCompileModel {
         private Script script;
 
         public FunctionRunner() {
-            this.script = groovyCodeResource.createFunctionScript(mappingFunction, mappingModel.getRecMapping().getFacts(), documentToString(codeDocument));
+            this.script = groovyCodeResource.createFunctionScript(mappingFunction, mappingModel.getRecMapping().getFacts(), StringUtil.documentToString(codeDocument));
         }
 
         public Object runFunction(Object argument) throws Problem {
@@ -287,7 +278,7 @@ public class FunctionCompileModel {
             if (matcher.find()) {
                 StringBuilder sb = new StringBuilder();
                 int lineNumber = Integer.parseInt(matcher.group(1));
-                for (String line : toLines(documentToString(codeDocument))) {
+                for (String line : toLines(StringUtil.documentToString(codeDocument))) {
                     lineNumber--;
                     if (Math.abs(lineNumber) <= 2) {
                         sb.append(lineNumber == 0 ? ">>>" : "   ");

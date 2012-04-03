@@ -55,6 +55,7 @@ public class MappingCompileModel {
     private NodeMapping selectedNodeMapping;
     private MetadataRecord metadataRecord;
     private Document codeDocument = new PlainDocument();
+    private Document docDocument = new PlainDocument();
     private Document outputDocument = new PlainDocument();
     private TriggerTimer triggerTimer = new TriggerTimer();
     private Type type;
@@ -100,6 +101,26 @@ public class MappingCompileModel {
                 triggerCompile();
             }
         });
+        this.docDocument.addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                pushIt();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                pushIt();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                pushIt();
+            }
+
+            private void pushIt() {
+                if (selectedNodeMapping != null) selectedNodeMapping.setDocumentation(StringUtil.documentToString(docDocument));
+            }
+        });
     }
 
     public void setEnabled(boolean enabled) {
@@ -109,6 +130,7 @@ public class MappingCompileModel {
 
     public void setNodeMapping(NodeMapping nodeMapping) {
         this.selectedNodeMapping = nodeMapping;
+        Exec.swing(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
         Exec.swing(new DocumentSetter(codeDocument, getGeneratedCode(), false));
         notifyStateChange(State.ORIGINAL);
     }
@@ -133,6 +155,10 @@ public class MappingCompileModel {
         return codeDocument;
     }
 
+    public Document getDocDocument() {
+        return docDocument;
+    }
+
     public Document getOutputDocument() {
         return outputDocument;
     }
@@ -142,16 +168,6 @@ public class MappingCompileModel {
     }
 
     // === privates
-
-    private static String documentToString(Document document) {
-        try {
-            int length = document.getLength();
-            return document.getText(0, length);
-        }
-        catch (BadLocationException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private void triggerCompile() {
         if (!enabled) return;
@@ -195,7 +211,7 @@ public class MappingCompileModel {
 
             @Override
             public String getEditedCode() {
-                return documentToString(codeDocument);
+                return StringUtil.documentToString(codeDocument);
             }
         };
     }
@@ -297,10 +313,9 @@ public class MappingCompileModel {
 
         private void setMappingCode() {
             if (selectedNodeMapping != null && selectedNodeMapping.isUserCodeEditable()) {
-                String editedCode = documentToString(codeDocument);
+                String editedCode = StringUtil.documentToString(codeDocument);
                 if (!selectedNodeMapping.codeLooksLike(editedCode)) {
                     selectedNodeMapping.setGroovyCode(editedCode);
-                    notifyStateChange(State.SAVED);
                 }
             }
         }

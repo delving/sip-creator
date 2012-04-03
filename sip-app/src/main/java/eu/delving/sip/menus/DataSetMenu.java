@@ -77,8 +77,6 @@ public class DataSetMenu extends JMenu {
         removeAll();
         final ButtonGroup buttonGroup = new ButtonGroup();
         try {
-            DataSetItem last = null;
-            boolean somethingSelected = false;
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 for (String prefix : dataSet.getRecDefPrefixes()) {
                     final DataSetItem item = new DataSetItem(dataSet, prefix);
@@ -99,26 +97,13 @@ public class DataSetMenu extends JMenu {
                             });
                         }
                     });
-                    if (item.isPreferred()) {
-                        Exec.swingLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                item.doClick();
-                            }
-                        });
-                        somethingSelected = true;
-                    }
-                    last = item;
+                    if (item.isPreferred()) Exec.swingLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            item.doClick();
+                        }
+                    });
                 }
-            }
-            if (!somethingSelected && last != null) {
-                final DataSetItem clicker = last;
-                Exec.swingLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        clicker.doClick();
-                    }
-                });
             }
             if (buttonGroup.getButtonCount() == 0) {
                 JMenuItem empty = new JMenuItem("No data sets available");

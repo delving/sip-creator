@@ -21,16 +21,13 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Operator;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.MappingCompileModel;
-import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -53,10 +50,12 @@ import java.util.List;
  */
 
 public class FieldMappingFrame extends FrameBase {
+    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
     private final Action REVERT_ACTION = new RevertAction();
     private final Action UNDO_ACTION = new UndoAction();
     private final Action REDO_ACTION = new RedoAction();
-    private JTextArea groovyCodeArea;
+    private JTextArea codeArea;
+    private JTextArea docArea;
     private JTextArea outputArea;
     private JEditorPane helpView;
     private JComboBox operatorBox = new JComboBox(Operator.values());
@@ -75,11 +74,16 @@ public class FieldMappingFrame extends FrameBase {
         }
         contextVarList.setPrototypeCellValue("somelongvariablename");
         dictionaryPanel = new DictionaryPanel(sipModel.getCreateModel());
-        groovyCodeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
-        groovyCodeArea.setFont(new Font("Monospaced", Font.BOLD, 12));
-        groovyCodeArea.setTabSize(3);
-        groovyCodeArea.getDocument().addUndoableEditListener(undoManager);
-        groovyCodeArea.getDocument().addDocumentListener(new DocumentListener() {
+        docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
+        docArea.setFont(MONOSPACED);
+        docArea.setTabSize(3);
+        docArea.setLineWrap(true);
+        docArea.setWrapStyleWord(true);
+        codeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
+        codeArea.setFont(MONOSPACED);
+        codeArea.setTabSize(3);
+        codeArea.getDocument().addUndoableEditListener(undoManager);
+        codeArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 handleEnablement();
@@ -103,8 +107,8 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private void attachAction(Action action) {
-        groovyCodeArea.getInputMap().put((KeyStroke) action.getValue(Action.ACCELERATOR_KEY), action.getValue(Action.NAME));
-        groovyCodeArea.getActionMap().put(action.getValue(Action.NAME), action);
+        codeArea.getInputMap().put((KeyStroke) action.getValue(Action.ACCELERATOR_KEY), action.getValue(Action.NAME));
+        codeArea.getActionMap().put(action.getValue(Action.NAME), action);
     }
 
     private void handleEnablement() {
@@ -132,16 +136,19 @@ public class FieldMappingFrame extends FrameBase {
 
     private JPanel createCodeOutputPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
-        p.add(createCodePanel());
+        p.add(createCodeDocPanel());
         p.add(createOutputPanel());
         return p;
     }
 
-    private JPanel createCodePanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.add(Utility.scrollVH("Groovy Code", groovyCodeArea), BorderLayout.CENTER);
-        p.add(createBesideCode(), BorderLayout.EAST);
-        return p;
+    private JComponent createCodeDocPanel() {
+        JPanel cp = new JPanel(new BorderLayout());
+        cp.add(Utility.scrollVH(codeArea), BorderLayout.CENTER);
+        cp.add(createBesideCode(), BorderLayout.EAST);
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Groovy Code", cp);
+        tabs.addTab("Documentation", Utility.scrollVH(docArea));
+        return tabs;
     }
 
     private JPanel createBesideCode() {
@@ -182,29 +189,29 @@ public class FieldMappingFrame extends FrameBase {
                 }
             }
         });
-        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
-            @Override
-            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-            }
-
-            @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
-                Exec.work(new Runnable() {
-                    @Override
-                    public void run() {
-                        sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                    }
-                });
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-        });
+//        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+//            @Override
+//            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+//            }
+//
+//            @Override
+//            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
+//                Exec.work(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+//            }
+//
+//            @Override
+//            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+//            }
+//        });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
@@ -222,7 +229,7 @@ public class FieldMappingFrame extends FrameBase {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
-                        groovyCodeArea.setEditable(nodeMapping != null && nodeMapping.isUserCodeEditable());
+                        codeArea.setEditable(nodeMapping != null && nodeMapping.isUserCodeEditable());
                         boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
                         operatorBox.setSelectedIndex(all ? 0 : 1);
                     }
@@ -290,13 +297,13 @@ public class FieldMappingFrame extends FrameBase {
                             undoManager.discardAllEdits();
                             // fall through
                         case SAVED:
-                            groovyCodeArea.setBackground(new Color(1.0f, 1.0f, 1.0f));
+                            codeArea.setBackground(new Color(1.0f, 1.0f, 1.0f));
                             break;
                         case EDITED:
-                            groovyCodeArea.setBackground(new Color(1.0f, 1.0f, 0.9f));
+                            codeArea.setBackground(new Color(1.0f, 1.0f, 0.9f));
                             break;
                         case ERROR:
-                            groovyCodeArea.setBackground(new Color(1.0f, 0.9f, 0.9f));
+                            codeArea.setBackground(new Color(1.0f, 0.9f, 0.9f));
                             break;
                     }
                 }

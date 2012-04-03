@@ -81,12 +81,7 @@ public class FunctionPanel extends JPanel {
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
         libraryList.setBackground(LIBRARY_COLOR);
-        JPanel center = new JPanel(new GridLayout(0, 1));
-        center.add(createInputPanel());
-        center.add(Utility.scrollV("Documentation", docArea));
-        center.add(Utility.scrollVH("Groovy Code", codeArea));
-        center.add(createOutputPanel());
-        add(center, BorderLayout.CENTER);
+        add(createCenter(), BorderLayout.CENTER);
         add(createFunctionPanels(), BorderLayout.WEST);
         wireUp();
         try {
@@ -97,10 +92,61 @@ public class FunctionPanel extends JPanel {
         }
     }
 
+    private JPanel createCenter() {
+        JPanel center = new JPanel(new GridLayout(0, 1));
+        center.add(createInputPanel());
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Groovy Code", Utility.scrollVH(codeArea));
+        tabs.addTab("Documentation", Utility.scrollVH(docArea));
+        center.add(tabs);
+        center.add(createOutputPanel());
+        return center;
+    }
+
     private void fetchFunctionList() throws IOException {
         URL functionFile = getClass().getResource("/mapping-functions.xml");
         MappingFunction.FunctionList functionList = MappingFunction.read(functionFile.openStream());
         libraryListModel.setList(functionList.functions);
+    }
+
+    private JPanel createFunctionPanels() {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(createFunctionsPanel());
+        p.add(createFunctionLibPanel());
+        return p;
+    }
+
+    private JPanel createFunctionsPanel() {
+        JPanel bp = new JPanel(new GridLayout(0, 1));
+        bp.add(new JButton(new CreateAction()));
+        bp.add(new JButton(new RemoveAction()));
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder("Functions"));
+        p.add(Utility.scrollV(functionList));
+        p.add(bp, BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createFunctionLibPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder("Library"));
+        p.add(Utility.scrollV(libraryList));
+        p.add(new JButton(new CopyAction()), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createInputPanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.add(Utility.scrollVH("Input Lines", inputArea), BorderLayout.CENTER);
+        p.add(Utility.scrollV("Available Facts", factsList), BorderLayout.EAST);
+        return p;
+    }
+
+    private JPanel createOutputPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder("Output Lines"));
+        p.add(Utility.scrollVH(outputArea));
+        return p;
     }
 
     private void wireUp() {
@@ -163,46 +209,6 @@ public class FunctionPanel extends JPanel {
             }
         });
         sipModel.getFunctionCompileModel().addListener(modelStateListener);
-    }
-
-    private JPanel createFunctionPanels() {
-        JPanel p = new JPanel(new GridLayout(0, 1));
-        p.add(createFunctionsPanel());
-        p.add(createFunctionLibPanel());
-        return p;
-    }
-
-    private JPanel createFunctionsPanel() {
-        JPanel bp = new JPanel(new GridLayout(0, 1));
-        bp.add(new JButton(new CreateAction()));
-        bp.add(new JButton(new RemoveAction()));
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Functions"));
-        p.add(Utility.scrollV(functionList));
-        p.add(bp, BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel createFunctionLibPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Library"));
-        p.add(Utility.scrollV(libraryList));
-        p.add(new JButton(new CopyAction()), BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel createInputPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(Utility.scrollVH("Input Lines", inputArea), BorderLayout.CENTER);
-        p.add(Utility.scrollV("Available Facts", factsList), BorderLayout.EAST);
-        return p;
-    }
-
-    private JPanel createOutputPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Output Lines"));
-        p.add(Utility.scrollVH(outputArea));
-        return p;
     }
 
     private class FunctionSelection implements ListSelectionListener {

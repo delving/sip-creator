@@ -63,6 +63,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
     @XStreamAlias("groovy-code")
     public List<String> groovyCode;
 
+    @XStreamAlias("documentation")
+    public List<String> documentation;
+
     @XStreamOmitField
     public RecDefNode recDefNode;
 
@@ -82,6 +85,15 @@ public class NodeMapping implements Comparable<NodeMapping> {
     @Override
     public int hashCode() {
         return inputPath.hashCode();
+    }
+
+    public String getDocumentation() {
+        return StringUtil.linesToString(documentation);
+    }
+
+    public void setDocumentation(String documentation) {
+        this.documentation = StringUtil.stringToLines(documentation);
+        recDefNode.notifyNodeMappingChange(this);
     }
 
     public Operator getOperator() {
