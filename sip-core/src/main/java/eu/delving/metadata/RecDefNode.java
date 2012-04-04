@@ -159,10 +159,6 @@ public class RecDefNode {
         return isAttr() ? attr.doc : elem.doc;
     }
 
-    public boolean hasOptList() {
-        return getOptList() != null;
-    }
-
     public RecDef.OptList getOptList() {
         return isAttr() ? null : elem.optList;
     }

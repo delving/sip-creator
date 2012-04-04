@@ -140,11 +140,15 @@ public class CreateModel {
         return values != null && options != null && nodeMapping.dictionary == null;
     }
 
-    public static void createDictionary(NodeMapping nodeMapping) {
+    public static boolean refreshDictionary(NodeMapping nodeMapping) {
         if (!isDictionaryPossible(nodeMapping)) throw new RuntimeException("Should have checked");
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
-        if (sourceTreeNode.getStatistics() == null) return;
-        nodeMapping.setDictionaryDomain(sourceTreeNode.getStatistics().getHistogramValues());
+        if (sourceTreeNode.getStatistics() == null) return false;
+        return nodeMapping.setDictionaryDomain(sourceTreeNode.getStatistics().getHistogramValues());
+    }
+
+    public void removeDictionary() {
+        if (nodeMapping.removeDictionary()) fireNodeMappingChanged();
     }
 
     public boolean isDictionaryPossible() {
@@ -155,13 +159,12 @@ public class CreateModel {
         return nodeMapping != null && nodeMapping.dictionary != null;
     }
 
-    public void fireDictionaryChanged() {
+    public void fireDictionaryEntriesChanged() {
         fireNodeMappingChanged();
     }
 
-    public void createDictionary() {
-        createDictionary(nodeMapping);
-        fireNodeMappingChanged();
+    public void refreshDictionary() {
+        if (refreshDictionary(nodeMapping)) fireNodeMappingChanged();
     }
 
     public int countNonemptyDictionaryEntries() {
@@ -170,13 +173,6 @@ public class CreateModel {
             for (String value : nodeMapping.dictionary.values()) if (!value.trim().isEmpty()) nonemptyEntries++;
         }
         return nonemptyEntries;
-    }
-
-    public void removeDictionary() {
-        if (isDictionaryPresent()) {
-            nodeMapping.dictionary = null;
-            fireNodeMappingChanged();
-        }
     }
 
     // observable

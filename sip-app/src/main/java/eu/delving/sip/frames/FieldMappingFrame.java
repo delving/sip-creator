@@ -238,6 +238,7 @@ public class FieldMappingFrame extends FrameBase {
 
             @Override
             public void nodeMappingChanged(CreateModel createModel) {
+                sipModel.getFieldCompileModel().refreshCode();
             }
         });
         sipModel.getFieldCompileModel().addListener(new ModelStateListener());

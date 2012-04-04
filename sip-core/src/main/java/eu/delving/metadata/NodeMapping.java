@@ -178,14 +178,32 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return this;
     }
 
-    public void setDictionaryDomain(Collection<String> domainValues) {
-        if (dictionary == null) dictionary = new TreeMap<String, String>();
-        for (String key : domainValues) if (!dictionary.containsKey(key)) dictionary.put(key, "");
+    public boolean setDictionaryDomain(Collection<String> domainValues) {
+        boolean changed = false;
+        if (dictionary == null) {
+            dictionary = new TreeMap<String, String>();
+            changed = true;
+        }
+        for (String key : domainValues) if (!dictionary.containsKey(key)) {
+            dictionary.put(key, "");
+            changed = true;
+        }
         Set<String> unused = new HashSet<String>(dictionary.keySet());
         unused.removeAll(domainValues);
-        for (String unusedKey : unused) dictionary.remove(unusedKey);
+        for (String unusedKey : unused) {
+            dictionary.remove(unusedKey);
+            changed = true;
+        }
+        groovyCode = null;
+        return changed;
     }
 
+    public boolean removeDictionary() {
+        if (dictionary == null) return false;
+        dictionary = null;
+        groovyCode = null;
+        return true;
+    }
     public boolean codeLooksLike(String codeString) {
         Iterator<String> walk;
         if (groovyCode == null) { // then generate the default code
@@ -415,6 +433,5 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public int compareTo(NodeMapping nodeMapping) {
         return this.inputPath.compareTo(nodeMapping.inputPath);
     }
-
 }
 

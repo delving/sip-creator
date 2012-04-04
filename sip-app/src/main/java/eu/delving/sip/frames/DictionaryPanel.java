@@ -89,8 +89,7 @@ public class DictionaryPanel extends JPanel {
         p.add(statusLabel);
         DELETE_ACTION.setEnabled(false);
         p.add(new JButton(DELETE_ACTION));
-        CREATE_ACTION.setEnabled(false);
-        p.add(new JButton(CREATE_ACTION));
+        p.add(new JButton(REFRESH_ACTION));
         return p;
     }
 
@@ -290,7 +289,6 @@ public class DictionaryPanel extends JPanel {
                     @Override
                     public void run() {
                         boolean isDictionary = createModel.isDictionaryPresent();
-                        CREATE_ACTION.setEnabled(createModel.isDictionaryPossible());
                         if (wasDictionary != isDictionary) {
                             wasDictionary = isDictionary;
                             DELETE_ACTION.setEnabled(isDictionary);
@@ -346,7 +344,7 @@ public class DictionaryPanel extends JPanel {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        createModel.fireDictionaryChanged();
+                        createModel.fireDictionaryEntriesChanged();
                     }
                 });
                 timer.restart();
@@ -404,20 +402,18 @@ public class DictionaryPanel extends JPanel {
         }
     }
 
-    private final Action CREATE_ACTION = new AbstractAction("Create") {
+    private final Action REFRESH_ACTION = new AbstractAction("Refresh Dictionary") {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    if (createModel.isDictionaryPossible()) createModel.createDictionary();
+                    if (createModel.isDictionaryPossible()) createModel.refreshDictionary();
                 }
             });
         }
     };
-
-    // todo: an update action for when new stats have been generated?
 
     private final Action DELETE_ACTION = new AbstractAction("Delete") {
         @Override

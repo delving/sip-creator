@@ -66,9 +66,9 @@ public class StringUtil {
     public static void indentCode(List<String> code, Out out) {
         for (String codeLine : code) {
             int indent = codeIndent(codeLine);
-            if (indent < 0) out.in();
+            if (indent < 0) out.out();
             out.line(codeLine);
-            if (indent > 0) out.out();
+            if (indent > 0) out.in();
         }
     }
 

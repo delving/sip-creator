@@ -135,6 +135,10 @@ public class MappingCompileModel {
         notifyStateChange(State.ORIGINAL);
     }
 
+    public void refreshCode() {
+        Exec.swing(new DocumentSetter(codeDocument, getGeneratedCode(), false));
+    }
+
     public MappingModel.ChangeListener getMappingModelChangeListener() {
         return mappingModelEar;
     }
