@@ -96,7 +96,7 @@ public interface DataSet {
 
     List<File> getRecMappingFiles(String prefix) throws StorageException;
 
-    Validator getValidator(String prefix) throws StorageException;
+    Validator newValidator(String prefix) throws StorageException;
 
     void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 

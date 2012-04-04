@@ -100,6 +100,7 @@ public class FieldMappingFrame extends FrameBase {
             }
         });
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
+        outputArea.setWrapStyleWord(true);
         attachAction(UNDO_ACTION);
         attachAction(REDO_ACTION);
         Utility.attachUrlLauncher(outputArea);

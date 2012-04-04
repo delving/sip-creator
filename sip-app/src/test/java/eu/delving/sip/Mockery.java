@@ -99,7 +99,7 @@ public class Mockery {
     }
 
     public Validator validator() throws StorageException {
-        return dataSetModel.getDataSet().getValidator(prefix);
+        return dataSetModel.getDataSet().newValidator(prefix);
     }
 
     public void createMapping() throws IOException {

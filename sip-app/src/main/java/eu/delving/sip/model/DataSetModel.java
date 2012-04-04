@@ -32,7 +32,10 @@ import javax.swing.Timer;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -43,7 +46,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
-    private Map<String, Validator> validatorMap = new TreeMap<String, Validator>();
     private DataSetState dataSetState = DataSetState.EMPTY;
     private List<FactDefinition> factDefinitions = new ArrayList<FactDefinition>();
 
@@ -62,13 +64,9 @@ public class DataSetModel implements RecDefModel {
         return dataSet;
     }
 
-    public Validator getValidator(String metadataPrefix) throws MetadataException {
+    public Validator newValidator(String metadataPrefix) throws MetadataException {
         try {
-            Validator found = validatorMap.get(metadataPrefix);
-            if (found == null) {
-                validatorMap.put(metadataPrefix, found = getDataSet().getValidator(metadataPrefix));
-            }
-            return found;
+            return dataSet.newValidator(metadataPrefix);
         }
         catch (StorageException e) {
             throw new MetadataException("Unable to get validator", e);
@@ -117,7 +115,6 @@ public class DataSetModel implements RecDefModel {
 
     public void setDataSet(final DataSet dataSet) throws StorageException {
         this.dataSet = dataSet;
-        this.validatorMap.clear();
         this.factDefinitions.clear();
         if (dataSet != null) {
             this.factDefinitions.addAll(dataSet.getFactDefinitions());

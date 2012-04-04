@@ -285,7 +285,7 @@ public class SipModel {
                     dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
                     mappingModel.setRecMapping(recMapping);
                     mappingModel.setFacts(facts);
-                    recordCompileModel.setValidator(dataSetModel.getValidator(prefix));
+                    recordCompileModel.setValidator(dataSetModel.newValidator(prefix));
                     feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), prefix));
                     Exec.swing(new Runnable() {
                         @Override

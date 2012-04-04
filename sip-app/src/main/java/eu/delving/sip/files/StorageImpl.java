@@ -97,6 +97,7 @@ public class StorageImpl extends StorageBase implements Storage {
     public class DataSetImpl implements DataSet, Serializable {
 
         private File here;
+        private Map<String,Schema> schemaMap = new TreeMap<String, Schema>();
 
         public DataSetImpl(File here) {
             this.here = here;
@@ -409,17 +410,19 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public Validator getValidator(String prefix) throws StorageException {
-            File schemaFile = schemaFile(here, prefix);
-            if (!schemaFile.exists()) throw new StorageException(String.format("Schema file for %s missing", prefix));
-            try {
+        public Validator newValidator(String prefix) throws StorageException {
+            if (!schemaMap.containsKey(prefix)) { // lazy
                 SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-                Schema schema = factory.newSchema(schemaFile);
-                return schema.newValidator();
+                File schemaFile = schemaFile(here, prefix);
+                if (!schemaFile.exists()) throw new StorageException(String.format("Schema %s missing", schemaFile));
+                try {
+                    schemaMap.put(prefix, factory.newSchema(schemaFile));
+                }
+                catch (SAXException e) {
+                    throw new StorageException("Unable to create schema validator for " + prefix, e);
+                }
             }
-            catch (SAXException e) {
-                throw new StorageException("Unable to create schema validator for " + prefix, e);
-            }
+            return schemaMap.get(prefix).newValidator();
         }
 
         @Override

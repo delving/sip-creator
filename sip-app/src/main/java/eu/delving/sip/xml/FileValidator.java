@@ -91,7 +91,8 @@ public class FileValidator implements Runnable {
         try {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping == null) return;
-            Validator validator = sipModel.getDataSetModel().getValidator(recMapping.getPrefix());
+            Validator validator = sipModel.getDataSetModel().newValidator(recMapping.getPrefix());
+            validator.setErrorHandler(null);
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
             MetadataParser parser = new MetadataParser(
                     sipModel.getDataSetModel().getDataSet().openSourceInputStream(),

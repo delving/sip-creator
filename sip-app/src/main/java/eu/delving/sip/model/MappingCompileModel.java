@@ -25,7 +25,9 @@ import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import org.w3c.dom.Node;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -288,12 +290,17 @@ public class MappingCompileModel {
                     if (node == null) return;
                     String output = XmlSerializer.toXml(node);
                     if (validator != null) {
+                        ForgivingErrorHandler handler = new ForgivingErrorHandler();
+                        validator.setErrorHandler(handler);
                         try {
                             validator.validate(new DOMSource(node));
-                            compilationComplete(output, null);
+                            compilationComplete(output, handler.getError());
                         }
                         catch (SAXException e) {
-                            compilationComplete(output, e.getMessage());
+                            compilationComplete(output, handler.getError());
+                        }
+                        finally {
+                            handler.reset();
                         }
                     }
                     else {
@@ -351,7 +358,7 @@ public class MappingCompileModel {
             ignoreDocChanges = ignore;
             int docLength = document.getLength();
             try {
-                document.remove(0, docLength);
+                document.remove(0, docLength-1);
                 document.insertString(0, content, null);
                 ignoreDocChanges = false;
             }
@@ -411,6 +418,30 @@ public class MappingCompileModel {
         }
     }
 
+    public class ForgivingErrorHandler implements ErrorHandler {
+
+        private StringBuilder error = new StringBuilder();
+
+        public void warning(SAXParseException ex) {
+            error.append(ex.getMessage()).append('\n');
+        }
+
+        public void error(SAXParseException ex) {
+            error.append(ex.getMessage()).append('\n');
+        }
+
+        public void fatalError(SAXParseException ex) throws SAXException {
+            error.append(ex.getMessage()).append('\n');
+        }
+
+        public String getError() {
+            return error.toString();
+        }
+
+        public void reset() {
+            error.setLength(0);
+        }
+    }
 
     private void notifyStateChange(final State state) {
         for (Listener listener : listeners) listener.stateChanged(state);
