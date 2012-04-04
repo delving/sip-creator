@@ -251,7 +251,7 @@ public class MappingCompileModel {
 
         @Override
         public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            if (type == RECORD) compileSoon();
+            compileSoon();
         }
 
         @Override
@@ -358,7 +358,7 @@ public class MappingCompileModel {
             ignoreDocChanges = ignore;
             int docLength = document.getLength();
             try {
-                document.remove(0, docLength-1);
+                document.remove(0, docLength);
                 document.insertString(0, content, null);
                 ignoreDocChanges = false;
             }

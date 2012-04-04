@@ -129,7 +129,7 @@ public class MappingCategory {
     }
 
     // run the closure once for the concatenated values
-    static List concat(List a, String delimiter) {
+    static List multiply(List a, String delimiter) {
         a = unwrap(a)
         Iterator walk = a.iterator();
         StringBuilder out = new StringBuilder()
@@ -137,6 +137,7 @@ public class MappingCategory {
             out.append(walk.next())
             if (walk.hasNext()) out.append(delimiter)
         }
+        System.out.println("MULTIPLY "+out.toString())
         return [out.toString()]
     }
 

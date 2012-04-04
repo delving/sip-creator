@@ -29,8 +29,10 @@ package eu.delving.metadata;
 
 public enum Operator {
     ALL("All Entries", "*"),
-    FIRST("First Entry", "**");
-    
+    FIRST("First Entry", "**"),
+    COMMA_DELIM("Comma-Delimited", "* ', ' *"),
+    SPACE_DELIM("Space-Delimited", "* ' ' *");
+
     private final String display;
     private final String opchar;
 
