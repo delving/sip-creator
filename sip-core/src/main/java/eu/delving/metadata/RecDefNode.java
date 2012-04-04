@@ -93,12 +93,8 @@ public class RecDefNode {
         }
     }
 
-    public String getDiscriminatorRootKey() {
-        return optRoot != null ? optRoot.key : null;
-    }
-
-    public String getOptRootValue() {
-        return optRoot != null ? optRoot.content : "";
+    public List<String> getOptions() {
+        return elem != null ? elem.options : attr.options;
     }
 
     public boolean hasSearchField() {
@@ -163,11 +159,11 @@ public class RecDefNode {
         return isAttr() ? attr.doc : elem.doc;
     }
 
-    public boolean hasDiscriminators() {
-        return getDiscriminators() != null;
+    public boolean hasOptList() {
+        return getOptList() != null;
     }
 
-    public RecDef.OptList getDiscriminators() {
+    public RecDef.OptList getOptList() {
         return isAttr() ? null : elem.optList;
     }
 

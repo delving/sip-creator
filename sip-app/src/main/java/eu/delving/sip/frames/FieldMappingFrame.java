@@ -73,7 +73,7 @@ public class FieldMappingFrame extends FrameBase {
             throw new RuntimeException(e);
         }
         contextVarList.setPrototypeCellValue("somelongvariablename");
-        dictionaryPanel = new DictionaryPanel(sipModel.getCreateModel());
+        dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);
         docArea.setTabSize(3);

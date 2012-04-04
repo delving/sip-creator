@@ -371,6 +371,8 @@ public class RecDef {
         @XStreamAsAttribute
         public boolean systemField;
 
+        public List<String> options;
+
         @XStreamOmitField
         public Doc doc;
         
@@ -408,6 +410,8 @@ public class RecDef {
 
         @XStreamAsAttribute
         public SummaryField summaryField;
+
+        public List<String> options;
 
         @XStreamImplicit
         public List<Elem> elemList = new ArrayList<Elem>();

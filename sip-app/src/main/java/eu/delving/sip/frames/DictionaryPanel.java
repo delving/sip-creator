@@ -22,11 +22,10 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDef;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.RecDefTreeNode;
+import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -53,12 +52,13 @@ import java.util.Map;
  */
 
 public class DictionaryPanel extends JPanel {
-    public static final RecDef.Opt COPY_VERBATIM = new RecDef.Opt().setContent("<<< empty >>>");
+    public static final String COPY_VERBATIM = "<<< verbatim >>>";
     public static final String ASSIGN_SELECTED = "Assign Selected";
     public static final String ASSIGN_ALL = "Assign All";
     public static final String NO_DICTIONARY = "No dictionary for this mapping";
+    private SipModel sipModel;
     private CreateModel createModel;
-    private JCheckBox showSet = new JCheckBox("Show Assigned");
+    private JCheckBox showAssigned = new JCheckBox("Show Assigned");
     private JLabel statusLabel = new JLabel(NO_DICTIONARY, JLabel.CENTER);
     private DictionaryModel dictionaryModel = new DictionaryModel(statusLabel);
     private JTextField patternField = new JTextField(6);
@@ -73,9 +73,10 @@ public class DictionaryPanel extends JPanel {
         }
     });
 
-    public DictionaryPanel(CreateModel createModel) {
+    public DictionaryPanel(SipModel sipModel) {
         super(new BorderLayout(5, 5));
-        this.createModel = createModel;
+        this.sipModel = sipModel;
+        this.createModel = sipModel.getCreateModel();
         this.timer.setRepeats(false);
         add(createNorth(), BorderLayout.NORTH);
         add(new JScrollPane(createTable()), BorderLayout.CENTER);
@@ -107,23 +108,21 @@ public class DictionaryPanel extends JPanel {
         p.setBorder(BorderFactory.createTitledBorder("Show"));
         p.add(label);
         p.add(patternField);
-        p.add(showSet);
+        p.add(showAssigned);
         return p;
     }
 
     private JPanel createNorthEast() {
         JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
         p.setBorder(BorderFactory.createTitledBorder("Assign"));
-        valueBox.setRenderer(new OptRenderer());
         p.add(valueBox);
         p.add(assign);
         return p;
     }
 
     private String getChosenValue() {
-        RecDef.Opt value = (RecDef.Opt) valueBox.getSelectedItem();
-        if (value == COPY_VERBATIM) return "";
-        return value.content; // todo: key?
+        String value = (String) valueBox.getSelectedItem();
+        return COPY_VERBATIM.equals(value) ? "" : value;
     }
 
     private JTable createTable() {
@@ -263,55 +262,46 @@ public class DictionaryPanel extends JPanel {
 
     private void wireUp() {
         createModel.addListener(new CreateModel.Listener() {
+
+            private boolean wasDictionary;
+
             @Override
             public void statsTreeNodeSet(CreateModel createModel) {
-                handleEnablement();
+                reactToChange();
             }
 
             @Override
             public void recDefTreeNodeSet(final CreateModel createModel) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
-                        if (recDefTreeNode != null) {
-                            valueModel.setRecDefNode(recDefTreeNode.getRecDefNode());
-                        }
-                        else {
-                            valueModel.setRecDefNode(null);
-                        }
-                    }
-                });
-                handleEnablement();
+                reactToChange();
             }
 
             @Override
             public void nodeMappingSet(final CreateModel createModel) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        dictionaryModel.setNodeMapping(createModel.getNodeMapping());
-                    }
-                });
-                handleEnablement();
+                reactToChange();
             }
 
             @Override
-            public void nodeMappingChanged(CreateModel createModel) {
-                handleEnablement();
+            public void nodeMappingChanged(final CreateModel createModel) {
+                reactToChange();
             }
 
-            void handleEnablement() {
+            void reactToChange() {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
+                        boolean isDictionary = createModel.isDictionaryPresent();
                         CREATE_ACTION.setEnabled(createModel.isDictionaryPossible());
-                        DELETE_ACTION.setEnabled(createModel.isDictionaryPresent());
-                        if (createModel.isDictionaryPresent()) {
-                            setSelectionPattern();
-                        }
-                        else {
-                            statusLabel.setText(NO_DICTIONARY);
+                        if (wasDictionary != isDictionary) {
+                            wasDictionary = isDictionary;
+                            DELETE_ACTION.setEnabled(isDictionary);
+                            if (isDictionary) {
+                                valueModel.setRecDefTreeNode(createModel.getRecDefTreeNode());
+                                dictionaryModel.setNodeMapping(createModel.getNodeMapping());
+                                setSelectionPattern();
+                            }
+                            else {
+                                statusLabel.setText(NO_DICTIONARY);
+                            }
                         }
                     }
                 });
@@ -333,7 +323,7 @@ public class DictionaryPanel extends JPanel {
                 timer.restart();
             }
         });
-        showSet.addItemListener(new ItemListener() {
+        showAssigned.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 timer.restart();
@@ -348,49 +338,47 @@ public class DictionaryPanel extends JPanel {
                     for (int row : selectedRows) table.getModel().setValueAt(value, row, 1);
                 }
                 else {
-                    for (int row = 0; row < table.getModel().getRowCount(); row++) table.getModel().setValueAt(value, row, 1);
+                    for (int row = 0; row < table.getModel().getRowCount(); row++)
+                        table.getModel().setValueAt(value, row, 1);
                 }
-                // todo: notify so that the mapping is saved at least
                 patternField.setText("");
                 patternField.requestFocus();
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        createModel.fireDictionaryChanged();
+                    }
+                });
                 timer.restart();
             }
         });
     }
 
     private void setSelectionPattern() {
-        dictionaryModel.setPattern(patternField.getText(), showSet.isSelected());
-    }
-
-    private class OptRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            RecDef.Opt opt = (RecDef.Opt)value;
-            return super.getListCellRendererComponent(list, opt.content, index, isSelected, cellHasFocus);
-        }
+        dictionaryModel.setPattern(patternField.getText(), showAssigned.isSelected());
     }
 
     private class ValueRenderer extends DefaultTableCellRenderer {
 
         @Override
-        public Component getTableCellRendererComponent(JTable table,Object value,boolean isSelected,boolean hasFocus,int row,int column) {
-            if (((String) value).isEmpty()) value = COPY_VERBATIM;
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (((String) value).trim().isEmpty()) value = COPY_VERBATIM;
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
 
     }
 
     private static class ValueModel extends AbstractListModel implements ComboBoxModel {
-        private List<RecDef.Opt> values = new ArrayList<RecDef.Opt>();
+        private List<String> values = new ArrayList<String>();
         private Object selectedItem = COPY_VERBATIM;
 
-        public void setRecDefNode(RecDefNode recDefNode) {
+        public void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
             int size = values.size();
             values.clear();
             fireIntervalRemoved(this, 0, size);
-            if (recDefNode != null && recDefNode.hasDiscriminators()) {
+            if (recDefTreeNode != null && recDefTreeNode.getRecDefNode().getOptions() != null) {
                 values.add(0, COPY_VERBATIM);
-//                values.addAll(recDefNode.getDiscriminators());
+                values.addAll(recDefTreeNode.getRecDefNode().getOptions());
                 fireIntervalAdded(this, 0, values.size());
             }
         }
@@ -417,13 +405,18 @@ public class DictionaryPanel extends JPanel {
     }
 
     private final Action CREATE_ACTION = new AbstractAction("Create") {
-        
+
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            createModel.createDictionary();
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    if (createModel.isDictionaryPossible()) createModel.createDictionary();
+                }
+            });
         }
     };
-    
+
     // todo: an update action for when new stats have been generated?
 
     private final Action DELETE_ACTION = new AbstractAction("Delete") {
@@ -439,7 +432,12 @@ public class DictionaryPanel extends JPanel {
                 );
                 if (response != JOptionPane.OK_OPTION) return;
             }
-            createModel.removeDictionary();
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    createModel.removeDictionary();
+                }
+            });
         }
     };
 }

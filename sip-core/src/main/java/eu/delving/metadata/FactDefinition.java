@@ -29,6 +29,7 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * Facts are the givens associated with a dataset, such as where it came from,
@@ -53,17 +54,17 @@ public class FactDefinition {
 
     public String prompt;
 
-    public java.util.List<String> options;
+    public List<String> options;
 
     public String toString() {
         return String.format("FactDefinition(%s)", name);
     }
 
     @XStreamAlias("fact-definition-list")
-    public static class List {
+    public static class FactList {
 
         @XStreamImplicit
-        public java.util.List<FactDefinition> factDefinitions;
+        public List<FactDefinition> factDefinitions;
     }
 
     public static java.util.List<FactDefinition> read(File file) throws FileNotFoundException {
@@ -71,8 +72,8 @@ public class FactDefinition {
         try {
             reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
             XStream stream = new XStream(new PureJavaReflectionProvider());
-            stream.processAnnotations(FactDefinition.List.class);
-            FactDefinition.List factDefinitions = (FactDefinition.List) stream.fromXML(reader);
+            stream.processAnnotations(FactList.class);
+            FactList factDefinitions = (FactList) stream.fromXML(reader);
             return factDefinitions.factDefinitions;
         }
         catch (UnsupportedEncodingException e) {

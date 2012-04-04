@@ -100,7 +100,7 @@ public class TestCodeGeneration {
         System.out.println("attr=" + attr2attr);
 
         RecDefNode optionsNode = node("/lido/administrativeMetadata/recordWrap/recordID/@type");
-//        RecDef.OptList opts = optionsNode.getDiscriminators();
+//        RecDef.OptList opts = optionsNode.getOptList();
 //        Assert.assertNotNull(opts);
         NodeMapping dictionaryMapping = optionsNode.addNodeMapping(mapping("/input/leadup/@orderofsort"));
         dictionaryMapping.dictionary = new TreeMap<String, String>();
@@ -221,7 +221,7 @@ public class TestCodeGeneration {
                     XStream stream = new XStream();
                     stream.processAnnotations(FactDefinition.class);
                     Reader reader = new InputStreamReader(inputStream, "UTF-8");
-                    FactDefinition.List factDefinitions = (FactDefinition.List) stream.fromXML(reader);
+                    FactDefinition.FactList factDefinitions = (FactDefinition.FactList) stream.fromXML(reader);
                     return factDefinitions.factDefinitions;
                 }
                 catch (Exception e) {

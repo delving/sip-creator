@@ -23,10 +23,12 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.RecDef;
 
 import javax.swing.tree.TreePath;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -98,7 +100,8 @@ public class CreateModel {
     public boolean canCreate() {
         if (recDefTreeNode == null || sourceTreeNodes == null) return false;
         if (nodeMapping == null) {
-            nextNodeMapping: for (NodeMapping mapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
+            nextNodeMapping:
+            for (NodeMapping mapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
                 Iterator<Path> pathIterator = mapping.getInputPaths().iterator();
                 for (Path inputPath : mapping.getInputPaths()) {
                     if (!pathIterator.hasNext() || !inputPath.equals(pathIterator.next())) continue nextNodeMapping;
@@ -109,7 +112,7 @@ public class CreateModel {
         }
         return nodeMapping == null;
     }
-    
+
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
         NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
@@ -128,24 +131,36 @@ public class CreateModel {
         setNodeMapping(nodeMapping);
     }
 
-    public boolean isDictionaryPossible() {
-        if (nodeMapping == null || recDefTreeNode == null|| !nodeMapping.hasOneStatsTreeNode()) return false;
+    public static boolean isDictionaryPossible(NodeMapping nodeMapping) {
+        if (nodeMapping == null || nodeMapping.recDefNode == null || !nodeMapping.hasOneStatsTreeNode()) return false;
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
         if (sourceTreeNode.getStatistics() == null) return false;
         Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
-        RecDef.OptList options = recDefTreeNode.getRecDefNode().getDiscriminators();
+        List<String> options = nodeMapping.recDefNode.getOptions();
         return values != null && options != null && nodeMapping.dictionary == null;
+    }
+
+    public static void createDictionary(NodeMapping nodeMapping) {
+        if (!isDictionaryPossible(nodeMapping)) throw new RuntimeException("Should have checked");
+        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
+        if (sourceTreeNode.getStatistics() == null) return;
+        nodeMapping.setDictionaryDomain(sourceTreeNode.getStatistics().getHistogramValues());
+    }
+
+    public boolean isDictionaryPossible() {
+        return isDictionaryPossible(nodeMapping);
     }
 
     public boolean isDictionaryPresent() {
         return nodeMapping != null && nodeMapping.dictionary != null;
     }
 
+    public void fireDictionaryChanged() {
+        fireNodeMappingChanged();
+    }
+
     public void createDictionary() {
-        if (!isDictionaryPossible()) throw new RuntimeException("Should have checked");
-        List<String> options = new ArrayList<String>();
-//        for (RecDef.Opt opt : recDefTreeNode.getRecDefNode().getDiscriminators()) options.add(opt.content); // todo: not key?
-        nodeMapping.setDictionaryDomain(options);
+        createDictionary(nodeMapping);
         fireNodeMappingChanged();
     }
 
