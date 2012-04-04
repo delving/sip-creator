@@ -23,6 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
@@ -64,7 +65,7 @@ public class DictionaryPanel extends JPanel {
     private JTextField patternField = new JTextField(6);
     private JButton assign = new JButton(ASSIGN_ALL);
     private ValueModel valueModel = new ValueModel();
-    private JComboBox valueBox = new JComboBox(valueModel);
+    private JList valueList = new JList(valueModel);
     private JTable table = new JTable(dictionaryModel, createTableColumnModel());
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
@@ -78,14 +79,31 @@ public class DictionaryPanel extends JPanel {
         this.sipModel = sipModel;
         this.createModel = sipModel.getCreateModel();
         this.timer.setRepeats(false);
-        add(createNorth(), BorderLayout.NORTH);
-        add(new JScrollPane(createTable()), BorderLayout.CENTER);
+        valueList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        valueList.setPrototypeCellValue("somelongoptionvaluename");
+        add(createCenter(), BorderLayout.CENTER);
+        add(createEast(), BorderLayout.EAST);
         add(createSouth(), BorderLayout.SOUTH);
         wireUp();
     }
 
+    private JPanel createCenter() {
+        JPanel p = new JPanel(new BorderLayout());
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int[] selectedRows = table.getSelectedRows();
+                assign.setText(selectedRows.length > 0 ? ASSIGN_SELECTED : ASSIGN_ALL);
+            }
+        });
+        p.add(createNorth(), BorderLayout.NORTH);
+        p.add(Utility.scrollV("Dictionary Entries",table), BorderLayout.CENTER);
+        return p;
+    }
+
     private JPanel createSouth() {
         JPanel p = new JPanel(new GridLayout(1, 0));
+        p.setBorder(BorderFactory.createTitledBorder("Dictionary"));
         p.add(statusLabel);
         DELETE_ACTION.setEnabled(false);
         p.add(new JButton(DELETE_ACTION));
@@ -94,13 +112,6 @@ public class DictionaryPanel extends JPanel {
     }
 
     private JPanel createNorth() {
-        JPanel p = new JPanel(new GridLayout(1, 0));
-        p.add(createNorthWest());
-        p.add(createNorthEast());
-        return p;
-    }
-
-    private JPanel createNorthWest() {
         JLabel label = new JLabel("Filter:", JLabel.RIGHT);
         label.setLabelFor(patternField);
         JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
@@ -111,28 +122,16 @@ public class DictionaryPanel extends JPanel {
         return p;
     }
 
-    private JPanel createNorthEast() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Assign"));
-        p.add(valueBox);
-        p.add(assign);
+    private JPanel createEast() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(Utility.scrollV("Target Values", valueList), BorderLayout.CENTER);
+        p.add(assign, BorderLayout.SOUTH);
         return p;
     }
 
     private String getChosenValue() {
-        String value = (String) valueBox.getSelectedItem();
-        return COPY_VERBATIM.equals(value) ? "" : value;
-    }
-
-    private JTable createTable() {
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                int[] selectedRows = table.getSelectedRows();
-                assign.setText(selectedRows.length > 0 ? ASSIGN_SELECTED : ASSIGN_ALL);
-            }
-        });
-        return table;
+        String value = (String) valueList.getSelectedValue();
+        return value == null || COPY_VERBATIM.equals(value) ? "" : value;
     }
 
     private TableColumnModel createTableColumnModel() {
@@ -299,6 +298,8 @@ public class DictionaryPanel extends JPanel {
                             }
                             else {
                                 statusLabel.setText(NO_DICTIONARY);
+                                valueModel.setRecDefTreeNode(null);
+                                dictionaryModel.setNodeMapping(null);
                             }
                         }
                     }
@@ -366,9 +367,8 @@ public class DictionaryPanel extends JPanel {
 
     }
 
-    private static class ValueModel extends AbstractListModel implements ComboBoxModel {
+    private static class ValueModel extends AbstractListModel {
         private List<String> values = new ArrayList<String>();
-        private Object selectedItem = COPY_VERBATIM;
 
         public void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
             int size = values.size();
@@ -379,16 +379,6 @@ public class DictionaryPanel extends JPanel {
                 values.addAll(recDefTreeNode.getRecDefNode().getOptions());
                 fireIntervalAdded(this, 0, values.size());
             }
-        }
-
-        @Override
-        public void setSelectedItem(Object item) {
-            selectedItem = item;
-        }
-
-        @Override
-        public Object getSelectedItem() {
-            return selectedItem;
         }
 
         @Override
