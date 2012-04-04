@@ -378,9 +378,34 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public void setRecMapping(RecMapping recMapping) throws StorageException {
+        public RecMapping revertRecMapping(File previousMappingFile, RecDefModel recDefModel) throws StorageException {
+            try {
+                RecMapping previousMapping = RecMapping.read(previousMappingFile, recDefModel);
+                setRecMapping(previousMapping, false);
+                return previousMapping;
+            }
+            catch (MetadataException e) {
+                throw new StorageException("Unable to fetch previous mapping", e);
+            }
+        }
+
+        @Override
+        public void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException {
             File file = new File(here, String.format(FileType.MAPPING.getPattern(), recMapping.getPrefix()));
             RecMapping.write(file, recMapping);
+            if (freeze) {
+                try {
+                    Hasher.ensureFileHashed(file);
+                }
+                catch (IOException e) {
+                    throw new StorageException("Unable to hash the mapping file name", e);
+                }
+            }
+        }
+
+        @Override
+        public List<File> getRecMappingFiles(String prefix) throws StorageException {
+            return findHashedMappingFiles(here, prefix);
         }
 
         @Override

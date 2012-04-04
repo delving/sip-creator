@@ -105,4 +105,5 @@ public interface Storage {
     String HARVEST_SPEC = "harvestSpec";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/%s", ENVELOPE_TAG, RECORD_TAG, UNIQUE_TAG));
+    long MAPPING_FREEZE_INTERVAL = 60000;
 }

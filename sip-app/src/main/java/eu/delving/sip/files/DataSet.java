@@ -90,7 +90,11 @@ public interface DataSet {
 
     RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException;
 
-    void setRecMapping(RecMapping recMapping) throws StorageException;
+    RecMapping revertRecMapping(File previousMappingFile, RecDefModel recDefModel) throws StorageException;
+
+    void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException;
+
+    List<File> getRecMappingFiles(String prefix) throws StorageException;
 
     Validator getValidator(String prefix) throws StorageException;
 

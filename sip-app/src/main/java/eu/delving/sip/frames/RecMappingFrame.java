@@ -27,6 +27,7 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.menus.RevertMappingMenu;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
@@ -36,6 +37,7 @@ import eu.delving.sip.panels.NodeMappingPanel;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
+import javax.swing.JMenuBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
@@ -55,6 +57,7 @@ public class RecMappingFrame extends FrameBase {
 
     public RecMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings", false);
+        setJMenuBar(createMenuBar());
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
@@ -81,6 +84,14 @@ public class RecMappingFrame extends FrameBase {
             }
         });
         nodeMappingPanel.getNodeMappingList().addListSelectionListener(new NodeMappingSelection());
+    }
+
+    private JMenuBar createMenuBar() {
+        JMenuBar bar = new JMenuBar();
+        RevertMappingMenu revertMappingMenu = new RevertMappingMenu(sipModel);
+        sipModel.getMappingSaveTimer().setListReceiver(revertMappingMenu);
+        bar.add(revertMappingMenu);
+        return bar;
     }
 
     private void updateList() {

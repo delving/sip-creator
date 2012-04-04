@@ -70,6 +70,7 @@ public class SipModel {
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
     private NodeTransferHandler nodeTransferHandler = new NodeTransferHandler(this);
+    private MappingSaveTimer mappingSaveTimer = new MappingSaveTimer(this);
     private volatile boolean converting, validating, analyzing, importing;
 
     public interface AnalysisListener {
@@ -107,9 +108,8 @@ public class SipModel {
         mappingModel.addSetListener(fieldCompileModel.getMappingModelSetListener());
         mappingModel.addChangeListener(fieldCompileModel.getMappingModelChangeListener());
         mappingModel.addChangeListener(mappingHintsModel);
-        MappingSaveTimer saveTimer = new MappingSaveTimer(this);
-        mappingModel.addSetListener(saveTimer);
-        mappingModel.addChangeListener(saveTimer);
+        mappingModel.addSetListener(mappingSaveTimer);
+        mappingModel.addChangeListener(mappingSaveTimer);
         mappingModel.addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
@@ -205,6 +205,10 @@ public class SipModel {
 
     public Storage getStorage() {
         return storage;
+    }
+
+    public MappingSaveTimer getMappingSaveTimer() {
+        return mappingSaveTimer;
     }
 
     public FactModel getDataSetFacts() {

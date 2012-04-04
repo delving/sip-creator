@@ -26,11 +26,14 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.List;
 
 /**
  * Save the mapping whenever things change
@@ -39,13 +42,29 @@ import java.awt.event.ActionListener;
  */
 
 public class MappingSaveTimer implements MappingModel.ChangeListener, MappingModel.SetListener, ActionListener, Runnable {
+    private long nextFreeze;
     private SipModel sipModel;
-    private Timer timer = new Timer(200, this);
+    private Timer triggerTimer = new Timer(200, this);
+    private ListReceiver listReceiver;
 
+    public interface ListReceiver {
+        void mappingFileList(List<File> mappingFiles);
+    }
 
     public MappingSaveTimer(SipModel sipModel) {
         this.sipModel = sipModel;
-        timer.setRepeats(false);
+        triggerTimer.setRepeats(false);
+        Timer kickTimer = new Timer((int) (Storage.MAPPING_FREEZE_INTERVAL / 10), new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                triggerTimer.restart();
+            }
+        });
+        kickTimer.start();
+    }
+
+    public void setListReceiver(ListReceiver listReceiver) {
+        this.listReceiver = listReceiver;
     }
 
     @Override
@@ -56,9 +75,29 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     @Override
     public void run() {
         try {
-            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+            final RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping != null) {
-                sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping);
+                boolean freeze = false;
+                if (System.currentTimeMillis() > nextFreeze) {
+                    nextFreeze = System.currentTimeMillis() + Storage.MAPPING_FREEZE_INTERVAL;
+                    freeze = true;
+                }
+                sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping, freeze);
+                if (freeze) {
+                    sipModel.getFeedback().say("Froze mapping");
+                    if (listReceiver != null) Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                List<File> recMappingFiles = sipModel.getDataSetModel().getDataSet().getRecMappingFiles(recMapping.getPrefix());
+                                listReceiver.mappingFileList(recMappingFiles);
+                            }
+                            catch (StorageException e) {
+                                sipModel.getFeedback().alert("Unable to fetch mapping files", e);
+                            }
+                        }
+                    });
+                }
             }
         }
         catch (StorageException e) {
@@ -68,27 +107,27 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void recMappingSet(MappingModel mappingModel) {
-        timer.restart();
+        triggerTimer.restart();
     }
 
     @Override
     public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-        timer.restart();
+        triggerTimer.restart();
     }
 
     @Override
     public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        timer.restart();
+        triggerTimer.restart();
     }
 
     @Override
     public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        timer.restart();
+        triggerTimer.restart();
     }
 
     @Override
     public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        timer.restart();
+        triggerTimer.restart();
     }
 }
 

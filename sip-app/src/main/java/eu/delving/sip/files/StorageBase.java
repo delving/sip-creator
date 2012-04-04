@@ -140,10 +140,6 @@ public class StorageBase {
         return findOrCreate(dir, SOURCE);
     }
 
-    File previousSourceOrNull(File dir) {
-        return findOrNull(dir, 1, new NameFileFilter(SOURCE.getName()), SOURCE);
-    }
-
     File latestMappingFileOrNull(File dir) {
         return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
     }
@@ -212,25 +208,24 @@ public class StorageBase {
     }
 
     File findLatestMappingFile(File dir, String metadataPrefix) {
-        return findLatestFile(dir, metadataPrefix, MAPPING);
-    }
-
-    File findLatestFile(File dir, String metadataPrefix, Storage.FileType fileType) {
         File mappingFile = null;
-        for (File file : findLatestFiles(dir, fileType)) {
+        for (File file : findLatestFiles(dir, MAPPING)) {
             String prefix = extractName(file, MAPPING);
-            if (prefix.equals(metadataPrefix)) {
-                mappingFile = file;
-            }
+            if (prefix.equals(metadataPrefix)) mappingFile = file;
         }
-        if (mappingFile == null) {
-            mappingFile = new File(dir, String.format(MAPPING.getPattern(), metadataPrefix));
-        }
+        if (mappingFile == null) mappingFile = new File(dir, String.format(MAPPING.getPattern(), metadataPrefix));
         return mappingFile;
     }
 
     Collection<File> findLatestMappingFiles(File dir) {
         return findLatestFiles(dir, MAPPING);
+    }
+
+    List<File> findHashedMappingFiles(File dir, String prefix) {
+        File[] files = dir.listFiles(new HashedMappingFileFilter(prefix));
+        List<File> sorted = new ArrayList<File>(Arrays.asList(files));
+        Collections.sort(sorted, new LastModifiedComparator());
+        return sorted;
     }
 
     Collection<File> findLatestFiles(File dir, Storage.FileType fileType) {
@@ -285,6 +280,20 @@ public class StorageBase {
         }
     }
 
+    class HashedMappingFileFilter implements FileFilter {
+        private String ending;
+
+        HashedMappingFileFilter(String prefix) {
+            this.ending = String.format(MAPPING.getPattern(), prefix);
+        }
+
+        @Override
+        public boolean accept(File file) {
+            String name = file.getName();
+            return file.isFile() && name.endsWith(ending);
+        }
+    }
+
     String extractName(File file, Storage.FileType fileType) {
         String name = Hasher.extractFileName(file);
         if (name.startsWith(fileType.getPrefix()) && name.endsWith(fileType.getSuffix())) {
@@ -301,9 +310,8 @@ public class StorageBase {
     static void delete(File file) throws StorageException {
         if (file.exists()) {
             if (file.isDirectory()) {
-                for (File sub : file.listFiles()) {
-                    delete(sub);
-                }
+                File[] files = file.listFiles();
+                if (files != null) for (File sub : files) delete(sub);
             }
             if (!file.delete()) {
                 throw new StorageException(String.format("Unable to delete %s", file.getAbsolutePath()));
@@ -316,32 +324,7 @@ public class StorageBase {
         if (files == null || files.length <= which || which > maxHistory) {
             return null;
         }
-        Arrays.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File a, File b) {
-                long lastA = a.lastModified();
-                long lastB = b.lastModified();
-                if (lastA > lastB) {
-                    return -1;
-                }
-                else if (lastA < lastB) {
-                    return 1;
-                }
-                else { // lastModified is only accurate to seconds (ends in 000) and we want the unhashed one at the top
-                    int nameA = a.getName().length();
-                    int nameB = b.getName().length();
-                    if (nameA > nameB) {
-                        return 1;
-                    }
-                    else if (nameB < nameA) {
-                        return -1;
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-            }
-        });
+        Arrays.sort(files, new LastModifiedComparator());
         if (files.length > maxHistory) {
             for (int walk = maxHistory; walk < files.length; walk++) {
                 //noinspection ResultOfMethodCallIgnored
@@ -361,6 +344,34 @@ public class StorageBase {
         @Override
         public boolean accept(File file) {
             return file.isFile() && Hasher.extractFileName(file).equals(name);
+        }
+    }
+
+    public static class LastModifiedComparator implements Comparator<File> {
+
+        @Override
+        public int compare(File a, File b) {
+            long lastA = a.lastModified();
+            long lastB = b.lastModified();
+            if (lastA > lastB) {
+                return -1;
+            }
+            else if (lastA < lastB) {
+                return 1;
+            }
+            else { // lastModified is only accurate to seconds (ends in 000) and we want the unhashed one at the top
+                int nameA = a.getName().length();
+                int nameB = b.getName().length();
+                if (nameA > nameB) {
+                    return 1;
+                }
+                else if (nameB < nameA) {
+                    return -1;
+                }
+                else {
+                    return 0;
+                }
+            }
         }
     }
 }
