@@ -435,6 +435,7 @@ public class MappingCompileModel {
         }
 
         public String getError() {
+            if (error.length() == 0) return null;
             return error.toString();
         }
 
