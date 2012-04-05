@@ -246,7 +246,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
             toUserCode(out, null);
         }
         else {
-            recDefNode.toElementCode(out, null);
+            recDefNode.toElementCode(out, new Stack<Tag>(), null);
         }
         return out.toString();
     }
@@ -296,12 +296,12 @@ public class NodeMapping implements Comparable<NodeMapping> {
         }
         else {
             if (tuplePaths != null) {
-                out.line_("%s %s { %s ->", getTupleExpression(), getOperator().getChar(), getTupleName());
+                out.line_("%s %s { %s -> // N1", getTupleExpression(), getOperator().getChar(), getTupleName());
             }
             else {
                 Tag outer = path.getTag(0);
                 Tag inner = path.getTag(1);
-                out.line_("%s%s %s { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), getOperator().getChar(), inner.toGroovyParam());
+                out.line_("%s%s %s { %s -> // N2", outer.toGroovyParam(), inner.toGroovyRef(), getOperator().getChar(), inner.toGroovyParam());
             }
             toInnerLoop(path.chop(-1), out);
             out._line("}");

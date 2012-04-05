@@ -219,24 +219,24 @@ public class RecDefNode {
         listener.nodeMappingChanged(this, nodeMapping);
     }
 
-    public void toElementCode(Out out, EditPath editPath) {
+    public void toElementCode(Out out, Stack<Tag> groovyParams, EditPath editPath) {
         if (isAttr() || !hasNodeMappings()) return;
         if (editPath != null && !path.equals(editPath.getPath()) && !path.isAncestorOf(editPath.getPath())) return;
         if (nodeMappings.isEmpty()) {
-            childrenToCode(out, editPath);
+            childrenToCode(out, groovyParams, editPath);
         }
         else for (NodeMapping nodeMapping : nodeMappings.values()) {
-            childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), out, editPath);
+            childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, out, editPath);
         }
     }
 
-    private void childrenInLoop(NodeMapping nodeMapping, Path path, Out out, EditPath editPath) {
+    private void childrenInLoop(NodeMapping nodeMapping, Path path, Stack<Tag> groovyParams, Out out, EditPath editPath) {
         if (path.isEmpty()) throw new RuntimeException("Empty path");
         if (path.size() == 1) {
-            childrenToCode(out, editPath);
+            childrenToCode(out, groovyParams, editPath);
         }
         else if (nodeMapping.hasTuple() && path.size() == 2) {
-            out.line_("%s * { %s ->", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
+            out.line_("%s * { %s -> // R1", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
             startBuilderCall(out, editPath);
             nodeMapping.toElementCode(out, editPath);
             out._line("}");
@@ -246,13 +246,20 @@ public class RecDefNode {
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
             Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
-            out.line_("%s%s %s { %s -> ", outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam());
-            childrenInLoop(nodeMapping, path.chop(-1), out, editPath);
-            out._line("}");
+            boolean needLoop = !groovyParams.contains(inner);
+            if (needLoop) {
+                out.line_("%s%s %s { %s -> // R2", outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam());
+                groovyParams.push(inner);
+            }
+            childrenInLoop(nodeMapping, path.chop(-1), groovyParams, out, editPath);
+            if (needLoop) {
+                groovyParams.pop();
+                out._line("}");
+            }
         }
     }
 
-    private void childrenToCode(Out out, EditPath editPath) {
+    private void childrenToCode(Out out, Stack<Tag> groovyParams, EditPath editPath) {
         if (hasChildren()) {
             startBuilderCall(out, editPath);
             for (RecDefNode sub : children) {
@@ -264,7 +271,7 @@ public class RecDefNode {
                     out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
                 }
                 else {
-                    sub.toElementCode(out, editPath);
+                    sub.toElementCode(out, groovyParams, editPath);
                 }
             }
             out._line("}");
@@ -282,7 +289,7 @@ public class RecDefNode {
                     out._line("}");
                 }
                 else {
-                    out.line_("%s %s { %s ->", nodeMapping.getTupleExpression(), nodeMapping.getOperator().getChar(), nodeMapping.getTupleName());
+                    out.line_("%s %s { %s -> // R3", nodeMapping.getTupleExpression(), nodeMapping.getOperator().getChar(), nodeMapping.getTupleName());
                     startBuilderCall(out, editPath);
                     nodeMapping.toElementCode(out, editPath);
                     out._line("}");

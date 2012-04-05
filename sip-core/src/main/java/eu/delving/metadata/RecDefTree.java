@@ -21,10 +21,7 @@
 
 package eu.delving.metadata;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class takes a RecDef instance and wraps itself around, ensuring
@@ -100,7 +97,7 @@ public class RecDefTree implements RecDefNode.Listener {
         out.line("_uniqueIdentifier = _input._id[0].toString()");
         out.line("outputNode = output.");
         if (root.hasNodeMappings()) {
-            root.toElementCode(out, editPath);
+            root.toElementCode(out, new Stack<Tag>(), editPath);
         }
         else {
             out.line("'no' { 'mapping' }");
