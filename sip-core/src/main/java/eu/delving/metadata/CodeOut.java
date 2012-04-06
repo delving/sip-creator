@@ -27,16 +27,26 @@ package eu.delving.metadata;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class Out {
+public class CodeOut {
     private static final String INDENT = "   ";
+    private CodeOut parent;
     private int indentLevel;
     private StringBuilder stringBuilder = new StringBuilder();
-    
-    public Out line() {
-        return line("");
+
+    public static CodeOut create() {
+        return new CodeOut(null);
     }
 
-    public Out line(String string, Object... params) {
+    private CodeOut(CodeOut parent) {
+        this.parent = parent;
+    }
+
+    public CodeOut createChild() {
+        return new CodeOut(this);
+    }
+
+    public CodeOut line(String string, Object... params) {
+        if (parent != null) parent.line(string, params);
         for (int walk = 0; walk < indentLevel; walk++) stringBuilder.append(INDENT);
         if (params.length == 0) {
             stringBuilder.append(string).append('\n');
@@ -47,20 +57,22 @@ public class Out {
         return this;
     }
     
-    public Out line_(String string, Object... params) {
+    public CodeOut line_(String string, Object... params) {
         return line(string, params).in();
     }
     
-    public Out _line(String string, Object... params) {
+    public CodeOut _line(String string, Object... params) {
         return out().line(string, params);
     }
 
-    public Out in() {
+    public CodeOut in() {
+        if (parent != null) parent.in();
         indentLevel++;
         return this;
     }
 
-    public Out out() {
+    public CodeOut out() {
+        if (parent != null) parent.out();
         indentLevel--;
         return this;
     }

@@ -94,7 +94,7 @@ public class CreateModel {
     }
 
     public void revertToOriginal() {
-        if (nodeMapping != null) nodeMapping.setGroovyCode(null);
+        if (nodeMapping != null) nodeMapping.setGroovyCode(null, null);
     }
 
     public boolean canCreate() {

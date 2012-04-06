@@ -81,9 +81,9 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public String getUserCode(String editedCode) {
-        Out out = new Out();
-        toUserCode(out, editedCode);
-        return out.toString();
+        CodeOut codeOut = CodeOut.create();
+        toUserCode(codeOut, editedCode);
+        return codeOut.toString();
     }
 
     public String getUserCode() {
@@ -91,30 +91,30 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public String toCode(String editedCode) {
-        Out out = new Out();
-        toCode(out, editedCode);
-        return out.toString();
+        CodeOut codeOut = CodeOut.create();
+        toCode(codeOut, editedCode);
+        return codeOut.toString();
     }
 
-    public void toCode(Out out) {
-        toCode(out, null);
+    public void toCode(CodeOut codeOut) {
+        toCode(codeOut, null);
     }
 
-    public void toCode(Out out, String editedCode) {
-        out.line_(String.format("def %s = { it ->", name));
-        toUserCode(out, editedCode);
-        out._line("}");
+    public void toCode(CodeOut codeOut, String editedCode) {
+        codeOut.line_(String.format("def %s = { it ->", name));
+        toUserCode(codeOut, editedCode);
+        codeOut._line("}");
     }
 
-    private void toUserCode(Out out, String editedCode) {
+    private void toUserCode(CodeOut codeOut, String editedCode) {
         if (editedCode != null) {
-            StringUtil.indentCode(editedCode, out);
+            StringUtil.indentCode(editedCode, codeOut);
         }
         else if (groovyCode != null) {
-            StringUtil.indentCode(groovyCode, out);
+            StringUtil.indentCode(groovyCode, codeOut);
         }
         else {
-            out.line("it");
+            codeOut.line("it");
         }
     }
 
