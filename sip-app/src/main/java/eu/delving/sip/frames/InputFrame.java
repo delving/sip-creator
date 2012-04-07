@@ -30,6 +30,7 @@ import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.tree.*;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -38,10 +39,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -136,12 +134,12 @@ public class InputFrame extends FrameBase {
         }
     }
 
-    private class GroovyTreeNode implements TreeNode {
+    private class GroovyTreeNode implements TreeNode, Comparable<GroovyTreeNode> {
         private static final int MAX_LENGTH = 40;
         private MetadataRecord metadataRecord;
         private GroovyTreeNode parent;
         private GroovyNode node;
-        private Vector<TreeNode> children = new Vector<TreeNode>();
+        private Vector<GroovyTreeNode> children = new Vector<GroovyTreeNode>();
         private String string;
         private String toolTip;
         
@@ -180,6 +178,7 @@ public class InputFrame extends FrameBase {
                     GroovyNode subnode = (GroovyNode) sub;
                     children.add(new GroovyTreeNode(this, subnode));
                 }
+                Collections.sort(children);
             }
         }
 
@@ -248,6 +247,11 @@ public class InputFrame extends FrameBase {
         private void compilePathList(List<TreeNode> list) {
             if (parent != null) parent.compilePathList(list);
             list.add(this);
+        }
+
+        @Override
+        public int compareTo(GroovyTreeNode groovyTreeNode) {
+            return node.name().compareTo(groovyTreeNode.node.name());
         }
     }
 
