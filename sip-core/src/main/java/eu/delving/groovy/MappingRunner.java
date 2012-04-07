@@ -145,7 +145,7 @@ public class MappingRunner {
                     break;
                 case Node.ELEMENT_NODE:
                     stripEmpty(kid);
-                    if (kid.getFirstChild() == null) node.removeChild(kid);
+                    if (!(kid.hasChildNodes() || kid.hasAttributes())) node.removeChild(kid);
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
