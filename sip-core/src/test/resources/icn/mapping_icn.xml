@@ -40,5 +40,20 @@
         <node-mapping inputPath="/input/creator.date_of_death" outputPath="/icn:record/icn:creatorYearOfDeath"/>
         <node-mapping inputPath="/input/description" outputPath="/icn:record/dc:description"/>
         <node-mapping inputPath="/input/priref" outputPath="/icn:record/europeana:uri"/>
+        <node-mapping inputPath="/input/priref" outputPath="/icn:record/europeana:isShownAt" operator="FIRST">
+            <groovy-code>
+                <string>&quot;http://www.jhm.nl/collectie/museumstukken/${_priref}&quot;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/input/priref" outputPath="/icn:record/europeana:object" operator="FIRST">
+            <groovy-code>
+                <string>&quot;http://www.jhm.nl/collectie/museumstukken/${_priref}&quot;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/input/priref" outputPath="/icn:record/delving:thumbnail">
+            <groovy-code>
+                <string>&quot;http://www.jhm.nl/collectie/museumstukken/${_priref}&quot;</string>
+            </groovy-code>
+        </node-mapping>
     </node-mappings>
 </rec-mapping>
