@@ -69,7 +69,7 @@ public class MappingRunner {
     public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath) {
         this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
-        this.code = recMapping.getRecDefTree().toCode(recMapping.getFunctions(), recMapping.getFacts(), editPath);
+        this.code = recMapping.toCode(editPath);
         script = groovyCodeResource.createMappingScript(code);
         for (Map.Entry<String,String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());
@@ -145,7 +145,7 @@ public class MappingRunner {
                     break;
                 case Node.ELEMENT_NODE:
                     stripEmpty(kid);
-                    if (kid.getFirstChild() == null) node.removeChild(kid);
+                    if (!(kid.hasChildNodes() || kid.hasAttributes())) node.removeChild(kid);
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());

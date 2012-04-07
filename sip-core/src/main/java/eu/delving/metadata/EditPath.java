@@ -32,5 +32,7 @@ public interface EditPath {
 
     Path getPath();
 
-    String getEditedCode();
+    String getEditedCode(Path path);
+
+    boolean generated();
 }

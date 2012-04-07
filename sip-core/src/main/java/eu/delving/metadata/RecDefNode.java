@@ -40,7 +40,7 @@ import java.util.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class RecDefNode {
+public class RecDefNode implements Comparable<RecDefNode> {
     private RecDefNode parent;
     private Path path;
     private RecDef.Elem elem;
@@ -49,6 +49,11 @@ public class RecDefNode {
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
+
+    @Override
+    public int compareTo(RecDefNode recDefNode) {
+        return getTag().compareTo(recDefNode.getTag());
+    }
 
     public interface Listener {
         void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping);
@@ -68,10 +73,8 @@ public class RecDefNode {
         this.elem = elem;
         this.attr = attr;
         this.optRoot = optRoot;
-        if (optKey != null && optKey.parent.key.equals(getTag()))
-            this.optKey = optKey;
-        if (optValue != null && optValue.parent.value.equals(getTag()))
-            this.optValue = optValue;
+        if (optKey != null && optKey.parent.key.equals(getTag())) this.optKey = optKey;
+        if (optValue != null && optValue.parent.value.equals(getTag())) this.optValue = optValue;
         if (elem != null) {
             for (RecDef.Attr sub : elem.attrList) {
                 children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot));
@@ -80,10 +83,11 @@ public class RecDefNode {
                 if (sub.optList == null) {
                     children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot));
                 }
-                else
+                else {
                     for (RecDef.Opt subOpt : sub.optList.opts) { // a child for each option
                         children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null));
                     }
+                }
             }
             if (elem.nodeMapping != null) {
                 nodeMappings.put(elem.nodeMapping.inputPath, elem.nodeMapping);
@@ -91,6 +95,7 @@ public class RecDefNode {
                 elem.nodeMapping.outputPath = getPath();
             }
         }
+        Collections.sort(children);
     }
 
     public List<String> getOptions() {
@@ -172,9 +177,9 @@ public class RecDefNode {
         return null;
     }
 
-    public boolean hasNodeMappings() {
+    public boolean hasDescendentNodeMappings() {
         if (!nodeMappings.isEmpty()) return true;
-        for (RecDefNode sub : children) if (sub.hasNodeMappings()) return true;
+        for (RecDefNode sub : children) if (sub.hasDescendentNodeMappings()) return true;
         return false;
     }
 
@@ -219,81 +224,109 @@ public class RecDefNode {
         listener.nodeMappingChanged(this, nodeMapping);
     }
 
-    public void toElementCode(Out out, Stack<Tag> groovyParams, EditPath editPath) {
-        if (isAttr() || !hasNodeMappings()) return;
+    public void toElementCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+        if (isAttr() || !hasDescendentNodeMappings()) return;
         if (editPath != null && !path.equals(editPath.getPath()) && !path.isAncestorOf(editPath.getPath())) return;
         if (nodeMappings.isEmpty()) {
-            childrenToCode(out, groovyParams, editPath);
+            childrenToCode(codeOut, groovyParams, editPath);
         }
         else for (NodeMapping nodeMapping : nodeMappings.values()) {
-            childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, out, editPath);
+            nodeMapping.codeOut = codeOut.createChild();
+            childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
         }
     }
 
-    private void childrenInLoop(NodeMapping nodeMapping, Path path, Stack<Tag> groovyParams, Out out, EditPath editPath) {
+    private void childrenInLoop(NodeMapping nodeMapping, Path path, Stack<String> groovyParams, CodeOut codeOut, EditPath editPath) {
         if (path.isEmpty()) throw new RuntimeException("Empty path");
         if (path.size() == 1) {
-            childrenToCode(out, groovyParams, editPath);
+            childrenToCode(codeOut, groovyParams, editPath);
         }
         else if (nodeMapping.hasTuple() && path.size() == 2) {
-            out.line_("%s * { %s -> // R1", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
-            startBuilderCall(out, editPath);
-            nodeMapping.toElementCode(out, editPath);
-            out._line("}");
-            out._line("}");
+            boolean needLoop = !groovyParams.contains(nodeMapping.getTupleName());
+            if (needLoop) {
+                codeOut.line_("%s * { %s -> // R1", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
+                groovyParams.push(nodeMapping.getTupleName());
+            }
+            startBuilderCall("R2", codeOut, groovyParams, editPath);
+            if (isLeafElem()) {
+                nodeMapping.toLeafElementCode(groovyParams, editPath);
+            }
+            else {
+                if (hasChildren()) {
+                    for (RecDefNode sub : children) {
+                        if (sub.isAttr()) continue;
+                        if (sub.optKey != null) {
+                            codeOut.line("%s '%s' // R3", sub.getTag().toBuilderCall(), sub.optKey.key);
+                        }
+                        else if (sub.optValue != null) {
+                            codeOut.line("%s '%s' // R3", sub.getTag().toBuilderCall(), sub.optValue.content);
+                        }
+                        else {
+                            sub.toElementCode(codeOut, groovyParams, editPath);
+                        }
+                    }
+                }
+            }
+            codeOut._line("}");
+            if (needLoop) {
+                groovyParams.pop();
+                codeOut._line("}");
+            }
         }
         else { // path should never be empty
             Tag outer = path.getTag(0);
             Tag inner = path.getTag(1);
             Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
-            boolean needLoop = !groovyParams.contains(inner);
+            boolean needLoop = !groovyParams.contains(inner.toGroovyParam());
             if (needLoop) {
-                out.line_("%s%s %s { %s -> // R2", outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam());
-                groovyParams.push(inner);
+                codeOut.line_("%s%s %s { %s -> // R4", outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam());
+                groovyParams.push(inner.toGroovyParam());
             }
-            childrenInLoop(nodeMapping, path.chop(-1), groovyParams, out, editPath);
+            childrenInLoop(nodeMapping, path.chop(-1), groovyParams, codeOut, editPath);
             if (needLoop) {
                 groovyParams.pop();
-                out._line("}");
+                codeOut._line("}");
             }
         }
     }
 
-    private void childrenToCode(Out out, Stack<Tag> groovyParams, EditPath editPath) {
+    private void childrenToCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (hasChildren()) {
-            startBuilderCall(out, editPath);
+            startBuilderCall("R5", codeOut, groovyParams, editPath);
             for (RecDefNode sub : children) {
                 if (sub.isAttr()) continue;
                 if (sub.optKey != null) {
-                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
+                    codeOut.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
                 }
                 else if (sub.optValue != null) {
-                    out.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
+                    codeOut.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
                 }
                 else {
-                    sub.toElementCode(out, groovyParams, editPath);
+                    sub.toElementCode(codeOut, groovyParams, editPath);
                 }
             }
-            out._line("}");
+            codeOut._line("}");
         }
         else if (nodeMappings.isEmpty()) {
-            startBuilderCall(out, editPath);
-            out.line("''");
-            out._line("}");
+            startBuilderCall("R6", codeOut, groovyParams, editPath);
+            codeOut.line("''");
+            codeOut._line("}");
         }
         else {
             for (NodeMapping nodeMapping : nodeMappings.values()) {
                 if (nodeMapping.tuplePaths == null) {
-                    startBuilderCall(out, editPath);
-                    nodeMapping.toElementCode(out, editPath);
-                    out._line("}");
+                    startBuilderCall("R7", codeOut, groovyParams, editPath);
+                    nodeMapping.codeOut = codeOut.createChild();
+                    nodeMapping.toLeafElementCode(groovyParams, editPath);
+                    codeOut._line("}");
                 }
                 else {
-                    out.line_("%s %s { %s -> // R3", nodeMapping.getTupleExpression(), nodeMapping.getOperator().getChar(), nodeMapping.getTupleName());
-                    startBuilderCall(out, editPath);
-                    nodeMapping.toElementCode(out, editPath);
-                    out._line("}");
-                    out._line("}");
+                    codeOut.line_("%s %s { %s -> // R8", nodeMapping.getTupleExpression(), nodeMapping.getOperator().getChar(), nodeMapping.getTupleName());
+                    startBuilderCall("R9", codeOut, groovyParams, editPath);
+                    nodeMapping.codeOut = codeOut.createChild();
+                    nodeMapping.toLeafElementCode(groovyParams, editPath);
+                    codeOut._line("}");
+                    codeOut._line("}");
                 }
             }
         }
@@ -303,41 +336,44 @@ public class RecDefNode {
         return !elem.elemList.isEmpty();
     }
 
-    private void startBuilderCall(Out out, EditPath editPath) {
+    private void startBuilderCall(String comment, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (hasActiveAttributes()) {
-            out.line_("%s (", getTag().toBuilderCall());
+            codeOut.line_("%s ( // %s", getTag().toBuilderCall(), comment);
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
                 if (sub.optKey != null) {
-                    if (comma) out.line(",");
-                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
+                    if (comma) codeOut.line(",");
+                    codeOut.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
                     comma = true;
                 }
                 else if (sub.optValue != null) {
-                    if (comma) out.line(",");
-                    out.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
+                    if (comma) codeOut.line(",");
+                    codeOut.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
                     comma = true;
                 }
                 else {
                     for (NodeMapping nodeMapping : sub.nodeMappings.values()) {
+                        nodeMapping.codeOut = codeOut.createChild();
                         if (sub.isAttr()) {
-                            if (comma) out.line(",");
-                            nodeMapping.toAttributeCode(out, editPath);
+                            if (comma) codeOut.line(",");
+                            codeOut.line_("%s : {", sub.getTag().toBuilderCall());
+                            nodeMapping.toAttributeCode(groovyParams, editPath);
+                            codeOut._line("}");
                             comma = true;
                         }
                     }
                 }
             }
-            out._line(") {").in();
+            codeOut._line(") {").in();
         }
         else {
-            out.line_("%s {", getTag().toBuilderCall());
+            codeOut.line_("%s { // %s", getTag().toBuilderCall(), comment);
         }
     }
 
     private boolean hasActiveAttributes() {
-        for (RecDefNode sub : children) if (sub.isAttr() && (sub.hasNodeMappings() || sub.hasConstant())) return true;
+        for (RecDefNode sub : children) if (sub.isAttr() && (sub.hasDescendentNodeMappings() || sub.hasConstant())) return true;
         return false;
     }
 

@@ -31,9 +31,17 @@ import eu.delving.groovy.GroovyNode
 
 public class MappingCategory {
 
-    private static NodeList unwrap(a) {
+    public static class TupleList extends ArrayList {
+        @Override
+        public String toString() {
+            return 'TUPLE' + super.toString();
+        }
+    }
+
+    private static List unwrap(a) {
         if (!a) return new NodeList(0);
         if (a instanceof NodeList) return a;
+        if (a instanceof TupleList) return a
         if (a instanceof List && ((List) a).size() == 1) return unwrap(((List) a)[0])
         NodeList list = new NodeList();
         list.add(a)
@@ -91,10 +99,10 @@ public class MappingCategory {
     static Object or(List a, List b) { // operator |
         a = unwrap(a)
         b = unwrap(b)
-        List tupleList = new ArrayList()
+        TupleList tupleList = new TupleList()
         int max = Math.min(a.size(), b.size());
-        if (max > 1) for (Integer index: 0..(max - 1)) {
-            if (a[index] instanceof List) {
+        if (max > 0) for (Integer index : 0..(max - 1)) {
+            if (a[index] instanceof TupleList) {
                 tupleList.add(a[index] += b[index]);
             }
             else {
@@ -108,7 +116,7 @@ public class MappingCategory {
     static List multiply(List a, Closure closure) { // operator *
         a = unwrap(a)
         List output = new ArrayList();
-        for (Object child: a) {
+        for (Object child : a) {
             Object returnValue = closure.call(child)
             if (returnValue) {
                 if (returnValue instanceof Object[]) {
@@ -137,14 +145,13 @@ public class MappingCategory {
             out.append(walk.next())
             if (walk.hasNext()) out.append(delimiter)
         }
-        System.out.println("MULTIPLY "+out.toString())
         return [out.toString()]
     }
 
     // call closure for the first if there is one
     static Object power(List a, Closure closure) {  // operator **
         a = unwrap(a)
-        for (Object child: a) {
+        for (Object child : a) {
             closure.call(child)
             break
         }

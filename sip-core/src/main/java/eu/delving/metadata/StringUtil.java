@@ -48,22 +48,28 @@ public class StringUtil {
     }
 
     public static String linesToString(List<String> list) {
-        StringBuilder s = new StringBuilder();
-        if (list != null) for (String line : list) s.append(line.trim()).append('\n');
-        return s.toString();
+        StringBuilder builder = new StringBuilder();
+        if (list != null) for (String line : list) {
+            line = line.trim();
+            if (!line.isEmpty()) builder.append(line).append('\n');
+        }
+        return builder.length() == 0 ? null : builder.toString();
     }
     
     public static List<String> stringToLines(String string) {
         List<String> lines = new ArrayList<String>();
-        if (string != null) for (String line : Arrays.asList(string.split("\n"))) lines.add(line.trim());
-        return lines;
+        if (string != null) for (String line : Arrays.asList(string.split("\n"))) {
+            line = line.trim();
+            if (!line.isEmpty()) lines.add(line);
+        }
+        return lines.isEmpty() ? null : lines;
     }
     
-    public static void indentCode(String code, Out out) {
+    public static void indentCode(String code, CodeOut out) {
         indentCode(Arrays.asList(code.split("\n")), out);
     }
 
-    public static void indentCode(List<String> code, Out out) {
+    public static void indentCode(List<String> code, CodeOut out) {
         for (String codeLine : code) {
             int indent = codeIndent(codeLine);
             if (indent < 0) out.out();

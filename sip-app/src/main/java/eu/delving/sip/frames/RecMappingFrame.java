@@ -95,7 +95,7 @@ public class RecMappingFrame extends FrameBase {
     }
 
     private void updateList() {
-        Exec.swingAny(new ListUpdater());
+        if (sipModel.getMappingModel().hasRecMapping()) Exec.swingAny(new ListUpdater());
     }
 
     @Override
@@ -125,8 +125,8 @@ public class RecMappingFrame extends FrameBase {
         private RecDefTree recDefTree;
 
         private ListUpdater() {
-            if (sipModel.getMappingModel().hasRecMapping())
-                recDefTree = sipModel.getMappingModel().getRecMapping().getRecDefTree();
+            if (!sipModel.getMappingModel().hasRecMapping()) throw new RuntimeException("No rec mapping");
+            recDefTree = sipModel.getMappingModel().getRecMapping().getRecDefTree();
         }
 
         @Override

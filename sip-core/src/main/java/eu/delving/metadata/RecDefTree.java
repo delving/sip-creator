@@ -78,35 +78,35 @@ public class RecDefTree implements RecDefNode.Listener {
     }
 
     public String toCode(Set<MappingFunction> mappingFunctions, Map<String,String> facts, EditPath editPath) {
-        Out out = new Out();
-        out.line("// SIP-Creator Generated Mapping Code");
-        out.line("// ----------------------------------");
-        out.line("// Facts:");
+        CodeOut codeOut = CodeOut.create();
+        codeOut.line("// SIP-Creator Generated Mapping Code");
+        codeOut.line("// ----------------------------------");
+        codeOut.line("// Facts:");
         for (Map.Entry<String,String> entry : facts.entrySet()) {
-            out.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
+            codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
         }
-        out.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
-        out.line("// Functions:");
-        for (MappingFunction function : mappingFunctions) function.toCode(out);
-        out.line("// Dictionaries:");
-        for (NodeMapping nodeMapping : getNodeMappings()) nodeMapping.generateDictionaryCode(out);
-        out.line("// DSL Category wraps Builder call:");
-        out.line("org.w3c.dom.Node outputNode");
-        out.line_("use (MappingCategory) {");
-        out.line_("input * { _input ->");
-        out.line("_uniqueIdentifier = _input._id[0].toString()");
-        out.line("outputNode = output.");
-        if (root.hasNodeMappings()) {
-            root.toElementCode(out, new Stack<Tag>(), editPath);
+        codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
+        codeOut.line("// Functions:");
+        for (MappingFunction function : mappingFunctions) function.toCode(codeOut);
+        codeOut.line("// Dictionaries:");
+        for (NodeMapping nodeMapping : getNodeMappings()) nodeMapping.generateDictionaryCode(codeOut);
+        codeOut.line("// DSL Category wraps Builder call:");
+        codeOut.line("org.w3c.dom.Node outputNode");
+        codeOut.line_("use (MappingCategory) {");
+        codeOut.line_("input * { _input ->");
+        codeOut.line("_uniqueIdentifier = _input._id[0].toString()");
+        codeOut.line("outputNode = output.");
+        if (root.hasDescendentNodeMappings()) {
+            root.toElementCode(codeOut, new Stack<String>(), editPath);
         }
         else {
-            out.line("'no' { 'mapping' }");
+            codeOut.line("'no' { 'mapping' }");
         }
-        out._line("}");
-        out.line("outputNode");
-        out._line("}");
-        out.line("// ----------------------------------");
-        return out.toString();
+        codeOut._line("}");
+        codeOut.line("outputNode");
+        codeOut._line("}");
+        codeOut.line("// ----------------------------------");
+        return codeOut.toString();
     }
 
     public List<RecDef.Namespace> getNamespaces() {

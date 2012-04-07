@@ -70,6 +70,9 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public RecDefNode recDefNode;
 
     @XStreamOmitField
+    public CodeOut codeOut;
+
+    @XStreamOmitField
     private SortedSet statsTreeNodes;
 
     @Override
@@ -99,7 +102,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
     public Operator getOperator() {
         return operator == null ? Operator.ALL : operator;
     }
-    
+
     public void clearStatsTreeNodes() {
         statsTreeNodes = null;
     }
@@ -184,10 +187,11 @@ public class NodeMapping implements Comparable<NodeMapping> {
             dictionary = new TreeMap<String, String>();
             changed = true;
         }
-        for (String key : domainValues) if (!dictionary.containsKey(key)) {
-            dictionary.put(key, "");
-            changed = true;
-        }
+        for (String key : domainValues)
+            if (!dictionary.containsKey(key)) {
+                dictionary.put(key, "");
+                changed = true;
+            }
         Set<String> unused = new HashSet<String>(dictionary.keySet());
         unused.removeAll(domainValues);
         for (String unusedKey : unused) {
@@ -204,51 +208,40 @@ public class NodeMapping implements Comparable<NodeMapping> {
         groovyCode = null;
         return true;
     }
-    public boolean codeLooksLike(String codeString) {
-        Iterator<String> walk;
-        if (groovyCode == null) { // then generate the default code
-            Out out = new Out();
-            toInnerLoop(getLocalPath(), out);
-            walk = Arrays.asList(out.toString().split("\n")).iterator();
-        }
-        else {
-            walk = groovyCode.iterator();
-        }
+
+    public boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
+        if (codeString == null) return false;
+        List<String> list = Arrays.asList(getCode(getGeneratorEditPath(), recMapping).split("\n"));
+        Iterator<String> walk = list.iterator();
         return isSimilar(codeString, walk);
     }
 
-    public void setGroovyCode(String groovyCode) {
-        this.groovyCode = StringUtil.stringToLines(groovyCode);
-        recDefNode.notifyNodeMappingChange(this);
+    public String getCode(EditPath editPath, RecMapping recMapping) {
+        recMapping.toCode(editPath);
+        return codeOut.toString();
     }
 
-    public void toAttributeCode(Out out, EditPath editPath) {
+    public void setGroovyCode(String codeString, RecMapping recMapping) {
+        if (codeString == null || generatedCodeLooksLike(codeString, recMapping)) {
+            if (groovyCode != null) {
+                groovyCode = null;
+                recDefNode.notifyNodeMappingChange(this);
+            }
+        }
+        else if (groovyCode == null || !isSimilar(codeString, groovyCode.iterator())) {
+            groovyCode = StringUtil.stringToLines(codeString);
+            recDefNode.notifyNodeMappingChange(this);
+        }
+    }
+
+    public void toAttributeCode(Stack<String> groovyParams, EditPath editPath) {
         if (!recDefNode.isAttr()) return;
-        String editedCode = getEditedCode(editPath);
-        out.line_("%s : {", recDefNode.getTag().toBuilderCall());
-        toUserCode(out, editedCode);
-        out._line("}");
+        toUserCode(groovyParams, editPath);
     }
 
-    public void toElementCode(Out out, EditPath editPath) {
+    public void toLeafElementCode(Stack<String> groovyParams, EditPath editPath) {
         if (recDefNode.isAttr() || !recDefNode.isLeafElem()) return;
-        String editedCode = getEditedCode(editPath);
-        toUserCode(out, editedCode);
-    }
-
-    private String getEditedCode(EditPath editPath) {
-        return editPath == null ? null : editPath.getEditedCode();
-    }
-
-    public String getGeneratedCode() {
-        Out out = new Out();
-        if (isUserCodeEditable()) {
-            toUserCode(out, null);
-        }
-        else {
-            recDefNode.toElementCode(out, new Stack<Tag>(), null);
-        }
-        return out.toString();
+        toUserCode(groovyParams, editPath);
     }
 
     public boolean isUserCodeEditable() {
@@ -260,81 +253,100 @@ public class NodeMapping implements Comparable<NodeMapping> {
             line = line.trim();
             if (line.isEmpty()) continue;
             if (!walk.hasNext()) return false;
-            if (!walk.next().equals(line)) return false;
+            while (walk.hasNext()) {
+                String otherLine = walk.next().trim();
+                if (otherLine.isEmpty()) continue;
+                if (!otherLine.equals(line)) return false;
+            }
         }
         return !walk.hasNext();
     }
 
-    private void toUserCode(Out out, String editedCode) {
-        if (editedCode != null) {
-            StringUtil.indentCode(editedCode, out);
+    private void toUserCode(Stack<String> groovyParams, EditPath editPath) {
+        if (editPath != null) {
+            if (!editPath.generated()) {
+                if (editPath.getEditedCode(outputPath) != null) {
+                    StringUtil.indentCode(editPath.getEditedCode(outputPath), codeOut);
+                    return;
+                }
+                else if (groovyCode != null) {
+                    StringUtil.indentCode(groovyCode, codeOut);
+                    return;
+                }
+            }
         }
         else if (groovyCode != null) {
-            StringUtil.indentCode(groovyCode, out);
+            StringUtil.indentCode(groovyCode, codeOut);
+            return;
         }
-        else {
-            toInnerLoop(getLocalPath(), out);
-        }
+        toInnerLoop(getLocalPath(), groovyParams);
     }
 
-    private void toInnerLoop(Path path, Out out) {
+    private void toInnerLoop(Path path, Stack<String> groovyParams) {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
             Tag inner = path.getTag(0);
             if (dictionary != null) {
-                out.line("from%s(%s)", getDictionaryName(), inner.toGroovyParam());
+                codeOut.line("from%s(%s)", getDictionaryName(), inner.toGroovyParam());
             }
             else if (tuplePaths != null) {
-                out.line(getTupleUsage());
+                codeOut.line(getTupleUsage());
             }
             else {
-                out.line("\"${%s}\"", inner.toGroovyParam());
+                codeOut.line("\"${%s}\"", inner.toGroovyParam());
             }
         }
         else if (recDefNode.isLeafElem()) {
-            toInnerLoop(path.chop(-1), out);
+            toInnerLoop(path.chop(-1), groovyParams);
         }
         else {
+            boolean needLoop;
             if (tuplePaths != null) {
-                out.line_("%s %s { %s -> // N1", getTupleExpression(), getOperator().getChar(), getTupleName());
+                needLoop = !groovyParams.contains(getTupleName());
+                if (needLoop) {
+                    codeOut.line_("%s %s { %s -> // N1", getTupleExpression(), getOperator().getChar(), getTupleName());
+                }
             }
             else {
                 Tag outer = path.getTag(0);
                 Tag inner = path.getTag(1);
-                out.line_("%s%s %s { %s -> // N2", outer.toGroovyParam(), inner.toGroovyRef(), getOperator().getChar(), inner.toGroovyParam());
+                needLoop = !groovyParams.contains(inner.toGroovyParam());
+                if (needLoop) {
+                    codeOut.line_("%s%s %s { %s -> // N2", outer.toGroovyParam(), inner.toGroovyRef(), getOperator().getChar(), inner.toGroovyParam());
+                }
             }
-            toInnerLoop(path.chop(-1), out);
-            out._line("}");
+            toInnerLoop(path.chop(-1), groovyParams);
+            if (needLoop) codeOut._line("}");
         }
     }
 
-    public void generateDictionaryCode(Out out) {
+    public void generateDictionaryCode(CodeOut codeOut) {
         if (dictionary == null) return;
         String name = getDictionaryName();
-        out.line_(String.format("def %s = [", name));
+        codeOut.line_(String.format("def %s = [", name));
         Iterator<Map.Entry<String, String>> walk = dictionary.entrySet().iterator();
         while (walk.hasNext()) {
             Map.Entry<String, String> entry = walk.next();
-            out.line(String.format("'''%s''':'''%s'''%s",
+            codeOut.line(String.format("'''%s''':'''%s'''%s",
                     StringUtil.sanitizeGroovy(entry.getKey()),
                     StringUtil.sanitizeGroovy(entry.getValue()),
                     walk.hasNext() ? "," : ""
             ));
         }
-        out._line("]");
-        out.line_("def from%s = { value ->", name);
-        out.line_("if (value) {");
-        out.line("def v = %s[value.sanitize()];", name);
-        out.line_("if (v) {");
-        out.line_("if (v.endsWith(':')) {");
-        out.line("return \"${v} ${value}\"");
-        out._line("} else {").in();
-        out.line("return v");
-        out._line("}");
-        out._line("}");
-        out._line("}");
-        out.line("return ''");
-        out._line("}");
+        codeOut._line("]");
+        codeOut.line_("def from%s = { value ->", name);
+        codeOut.line_("if (value) {");
+        codeOut.line("def v = %s[value.sanitize()];", name);
+        codeOut.line_("if (v) {");
+        codeOut.line_("if (v.endsWith(':')) {");
+        codeOut.line("return \"${v} ${value}\"");
+        codeOut._line("} else {").in();
+        codeOut.line("return v");
+        codeOut._line("}");
+        codeOut._line("}");
+        codeOut._line("}");
+        codeOut.line("return ''");
+        codeOut._line("}");
     }
 
     public Path getLocalPath() {
@@ -415,6 +427,25 @@ public class NodeMapping implements Comparable<NodeMapping> {
             }
         }
         return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.chop(1));
+    }
+
+    private EditPath getGeneratorEditPath() {
+        return new EditPath() {
+            @Override
+            public Path getPath() {
+                return outputPath;
+            }
+
+            @Override
+            public String getEditedCode(Path path) {
+                return null;
+            }
+
+            @Override
+            public boolean generated() {
+                return true;
+            }
+        };
     }
 
     private static final Hasher HASHER = new Hasher();

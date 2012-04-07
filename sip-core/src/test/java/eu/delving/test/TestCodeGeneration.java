@@ -113,7 +113,8 @@ public class TestCodeGeneration {
                         "return _name.split(' ');\n" +
                         "} else {\n" +
                         "return _name.text();\n" +
-                        "}"
+                        "}",
+                recMapping
         );
         String code = recMapping.toCode(null);
         printWithLineNumbers(code);

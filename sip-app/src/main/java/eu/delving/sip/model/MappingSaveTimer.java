@@ -84,7 +84,6 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
                 }
                 sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping, freeze);
                 if (freeze) {
-                    sipModel.getFeedback().say("Froze mapping");
                     if (listReceiver != null) Exec.swing(new Runnable() {
                         @Override
                         public void run() {
