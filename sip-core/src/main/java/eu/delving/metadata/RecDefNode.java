@@ -40,7 +40,7 @@ import java.util.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class RecDefNode {
+public class RecDefNode implements Comparable<RecDefNode> {
     private RecDefNode parent;
     private Path path;
     private RecDef.Elem elem;
@@ -49,6 +49,11 @@ public class RecDefNode {
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
+
+    @Override
+    public int compareTo(RecDefNode recDefNode) {
+        return getTag().compareTo(recDefNode.getTag());
+    }
 
     public interface Listener {
         void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping);
@@ -68,10 +73,8 @@ public class RecDefNode {
         this.elem = elem;
         this.attr = attr;
         this.optRoot = optRoot;
-        if (optKey != null && optKey.parent.key.equals(getTag()))
-            this.optKey = optKey;
-        if (optValue != null && optValue.parent.value.equals(getTag()))
-            this.optValue = optValue;
+        if (optKey != null && optKey.parent.key.equals(getTag())) this.optKey = optKey;
+        if (optValue != null && optValue.parent.value.equals(getTag())) this.optValue = optValue;
         if (elem != null) {
             for (RecDef.Attr sub : elem.attrList) {
                 children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot));
@@ -80,10 +83,11 @@ public class RecDefNode {
                 if (sub.optList == null) {
                     children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot));
                 }
-                else
+                else {
                     for (RecDef.Opt subOpt : sub.optList.opts) { // a child for each option
                         children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null));
                     }
+                }
             }
             if (elem.nodeMapping != null) {
                 nodeMappings.put(elem.nodeMapping.inputPath, elem.nodeMapping);
@@ -91,6 +95,7 @@ public class RecDefNode {
                 elem.nodeMapping.outputPath = getPath();
             }
         }
+        Collections.sort(children);
     }
 
     public List<String> getOptions() {
