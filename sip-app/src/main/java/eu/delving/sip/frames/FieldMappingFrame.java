@@ -215,7 +215,7 @@ public class FieldMappingFrame extends FrameBase {
 //        });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void statsTreeNodeSet(CreateModel createModel) {
+            public void sourceTreeNodesSet(CreateModel createModel) {
             }
 
             @Override

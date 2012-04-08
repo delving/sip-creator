@@ -52,7 +52,7 @@ public class CreateModel {
         if (sourceTreeNodes != null && sourceTreeNodes.isEmpty()) sourceTreeNodes = null;
         this.sourceTreeNodes = sourceTreeNodes;
         setNodeMapping(null);
-        for (Listener listener : listeners) listener.statsTreeNodeSet(this);
+        for (Listener listener : listeners) listener.sourceTreeNodesSet(this);
     }
 
     public void setRecDefTreePath(Path path) {
@@ -179,7 +179,7 @@ public class CreateModel {
 
     public interface Listener {
 
-        void statsTreeNodeSet(CreateModel createModel);
+        void sourceTreeNodesSet(CreateModel createModel);
 
         void recDefTreeNodeSet(CreateModel createModel);
 

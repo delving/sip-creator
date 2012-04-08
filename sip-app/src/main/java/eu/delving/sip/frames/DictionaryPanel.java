@@ -264,7 +264,7 @@ public class DictionaryPanel extends JPanel {
             private boolean wasDictionary;
 
             @Override
-            public void statsTreeNodeSet(CreateModel createModel) {
+            public void sourceTreeNodesSet(CreateModel createModel) {
                 reactToChange();
             }
 

@@ -207,21 +207,32 @@ public class RecDefTreeNode extends FilterNode {
         }
 
         private void markNodeMappings(boolean selected, RecDefTreeNode node) {
-            setOpaque(!selected);
-            setBackground(selected ? Color.WHITE : MAPPED_HILITE);
-            setForeground(selected ? MAPPED_HILITE : Color.BLACK);
+            if (selected) {
+                setOpaque(false);
+                setBackground(Color.WHITE);
+                setForeground(MAPPED_HILITE);
+            }
+            else {
+                setOpaque(true);
+                setBackground(MAPPED_HILITE);
+                setForeground(Color.BLACK);
+            }
             setBorder(BorderFactory.createEtchedBorder());
+            setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node)));
+        }
+
+        private String getCommaList(RecDefTreeNode node) {
             Set<String> tails = new TreeSet<String>();
             for (NodeMapping nodeMapping : node.recDefNode.getNodeMappings().values()) {
                 for (Path path : nodeMapping.getInputPaths()) tails.add(path.getTail());
             }
-            StringBuilder commaList = new StringBuilder();
-            Iterator<String> commaWalk = tails.iterator();
-            while (commaWalk.hasNext()) {
-                commaList.append(commaWalk.next());
-                if (commaWalk.hasNext()) commaList.append(", ");
+            StringBuilder list = new StringBuilder();
+            Iterator<String> walk = tails.iterator();
+            while (walk.hasNext()) {
+                list.append(walk.next());
+                if (walk.hasNext()) list.append(", ");
             }
-            setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), commaList.toString()));
+            return list.toString();
         }
 
     }

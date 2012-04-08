@@ -73,7 +73,7 @@ public class CreateFrame extends FrameBase {
         });
         createModel.addListener(new CreateModel.Listener() {
             @Override
-            public void statsTreeNodeSet(CreateModel createModel) {
+            public void sourceTreeNodesSet(CreateModel createModel) {
                 SortedSet<SourceTreeNode> sourceTreeNodes = createModel.getSourceTreeNodes();
                 if (sourceTreeNodes == null) {
                     statsHtml.setHtml(SELECT_STATS);
