@@ -37,6 +37,8 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import static eu.delving.sip.base.Utility.MAPPED_HILITE;
@@ -209,11 +211,15 @@ public class RecDefTreeNode extends FilterNode {
             setBackground(selected ? Color.WHITE : MAPPED_HILITE);
             setForeground(selected ? MAPPED_HILITE : Color.BLACK);
             setBorder(BorderFactory.createEtchedBorder());
+            Set<String> tails = new TreeSet<String>();
+            for (NodeMapping nodeMapping : node.recDefNode.getNodeMappings().values()) {
+                for (Path path : nodeMapping.getInputPaths()) tails.add(path.getTail());
+            }
             StringBuilder commaList = new StringBuilder();
-            Iterator<NodeMapping> walk = node.recDefNode.getNodeMappings().values().iterator();
-            while (walk.hasNext()) {
-                commaList.append(walk.next().inputPath.getTail());
-                if (walk.hasNext()) commaList.append(", ");
+            Iterator<String> commaWalk = tails.iterator();
+            while (commaWalk.hasNext()) {
+                commaList.append(commaWalk.next());
+                if (commaWalk.hasNext()) commaList.append(", ");
             }
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), commaList.toString()));
         }
