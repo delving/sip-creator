@@ -95,7 +95,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 elem.nodeMapping.outputPath = getPath();
             }
         }
-        Collections.sort(children);
     }
 
     public List<String> getOptions() {
