@@ -25,7 +25,6 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.Storage;
 import org.antlr.stringtemplate.StringTemplate;
@@ -41,8 +40,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
 
-import static eu.delving.sip.base.Utility.DELIMITER_HILITE;
-import static eu.delving.sip.base.Utility.MAPPED_HILITE;
+import static eu.delving.sip.base.Utility.*;
 
 /**
  * A node of the analysis tree
@@ -57,8 +55,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private boolean recordRoot, uniqueElement;
     private FieldStatistics fieldStatistics;
     private String htmlChunk;
-    private List<NodeMapping> mappedIn = new ArrayList<NodeMapping>();
-    private FilterTreeModel treeModel;
+    private List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
 
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
@@ -73,8 +70,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
             root.getChildren().add(0, factNode);
             for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, entry);
-            // todo: derived fields?
-//            SourceTreeNode derivedNode = new SourceTreeNode(root, Storage.DERIVED_TAG, "<h3>Select a derived fields from here</h3>");
         }
         return root;
     }
@@ -106,11 +101,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         setStatistics(fieldStatistics);
     }
 
-    public void setTreeModel(FilterTreeModel treeModel) {
-        this.treeModel = treeModel;
-        for (SourceTreeNode child : children) child.setTreeModel(treeModel);
-    }
-
     public void setStatistics(FieldStatistics fieldStatistics) {
         this.fieldStatistics = fieldStatistics;
         StringTemplate template = Utility.getTemplate("stats-brief");
@@ -135,6 +125,10 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         return fieldStatistics;
     }
 
+    public List<NodeMapping> getNodeMappings() {
+        return nodeMappings;
+    }
+
     public TreePath getTreePath() {
         List<SourceTreeNode> list = new ArrayList<SourceTreeNode>();
         compilePathList(list, true);
@@ -157,7 +151,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         boolean oldValue = this.recordRoot;
         Path ourPath = getPath(true);
         this.recordRoot = recordRoot != null && ourPath.equals(recordRoot);
-        if (this.recordRoot || this.recordRoot != oldValue) treeModel.refreshNode(this);
+        if (this.recordRoot || this.recordRoot != oldValue) fireChanged();
         int childTotal = 0;
         for (SourceTreeNode child : children) {
             int subtotal = child.setRecordRoot(recordRoot);
@@ -169,7 +163,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     public void setUniqueElement(Path uniqueElement) {
         boolean oldValue = this.uniqueElement;
         this.uniqueElement = uniqueElement != null && getPath(true).equals(uniqueElement);
-        if (this.uniqueElement != oldValue) treeModel.refreshNode(this);
+        if (this.uniqueElement != oldValue) fireChanged();
         for (SourceTreeNode child : children) child.setUniqueElement(uniqueElement);
     }
 
@@ -278,33 +272,19 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     public static void removeStatsTreeNodes(final NodeMapping nodeMapping) {
         if (nodeMapping.hasStatsTreeNodes()) {
-            for (Object nodeObject : nodeMapping.getStatsTreeNodes()) {
+            for (Object nodeObject : nodeMapping.getSourceTreeNodes()) {
                 ((SourceTreeNode) nodeObject).removeMappedIn(nodeMapping);
             }
         }
     }
 
     private void addMappedIn(NodeMapping nodeMapping) {
-        this.mappedIn.add(nodeMapping);
-        final FilterTreeModel treeModel = this.treeModel;
-        Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                treeModel.refreshNode(SourceTreeNode.this);
-            }
-        });
+        this.nodeMappings.add(nodeMapping);
+        fireChanged();
     }
 
     private void removeMappedIn(NodeMapping nodeMapping) {
-        final FilterTreeModel treeModel = this.treeModel;
-        if (this.mappedIn.remove(nodeMapping)) {
-            Exec.swing(new Runnable() {
-                @Override
-                public void run() {
-                    treeModel.refreshNode(SourceTreeNode.this);
-                }
-            });
-        }
+        if (this.nodeMappings.remove(nodeMapping)) fireChanged();
     }
 
     private static SourceTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, SourceTreeNode parent) {
@@ -362,7 +342,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 if (node.isRecordRoot() || node.isUniqueElement()) {
                     markDelimiters(sel, node);
                 }
-                else if (!node.mappedIn.isEmpty()) {
+                else if (!node.nodeMappings.isEmpty()) {
                     markNodeMappings(sel, node);
                 }
                 else {
@@ -382,12 +362,20 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         }
 
         private void markNodeMappings(boolean selected, SourceTreeNode node) {
-            setOpaque(!selected);
-            setBackground(selected ? Color.WHITE : MAPPED_HILITE);
-            setForeground(selected ? MAPPED_HILITE : Color.BLACK);
+            Color color = node.isHighlighted() ? HILIGHTED_COLOR : MAPPED_COLOR;
+            if (selected) {
+                setOpaque(false);
+                setBackground(Color.WHITE);
+                setForeground(color);
+            }
+            else {
+                setOpaque(true);
+                setBackground(color);
+                setForeground(Color.BLACK);
+            }
             setBorder(BorderFactory.createEtchedBorder());
             StringBuilder commaList = new StringBuilder();
-            Iterator<NodeMapping> walk = node.mappedIn.iterator();
+            Iterator<NodeMapping> walk = node.nodeMappings.iterator();
             while (walk.hasNext()) {
                 commaList.append(walk.next().recDefNode.toString());
                 if (walk.hasNext()) commaList.append(", ");

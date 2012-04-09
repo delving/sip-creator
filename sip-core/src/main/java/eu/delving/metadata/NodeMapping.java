@@ -123,7 +123,7 @@ public class NodeMapping implements Comparable<NodeMapping> {
         return statsTreeNodes.iterator().next();
     }
 
-    public SortedSet getStatsTreeNodes() {
+    public SortedSet getSourceTreeNodes() {
         return statsTreeNodes;
     }
 

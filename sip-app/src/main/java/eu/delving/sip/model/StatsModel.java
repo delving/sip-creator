@@ -50,7 +50,7 @@ public class StatsModel {
     private FactModel hintsModel = new FactModel();
     private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
     private SourceTreeNode root;
-    private FilterTreeModel statsTreeModel = new FilterTreeModel(root = sourceTree);
+    private FilterTreeModel sourceTreeModel = new FilterTreeModel(root = sourceTree);
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -74,8 +74,8 @@ public class StatsModel {
         else {
             sourceTree = SourceTreeNode.create("Analysis not yet performed");
         }
-        sourceTree.setTreeModel(statsTreeModel);
-        statsTreeModel.setRoot(sourceTree);
+        sourceTree.setTreeModel(sourceTreeModel);
+        sourceTreeModel.setRoot(sourceTree);
         root = sourceTree;
         setDelimiters(recordRoot, uniqueElement);
     }
@@ -118,18 +118,18 @@ public class StatsModel {
         return sourceTree;
     }
 
-    public TreeModel getStatsTreeModel() {
-        return statsTreeModel;
+    public TreeModel getSourceTreeModel() {
+        return sourceTreeModel;
     }
 
     public SortedSet<SourceTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
         SortedSet<SourceTreeNode> nodes = new TreeSet<SourceTreeNode>();
-        if (!(statsTreeModel.getRoot() instanceof SourceTreeNode)) {
+        if (!(sourceTreeModel.getRoot() instanceof SourceTreeNode)) {
             nodeMapping.clearStatsTreeNodes();
         }
         else if (!nodeMapping.hasStatsTreeNodes()) {
             for (Path path : nodeMapping.getInputPaths()) {
-                TreePath treePath = findNodeForInputPath(path, (SourceTreeNode) statsTreeModel.getRoot());
+                TreePath treePath = findNodeForInputPath(path, (SourceTreeNode) sourceTreeModel.getRoot());
                 if (treePath != null) nodes.add((SourceTreeNode) treePath.getLastPathComponent());
             }
             if (nodes.isEmpty()) {
@@ -140,7 +140,7 @@ public class StatsModel {
             }
         }
         else {
-            for (Object node : nodeMapping.getStatsTreeNodes()) nodes.add((SourceTreeNode) node);
+            for (Object node : nodeMapping.getSourceTreeNodes()) nodes.add((SourceTreeNode) node);
         }
         return nodes.isEmpty() ? null : nodes;
     }

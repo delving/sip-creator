@@ -242,22 +242,16 @@ public class TargetFrame extends FrameBase {
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                refreshNode(mappingModel, node);
+                refreshRecDefTreeNode(mappingModel, node);
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                refreshNode(mappingModel, node);
+                refreshRecDefTreeNode(mappingModel, node);
             }
-            
-            private void refreshNode(final MappingModel mappingModel, final RecDefNode node) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        RecDefTreeNode recDefTreeNode = mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node);
-                        ((FilterTreeModel) recDefTree.getModel()).refreshNode(recDefTreeNode);
-                    }
-                });
+
+            private void refreshRecDefTreeNode(final MappingModel mappingModel, final RecDefNode node) {
+                mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node).fireChanged();
             }
         });
     }

@@ -25,10 +25,7 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 
 import javax.swing.tree.TreePath;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -43,6 +40,7 @@ public class CreateModel {
     private RecDefTreeNode recDefTreeNode;
     private NodeMapping nodeMapping;
     private boolean settingNodeMapping;
+    private List<NodeMapping> highlightedNodeMappings = new ArrayList<NodeMapping>();
 
     public CreateModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -51,7 +49,20 @@ public class CreateModel {
     public void setSourceTreeNodes(SortedSet<SourceTreeNode> sourceTreeNodes) {
         if (sourceTreeNodes != null && sourceTreeNodes.isEmpty()) sourceTreeNodes = null;
         this.sourceTreeNodes = sourceTreeNodes;
-        setNodeMapping(null);
+        if (!settingNodeMapping) {
+            setNodeMapping(null);
+            clearHighlights();
+            sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
+            if (sourceTreeNodes != null) {
+                for (SourceTreeNode node : sourceTreeNodes) {
+                    for (NodeMapping nodeMapping : node.getNodeMappings()) {
+                        highlight(nodeMapping);
+                        RecDefTreeNode recDefTreeNode = sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode);
+                        recDefTreeNode.setHighlighted();
+                    }
+                }
+            }
+        }
         for (Listener listener : listeners) listener.sourceTreeNodesSet(this);
     }
 
@@ -64,18 +75,35 @@ public class CreateModel {
     public void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
         if (recDefTreeNode != null && recDefTreeNode.getParent() == null) recDefTreeNode = null;
         this.recDefTreeNode = recDefTreeNode;
-        setNodeMapping(null);
+        if (!settingNodeMapping) {
+            setNodeMapping(null);
+            clearHighlights();
+            sipModel.getStatsModel().getSourceTree().clearHighlighted();
+            if (recDefTreeNode != null) {
+                for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
+                    highlight(nodeMapping);
+                    for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
+                        ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+                    }
+                }
+            }
+        }
         for (Listener listener : listeners) listener.recDefTreeNodeSet(this);
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
-        if (settingNodeMapping) return;
         this.nodeMapping = nodeMapping;
         if (nodeMapping != null) {
             settingNodeMapping = true;
             setSourceTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping));
             TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
             if (treePath != null) setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
+            clearHighlights();
+            for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
+                ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+            }
+            RecDefTreeNode recDefTreeNode = sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode);
+            recDefTreeNode.setHighlighted();
             settingNodeMapping = false;
         }
         for (Listener listener : listeners) listener.nodeMappingSet(this);
@@ -173,6 +201,16 @@ public class CreateModel {
             for (String value : nodeMapping.dictionary.values()) if (!value.trim().isEmpty()) nonemptyEntries++;
         }
         return nonemptyEntries;
+    }
+
+    private void clearHighlights() {
+        highlightedNodeMappings.clear();
+        sipModel.getStatsModel().getSourceTree().clearHighlighted();
+        sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
+    }
+
+    private void highlight(NodeMapping nodeMapping) {
+        highlightedNodeMappings.add(nodeMapping);
     }
 
     // observable

@@ -20,6 +20,7 @@ public class FilterTreeModel implements TreeModel {
 
     public FilterTreeModel(FilterNode root) {
         this.root = root;
+        root.setTreeModel(this);
     }
 
     public void setFilter(String patternString) {
@@ -29,6 +30,7 @@ public class FilterTreeModel implements TreeModel {
 
     public void setRoot(FilterNode root) {
         this.root = root;
+        root.setTreeModel(this);
         refreshTree();
     }
 
@@ -39,6 +41,7 @@ public class FilterTreeModel implements TreeModel {
 
     @Override
     public Object getChild(Object nodeObject, int index) {
+        if (index < 0) return null;
         return filterChildren(nodeObject).get(index);
     }
 

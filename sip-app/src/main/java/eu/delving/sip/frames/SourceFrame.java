@@ -81,7 +81,7 @@ public class SourceFrame extends FrameBase {
     public SourceFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
         super(Which.SOURCE, desktop, sipModel, "Source", false);
         this.statisticsFrame = statisticsFrame;
-        sourceTree = new JTree(sipModel.getStatsModel().getStatsTreeModel()) {
+        sourceTree = new JTree(sipModel.getStatsModel().getSourceTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {
                 TreePath treePath = sourceTree.getPathForLocation(evt.getX(), evt.getY());

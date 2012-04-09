@@ -21,6 +21,8 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.sip.base.Exec;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -32,7 +34,24 @@ import java.util.regex.Pattern;
  */
 
 public abstract class FilterNode {
+    private FilterTreeModel treeModel;
+    private boolean highlighted = false;
     private boolean passesFilter = true;
+
+    void setTreeModel(FilterTreeModel treeModel) {
+        this.treeModel = treeModel;
+        for (FilterNode child : getChildren()) child.setTreeModel(treeModel);
+    }
+
+    public final void fireChanged() {
+        if (treeModel == null) throw new RuntimeException("Tree model must be set");
+        Exec.swingAny(new Runnable() {
+            @Override
+            public void run() {
+                treeModel.refreshNode(FilterNode.this);
+            }
+        });
+    }
 
     public final void filter(String patternString) {
         List<Pattern> patterns = createPatternsFromString(patternString);
@@ -64,6 +83,25 @@ public abstract class FilterNode {
 
     public final boolean passesFilter() {
         return passesFilter;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted() {
+        if (!highlighted) {
+            this.highlighted = true;
+            fireChanged();
+        }
+    }
+
+    public void clearHighlighted() {
+        if (highlighted) {
+            highlighted = false;
+            fireChanged();
+        }
+        for (FilterNode child : getChildren()) child.clearHighlighted();
     }
 
     public abstract boolean isLeaf();

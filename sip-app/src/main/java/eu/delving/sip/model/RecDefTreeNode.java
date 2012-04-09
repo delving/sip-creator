@@ -41,7 +41,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import static eu.delving.sip.base.Utility.MAPPED_HILITE;
+import static eu.delving.sip.base.Utility.HILIGHTED_COLOR;
+import static eu.delving.sip.base.Utility.MAPPED_COLOR;
 
 /**
  * Represent an element in the JTree
@@ -207,14 +208,15 @@ public class RecDefTreeNode extends FilterNode {
         }
 
         private void markNodeMappings(boolean selected, RecDefTreeNode node) {
+            Color color = node.isHighlighted() ? HILIGHTED_COLOR : MAPPED_COLOR;
             if (selected) {
                 setOpaque(false);
                 setBackground(Color.WHITE);
-                setForeground(MAPPED_HILITE);
+                setForeground(color);
             }
             else {
                 setOpaque(true);
-                setBackground(MAPPED_HILITE);
+                setBackground(color);
                 setForeground(Color.BLACK);
             }
             setBorder(BorderFactory.createEtchedBorder());

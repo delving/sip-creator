@@ -198,7 +198,7 @@ public class TestMappingValidation {
                     }
                     dataSet().setStatistics(statistics);
                     sourceTree = SourceTreeNode.create(statistics.getFieldStatisticsList(), dataSet().getDataSetFacts());
-                    sourceTree.setTreeModel(new FilterTreeModel(sourceTree));
+                    new FilterTreeModel(sourceTree);
                     int recordCount = sourceTree.setRecordRoot(recordRoot);
                     mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));
                 }
