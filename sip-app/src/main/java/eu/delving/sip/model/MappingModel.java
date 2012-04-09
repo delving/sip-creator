@@ -43,6 +43,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MappingModel implements RecDefNode.Listener {
     private RecMapping recMapping;
     private RecDefTreeNode recDefTreeRoot;
+    private NodeMappingListModel nodeMappingListModel = new NodeMappingListModel();
+
+    public MappingModel() {
+        addSetListener(nodeMappingListModel.createSetEar());
+        addChangeListener(nodeMappingListModel.createMappingChangeEar());
+    }
 
     public void setRecMapping(RecMapping recMapping) {
         this.recMapping = recMapping;
@@ -64,6 +70,10 @@ public class MappingModel implements RecDefNode.Listener {
             recDefTreeRoot = RecDefTreeNode.create(recMapping.getRecDefTree().getRoot());
         }
         return recDefTreeRoot;
+    }
+
+    public NodeMappingListModel getNodeMappingListModel() {
+        return nodeMappingListModel;
     }
 
     public TreePath getTreePath(Path path) {

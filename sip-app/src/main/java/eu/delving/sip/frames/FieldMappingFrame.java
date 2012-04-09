@@ -28,6 +28,7 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.MappingCompileModel;
+import eu.delving.sip.model.NodeMappingEntry;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -167,7 +168,7 @@ public class FieldMappingFrame extends FrameBase {
     private JButton createActionButton(Action action) {
         KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
         JButton button = new JButton(action);
-        button.setText(button.getText()+ " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + "-" + KeyEvent.getKeyText(stroke.getKeyCode()));
+        button.setText(button.getText() + " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + "-" + KeyEvent.getKeyText(stroke.getKeyCode()));
         return button;
     }
 
@@ -183,10 +184,10 @@ public class FieldMappingFrame extends FrameBase {
         operatorBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
-                final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
-                if (nodeMapping != null) {
-                    nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
-                    nodeMapping.notifyChanged();
+                final NodeMappingEntry nodeMappingEntry = sipModel.getCreateModel().getNodeMappingEntry();
+                if (nodeMappingEntry != null) {
+                    nodeMappingEntry.getNodeMapping().operator = (Operator) operatorBox.getSelectedItem();
+                    nodeMappingEntry.getNodeMapping().notifyChanged();
                 }
             }
         });
@@ -200,7 +201,7 @@ public class FieldMappingFrame extends FrameBase {
 //                Exec.work(new Runnable() {
 //                    @Override
 //                    public void run() {
-//                        sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
+//                        sipModel.getFieldCompileModel().setNodeMappingEntry(nodeMapping);
 //                    }
 //                });
 //            }
@@ -224,17 +225,20 @@ public class FieldMappingFrame extends FrameBase {
 
             @Override
             public void nodeMappingSet(CreateModel createModel) {
-                final NodeMapping nodeMapping = createModel.getNodeMapping();
-                contextVarModel.setList(nodeMapping);
-                sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        codeArea.setEditable(nodeMapping != null && nodeMapping.isUserCodeEditable());
-                        boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
-                        operatorBox.setSelectedIndex(all ? 0 : 1);
-                    }
-                });
+                final NodeMappingEntry nodeMappingEntry = createModel.getNodeMappingEntry();
+                if (nodeMappingEntry != null) {
+                    contextVarModel.setList(nodeMappingEntry.getNodeMapping());
+                    sipModel.getFieldCompileModel().setNodeMappingEntry(nodeMappingEntry);
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            NodeMapping nodeMapping = nodeMappingEntry.getNodeMapping();
+                            codeArea.setEditable(nodeMapping != null && nodeMapping.isUserCodeEditable());
+                            boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
+                            operatorBox.setSelectedIndex(all ? 0 : 1);
+                        }
+                    });
+                }
             }
 
             @Override
@@ -326,7 +330,7 @@ public class FieldMappingFrame extends FrameBase {
                     @Override
                     public void run() {
                         sipModel.getCreateModel().revertToOriginal();
-                        sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
+                        sipModel.getFieldCompileModel().setNodeMappingEntry(sipModel.getCreateModel().getNodeMappingEntry());
                     }
                 });
             }

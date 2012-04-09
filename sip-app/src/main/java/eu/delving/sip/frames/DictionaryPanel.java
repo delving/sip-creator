@@ -21,10 +21,10 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.NodeMappingEntry;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
@@ -57,7 +57,6 @@ public class DictionaryPanel extends JPanel {
     public static final String ASSIGN_SELECTED = "Assign Selected";
     public static final String ASSIGN_ALL = "Assign All";
     public static final String NO_DICTIONARY = "No dictionary for this mapping";
-    private SipModel sipModel;
     private CreateModel createModel;
     private JCheckBox showAssigned = new JCheckBox("Show Assigned");
     private JLabel statusLabel = new JLabel(NO_DICTIONARY, JLabel.CENTER);
@@ -76,7 +75,6 @@ public class DictionaryPanel extends JPanel {
 
     public DictionaryPanel(SipModel sipModel) {
         super(new BorderLayout(5, 5));
-        this.sipModel = sipModel;
         this.createModel = sipModel.getCreateModel();
         this.timer.setRepeats(false);
         valueList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -149,7 +147,7 @@ public class DictionaryPanel extends JPanel {
     }
 
     private static class DictionaryModel extends AbstractTableModel {
-        private NodeMapping nodeMapping;
+        private NodeMappingEntry nodeMappingEntry;
         private List<String[]> rows = new ArrayList<String[]>();
         private Map<Integer, Integer> index;
         private JLabel statusLabel;
@@ -158,16 +156,16 @@ public class DictionaryPanel extends JPanel {
             this.statusLabel = statusLabel;
         }
 
-        public void setNodeMapping(NodeMapping nodeMapping) {
-            this.nodeMapping = nodeMapping;
+        public void setNodeMappingEntry(NodeMappingEntry nodeMappingEntry) {
+            this.nodeMappingEntry = nodeMappingEntry;
             this.index = null;
             int size = rows.size();
             rows.clear();
             if (size > 0) {
                 fireTableRowsDeleted(0, size);
             }
-            if (nodeMapping != null && nodeMapping.dictionary != null) {
-                for (Map.Entry<String, String> entry : nodeMapping.dictionary.entrySet()) {
+            if (nodeMappingEntry != null && nodeMappingEntry.getNodeMapping().dictionary != null) {
+                for (Map.Entry<String, String> entry : nodeMappingEntry.getNodeMapping().dictionary.entrySet()) {
                     rows.add(new String[]{entry.getKey(), entry.getValue()});
                 }
                 fireTableRowsInserted(0, rows.size());
@@ -253,7 +251,7 @@ public class DictionaryPanel extends JPanel {
                     mappedRow = foundRow;
                 }
             }
-            nodeMapping.dictionary.put(rows.get(mappedRow)[0], rows.get(mappedRow)[1] = (String) valueObject);
+            nodeMappingEntry.getNodeMapping().dictionary.put(rows.get(mappedRow)[0], rows.get(mappedRow)[1] = (String) valueObject);
             fireTableCellUpdated(rowIndex, columnIndex);
         }
     }
@@ -293,13 +291,13 @@ public class DictionaryPanel extends JPanel {
                             DELETE_ACTION.setEnabled(isDictionary);
                             if (isDictionary) {
                                 valueModel.setRecDefTreeNode(createModel.getRecDefTreeNode());
-                                dictionaryModel.setNodeMapping(createModel.getNodeMapping());
+                                dictionaryModel.setNodeMappingEntry(createModel.getNodeMappingEntry());
                                 setSelectionPattern();
                             }
                             else {
                                 statusLabel.setText(NO_DICTIONARY);
                                 valueModel.setRecDefTreeNode(null);
-                                dictionaryModel.setNodeMapping(null);
+                                dictionaryModel.setNodeMappingEntry(null);
                             }
                         }
                     }

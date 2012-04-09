@@ -296,8 +296,7 @@ public class SipModel {
                             Exec.work(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mappingHintsModel.setPrefix(requestedPrefix, dataSetModel);
-                                    mappingHintsModel.setSourceTree(statsModel.getSourceTree());
+                                    mappingHintsModel.initialize(requestedPrefix, dataSetModel, statsModel.getSourceTree());
                                     for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
                                         statsModel.findNodesForInputPaths(nodeMapping);
                                     }

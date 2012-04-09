@@ -45,7 +45,7 @@ public class Utility {
 
     public static Color DELIMITER_HILITE = new Color(255,255,200);
     public static Color MAPPED_COLOR = new Color(220,255,220);
-    public static Color HILIGHTED_COLOR = new Color(255,200,255);
+    public static Color HILIGHTED_COLOR = new Color(255,205,205);
 
     public static final Icon BOOKMARK_EXPANDED_ICON = new ImageIcon(Utility.class.getResource("/icons/bookmark-expanded-icon.png"));
     public static final Icon BOOKMARK_ICON = new ImageIcon(Utility.class.getResource("/icons/bookmark-icon.png"));

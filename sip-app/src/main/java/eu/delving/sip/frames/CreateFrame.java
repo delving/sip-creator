@@ -24,9 +24,12 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.model.*;
+import eu.delving.sip.base.Utility;
+import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.RecDefTreeNode;
+import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.panels.HtmlPanel;
-import eu.delving.sip.panels.NodeMappingPanel;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
@@ -34,7 +37,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.List;
 import java.util.SortedSet;
 
 /**
@@ -49,28 +51,18 @@ public class CreateFrame extends FrameBase {
     private CreateModel createModel;
     private HtmlPanel statsHtml = new HtmlPanel("Source Statistics");
     private HtmlPanel recDefHtml = new HtmlPanel("Target Documentation");
-    private NodeMappingPanel nodeMappingPanel = new NodeMappingPanel();
+    private JList mappingHintsList;
     private CreateMappingAction createMappingAction;
     private CopyMappingAction copyMappingAction;
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.CREATE, desktop, sipModel, "Create", false);
         createModel = sipModel.getCreateModel();
+        mappingHintsList = sipModel.getMappingHintsModel().getNodeMappingListModel().createJList();
         createMappingAction = new CreateMappingAction();
         copyMappingAction = new CopyMappingAction();
         statsHtml.setHtml(SELECT_STATS);
         recDefHtml.setHtml(SELECT_RECDEF);
-        sipModel.getMappingHintsModel().addListener(new MappingHintsModel.Listener() {
-            @Override
-            public void mappingHintsChanged(final List<NodeMapping> list) {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        nodeMappingPanel.setList(list);
-                    }
-                });
-            }
-        });
         createModel.addListener(new CreateModel.Listener() {
             @Override
             public void sourceTreeNodesSet(CreateModel createModel) {
@@ -124,7 +116,7 @@ public class CreateFrame extends FrameBase {
 
     private JComponent createHintsPanel() {
         JPanel p = new JPanel(new BorderLayout(8, 8));
-        p.add(nodeMappingPanel, BorderLayout.CENTER);
+        p.add(Utility.scrollV("Mapping Hints", mappingHintsList), BorderLayout.CENTER);
         p.add(new JButton(copyMappingAction), BorderLayout.SOUTH);
         return p;
     }
@@ -146,7 +138,7 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Object selected = nodeMappingPanel.getNodeMappingList().getSelectedValue();
+            Object selected = mappingHintsList.getSelectedValue();
             if (selected != null) {
                 final NodeMapping nodeMapping = (NodeMapping) selected;
                 Exec.work(new Runnable() {
@@ -192,7 +184,7 @@ public class CreateFrame extends FrameBase {
                 putValue(Action.NAME, CREATE);
                 putValue(Action.SHORT_DESCRIPTION, tooltip.toString());
             }
-            else if (createModel.getNodeMapping() != null) {
+            else if (createModel.getNodeMappingEntry() != null) {
                 setEnabled(false);
                 putValue(Action.NAME, EXISTS);
                 putValue(Action.SHORT_DESCRIPTION, "<html>The mapping has already been created.");

@@ -21,23 +21,17 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
-import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Utility;
 import eu.delving.sip.menus.RevertMappingMenu;
-import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.NodeMappingEntry;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SourceTreeNode;
-import eu.delving.sip.panels.NodeMappingPanel;
 
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JMenuBar;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
@@ -53,37 +47,13 @@ import java.awt.event.ActionEvent;
 
 public class RecMappingFrame extends FrameBase {
     private RemoveNodeMappingAction removeAction = new RemoveNodeMappingAction();
-    private NodeMappingPanel nodeMappingPanel = new NodeMappingPanel();
+    private JList nodeMappingList;
 
     public RecMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings", false);
         setJMenuBar(createMenuBar());
-        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
-            @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                updateList();
-            }
-        });
-        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
-            @Override
-            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-            }
-
-            @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                updateList();
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                updateList();
-            }
-        });
-        nodeMappingPanel.getNodeMappingList().addListSelectionListener(new NodeMappingSelection());
+        nodeMappingList = sipModel.getMappingModel().getNodeMappingListModel().createJList();
+        nodeMappingList.addListSelectionListener(new NodeMappingSelection());
     }
 
     private JMenuBar createMenuBar() {
@@ -94,13 +64,9 @@ public class RecMappingFrame extends FrameBase {
         return bar;
     }
 
-    private void updateList() {
-        if (sipModel.getMappingModel().hasRecMapping()) Exec.swingAny(new ListUpdater());
-    }
-
     @Override
     protected void buildContent(Container content) {
-        content.add(nodeMappingPanel, BorderLayout.CENTER);
+        content.add(Utility.scrollV("Node Mappings", nodeMappingList), BorderLayout.CENTER);
         content.add(new JButton(removeAction), BorderLayout.SOUTH);
     }
 
@@ -109,7 +75,7 @@ public class RecMappingFrame extends FrameBase {
         @Override
         public void valueChanged(ListSelectionEvent event) {
             if (event.getValueIsAdjusting()) return;
-            final NodeMapping selected = (NodeMapping) nodeMappingPanel.getNodeMappingList().getSelectedValue();
+            final NodeMappingEntry selected = (NodeMappingEntry) nodeMappingList.getSelectedValue();
             if (selected != null) {
                 Exec.work(new Runnable() {
                     @Override
@@ -118,21 +84,6 @@ public class RecMappingFrame extends FrameBase {
                     }
                 });
             }
-        }
-    }
-
-    private class ListUpdater implements Runnable {
-        private RecDefTree recDefTree;
-
-        private ListUpdater() {
-            if (!sipModel.getMappingModel().hasRecMapping()) throw new RuntimeException("No rec mapping");
-            recDefTree = sipModel.getMappingModel().getRecMapping().getRecDefTree();
-        }
-
-        @Override
-        public void run() {
-            nodeMappingPanel.setList(recDefTree.getNodeMappings());
-            nodeMappingPanel.select(sipModel.getCreateModel().getNodeMapping());
         }
     }
 
@@ -149,15 +100,15 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void run() {
-            NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
-            if (nodeMapping != null) {
+            NodeMappingEntry nodeMappingEntry = sipModel.getCreateModel().getNodeMappingEntry();
+            if (nodeMappingEntry != null) {
+                NodeMapping nodeMapping = nodeMappingEntry.getNodeMapping();
                 TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
                 if (treePath != null) {
                     RecDefTreeNode node = (RecDefTreeNode) treePath.getLastPathComponent();
                     nodeMapping = node.getRecDefNode().removeNodeMapping(nodeMapping.inputPath);
                     SourceTreeNode.removeStatsTreeNodes(nodeMapping);
-                    sipModel.getCreateModel().setNodeMapping(null);
-                    updateList();
+                    sipModel.getCreateModel().clearNodeMapping();
                 }
             }
         }
