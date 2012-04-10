@@ -103,25 +103,11 @@ public class MappingCompileModel {
                 triggerCompile();
             }
         });
-        this.docDocument.addDocumentListener(new DocumentListener() {
+        this.docDocument.addDocumentListener(new DocChangeDelayedListener() {
             @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                pushIt();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                pushIt();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                pushIt();
-            }
-
-            private void pushIt() {
-                if (selected != null)
-                    selected.getNodeMapping().setDocumentation(StringUtil.documentToString(docDocument));
+            public void later() {
+                if (selected == null) return;
+                selected.getNodeMapping().setDocumentation(StringUtil.documentToString(docDocument));
             }
         });
     }
@@ -429,6 +415,32 @@ public class MappingCompileModel {
         private void go() {
             if (!ignoreDocChanges) Exec.work(this);
         }
+    }
+
+    private abstract class DocChangeDelayedListener extends DocChangeListener implements ActionListener {
+        private Timer laterTimer = new Timer(200, this);
+
+        DocChangeDelayedListener() {
+            laterTimer.setRepeats(false);
+        }
+
+        @Override
+        public void run() {
+            laterTimer.restart();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    later();
+                }
+            });
+        }
+
+        public abstract void later();
+
     }
 
     public class ForgivingErrorHandler implements ErrorHandler {
