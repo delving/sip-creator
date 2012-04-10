@@ -21,14 +21,10 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
-import eu.delving.sip.model.CreateModel;
-import eu.delving.sip.model.RecDefTreeNode;
-import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.SourceTreeNode;
+import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
 
 import javax.swing.*;
@@ -140,11 +136,11 @@ public class CreateFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             Object selected = mappingHintsList.getSelectedValue();
             if (selected != null) {
-                final NodeMapping nodeMapping = (NodeMapping) selected;
+                final NodeMappingEntry nodeMappingEntry = (NodeMappingEntry) selected;
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        createModel.createMapping(nodeMapping);
+                        createModel.createMapping(nodeMappingEntry.getNodeMapping());
                     }
                 });
             }

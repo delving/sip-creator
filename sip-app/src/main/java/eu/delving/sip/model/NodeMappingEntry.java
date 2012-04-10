@@ -97,9 +97,14 @@ public class NodeMappingEntry {
             else {
                 setIcon(Utility.COMPOSITE_ELEMENT_ICON);
             }
-            if (entry.isHighlighted() && !selected) {
-                setOpaque(true);
+            if (selected) {
+                setBackground(list.getSelectionBackground());
+            }
+            else if (entry.isHighlighted()) {
                 setBackground(HILIGHTED_COLOR);
+            }
+            else {
+                setBackground(list.getBackground());
             }
             return label;
         }
