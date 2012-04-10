@@ -30,8 +30,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import java.awt.Component;
 
-import static eu.delving.sip.base.Utility.HILIGHTED_COLOR;
-
 /**
  * An entry in the NodeMappingListModel
  *
@@ -112,7 +110,7 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
                 setIcon(Utility.COMPOSITE_ELEMENT_ICON);
             }
             if (entry.isHighlighted()) {
-                setBackground(HILIGHTED_COLOR);
+                setBackground(Utility.HILIGHTED_COLOR);
             }
             else {
                 setBackground(selected ? list.getSelectionBackground() : list.getBackground());

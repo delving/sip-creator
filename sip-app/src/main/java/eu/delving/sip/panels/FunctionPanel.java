@@ -54,7 +54,6 @@ import java.util.regex.Pattern;
  */
 
 public class FunctionPanel extends JPanel {
-    private static Color LIBRARY_COLOR = new Color(255,255,200);
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
     private SipModel sipModel;
@@ -80,7 +79,7 @@ public class FunctionPanel extends JPanel {
         docArea.setWrapStyleWord(true);
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
-        libraryList.setBackground(LIBRARY_COLOR);
+        libraryList.setBackground(Utility.UNEDITABLE_BG);
         add(createCenter(), BorderLayout.CENTER);
         add(createFunctionPanels(), BorderLayout.WEST);
         wireUp();
@@ -242,15 +241,11 @@ public class FunctionPanel extends JPanel {
             else {
                 libraryList.clearSelection();
             }
-            docArea.setEditable(!library);
-            inputArea.setEditable(!library);
-            codeArea.setEditable(!library);
-            outputArea.setEditable(!library);
             modelStateListener.setLibrary(this.library);
-            if (modelStateListener.library) codeArea.setBackground(LIBRARY_COLOR);
-            docArea.setBackground(library ? LIBRARY_COLOR : Color.WHITE);
-            inputArea.setBackground(library ? LIBRARY_COLOR : Color.WHITE);
-            outputArea.setBackground(library ? LIBRARY_COLOR : Color.WHITE);
+            Utility.setEditable(codeArea, !library);
+            Utility.setEditable(docArea, !library);
+            Utility.setEditable(inputArea, !library);
+            Utility.setEditable(outputArea, !library);
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
@@ -392,7 +387,7 @@ public class FunctionPanel extends JPanel {
                 @Override
                 public void run() {
                     if (lib) {
-                        codeArea.setBackground(LIBRARY_COLOR);
+                        Utility.setEditable(codeArea, false);
                     }
                     else switch (state) {
                         case ORIGINAL:

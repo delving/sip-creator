@@ -191,29 +191,6 @@ public class FieldMappingFrame extends FrameBase {
                 }
             }
         });
-//        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
-//            @Override
-//            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-//            }
-//
-//            @Override
-//            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
-//                Exec.work(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        sipModel.getFieldCompileModel().setNodeMappingEntry(nodeMapping);
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-//            }
-//
-//            @Override
-//            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-//            }
-//        });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void sourceTreeNodesSet(CreateModel createModel) {
@@ -233,7 +210,7 @@ public class FieldMappingFrame extends FrameBase {
                         @Override
                         public void run() {
                             NodeMapping nodeMapping = nodeMappingEntry.getNodeMapping();
-                            codeArea.setEditable(nodeMapping != null && nodeMapping.isUserCodeEditable());
+                            Utility.setEditable(codeArea, nodeMapping != null && nodeMapping.isUserCodeEditable());
                             boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
                             operatorBox.setSelectedIndex(all ? 0 : 1);
                         }

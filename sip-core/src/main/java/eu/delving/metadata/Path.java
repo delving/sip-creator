@@ -120,6 +120,10 @@ public class Path implements Comparable<Path>, Serializable {
         return tag;
     }
 
+    public boolean isFamilyOf(Path other) {
+        return equals(other) || this.isAncestorOf(other) || other.isAncestorOf(this);
+    }
+
     public boolean isAncestorOf(Path other) {
         if (other == null) return false;
         Iterator<Tag> walkThis = stack.iterator();

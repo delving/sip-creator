@@ -40,7 +40,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
 
-import static eu.delving.sip.base.Utility.*;
+import static eu.delving.sip.base.Utility.HILIGHTED_COLOR;
+import static eu.delving.sip.base.Utility.MAPPED_COLOR;
 
 /**
  * A node of the analysis tree
@@ -354,9 +355,8 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         }
 
         private void markDelimiters(boolean selected, SourceTreeNode node) {
+            Utility.setDelimitedColor(this, selected);
             setOpaque(!selected);
-            setBackground(selected ? Color.WHITE : DELIMITER_HILITE);
-            setForeground(selected ? DELIMITER_HILITE : Color.BLACK);
             setBorder(BorderFactory.createEtchedBorder());
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
         }

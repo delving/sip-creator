@@ -30,6 +30,7 @@ import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.JTextComponent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.net.MalformedURLException;
@@ -42,8 +43,11 @@ import java.net.URL;
  */
 
 public class Utility {
-
-    public static Color DELIMITER_HILITE = new Color(255,255,200);
+    private static Color NORMAL_BG = Color.WHITE;
+    private static Color NORMAL_FG = Color.BLACK;
+    private static Color ERROR_BG = new Color(255,200,200);
+    public static Color UNEDITABLE_BG = new Color(255,255,200);
+    private static Color DELIMITER_BG = new Color(255,255,200);
     public static Color MAPPED_COLOR = new Color(220,255,220);
     public static Color HILIGHTED_COLOR = new Color(255,205,205);
 
@@ -69,6 +73,20 @@ public class Utility {
 
     public static void attachUrlLauncher(JTextArea area) {
         new URLLauncher(area);
+    }
+
+    public static void setEditable(JTextComponent component, boolean editable) {
+        component.setEditable(editable);
+        component.setBackground(editable ? NORMAL_BG : UNEDITABLE_BG);
+    }
+
+    public static void setError(JTextComponent component, boolean error) {
+        component.setBackground(error ? ERROR_BG : UNEDITABLE_BG);
+    }
+
+    public static void setDelimitedColor(JComponent component, boolean selected) {
+        component.setBackground(selected ? NORMAL_BG : DELIMITER_BG);
+        component.setForeground(selected ? DELIMITER_BG : NORMAL_FG);
     }
 
     public static class URLLauncher implements CaretListener {

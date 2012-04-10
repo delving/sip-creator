@@ -75,6 +75,7 @@ public class OutputFrame extends FrameBase {
                     Exec.swingLater(new Runnable() {
                         @Override
                         public void run() {
+                            Utility.setError(area, error);
                             area.setBackground(error ? new Color(1.0f, 0.9f, 0.9f) : Color.WHITE);
                             area.setLineWrap(error);
                             area.setCaretPosition(0);
