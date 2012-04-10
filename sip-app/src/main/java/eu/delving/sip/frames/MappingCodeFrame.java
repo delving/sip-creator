@@ -30,15 +30,13 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.panels.FunctionPanel;
 
+import javax.swing.Action;
 import javax.swing.JDesktopPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Point;
+import javax.swing.KeyStroke;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 /**
  * This frame shows the entire builder that is responsible for transforming the input to output,
@@ -47,13 +45,12 @@ import java.awt.Point;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class CodeFrame extends FrameBase {
+public class MappingCodeFrame extends FrameBase {
     private static int MARG = 30;
     private JTextArea codeArea = new JTextArea();
-    private final FunctionPanel functionPanel;
 
-    public CodeFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CODE, desktop, sipModel, "Global Functions & Mapping Code", false);
+    public MappingCodeFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(Which.CODE, desktop, sipModel, "Mapping Code", false);
         codeArea.setFont(new Font("Monospaced", Font.BOLD, 10));
         codeArea.setEditable(false);
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
@@ -84,18 +81,6 @@ public class CodeFrame extends FrameBase {
             }
 
         });
-        functionPanel = new FunctionPanel(this.sipModel);
-    }
-
-    void refresh() {
-        Exec.swingAny(new CodeUpdater());
-    }
-
-    @Override
-    protected void buildContent(Container content) {
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Global Functions", functionPanel);
-        tabs.addTab("Mapping Code", Utility.scrollVH(codeArea));
         setPlacement(new Placement() {
             @Override
             public Point getLocation() {
@@ -107,7 +92,19 @@ public class CodeFrame extends FrameBase {
                 return new Dimension(desktopPane.getSize().width - MARG * 2, desktopPane.getSize().height - MARG * 2);
             }
         });
-        content.add(tabs);
+        getAction().putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
+    }
+
+    void refresh() {
+        Exec.swingAny(new CodeUpdater());
+    }
+
+    @Override
+    protected void buildContent(Container content) {
+        content.add(Utility.scrollVH(codeArea));
     }
 
     private class CodeUpdater implements Runnable {

@@ -98,7 +98,7 @@ public class CreateFrame extends FrameBase {
         });
     }
 
-    public CreateMappingAction getAction() {
+    public CreateMappingAction getCreateMappingAction() {
         return createMappingAction;
     }
 

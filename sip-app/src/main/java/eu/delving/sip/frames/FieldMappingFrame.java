@@ -59,6 +59,7 @@ public class FieldMappingFrame extends FrameBase {
     private JTextArea docArea;
     private JTextArea outputArea;
     private JEditorPane helpView;
+    private boolean operatorBoxSetting = false;
     private JComboBox operatorBox = new JComboBox(Operator.values());
     private ContextVarListModel contextVarModel = new ContextVarListModel();
     private JList contextVarList = new JList(contextVarModel);
@@ -184,6 +185,7 @@ public class FieldMappingFrame extends FrameBase {
         operatorBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
+                if (operatorBoxSetting) return;
                 final NodeMappingEntry nodeMappingEntry = sipModel.getCreateModel().getNodeMappingEntry();
                 if (nodeMappingEntry != null) {
                     nodeMappingEntry.getNodeMapping().operator = (Operator) operatorBox.getSelectedItem();
@@ -212,7 +214,9 @@ public class FieldMappingFrame extends FrameBase {
                             NodeMapping nodeMapping = nodeMappingEntry.getNodeMapping();
                             Utility.setEditable(codeArea, nodeMapping != null && nodeMapping.isUserCodeEditable());
                             boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
+                            operatorBoxSetting = true;
                             operatorBox.setSelectedIndex(all ? 0 : 1);
+                            operatorBoxSetting = false;
                         }
                     });
                 }

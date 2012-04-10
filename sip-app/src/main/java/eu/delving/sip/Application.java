@@ -26,7 +26,6 @@ import eu.delving.sip.actions.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
-import eu.delving.sip.frames.CodeFrame;
 import eu.delving.sip.frames.HarvestDialog;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
@@ -69,7 +68,6 @@ public class Application {
     private HarvestPool harvestPool;
     private StatusPanel statusPanel;
     private Timer resizeTimer;
-    private CodeFrame codeFrame;
 
     private Application(final File storageDirectory) throws StorageException {
         Storage storage = new StorageImpl(storageDirectory);
@@ -109,7 +107,6 @@ public class Application {
         home = new JFrame("Delving SIP Creator");
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
-        codeFrame = new CodeFrame(desktop, sipModel);
         allFrames = new AllFrames(desktop, sipModel);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
@@ -118,7 +115,7 @@ public class Application {
         uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
         deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
-        home.getContentPane().add(allFrames.getButtonPanel(), BorderLayout.WEST);
+        home.getContentPane().add(allFrames.getArrangementsPanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         screen.height -= 30;
         home.setSize(screen);
@@ -219,7 +216,7 @@ public class Application {
     private JPanel createStatePanel() {
         refreshToggleButton();
         JPanel right = new JPanel(new BorderLayout(6, 6));
-        right.add(new JButton(codeFrame.getAction()), BorderLayout.WEST);
+        right.add(allFrames.getBigWindowsPanel(), BorderLayout.WEST);
         right.add(feedback.getToggle(), BorderLayout.CENTER);
         right.add(new JButton(harvestDialog.getAction()), BorderLayout.EAST);
         JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));

@@ -47,11 +47,12 @@ import static eu.delving.sip.base.FrameBase.INSETS;
  */
 
 public class AllFrames {
-    private final String VIEW_PREF_PATTERN = "view_%s";
     private final String CURRENT_VIEW_PREF = "currentView";
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
     private FrameBase[] frames;
+    private FunctionFrame functionFrame;
+    private MappingCodeFrame mappingCodeFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
@@ -60,13 +61,15 @@ public class AllFrames {
 
     private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
         final String CREATE = "create";
-        analysis.getActionMap().put(CREATE, create.getAction());
+        analysis.getActionMap().put(CREATE, create.getCreateMappingAction());
         analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
     public AllFrames(JDesktopPane desktop, final SipModel sipModel) {
         this.desktop = desktop;
         this.sipModel = sipModel;
+        functionFrame = new FunctionFrame(desktop, sipModel);
+        mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
@@ -102,6 +105,14 @@ public class AllFrames {
         catch (IOException e) {
             throw new RuntimeException("Initializing views", e);
         }
+    }
+
+    public FunctionFrame getFunctionFrame() {
+        return functionFrame;
+    }
+
+    public MappingCodeFrame getMappingCodeFrame() {
+        return mappingCodeFrame;
     }
 
     private void createDefaultFrameArrangements(File file) throws IOException {
@@ -174,6 +185,9 @@ public class AllFrames {
             frame.setAccelerator(index++);
             menu.add(frame.getAction());
         }
+        menu.addSeparator();
+        menu.add(functionFrame.getAction());
+        menu.add(mappingCodeFrame.getAction());
         return menu;
     }
 
@@ -185,7 +199,7 @@ public class AllFrames {
         return menu;
     }
 
-    public JPanel getButtonPanel() {
+    public JPanel getArrangementsPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBorder(BorderFactory.createTitledBorder("Arrangements"));
@@ -198,6 +212,13 @@ public class AllFrames {
             p.add(Box.createVerticalStrut(5));
         }
         p.add(Box.createVerticalGlue());
+        return p;
+    }
+
+    public JPanel getBigWindowsPanel() {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(new JButton(functionFrame.getAction()));
+        p.add(new JButton(mappingCodeFrame.getAction()));
         return p;
     }
 

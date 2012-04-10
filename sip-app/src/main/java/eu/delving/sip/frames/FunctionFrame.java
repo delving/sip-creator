@@ -19,13 +19,14 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.panels;
+package eu.delving.sip.frames;
 
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
@@ -34,11 +35,9 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
@@ -53,10 +52,9 @@ import java.util.regex.Pattern;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class FunctionPanel extends JPanel {
+public class FunctionFrame extends FrameBase {
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
-    private SipModel sipModel;
     private FunctionListModel libraryListModel = new FunctionListModel();
     private JList libraryList = new MappingFunctionJList(libraryListModel);
     private FunctionListModel functionModel = new FunctionListModel();
@@ -69,9 +67,8 @@ public class FunctionPanel extends JPanel {
     private JTextArea outputArea = new JTextArea();
     private ModelStateListener modelStateListener = new ModelStateListener();
 
-    public FunctionPanel(SipModel sipModel) {
-        super(new BorderLayout());
-        this.sipModel = sipModel;
+    public FunctionFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(Which.FUNCTIONS, desktop, sipModel, "Global Functions", false);
         inputArea.setFont(MONOSPACED);
         codeArea.setFont(MONOSPACED);
         docArea.setFont(MONOSPACED);
@@ -80,8 +77,6 @@ public class FunctionPanel extends JPanel {
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
         libraryList.setBackground(Utility.UNEDITABLE_BG);
-        add(createCenter(), BorderLayout.CENTER);
-        add(createFunctionPanels(), BorderLayout.WEST);
         wireUp();
         try {
             fetchFunctionList();
@@ -89,6 +84,16 @@ public class FunctionPanel extends JPanel {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+        getAction().putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
+    }
+
+    @Override
+    protected void buildContent(Container content) {
+        content.add(createCenter(), BorderLayout.CENTER);
+        content.add(createFunctionPanels(), BorderLayout.WEST);
     }
 
     private JPanel createCenter() {
@@ -263,15 +268,15 @@ public class FunctionPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            final String name = JOptionPane.showInputDialog(FunctionPanel.this, "Please enter the function name");
+            final String name = JOptionPane.showInputDialog(FunctionFrame.this, "Please enter the function name");
             if (name != null) {
                 if (!FUNCTION_NAME.matcher(name).matches()) {
-                    JOptionPane.showMessageDialog(FunctionPanel.this, "Sorry, the name must be of the form 'aaaaa' or 'aaaaAaaa'");
+                    JOptionPane.showMessageDialog(FunctionFrame.this, "Sorry, the name must be of the form 'aaaaa' or 'aaaaAaaa'");
                     return;
                 }
                 final RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
                 if (recMapping.hasFunction(name)) {
-                    JOptionPane.showMessageDialog(FunctionPanel.this, "Sorry, but this function name already exists");
+                    JOptionPane.showMessageDialog(FunctionFrame.this, "Sorry, but this function name already exists");
                     return;
                 }
                 Exec.work(new Runnable() {
