@@ -377,9 +377,16 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return false;
     }
 
+    private RecDef.Opt findRoot() {
+        if (optRoot != null) return optRoot;
+        if (parent == null) return null;
+        return parent.findRoot();
+    }
+
     public String toString() {
         String name = isAttr() ? attr.tag.toString() : elem.tag.toString();
-        if (optRoot != null) name += String.format("[%s]", optRoot.content);
+        RecDef.Opt root = findRoot();
+        if (root != null) name += String.format("[%s]", root.content);
         if (optKey != null || optValue != null) name += "{Constant}";
         return name;
     }
