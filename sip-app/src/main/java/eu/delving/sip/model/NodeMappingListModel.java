@@ -157,12 +157,24 @@ public class NodeMappingListModel extends AbstractListModel {
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+                final int index = indexOf(nodeMapping);
+                if (index >= 0) Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        fireChanged(index);
+                    }
+                });
             }
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                int index = indexOf(nodeMapping);
-                if (index >= 0) fireIntervalAdded(this, index, index);
+                final int index = indexOf(nodeMapping);
+                if (index >= 0) Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        fireIntervalAdded(this, index, index);
+                    }
+                });
             }
 
             @Override

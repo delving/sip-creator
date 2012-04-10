@@ -257,6 +257,7 @@ public class NodeMapping {
                 String otherLine = walk.next().trim();
                 if (otherLine.isEmpty()) continue;
                 if (!otherLine.equals(line)) return false;
+                break;
             }
         }
         return !walk.hasNext();
@@ -304,7 +305,7 @@ public class NodeMapping {
             if (tuplePaths != null) {
                 needLoop = !groovyParams.contains(getTupleName());
                 if (needLoop) {
-                    codeOut.line_("%s %s { %s -> // N1", getTupleExpression(), getOperator().getChar(), getTupleName());
+                    codeOut.line_("%s %s { %s ->", getTupleExpression(), getOperator().getChar(), getTupleName());
                 }
             }
             else {
@@ -312,7 +313,7 @@ public class NodeMapping {
                 Tag inner = path.getTag(1);
                 needLoop = !groovyParams.contains(inner.toGroovyParam());
                 if (needLoop) {
-                    codeOut.line_("%s%s %s { %s -> // N2", outer.toGroovyParam(), inner.toGroovyRef(), getOperator().getChar(), inner.toGroovyParam());
+                    codeOut.line_("%s%s %s { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), getOperator().getChar(), inner.toGroovyParam());
                 }
             }
             toInnerLoop(path.chop(-1), groovyParams);
@@ -404,7 +405,12 @@ public class NodeMapping {
             }
             input = out.toString();
         }
-        return String.format("<html>%s &larr; %s", recDefNode.toString(), input);
+        if (groovyCode == null) {
+            return String.format("<html><p>%s &larr; %s</p>", recDefNode.toString(), input);
+        }
+        else {
+            return String.format("<html><b>%s &larr; %s</b>", recDefNode.toString(), input);
+        }
     }
 
     private String getTupleUsage() {
