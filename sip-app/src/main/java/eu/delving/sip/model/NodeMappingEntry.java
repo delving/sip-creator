@@ -37,16 +37,23 @@ import static eu.delving.sip.base.Utility.HILIGHTED_COLOR;
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
-public class NodeMappingEntry {
-    private int index;
+public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
+    private int index = -1;
     private NodeMapping nodeMapping;
     private boolean highlighted;
     private NodeMappingListModel listModel;
 
-    public NodeMappingEntry(NodeMappingListModel listModel, int index, NodeMapping nodeMapping) {
+    public NodeMappingEntry(NodeMappingListModel listModel, NodeMapping nodeMapping) {
         this.listModel = listModel;
-        this.index = index;
         this.nodeMapping = nodeMapping;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public NodeMapping getNodeMapping() {
@@ -66,10 +73,6 @@ public class NodeMappingEntry {
         });
     }
 
-    public String toString() {
-        return nodeMapping.toString();
-    }
-
     public void clearHighlighted() {
         if (highlighted) {
             highlighted = false;
@@ -82,6 +85,17 @@ public class NodeMappingEntry {
             highlighted = true;
             fireChanged();
         }
+    }
+
+    public String toString() {
+        return nodeMapping.toString();
+    }
+
+    @Override
+    public int compareTo(NodeMappingEntry nodeMappingEntry) {
+        int compare = nodeMapping.outputPath.getTail().compareTo(nodeMappingEntry.getNodeMapping().outputPath.getTail());
+        if (compare != 0) return compare;
+        return nodeMapping.inputPath.compareTo(nodeMappingEntry.getNodeMapping().inputPath);
     }
 
     public static class CellRenderer extends DefaultListCellRenderer {
@@ -97,14 +111,11 @@ public class NodeMappingEntry {
             else {
                 setIcon(Utility.COMPOSITE_ELEMENT_ICON);
             }
-            if (selected) {
-                setBackground(list.getSelectionBackground());
-            }
-            else if (entry.isHighlighted()) {
+            if (entry.isHighlighted()) {
                 setBackground(HILIGHTED_COLOR);
             }
             else {
-                setBackground(list.getBackground());
+                setBackground(selected ? list.getSelectionBackground() : list.getBackground());
             }
             return label;
         }

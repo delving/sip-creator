@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Utility;
 import org.antlr.stringtemplate.StringTemplate;
 
@@ -31,6 +32,7 @@ import javax.swing.AbstractListModel;
 import javax.swing.JList;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,28 +44,46 @@ import java.util.List;
 public class NodeMappingListModel extends AbstractListModel {
     private List<NodeMappingEntry> entries = new ArrayList<NodeMappingEntry>();
 
-    public void clearList() {
+    private void clearList() {
         if (!entries.isEmpty()) {
-            int size = getSize();
+            final int size = getSize();
             entries.clear();
-            if (size > 0) fireIntervalRemoved(this, 0, size - 1);
+            if (size > 0) Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    fireIntervalRemoved(this, 0, size - 1);
+                }
+            });
         }
     }
 
     public void setList(List<NodeMapping> freshList) {
         clearList();
         if (freshList != null) {
-            int index = 0;
-            for (NodeMapping nodeMapping : freshList) entries.add(new NodeMappingEntry(this, index++, nodeMapping));
+            for (NodeMapping nodeMapping : freshList) entries.add(new NodeMappingEntry(this, nodeMapping));
+            sortEntries();
         }
-        fireIntervalAdded(this, 0, getSize());
+        final int size = getSize();
+        if (size > 0) Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                fireIntervalAdded(this, 0, size);
+            }
+        });
     }
 
     public NodeMappingEntry addEntry(NodeMapping nodeMapping) {
-        int size = getSize();
-        NodeMappingEntry entry = new NodeMappingEntry(this, size, nodeMapping);
-        entries.add(entry); // todo: sort order?
-        fireIntervalAdded(this, size, size);
+        NodeMappingEntry entry = new NodeMappingEntry(this, nodeMapping);
+        int spot = Collections.binarySearch(entries, entry);
+        if (spot >= 0) return entries.get(spot);
+        entries.add(entry);
+        final int index = sortEntries();
+        if (index >= 0) Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                fireIntervalAdded(this, index, index);
+            }
+        });
         return entry;
     }
 
@@ -116,6 +136,19 @@ public class NodeMappingListModel extends AbstractListModel {
         for (NodeMappingEntry entry : entries) entry.clearHighlighted();
     }
 
+    private int sortEntries() {
+        int inserted = -1;
+        Collections.sort(entries);
+        int index = 0;
+        for (NodeMappingEntry entry : entries) {
+            if (entry.getIndex() < 0) inserted = index;
+            index++;
+        }
+        index = 0;
+        for (NodeMappingEntry nodeMappingEntry : entries) nodeMappingEntry.setIndex(index++);
+        return inserted;
+    }
+
     public MappingModel.ChangeListener createMappingChangeEar() {
         return new MappingModel.ChangeListener() {
             @Override
@@ -134,7 +167,7 @@ public class NodeMappingListModel extends AbstractListModel {
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                setList(mappingModel.getRecMapping().getNodeMappings());
+                setList(mappingModel.getRecMapping().getRecDefTree().getNodeMappings());
             }
         };
     }

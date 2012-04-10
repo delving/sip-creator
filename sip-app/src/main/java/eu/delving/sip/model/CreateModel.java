@@ -108,7 +108,9 @@ public class CreateModel {
     public void setNodeMapping(NodeMapping nodeMapping) {
         assert nodeMapping != null;
         settingNodeMapping = true;
-        this.nodeMappingEntry = sipModel.getMappingModel().getNodeMappingListModel().addEntry(nodeMapping);
+        if (nodeMappingEntry == null || nodeMappingEntry.getNodeMapping() != nodeMapping) {
+            nodeMappingEntry = sipModel.getMappingModel().getNodeMappingListModel().addEntry(nodeMapping);
+        }
         setSourceTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping));
         TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
         if (treePath != null) setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
@@ -218,7 +220,8 @@ public class CreateModel {
     public int countNonemptyDictionaryEntries() {
         int nonemptyEntries = 0;
         if (isDictionaryPresent()) {
-            for (String value : nodeMappingEntry.getNodeMapping().dictionary.values()) if (!value.trim().isEmpty()) nonemptyEntries++;
+            for (String value : nodeMappingEntry.getNodeMapping().dictionary.values())
+                if (!value.trim().isEmpty()) nonemptyEntries++;
         }
         return nonemptyEntries;
     }

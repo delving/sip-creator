@@ -43,7 +43,7 @@ import java.util.*;
  */
 
 @XStreamAlias("node-mapping")
-public class NodeMapping implements Comparable<NodeMapping> {
+public class NodeMapping {
 
     @XStreamAsAttribute
     public Path inputPath;
@@ -452,17 +452,6 @@ public class NodeMapping implements Comparable<NodeMapping> {
 
     private String getDictionaryName() {
         return "Dictionary" + HASHER.getHashString(outputPath.toString()).substring(16);
-    }
-
-    /**
-     * For comparing node mappings within a RecDefNode
-     *
-     * @param nodeMapping who to compare with
-     * @return true if the input paths were the same
-     */
-    @Override
-    public int compareTo(NodeMapping nodeMapping) {
-        return this.inputPath.compareTo(nodeMapping.inputPath);
     }
 }
 
