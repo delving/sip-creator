@@ -69,7 +69,7 @@ public class TargetFrame extends FrameBase {
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                Exec.swing(new TreeUpdater());
+                Exec.swing(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
             }
         });
         createRecDefTree(sipModel);
@@ -257,6 +257,11 @@ public class TargetFrame extends FrameBase {
     }
 
     private class TreeUpdater implements Runnable {
+        private String prefix;
+
+        private TreeUpdater(String prefix) {
+            this.prefix = prefix;
+        }
 
         @Override
         public void run() {
@@ -284,7 +289,7 @@ public class TargetFrame extends FrameBase {
                 bookmarkTree.setModel(new BookmarksTreeModel());
             }
             treePanel.removeAll();
-            treePanel.add(Utility.scrollVH("Record Definition", recDefTree));
+            treePanel.add(Utility.scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
             if (bookmarksPresent) {
                 JPanel p = new JPanel(new GridLayout(1, 0));
                 p.add(Utility.scrollVH("Bookmarks", bookmarkTree));

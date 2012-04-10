@@ -31,6 +31,7 @@ import eu.delving.sip.frames.HarvestDialog;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.xml.AnalysisParser;
@@ -100,7 +101,7 @@ public class Application {
         });
         feedback = new VisualFeedback(desktop);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
-        statusPanel = new StatusPanel(sipModel.getDataSetModel());
+        statusPanel = new StatusPanel(sipModel);
         harvestPool = new HarvestPool(sipModel);
         harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
         feedback.setSipModel(sipModel);
@@ -138,16 +139,29 @@ public class Application {
                 quit();
             }
         });
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
+            @Override
+            public void recMappingSet(MappingModel mappingModel) {
+                if (sipModel.getDataSetModel().hasDataSet() && mappingModel.hasRecMapping()) {
+                    home.setTitle(String.format(
+                            "Delving SIP Creator - [%s -> %s]",
+                            sipModel.getDataSetModel().getDataSet().getSpec(),
+                            mappingModel.getRecMapping().getPrefix().toUpperCase()
+                    ));
+                }
+                else {
+                    home.setTitle("Delving SIP Creator");
+                }
+            }
+        });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void dataSetChanged(DataSet dataSet) {
-                home.setTitle(String.format("Delving SIP Creator [%s]", dataSet.getSpec()));
                 dataSetStateChanged(dataSet, dataSet.getState());
             }
 
             @Override
             public void dataSetRemoved() {
-                home.setTitle("Delving SIP Creator");
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {

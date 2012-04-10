@@ -86,7 +86,7 @@ public class ReleaseAction extends AbstractAction {
                                 sipModel.seekReset(); // release the file handle
                             }
                         });
-                        sipModel.getDataSetModel().setDataSet(null);
+                        sipModel.getDataSetModel().clearDataSet();
                         dataSet.remove();
                     }
                     catch (StorageException e) {

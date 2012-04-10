@@ -46,7 +46,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -64,6 +63,9 @@ public class SourceFrame extends FrameBase {
     private JButton uniqueElementButton = new JButton("Select Unique Element");
     private JTree sourceTree;
     private boolean delimited = false;
+    private JPanel treePanel = new JPanel(new BorderLayout());
+    private JPanel selectButtonPanel = new JPanel(new GridLayout(1, 0, 5, 5));
+    private JPanel filterPanel = new JPanel(new BorderLayout(10, 10));
     private JTextField filterField = new JTextField();
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
     private StatisticsFrame statisticsFrame;
@@ -94,6 +96,15 @@ public class SourceFrame extends FrameBase {
         sourceTree.setDragEnabled(true);
         sourceTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         timer.setRepeats(false);
+        treePanel.add(Utility.scrollVH(sourceTree), BorderLayout.CENTER);
+        recordRootButton.setEnabled(false);
+        selectButtonPanel.add(recordRootButton);
+        uniqueElementButton.setEnabled(false);
+        selectButtonPanel.add(uniqueElementButton);
+        filterPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        filterPanel.add(new JLabel("Filter:", JLabel.RIGHT), BorderLayout.WEST);
+        filterPanel.add(filterField, BorderLayout.CENTER);
+        filterPanel.add(autoFoldBox, BorderLayout.EAST);
         wireUp();
     }
 
@@ -110,45 +121,9 @@ public class SourceFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(createFilterPanel(), BorderLayout.NORTH);
-        content.add(createPanel(), BorderLayout.CENTER);
-    }
-
-    private JPanel createPanel() {
-        return delimited ? createSourcePanel() : createImportedPanel();
-    }
-
-    private JPanel createFilterPanel() {
-        JPanel p = new JPanel(new BorderLayout(10, 10));
-        p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-        p.add(new JLabel("Filter:", JLabel.RIGHT), BorderLayout.WEST);
-        p.add(filterField, BorderLayout.CENTER);
-        p.add(autoFoldBox, BorderLayout.EAST);
-        return p;
-    }
-
-    private JPanel createImportedPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Analysis of imported data"));
-        p.add(Utility.scrollVH(sourceTree), BorderLayout.CENTER);
-        p.add(createSelectButtonPanel(), BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel createSourcePanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createTitledBorder("Source data"));
-        p.add(Utility.scrollVH(sourceTree), BorderLayout.CENTER);
-        return p;
-    }
-
-    private JPanel createSelectButtonPanel() {
-        JPanel bp = new JPanel(new GridLayout(1, 0, 5, 5));
-        recordRootButton.setEnabled(false);
-        bp.add(recordRootButton);
-        uniqueElementButton.setEnabled(false);
-        bp.add(uniqueElementButton);
-        return bp;
+        content.add(filterPanel, BorderLayout.NORTH);
+        content.add(treePanel, BorderLayout.CENTER);
+        if (!delimited) content.add(selectButtonPanel, BorderLayout.SOUTH);
     }
 
     private void onDoubleClick() {
@@ -182,8 +157,18 @@ public class SourceFrame extends FrameBase {
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet) {
-                dataSetStateChanged(dataSet, dataSet.getState());
+            public void dataSetChanged(final DataSet dataSet) {
+                if (dataSet != null) {
+                    reactToState(dataSet.getState());
+                    String kind = delimited ? "Source" : "Imported";
+                    treePanel.setBorder(BorderFactory.createTitledBorder(
+                            String.format("%s Data for \"%s\"", kind, dataSet.getSpec()
+                    )));
+                    dataSetStateChanged(dataSet, dataSet.getState());
+                }
+                else {
+                    treePanel.setBorder(BorderFactory.createEtchedBorder());
+                }
             }
 
             @Override
@@ -203,7 +188,7 @@ public class SourceFrame extends FrameBase {
                 TreePath[] selectionPaths = sourceTree.getSelectionModel().getSelectionPaths();
                 if (selectionPaths != null) {
                     for (TreePath path : selectionPaths) {
-                        SourceTreeNode node = (SourceTreeNode)path.getLastPathComponent();
+                        SourceTreeNode node = (SourceTreeNode) path.getLastPathComponent();
                         if (autoFoldBox.isSelected()) showPath(node);
                         if (node.getTag().equals(Tag.attribute(Storage.FACTS_TAG))) continue;
                         if (node.getTag().equals(Tag.attribute(Storage.ENVELOPE_TAG))) continue;
@@ -241,26 +226,10 @@ public class SourceFrame extends FrameBase {
                 });
             }
         });
-        sourceTree.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-            }
-
+        sourceTree.addMouseListener(new MouseInputAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 if (mouseEvent.getClickCount() == 2) onDoubleClick();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
             }
         });
         recordRootButton.addActionListener(new ActionListener() {

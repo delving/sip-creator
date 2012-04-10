@@ -24,6 +24,8 @@ package eu.delving.sip.panels;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
+import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import java.awt.GridLayout;
@@ -41,19 +43,34 @@ public class StatusPanel extends JPanel {
 
     private List<StateAction> actions = new ArrayList<StateAction>();
 
-    public StatusPanel(DataSetModel dataSetModel) {
+    public StatusPanel(final SipModel sipModel) {
         super(new GridLayout(1, 0, 5, 5));
-        setBorder(BorderFactory.createTitledBorder("Actions"));
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
+            @Override
+            public void recMappingSet(MappingModel mappingModel) {
+                if (sipModel.getDataSetModel().hasDataSet() && mappingModel.hasRecMapping()) {
+                    setBorder(BorderFactory.createTitledBorder(String.format(
+                            "Actions - [%s -> %s]",
+                            sipModel.getDataSetModel().getDataSet().getSpec(),
+                            mappingModel.getRecMapping().getPrefix().toUpperCase()
+                    )));
+                }
+                else {
+                    setBorder(BorderFactory.createEtchedBorder());
+                }
+            }
+        });
         for (DataSetState state : DataSetState.values()) {
             StateAction action = new StateAction(state);
             actions.add(action);
-            if (state == DataSetState.SOURCED) dataSetModel.addListener(new SourcedListener(action));
+            if (state == DataSetState.SOURCED) sipModel.getDataSetModel().addListener(new SourcedListener(action));
         }
         for (StateAction action : actions) {
             JButton button = new JButton(action);
             button.setToolTipText(action.state.toHtml());
             add(button);
         }
+        setBorder(BorderFactory.createEtchedBorder());
     }
 
     public void setState(DataSetState state) {
