@@ -61,7 +61,7 @@ public class MappingEngine {
             Node outputRecord = mappingRunner.runMapping(metadataRecord);
             return IndexDocument.fromNode(outputRecord, mappingRunner.getRecDefTree());
         }
-        catch (DiscardRecordException e) {
+        catch (AssertionError e) {
             throw new MappingException(null, "Discarded record should have been marked before upload!", e);
         }
         catch (XMLStreamException e) {

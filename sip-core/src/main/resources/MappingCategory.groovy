@@ -19,7 +19,6 @@
  *  permissions and limitations under the Licence.
  */
 
-import eu.delving.groovy.DiscardRecordException
 import eu.delving.groovy.GroovyNode
 
 /**
@@ -52,10 +51,6 @@ public class MappingCategory {
         if (list.isEmpty()) return false;
         if (list.size() == 1 && list[0] instanceof List) return list[0].asBoolean()
         return true;
-    }
-
-    static void discard(Boolean condition, String why) {
-        if (condition) throw new DiscardRecordException(why)
     }
 
     static String getAt(GroovyNode node, Object what) {

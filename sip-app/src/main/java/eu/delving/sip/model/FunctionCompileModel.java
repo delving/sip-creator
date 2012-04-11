@@ -21,7 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.StringUtil;
@@ -240,7 +239,7 @@ public class FunctionCompileModel {
                 if (result == null) return "";
                 return result;
             }
-            catch (DiscardRecordException e) {
+            catch (AssertionError e) {
                 throw e;
             }
             catch (MissingPropertyException e) {

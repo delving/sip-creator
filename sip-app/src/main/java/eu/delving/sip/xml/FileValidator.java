@@ -130,7 +130,7 @@ public class FileValidator implements Runnable {
                             listener.outputInvalid(record.getRecordNumber(), outputNode, e.getMessage());
                         }
                     }
-                    catch (DiscardRecordException e) {
+                    catch (AssertionError e) {
                         invalidCount++;
                         out.println("Discarded explicitly:");
                         out.println(XmlSerializer.toXml(record.getRootNode()));
