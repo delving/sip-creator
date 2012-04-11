@@ -26,6 +26,7 @@ import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
+import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
@@ -89,13 +90,6 @@ public class MappingCompileModel {
         }
     }
 
-    public enum State {
-        ORIGINAL,
-        SAVED,
-        EDITED,
-        ERROR,
-    }
-
     public MappingCompileModel(Type type, Feedback feedback, GroovyCodeResource groovyCodeResource) {
         this.type = type;
         this.feedback = feedback;
@@ -124,7 +118,7 @@ public class MappingCompileModel {
         this.selected = nodeMappingEntry;
         Exec.swing(new DocumentSetter(docDocument, selected != null ? selected.getNodeMapping().getDocumentation() : "", false));
         Exec.swing(new DocumentSetter(codeDocument, getCode(getEditPath(false)), false));
-        notifyStateChange(State.ORIGINAL);
+        notifyStateChange(CompileState.ORIGINAL);
     }
 
     public void refreshCode() {
@@ -309,8 +303,8 @@ public class MappingCompileModel {
                     }
                     else {
                         compilationComplete(output, null);
-                        setMappingCode();
                     }
+                    setMappingCode();
                 }
                 catch (AssertionError e) {
                     compilationComplete("Discarded explicitly with 'assert'", e.getMessage());
@@ -319,7 +313,7 @@ public class MappingCompileModel {
             }
             catch (Exception e) {
                 compilationComplete("No output available", e.getMessage());
-                notifyStateChange(State.ERROR);
+                notifyStateChange(CompileState.ERROR);
             }
             finally {
                 compiling = false;
@@ -330,6 +324,7 @@ public class MappingCompileModel {
             if (selected != null && selected.getNodeMapping().isUserCodeEditable()) {
                 String editedCode = StringUtil.documentToString(codeDocument);
                 selected.getNodeMapping().setGroovyCode(editedCode, recMapping);
+                notifyStateChange(selected.getNodeMapping().groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);
             }
         }
 
@@ -472,12 +467,12 @@ public class MappingCompileModel {
         }
     }
 
-    private void notifyStateChange(final State state) {
+    private void notifyStateChange(final CompileState state) {
         for (Listener listener : listeners) listener.stateChanged(state);
     }
 
     public interface Listener {
-        void stateChanged(State state);
+        void stateChanged(CompileState state);
     }
 
     public void addListener(Listener listener) {

@@ -25,6 +25,7 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
+import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
@@ -386,25 +387,13 @@ public class FunctionFrame extends FrameBase {
         }
 
         @Override
-        public void stateChanged(final FunctionCompileModel.State state) {
+        public void stateChanged(final CompileState state) {
             final boolean lib = this.library;
             Exec.swing(new Runnable() {
                 @Override
                 public void run() {
-                    if (lib) {
-                        Utility.setEditable(codeArea, false);
-                    }
-                    else switch (state) {
-                        case ORIGINAL:
-                            codeArea.setBackground(new Color(1.0f, 1.0f, 1.0f));
-                            break;
-                        case EDITED:
-                            codeArea.setBackground(new Color(1.0f, 1.0f, 0.9f));
-                            break;
-                        case ERROR:
-                            codeArea.setBackground(new Color(1.0f, 0.9f, 0.9f));
-                            break;
-                    }
+                    if (lib) Utility.setEditable(codeArea, false);
+                    state.setBackgroundOf(codeArea);
                 }
             });
         }

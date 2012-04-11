@@ -23,6 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Operator;
+import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
@@ -227,7 +228,18 @@ public class FieldMappingFrame extends FrameBase {
                 sipModel.getFieldCompileModel().refreshCode();
             }
         });
-        sipModel.getFieldCompileModel().addListener(new ModelStateListener());
+        sipModel.getFieldCompileModel().addListener(new MappingCompileModel.Listener() {
+            @Override
+            public void stateChanged(final CompileState state) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (state == CompileState.ORIGINAL) undoManager.discardAllEdits();
+                        state.setBackgroundOf(codeArea);
+                    }
+                });
+            }
+        });
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -268,33 +280,6 @@ public class FieldMappingFrame extends FrameBase {
         @Override
         public Object getElementAt(int i) {
             return vars.get(i);
-        }
-    }
-
-    private class ModelStateListener implements MappingCompileModel.Listener {
-
-        @Override
-        public void stateChanged(final MappingCompileModel.State state) {
-            Exec.swing(new Runnable() {
-
-                @Override
-                public void run() {
-                    switch (state) {
-                        case ORIGINAL:
-                            undoManager.discardAllEdits();
-                            // fall through
-                        case SAVED:
-                            codeArea.setBackground(new Color(1.0f, 1.0f, 1.0f));
-                            break;
-                        case EDITED:
-                            codeArea.setBackground(new Color(1.0f, 1.0f, 0.9f));
-                            break;
-                        case ERROR:
-                            codeArea.setBackground(new Color(1.0f, 0.9f, 0.9f));
-                            break;
-                    }
-                }
-            });
         }
     }
 

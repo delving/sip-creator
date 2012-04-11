@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.StringUtil;
+import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
@@ -70,12 +71,6 @@ public class FunctionCompileModel {
     private MappingFunction mappingFunction;
     private boolean ignoreDocChanges;
 
-    public enum State {
-        ORIGINAL,
-        EDITED,
-        ERROR
-    }
-
     public FunctionCompileModel(MappingModel mappingModel, Feedback feedback, GroovyCodeResource groovyCodeResource) {
         this.mappingModel = mappingModel;
         this.feedback = feedback;
@@ -96,7 +91,7 @@ public class FunctionCompileModel {
             @Override
             public void run() {
                 functionRunner = null;
-                notifyStateChange(State.EDITED);
+                notifyStateChange(CompileState.EDITED);
                 trigger(COMPILE_DELAY);
             }
         });
@@ -108,7 +103,7 @@ public class FunctionCompileModel {
         Exec.swing(new DocumentSetter(inputDocument, getSampleInput(), true));
         Exec.swing(new DocumentSetter(docDocument, getDocInput(), true));
         Exec.swing(new DocumentSetter(codeDocument, getOriginalCode(), true));
-        notifyStateChange(State.ORIGINAL);
+        notifyStateChange(CompileState.SAVED);
         trigger(COMPILE_DELAY);
     }
 
@@ -185,19 +180,19 @@ public class FunctionCompileModel {
                 }
                 Exec.swing(new DocumentSetter(outputDocument, outputLines));
                 if (problems) {
-                    notifyStateChange(State.ERROR);
+                    notifyStateChange(CompileState.ERROR);
                 }
                 else {
                     mappingFunction.setSampleInput(StringUtil.documentToString(inputDocument));
                     mappingFunction.setDocumentation(StringUtil.documentToString(docDocument));
                     mappingFunction.setGroovyCode(StringUtil.documentToString(codeDocument));
                     mappingModel.notifyFunctionChanged(mappingFunction);
-                    notifyStateChange(State.ORIGINAL);
+                    notifyStateChange(CompileState.SAVED);
                 }
             }
             catch (Exception e) {
                 compilationComplete(e.toString());
-                notifyStateChange(State.ERROR);
+                notifyStateChange(CompileState.ERROR);
             }
             finally {
                 busy = false;
@@ -367,12 +362,12 @@ public class FunctionCompileModel {
         }
     }
 
-    private void notifyStateChange(final State state) {
+    private void notifyStateChange(final CompileState state) {
         for (Listener listener : listeners) listener.stateChanged(state);
     }
 
     public interface Listener {
-        void stateChanged(State state);
+        void stateChanged(CompileState state);
     }
 
     public void addListener(Listener listener) {
