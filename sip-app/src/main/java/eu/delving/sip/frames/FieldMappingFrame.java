@@ -65,7 +65,7 @@ public class FieldMappingFrame extends FrameBase {
     private FunctionListModel functionModel = new FunctionListModel();
     private JList functionList = new MappingFunctionJList(functionModel);
     private ContextVarListModel contextVarModel = new ContextVarListModel();
-    private JList contextVarList = new JList(contextVarModel);
+    private JList contextVarList = new ContextVarJList(contextVarModel);
     private DictionaryPanel dictionaryPanel;
     private UndoManager undoManager = new UndoManager();
 
@@ -77,8 +77,6 @@ public class FieldMappingFrame extends FrameBase {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-        contextVarList.setPrototypeCellValue("aVeryLongVariableNameIndeed");
-        functionList.setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
         dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);
@@ -376,6 +374,42 @@ public class FieldMappingFrame extends FrameBase {
         }
     }
 
+    private class ContextVarJList extends JList {
+
+        private Timer timer = new Timer(500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String contextVar = (String) getSelectedValue();
+                if (contextVar != null) {
+                    int start = codeArea.getCaretPosition();
+                    try {
+                        Document doc = codeArea.getDocument();
+                        doc.insertString(start, contextVar, null);
+                    }
+                    catch (BadLocationException e) {
+                        throw new RuntimeException("What?", e);
+                    }
+                }
+                clearSelection();
+            }
+        });
+
+        private ContextVarJList(ContextVarListModel listModel) {
+            super(listModel);
+            timer.setRepeats(false);
+            setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                    if (listSelectionEvent.getValueIsAdjusting() || getSelectedValue() == null) return;
+                    timer.restart();
+                }
+            });
+            setPrototypeCellValue("aVeryLongVariableNameIndeed");
+            setToolTipText("Clicking here will insert a variable name into the code");
+        }
+    }
+
     private class MappingFunctionJList extends JList {
 
         private Timer timer = new Timer(500, new ActionListener() {
@@ -410,13 +444,8 @@ public class FieldMappingFrame extends FrameBase {
                     timer.restart();
                 }
             });
-        }
-
-        @Override
-        public String getToolTipText(MouseEvent evt) {
-            int index = this.locationToIndex(evt.getPoint());
-            MappingFunction mappingFunction = (MappingFunction) getModel().getElementAt(index);
-            return mappingFunction.getDocumentation();
+            setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
+            setToolTipText("Clicking here will insert a function call around the selected code");
         }
     }
 
