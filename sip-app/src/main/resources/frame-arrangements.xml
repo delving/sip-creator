@@ -23,12 +23,12 @@
         <frame where="0011" which="FIELD_MAPPING"/>
     </arrangement>
     <arrangement name="Decadent Display">
-        <frame where="0023" which="SOURCE"/>
+        <frame where="0024" which="SOURCE"/>
         <frame where="2013" which="CREATE"/>
         <frame where="3023" which="TARGET"/>
         <frame where="5024" which="INPUT"/>
         <frame where="2335" which="FIELD_MAPPING"/>
         <frame where="5424" which="OUTPUT"/>
-        <frame where="0325" which="REC_MAPPING"/>
+        <frame where="0424" which="REC_MAPPING"/>
     </arrangement>
 </frame-arrangements>

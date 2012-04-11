@@ -46,6 +46,7 @@ public abstract class FrameBase extends JInternalFrame {
     public static Insets INSETS = new Insets(2, /* top */ 8, /* left */ 14, /* bottom */ 10 /* right */);
     private static final int DEFAULT_MOVE_INTERVAL = 1000;
     private static final int MARGIN = 12;
+    private JMenuBar originalMenuBar;
     private Which which;
     private Placement placement;
     protected JDesktopPane desktopPane;
@@ -145,7 +146,8 @@ public abstract class FrameBase extends JInternalFrame {
     }
 
     public void toggleEditMenu() {
-        if (getJMenuBar() == null) {
+        if (originalMenuBar == null && getJMenuBar() != null) originalMenuBar = getJMenuBar();
+        if (getJMenuBar() == originalMenuBar) {
             JMenuBar bar = new JMenuBar();
             JMenu menu = new JMenu("Edit");
             for (AdjustAction action : adjustActions) menu.add(action);
@@ -160,7 +162,7 @@ public abstract class FrameBase extends JInternalFrame {
             }
         }
         else {
-            setJMenuBar(null);
+            setJMenuBar(originalMenuBar);
             setTitle(title);
         }
         validateTree();
