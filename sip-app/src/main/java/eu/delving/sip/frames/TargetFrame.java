@@ -28,10 +28,12 @@ import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
 import org.antlr.stringtemplate.StringTemplate;
-import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
@@ -268,12 +270,7 @@ public class TargetFrame extends FrameBase {
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
             if (root != null) {
                 recDefTree.setModel(new FilterTreeModel(root));
-                recDefTree.getModel().addTreeModelListener(new TreeModelAdapter() {
-                    @Override
-                    public void treeStructureChanged(TreeModelEvent treeModelEvent) {
-                        showPath((RecDefTreeNode) recDefTree.getModel().getRoot());
-                    }
-                });
+                showPath(root);
             }
             else {
                 recDefTree.setModel(new FilterTreeModel(FilterNode.createMessageNode("No record definition")));
