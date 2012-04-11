@@ -363,6 +363,7 @@ public class NodeMapping {
 
     public List<String> getContextVariables() {
         List<String> variables = new ArrayList<String>();
+        variables.add("_uniqueIdentifier");
         Path back = inputPath.copy();
         while (!back.isEmpty()) variables.add(back.pop().toGroovyParam());
         return variables;

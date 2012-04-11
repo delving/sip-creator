@@ -58,7 +58,7 @@ import java.util.regex.Pattern;
 
 public class FunctionFrame extends FrameBase {
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
+    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 14);
     private final Action UNDO_ACTION = new UndoAction();
     private final Action REDO_ACTION = new RedoAction();
     private FunctionListModel libraryListModel = new FunctionListModel();
@@ -87,7 +87,10 @@ public class FunctionFrame extends FrameBase {
         outputArea = new JTextArea(sipModel.getFunctionCompileModel().getOutputDocument());
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
+        libraryList.setFont(MONOSPACED);
         libraryList.setBackground(Utility.UNEDITABLE_BG);
+        libraryList.setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
+        functionList.setFont(MONOSPACED);
         wireUp();
         try {
             fetchFunctionList();

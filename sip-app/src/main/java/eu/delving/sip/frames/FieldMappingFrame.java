@@ -21,28 +21,28 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Operator;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
-import eu.delving.sip.model.CreateModel;
-import eu.delving.sip.model.MappingCompileModel;
-import eu.delving.sip.model.NodeMappingEntry;
-import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.*;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -62,6 +62,8 @@ public class FieldMappingFrame extends FrameBase {
     private JEditorPane helpView;
     private boolean operatorBoxSetting = false;
     private JComboBox operatorBox = new JComboBox(Operator.values());
+    private FunctionListModel functionModel = new FunctionListModel();
+    private JList functionList = new MappingFunctionJList(functionModel);
     private ContextVarListModel contextVarModel = new ContextVarListModel();
     private JList contextVarList = new JList(contextVarModel);
     private DictionaryPanel dictionaryPanel;
@@ -75,7 +77,8 @@ public class FieldMappingFrame extends FrameBase {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-        contextVarList.setPrototypeCellValue("somelongvariablename");
+        contextVarList.setPrototypeCellValue("aVeryLongVariableNameIndeed");
+        functionList.setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
         dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);
@@ -85,30 +88,13 @@ public class FieldMappingFrame extends FrameBase {
         codeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         codeArea.setFont(MONOSPACED);
         codeArea.setTabSize(3);
-        handleEnablement();
-        codeArea.getDocument().addUndoableEditListener(undoManager);
-        codeArea.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                handleEnablement();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                handleEnablement();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                handleEnablement();
-            }
-        });
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setWrapStyleWord(true);
         attachAction(UNDO_ACTION);
         attachAction(REDO_ACTION);
         Utility.attachUrlLauncher(outputArea);
         wireUp();
+        handleEnablement();
     }
 
     private void attachAction(Action action) {
@@ -169,8 +155,15 @@ public class FieldMappingFrame extends FrameBase {
         pp.add(new JButton(REVERT_ACTION));
         JPanel p = new JPanel(new BorderLayout());
         p.add(pp, BorderLayout.NORTH);
-        p.add(Utility.scrollV("Context", contextVarList), BorderLayout.CENTER);
+        p.add(createContextPanel(), BorderLayout.CENTER);
         return p;
+    }
+
+    private JComponent createContextPanel() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Functions", Utility.scrollV(functionList));
+        tabs.addTab("Variables", Utility.scrollV(contextVarList));
+        return tabs;
     }
 
     private JButton createActionButton(Action action) {
@@ -189,6 +182,23 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private void wireUp() {
+        codeArea.getDocument().addUndoableEditListener(undoManager);
+        codeArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
+            }
+        });
         operatorBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -249,6 +259,12 @@ public class FieldMappingFrame extends FrameBase {
                 });
             }
         });
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
+            @Override
+            public void recMappingSet(MappingModel mappingModel) {
+                functionModel.setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getFunctions() : null);
+            }
+        });
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -263,6 +279,30 @@ public class FieldMappingFrame extends FrameBase {
             public void changedUpdate(DocumentEvent documentEvent) {
             }
         });
+    }
+
+    private class FunctionListModel extends AbstractListModel {
+        private List<MappingFunction> functions = new ArrayList<MappingFunction>();
+
+        public void setList(Collection<MappingFunction> functions) {
+            if (!this.functions.isEmpty()) {
+                int size = getSize();
+                this.functions.clear();
+                fireIntervalRemoved(this, 0, size);
+            }
+            if (functions != null) this.functions.addAll(functions);
+            if (!this.functions.isEmpty()) fireIntervalAdded(this, 0, getSize());
+        }
+
+        @Override
+        public int getSize() {
+            return functions.size();
+        }
+
+        @Override
+        public Object getElementAt(int i) {
+            return functions.get(i);
+        }
     }
 
     private class ContextVarListModel extends AbstractListModel {
@@ -333,6 +373,50 @@ public class FieldMappingFrame extends FrameBase {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             if (undoManager.canRedo()) undoManager.redo();
+        }
+    }
+
+    private class MappingFunctionJList extends JList {
+
+        private Timer timer = new Timer(500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String selectedText = codeArea.getSelectedText();
+                MappingFunction mappingFunction = (MappingFunction) getSelectedValue();
+                if (selectedText != null && mappingFunction != null) {
+                    int start = codeArea.getSelectionStart();
+                    try {
+                        if (selectedText.endsWith("\n")) selectedText = selectedText.substring(0, selectedText.length() - 1);
+                        Document doc = codeArea.getDocument();
+                        doc.remove(start, selectedText.length());
+                        doc.insertString(start, String.format("%s(%s)", mappingFunction.name, selectedText), null);
+                    }
+                    catch (BadLocationException e) {
+                        throw new RuntimeException("What?", e);
+                    }
+                }
+                clearSelection();
+            }
+        });
+
+        private MappingFunctionJList(FunctionListModel functionListModel) {
+            super(functionListModel);
+            timer.setRepeats(false);
+            setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                    if (listSelectionEvent.getValueIsAdjusting() || getSelectedValue() == null) return;
+                    timer.restart();
+                }
+            });
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent evt) {
+            int index = this.locationToIndex(evt.getPoint());
+            MappingFunction mappingFunction = (MappingFunction) getModel().getElementAt(index);
+            return mappingFunction.getDocumentation();
         }
     }
 

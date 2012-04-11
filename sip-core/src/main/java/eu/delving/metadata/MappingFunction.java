@@ -124,7 +124,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public String toString() {
-        return name;
+        return String.format("%s(it)", name);
     }
 
     @Override
