@@ -272,8 +272,13 @@ public class FunctionFrame extends FrameBase {
     }
 
     private void handleEnablement() {
-        UNDO_ACTION.setEnabled(undoManager.canUndo());
-        REDO_ACTION.setEnabled(undoManager.canRedo());
+        Exec.swingLater(new Runnable() {
+            @Override
+            public void run() {
+                UNDO_ACTION.setEnabled(undoManager.canUndo());
+                REDO_ACTION.setEnabled(undoManager.canRedo());
+            }
+        });
     }
 
     private class FunctionSelection implements ListSelectionListener {
