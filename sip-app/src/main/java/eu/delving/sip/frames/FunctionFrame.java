@@ -34,8 +34,11 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -56,25 +59,32 @@ import java.util.regex.Pattern;
 public class FunctionFrame extends FrameBase {
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
+    private final Action UNDO_ACTION = new UndoAction();
+    private final Action REDO_ACTION = new RedoAction();
     private FunctionListModel libraryListModel = new FunctionListModel();
     private JList libraryList = new MappingFunctionJList(libraryListModel);
     private FunctionListModel functionModel = new FunctionListModel();
     private JList functionList = new MappingFunctionJList(functionModel);
     private DefaultListModel factsModel = new DefaultListModel();
     private JList factsList = new JList(factsModel);
-    private JTextArea inputArea = new JTextArea();
-    private JTextArea docArea = new JTextArea();
-    private JTextArea codeArea = new JTextArea();
-    private JTextArea outputArea = new JTextArea();
+    private JTextArea inputArea;
+    private JTextArea docArea;
+    private JTextArea codeArea;
+    private JTextArea outputArea;
     private ModelStateListener modelStateListener = new ModelStateListener();
+    private UndoManager undoManager = new UndoManager();
 
     public FunctionFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.FUNCTIONS, desktop, sipModel, "Global Functions", false);
+        inputArea = new JTextArea(sipModel.getFunctionCompileModel().getInputDocument());
         inputArea.setFont(MONOSPACED);
-        codeArea.setFont(MONOSPACED);
+        docArea = new JTextArea(sipModel.getFunctionCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);
         docArea.setLineWrap(true);
         docArea.setWrapStyleWord(true);
+        codeArea = new JTextArea(sipModel.getFunctionCompileModel().getCodeDocument());
+        codeArea.setFont(MONOSPACED);
+        outputArea = new JTextArea(sipModel.getFunctionCompileModel().getOutputDocument());
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
         libraryList.setBackground(Utility.UNEDITABLE_BG);
@@ -89,6 +99,13 @@ public class FunctionFrame extends FrameBase {
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
         );
+        attachAction(UNDO_ACTION);
+        attachAction(REDO_ACTION);
+    }
+
+    private void attachAction(Action action) {
+        codeArea.getInputMap().put((KeyStroke) action.getValue(Action.ACCELERATOR_KEY), action.getValue(Action.NAME));
+        codeArea.getActionMap().put(action.getValue(Action.NAME), action);
     }
 
     @Override
@@ -99,13 +116,51 @@ public class FunctionFrame extends FrameBase {
 
     private JPanel createCenter() {
         JPanel center = new JPanel(new GridLayout(0, 1));
-        center.add(createInputPanel());
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Groovy Code", Utility.scrollVH(codeArea));
-        tabs.addTab("Documentation", Utility.scrollVH(docArea));
-        center.add(tabs);
-        center.add(createOutputPanel());
+        center.add(createCodeDoc());
+        center.add(createInputOutput());
         return center;
+    }
+
+    private JTabbedPane createCodeDoc() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Groovy Code", createCodePanel());
+        tabs.addTab("Documentation", Utility.scrollVH(docArea));
+        return tabs;
+    }
+
+    private JPanel createCodePanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.add(Utility.scrollVH("Groovy Code", codeArea), BorderLayout.CENTER);
+        p.add(createSidePanel(), BorderLayout.EAST);
+        return p;
+    }
+
+    private JPanel createSidePanel() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+        p.add(Utility.scrollV("Available Facts", factsList), BorderLayout.CENTER);
+        p.add(createBesideCode(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createBesideCode() {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(createActionButton(UNDO_ACTION));
+        p.add(createActionButton(REDO_ACTION));
+        return p;
+    }
+
+    private JButton createActionButton(Action action) {
+        KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        JButton button = new JButton(action);
+        button.setText(button.getText() + " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + KeyEvent.getKeyText(stroke.getKeyCode()));
+        return button;
+    }
+
+    private JPanel createInputOutput() {
+        JPanel p = new JPanel(new GridLayout(1, 0));
+        p.add(Utility.scrollVH("Input Lines", inputArea));
+        p.add(Utility.scrollVH("Output Lines", outputArea));
+        return p;
     }
 
     private void fetchFunctionList() throws IOException {
@@ -140,29 +195,29 @@ public class FunctionFrame extends FrameBase {
         return p;
     }
 
-    private JPanel createInputPanel() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(Utility.scrollVH("Input Lines", inputArea), BorderLayout.CENTER);
-        p.add(Utility.scrollV("Available Facts", factsList), BorderLayout.EAST);
-        return p;
-    }
-
-    private JPanel createOutputPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Output Lines"));
-        p.add(Utility.scrollVH(outputArea));
-        return p;
-    }
-
     private void wireUp() {
+        handleEnablement();
         functionList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         functionList.getSelectionModel().addListSelectionListener(new FunctionSelection(false, functionList));
         libraryList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         libraryList.getSelectionModel().addListSelectionListener(new FunctionSelection(true, libraryList));
-        inputArea.setDocument(sipModel.getFunctionCompileModel().getInputDocument());
-        codeArea.setDocument(sipModel.getFunctionCompileModel().getCodeDocument());
-        docArea.setDocument(sipModel.getFunctionCompileModel().getDocDocument());
-        outputArea.setDocument(sipModel.getFunctionCompileModel().getOutputDocument());
+        codeArea.getDocument().addUndoableEditListener(undoManager);
+        codeArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                handleEnablement();
+            }
+        });
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(final MappingModel mappingModel) {
@@ -216,6 +271,11 @@ public class FunctionFrame extends FrameBase {
         sipModel.getFunctionCompileModel().addListener(modelStateListener);
     }
 
+    private void handleEnablement() {
+        UNDO_ACTION.setEnabled(undoManager.canUndo());
+        REDO_ACTION.setEnabled(undoManager.canRedo());
+    }
+
     private class FunctionSelection implements ListSelectionListener {
 
         private final boolean library;
@@ -256,6 +316,13 @@ public class FunctionFrame extends FrameBase {
                 @Override
                 public void run() {
                     sipModel.getFunctionCompileModel().setFunction(function);
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            undoManager.discardAllEdits();
+                            handleEnablement();
+                        }
+                    });
                 }
             });
         }
@@ -331,9 +398,33 @@ public class FunctionFrame extends FrameBase {
         }
     }
 
+    private class UndoAction extends AbstractAction {
+        private UndoAction() {
+            super("Undo");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (undoManager.canUndo()) undoManager.undo();
+        }
+    }
+
+    private class RedoAction extends AbstractAction {
+        private RedoAction() {
+            super("Redo");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (undoManager.canRedo()) undoManager.redo();
+        }
+    }
+
     private class FunctionListModel extends AbstractListModel {
         private List<MappingFunction> functions = new ArrayList<MappingFunction>();
-        
+
         public void setList(Collection<MappingFunction> functions) {
             if (!this.functions.isEmpty()) {
                 int size = getSize();
@@ -379,7 +470,7 @@ public class FunctionFrame extends FrameBase {
     }
 
     private class ModelStateListener implements FunctionCompileModel.Listener {
-        
+
         private boolean library;
 
         public void setLibrary(boolean library) {
@@ -392,8 +483,13 @@ public class FunctionFrame extends FrameBase {
             Exec.swing(new Runnable() {
                 @Override
                 public void run() {
-                    if (lib) Utility.setEditable(codeArea, false);
-                    state.setBackgroundOf(codeArea);
+                    if (state == CompileState.ORIGINAL) undoManager.discardAllEdits();
+                    if (lib) {
+                        Utility.setEditable(codeArea, false);
+                    }
+                    else {
+                        state.setBackgroundOf(codeArea);
+                    }
                 }
             });
         }

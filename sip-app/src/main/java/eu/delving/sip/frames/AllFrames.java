@@ -217,8 +217,14 @@ public class AllFrames {
 
     public JPanel getBigWindowsPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1));
-        p.add(new JButton(functionFrame.getAction()));
-        p.add(new JButton(mappingCodeFrame.getAction()));
+        JButton function = new JButton(functionFrame.getAction());
+        KeyStroke stroke = (KeyStroke) functionFrame.getAction().getValue(Action.ACCELERATOR_KEY);
+        function.setText(function.getText() + " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + KeyEvent.getKeyText(stroke.getKeyCode()));
+        p.add(function);
+        JButton code = new JButton(mappingCodeFrame.getAction());
+        stroke = (KeyStroke) mappingCodeFrame.getAction().getValue(Action.ACCELERATOR_KEY);
+        code.setText(code.getText() + " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + KeyEvent.getKeyText(stroke.getKeyCode()));
+        p.add(code);
         return p;
     }
 

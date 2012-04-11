@@ -187,7 +187,7 @@ public class FunctionCompileModel {
                     mappingFunction.setDocumentation(StringUtil.documentToString(docDocument));
                     mappingFunction.setGroovyCode(StringUtil.documentToString(codeDocument));
                     mappingModel.notifyFunctionChanged(mappingFunction);
-                    notifyStateChange(CompileState.SAVED);
+                    notifyStateChange(mappingFunction.groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);
                 }
             }
             catch (Exception e) {

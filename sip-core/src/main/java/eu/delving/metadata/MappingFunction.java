@@ -41,6 +41,8 @@ import java.util.TreeSet;
 @XStreamAlias("mapping-function")
 public class MappingFunction implements Comparable<MappingFunction> {
 
+    private static final String DEFAULT_VALUE = "\"${it}\"";
+
     @XStreamAsAttribute
     public String name;
 
@@ -74,6 +76,9 @@ public class MappingFunction implements Comparable<MappingFunction> {
 
     public void setGroovyCode(String groovyCode) {
         this.groovyCode = StringUtil.stringToLines(groovyCode);
+        if (this.groovyCode != null && this.groovyCode.size() == 1 && this.groovyCode.get(0).equals(DEFAULT_VALUE)) {
+            this.groovyCode = null;
+        }
     }
 
     public String getSampleInputString() {
@@ -114,7 +119,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
             StringUtil.indentCode(groovyCode, codeOut);
         }
         else {
-            codeOut.line("it");
+            codeOut.line(DEFAULT_VALUE);
         }
     }
 

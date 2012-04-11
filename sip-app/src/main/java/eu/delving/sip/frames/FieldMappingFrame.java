@@ -85,6 +85,7 @@ public class FieldMappingFrame extends FrameBase {
         codeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         codeArea.setFont(MONOSPACED);
         codeArea.setTabSize(3);
+        handleEnablement();
         codeArea.getDocument().addUndoableEditListener(undoManager);
         codeArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -170,7 +171,7 @@ public class FieldMappingFrame extends FrameBase {
     private JButton createActionButton(Action action) {
         KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
         JButton button = new JButton(action);
-        button.setText(button.getText() + " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + "-" + KeyEvent.getKeyText(stroke.getKeyCode()));
+        button.setText(button.getText() + " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + KeyEvent.getKeyText(stroke.getKeyCode()));
         return button;
     }
 
@@ -234,7 +235,10 @@ public class FieldMappingFrame extends FrameBase {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
-                        if (state == CompileState.ORIGINAL) undoManager.discardAllEdits();
+                        if (state == CompileState.ORIGINAL) {
+                            undoManager.discardAllEdits();
+                            handleEnablement();
+                        }
                         state.setBackgroundOf(codeArea);
                     }
                 });
@@ -311,7 +315,7 @@ public class FieldMappingFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            undoManager.undo();
+            if (undoManager.canUndo()) undoManager.undo();
         }
     }
 
@@ -323,7 +327,7 @@ public class FieldMappingFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            undoManager.redo();
+            if (undoManager.canRedo()) undoManager.redo();
         }
     }
 
