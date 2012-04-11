@@ -205,6 +205,10 @@ public class GroovyNode {
         return getByName(key);
     }
 
+    public boolean equals(Object other) {
+        return other != null && toString().equals(other.toString());
+    }
+
     public String toString() {
         return text();
     }
