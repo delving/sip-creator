@@ -93,6 +93,11 @@ public class RecDefTreeNode extends FilterNode {
         return recDefNode.getTag().toString();
     }
 
+    @Override
+    public boolean isAttr() {
+        return recDefNode.isAttr();
+    }
+
     public String toHtml() {
         if (html == null) {
             StringTemplate t = Utility.getTemplate(recDefNode.isAttr() ? "recdef-attribute" : "recdef-element");

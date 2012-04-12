@@ -54,6 +54,7 @@ public class TargetFrame extends FrameBase {
     private HtmlPanel bookmarkDocPanel = new HtmlPanel("Documentation");
     private JTextField filterField = new JTextField();
     private JPanel treePanel = new JPanel(new GridLayout(0, 1));
+    private JCheckBox hideAttributes = new JCheckBox("Hide Attributes");
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
@@ -101,6 +102,16 @@ public class TargetFrame extends FrameBase {
                 filterField.setSelectionEnd(text.length());
             }
         });
+        hideAttributes.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (recDefTree.getModel().getRoot() instanceof RecDefTreeNode) {
+                    FilterTreeModel filterTreeModel = (FilterTreeModel) recDefTree.getModel();
+                    filterTreeModel.setAttributesHidden(hideAttributes.isSelected());
+                    showPath((RecDefTreeNode) filterTreeModel.getRoot());
+                }
+            }
+        });
     }
 
     @Override
@@ -114,7 +125,10 @@ public class TargetFrame extends FrameBase {
         p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         p.add(new JLabel("Filter:", JLabel.RIGHT), BorderLayout.WEST);
         p.add(filterField, BorderLayout.CENTER);
-        p.add(autoFoldBox, BorderLayout.EAST);
+        JPanel pp = new JPanel(new GridLayout(1, 0));
+        pp.add(hideAttributes);
+        pp.add(autoFoldBox);
+        p.add(pp, BorderLayout.EAST);
         return p;
     }
 
@@ -269,7 +283,9 @@ public class TargetFrame extends FrameBase {
         public void run() {
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
             if (root != null) {
-                recDefTree.setModel(new FilterTreeModel(root));
+                FilterTreeModel filterTreeModel = new FilterTreeModel(root);
+                recDefTree.setModel(filterTreeModel);
+                filterTreeModel.setAttributesHidden(hideAttributes.isSelected());
                 showPath(root);
             }
             else {

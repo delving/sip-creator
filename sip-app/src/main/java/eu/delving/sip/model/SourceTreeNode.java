@@ -58,6 +58,10 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private String htmlChunk;
     private List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
 
+    public SourceTreeNode(SourceTreeNode parent) {
+        this.parent = parent;
+    }
+
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
     }
@@ -214,6 +218,11 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     public String getStringToFilter() {
         return tag.toString();
+    }
+
+    @Override
+    public boolean isAttr() {
+        return tag.isAttribute();
     }
 
     private void compilePathList(List<SourceTreeNode> list, boolean fromRoot) {

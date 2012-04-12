@@ -17,10 +17,11 @@ import java.util.List;
 public class FilterTreeModel implements TreeModel {
     private EventListenerList listeners = new EventListenerList();
     private FilterNode root;
+    private boolean attributesHidden;
 
     public FilterTreeModel(FilterNode root) {
         this.root = root;
-        root.setTreeModel(this);
+        root.setFilterModel(this);
     }
 
     public void setFilter(String patternString) {
@@ -30,8 +31,19 @@ public class FilterTreeModel implements TreeModel {
 
     public void setRoot(FilterNode root) {
         this.root = root;
-        root.setTreeModel(this);
+        root.setFilterModel(this);
         refreshTree();
+    }
+
+    public boolean isAttributesHidden() {
+        return attributesHidden;
+    }
+
+    public void setAttributesHidden(boolean attributesHidden) {
+        if (this.attributesHidden != attributesHidden) {
+            this.attributesHidden = attributesHidden;
+            refreshTree();
+        }
     }
 
     @Override
@@ -80,7 +92,7 @@ public class FilterTreeModel implements TreeModel {
     }
 
     public void refreshTree() {
-        TreeModelEvent event = new TreeModelEvent(this, new Object[] {root}, new int[]  {}, new Object[] {});
+        TreeModelEvent event = new TreeModelEvent(this, new Object[]{root}, new int[]{}, new Object[]{});
         Object[] ears = listeners.getListenerList();
         for (int walk = ears.length - 2; walk >= 0; walk -= 2) {
             if (ears[walk] == TreeModelListener.class) {
@@ -91,9 +103,9 @@ public class FilterTreeModel implements TreeModel {
 
     public void refreshNode(Object nodeObject) {
         FilterNode child = (FilterNode) nodeObject;
-        FilterNode parent = (FilterNode)child.getParent();
+        FilterNode parent = (FilterNode) child.getParent();
         int index = getIndexOfChild(parent, child);
-        TreeModelEvent event = new TreeModelEvent(this, getPathToRoot(parent), new int[] { index }, new Object[] {child});
+        TreeModelEvent event = new TreeModelEvent(this, getPathToRoot(parent), new int[]{index}, new Object[]{child});
         Object[] ears = listeners.getListenerList();
         for (int walk = ears.length - 2; walk >= 0; walk -= 2) {
             if (ears[walk] == TreeModelListener.class) {
@@ -106,7 +118,7 @@ public class FilterTreeModel implements TreeModel {
         List<Object> path = new ArrayList<Object>();
         path.add(node);
         while (node.getParent() != null) {
-            node = (FilterNode)node.getParent();
+            node = (FilterNode) node.getParent();
             path.add(0, node);
         }
         return path.toArray();

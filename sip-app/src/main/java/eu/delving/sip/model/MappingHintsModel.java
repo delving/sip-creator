@@ -78,7 +78,7 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
                 mappingPaths.add(mapping.inputPath);
             }
         }
-        for (NodeMapping mapping : mappingHints.getNodeMappings()) {
+        if (mappingHints != null) for (NodeMapping mapping : mappingHints.getNodeMappings()) {
             if (sourcePaths.contains(mapping.inputPath) && !mappingPaths.contains(mapping.inputPath)) {
                 nodeMappings.add(mapping);
             }

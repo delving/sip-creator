@@ -34,21 +34,21 @@ import java.util.regex.Pattern;
  */
 
 public abstract class FilterNode {
-    private FilterTreeModel treeModel;
+    private FilterTreeModel filterModel;
     private boolean highlighted = false;
     private boolean passesFilter = true;
 
-    void setTreeModel(FilterTreeModel treeModel) {
-        this.treeModel = treeModel;
-        for (FilterNode child : getChildren()) child.setTreeModel(treeModel);
+    void setFilterModel(FilterTreeModel filterModel) {
+        this.filterModel = filterModel;
+        for (FilterNode child : getChildren()) child.setFilterModel(filterModel);
     }
 
     public final void fireChanged() {
-        if (treeModel == null) throw new RuntimeException("Tree model must be set");
+        if (filterModel == null) throw new RuntimeException("Tree model must be set");
         Exec.swingAny(new Runnable() {
             @Override
             public void run() {
-                treeModel.refreshNode(FilterNode.this);
+                filterModel.refreshNode(FilterNode.this);
             }
         });
     }
@@ -82,6 +82,7 @@ public abstract class FilterNode {
     }
 
     public final boolean passesFilter() {
+        if (filterModel.isAttributesHidden() && isAttr()) return false;
         return passesFilter;
     }
 
@@ -111,6 +112,8 @@ public abstract class FilterNode {
     public abstract List<? extends FilterNode> getChildren();
 
     public abstract String getStringToFilter();
+
+    public abstract boolean isAttr();
 
     public static FilterNode createMessageNode(String message) {
         return new MessageNode(message);
@@ -155,6 +158,11 @@ public abstract class FilterNode {
         @Override
         public String getStringToFilter() {
             return message;
+        }
+
+        @Override
+        public boolean isAttr() {
+            return false;
         }
 
         @Override

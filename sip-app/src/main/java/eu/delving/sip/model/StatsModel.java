@@ -74,7 +74,7 @@ public class StatsModel {
         else {
             sourceTree = SourceTreeNode.create("Analysis not yet performed");
         }
-        sourceTree.setTreeModel(sourceTreeModel);
+        sourceTree.setFilterModel(sourceTreeModel);
         sourceTreeModel.setRoot(sourceTree);
         root = sourceTree;
         setDelimiters(recordRoot, uniqueElement);
