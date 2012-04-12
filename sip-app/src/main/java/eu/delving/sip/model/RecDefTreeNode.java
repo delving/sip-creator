@@ -98,6 +98,14 @@ public class RecDefTreeNode extends FilterNode {
         return recDefNode.isAttr();
     }
 
+    @Override
+    public boolean passesFilter() {
+        RecDefTreeModel recDefTreeModel = (RecDefTreeModel) filterModel;
+        if (recDefTreeModel.isAttributesHidden() && isAttr()) return false;
+        if (recDefNode.isHiddenOpt(recDefTreeModel.getSelectedOpt()) && !recDefNode.hasDescendentNodeMappings()) return false;
+        return super.passesFilter();
+    }
+
     public String toHtml() {
         if (html == null) {
             StringTemplate t = Utility.getTemplate(recDefNode.isAttr() ? "recdef-attribute" : "recdef-element");
@@ -124,8 +132,9 @@ public class RecDefTreeNode extends FilterNode {
         Timer timer = new Timer(30, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if ((pathToShow.equals(here) || pathToShow.isAncestorOf(here)) && !tree.isExpanded(getRecDefPath())) {
-                    tree.expandPath(getRecDefPath());
+                boolean pathShouldShow = pathToShow.equals(here) || pathToShow.isAncestorOf(here);
+                if (pathShouldShow) {
+                    if (!tree.isExpanded(getRecDefPath())) tree.expandPath(getRecDefPath());
                 }
                 else if ((here.size() <= pathToShow.size() && !here.isAncestorOf(pathToShow)) && !tree.isCollapsed(getRecDefPath())) {
                     tree.collapsePath(getRecDefPath());

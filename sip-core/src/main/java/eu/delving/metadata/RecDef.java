@@ -273,6 +273,9 @@ public class RecDef {
         @XStreamAsAttribute
         public String key;
 
+        @XStreamAsAttribute
+        public boolean hidden;
+
         public String content;
         
         @XStreamOmitField

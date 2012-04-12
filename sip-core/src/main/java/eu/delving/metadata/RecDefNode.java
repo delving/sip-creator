@@ -97,6 +97,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
     }
 
+    public boolean isHiddenOpt(RecDef.Opt shown) {
+        if (optRoot == null || optRoot == shown || elem == null) return false;
+        return optRoot.hidden;
+    }
+
     public List<String> getOptions() {
         return elem != null ? elem.options : attr.options;
     }

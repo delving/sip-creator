@@ -34,9 +34,9 @@ import java.util.regex.Pattern;
  */
 
 public abstract class FilterNode {
-    private FilterTreeModel filterModel;
-    private boolean highlighted = false;
-    private boolean passesFilter = true;
+    protected FilterTreeModel filterModel;
+    protected boolean highlighted = false;
+    protected boolean passesFilter = true;
 
     void setFilterModel(FilterTreeModel filterModel) {
         this.filterModel = filterModel;
@@ -76,13 +76,12 @@ public abstract class FilterNode {
         }
     }
 
-    public final void setPassesFilter(boolean passesFilter) {
+    public void setPassesFilter(boolean passesFilter) {
         this.passesFilter = passesFilter;
         for (FilterNode sub : getChildren()) sub.setPassesFilter(passesFilter);
     }
 
-    public final boolean passesFilter() {
-        if (filterModel.isAttributesHidden() && isAttr()) return false;
+    public boolean passesFilter() {
         return passesFilter;
     }
 

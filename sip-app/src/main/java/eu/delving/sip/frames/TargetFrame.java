@@ -53,15 +53,17 @@ public class TargetFrame extends FrameBase {
     private JTree bookmarkTree;
     private HtmlPanel bookmarkDocPanel = new HtmlPanel("Documentation");
     private JTextField filterField = new JTextField();
+    private OptListModel optListModel = new OptListModel();
     private JPanel treePanel = new JPanel(new GridLayout(0, 1));
     private JCheckBox hideAttributes = new JCheckBox("Hide Attributes");
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
+    private JComboBox optCombo = new JComboBox(optListModel);
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             Object model = recDefTree.getModel();
-            if (model instanceof FilterTreeModel) {
-                FilterTreeModel ftm = (FilterTreeModel) model;
+            if (model instanceof RecDefTreeModel) {
+                RecDefTreeModel ftm = (RecDefTreeModel) model;
                 ftm.setFilter(filterField.getText().trim());
             }
         }
@@ -78,6 +80,44 @@ public class TargetFrame extends FrameBase {
         createRecDefTree(sipModel);
         createBookmarkTree(sipModel);
         timer.setRepeats(false);
+        optCombo.setPrototypeDisplayValue("anelement[withanoptinbrackets]");
+        wireUp();
+    }
+
+    @Override
+    protected void buildContent(Container content) {
+        content.add(createNorthPanel(), BorderLayout.NORTH);
+        content.add(treePanel, BorderLayout.CENTER);
+    }
+
+    private JPanel createNorthPanel() {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(createNorthCenterPanel(), BorderLayout.CENTER);
+        p.add(createNorthEastPanel(), BorderLayout.EAST);
+        return p;
+    }
+
+    private JPanel createNorthEastPanel() {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(hideAttributes);
+        p.add(autoFoldBox);
+        return p;
+    }
+
+    private JPanel createNorthCenterPanel() {
+        JPanel fp = new JPanel(new GridLayout(1, 0));
+        fp.setBorder(BorderFactory.createTitledBorder("Filter"));
+        fp.add(filterField);
+        JPanel op = new JPanel(new GridLayout(1, 0));
+        op.setBorder(BorderFactory.createTitledBorder("Option to show"));
+        op.add(optCombo);
+        JPanel p = new JPanel(new GridLayout(1, 0));
+        p.add(fp);
+        p.add(op);
+        return p;
+    }
+
+    private void wireUp() {
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -106,30 +146,24 @@ public class TargetFrame extends FrameBase {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (recDefTree.getModel().getRoot() instanceof RecDefTreeNode) {
-                    FilterTreeModel filterTreeModel = (FilterTreeModel) recDefTree.getModel();
-                    filterTreeModel.setAttributesHidden(hideAttributes.isSelected());
-                    showPath((RecDefTreeNode) filterTreeModel.getRoot());
+                    RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
+                    model.setAttributesHidden(hideAttributes.isSelected());
+                    showPath((RecDefTreeNode) model.getRoot());
                 }
             }
         });
-    }
-
-    @Override
-    protected void buildContent(Container content) {
-        content.add(createFilterPanel(), BorderLayout.NORTH);
-        content.add(treePanel, BorderLayout.CENTER);
-    }
-
-    private JPanel createFilterPanel() {
-        JPanel p = new JPanel(new BorderLayout(10, 10));
-        p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-        p.add(new JLabel("Filter:", JLabel.RIGHT), BorderLayout.WEST);
-        p.add(filterField, BorderLayout.CENTER);
-        JPanel pp = new JPanel(new GridLayout(1, 0));
-        pp.add(hideAttributes);
-        pp.add(autoFoldBox);
-        p.add(pp, BorderLayout.EAST);
-        return p;
+        optCombo.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                OptListModel.OptChoice choice = (OptListModel.OptChoice) itemEvent.getItem();
+                if (choice != null && choice.getPath() != null) {
+                    RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
+                    model.setSelectedOpt(choice.getOpt());
+                    RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
+                    root.showPath(recDefTree, choice.getPath());
+                }
+            }
+        });
     }
 
     private class RecDefSelection implements TreeSelectionListener, Runnable {
@@ -233,7 +267,7 @@ public class TargetFrame extends FrameBase {
     }
 
     private void createRecDefTree(SipModel sipModel) {
-        recDefTree = new JTree(new FilterTreeModel(FilterNode.createMessageNode("Empty"))) {
+        recDefTree = new JTree(new RecDefTreeModel(FilterNode.createMessageNode("Empty"))) {
             @Override
             public String getToolTipText(MouseEvent evt) {
                 TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
@@ -283,13 +317,14 @@ public class TargetFrame extends FrameBase {
         public void run() {
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
             if (root != null) {
-                FilterTreeModel filterTreeModel = new FilterTreeModel(root);
-                recDefTree.setModel(filterTreeModel);
-                filterTreeModel.setAttributesHidden(hideAttributes.isSelected());
-                showPath(root);
+                RecDefTreeModel model = new RecDefTreeModel(root);
+                recDefTree.setModel(model);
+                model.setAttributesHidden(hideAttributes.isSelected());
+                RecDef recDef = sipModel.getMappingModel().getRecMapping().getRecDefTree().getRecDef();
+                optListModel.setList(recDef);
             }
             else {
-                recDefTree.setModel(new FilterTreeModel(FilterNode.createMessageNode("No record definition")));
+                recDefTree.setModel(new RecDefTreeModel(FilterNode.createMessageNode("No record definition")));
             }
             boolean bookmarksPresent = false;
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
