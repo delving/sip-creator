@@ -270,12 +270,14 @@ public class Tag implements Comparable<Tag>, Serializable {
             if (pos > -1) {
                 sb.append(PLAIN_ASCII.charAt(pos));
             }
-            else {
+            else if (DELETED.indexOf(c) < 0) {
                 sb.append(c);
             }
         }
         return sb.toString();
     }
+
+    private static final String DELETED = "-.;:_";
 
     private static final String UNICODE =
             "\u00C0\u00E0\u00C8\u00E8\u00CC\u00EC\u00D2\u00F2\u00D9\u00F9"
@@ -286,9 +288,7 @@ public class Tag implements Comparable<Tag>, Serializable {
                     + "\u00C5\u00E5"
                     + "\u00C7\u00E7"
                     + "\u0150\u0151\u0170\u0171"
-                    + "-"
-                    + "."
-                    + ":";
+            ;
 
     private static final String PLAIN_ASCII =
             "AaEeIiOoUu"    // grave
@@ -299,11 +299,7 @@ public class Tag implements Comparable<Tag>, Serializable {
                     + "Aa"            // ring
                     + "Cc"            // cedilla
                     + "OoUu"          // double acute
-                    + "_"             // dash
-                    + "_"             // dot
-                    + "_"             // colon
             ;
-
 }
 
 
