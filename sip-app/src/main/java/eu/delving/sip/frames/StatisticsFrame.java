@@ -144,7 +144,7 @@ public class StatisticsFrame extends FrameBase {
             list.clear();
             fireIntervalRemoved(this, 0, size);
             if (histogram != null) {
-                list.addAll(histogram.getTrimmedCounters());
+                list.addAll(histogram.getCounters());
                 fireIntervalAdded(this, 0, getSize());
             }
         }

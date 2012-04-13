@@ -29,7 +29,7 @@ import java.util.Set;
  * being analyzed, one for each path encountered.  Some of the paths are to
  * elements that don't have any values (just sub-elements), and these will
  * only contain the count, and have no ValueStats available.
- *
+ * <p/>
  * Instances are serialized into a cache file which is read in when available,
  * rather than re-doing the analysis.
  *
@@ -37,10 +37,6 @@ import java.util.Set;
  */
 
 public class FieldStatistics implements Comparable<FieldStatistics>, Serializable {
-    private static final int RANDOM_SAMPLE_SIZE = 200;
-    private static final int HISTOGRAM_MAX_STORAGE_SIZE = 1024 * 128;
-    private static final int HISTOGRAM_MAX_SIZE = 2400;
-
     private Path path;
     private int total;
     private ValueStats valueStats;
@@ -50,9 +46,7 @@ public class FieldStatistics implements Comparable<FieldStatistics>, Serializabl
     }
 
     public void recordValue(String value) {
-        if (valueStats == null) {
-            valueStats = new ValueStats();
-        }
+        if (valueStats == null) valueStats = new ValueStats();
         valueStats.recordValue(value);
     }
 
@@ -68,6 +62,11 @@ public class FieldStatistics implements Comparable<FieldStatistics>, Serializabl
         return total;
     }
 
+    public int getApproximateSize() {
+        if (valueStats == null) return 0;
+        return valueStats.getApproximateSize();
+    }
+
     public Histogram getHistogram() {
         return valueStats != null ? valueStats.histogram : null;
     }
@@ -77,17 +76,9 @@ public class FieldStatistics implements Comparable<FieldStatistics>, Serializabl
     }
 
     public String getSummary() {
-        if (valueStats == null) {
-            if (total == 1) {
-                return "Element appears just once.";
-            }
-            else {
-                return String.format("Element appears %d times.", total);
-            }
-        }
-        else {
-            return valueStats.getSummary();
-        }
+        if (valueStats != null) return valueStats.getSummary();
+        if (total == 1) return "Element appears just once.";
+        return String.format("Element appears %d times.", total);
     }
 
     public boolean hasValues() {
@@ -100,9 +91,7 @@ public class FieldStatistics implements Comparable<FieldStatistics>, Serializabl
     }
 
     public void finish() {
-        if (valueStats != null) {
-            valueStats.finish();
-        }
+        if (valueStats != null) valueStats.finish();
     }
 
     public String toString() {
@@ -115,69 +104,59 @@ public class FieldStatistics implements Comparable<FieldStatistics>, Serializabl
     }
 
     private class ValueStats implements Serializable {
-        RandomSample randomSample = new RandomSample(RANDOM_SAMPLE_SIZE);
-        Histogram histogram = new Histogram(HISTOGRAM_MAX_STORAGE_SIZE, HISTOGRAM_MAX_SIZE);
+        RandomSample randomSample = new RandomSample();
+        Histogram histogram = new Histogram();
         Uniqueness uniqueness = new Uniqueness();
         boolean uniqueValues;
 
         void recordValue(String value) {
-            if (randomSample != null) {
-                randomSample.recordValue(value);
-            }
+            randomSample.recordValue(value);
             if (histogram != null) {
                 histogram.recordValue(value);
-                if (histogram.isTooLarge()) {
-                    histogram.getTrimmedCounters();
-                }
-                else if (histogram.isTooMuchData()) {
-                    histogram = null;
-                }
+                histogram.trimIfNecessary();
+                if (histogram.isTooMuchData()) histogram = null;
             }
-            if (uniqueness != null) {
-                if (uniqueness.isRepeated(value)) {
-                    uniqueness = null;
-                }
+            if (uniqueness != null && uniqueness.isRepeated(value)) {
+                uniqueness.destroy();
+                uniqueness = null;
             }
+        }
+
+        public int getApproximateSize() {
+            int size = randomSample.getSize();
+            if (histogram != null) size += histogram.getSize();
+            if (uniqueness != null) size += uniqueness.getSize();
+            return size;
         }
 
         public void finish() {
             if (uniqueness != null) {
                 Set<String> repeated = uniqueness.getRepeated();
-                if (repeated.isEmpty()) {
-                    uniqueValues = total > 1;
-                }
+                if (repeated.isEmpty()) uniqueValues = total > 1;
                 uniqueness = null;
                 if (total > 1) {
                     uniqueValues = true;
                     histogram = null;
                 }
             }
-            if (histogram != null) {
-                histogram.getTrimmedCounters();
-            }
+            if (histogram != null) histogram.trimIfNecessary();
         }
 
         public String getSummary() {
             if (uniqueValues) {
                 return String.format("All %d values are completely unique", total);
             }
-            else if (histogram != null) {
-                if (histogram.isTrimmed()) {
-                    return String.format("Histogram size %d exceeded, so histogram is incomplete.", histogram.getMaxSize());
-                }
-                else {
-                    if (histogram.getSize() == 1) {
-                        Histogram.Counter counter = histogram.getTrimmedCounters().iterator().next();
-                        return String.format("The single value '%s' appears %d times.", counter.getValue(), counter.getCount());
-                    }
-                    else {
-                        return String.format("There were %d different values, not all unique.", histogram.getSize());
-                    }
-                }
+            if (histogram == null) {
+                return String.format("Histogram became too large, discarded.");
             }
-            else {
-                return String.format("Storage %dk exceeded, so histogram is discarded.", HISTOGRAM_MAX_STORAGE_SIZE / 1024);
+            if (histogram.isTrimmed()) {
+                return String.format("Histogram begame too large, so histogram is incomplete.");
             }
+            if (histogram.getSize() != 1) {
+                return String.format("There were %d different values, not all unique.", histogram.getSize());
+            }
+            Histogram.Counter counter = histogram.getCounters().iterator().next();
+            return String.format("The single value '%s' appears %d times.", counter.getValue(), counter.getCount());
         }
     }
 }

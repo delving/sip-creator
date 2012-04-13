@@ -33,20 +33,16 @@ import java.util.*;
  */
 
 public class RandomSample implements Serializable {
+    private static final int RANDOM_SAMPLE_SIZE = 300;
     private static final int SAMPLE_SIZE = 15;
     private static final int MAX_VALUE_LENGTH = 40;
-    private int size;
     private Set<String> values = new TreeSet<String>();
 
-    public RandomSample(int size) {
-        this.size = size;
-    }
-
     public void recordValue(String value) {
-        if (values.size() < size || Math.random() > 0.1) {
+        if (values.size() < RANDOM_SAMPLE_SIZE || Math.random() > 0.1) {
             values.add(value);
         }
-        if (values.size() > size * 2) {
+        if (values.size() > RANDOM_SAMPLE_SIZE * 2) {
             Iterator<String> walk = values.iterator();
             while (walk.hasNext()) {
                 walk.next();
@@ -69,5 +65,10 @@ public class RandomSample implements Serializable {
 
     public Set<String> getValues() {
         return values;
+    }
+
+
+    public int getSize() {
+        return values.size();
     }
 }

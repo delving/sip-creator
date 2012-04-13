@@ -38,19 +38,19 @@ import java.util.*;
  */
 
 public class Histogram implements Serializable {
+    private static final int MAX_STORAGE_SIZE = 1024 * 512;
+    private static final int MAX_SIZE = 5000;
     private static final int SAMPLE_SIZE = 15;
-    private static final int MAX_VALUE_LENGTH = 40;
+    private static final int MAX_VALUE_LENGTH = 60;
     private static final DecimalFormat PERCENT = new DecimalFormat("#0.00%");
-    private static final double OVERSAMPLING = 1.2;
-    private int maxStorageSize, maxSize;
+    private static final double OVERSAMPLING = 1.3;
     private int total;
     private int storageSize;
-    private Map<String, Counter> counterMap = new HashMap<String, Counter>();
+    private Map<String, Counter> counterMap;
     private boolean trimmed;
 
-    public Histogram(int maxStorageSize, int maxSize) {
-        this.maxStorageSize = maxStorageSize;
-        this.maxSize = maxSize;
+    public Histogram() {
+        this.counterMap = new HashMap<String, Counter>((int)(MAX_SIZE * OVERSAMPLING));
     }
 
     public void recordValue(String value) {
@@ -67,60 +67,48 @@ public class Histogram implements Serializable {
         return total;
     }
 
-    public int getMaxSize() {
-        return maxSize;
-    }
-
-    public int getMaxStorageSize() {
-        return maxStorageSize;
-    }
-
     public int getSize() {
         return counterMap.size();
     }
 
     public List<Counter> getFirstValues() {
-        List<Counter> values = new ArrayList<Counter>(SAMPLE_SIZE);
-        Iterator<Counter> it = counterMap.values().iterator();
-        for (int walk = 0; walk < SAMPLE_SIZE; walk++) if (it.hasNext()) values.add(it.next());
-        return values;
+        List<Counter> values = getCounters();
+        return values.subList(0, Math.min(SAMPLE_SIZE, values.size()));
     }
 
     public Set<String> getValues() {
-        if (trimmed) {
-            throw new RuntimeException("Should not be using values if the histogram is trimmed");
-        }
+        if (trimmed) throw new RuntimeException("Should not be using values if the histogram is trimmed");
         return counterMap.keySet();
+    }
+
+    public void trimIfNecessary() {
+        if (trimmed) return;
+        if (getSize() <= MAX_SIZE) return;
+        trimmed = true;
+        List<Counter> counters = new ArrayList<Counter>(counterMap.values());
+        Collections.sort(counters);
+        counterMap.clear();
+        int countDown = MAX_SIZE;
+        storageSize = 0;
+        for (Counter counter : counters) {
+            if (countDown-- == 0) break;
+            counterMap.put(counter.getValue(), counter);
+            storageSize += counter.getValue().length();
+        }
     }
 
     public boolean isTrimmed() {
         return trimmed;
     }
 
-    public Collection<Counter> getTrimmedCounters() {
+    public List<Counter> getCounters() {
         List<Counter> counters = new ArrayList<Counter>(counterMap.values());
         Collections.sort(counters);
-        int size = counters.size();
-        if (size > maxSize) {
-            trimmed = true;
-            for (int walk = maxSize; walk < size; walk++) { // remove excess
-                Counter c = counters.get(walk);
-                storageSize -= c.getValue().length();
-                counterMap.remove(c.getValue());
-            }
-            return counters.subList(0, maxSize);
-        }
-        else {
-            return counters;
-        }
-    }
-
-    public boolean isTooLarge() {
-        return counterMap.size() > (int) (maxSize * OVERSAMPLING);
+        return counters;
     }
 
     public boolean isTooMuchData() {
-        return storageSize > maxStorageSize;
+        return storageSize > MAX_STORAGE_SIZE;
     }
 
     public class Counter implements Comparable<Counter>, Serializable {
@@ -147,9 +135,7 @@ public class Histogram implements Serializable {
         @Override
         public int compareTo(Counter counter) {
             int diff = counter.count - count;
-            if (diff == 0) {
-                return value.compareTo(counter.value);
-            }
+            if (diff == 0) return value.compareTo(counter.value);
             return diff;
         }
 

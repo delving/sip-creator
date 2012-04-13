@@ -29,10 +29,10 @@ import java.util.TreeSet;
 /**
  * Tackling the difficult problem of testing uniqueness of the potentially very
  * numerous values of a field, within limited memory.
- *
+ * <p/>
  * This class has a threshold at which it gives up
  * on storing values in an in-memory set, and writes all values to a text file.
- *
+ * <p/>
  * Later, when the analysis storm is over, it can be called upon to re-read the
  * dumped values and give final judgement.
  *
@@ -41,29 +41,22 @@ import java.util.TreeSet;
 
 public class Uniqueness {
     private static final int HOLD_THRESHOLD = 50000;
-    private static final int TEXT_SIZE_LIMIT = 120;
+    private static final int TEXT_SIZE_LIMIT = 60;
     private Set<String> all = new HashSet<String>(HOLD_THRESHOLD * 3 / 2);
     private File tempFile;
     private Writer out;
     private int count;
 
-    public Uniqueness() {
-    }
-
     public boolean isRepeated(String text) {
         count++;
-        if (text.length() > TEXT_SIZE_LIMIT) {
-            return true; // a silly test on such large strings
-        }
+        if (text.length() > TEXT_SIZE_LIMIT) return true; // a silly test on such large strings
         if (all != null) {
-            if (all.contains(text)) {
-                return true;
-            }
+            if (all.contains(text)) return true;
             all.add(text);
             if (all.size() > HOLD_THRESHOLD) {
                 try {
                     tempFile = File.createTempFile("Uniqueness", ".tmp");
-                    System.out.println("Creating temporary file "+tempFile.getAbsolutePath());
+                    System.out.println("Creating temporary file " + tempFile.getAbsolutePath());
                     tempFile.deleteOnExit();
                     out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
                     for (String one : all) {
@@ -92,49 +85,42 @@ public class Uniqueness {
 
     public Set<String> getRepeated() {
         Set<String> repeated = new TreeSet<String>();
-        if (all != null) {
-            return repeated; // empty
+        if (all != null) return repeated; // empty
+        try {
+            out.close();
+            out = null;
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(tempFile), "UTF-8"));
+            all = new HashSet<String>(count * 3 / 2);
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (all.contains(line)) {
+                    repeated.add(line);
+                    if (repeated.size() > 20) break;
+                }
+                all.add(line);
+            }
+            all = null;
+            in.close();
+            if (!tempFile.delete()) System.out.println("Unable to delete");
         }
-        else {
-            try {
-                out.close();
-                out = null;
-                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(tempFile), "UTF-8"));
-                all = new HashSet<String>(count * 3 / 2);
-                String line;
-                while ((line = in.readLine()) != null) {
-                    if (all.contains(line)) {
-                        repeated.add(line);
-                        if (repeated.size() > 20) {
-                            break;
-                        }
-                    }
-                    all.add(line);
-                }
-                all = null;
-                in.close();
-                if (!tempFile.delete()) {
-                    System.out.println("Unable to delete");
-                }
-            }
-            catch (IOException e) {
-                throw new RuntimeException("Unable to work with temporary file!", e);
-            }
+        catch (IOException e) {
+            throw new RuntimeException("Unable to work with temporary file!", e);
         }
         return repeated;
     }
 
     public void destroy() {
         try {
-            if (out != null) {
-                out.close();
-            }
-            if (tempFile != null && !tempFile.delete()) {
-                // nothing
-            }
+            if (out != null) out.close();
+            if (tempFile != null && !tempFile.delete()) {}
         }
         catch (IOException e) {
             // nothing
         }
+    }
+
+    public int getSize() {
+        if (all == null) return 0;
+        return all.size();
     }
 }

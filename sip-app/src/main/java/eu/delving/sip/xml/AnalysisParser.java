@@ -82,10 +82,10 @@ public class AnalysisParser implements Runnable {
             try {
                 switch (dataSet.getState()) {
                     case IMPORTED:
-                        inputStream = dataSet.openImportedInputStream(); // todo: close this stream
+                        inputStream = dataSet.openImportedInputStream();
                         break;
                     case SOURCED:
-                        inputStream = dataSet.openSourceInputStream(); // todo: close this stream
+                        inputStream = dataSet.openSourceInputStream();
                         sourceFormat = true;
                         break;
                     default:
@@ -94,11 +94,19 @@ public class AnalysisParser implements Runnable {
                 XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
                 StringBuilder text = new StringBuilder();
                 long count = 0;
+//                long time = System.currentTimeMillis();
                 while (running) {
                     switch (input.getEventType()) {
                         case XMLEvent.START_ELEMENT:
-                            if (++count % ELEMENT_STEP == 0 && null != listener && !listener.progress(count))
-                                running = false;
+                            if (++count % ELEMENT_STEP == 0) {
+                                if (listener != null && !listener.progress(count)) running = false;
+//                                Runtime r = Runtime.getRuntime();
+//                                long since = System.currentTimeMillis() - time;
+//                                time = System.currentTimeMillis();
+//                                int approximateSize = 0;
+//                                for (FieldStatistics stat : statisticsMap.values()) approximateSize += stat.getApproximateSize();
+//                                System.out.println(String.format("Mem: Since: %5d, Size: %5d, Free: %10d", since, approximateSize, r.freeMemory()));
+                            }
                             for (int walk = 0; walk < input.getNamespaceCount(); walk++) {
                                 namespaces.put(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
                             }
@@ -122,9 +130,7 @@ public class AnalysisParser implements Runnable {
                             path.pop();
                             break;
                     }
-                    if (!input.hasNext()) {
-                        break;
-                    }
+                    if (!input.hasNext()) break;
                     input.next();
                 }
             }
@@ -141,7 +147,7 @@ public class AnalysisParser implements Runnable {
         }
         catch (Exception e) {
             try {
-                File renamedTo = null;
+                File renamedTo;
                 switch (dataSet.getState()) {
                     case IMPORTED:
                     case DELIMITED:
@@ -168,9 +174,7 @@ public class AnalysisParser implements Runnable {
             Path key = path.copy();
             statisticsMap.put(key, fieldStatistics = new FieldStatistics(key));
         }
-        if (!value.isEmpty()) {
-            fieldStatistics.recordValue(value);
-        }
+        if (!value.isEmpty()) fieldStatistics.recordValue(value);
         fieldStatistics.recordOccurrence();
     }
 }
