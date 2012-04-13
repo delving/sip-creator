@@ -258,8 +258,13 @@ public class RecDefNode implements Comparable<RecDefNode> {
         else if (nodeMapping.hasTuple() && path.size() == 2) {
             boolean needLoop = !groovyParams.contains(nodeMapping.getTupleName());
             if (needLoop) {
-                codeOut.line_("%s * { %s -> // R1%s", nodeMapping.getTupleExpression(), nodeMapping.getTupleName(), nodeMapping.isVirtual() ? "(V)":"");
-                groovyParams.push(nodeMapping.getTupleName());
+                if (nodeMapping.isVirtual()) {
+                    codeOut.line_("if (%s) { // R1v", nodeMapping.getTupleExpression());
+                }
+                else {
+                    codeOut.line_("%s * { %s -> // R1", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
+                    groovyParams.push(nodeMapping.getTupleName());
+                }
             }
             if (isLeafElem()) {
                 startBuilderCall("R2", codeOut, groovyParams, editPath);
@@ -283,7 +288,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 nodeMapping.codeOut._line("}");
             }
             if (needLoop) {
-                groovyParams.pop();
+                if (!nodeMapping.isVirtual()) groovyParams.pop();
                 codeOut._line("}");
             }
         }
@@ -293,12 +298,19 @@ public class RecDefNode implements Comparable<RecDefNode> {
             Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
             boolean needLoop = !groovyParams.contains(inner.toGroovyParam());
             if (needLoop) {
-                codeOut.line_("%s%s %s { %s -> // R4%s", outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam(), nodeMapping.isVirtual() ? "(V)":"");
-                groovyParams.push(inner.toGroovyParam());
+                if (nodeMapping.isVirtual()) {
+                    codeOut.line_("if (%s%s) { // R4v",
+                            outer.toGroovyParam(), inner.toGroovyRef());
+                }
+                else {
+                    codeOut.line_("%s%s %s { %s -> // R4",
+                            outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam());
+                    groovyParams.push(inner.toGroovyParam());
+                }
             }
             childrenInLoop(nodeMapping, path.chop(-1), groovyParams, codeOut, editPath);
             if (needLoop) {
-                groovyParams.pop();
+                if (!nodeMapping.isVirtual()) groovyParams.pop();
                 codeOut._line("}");
             }
         }
