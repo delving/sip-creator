@@ -113,7 +113,9 @@ public class FilterTreeModel implements TreeModel {
     public void refreshNode(Object nodeObject) {
         FilterNode child = (FilterNode) nodeObject;
         FilterNode parent = (FilterNode) child.getParent();
+        if (parent == null) return;
         int index = getIndexOfChild(parent, child);
+        if (index < 0) return;
         TreeModelEvent event = new TreeModelEvent(this, getPathToRoot(parent), new int[]{index}, new Object[]{child});
         Object[] ears = listeners.getListenerList();
         for (int walk = ears.length - 2; walk >= 0; walk -= 2) {
