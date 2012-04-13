@@ -147,6 +147,7 @@ public class Mockery {
     public Node runMapping(MetadataRecord record) throws MappingException {
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
+        System.out.println(mappingRunner.getCode());
         return mappingRunner.runMapping(record);
     }
 

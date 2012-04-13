@@ -44,7 +44,7 @@
             <elem tag="thingUri">
                 <node-mapping inputPath="/input/_id">
                     <groovy-code>
-                        <string>"${spec}/${__id}"</string>
+                        <string>"${spec}/${_id}"</string>
                     </groovy-code>
                 </node-mapping>
             </elem>

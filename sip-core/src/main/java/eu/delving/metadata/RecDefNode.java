@@ -232,9 +232,19 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (isAttr() || !hasDescendentNodeMappings()) return;
         if (editPath != null && !path.isFamilyOf(editPath.getPath())) return;
         if (nodeMappings.isEmpty()) {
+            if (optRoot != null) { // maybe create a virtual node mapping if all kids agree
+                Path childrenInputPath = getSingleInputPathOfChildren();
+                if (childrenInputPath != null) {
+                    NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPath(childrenInputPath);
+                    nodeMapping.recDefNode = this;
+                    childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
+                    return;
+                }
+            }
             childrenToCode(codeOut, groovyParams, editPath);
+            return;
         }
-        else for (NodeMapping nodeMapping : nodeMappings.values()) {
+        for (NodeMapping nodeMapping : nodeMappings.values()) {
             nodeMapping.codeOut = codeOut.createChild();
             childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
         }
@@ -248,7 +258,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         else if (nodeMapping.hasTuple() && path.size() == 2) {
             boolean needLoop = !groovyParams.contains(nodeMapping.getTupleName());
             if (needLoop) {
-                codeOut.line_("%s * { %s -> // R1", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
+                codeOut.line_("%s * { %s -> // R1%s", nodeMapping.getTupleExpression(), nodeMapping.getTupleName(), nodeMapping.isVirtual() ? "(V)":"");
                 groovyParams.push(nodeMapping.getTupleName());
             }
             if (isLeafElem()) {
@@ -283,7 +293,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
             boolean needLoop = !groovyParams.contains(inner.toGroovyParam());
             if (needLoop) {
-                codeOut.line_("%s%s %s { %s -> // R4", outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam());
+                codeOut.line_("%s%s %s { %s -> // R4%s", outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam(), nodeMapping.isVirtual() ? "(V)":"");
                 groovyParams.push(inner.toGroovyParam());
             }
             childrenInLoop(nodeMapping, path.chop(-1), groovyParams, codeOut, editPath);
@@ -340,9 +350,18 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return !elem.elemList.isEmpty();
     }
 
+    public Path getSingleInputPathOfChildren() {
+        List<NodeMapping> subMappings = new ArrayList<NodeMapping>();
+        for (RecDefNode sub : children) sub.collectNodeMappings(subMappings);
+        Set<Path> inputPaths = new TreeSet<Path>();
+        for (NodeMapping subMapping : subMappings) inputPaths.add(subMapping.inputPath);
+        return inputPaths.size() == 1 ? inputPaths.iterator().next() : null;
+    }
+
     private void startBuilderCall(String comment, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+        boolean hasOpt = optRoot != null;
         if (hasActiveAttributes()) {
-            codeOut.line_("%s ( // %s", getTag().toBuilderCall(), comment);
+            codeOut.line_("%s ( // %s%s", getTag().toBuilderCall(), comment, hasOpt ? "(opt)" : "");
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
@@ -372,7 +391,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             codeOut._line(") {").in();
         }
         else {
-            codeOut.line_("%s { // %s", getTag().toBuilderCall(), comment);
+            codeOut.line_("%s { // %s%s", getTag().toBuilderCall(), comment, hasOpt ? "(opt)" : "");
         }
     }
 

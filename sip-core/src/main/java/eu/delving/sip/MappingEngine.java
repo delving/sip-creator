@@ -50,6 +50,10 @@ public class MappingEngine {
         metadataRecordFactory = new MetadataRecordFactory(namespaces);
     }
 
+    public String getCode() {
+        return mappingRunner.getCode();
+    }
+
     public Node toNode(String originalRecord) throws XMLStreamException, MappingException {
         MetadataRecord metadataRecord = metadataRecordFactory.fromXml(originalRecord);
         return mappingRunner.runMapping(metadataRecord);

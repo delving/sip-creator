@@ -145,7 +145,7 @@ public class GroovyNode {
                 stringName = StringUtil.tagToVariable(qName.getLocalPart());
             }
             else {
-                stringName = qName.getPrefix() + "_" + StringUtil.tagToVariable(qName.getLocalPart());
+                stringName = qName.getPrefix() + StringUtil.tagToVariable(qName.getLocalPart());
             }
         }
         return stringName;

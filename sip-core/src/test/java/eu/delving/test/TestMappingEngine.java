@@ -57,6 +57,7 @@ public class TestMappingEngine {
         MappingEngine mappingEngine = new MappingEngine(mapping("lido"), classLoader(), new MockRecDefModel("lido"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
+        System.out.println(mappingEngine.getCode());
         Node node = mappingEngine.toNode(input("lido"));
         System.out.println(XmlSerializer.toXml(node));
         Source source = new DOMSource(node);
@@ -96,6 +97,7 @@ public class TestMappingEngine {
         MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
+        System.out.println(mappingEngine.getCode());
         Node node = mappingEngine.toNode(input("aff"));
         System.out.println(XmlSerializer.toXml(node));
     }
@@ -105,6 +107,7 @@ public class TestMappingEngine {
         MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
+        System.out.println(mappingEngine.getCode());
         Node node = mappingEngine.toNode(input("aff"));
         System.out.println(XmlSerializer.toXml(node));
         IndexDocument indexDocument = mappingEngine.toIndexDocument(input("aff"));

@@ -90,6 +90,10 @@ public class NodeMapping {
         return inputPath.hashCode();
     }
 
+    public boolean isVirtual() {
+        return recDefNode.getNodeMappings().isEmpty();
+    }
+
     public String getDocumentation() {
         return StringUtil.linesToString(documentation);
     }
