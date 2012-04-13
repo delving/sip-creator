@@ -203,8 +203,13 @@ public class FieldMappingFrame extends FrameBase {
                 if (operatorBoxSetting) return;
                 final NodeMappingEntry nodeMappingEntry = sipModel.getCreateModel().getNodeMappingEntry();
                 if (nodeMappingEntry != null) {
-                    nodeMappingEntry.getNodeMapping().operator = (Operator) operatorBox.getSelectedItem();
-                    nodeMappingEntry.getNodeMapping().notifyChanged();
+                    Exec.work(new Runnable() {
+                        @Override
+                        public void run() {
+                            nodeMappingEntry.getNodeMapping().operator = (Operator) operatorBox.getSelectedItem();
+                            nodeMappingEntry.getNodeMapping().notifyChanged();
+                        }
+                    });
                 }
             }
         });
