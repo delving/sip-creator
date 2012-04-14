@@ -127,7 +127,7 @@ public class Mockery {
     public NodeMapping map(String fromPath, String toPath) {
         List<Path> inputPaths = new ArrayList<Path>();
         for (String s : fromPath.split(" ")) inputPaths.add(Path.create(s));
-        Path outputPath = Path.create(toPath).defaultPrefix(prefix);
+        Path outputPath = Path.create(toPath).withDefaultPrefix(prefix);
         RecDefNode node = recMapping.getRecDefTree().getRecDefNode(outputPath);
         if (node == null) {
             throw new RuntimeException("No node found for " + outputPath);

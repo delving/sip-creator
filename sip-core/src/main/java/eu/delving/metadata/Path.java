@@ -81,15 +81,15 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     private Path(Path path) {
-        if (path.stack != null) for (Tag name : path.stack) stack.push(name);
+        if (path.stack != null) for (Tag tag : path.stack) stack.push(tag);
     }
 
-    private Path(Path path, int count) {
-        if (count >= 0) {
-            for (Tag name : path.stack) if (count-- > 0) stack.push(name);
+    private Path(Path path, int n) {
+        if (n >= 0) { // take the first n tags, ignore the rest
+            for (Tag tag : path.stack) if (n-- > 0) stack.push(tag);
         }
-        else {
-            for (Tag name : path.stack) if (count++ >= 0) stack.push(name);
+        else { // ignore the first -n tags, take the rest
+            for (Tag tag : path.stack) if (n++ >= 0) stack.push(tag);
         }
     }
 
@@ -99,25 +99,20 @@ public class Path implements Comparable<Path>, Serializable {
 
     public Path extend(Tag tag) {
         Path extended = new Path(this);
-        extended.push(tag);
+        extended.stack.push(tag);
         return extended;
     }
 
-    public Path defaultPrefix(String prefix) {
-        for (int walk=0; walk<size(); walk++) stack.set(walk, stack.get(walk).defaultPrefix(prefix));
-        string = null;
-        return this;
+    public Path shorten() {
+        Path popped = new Path(this);
+        popped.stack.pop();
+        return popped;
     }
 
-    public void push(Tag tag) {
-        stack.push(tag);
-        string = null;
-    }
-
-    public Tag pop() {
-        Tag tag = stack.pop();
-        string = null;
-        return tag;
+    public Path withDefaultPrefix(String prefix) {
+        Path with = new Path(this);
+        for (int walk=0; walk<size(); walk++) with.stack.set(walk, with.stack.get(walk).defaultPrefix(prefix));
+        return with;
     }
 
     public boolean isFamilyOf(Path other) {
@@ -142,9 +137,9 @@ public class Path implements Comparable<Path>, Serializable {
     }
     
     public Path prefixWith(Tag tag) {
-        Path copy = new Path(this);
-        copy.stack.insertElementAt(tag, 0);
-        return copy;
+        Path prefixed = new Path(this);
+        prefixed.stack.insertElementAt(tag, 0);
+        return prefixed;
     }
 
     public Path minusAncestor(Path ancestor) {

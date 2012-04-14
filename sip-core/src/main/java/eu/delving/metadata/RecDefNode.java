@@ -257,14 +257,21 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (path.size() == 1) {
             childrenToCode(codeOut, groovyParams, editPath);
         }
-        else if (nodeMapping.hasTuple() && path.size() == 2) {
+        else if (nodeMapping.hasMap() && path.size() == 2) {
             boolean needLoop = !groovyParams.contains(nodeMapping.getMapName());
             if (needLoop) {
                 if (nodeMapping.isVirtual()) {
-                    codeOut.line_("if (%s) { // R1v", toMapExpression(nodeMapping));
+                    codeOut.line_(
+                            "if (%s) { // R1v",
+                            toMapExpression(nodeMapping)
+                    );
                 }
                 else {
-                    codeOut.line_("%s * { %s -> // R1", toMapExpression(nodeMapping), nodeMapping.getMapName());
+                    codeOut.line_(
+                            "%s * { %s -> // R1",
+                            toMapExpression(nodeMapping),
+                            nodeMapping.getMapName()
+                    );
                     groovyParams.push(nodeMapping.getMapName());
                 }
             }
@@ -278,10 +285,16 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 for (RecDefNode sub : children) {
                     if (sub.isAttr()) continue;
                     if (sub.optKey != null) {
-                        nodeMapping.codeOut.line("%s '%s' // R3k", sub.getTag().toBuilderCall(), sub.optKey.key);
+                        nodeMapping.codeOut.line(
+                                "%s '%s' // R3k",
+                                sub.getTag().toBuilderCall(), sub.optKey.key
+                        );
                     }
                     else if (sub.optValue != null) {
-                        nodeMapping.codeOut.line("%s '%s' // R3v", sub.getTag().toBuilderCall(), sub.optValue.content);
+                        nodeMapping.codeOut.line(
+                                "%s '%s' // R3v",
+                                sub.getTag().toBuilderCall(), sub.optValue.content
+                        );
                     }
                     else {
                         sub.toElementCode(nodeMapping.codeOut, groovyParams, editPath);
@@ -296,7 +309,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
         else { // path should never be empty
             Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
-            String param = toGroovyParam(path);
+            String param = toLoopGroovyParam(path);
             boolean needLoop = !groovyParams.contains(param);
             if (needLoop) {
                 if (nodeMapping.isVirtual()) {
@@ -327,10 +340,16 @@ public class RecDefNode implements Comparable<RecDefNode> {
             for (RecDefNode sub : children) {
                 if (sub.isAttr()) continue;
                 if (sub.optKey != null) {
-                    codeOut.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
+                    codeOut.line(
+                            "%s '%s'",
+                            sub.getTag().toBuilderCall(), sub.optKey.key
+                    );
                 }
                 else if (sub.optValue != null) {
-                    codeOut.line("%s '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
+                    codeOut.line(
+                            "%s '%s'",
+                            sub.getTag().toBuilderCall(), sub.optValue.content
+                    );
                 }
                 else {
                     sub.toElementCode(codeOut, groovyParams, editPath);
@@ -345,13 +364,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
         else {
             for (NodeMapping nodeMapping : nodeMappings.values()) {
-                if (nodeMapping.tuplePaths == null) {
-                    startBuilderCall("R7", codeOut, groovyParams, editPath);
-                    nodeMapping.codeOut = codeOut.createChild();
-                    nodeMapping.toLeafElementCode(groovyParams, editPath);
-                    codeOut._line("}");
-                }
-                else {
+                if (nodeMapping.hasMap()) {
                     codeOut.line_(
                             "%s %s { %s -> // R8",
                             toMapExpression(nodeMapping), nodeMapping.getOperator().getChar(), nodeMapping.getMapName()
@@ -360,6 +373,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     nodeMapping.codeOut = codeOut.createChild();
                     nodeMapping.toLeafElementCode(groovyParams, editPath);
                     codeOut._line("}");
+                    codeOut._line("}");
+                }
+                else {
+                    startBuilderCall("R7", codeOut, groovyParams, editPath);
+                    nodeMapping.codeOut = codeOut.createChild();
+                    nodeMapping.toLeafElementCode(groovyParams, editPath);
                     codeOut._line("}");
                 }
             }

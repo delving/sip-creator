@@ -191,7 +191,7 @@ public class Harvestor implements Runnable {
             switch (event.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     StartElement start = event.asStartElement();
-                    path.push(Tag.element(start.getName()));
+                    path = path.extend(Tag.element(start.getName()));
                     if (!recordEvents.isEmpty()) {
                         recordEvents.add(event);
                     }
@@ -240,7 +240,7 @@ public class Harvestor implements Runnable {
                     else if (path.equals(ERROR) && errorBuilder != null) {
                         listener.failed(String.format("OAI-PMH Error: %s", errorBuilder), null);
                     }
-                    path.pop();
+                    path = path.shorten();
                     break;
                 case XMLEvent.END_DOCUMENT:
                     finished = true;

@@ -208,7 +208,7 @@ public class TestCodeGeneration {
     }
 
     private static RecDefNode node(String path) {
-        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(Path.create(path).defaultPrefix("lido"));
+        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(Path.create(path).withDefaultPrefix("lido"));
         Assert.assertNotNull(node);
         return node;
     }

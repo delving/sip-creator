@@ -148,7 +148,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         List<SourceTreeNode> list = new ArrayList<SourceTreeNode>();
         compilePathList(list, fromRoot);
         Path path = Path.empty();
-        for (SourceTreeNode node : list) path.push(node.getTag());
+        for (SourceTreeNode node : list) path = path.extend(node.getTag());
         return path;
     }
 
@@ -314,8 +314,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         Tag tag = path.peek();
         SourceTreeNode node = tag == null ? null : new SourceTreeNode(parent, tag);
         for (Map.Entry<Tag, List<FieldStatistics>> entry : statisticsMap.entrySet()) {
-            Path childPath = path.copy();
-            childPath.push(entry.getKey());
+            Path childPath = path.extend(entry.getKey());
             FieldStatistics fieldStatisticsForChild = null;
             for (FieldStatistics fieldStatistics : entry.getValue()) {
                 if (fieldStatistics.getPath().equals(childPath)) fieldStatisticsForChild = fieldStatistics;

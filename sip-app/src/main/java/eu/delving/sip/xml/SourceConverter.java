@@ -62,7 +62,6 @@ public class SourceConverter {
     private Map<String, String> namespaces;
     private int recordCount, totalRecords;
     private ProgressListener progressListener;
-    private Path path = Path.empty();
     private String unique;
     private StartElement start;
     private boolean recordEvents;
@@ -84,6 +83,7 @@ public class SourceConverter {
 
     public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException, UniquenessException {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
+        Path path = Path.empty();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         try {
@@ -103,8 +103,8 @@ public class SourceConverter {
                     case XMLEvent.START_ELEMENT:
                         boolean followsStart = start != null;
                         start = event.asStartElement();
-                        path.push(Tag.element(start.getName()));
-                        handleStartElement(followsStart);
+                        path = path.extend(Tag.element(start.getName()));
+                        handleStartElement(path, followsStart);
                         if (progressListener != null) progressListener.setProgress(recordCount);
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -140,7 +140,7 @@ public class SourceConverter {
                                             if (walk.hasNext()) {
                                                 eventBuffer.add(end);
                                                 eventBuffer.add(eventFactory.createCharacters("\n"));
-                                                handleStartElement(false);
+                                                handleStartElement(path, false);
                                             }
                                         }
                                         lines.clear();
@@ -151,7 +151,7 @@ public class SourceConverter {
                             }
                         }
                         start = null;
-                        path.pop();
+                        path = path.shorten();
                         break;
                     case XMLEvent.END_DOCUMENT:
                         out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
@@ -187,10 +187,10 @@ public class SourceConverter {
         clearEvents();
     }
 
-    private void handleStartElement(boolean followsStart) {
+    private void handleStartElement(Path path, boolean followsStart) {
         if (recordEvents) {
             if (followsStart) eventBuffer.add(eventFactory.createCharacters("\n"));
-            if (uniqueElementPath.peek().isAttribute()) checkForUnique(start);
+            if (uniqueElementPath.peek().isAttribute()) checkForUnique(path, start);
             eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
         }
         else if (path.equals(recordRootPath)) {
@@ -198,15 +198,14 @@ public class SourceConverter {
         }
     }
 
-    private void checkForUnique(StartElement start) {
+    private void checkForUnique(Path path, StartElement start) {
         Iterator attrWalk = start.getAttributes();
-        while (attrWalk.hasNext()) checkForUnique((Attribute) attrWalk.next());
+        while (attrWalk.hasNext()) checkForUnique(path, (Attribute) attrWalk.next());
     }
 
-    private void checkForUnique(Attribute attr) {
-        path.push(Tag.attribute(attr.getName()));
-        if (path.equals(uniqueElementPath)) unique = attr.getValue();
-        path.pop();
+    private void checkForUnique(Path path, Attribute attr) {
+        Path extended = path.extend(Tag.attribute(attr.getName()));
+        if (extended.equals(uniqueElementPath)) unique = attr.getValue();
     }
 
     private void extractLines(String value) {

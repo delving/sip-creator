@@ -70,16 +70,12 @@ public class StringUtil {
         codeOut._line("}");
     }
 
-    public String getDictionaryName(NodeMapping nodeMapping) {
-        return null;  //To change body of created methods use File | Settings | File Templates.
-    }
-
-    public static String toGroovyParam(Path path) {
+    public static String toLoopGroovyParam(Path path) {
         Tag inner = path.getTag(1);
         return toGroovyParam(inner);
     }
 
-    public static String toNodeMappingGroovyParam(Path path) {
+    public static String toLeafGroovyParam(Path path) {
         Tag inner = path.getTag(0);
         return toGroovyParam(inner);
     }

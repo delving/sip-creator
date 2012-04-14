@@ -51,7 +51,6 @@ public class MetadataParser {
     private InputStream inputStream;
     private XMLStreamReader2 input;
     private int recordIndex, recordCount;
-    private Path path = Path.empty();
     private Map<String, String> namespaces = new TreeMap<String, String>();
     private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;
@@ -77,6 +76,7 @@ public class MetadataParser {
     @SuppressWarnings("unchecked")
     public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, AbortException {
         MetadataRecord metadataRecord = null;
+        Path path = Path.empty();
         GroovyNode node = null;
         StringBuilder value = new StringBuilder();
         while (metadataRecord == null) {
@@ -84,7 +84,7 @@ public class MetadataParser {
                 case XMLEvent.START_DOCUMENT:
                     break;
                 case XMLEvent.START_ELEMENT:
-                    path.push(Tag.element(input.getName()));
+                    path = path.extend(Tag.element(input.getName()));
                     if (node == null && path.equals(Storage.RECORD_ROOT)) {
                         node = new GroovyNode(null, "input");
                     }
@@ -136,7 +136,7 @@ public class MetadataParser {
                             node = node.parent();
                         }
                     }
-                    path.pop();
+                    path = path.shorten();
                     break;
                 case XMLEvent.END_DOCUMENT: {
                     break;

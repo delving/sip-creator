@@ -48,7 +48,6 @@ import java.util.*;
 
 public class AnalysisParser implements Runnable {
     public static final int ELEMENT_STEP = 10000;
-    private Path path = Path.empty();
     private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
     private Map<String, String> namespaces = new TreeMap<String, String>();
     private Listener listener;
@@ -76,6 +75,7 @@ public class AnalysisParser implements Runnable {
             xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
             xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
             xmlif.configureForSpeed();
+            Path path = Path.empty();
             boolean running = true;
             boolean sourceFormat = false;
             InputStream inputStream = null;
@@ -94,29 +94,21 @@ public class AnalysisParser implements Runnable {
                 XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
                 StringBuilder text = new StringBuilder();
                 long count = 0;
-//                long time = System.currentTimeMillis();
                 while (running) {
                     switch (input.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             if (++count % ELEMENT_STEP == 0) {
                                 if (listener != null && !listener.progress(count)) running = false;
-//                                Runtime r = Runtime.getRuntime();
-//                                long since = System.currentTimeMillis() - time;
-//                                time = System.currentTimeMillis();
-//                                int approximateSize = 0;
-//                                for (FieldStatistics stat : statisticsMap.values()) approximateSize += stat.getApproximateSize();
-//                                System.out.println(String.format("Mem: Since: %5d, Size: %5d, Free: %10d", since, approximateSize, r.freeMemory()));
                             }
                             for (int walk = 0; walk < input.getNamespaceCount(); walk++) {
                                 namespaces.put(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
                             }
-                            path.push(Tag.element(input.getName()));
+                            path = path.extend(Tag.element(input.getName()));
                             if (input.getAttributeCount() > 0) {
                                 for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                     QName attributeName = input.getAttributeName(walk);
-                                    path.push(Tag.attribute(attributeName));
-                                    recordValue(input.getAttributeValue(walk));
-                                    path.pop();
+                                    Path withAttr = path.extend(Tag.attribute(attributeName));
+                                    recordValue(withAttr, input.getAttributeValue(walk));
                                 }
                             }
                             break;
@@ -125,9 +117,9 @@ public class AnalysisParser implements Runnable {
                             text.append(input.getText());
                             break;
                         case XMLEvent.END_ELEMENT:
-                            recordValue(text.toString().trim());
+                            recordValue(path, text.toString().trim());
                             text.setLength(0);
-                            path.pop();
+                            path = path.shorten();
                             break;
                     }
                     if (!input.hasNext()) break;
@@ -167,7 +159,7 @@ public class AnalysisParser implements Runnable {
         }
     }
 
-    private void recordValue(String value) {
+    private void recordValue(Path path, String value) {
         value = value.trim();
         FieldStatistics fieldStatistics = statisticsMap.get(path);
         if (fieldStatistics == null) {

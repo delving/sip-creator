@@ -56,16 +56,13 @@ public class NodeMapping {
     @XStreamAsAttribute
     public Operator operator;
 
-    @XStreamAlias("tuplePaths")
-    public List<Path> tuplePaths;
+    public List<Path> siblings;
 
-    @XStreamAlias("dictionary")
     public Map<String, String> dictionary;
 
     @XStreamAlias("groovy-code")
     public List<String> groovyCode;
 
-    @XStreamAlias("documentation")
     public List<String> documentation;
 
     @XStreamOmitField
@@ -113,8 +110,8 @@ public class NodeMapping {
         statsTreeNodes = null;
     }
 
-    public boolean hasTuple() {
-        return tuplePaths != null;
+    public boolean hasMap() {
+        return siblings != null;
     }
 
     public boolean hasStatsTreeNodes() {
@@ -168,8 +165,8 @@ public class NodeMapping {
         }
         this.inputPath = inputPaths.get(0);
         if (inputPaths.size() > 1) {
-            tuplePaths = new ArrayList<Path>();
-            for (int walk = 1; walk < inputPaths.size(); walk++) tuplePaths.add(inputPaths.get(walk));
+            siblings = new ArrayList<Path>();
+            for (int walk = 1; walk < inputPaths.size(); walk++) siblings.add(inputPaths.get(walk));
         }
         return this;
     }
@@ -177,7 +174,7 @@ public class NodeMapping {
     public List<Path> getInputPaths() {
         List<Path> inputPaths = new ArrayList<Path>();
         inputPaths.add(inputPath);
-        if (tuplePaths != null) inputPaths.addAll(tuplePaths);
+        if (siblings != null) inputPaths.addAll(siblings);
         Collections.sort(inputPaths);
         return inputPaths;
     }
@@ -293,13 +290,13 @@ public class NodeMapping {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
             if (dictionary != null) {
-                codeOut.line("from%s(%s)", toDictionaryName(this), toNodeMappingGroovyParam(path));
+                codeOut.line("from%s(%s)", toDictionaryName(this), toLeafGroovyParam(path));
             }
-            else if (tuplePaths != null) {
+            else if (hasMap()) {
                 codeOut.line(getMapUsage());
             }
             else {
-                codeOut.line("\"${%s}\"", toNodeMappingGroovyParam(path));
+                codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
             }
         }
         else if (recDefNode.isLeafElem()) {
@@ -307,14 +304,16 @@ public class NodeMapping {
         }
         else {
             boolean needLoop;
-            if (tuplePaths != null) {
+            if (hasMap()) {
                 needLoop = !groovyParams.contains(getMapName());
                 if (needLoop) {
-                    codeOut.line_("%s %s { %s ->", toMapExpression(this), getOperator().getChar(), getMapName());
+                    codeOut.line_(
+                            "%s %s { %s ->",
+                            toMapExpression(this), getOperator().getChar(), getMapName());
                 }
             }
             else {
-                String param = toGroovyParam(path);
+                String param = toLoopGroovyParam(path);
                 needLoop = !groovyParams.contains(param);
                 if (needLoop) {
                     codeOut.line_("%s %s { %s ->", toLoopRef(path), getOperator().getChar(), param);
@@ -340,12 +339,15 @@ public class NodeMapping {
         List<String> variables = new ArrayList<String>();
         variables.add("_uniqueIdentifier");
         Path back = inputPath.copy();
-        while (!back.isEmpty()) variables.add(toGroovyParam(back.pop()));
+        while (!back.isEmpty()) {
+            variables.add(toGroovyParam(back.peek()));
+            back = back.shorten();
+        }
         return variables;
     }
 
     private String getMapUsage() {
-        if (tuplePaths == null) return null;
+        if (!hasMap()) return null;
         StringBuilder usage = new StringBuilder("\"");
         Iterator<Path> walk = getInputPaths().iterator();
         while (walk.hasNext()) {
@@ -364,7 +366,7 @@ public class NodeMapping {
     public String toString() {
         if (recDefNode == null) return "No RecDefNode";
         String input = inputPath.getTail();
-        if (tuplePaths != null) {
+        if (hasMap()) {
             StringBuilder out = new StringBuilder();
             Iterator<Path> walk = getInputPaths().iterator();
             while (walk.hasNext()) {

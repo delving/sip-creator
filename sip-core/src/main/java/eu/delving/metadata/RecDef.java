@@ -211,7 +211,7 @@ public class RecDef {
         public Attr attr;
 
         public void resolve(RecDef recDef) {
-            outputPath.defaultPrefix(recDef.prefix);
+            outputPath = outputPath.withDefaultPrefix(recDef.prefix);
             if (outputPath.peek().isAttribute()) {
                 this.attr = recDef.findAttr(outputPath);
             }
@@ -258,7 +258,7 @@ public class RecDef {
             for (Opt opt : opts) opt.parent = this;
             if (path == null) throw new RuntimeException("No path for OptList: " + opts);
             if (path.peek().isAttribute()) throw new RuntimeException("An option list may not be connected to an attribute: " + path);
-            path.defaultPrefix(recDef.prefix);
+            path = path.withDefaultPrefix(recDef.prefix);
             key = key.defaultPrefix(recDef.prefix);
             value = value.defaultPrefix(recDef.prefix);
             Elem elem = recDef.findElem(path);
@@ -302,7 +302,8 @@ public class RecDef {
 
         public void resolve(RecDef recDef) {
             if (path.peek().isAttribute()) throw new RuntimeException("Attribute here?");
-            Elem elem = recDef.findElem(path.defaultPrefix(recDef.prefix));
+            path = path.withDefaultPrefix(recDef.prefix);
+            Elem elem = recDef.findElem(path);
             elem.searchField = this;
         }
     }
@@ -325,7 +326,7 @@ public class RecDef {
             Attr attr;
             if (path != null) {
                 if (lines == null) throw new RuntimeException("Lines is null for " + path);
-                path = path.defaultPrefix(recDef.prefix);
+                path = path.withDefaultPrefix(recDef.prefix);
                 elem = recDef.root.findElem(path, 0);
                 attr = recDef.root.findAttr(path, 0);
                 if (elem == null && attr == null) throw new RuntimeException("Cannot find path " + path);
@@ -481,7 +482,7 @@ public class RecDef {
 
         public void resolve(Path path, RecDef recDef) {
             if (tag == null) throw new RuntimeException("Null tag at: " + path);
-            path.push(tag);
+            path = path.extend(tag);
             tag = tag.defaultPrefix(recDef.prefix);
             if (attrs != null) {
                 for (String localName : attrs.split(DELIM)) {
@@ -496,7 +497,6 @@ public class RecDef {
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
-            path.pop();
         }
 
         public void print(StringBuilder out, int level) {
