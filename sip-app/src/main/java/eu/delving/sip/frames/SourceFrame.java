@@ -207,10 +207,10 @@ public class SourceFrame extends FrameBase {
                         Path parentPath = null;
                         for (SourceTreeNode node : nodeList) {
                             if (parentPath == null) {
-                                parentPath = node.getPath(true).chop(1);
+                                parentPath = node.getPath(true).takeFirst();
                             }
                             else {
-                                if (!parentPath.equals(node.getPath(true).chop(1))) {
+                                if (!parentPath.equals(node.getPath(true).takeFirst())) {
                                     sourceTree.clearSelection();
                                     return;
                                 }

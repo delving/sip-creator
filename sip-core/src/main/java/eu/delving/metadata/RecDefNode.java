@@ -326,7 +326,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     groovyParams.push(param);
                 }
             }
-            childrenInLoop(nodeMapping, path.chop(-1), groovyParams, codeOut, editPath);
+            childrenInLoop(nodeMapping, path.withRootRemoved(), groovyParams, codeOut, editPath);
             if (needLoop) {
                 if (!nodeMapping.isVirtual()) groovyParams.pop();
                 codeOut._line("}");

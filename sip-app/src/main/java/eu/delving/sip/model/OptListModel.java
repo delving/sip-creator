@@ -88,7 +88,6 @@ public class OptListModel extends AbstractListModel implements ComboBoxModel {
         }
 
         public OptChoice(Path path, RecDef.Opt opt) {
-            path = path.copy();
             this.tail = path.peek();
             this.path = path.shorten().extend(tail.withOpt(opt.key));
             this.opt = opt;

@@ -71,9 +71,11 @@ public class Path implements Comparable<Path>, Serializable {
                 int at = part.indexOf("@");
                 if (at > 0) throw new IllegalArgumentException("@ must be at the beginning of an attribute name");
                 if (at == 0) {
+                    // todo: here it could be renamed
                     stack.push(Tag.attribute(part.substring(1)));
                 }
                 else {
+                    // todo: here it could be renamed
                     stack.push(Tag.element(part));
                 }
             }
@@ -93,12 +95,11 @@ public class Path implements Comparable<Path>, Serializable {
         }
     }
 
-    public Path copy() {
-        return new Path(this);
-    }
+    // modifiers
 
     public Path extend(Tag tag) {
         Path extended = new Path(this);
+        // todo: here it could be renamed
         extended.stack.push(tag);
         return extended;
     }
@@ -115,6 +116,37 @@ public class Path implements Comparable<Path>, Serializable {
         return with;
     }
 
+    public Path takeFirst(int count) {
+        return new Path(this, count);
+    }
+
+    public Path takeFirst() {
+        return takeFirst(1);
+    }
+
+    public Path withRootRemoved() {
+        Path removed = new Path(this);
+        removed.stack.remove(0);
+        return removed;
+    }
+
+    public Path extendAncestor(Path ancestor) {
+        if (!(ancestor.isAncestorOf(this) || ancestor.equals(this))) {
+            throw new IllegalArgumentException(String.format("%s is not an ancestor of %s", ancestor, this));
+        }
+        Path contained = new Path(this, -ancestor.size());
+        contained.stack.insertElementAt(ancestor.peek(), 0);
+        return contained;
+    }
+
+    public Path getParent() {
+        Path parent = new Path(this);
+        parent.stack.pop();
+        return parent;
+    }
+
+    // getters
+
     public boolean isFamilyOf(Path other) {
         return equals(other) || this.isAncestorOf(other) || other.isAncestorOf(this);
     }
@@ -130,23 +162,6 @@ public class Path implements Comparable<Path>, Serializable {
             if (!thisTag.equals(otherTag)) return false; // always equal
         }
         return walkOther.hasNext();
-    }
-
-    public Path chop(int index) {
-        return new Path(this, index);
-    }
-    
-    public Path prefixWith(Tag tag) {
-        Path prefixed = new Path(this);
-        prefixed.stack.insertElementAt(tag, 0);
-        return prefixed;
-    }
-
-    public Path minusAncestor(Path ancestor) {
-        if (!(ancestor.isAncestorOf(this) || ancestor.equals(this))) {
-            throw new IllegalArgumentException(String.format("%s is not an ancestor of %s", ancestor, this));
-        }
-        return chop(-ancestor.size());
     }
 
     @Override
@@ -183,12 +198,6 @@ public class Path implements Comparable<Path>, Serializable {
 
     public String getTail() {
         return stack.isEmpty() ? "?" : stack.peek().toString();
-    }
-
-    public Path getParent() {
-        Path parent = new Path(this);
-        parent.stack.pop();
-        return parent;
     }
 
     public boolean isEmpty() {

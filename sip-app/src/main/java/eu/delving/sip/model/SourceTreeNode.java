@@ -300,7 +300,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private static SourceTreeNode createSubtree(List<FieldStatistics> fieldStatisticsList, Path path, SourceTreeNode parent) {
         Map<Tag, List<FieldStatistics>> statisticsMap = new TreeMap<Tag, List<FieldStatistics>>();
         for (FieldStatistics fieldStatistics : fieldStatisticsList) {
-            Path subPath = fieldStatistics.getPath().chop(path.size());
+            Path subPath = fieldStatistics.getPath().takeFirst(path.size());
             if (subPath.equals(path) && fieldStatistics.getPath().size() == path.size() + 1) {
                 Tag tag = fieldStatistics.getPath().getTag(path.size());
                 if (tag != null) {

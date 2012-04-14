@@ -300,7 +300,7 @@ public class NodeMapping {
             }
         }
         else if (recDefNode.isLeafElem()) {
-            toInnerLoop(path.chop(-1), groovyParams);
+            toInnerLoop(path.withRootRemoved(), groovyParams);
         }
         else {
             boolean needLoop;
@@ -319,7 +319,7 @@ public class NodeMapping {
                     codeOut.line_("%s %s { %s ->", toLoopRef(path), getOperator().getChar(), param);
                 }
             }
-            toInnerLoop(path.chop(-1), groovyParams);
+            toInnerLoop(path.withRootRemoved(), groovyParams);
             if (needLoop) codeOut._line("}");
         }
     }
@@ -327,8 +327,7 @@ public class NodeMapping {
     public Path getLocalPath() {
         NodeMapping ancestor = getAncestorNodeMapping(inputPath);
         if (ancestor.inputPath.isAncestorOf(inputPath)) {
-            Path contained = inputPath.minusAncestor(ancestor.inputPath);
-            return contained.prefixWith(ancestor.inputPath.peek());
+            return inputPath.extendAncestor(ancestor.inputPath);
         }
         else {
             return inputPath;
@@ -338,7 +337,7 @@ public class NodeMapping {
     public List<String> getContextVariables() {
         List<String> variables = new ArrayList<String>();
         variables.add("_uniqueIdentifier");
-        Path back = inputPath.copy();
+        Path back = inputPath;
         while (!back.isEmpty()) {
             variables.add(toGroovyParam(back.peek()));
             back = back.shorten();
@@ -389,7 +388,7 @@ public class NodeMapping {
                 if (nodeMapping.inputPath.isAncestorOf(path)) return nodeMapping;
             }
         }
-        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.chop(1));
+        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.takeFirst());
     }
 
     private EditPath getGeneratorEditPath() {

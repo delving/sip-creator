@@ -163,8 +163,7 @@ public class AnalysisParser implements Runnable {
         value = value.trim();
         FieldStatistics fieldStatistics = statisticsMap.get(path);
         if (fieldStatistics == null) {
-            Path key = path.copy();
-            statisticsMap.put(key, fieldStatistics = new FieldStatistics(key));
+            statisticsMap.put(path, fieldStatistics = new FieldStatistics(path));
         }
         if (!value.isEmpty()) fieldStatistics.recordValue(value);
         fieldStatistics.recordOccurrence();
