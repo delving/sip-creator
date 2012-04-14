@@ -27,6 +27,8 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.*;
 
+import static eu.delving.metadata.StringUtil.*;
+
 /**
  * This class describes how one node is transformed into another, which is part of mapping
  * one hierarchy onto another.  It can contain a dictionary, as well as a snippet
@@ -95,11 +97,11 @@ public class NodeMapping {
     }
 
     public String getDocumentation() {
-        return StringUtil.linesToString(documentation);
+        return linesToString(documentation);
     }
 
     public void setDocumentation(String documentation) {
-        this.documentation = StringUtil.stringToLines(documentation);
+        this.documentation = stringToLines(documentation);
         recDefNode.notifyNodeMappingChange(this);
     }
 
@@ -233,7 +235,7 @@ public class NodeMapping {
             }
         }
         else if (groovyCode == null || !isSimilar(codeString, groovyCode.iterator())) {
-            groovyCode = StringUtil.stringToLines(codeString);
+            groovyCode = stringToLines(codeString);
             recDefNode.notifyNodeMappingChange(this);
         }
     }
@@ -271,17 +273,17 @@ public class NodeMapping {
         if (editPath != null) {
             if (!editPath.generated()) {
                 if (editPath.getEditedCode(outputPath) != null) {
-                    StringUtil.indentCode(editPath.getEditedCode(outputPath), codeOut);
+                    indentCode(editPath.getEditedCode(outputPath), codeOut);
                     return;
                 }
                 else if (groovyCode != null) {
-                    StringUtil.indentCode(groovyCode, codeOut);
+                    indentCode(groovyCode, codeOut);
                     return;
                 }
             }
         }
         else if (groovyCode != null) {
-            StringUtil.indentCode(groovyCode, codeOut);
+            indentCode(groovyCode, codeOut);
             return;
         }
         toInnerLoop(getLocalPath(), groovyParams);
@@ -290,15 +292,14 @@ public class NodeMapping {
     private void toInnerLoop(Path path, Stack<String> groovyParams) {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
-            Tag inner = path.getTag(0);
             if (dictionary != null) {
-                codeOut.line("from%s(%s)", getDictionaryName(), inner.toGroovyParam());
+                codeOut.line("from%s(%s)", toDictionaryName(this), toNodeMappingGroovyParam(path));
             }
             else if (tuplePaths != null) {
                 codeOut.line(getMapUsage());
             }
             else {
-                codeOut.line("\"${%s}\"", inner.toGroovyParam());
+                codeOut.line("\"${%s}\"", toNodeMappingGroovyParam(path));
             }
         }
         else if (recDefNode.isLeafElem()) {
@@ -309,49 +310,19 @@ public class NodeMapping {
             if (tuplePaths != null) {
                 needLoop = !groovyParams.contains(getMapName());
                 if (needLoop) {
-                    codeOut.line_("%s %s { %s ->", getMapExpression(), getOperator().getChar(), getMapName());
+                    codeOut.line_("%s %s { %s ->", toMapExpression(this), getOperator().getChar(), getMapName());
                 }
             }
             else {
-                Tag outer = path.getTag(0);
-                Tag inner = path.getTag(1);
-                needLoop = !groovyParams.contains(inner.toGroovyParam());
+                String param = toGroovyParam(path);
+                needLoop = !groovyParams.contains(param);
                 if (needLoop) {
-                    codeOut.line_("%s%s %s { %s ->", outer.toGroovyParam(), inner.toGroovyRef(), getOperator().getChar(), inner.toGroovyParam());
+                    codeOut.line_("%s %s { %s ->", toLoopRef(path), getOperator().getChar(), param);
                 }
             }
             toInnerLoop(path.chop(-1), groovyParams);
             if (needLoop) codeOut._line("}");
         }
-    }
-
-    public void generateDictionaryCode(CodeOut codeOut) {
-        if (dictionary == null) return;
-        String name = getDictionaryName();
-        codeOut.line_(String.format("def %s = [", name));
-        Iterator<Map.Entry<String, String>> walk = dictionary.entrySet().iterator();
-        while (walk.hasNext()) {
-            Map.Entry<String, String> entry = walk.next();
-            codeOut.line(String.format("'''%s''':'''%s'''%s",
-                    StringUtil.sanitizeGroovy(entry.getKey()),
-                    StringUtil.sanitizeGroovy(entry.getValue()),
-                    walk.hasNext() ? "," : ""
-            ));
-        }
-        codeOut._line("]");
-        codeOut.line_("def from%s = { value ->", name);
-        codeOut.line_("if (value) {");
-        codeOut.line("def v = %s[value.sanitize()];", name);
-        codeOut.line_("if (v) {");
-        codeOut.line_("if (v.endsWith(':')) {");
-        codeOut.line("return \"${v} ${value}\"");
-        codeOut._line("} else {").in();
-        codeOut.line("return v");
-        codeOut._line("}");
-        codeOut._line("}");
-        codeOut._line("}");
-        codeOut.line("return ''");
-        codeOut._line("}");
     }
 
     public Path getLocalPath() {
@@ -369,7 +340,7 @@ public class NodeMapping {
         List<String> variables = new ArrayList<String>();
         variables.add("_uniqueIdentifier");
         Path back = inputPath.copy();
-        while (!back.isEmpty()) variables.add(back.pop().toGroovyParam());
+        while (!back.isEmpty()) variables.add(toGroovyParam(back.pop()));
         return variables;
     }
 
@@ -388,22 +359,6 @@ public class NodeMapping {
 
     public String getMapName() {
         return String.format("_M%d", inputPath.size());
-    }
-
-    public String getMapExpression() {
-        if (tuplePaths == null) return null;
-        StringBuilder expression = new StringBuilder("(");
-        Iterator<Path> walk = getInputPaths().iterator();
-        while (walk.hasNext()) {
-            Path inputPath = walk.next();
-            if (inputPath.size() < 2) throw new RuntimeException("Path too short");
-            Tag outer = inputPath.getTag(-2);
-            Tag inner = inputPath.getTag(-1);
-            expression.append(outer.toGroovyParam()).append(inner.toGroovyRef());
-            if (walk.hasNext()) expression.append(" | ");
-        }
-        expression.append(")");
-        return expression.toString();
     }
 
     public String toString() {
@@ -452,12 +407,6 @@ public class NodeMapping {
                 return true;
             }
         };
-    }
-
-    private static final Hasher HASHER = new Hasher();
-
-    private String getDictionaryName() {
-        return "Dictionary" + HASHER.getHashString(outputPath.toString()).substring(16);
     }
 }
 

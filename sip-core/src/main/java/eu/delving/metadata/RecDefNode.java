@@ -23,6 +23,8 @@ package eu.delving.metadata;
 
 import java.util.*;
 
+import static eu.delving.metadata.StringUtil.*;
+
 /**
  * The RecDefNode is the node element of a RecDefTree which stores the whole
  * hierarchy of the record definition as an in-memory data structure that
@@ -259,10 +261,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
             boolean needLoop = !groovyParams.contains(nodeMapping.getMapName());
             if (needLoop) {
                 if (nodeMapping.isVirtual()) {
-                    codeOut.line_("if (%s) { // R1v", nodeMapping.getMapExpression());
+                    codeOut.line_("if (%s) { // R1v", toMapExpression(nodeMapping));
                 }
                 else {
-                    codeOut.line_("%s * { %s -> // R1", nodeMapping.getMapExpression(), nodeMapping.getMapName());
+                    codeOut.line_("%s * { %s -> // R1", toMapExpression(nodeMapping), nodeMapping.getMapName());
                     groovyParams.push(nodeMapping.getMapName());
                 }
             }
@@ -293,19 +295,22 @@ public class RecDefNode implements Comparable<RecDefNode> {
             }
         }
         else { // path should never be empty
-            Tag outer = path.getTag(0);
-            Tag inner = path.getTag(1);
             Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
-            boolean needLoop = !groovyParams.contains(inner.toGroovyParam());
+            String param = toGroovyParam(path);
+            boolean needLoop = !groovyParams.contains(param);
             if (needLoop) {
                 if (nodeMapping.isVirtual()) {
-                    codeOut.line_("if (%s%s) { // R4v",
-                            outer.toGroovyParam(), inner.toGroovyRef());
+                    codeOut.line_(
+                            "if (%s) { // R4v",
+                            toLoopRef(path)
+                    );
                 }
                 else {
-                    codeOut.line_("%s%s %s { %s -> // R4",
-                            outer.toGroovyParam(), inner.toGroovyRef(), operator.getChar(), inner.toGroovyParam());
-                    groovyParams.push(inner.toGroovyParam());
+                    codeOut.line_(
+                            "%s %s { %s -> // R4",
+                            toLoopRef(path), operator.getChar(), param
+                    );
+                    groovyParams.push(param);
                 }
             }
             childrenInLoop(nodeMapping, path.chop(-1), groovyParams, codeOut, editPath);
@@ -347,7 +352,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     codeOut._line("}");
                 }
                 else {
-                    codeOut.line_("%s %s { %s -> // R8", nodeMapping.getMapExpression(), nodeMapping.getOperator().getChar(), nodeMapping.getMapName());
+                    codeOut.line_(
+                            "%s %s { %s -> // R8",
+                            toMapExpression(nodeMapping), nodeMapping.getOperator().getChar(), nodeMapping.getMapName()
+                    );
                     startBuilderCall("R9", codeOut, groovyParams, editPath);
                     nodeMapping.codeOut = codeOut.createChild();
                     nodeMapping.toLeafElementCode(groovyParams, editPath);

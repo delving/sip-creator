@@ -23,9 +23,7 @@ package eu.delving.metadata;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Handle some common string manipulations.
@@ -36,6 +34,90 @@ import java.util.List;
  */
 
 public class StringUtil {
+
+    private static final Hasher HASHER = new Hasher();
+
+    public static String toDictionaryName(NodeMapping nodeMapping) {
+        return "Dictionary" + HASHER.getHashString(nodeMapping.outputPath.toString()).substring(16);
+    }
+
+    public static void toDictionaryCode(NodeMapping nodeMapping, CodeOut codeOut) {
+        if (nodeMapping.dictionary == null) return;
+        String name = toDictionaryName(nodeMapping);
+        codeOut.line_(String.format("def %s = [", name));
+        Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
+        while (walk.hasNext()) {
+            Map.Entry<String, String> entry = walk.next();
+            codeOut.line(String.format("'''%s''':'''%s'''%s",
+                    StringUtil.sanitizeGroovy(entry.getKey()),
+                    StringUtil.sanitizeGroovy(entry.getValue()),
+                    walk.hasNext() ? "," : ""
+            ));
+        }
+        codeOut._line("]");
+        codeOut.line_("def from%s = { value ->", name);
+        codeOut.line_("if (value) {");
+        codeOut.line("def v = %s[value.sanitize()];", name);
+        codeOut.line_("if (v) {");
+        codeOut.line_("if (v.endsWith(':')) {");
+        codeOut.line("return \"${v} ${value}\"");
+        codeOut._line("} else {").in();
+        codeOut.line("return v");
+        codeOut._line("}");
+        codeOut._line("}");
+        codeOut._line("}");
+        codeOut.line("return ''");
+        codeOut._line("}");
+    }
+
+    public String getDictionaryName(NodeMapping nodeMapping) {
+        return null;  //To change body of created methods use File | Settings | File Templates.
+    }
+
+    public static String toGroovyParam(Path path) {
+        Tag inner = path.getTag(1);
+        return toGroovyParam(inner);
+    }
+
+    public static String toNodeMappingGroovyParam(Path path) {
+        Tag inner = path.getTag(0);
+        return toGroovyParam(inner);
+    }
+
+    public static String toLoopRef(Path path) {
+        Tag outer = path.getTag(0);
+        Tag inner = path.getTag(1);
+        return toGroovyParam(outer) + toGroovyRef(inner);
+    }
+
+    public static String toMapExpression(NodeMapping nodeMapping) {
+        List<Path> paths = nodeMapping.getInputPaths();
+        StringBuilder expression = new StringBuilder("(");
+        Iterator<Path> walk = paths.iterator();
+        while (walk.hasNext()) {
+            Path inputPath = walk.next();
+            if (inputPath.size() < 2) throw new RuntimeException("Path too short");
+            expression.append(StringUtil.toMapExpressionElement(inputPath));
+            if (walk.hasNext()) expression.append(" | ");
+        }
+        expression.append(")");
+        return expression.toString();
+    }
+
+    public static String toMapExpressionElement(Path path) {
+        if (path.size() != 2) throw new RuntimeException("Yes it is");
+        Tag outer = path.getTag(-2); // todo: is this really different from the above?
+        Tag inner = path.getTag(-1);
+        return toGroovyParam(outer) + toGroovyRef(inner);
+    }
+
+    public static String toGroovyParam(Tag tag) {
+        return "_" + StringUtil.tagToVariable(tag.toString());
+    }
+
+    private static String toGroovyRef(Tag tag) {
+            return tag.isAttribute() ? String.format("['@%s']", tag.toString()) : "." + tagToVariable(tag.toString());
+    }
 
     public static String documentToString(Document document) {
         try {
