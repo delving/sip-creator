@@ -256,14 +256,14 @@ public class RecDefNode implements Comparable<RecDefNode> {
             childrenToCode(codeOut, groovyParams, editPath);
         }
         else if (nodeMapping.hasTuple() && path.size() == 2) {
-            boolean needLoop = !groovyParams.contains(nodeMapping.getTupleName());
+            boolean needLoop = !groovyParams.contains(nodeMapping.getMapName());
             if (needLoop) {
                 if (nodeMapping.isVirtual()) {
-                    codeOut.line_("if (%s) { // R1v", nodeMapping.getTupleExpression());
+                    codeOut.line_("if (%s) { // R1v", nodeMapping.getMapExpression());
                 }
                 else {
-                    codeOut.line_("%s * { %s -> // R1", nodeMapping.getTupleExpression(), nodeMapping.getTupleName());
-                    groovyParams.push(nodeMapping.getTupleName());
+                    codeOut.line_("%s * { %s -> // R1", nodeMapping.getMapExpression(), nodeMapping.getMapName());
+                    groovyParams.push(nodeMapping.getMapName());
                 }
             }
             if (isLeafElem()) {
@@ -347,7 +347,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     codeOut._line("}");
                 }
                 else {
-                    codeOut.line_("%s %s { %s -> // R8", nodeMapping.getTupleExpression(), nodeMapping.getOperator().getChar(), nodeMapping.getTupleName());
+                    codeOut.line_("%s %s { %s -> // R8", nodeMapping.getMapExpression(), nodeMapping.getOperator().getChar(), nodeMapping.getMapName());
                     startBuilderCall("R9", codeOut, groovyParams, editPath);
                     nodeMapping.codeOut = codeOut.createChild();
                     nodeMapping.toLeafElementCode(groovyParams, editPath);

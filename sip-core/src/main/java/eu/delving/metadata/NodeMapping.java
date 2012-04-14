@@ -295,7 +295,7 @@ public class NodeMapping {
                 codeOut.line("from%s(%s)", getDictionaryName(), inner.toGroovyParam());
             }
             else if (tuplePaths != null) {
-                codeOut.line(getTupleUsage());
+                codeOut.line(getMapUsage());
             }
             else {
                 codeOut.line("\"${%s}\"", inner.toGroovyParam());
@@ -307,9 +307,9 @@ public class NodeMapping {
         else {
             boolean needLoop;
             if (tuplePaths != null) {
-                needLoop = !groovyParams.contains(getTupleName());
+                needLoop = !groovyParams.contains(getMapName());
                 if (needLoop) {
-                    codeOut.line_("%s %s { %s ->", getTupleExpression(), getOperator().getChar(), getTupleName());
+                    codeOut.line_("%s %s { %s ->", getMapExpression(), getOperator().getChar(), getMapName());
                 }
             }
             else {
@@ -373,29 +373,37 @@ public class NodeMapping {
         return variables;
     }
 
-    public String getTupleName() {
-        StringBuilder name = new StringBuilder();
-        for (Path inputPath : getInputPaths()) {
-            Tag inner = inputPath.peek();
-            name.append(inner.toGroovyParam());
+    private String getMapUsage() {
+        if (tuplePaths == null) return null;
+        StringBuilder usage = new StringBuilder("\"");
+        Iterator<Path> walk = getInputPaths().iterator();
+        while (walk.hasNext()) {
+            Path path = walk.next();
+            usage.append(String.format("${%s['%s']}", getMapName(), path.peek().toMapKey()));
+            if (walk.hasNext()) usage.append(" ");
         }
-        return name.toString();
+        usage.append("\"");
+        return usage.toString();
     }
 
-    public String getTupleExpression() {
+    public String getMapName() {
+        return String.format("_M%d", inputPath.size());
+    }
+
+    public String getMapExpression() {
         if (tuplePaths == null) return null;
-        StringBuilder tuple = new StringBuilder("(");
+        StringBuilder expression = new StringBuilder("(");
         Iterator<Path> walk = getInputPaths().iterator();
         while (walk.hasNext()) {
             Path inputPath = walk.next();
             if (inputPath.size() < 2) throw new RuntimeException("Path too short");
             Tag outer = inputPath.getTag(-2);
             Tag inner = inputPath.getTag(-1);
-            tuple.append(outer.toGroovyParam()).append(inner.toGroovyRef());
-            if (walk.hasNext()) tuple.append(" | ");
+            expression.append(outer.toGroovyParam()).append(inner.toGroovyRef());
+            if (walk.hasNext()) expression.append(" | ");
         }
-        tuple.append(")");
-        return tuple.toString();
+        expression.append(")");
+        return expression.toString();
     }
 
     public String toString() {
@@ -416,19 +424,6 @@ public class NodeMapping {
         else {
             return String.format("<html><b>%s &larr; %s</b>", recDefNode.toString(), input);
         }
-    }
-
-    private String getTupleUsage() {
-        if (tuplePaths == null) return null;
-        String name = getTupleName();
-        int size = tuplePaths.size() + 1;
-        StringBuilder usage = new StringBuilder("\"");
-        for (int walk = 0; walk < size; walk++) {
-            usage.append(String.format("${%s[%d]}", name, walk));
-            if (walk < size - 1) usage.append(" ");
-        }
-        usage.append("\"");
-        return usage.toString();
     }
 
     private NodeMapping getAncestorNodeMapping(Path path) {

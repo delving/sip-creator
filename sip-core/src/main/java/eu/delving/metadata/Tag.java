@@ -217,6 +217,15 @@ public class Tag implements Comparable<Tag>, Serializable {
         return "_" + StringUtil.tagToVariable(toString());
     }
 
+    public String toMapKey() {
+        if (prefix == null) {
+            return StringUtil.tagToVariable(localName);
+        }
+        else {
+            return prefix + StringUtil.tagToVariable(localName);
+        }
+    }
+
     public String toPathElement() {
         if (attribute) {
             return "/@" + toString();

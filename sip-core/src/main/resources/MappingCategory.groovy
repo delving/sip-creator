@@ -90,21 +90,51 @@ public class MappingCategory {
         return both;
     }
 
-    // make tuples out of the entries in two lists
+    // make maps out of the entries in two lists
     static Object or(List a, List b) { // operator |
         a = unwrap(a)
         b = unwrap(b)
-        TupleList tupleList = new TupleList()
-        int max = Math.min(a.size(), b.size());
-        if (max > 0) for (Integer index : 0..(max - 1)) {
-            if (a[index] instanceof TupleList) {
-                tupleList.add(a[index] += b[index]);
+        TupleList list = new TupleList()
+        Iterator aa = a.iterator()
+        Iterator bb = b.iterator()
+        while (aa.hasNext() || bb.hasNext()) {
+            if (aa.hasNext() && bb.hasNext()) {
+                def ma = aa.next()
+                GroovyNode mb = (GroovyNode)bb.next()
+                if (ma instanceof Map) {
+                    ma[mb.name()] = mb
+                    list.add(ma);
+                }
+                else {
+                    GroovyNode na = (GroovyNode) ma
+                    GroovyNode nb = (GroovyNode) mb
+                    Map map = new TreeMap()
+                    map[na.name()] = na
+                    map[nb.name()] = nb
+                    list.add(map)
+                }
             }
-            else {
-                tupleList.add([a[index], b[index]])
+            else if (aa.hasNext()) {
+                def ma = aa.next()
+                if (ma instanceof Map) {
+                    list.add(ma)
+                }
+                else {
+                    GroovyNode na = (GroovyNode) ma;
+                    Map map = new TreeMap()
+                    map[na.name()] = na
+                    list.add(map)
+                }
+            }
+            else { // bb only
+                def mb = bb.next()
+                GroovyNode nb = (GroovyNode) mb;
+                Map map = new TreeMap()
+                map[nb.name()] = nb
+                list.add(map)
             }
         }
-        return tupleList
+        return list
     }
 
     // run a closure on each member of the list
