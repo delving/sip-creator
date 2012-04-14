@@ -70,14 +70,15 @@ public class Path implements Comparable<Path>, Serializable {
                 String part = matcher.group(0).substring(1);
                 int at = part.indexOf("@");
                 if (at > 0) throw new IllegalArgumentException("@ must be at the beginning of an attribute name");
+                Tag newTag;
                 if (at == 0) {
-                    // todo: here it could be renamed
-                    stack.push(Tag.attribute(part.substring(1)));
+                    newTag = Tag.attribute(part.substring(1));
                 }
                 else {
-                    // todo: here it could be renamed
-                    stack.push(Tag.element(part));
+                    newTag = Tag.element(part);
                 }
+                for (Tag tag : stack) newTag.inContextOf(tag);
+                stack.push(newTag);
             }
         }
     }
@@ -90,17 +91,17 @@ public class Path implements Comparable<Path>, Serializable {
         if (n >= 0) { // take the first n tags, ignore the rest
             for (Tag tag : path.stack) if (n-- > 0) stack.push(tag);
         }
-        else { // ignore the first -n tags, take the rest
-            for (Tag tag : path.stack) if (n++ >= 0) stack.push(tag);
+        else {
+            throw new IllegalArgumentException("negative!");
         }
     }
 
     // modifiers
 
-    public Path extend(Tag tag) {
+    public Path extend(Tag newTag) {
         Path extended = new Path(this);
-        // todo: here it could be renamed
-        extended.stack.push(tag);
+        for (Tag tag : stack) newTag.inContextOf(tag);
+        extended.stack.push(newTag);
         return extended;
     }
 
@@ -134,7 +135,8 @@ public class Path implements Comparable<Path>, Serializable {
         if (!(ancestor.isAncestorOf(this) || ancestor.equals(this))) {
             throw new IllegalArgumentException(String.format("%s is not an ancestor of %s", ancestor, this));
         }
-        Path contained = new Path(this, -ancestor.size());
+        Path contained = new Path(this);
+        for (int walk=0; walk<ancestor.size(); walk++) contained.stack.remove(0);
         contained.stack.insertElementAt(ancestor.peek(), 0);
         return contained;
     }

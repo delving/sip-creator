@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 public class Tag implements Comparable<Tag>, Serializable {
     private static final Pattern PAT = Pattern.compile("(([^:]*):)?([^\\[/]*)(\\[([^\\]]*)\\])?");
     private boolean attribute;
+    private int descendency;
     private String prefix;
     private String localName;
     private String opt;
@@ -117,12 +118,22 @@ public class Tag implements Comparable<Tag>, Serializable {
         return attribute;
     }
 
+    public boolean isDescendent() {
+        return descendency > 0;
+    }
+
     public Tag defaultPrefix(String prefix) {
         if (this.prefix == null) {
             return attribute ? Tag.attribute(prefix, localName) : Tag.element(prefix, localName, opt);
         }
         else {
             return this;
+        }
+    }
+
+    public void inContextOf(Tag ancestorTag) {
+        if (this.equals(ancestorTag) && descendency <= ancestorTag.descendency) {
+            descendency = ancestorTag.descendency + 1;
         }
     }
 
@@ -140,6 +151,10 @@ public class Tag implements Comparable<Tag>, Serializable {
 
     public String getOpt() {
         return opt;
+    }
+
+    public int getDescendency() {
+        return descendency;
     }
 
     @Override

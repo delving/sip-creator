@@ -339,7 +339,7 @@ public class NodeMapping {
         variables.add("_uniqueIdentifier");
         Path back = inputPath;
         while (!back.isEmpty()) {
-            variables.add(toGroovyParam(back.peek()));
+            variables.add(toGroovyIdentifier(back.peek()));
             back = back.shorten();
         }
         return variables;
