@@ -120,9 +120,11 @@ public class SourceConverter {
                                 }
                             }
                             else {
-                                if (path.equals(uniqueElementPath)) {
+                                if (!uniqueElementPath.peek().isAttribute() && path.equals(uniqueElementPath)) {
                                     unique = StringUtils.join(lines, ' ');
-                                    if (uniqueness.isRepeated(unique)) throw new UniquenessException(uniqueElementPath, recordCount);
+                                    if (uniqueness.isRepeated(unique)) {
+                                        throw new UniquenessException(uniqueElementPath, recordCount);
+                                    }
                                 }
                                 switch (lines.size()) {
                                     case 0:
@@ -172,18 +174,6 @@ public class SourceConverter {
         }
     }
 
-    private void handleStartElement(boolean followsStart) {
-        if (recordEvents) {
-            if (followsStart) eventBuffer.add(eventFactory.createCharacters("\n"));
-            eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
-        }
-        else if (path.equals(recordRootPath)) {
-            recordEvents = true;
-//            eventBuffer.add(eventFactory.createCharacters("\n")); // nonempty: flag that record has started
-            handleRecordAttributes(start);
-        }
-    }
-
     private void outputRecord(XMLEventWriter out) throws XMLStreamException {
         out.add(eventFactory.createStartElement("", "", RECORD_TAG, null, null));
         out.add(eventFactory.createCharacters("\n"));
@@ -197,26 +187,26 @@ public class SourceConverter {
         clearEvents();
     }
 
-    private void handleRecordAttributes(StartElement start) {
-        Iterator attrWalk = start.getAttributes();
-        if (attrWalk.hasNext()) eventBuffer.add(eventFactory.createCharacters("\n"));
-        while (attrWalk.hasNext()) handleRecordAttribute((Attribute) attrWalk.next());
+    private void handleStartElement(boolean followsStart) {
+        if (recordEvents) {
+            if (followsStart) eventBuffer.add(eventFactory.createCharacters("\n"));
+            if (uniqueElementPath.peek().isAttribute()) checkForUnique(start);
+            eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
+        }
+        else if (path.equals(recordRootPath)) {
+            recordEvents = true;
+        }
     }
 
-    private void handleRecordAttribute(Attribute attr) {
+    private void checkForUnique(StartElement start) {
+        Iterator attrWalk = start.getAttributes();
+        while (attrWalk.hasNext()) checkForUnique((Attribute) attrWalk.next());
+    }
+
+    private void checkForUnique(Attribute attr) {
         path.push(Tag.attribute(attr.getName()));
         if (path.equals(uniqueElementPath)) unique = attr.getValue();
         path.pop();
-        path.push(Tag.element(attr.getName()));
-        addAttributeAsElement(attr);
-        path.pop();
-    }
-
-    private void addAttributeAsElement(Attribute attr) {
-        eventBuffer.add(eventFactory.createStartElement(attr.getName(), null, null));
-        eventBuffer.add(eventFactory.createCharacters(attr.getValue()));
-        eventBuffer.add(eventFactory.createEndElement(attr.getName(), null));
-        eventBuffer.add(eventFactory.createCharacters("\n"));
     }
 
     private void extractLines(String value) {
