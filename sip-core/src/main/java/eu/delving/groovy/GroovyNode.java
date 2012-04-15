@@ -33,10 +33,10 @@ import java.util.*;
 /**
  * A variation on the Groovy Node class which is used to store XML-like data
  * in memory.
- *
+ * <p/>
  * Trimmed down from the original and with some added or modified functions to make
  * it easier to use these as input variables in the mapping code.
- *
+ * <p/>
  * The MetadataParser produces records containing structures of these nodes.
  *
  * @author Gerald de Jong <gerald@delving.eu>
@@ -44,7 +44,7 @@ import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class GroovyNode {
-    
+
     private GroovyNode parent;
 
     private QName qName;
@@ -122,7 +122,7 @@ public class GroovyNode {
 
     public List children() {
         if (value instanceof List) {
-            return(List)value;
+            return (List) value;
         }
         else {
             List l = new NodeList(4);
@@ -141,12 +141,7 @@ public class GroovyNode {
 
     public String name() {
         if (stringName == null) {
-            if (qName.getPrefix().isEmpty()) {
-                stringName = StringUtil.tagToVariable(qName.getLocalPart());
-            }
-            else {
-                stringName = qName.getPrefix() + StringUtil.tagToVariable(qName.getLocalPart());
-            }
+            stringName = StringUtil.tagToVariable(qName.getPrefix() + qName.getLocalPart());
         }
         return stringName;
     }
@@ -163,7 +158,7 @@ public class GroovyNode {
         return text().contains(s);
     }
 
-    public String [] split(String s) {
+    public String[] split(String s) {
         return text().split(s);
     }
 
