@@ -105,7 +105,7 @@ public class CreateModel {
         setNodeMapping(entry.getNodeMapping());
     }
 
-    public void setNodeMapping(NodeMapping nodeMapping) {
+    public void setNodeMapping(NodeMapping nodeMapping) { // todo: make this bullet-proof, avoid all NPE
         assert nodeMapping != null;
         settingNodeMapping = true;
         if (nodeMappingEntry == null || nodeMappingEntry.getNodeMapping() != nodeMapping) {

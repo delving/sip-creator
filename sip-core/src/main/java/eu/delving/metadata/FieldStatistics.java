@@ -54,6 +54,10 @@ public class FieldStatistics implements Comparable<FieldStatistics>, Serializabl
         total++;
     }
 
+    public boolean isUnique() {
+        return valueStats != null && valueStats.uniqueValues;
+    }
+
     public Path getPath() {
         return path;
     }
