@@ -130,7 +130,7 @@ public class RecDef {
 
     public String toString() {
         List<Path> paths = new ArrayList<Path>();
-        Path path = Path.empty();
+        Path path = Path.create();
         collectPaths(root, path, paths);
         StringBuilder out = new StringBuilder();
         for (Path p : paths) out.append(p.toString()).append('\n');
@@ -138,21 +138,21 @@ public class RecDef {
     }
 
     private void resolve() {
-        root.resolve(Path.empty(), this);
+        root.resolve(Path.create(), this);
         if (searchFields != null) for (SearchField searchField : searchFields) searchField.resolve(this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
     }
 
     private void collectPaths(Elem elem, Path path, List<Path> paths) {
-        path = path.extend(elem.tag);
+        path = path.child(elem.tag);
         paths.add(path);
         for (Attr sub : elem.attrList) collectPaths(sub, path, paths);
         for (Elem sub : elem.elemList) collectPaths(sub, path, paths);
     }
 
     private void collectPaths(Attr attr, Path path, List<Path> paths) {
-        path = path.extend(attr.tag);
+        path = path.child(attr.tag);
         paths.add(path);
     }
 
@@ -421,7 +421,7 @@ public class RecDef {
 
         public void resolve(Path path, RecDef recDef) {
             if (tag == null) throw new RuntimeException("Null tag at: " + path);
-            path = path.extend(tag);
+            path = path.child(tag);
             tag = tag.defaultPrefix(recDef.prefix);
             if (attrs != null) {
                 for (String localName : attrs.split(DELIM)) {

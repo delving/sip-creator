@@ -27,13 +27,10 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Utility;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.BorderFactory;
-import javax.swing.JTree;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -181,10 +178,10 @@ public class RecDefTreeNode extends FilterNode {
         }
 
         public Path getTagPath() {
-            Path path = Path.empty();
+            Path path = Path.create();
             for (Object object : getPath()) {
                 RecDefTreeNode treeNode = (RecDefTreeNode) object;
-                path = path.extend(treeNode.getRecDefNode().getTag());
+                path = path.child(treeNode.getRecDefNode().getTag());
             }
             return path;
         }

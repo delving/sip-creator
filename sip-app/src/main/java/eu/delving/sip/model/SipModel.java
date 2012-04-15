@@ -36,7 +36,7 @@ import eu.delving.sip.xml.MetadataParser;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 
-import javax.swing.ListModel;
+import javax.swing.*;
 import java.io.File;
 import java.util.BitSet;
 import java.util.List;
@@ -524,7 +524,10 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                if (!hasDataSet() || !statsModel.hasRecordRoot() || dataSetModel.getDataSet().getState().ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
+                boolean noDataSet = !hasDataSet();
+                boolean noRecordRoot = !statsModel.hasRecordRoot();
+                DataSetState state = dataSetModel.getDataSet().getState();
+                if (noDataSet || noRecordRoot || state.ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                     return;
                 }

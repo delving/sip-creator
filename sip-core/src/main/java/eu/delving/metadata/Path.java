@@ -25,8 +25,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,9 +32,9 @@ import java.util.regex.Pattern;
  * A very frequently used class which stores a stack of Tag instances, which
  * correspond to a QName's prefix and localPart, and which can be either
  * for an element or an attribute.
- *
+ * <p/>
  * The string representation is cached for efficiency, since it is used a lot.
- *
+ * <p/>
  * There is a static converter class at the bottom so that these things can be
  * used easily in XStream.
  *
@@ -46,105 +44,91 @@ import java.util.regex.Pattern;
 @XStreamAlias("path")
 public class Path implements Comparable<Path>, Serializable {
     private static final Pattern PAT = Pattern.compile("/([^\\[/]*)(\\[([^\\]]*)\\])?");
-    private Stack<Tag> stack = new Stack<Tag>();
+    private static final Path ROOT = new Path();
+    private Path parent;
+    private Tag tag;
     private String string;
 
-    public static Path empty() {
-        return new Path();
+    public static Path create() {
+        return ROOT;
     }
 
     public static Path create(String pathString) {
-        return new Path(pathString);
+        if (pathString == null) return create();
+        if (!pathString.startsWith("/")) pathString = "/" + pathString;
+        Path path = create();
+        Matcher matcher = PAT.matcher(pathString);
+        while (matcher.find()) {
+            String part = matcher.group(0).substring(1);
+            int at = part.indexOf("@");
+            if (at > 0) throw new IllegalArgumentException("@ must be at the beginning of an attribute name");
+            Tag newTag;
+            if (at == 0) {
+                newTag = Tag.attribute(part.substring(1));
+            }
+            else {
+                newTag = Tag.element(part);
+            }
+            newTag.inContextOf(path);
+            path = path.child(newTag);
+        }
+        return path;
     }
 
     private Path() {
     }
 
-    private Path(String pathString) {
-        if (pathString != null) {
-            if (!pathString.startsWith("/")) {
-                pathString = "/" + pathString;
-            }
-            Matcher matcher = PAT.matcher(pathString);
-            while (matcher.find()) {
-                String part = matcher.group(0).substring(1);
-                int at = part.indexOf("@");
-                if (at > 0) throw new IllegalArgumentException("@ must be at the beginning of an attribute name");
-                Tag newTag;
-                if (at == 0) {
-                    newTag = Tag.attribute(part.substring(1));
-                }
-                else {
-                    newTag = Tag.element(part);
-                }
-                for (Tag tag : stack) newTag.inContextOf(tag);
-                stack.push(newTag);
-            }
-        }
-    }
-
-    private Path(Path path) {
-        if (path.stack != null) for (Tag tag : path.stack) stack.push(tag);
-    }
-
-    private Path(Path path, int n) {
-        if (n >= 0) { // take the first n tags, ignore the rest
-            for (Tag tag : path.stack) if (n-- > 0) stack.push(tag);
-        }
-        else {
-            throw new IllegalArgumentException("negative!");
-        }
+    private Path(Path parent, Tag tag) {
+        this.parent = parent;
+        this.tag = tag;
     }
 
     // modifiers
 
-    public Path extend(Tag newTag) {
-        Path extended = new Path(this);
-        for (Tag tag : stack) newTag.inContextOf(tag);
-        extended.stack.push(newTag);
-        return extended;
+    public Path child(Tag newTag) {
+        return new Path(this, newTag);
     }
 
-    public Path shorten() {
-        Path popped = new Path(this);
-        popped.stack.pop();
-        return popped;
+    public Path parent() {
+        return parent;
     }
 
     public Path withDefaultPrefix(String prefix) {
-        Path with = new Path(this);
-        for (int walk=0; walk<size(); walk++) with.stack.set(walk, with.stack.get(walk).defaultPrefix(prefix));
-        return with;
+        if (parent.isEmpty()) {
+            return parent.child(tag.defaultPrefix(prefix));
+        }
+        else {
+            return parent.withDefaultPrefix(prefix).child(tag.defaultPrefix(prefix));
+        }
     }
 
     public Path takeFirst(int count) {
-        return new Path(this, count);
+        return size() > count ? parent.takeFirst(count) : this;
     }
 
     public Path takeFirst() {
-        return takeFirst(1);
+        Path ancestor = this.parent;
+        while (!ancestor.isEmpty()) ancestor = ancestor.parent;
+        return ancestor;
     }
 
     public Path withRootRemoved() {
-        Path removed = new Path(this);
-        removed.stack.remove(0);
-        return removed;
+        if (parent == null || parent.parent == null) throw new RuntimeException("Cannot remove root");
+        if (parent.parent.isEmpty()) {
+            return create().child(tag);
+        }
+        else {
+            return parent.withRootRemoved().child(tag);
+        }
     }
 
     public Path extendAncestor(Path ancestor) {
-        if (!(ancestor.isAncestorOf(this) || ancestor.equals(this))) {
-            throw new IllegalArgumentException(String.format("%s is not an ancestor of %s", ancestor, this));
+        if (equals(ancestor)) {
+            return create().child(ancestor.peek());
         }
-        Path contained = new Path(this);
-        for (int walk=0; walk<ancestor.size(); walk++) contained.stack.remove(0);
-        contained.stack.insertElementAt(ancestor.peek(), 0);
-        return contained;
-    }
-
-    public Path getParent() {
-        Path parent = new Path(this);
-        parent.stack.pop();
-        return parent;
+        else {
+            return parent.extendAncestor(ancestor).child(tag);
+        }
     }
 
     // getters
@@ -154,16 +138,7 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     public boolean isAncestorOf(Path other) {
-        if (other == null) return false;
-        Iterator<Tag> walkThis = stack.iterator();
-        Iterator<Tag> walkOther = other.stack.iterator();
-        while (walkThis.hasNext()) {
-            if (!walkOther.hasNext()) return false; // other shorter than this
-            Tag thisTag = walkThis.next();
-            Tag otherTag = walkOther.next();
-            if (!thisTag.equals(otherTag)) return false; // always equal
-        }
-        return walkOther.hasNext();
+        return !other.isEmpty() && !isEmpty() && (equals(other.parent) || isAncestorOf(other.parent()));
     }
 
     @Override
@@ -177,51 +152,59 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     @Override
-    public int compareTo(Path path) {
-        Iterator<Tag> us = stack.iterator();
-        Iterator<Tag> them = path.stack.iterator();
-        while (us.hasNext() && them.hasNext()) {
-            int cmp = us.next().compareTo(them.next());
-            if (cmp != 0) return cmp;
+    public int compareTo(Path that) {
+        if (this.isEmpty() && that.isEmpty()) return 0;
+        else if (this.isEmpty()) return -1;
+        else if (that.isEmpty()) return 1;
+        if (this.parent.isEmpty() && that.parent.isEmpty()) {
+            int comparison = this.tag.compareTo(that.tag);
+            if (comparison != 0) return comparison;
         }
-        if (us.hasNext()) return -1;
-        if (them.hasNext()) return 1;
-        return 0;
+        else if (this.parent.isEmpty()) {
+            int comparison = this.compareTo(that.parent);
+            if (comparison != 0) return comparison;
+        }
+        else if (that.parent.isEmpty()) {
+            int comparison = this.parent.compareTo(that);
+            if (comparison != 0) return comparison;
+        }
+        int comparison = this.parent.compareTo(that.parent);
+        if (comparison != 0) return comparison;
+        return this.tag.compareTo(that.tag);
     }
 
     public Tag getTag(int level) {
-        if (level < 0) level = size() + level;
-        return level < size() ? stack.get(level) : null;
+        int ourLevel = getLevel();
+        if (ourLevel < level) return null;
+        if (ourLevel == level) return tag;
+        return parent.getTag(level);
     }
 
     public Tag peek() {
-        return stack.isEmpty() ? null : stack.peek();
+        return tag;
+    }
+
+    public int getLevel() {
+        if (isEmpty()) return -1;
+        return parent.getLevel() + 1;
     }
 
     public String getTail() {
-        return stack.isEmpty() ? "?" : stack.peek().toString();
+        return peek().toString();
     }
 
     public boolean isEmpty() {
-        return stack.isEmpty();
+        return tag == null;
     }
 
     public int size() {
-        return stack.size();
+        if (parent != null) return parent.size() + 1;
+        return 0;
     }
-    
-    public Iterator<Tag> iterator() {
-        return stack.iterator();
-    }
-    
+
     public String toString() {
-        if (string == null) {
-            StringBuilder builder = new StringBuilder(150);
-            for (Tag tag : stack) {
-                builder.append(tag.toPathElement());
-            }
-            string = builder.toString();
-        }
+        if (tag == null) return "";
+        if (string == null) string = parent.toString() + tag.toPathElement();
         return string;
     }
 
@@ -234,7 +217,7 @@ public class Path implements Comparable<Path>, Serializable {
 
         @Override
         public Object fromString(String str) {
-            return new Path(str);
+            return create(str);
         }
     }
 }

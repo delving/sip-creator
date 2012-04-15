@@ -37,9 +37,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.*;
 
 /**
@@ -78,19 +76,15 @@ public class TargetFrame extends FrameBase {
         createRecDefTree(sipModel);
         timer.setRepeats(false);
         optCombo.setPrototypeDisplayValue("anelement[withanoptinbrackets]");
+        treePanel = new JPanel(new BorderLayout());
+        treePanel.add(Utility.scrollVH("Record Definition", recDefTree));
         wireUp();
     }
 
     @Override
     protected void buildContent(Container content) {
         content.add(createNorthPanel(), BorderLayout.NORTH);
-        content.add(createTreePanel(), BorderLayout.CENTER);
-    }
-
-    private JPanel createTreePanel() {
-        treePanel = new JPanel(new BorderLayout());
-        treePanel.add(Utility.scrollVH("Record Definition", recDefTree));
-        return treePanel;
+        content.add(treePanel, BorderLayout.CENTER);
     }
 
     private JPanel createNorthPanel() {

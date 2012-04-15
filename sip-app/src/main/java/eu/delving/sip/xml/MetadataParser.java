@@ -76,7 +76,7 @@ public class MetadataParser {
     @SuppressWarnings("unchecked")
     public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, AbortException {
         MetadataRecord metadataRecord = null;
-        Path path = Path.empty();
+        Path path = Path.create();
         GroovyNode node = null;
         StringBuilder value = new StringBuilder();
         while (metadataRecord == null) {
@@ -84,7 +84,7 @@ public class MetadataParser {
                 case XMLEvent.START_DOCUMENT:
                     break;
                 case XMLEvent.START_ELEMENT:
-                    path = path.extend(Tag.element(input.getName()));
+                    path = path.child(Tag.element(input.getName()));
                     if (node == null && path.equals(Storage.RECORD_ROOT)) {
                         node = new GroovyNode(null, "input");
                     }
@@ -136,7 +136,7 @@ public class MetadataParser {
                             node = node.parent();
                         }
                     }
-                    path = path.shorten();
+                    path = path.parent();
                     break;
                 case XMLEvent.END_DOCUMENT: {
                     break;

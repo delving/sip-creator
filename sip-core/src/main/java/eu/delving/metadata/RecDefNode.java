@@ -161,7 +161,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public Path getPath() {
         if (path == null) {
-            path = (parent == null) ? Path.empty().extend(getTag()) : parent.getPath().extend(getTag());
+            path = (parent == null) ? Path.create().child(getTag()) : parent.getPath().child(getTag());
         }
         return path;
     }

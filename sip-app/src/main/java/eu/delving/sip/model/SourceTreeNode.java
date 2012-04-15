@@ -29,16 +29,15 @@ import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.Storage;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.BorderFactory;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+import java.util.List;
 
 import static eu.delving.sip.base.Utility.HILIGHTED_COLOR;
 import static eu.delving.sip.base.Utility.MAPPED_COLOR;
@@ -67,7 +66,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public static SourceTreeNode create(List<FieldStatistics> fieldStatisticsList, Map<String, String> facts) {
-        SourceTreeNode root = createSubtree(fieldStatisticsList, Path.empty(), null);
+        SourceTreeNode root = createSubtree(fieldStatisticsList, Path.create(), null);
         if (root == null) {
             root = new SourceTreeNode("No statistics", "<h3>No statistics</h3>");
         }
@@ -147,8 +146,8 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     public Path getPath(boolean fromRoot) {
         List<SourceTreeNode> list = new ArrayList<SourceTreeNode>();
         compilePathList(list, fromRoot);
-        Path path = Path.empty();
-        for (SourceTreeNode node : list) path = path.extend(node.getTag());
+        Path path = Path.create();
+        for (SourceTreeNode node : list) path = path.child(node.getTag());
         return path;
     }
 
@@ -314,7 +313,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         Tag tag = path.peek();
         SourceTreeNode node = tag == null ? null : new SourceTreeNode(parent, tag);
         for (Map.Entry<Tag, List<FieldStatistics>> entry : statisticsMap.entrySet()) {
-            Path childPath = path.extend(entry.getKey());
+            Path childPath = path.child(entry.getKey());
             FieldStatistics fieldStatisticsForChild = null;
             for (FieldStatistics fieldStatistics : entry.getValue()) {
                 if (fieldStatistics.getPath().equals(childPath)) fieldStatisticsForChild = fieldStatistics;

@@ -157,9 +157,9 @@ public class NodeMapping {
         Path parent = null;
         for (Path input : inputPaths) {
             if (parent == null) {
-                parent = input.getParent();
+                parent = input.parent();
             }
-            else if (!parent.equals(input.getParent())) {
+            else if (!parent.equals(input.parent())) {
                 throw new RuntimeException(String.format("Input path %s should all be from the same parent %s", input, parent));
             }
         }
@@ -340,7 +340,7 @@ public class NodeMapping {
         Path back = inputPath;
         while (!back.isEmpty()) {
             variables.add(toGroovyIdentifier(back.peek()));
-            back = back.shorten();
+            back = back.parent();
         }
         return variables;
     }

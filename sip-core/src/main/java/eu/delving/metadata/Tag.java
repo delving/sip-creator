@@ -131,10 +131,13 @@ public class Tag implements Comparable<Tag>, Serializable {
         }
     }
 
-    public void inContextOf(Tag ancestorTag) {
+    public void inContextOf(Path path) {
+        if (path.isEmpty()) return;
+        Tag ancestorTag = path.peek();
         if (this.equals(ancestorTag) && descendency <= ancestorTag.descendency) {
             descendency = ancestorTag.descendency + 1;
         }
+        inContextOf(path.parent());
     }
 
     public Tag withOpt(String optKey) {
@@ -178,10 +181,10 @@ public class Tag implements Comparable<Tag>, Serializable {
         int local = localName.compareTo(tag.localName);
         if (local != 0) return local;
         if (opt == null && tag.opt != null) {
-            return 1;
+            return -1;
         }
         if (opt != null && tag.opt == null) {
-            return -1;
+            return 1;
         }
         if (opt != null && tag.opt != null) {
             return opt.compareTo(tag.opt);

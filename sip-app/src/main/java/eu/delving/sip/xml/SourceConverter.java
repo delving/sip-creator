@@ -83,7 +83,7 @@ public class SourceConverter {
 
     public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException, UniquenessException {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
-        Path path = Path.empty();
+        Path path = Path.create();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         try {
@@ -103,7 +103,7 @@ public class SourceConverter {
                     case XMLEvent.START_ELEMENT:
                         boolean followsStart = start != null;
                         start = event.asStartElement();
-                        path = path.extend(Tag.element(start.getName()));
+                        path = path.child(Tag.element(start.getName()));
                         handleStartElement(path, followsStart);
                         if (progressListener != null) progressListener.setProgress(recordCount);
                         break;
@@ -151,7 +151,7 @@ public class SourceConverter {
                             }
                         }
                         start = null;
-                        path = path.shorten();
+                        path = path.parent();
                         break;
                     case XMLEvent.END_DOCUMENT:
                         out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
@@ -204,7 +204,7 @@ public class SourceConverter {
     }
 
     private void checkForUnique(Path path, Attribute attr) {
-        Path extended = path.extend(Tag.attribute(attr.getName()));
+        Path extended = path.child(Tag.attribute(attr.getName()));
         if (extended.equals(uniqueElementPath)) unique = attr.getValue();
     }
 

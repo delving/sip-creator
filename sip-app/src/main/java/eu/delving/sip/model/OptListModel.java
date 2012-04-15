@@ -25,8 +25,7 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.Tag;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +88,7 @@ public class OptListModel extends AbstractListModel implements ComboBoxModel {
 
         public OptChoice(Path path, RecDef.Opt opt) {
             this.tail = path.peek();
-            this.path = path.shorten().extend(tail.withOpt(opt.key));
+            this.path = path.parent().child(tail.withOpt(opt.key));
             this.opt = opt;
         }
 

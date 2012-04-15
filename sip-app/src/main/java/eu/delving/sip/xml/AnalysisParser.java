@@ -75,7 +75,7 @@ public class AnalysisParser implements Runnable {
             xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
             xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
             xmlif.configureForSpeed();
-            Path path = Path.empty();
+            Path path = Path.create();
             boolean running = true;
             boolean sourceFormat = false;
             InputStream inputStream = null;
@@ -103,11 +103,11 @@ public class AnalysisParser implements Runnable {
                             for (int walk = 0; walk < input.getNamespaceCount(); walk++) {
                                 namespaces.put(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
                             }
-                            path = path.extend(Tag.element(input.getName()));
+                            path = path.child(Tag.element(input.getName()));
                             if (input.getAttributeCount() > 0) {
                                 for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                     QName attributeName = input.getAttributeName(walk);
-                                    Path withAttr = path.extend(Tag.attribute(attributeName));
+                                    Path withAttr = path.child(Tag.attribute(attributeName));
                                     recordValue(withAttr, input.getAttributeValue(walk));
                                 }
                             }
@@ -119,7 +119,7 @@ public class AnalysisParser implements Runnable {
                         case XMLEvent.END_ELEMENT:
                             recordValue(path, text.toString().trim());
                             text.setLength(0);
-                            path = path.shorten();
+                            path = path.parent();
                             break;
                     }
                     if (!input.hasNext()) break;

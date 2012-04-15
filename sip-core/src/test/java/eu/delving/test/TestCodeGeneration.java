@@ -71,21 +71,13 @@ public class TestCodeGeneration {
 
     @Test
     public void cornucopia() throws MappingException {
-//        Assert.assertNotNull(recMapping.getRecDefTree().getRecDef().roles);
-//        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().roles.size());
-//        Assert.assertNotNull(recMapping.getRecDefTree().getRecDef().views);
-//        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().views.size());
-//        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().views.get(0).rows.size());
-//        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().views.get(0).rows.get(0).columns.size());
-//        Assert.assertEquals(1, recMapping.getRecDefTree().getRecDef().views.get(0).rows.get(0).columns.get(0).cells.size());
-
         recMapping.setFact("dogExists", "true");
-
-        node("/lido/@sortorder").addNodeMapping(mapping("/input/leadup/@orderofsort"));
-        node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet").addNodeMapping(mapping("/input/leadup/record/list/member"));
-        node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder").addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
-
-
+        RecDefNode sortOrder = node("/lido/@sortorder");
+        sortOrder.addNodeMapping(mapping("/input/leadup/@orderofsort"));
+        RecDefNode subjectSet = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet");
+        subjectSet.addNodeMapping(mapping("/input/leadup/record/list/member"));
+        RecDefNode subjectSetSortOrder = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/@sortorder");
+        subjectSetSortOrder.addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
         RecDefNode termNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term");
         NodeMapping concept = mapping("/input/leadup/record/list/member/concept");
         concept.operator = Operator.FIRST;
@@ -94,14 +86,11 @@ public class TestCodeGeneration {
         term.dictionary.put("superhero", "Clay Man");
         term.dictionary.put("savior", "Jesus!");
         term.dictionary.put("sidekick", "Clay Horse");
-
         RecDefNode prefNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term/@pref");
         NodeMapping attr2attr = prefNode.addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
         System.out.println("attr=" + attr2attr);
 
         RecDefNode optionsNode = node("/lido/administrativeMetadata/recordWrap/recordID/@type");
-//        RecDef.OptList opts = optionsNode.getOptList();
-//        Assert.assertNotNull(opts);
         NodeMapping dictionaryMapping = optionsNode.addNodeMapping(mapping("/input/leadup/@orderofsort"));
         dictionaryMapping.dictionary = new TreeMap<String, String>();
         dictionaryMapping.dictionary.put("backward", "reverse reverse");
@@ -208,7 +197,8 @@ public class TestCodeGeneration {
     }
 
     private static RecDefNode node(String path) {
-        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(Path.create(path).withDefaultPrefix("lido"));
+        Path prefixed = Path.create(path).withDefaultPrefix("lido");
+        RecDefNode node = recMapping.getRecDefTree().getRecDefNode(prefixed);
         Assert.assertNotNull(node);
         return node;
     }

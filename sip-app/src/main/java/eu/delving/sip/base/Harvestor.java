@@ -180,7 +180,7 @@ public class Harvestor implements Runnable {
     private String saveRecords(HttpEntity fetchedRecords, XMLEventWriter out) throws IOException, XMLStreamException {
         InputStream inputStream = fetchedRecords.getContent();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
-        Path path = Path.empty();
+        Path path = Path.create();
         StringBuilder tokenBuilder = null;
         StringBuilder errorBuilder = null;
         String tokenValue = null;
@@ -191,7 +191,7 @@ public class Harvestor implements Runnable {
             switch (event.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     StartElement start = event.asStartElement();
-                    path = path.extend(Tag.element(start.getName()));
+                    path = path.child(Tag.element(start.getName()));
                     if (!recordEvents.isEmpty()) {
                         recordEvents.add(event);
                     }
@@ -240,7 +240,7 @@ public class Harvestor implements Runnable {
                     else if (path.equals(ERROR) && errorBuilder != null) {
                         listener.failed(String.format("OAI-PMH Error: %s", errorBuilder), null);
                     }
-                    path = path.shorten();
+                    path = path.parent();
                     break;
                 case XMLEvent.END_DOCUMENT:
                     finished = true;

@@ -83,6 +83,7 @@ public class StringUtil {
     public static String toLoopRef(Path path) {
         Tag outer = path.getTag(0);
         Tag inner = path.getTag(1);
+        if (outer == null || inner == null) throw new RuntimeException("toLoopRef called on "+path);
         return toGroovyIdentifier(outer) + toGroovyReference(inner);
     }
 
