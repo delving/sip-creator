@@ -31,6 +31,7 @@ import eu.delving.sip.files.Storage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
 import javax.xml.transform.stream.StreamSource;
@@ -190,23 +191,33 @@ public class SourceConverter {
     private void handleStartElement(Path path, boolean followsStart) {
         if (recordEvents) {
             if (followsStart) eventBuffer.add(eventFactory.createCharacters("\n"));
-            if (uniqueElementPath.peek().isAttribute()) checkForUnique(path, start);
+            if (uniqueElementPath.peek().isAttribute()) handleAttributes(path, start);
             eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
         }
         else if (path.equals(recordRootPath)) {
             recordEvents = true;
-            if (uniqueElementPath.peek().isAttribute()) checkForUnique(path, start);
+            if (uniqueElementPath.peek().isAttribute()) handleAttributes(path, start);
         }
     }
 
-    private void checkForUnique(Path path, StartElement start) {
+    private void handleAttributes(Path path, StartElement start) {
         Iterator attrWalk = start.getAttributes();
-        while (attrWalk.hasNext()) checkForUnique(path, (Attribute) attrWalk.next());
+        while (attrWalk.hasNext()) handleAttribute(path, (Attribute) attrWalk.next());
     }
 
-    private void checkForUnique(Path path, Attribute attr) {
+    private void handleAttribute(Path path, Attribute attr) {
         Path extended = path.child(Tag.attribute(attr.getName()));
-        if (extended.equals(uniqueElementPath)) unique = attr.getValue();
+        if (extended.equals(uniqueElementPath)) {
+            unique = attr.getValue();
+        }
+        else if (path.equals(recordRootPath)) {
+            QName a = attr.getName();
+            QName attrName = new QName(a.getNamespaceURI(), "_" + a.getLocalPart(), a.getPrefix());
+            eventBuffer.add(eventFactory.createStartElement(attrName, null, null));
+            eventBuffer.add(eventFactory.createCharacters(attr.getValue()));
+            eventBuffer.add(eventFactory.createEndElement(attrName, null));
+            eventBuffer.add(eventFactory.createCharacters("\n"));
+        }
     }
 
     private void extractLines(String value) {
