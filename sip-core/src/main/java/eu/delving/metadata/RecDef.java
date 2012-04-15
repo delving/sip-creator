@@ -102,8 +102,6 @@ public class RecDef {
 
     public List<Doc> docs;
 
-    public List<Category> bookmarks;
-
     public Map<String, String> getNamespacesMap() {
         Map<String, String> ns = new HashMap<String, String>();
         if (namespaces != null) for (Namespace namespace : namespaces) ns.put(namespace.prefix, namespace.uri);
@@ -143,7 +141,6 @@ public class RecDef {
         root.resolve(Path.empty(), this);
         if (searchFields != null) for (SearchField searchField : searchFields) searchField.resolve(this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
-        if (bookmarks != null) for (Category category : bookmarks) category.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
     }
 
@@ -169,64 +166,6 @@ public class RecDef {
         Elem found = root.findElem(path, 0);
         if (found == null) throw new RuntimeException("No element found for path " + path);
         return found;
-    }
-
-    @XStreamAlias("category")
-    public static class Category {
-
-        @XStreamAsAttribute
-        public String name;
-
-        public List<String> doc;
-
-        @XStreamImplicit
-        public List<Ref> refs;
-
-        public void resolve(RecDef recDef) {
-            for (Ref ref : refs) ref.resolve(recDef);
-        }
-
-        public String toString() {
-            return name;
-        }
-    }
-
-    @XStreamAlias("ref")
-    public static class Ref {
-
-        @XStreamAsAttribute
-        public Path outputPath;
-
-        @XStreamAsAttribute
-        public String display;
-
-        public List<Opt> opts;
-
-        public List<String> doc;
-
-        @XStreamOmitField
-        public Elem elem;
-
-        @XStreamOmitField
-        public Attr attr;
-
-        public void resolve(RecDef recDef) {
-            outputPath = outputPath.withDefaultPrefix(recDef.prefix);
-            if (outputPath.peek().isAttribute()) {
-                this.attr = recDef.findAttr(outputPath);
-            }
-            else {
-                this.elem = recDef.findElem(outputPath);
-            }
-        }
-
-        public String toString() {
-            return display;
-        }
-
-        public boolean isAttr() {
-            return attr != null;
-        }
     }
 
     @XStreamAlias("fact-ref")

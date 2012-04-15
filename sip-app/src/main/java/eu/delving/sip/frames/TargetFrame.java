@@ -21,13 +21,14 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.*;
-import eu.delving.sip.panels.HtmlPanel;
-import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -40,7 +41,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.*;
-import java.util.List;
 
 /**
  * Render the record definition as a JTree
@@ -50,11 +50,9 @@ import java.util.List;
 
 public class TargetFrame extends FrameBase {
     private JTree recDefTree;
-    private JTree bookmarkTree;
-    private HtmlPanel bookmarkDocPanel = new HtmlPanel("Documentation");
     private JTextField filterField = new JTextField();
+    private JPanel treePanel;
     private OptListModel optListModel = new OptListModel();
-    private JPanel treePanel = new JPanel(new GridLayout(0, 1));
     private JCheckBox hideAttributes = new JCheckBox("Hide Attributes");
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
     private JComboBox optCombo = new JComboBox(optListModel);
@@ -78,7 +76,6 @@ public class TargetFrame extends FrameBase {
             }
         });
         createRecDefTree(sipModel);
-        createBookmarkTree(sipModel);
         timer.setRepeats(false);
         optCombo.setPrototypeDisplayValue("anelement[withanoptinbrackets]");
         wireUp();
@@ -87,7 +84,13 @@ public class TargetFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.add(createNorthPanel(), BorderLayout.NORTH);
-        content.add(treePanel, BorderLayout.CENTER);
+        content.add(createTreePanel(), BorderLayout.CENTER);
+    }
+
+    private JPanel createTreePanel() {
+        treePanel = new JPanel(new BorderLayout());
+        treePanel.add(Utility.scrollVH("Record Definition", recDefTree));
+        return treePanel;
     }
 
     private JPanel createNorthPanel() {
@@ -190,80 +193,9 @@ public class TargetFrame extends FrameBase {
         }
     }
 
-    private class BookmarkSelection implements TreeSelectionListener {
-
-        @Override
-        public void valueChanged(TreeSelectionEvent event) {
-            Object object = event.getPath().getLastPathComponent();
-            if (object instanceof RecDef.Category) {
-                if (bookmarkTree.isCollapsed(event.getPath())) {
-                    bookmarkTree.expandPath(event.getPath());
-                }
-                else {
-                    bookmarkTree.collapsePath(event.getPath());
-                }
-            }
-            else if (object instanceof RecDef.Ref) {
-                RecDef.Ref ref = (RecDef.Ref) object;
-                bookmarkDocPanel.setHtml(docToHtml(ref.doc));
-                recDefTree.setSelectionPath(sipModel.getMappingModel().getTreePath(ref.outputPath));
-            }
-        }
-    }
-
-    private String docToHtml(List<String> doc) {
-        StringBuilder html = new StringBuilder("<html><p>");
-        if (doc == null) {
-            html.append("No documentation");
-        }
-        else {
-            for (String line : doc) html.append(line).append('\n');
-        }
-        html.append("</p></html>");
-        return html.toString();
-    }
-
     private void showPath(RecDefTreeNode node) {
         RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
         root.showPath(recDefTree, node.getRecDefPath().getTagPath());
-    }
-
-    private void createBookmarkTree(SipModel sipModel) {
-        bookmarkTree = new JTree(new BookmarksTreeModel()) {
-            @Override
-            public String getToolTipText(MouseEvent evt) {
-                TreePath treePath = bookmarkTree.getPathForLocation(evt.getX(), evt.getY());
-                if (treePath == null) return "";
-                Object last = treePath.getLastPathComponent();
-                if (last instanceof RecDef.Category) {
-                    RecDef.Category category = (RecDef.Category) last;
-                    StringTemplate t = Utility.getTemplate("bookmark-category");
-                    t.setAttribute("name", category.name);
-                    t.setAttribute("doc", category.doc);
-                    return t.toString();
-
-                }
-                else if (last instanceof RecDef.Ref) {
-                    RecDef.Ref ref = (RecDef.Ref) last;
-                    StringTemplate t = Utility.getTemplate(ref.isAttr() ? "bookmark-attribute" : "bookmark-element");
-                    t.setAttribute("name", ref.display);
-                    t.setAttribute("doc", ref.doc);
-                    t.setAttribute("opts", ref.opts);
-                    return t.toString();
-                }
-                else {
-                    return "";
-                }
-            }
-        };
-        bookmarkTree.setRootVisible(false);
-        bookmarkTree.setToolTipText("?");
-        bookmarkTree.setDragEnabled(false);
-        bookmarkTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        bookmarkTree.getSelectionModel().addTreeSelectionListener(new BookmarkSelection());
-        bookmarkTree.setCellRenderer(new BookmarksTreeModel.BookmarkRenderer());
-        bookmarkTree.setDropMode(DropMode.ON);
-        bookmarkTree.setTransferHandler(sipModel.getNodeTransferHandler());
     }
 
     private void createRecDefTree(SipModel sipModel) {
@@ -326,24 +258,8 @@ public class TargetFrame extends FrameBase {
             else {
                 recDefTree.setModel(new RecDefTreeModel(FilterNode.createMessageNode("No record definition")));
             }
-            boolean bookmarksPresent = false;
-            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
-            if (recMapping != null) {
-                RecDef recDef = recMapping.getRecDefTree().getRecDef();
-                bookmarksPresent = !recDef.bookmarks.isEmpty();
-                bookmarkTree.setModel(new BookmarksTreeModel(recDef.bookmarks));
-            }
-            else {
-                bookmarkTree.setModel(new BookmarksTreeModel());
-            }
             treePanel.removeAll();
             treePanel.add(Utility.scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
-            if (bookmarksPresent) {
-                JPanel p = new JPanel(new GridLayout(1, 0));
-                p.add(Utility.scrollVH("Bookmarks", bookmarkTree));
-                p.add(bookmarkDocPanel);
-                treePanel.add(p);
-            }
         }
     }
 

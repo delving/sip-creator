@@ -21,7 +21,6 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.metadata.RecDef;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SourceTreeNode;
@@ -94,11 +93,7 @@ public class NodeTransferHandler extends TransferHandler {
                     sipModel.getCreateModel().setSourceTreeNodes(nodeListHolder.nodeSet);
                     JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
                     TreePath treePath = location.getPath();
-                    if (treePath.getLastPathComponent() instanceof RecDef.Ref) {
-                        RecDef.Ref ref = (RecDef.Ref) treePath.getLastPathComponent();
-                        sipModel.getCreateModel().setRecDefTreePath(ref.outputPath);
-                    }
-                    else if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
+                    if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
                         sipModel.getCreateModel().setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
                     }
                 }

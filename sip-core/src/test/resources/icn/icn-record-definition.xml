@@ -135,20 +135,6 @@
         <!-- ... -->
     </docs>
 
-    <bookmarks>
-        <!--<category name="Mandatory ICN elements">-->
-            <!--<doc>-->
-                <!--<string>These elements must be included in any ESE delivery to Europeana</string>-->
-            <!--</doc>-->
-            <!--<ref outputPath="/europeana:provider" display="Provider"/>-->
-            <!--<ref outputPath="/europeana:dataProvider" display="Data provider"/>-->
-            <!--<ref outputPath="/europeana:rights" display="Rights"/>-->
-            <!--<ref outputPath="/europeana:type" display="Type"/>-->
-            <!--<ref outputPath="/europeana:isShownBy" display="Is Shown By"/>-->
-            <!--<ref outputPath="/europeana:isShownAt" display="Is Shown At"/>-->
-        <!--</category>-->
-    </bookmarks>
-
 </record-definition>
 
 
