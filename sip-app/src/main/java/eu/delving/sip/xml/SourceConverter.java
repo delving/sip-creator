@@ -195,6 +195,7 @@ public class SourceConverter {
         }
         else if (path.equals(recordRootPath)) {
             recordEvents = true;
+            if (uniqueElementPath.peek().isAttribute()) checkForUnique(path, start);
         }
     }
 
