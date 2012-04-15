@@ -133,21 +133,24 @@ public class MappingRunner {
 
     private void stripEmpty(Node node) {
         NodeList kids = node.getChildNodes();
+        List<Node> dead = new ArrayList<Node>();
         for (int walk = 0; walk < kids.getLength(); walk++) {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
                     break;
                 case Node.TEXT_NODE:
+                    if (kid.getTextContent().trim().isEmpty()) dead.add(kid);
                     break;
                 case Node.ELEMENT_NODE:
                     stripEmpty(kid);
-                    if (!(kid.hasChildNodes() || kid.hasAttributes())) node.removeChild(kid);
+                    if (!(kid.hasChildNodes() || kid.hasAttributes())) dead.add(kid);
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
             }
         }
+        for (Node kill : dead) node.removeChild(kill);
     }
 
     private List<GroovyNode> wrap(GroovyNode node) {

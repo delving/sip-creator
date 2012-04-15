@@ -253,9 +253,14 @@ public class DOMBuilder extends BuilderSupport {
         else if (result instanceof Object[]) {
             cr.list = unpack(Arrays.asList((Object[]) result));
         }
-        if (cr.list != null && cr.list.size() == 1) {
-            cr.string = cr.list.get(0);
-            cr.list = null;
+        if (cr.string != null && cr.string.trim().isEmpty()) cr.string = null;
+        if (cr.list != null) {
+            Iterator<String> walk = cr.list.iterator();
+            while (walk.hasNext()) {
+                String member = walk.next();
+                if (member.trim().isEmpty()) walk.remove();
+            }
+            if (cr.list.isEmpty()) cr.list = null;
         }
         return cr;
     }
@@ -275,13 +280,13 @@ public class DOMBuilder extends BuilderSupport {
                 unpack(Arrays.asList((Object[]) member), to);
             }
             else if (member instanceof String) {
-                to.add((String)member);
+                to.add((String) member);
             }
             else if (!(member instanceof Node)) {
                 to.add(member.toString());
             }
             else {
-                throw new RuntimeException("unpack: "+member.getClass());
+                throw new RuntimeException("unpack: " + member.getClass());
             }
         }
     }
