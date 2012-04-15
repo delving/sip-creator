@@ -52,6 +52,7 @@ public class MetadataParser {
     private XMLStreamReader2 input;
     private int recordIndex, recordCount;
     private Map<String, String> namespaces = new TreeMap<String, String>();
+    private Path path = Path.create();
     private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;
 
@@ -76,7 +77,6 @@ public class MetadataParser {
     @SuppressWarnings("unchecked")
     public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, AbortException {
         MetadataRecord metadataRecord = null;
-        Path path = Path.create();
         GroovyNode node = null;
         StringBuilder value = new StringBuilder();
         while (metadataRecord == null) {
