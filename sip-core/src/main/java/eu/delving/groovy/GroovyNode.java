@@ -80,9 +80,7 @@ public class GroovyNode {
         this.qName = qName;
         this.attributes = attributes;
         this.value = value;
-        if (parent != null) {
-            getParentList(parent).add(this);
-        }
+        if (parent != null) getParentList(parent).add(this);
     }
 
     public String text() {
@@ -111,10 +109,8 @@ public class GroovyNode {
             if (buffer != null) {
                 return buffer.toString();
             }
-            else {
-                if (previousText != null) {
-                    return previousText;
-                }
+            else if (previousText != null) {
+                return previousText;
             }
         }
         return "";
@@ -140,9 +136,7 @@ public class GroovyNode {
     }
 
     public String name() {
-        if (stringName == null) {
-            stringName = StringUtil.tagToVariable(qName.getPrefix() + qName.getLocalPart());
-        }
+        if (stringName == null) stringName = StringUtil.tagToVariable(qName.getPrefix() + qName.getLocalPart());
         return stringName;
     }
 
@@ -191,12 +185,8 @@ public class GroovyNode {
             if (value != null) answer.add(value);
             return answer;
         }
-        if ("*".equals(key)) {
-            return children();
-        }
-        if ("_".equals(key)) {
-            return getValueNodes();
-        }
+        if ("*".equals(key)) return children();
+        if ("_".equals(key)) return getValueNodes();
         return getByName(key);
     }
 
@@ -229,12 +219,7 @@ public class GroovyNode {
         for (Object child : children()) {
             if (child instanceof GroovyNode) {
                 GroovyNode childNode = (GroovyNode) child;
-                if (childNode.value() instanceof List && ((List) childNode.value).isEmpty()) {
-                    continue;
-                }
-                if (name.equals(childNode.name())) {
-                    answer.add(childNode);
-                }
+                if (name.equals(childNode.name())) answer.add(childNode);
             }
         }
         return answer;
