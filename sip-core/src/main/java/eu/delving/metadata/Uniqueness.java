@@ -41,7 +41,7 @@ import java.util.TreeSet;
 
 public class Uniqueness {
     private static final int HOLD_THRESHOLD = 50000;
-    private static final int TEXT_SIZE_LIMIT = 60;
+    private static final int TEXT_SIZE_LIMIT = 40;
     private Set<String> all = new HashSet<String>(HOLD_THRESHOLD * 3 / 2);
     private File tempFile;
     private Writer out;
@@ -49,7 +49,7 @@ public class Uniqueness {
 
     public boolean isRepeated(String text) {
         count++;
-        if (text.length() > TEXT_SIZE_LIMIT) return true; // a silly test on such large strings
+        if (text.length() > TEXT_SIZE_LIMIT) text = text.substring(0, TEXT_SIZE_LIMIT);
         if (all != null) {
             if (all.contains(text)) return true;
             all.add(text);
