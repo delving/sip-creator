@@ -23,7 +23,6 @@ package eu.delving.metadata;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
-import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 import java.io.InputStream;
@@ -85,8 +84,6 @@ public class RecDef {
     public boolean flat;
 
     public List<Namespace> namespaces;
-
-    public List<Role> roles;
 
     public List<Attr> attrs;
 
@@ -162,7 +159,7 @@ public class RecDef {
         return found;
     }
 
-    private Elem findElem(Path path) {
+    Elem findElem(Path path) {
         Elem found = root.findElem(path, 0);
         if (found == null) throw new RuntimeException("No element found for path " + path);
         return found;
@@ -176,58 +173,6 @@ public class RecDef {
 
         @XStreamAsAttribute
         public String name;
-    }
-
-    @XStreamAlias("opt-list")
-    public static class OptList {
-
-        @XStreamAsAttribute
-        public Path path;
-
-        @XStreamAsAttribute
-        public Tag key;
-
-        @XStreamAsAttribute
-        public Tag value;
-
-        @XStreamImplicit
-        public List<Opt> opts;
-
-        public void resolve(RecDef recDef) {
-            for (Opt opt : opts) opt.parent = this;
-            if (path == null) throw new RuntimeException("No path for OptList: " + opts);
-            if (path.peek().isAttribute()) throw new RuntimeException("An option list may not be connected to an attribute: " + path);
-            path = path.withDefaultPrefix(recDef.prefix);
-            key = key.defaultPrefix(recDef.prefix);
-            value = value.defaultPrefix(recDef.prefix);
-            Elem elem = recDef.findElem(path);
-            elem.optList = this;
-        }
-    }
-
-    @XStreamAlias("opt")
-    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"content"})
-    public static class Opt {
-
-        @XStreamAsAttribute
-        public String key;
-
-        @XStreamAsAttribute
-        public boolean hidden;
-
-        public String content;
-        
-        @XStreamOmitField
-        public OptList parent;
-
-        public Opt setContent(String content) {
-            this.content = content;
-            return this;
-        }
-
-        public String toString() {
-            return String.format("%s: %s", key, content);
-        }
     }
 
     @XStreamAlias("searchField")
@@ -314,8 +259,6 @@ public class RecDef {
         @XStreamAsAttribute
         public boolean systemField;
 
-        public List<String> options;
-
         @XStreamOmitField
         public Doc doc;
         
@@ -353,8 +296,6 @@ public class RecDef {
 
         @XStreamAsAttribute
         public SummaryField summaryField;
-
-        public List<String> options;
 
         @XStreamImplicit
         public List<Elem> elemList = new ArrayList<Elem>();
@@ -449,7 +390,7 @@ public class RecDef {
             }
             if (optList != null) {
                 indent(out, level).append("// ");
-                for (Opt opt : optList.opts) out.append(String.format("%s=%s, ", opt.key, opt.content));
+                for (OptList.Opt opt : optList.opts) out.append(String.format("%s=%s, ", opt.key, opt.content));
                 out.append("\n");
             }
             indent(out, level).append("lido.");

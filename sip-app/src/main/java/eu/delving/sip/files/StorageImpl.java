@@ -124,16 +124,6 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public List<FactDefinition> getFactDefinitions() throws StorageException {
-            try {
-                return FactDefinition.read(factDefinitionFile(here));
-            }
-            catch (FileNotFoundException e) {
-                throw new StorageException("Unable to load fact definitions", e);
-            }
-        }
-
-        @Override
         public List<String> getRecDefPrefixes() throws StorageException {
             List<String> prefixes = new ArrayList<String>();
             try {

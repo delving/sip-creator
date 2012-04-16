@@ -27,15 +27,11 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -47,7 +43,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
     private DataSetState dataSetState = DataSetState.EMPTY;
-    private List<FactDefinition> factDefinitions = new ArrayList<FactDefinition>();
 
     public DataSetModel() {
         new StateCheckTimer();
@@ -70,21 +65,6 @@ public class DataSetModel implements RecDefModel {
         }
         catch (StorageException e) {
             throw new MetadataException("Unable to get validator", e);
-        }
-    }
-
-    @Override
-    public List<FactDefinition> getFactDefinitions() {
-        return factDefinitions;
-    }
-
-    @Override
-    public Set<String> getPrefixes() throws MetadataException {
-        try {
-            return new TreeSet<String>(dataSet.getRecDefPrefixes());
-        }
-        catch (StorageException e) {
-            throw new MetadataException(e);
         }
     }
 
@@ -115,9 +95,7 @@ public class DataSetModel implements RecDefModel {
 
     public void setDataSet(final DataSet dataSet) throws StorageException {
         this.dataSet = dataSet;
-        this.factDefinitions.clear();
         if (dataSet != null) {
-            this.factDefinitions.addAll(dataSet.getFactDefinitions());
             this.dataSetState = dataSet.getState();
             if (SwingUtilities.isEventDispatchThread()) {
                 for (Listener listener : listeners) {

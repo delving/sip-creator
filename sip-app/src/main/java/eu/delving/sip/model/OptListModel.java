@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.metadata.OptList;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.Tag;
@@ -47,8 +48,8 @@ public class OptListModel extends AbstractListModel implements ComboBoxModel {
         }
         if (recDef.opts == null) return;
         list.add(new OptChoice());
-        for (RecDef.OptList optList : recDef.opts) {
-            for (RecDef.Opt opt : optList.opts) {
+        for (OptList optList : recDef.opts) {
+            for (OptList.Opt opt : optList.opts) {
                 list.add(new OptChoice(optList.path, opt));
             }
         }
@@ -81,12 +82,12 @@ public class OptListModel extends AbstractListModel implements ComboBoxModel {
     public static class OptChoice {
         private Path path;
         private Tag tail;
-        private RecDef.Opt opt;
+        private OptList.Opt opt;
 
         public OptChoice() {
         }
 
-        public OptChoice(Path path, RecDef.Opt opt) {
+        public OptChoice(Path path, OptList.Opt opt) {
             this.tail = path.peek();
             this.path = path.parent().child(tail.withOpt(opt.key));
             this.opt = opt;
@@ -96,7 +97,7 @@ public class OptListModel extends AbstractListModel implements ComboBoxModel {
             return path;
         }
 
-        public RecDef.Opt getOpt() {
+        public OptList.Opt getOpt() {
             return opt;
         }
 
