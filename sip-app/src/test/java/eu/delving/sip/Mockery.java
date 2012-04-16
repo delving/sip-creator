@@ -32,7 +32,6 @@ import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.xml.MetadataParser;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Node;
 
 import javax.xml.stream.XMLStreamException;
@@ -102,20 +101,8 @@ public class Mockery {
         return dataSetModel.getDataSet().newValidator(prefix);
     }
 
-    public void createMapping() throws IOException {
-        List<String> lines = IOUtils.readLines(mappingList());
-        int index = 0;
-        while (index < lines.size()) {
-            if (lines.get(index).trim().isEmpty()) {
-                index++;
-            }
-            else {
-                String from = lines.get(index++);
-                String to = lines.get(index++);
-                map(from, to);
-            }
-        }
-        recMapping.getFacts().putAll(dataSetModel.getDataSet().getDataSetFacts());
+    public void createMapping() throws IOException, MetadataException {
+        recMapping = RecMapping.read(mappingInputStream(), dataSetModel);
     }
 
     public String mapping() throws UnsupportedEncodingException {
@@ -171,8 +158,8 @@ public class Mockery {
         return getClass().getResource(String.format("/test/%s/example-input.xml", prefix));
     }
 
-    private InputStream mappingList() throws IOException {
-        return getClass().getResource(String.format("/test/%s/mapping-list.txt", prefix)).openStream();
+    private InputStream mappingInputStream() throws IOException {
+        return getClass().getResource(String.format("/test/%s/mapping_%s.xml", prefix, prefix)).openStream();
     }
 
     public File sampleInputFile() throws IOException {

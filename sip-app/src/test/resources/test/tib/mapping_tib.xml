@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="tib">
+    <node-mappings>
+
+        <!--/input/creator.date_of_birth-->
+        <!--/record/tib:creatorBirthYear-->
+
+        <!--/input/creator.date_of_death-->
+        <!--/record/tib:creatorDeathYear-->
+
+        <!--/input/priref-->
+        <!--/record/europeana:uri-->
+
+        <!--/input/description-->
+        <!--/record/dc:description-->
+
+    </node-mappings>
+</rec-mapping>

@@ -1,7 +1,0 @@
-
-/input/priref
-/record/europeana:uri
-
-/input/description
-/record/abc:description
-

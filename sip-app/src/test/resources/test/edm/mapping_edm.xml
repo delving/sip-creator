@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="edm">
+    <node-mappings>
+        <!--/facts/rights-->
+        <!--/record/admin/rights-->
+
+        <!--/input/lido:lidoRecID-->
+        <!--/record/thing/thingId-->
+
+    </node-mappings>
+</rec-mapping>
+

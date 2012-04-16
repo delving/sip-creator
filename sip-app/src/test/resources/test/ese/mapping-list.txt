@@ -1,9 +1,0 @@
-/input/OBS_GUID
-/europeana:record/dc:identifier
-
-/input/Afbeelding
-/europeana:record/europeana:isShownBy
-
-/input/Hoogte /input/Breedte
-/europeana:record/dc:format
-
