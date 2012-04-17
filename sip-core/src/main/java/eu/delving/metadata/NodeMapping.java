@@ -296,7 +296,12 @@ public class NodeMapping {
                 codeOut.line(getMapUsage());
             }
             else {
-                codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
+                if (path.peek().getLocalName().equals("constant")) {
+                    codeOut.line("'CONSTANT'");
+                }
+                else {
+                    codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
+                }
             }
         }
         else if (recDefNode.isLeafElem()) {
