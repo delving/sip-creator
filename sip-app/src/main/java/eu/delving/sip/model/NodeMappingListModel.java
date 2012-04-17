@@ -28,8 +28,7 @@ import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Utility;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.AbstractListModel;
-import javax.swing.JList;
+import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -128,7 +127,10 @@ public class NodeMappingListModel extends AbstractListModel {
 
     public NodeMappingEntry getEntry(NodeMapping nodeMapping) {
         int index = indexOf(nodeMapping);
-        if (index < 0) throw new RuntimeException("Node mapping not found");
+        if (index < 0) {
+            return null; // todo: fix this
+//            throw new RuntimeException("Node mapping not found");
+        }
         return entries.get(index);
     }
 

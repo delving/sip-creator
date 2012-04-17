@@ -59,7 +59,7 @@ public class CreateModel {
                 for (SourceTreeNode node : sourceTreeNodes) {
                     for (NodeMapping nodeMapping : node.getNodeMappings()) {
                         NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
-                        entry.setHighlighted();
+                        if (entry != null) entry.setHighlighted(); // todo: fix
                         RecDefTreeNode recDefTreeNode = sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode);
                         recDefTreeNode.setHighlighted();
                     }
@@ -85,7 +85,7 @@ public class CreateModel {
             if (recDefTreeNode != null) {
                 for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
                     NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping); // todo: threading??
-                    entry.setHighlighted();
+                    if (entry != null) entry.setHighlighted(); // todo: fix
                     for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
                         ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
                     }
