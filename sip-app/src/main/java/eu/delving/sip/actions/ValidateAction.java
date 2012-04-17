@@ -35,6 +35,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import static eu.delving.sip.files.DataSetState.MAPPING;
+
 /**
  * Runs the validation for a file.
  *
@@ -80,7 +82,7 @@ public class ValidateAction extends AbstractAction {
     }
 
     private void enableAccordingTo(DataSetState dataSetState) {
-        setEnabled(dataSetState.ordinal() >= DataSetState.MAPPING.ordinal());
+        setEnabled(dataSetState.atLeast(MAPPING));
     }
 
     private void prepareDialog() {

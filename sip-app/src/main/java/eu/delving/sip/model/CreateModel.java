@@ -23,7 +23,6 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
-import eu.delving.sip.files.DataSetState;
 
 import javax.swing.tree.TreePath;
 import java.util.Iterator;
@@ -31,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static eu.delving.sip.files.DataSetState.MAPPING;
 
 /**
  * This model holds the source and destination of a node mapping, and is observable.
@@ -136,8 +137,7 @@ public class CreateModel {
     }
 
     public boolean canCreate() {
-        boolean mappingState = sipModel.hasDataSet() && sipModel.getDataSetModel().getDataSet().getState().ordinal() >= DataSetState.MAPPING.ordinal();
-        if (recDefTreeNode != null && sourceTreeNodes != null && mappingState) {
+        if (recDefTreeNode != null && sourceTreeNodes != null && sipModel.getDataSetState().atLeast(MAPPING)) {
             if (nodeMappingEntry == null) {
                 nextNodeMapping:
                 for (NodeMapping mapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {

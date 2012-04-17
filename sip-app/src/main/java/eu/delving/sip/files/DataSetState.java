@@ -49,6 +49,10 @@ public enum DataSetState {
 //        return WordUtils.capitalize(toString().replaceAll("_", " ").toLowerCase());
     }
 
+    public boolean atLeast(DataSetState state) {
+        return ordinal() >= state.ordinal();
+    }
+
     public String toHtml() {
         StringBuilder out = new StringBuilder("<html><strong>&quot;");
         out.append(toTitle());
