@@ -48,6 +48,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private RecDef.Elem elem;
     private RecDef.Attr attr;
     private RecDef.Opt optRoot, optKey, optValue;
+    private String defaultPrefix;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
@@ -66,28 +67,29 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public static RecDefNode create(Listener listener, RecDef recDef) {
-        return new RecDefNode(listener, null, recDef.root, null, null, null, null); // only root element
+        return new RecDefNode(listener, null, recDef.root, null, null, null, null, recDef.prefix); // only root element
     }
 
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, RecDef.Opt optRoot, RecDef.Opt optKey, RecDef.Opt optValue) {
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, RecDef.Opt optRoot, RecDef.Opt optKey, RecDef.Opt optValue, String defaultPrefix) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
         this.attr = attr;
         this.optRoot = optRoot;
+        this.defaultPrefix = defaultPrefix;
         if (optKey != null && optKey.parent.key.equals(getTag())) this.optKey = optKey;
         if (optValue != null && optValue.parent.value.equals(getTag())) this.optValue = optValue;
         if (elem != null) {
             for (RecDef.Attr sub : elem.attrList) {
-                children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot));
+                children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot, defaultPrefix));
             }
             for (RecDef.Elem sub : elem.elemList) {
                 if (sub.optList == null) {
-                    children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot));
+                    children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot, defaultPrefix));
                 }
                 else {
                     for (RecDef.Opt subOpt : sub.optList.opts) { // a child for each option
-                        children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null));
+                        children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null, defaultPrefix));
                     }
                 }
             }
@@ -451,14 +453,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return false;
     }
 
-    private RecDef.Opt findRoot() {
-        if (optRoot != null) return optRoot;
-        if (parent == null) return null;
-        return parent.findRoot();
-    }
-
     public String toString() {
-        String name = isAttr() ? attr.tag.toString() : elem.tag.toString();
+        String name = isAttr() ? attr.tag.toString(defaultPrefix) : elem.tag.toString(defaultPrefix);
         if (optRoot != null) name += String.format("[%s]", optRoot.content);
         if (optKey != null || optValue != null) name += "{Constant}";
         return name;
