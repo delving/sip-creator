@@ -30,6 +30,15 @@ import eu.delving.groovy.GroovyNode
 
 public class MappingCategory {
 
+    public static class TupleMap extends TreeMap {
+        @Override
+        public Object get(Object key) {
+            Object value = super.get(key);
+            if (value == null) value = "";
+            return value;
+        }
+    }
+
     public static class TupleList extends ArrayList {
         @Override
         public String toString() {
@@ -108,7 +117,7 @@ public class MappingCategory {
                 else {
                     GroovyNode na = (GroovyNode) ma
                     GroovyNode nb = (GroovyNode) mb
-                    Map map = new TreeMap()
+                    Map map = new TupleMap()
                     map[na.name()] = na
                     map[nb.name()] = nb
                     list.add(map)
@@ -116,12 +125,12 @@ public class MappingCategory {
             }
             else if (aa.hasNext()) {
                 def ma = aa.next()
-                if (ma instanceof Map) {
+                if (ma instanceof TupleMap) {
                     list.add(ma)
                 }
                 else {
                     GroovyNode na = (GroovyNode) ma;
-                    Map map = new TreeMap()
+                    Map map = new TupleMap()
                     map[na.name()] = na
                     list.add(map)
                 }
@@ -129,7 +138,7 @@ public class MappingCategory {
             else { // bb only
                 def mb = bb.next()
                 GroovyNode nb = (GroovyNode) mb;
-                Map map = new TreeMap()
+                Map map = new TupleMap()
                 map[nb.name()] = nb
                 list.add(map)
             }
