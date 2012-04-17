@@ -57,10 +57,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private String htmlChunk;
     private List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
 
-    public SourceTreeNode(SourceTreeNode parent) {
-        this.parent = parent;
-    }
-
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
     }
@@ -70,10 +66,13 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         if (root == null) {
             root = new SourceTreeNode("No statistics", "<h3>No statistics</h3>");
         }
-        if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
-            SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
-            root.getChildren().add(0, factNode);
-            for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, entry);
+        else {
+            if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
+                SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
+                root.getChildren().add(0, factNode);
+                for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, entry);
+            }
+            root.getChildren().add(0, new SourceTreeNode(root, "constant", "<html>Constant value which you can adjust in the code snippet"));
         }
         return root;
     }
@@ -364,7 +363,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         private void markDelimiters(boolean selected, SourceTreeNode node) {
             Utility.setDelimitedColor(this, selected);
             setOpaque(!selected);
-            setBorder(BorderFactory.createEtchedBorder());
+//            setBorder(BorderFactory.createEtchedBorder());
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
         }
 
@@ -380,7 +379,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 setBackground(color);
                 setForeground(Color.BLACK);
             }
-            setBorder(BorderFactory.createEtchedBorder());
+//            setBorder(BorderFactory.createEtchedBorder());
             StringBuilder commaList = new StringBuilder();
             Iterator<NodeMapping> walk = node.nodeMappings.iterator();
             while (walk.hasNext()) {

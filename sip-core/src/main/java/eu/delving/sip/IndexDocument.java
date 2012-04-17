@@ -21,7 +21,10 @@
 
 package eu.delving.sip;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.Tag;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,8 +42,6 @@ import java.util.TreeMap;
  */
 
 public class IndexDocument {
-    private static final String GARBAGE_FIELD = "delving_fullText";
-    private StringBuilder garbageField = new StringBuilder();
     private Map<String, List<Value>> map = new TreeMap<String, List<Value>>();
 
     public static IndexDocument fromNode(Node inputNode, RecDefTree recordDefinition) {
@@ -59,7 +60,7 @@ public class IndexDocument {
         traverse(inputNode, 0);
         IndexDocument doc = new IndexDocument();
         fromAFFRecord((Element)inputNode, recordDefinition, doc);
-        return doc.complete();
+        return doc;
     }
 
     private static void fromAFFRecord(Element element, RecDefTree recordDefinition, IndexDocument doc) {
@@ -77,16 +78,6 @@ public class IndexDocument {
                         Node textNode = getTextNode(kid);
                         if (textNode == null) throw new RuntimeException("No text subnode for content of "+recDefNode);
                         doc.put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), textNode.getNodeValue());
-                        SummaryField summaryField = recDefNode.getSummaryField();
-                        if (summaryField != null) {
-                            doc.put(summaryField.tag, textNode.getNodeValue());
-                        }
-                        else if (recDefNode.hasSearchField()) {
-                            doc.put(recDefNode.getSearchField(), textNode.getNodeValue());
-                        }
-                        else {
-                            doc.garbageField.append(textNode.getNodeValue()).append(' ');
-                        }
                     }
                     else {
                         fromAFFRecord((Element) kid, recordDefinition, doc);
@@ -112,19 +103,12 @@ public class IndexDocument {
                     Node textNode = getTextNode(kid);
                     RecDefNode recDefNode = getRecDefNode(recordDefinition, (Element)kid);
                     doc.put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), textNode.getNodeValue());
-                    SummaryField summaryField = recDefNode.getSummaryField();
-                    if (summaryField != null) {
-                        doc.put(summaryField.tag, textNode.getNodeValue());
-                    }
-                    else {
-                        doc.garbageField.append(textNode.getNodeValue()).append(' ');
-                    }
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
             }
         }
-        return doc.complete();
+        return doc;
     }
 
     private static RecDefNode getRecDefNode(RecDefTree recordDefinition, Element element) {
@@ -178,11 +162,6 @@ public class IndexDocument {
         }
     }
     
-    private IndexDocument complete() {
-        put(GARBAGE_FIELD, garbageField.toString());
-        return this;
-    }
-
     public String toString() {
         StringBuilder out = new StringBuilder("IndexDocument {\n");
         for (Map.Entry<String, List<Value>> entry : map.entrySet()) {

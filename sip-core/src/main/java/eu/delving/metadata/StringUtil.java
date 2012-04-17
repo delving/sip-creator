@@ -94,18 +94,11 @@ public class StringUtil {
         while (walk.hasNext()) {
             Path inputPath = walk.next();
             if (inputPath.size() < 2) throw new RuntimeException("Path too short");
-            expression.append(StringUtil.toMapExpressionElement(inputPath));
+            expression.append(StringUtil.toLoopRef(inputPath));
             if (walk.hasNext()) expression.append(" | ");
         }
         expression.append(")");
         return expression.toString();
-    }
-
-    public static String toMapExpressionElement(Path path) {
-        if (path.size() != 2) throw new RuntimeException("Yes it is");
-        Tag outer = path.getTag(-2); // todo: is this really different from the above?
-        Tag inner = path.getTag(-1);
-        return toGroovyIdentifier(outer) + toGroovyReference(inner);
     }
 
     public static String toGroovyIdentifier(Tag tag) {

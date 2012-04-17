@@ -245,12 +245,16 @@ public class Tag implements Comparable<Tag>, Serializable {
         }
     }
 
-    public String toString() {
+    public String toString(String defaultPrefix) {
         StringBuilder out = new StringBuilder();
-        if (prefix != null) out.append(prefix).append(':');
+        if (prefix != null && (defaultPrefix == null || !defaultPrefix.equals(prefix))) out.append(prefix).append(':');
         out.append(localName);
         if (opt != null) out.append('[').append(opt).append(']');
         return out.toString();
+    }
+
+    public String toString() {
+        return toString(null);
     }
 
     public static class Converter extends AbstractSingleValueConverter {

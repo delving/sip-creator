@@ -90,7 +90,7 @@ public class NodeMapping {
     }
 
     public boolean isVirtual() {
-        return recDefNode.getNodeMappings().isEmpty();
+        return !recDefNode.getNodeMappings().containsKey(inputPath);
     }
 
     public String getDocumentation() {
@@ -152,7 +152,7 @@ public class NodeMapping {
         if (recDefNode != null) recDefNode.notifyNodeMappingChange(this);
     }
 
-    public NodeMapping setInputPaths(List<Path> inputPaths) {
+    public NodeMapping setInputPaths(Collection<Path> inputPaths) {
         if (inputPaths.isEmpty()) throw new RuntimeException();
         Path parent = null;
         for (Path input : inputPaths) {
@@ -163,10 +163,11 @@ public class NodeMapping {
                 throw new RuntimeException(String.format("Input path %s should all be from the same parent %s", input, parent));
             }
         }
-        this.inputPath = inputPaths.get(0);
-        if (inputPaths.size() > 1) {
+        Iterator<Path> pathWalk = inputPaths.iterator();
+        this.inputPath = pathWalk.next();
+        if (pathWalk.hasNext()) {
             siblings = new ArrayList<Path>();
-            for (int walk = 1; walk < inputPaths.size(); walk++) siblings.add(inputPaths.get(walk));
+            while (pathWalk.hasNext()) siblings.add(pathWalk.next());
         }
         return this;
     }
@@ -296,7 +297,12 @@ public class NodeMapping {
                 codeOut.line(getMapUsage());
             }
             else {
-                codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
+                if (path.peek().getLocalName().equals("constant")) {
+                    codeOut.line("'CONSTANT'");
+                }
+                else {
+                    codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
+                }
             }
         }
         else if (recDefNode.isLeafElem()) {

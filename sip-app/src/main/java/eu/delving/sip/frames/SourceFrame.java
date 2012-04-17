@@ -39,10 +39,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -50,6 +47,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
+import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
 /**
  * The structure of the input data, tree, variables and statistics.
@@ -109,8 +107,8 @@ public class SourceFrame extends FrameBase {
     }
 
     private void reactToState(DataSetState state) {
-        if (state.ordinal() < DataSetState.ANALYZED_IMPORT.ordinal()) sipModel.getStatsModel().setStatistics(null);
-        boolean newDelimited = state.ordinal() >= DataSetState.ANALYZED_SOURCE.ordinal();
+        if (!state.atLeast(DataSetState.ANALYZED_IMPORT)) sipModel.getStatsModel().setStatistics(null);
+        boolean newDelimited = state.atLeast(ANALYZED_SOURCE);
         if (newDelimited != delimited) {
             delimited = newDelimited;
             getContentPane().removeAll();

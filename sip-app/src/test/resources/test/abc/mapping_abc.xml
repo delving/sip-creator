@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="abc">
+    <node-mappings>
+        <!--/input/priref-->
+        <!--/record/europeana:uri-->
+
+        <!--/input/description-->
+        <!--/record/abc:description-->
+    </node-mappings>
+</rec-mapping>
+
+
+

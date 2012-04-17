@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="ese">
+    <node-mappings>
+        <!--/input/OBS_GUID-->
+        <!--/europeana:record/dc:identifier-->
+
+        <!--/input/Afbeelding-->
+        <!--/europeana:record/europeana:isShownBy-->
+
+        <!--/input/Hoogte /input/Breedte-->
+        <!--/europeana:record/dc:format-->
+    </node-mappings>
+</rec-mapping>
+

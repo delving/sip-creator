@@ -32,14 +32,12 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.*;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -138,6 +136,7 @@ public class InputFrame extends FrameBase {
         private static final int MAX_LENGTH = 40;
         private MetadataRecord metadataRecord;
         private GroovyTreeNode parent;
+        private String attrKey, attrValue;
         private GroovyNode node;
         private Vector<GroovyTreeNode> children = new Vector<GroovyTreeNode>();
         private String string;
@@ -148,9 +147,20 @@ public class InputFrame extends FrameBase {
             this.metadataRecord = metadataRecord;
         }
 
+        private GroovyTreeNode(GroovyTreeNode parent, String attrKey, String attrValue) {
+            this.parent = parent;
+            this.attrKey = attrKey;
+            this.attrValue = attrValue;
+            string = String.format("<html><b>%s</b> = %s</html>", attrKey, attrValue);
+            toolTip = string; // todo
+        }
+
         private GroovyTreeNode(GroovyTreeNode parent, GroovyNode node) {
             this.parent = parent;
             this.node = node;
+            for (Map.Entry<String,String> entry : node.attributes().entrySet()) {
+                children.add(new GroovyTreeNode(this, entry.getKey(), entry.getValue()));
+            }
             if (node.value() instanceof List) {
                 string = node.name();
                 toolTip = String.format("Size: %d", ((List) node.value()).size());
@@ -219,7 +229,7 @@ public class InputFrame extends FrameBase {
 
         @Override
         public String toString() {
-            return metadataRecord == null ? string : String.format("record %d", metadataRecord.getRecordNumber());
+            return metadataRecord != null ? String.format("record %d", metadataRecord.getRecordNumber()) : string;
         }
 
         public void expand() {
@@ -250,8 +260,11 @@ public class InputFrame extends FrameBase {
         }
 
         @Override
-        public int compareTo(GroovyTreeNode groovyTreeNode) {
-            return node.name().compareTo(groovyTreeNode.node.name());
+        public int compareTo(GroovyTreeNode gtn) {
+            if (attrKey != null && gtn.attrKey == null) return -1;
+            if (attrKey == null && gtn.attrKey != null) return 1;
+            if (attrKey != null && gtn.attrKey != null) return attrKey.compareTo(gtn.attrKey);
+            return node.name().compareTo(gtn.node.name());
         }
     }
 
@@ -262,10 +275,10 @@ public class InputFrame extends FrameBase {
             Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             if (value instanceof GroovyTreeNode) {
                 GroovyTreeNode node = (GroovyTreeNode) value;
-//                if (node) {
-//                    setIcon(Utility.ATTRIBUTE_ICON);
-//                }
-                if (!node.isLeaf()) {
+                if (node.attrKey != null) {
+                    setIcon(Utility.ATTRIBUTE_ICON);
+                }
+                else if (!node.isLeaf()) {
                     setIcon(Utility.COMPOSITE_ELEMENT_ICON);
                 }
                 else {

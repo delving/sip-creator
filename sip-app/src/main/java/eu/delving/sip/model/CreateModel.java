@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static eu.delving.sip.files.DataSetState.MAPPING;
+
 /**
  * This model holds the source and destination of a node mapping, and is observable.
  *
@@ -60,7 +62,7 @@ public class CreateModel {
                 for (SourceTreeNode node : sourceTreeNodes) {
                     for (NodeMapping nodeMapping : node.getNodeMappings()) {
                         NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
-                        entry.setHighlighted();
+                        if (entry != null) entry.setHighlighted(); // todo: fix
                         RecDefTreeNode recDefTreeNode = sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode);
                         recDefTreeNode.setHighlighted();
                     }
@@ -68,12 +70,6 @@ public class CreateModel {
             }
         }
         for (Listener listener : listeners) listener.sourceTreeNodesSet(this);
-    }
-
-    public void setRecDefTreePath(Path path) {
-        TreePath treePath = sipModel.getMappingModel().getTreePath(path);
-        RecDefTreeNode node = ((RecDefTreeNode) (treePath.getLastPathComponent()));
-        setRecDefTreeNode(node);
     }
 
     public void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
@@ -86,7 +82,7 @@ public class CreateModel {
             if (recDefTreeNode != null) {
                 for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
                     NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping); // todo: threading??
-                    entry.setHighlighted();
+                    if (entry != null) entry.setHighlighted(); // todo: fix
                     for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
                         ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
                     }
@@ -142,7 +138,7 @@ public class CreateModel {
     }
 
     public boolean canCreate() {
-        if (recDefTreeNode != null && sourceTreeNodes != null) {
+        if (recDefTreeNode != null && sourceTreeNodes != null && sipModel.getDataSetState().atLeast(MAPPING)) {
             if (nodeMappingEntry == null) {
                 nextNodeMapping:
                 for (NodeMapping mapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {

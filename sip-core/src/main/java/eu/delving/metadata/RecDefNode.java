@@ -48,6 +48,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private RecDef.Elem elem;
     private RecDef.Attr attr;
     private OptList.Opt optRoot, optKey, optValue;
+    private String defaultPrefix;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private Listener listener;
@@ -66,28 +67,29 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public static RecDefNode create(Listener listener, RecDef recDef) {
-        return new RecDefNode(listener, null, recDef.root, null, null, null, null); // only root element
+        return new RecDefNode(listener, null, recDef.root, null, null, null, null, recDef.prefix); // only root element
     }
 
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, OptList.Opt optRoot, OptList.Opt optKey, OptList.Opt optValue) {
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, OptList.Opt optRoot, OptList.Opt optKey, OptList.Opt optValue, String defaultPrefix) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
         this.attr = attr;
         this.optRoot = optRoot;
+        this.defaultPrefix = defaultPrefix;
         if (optKey != null && optKey.parent.key.equals(getTag())) this.optKey = optKey;
         if (optValue != null && optValue.parent.value.equals(getTag())) this.optValue = optValue;
         if (elem != null) {
             for (RecDef.Attr sub : elem.attrList) {
-                children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot));
+                children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot, defaultPrefix));
             }
             for (RecDef.Elem sub : elem.elemList) {
                 if (sub.optList == null) {
-                    children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot));
+                    children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot, defaultPrefix));
                 }
                 else {
                     for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option
-                        children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null));
+                        children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null, defaultPrefix));
                     }
                 }
             }
@@ -104,22 +106,9 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return optRoot.hidden;
     }
 
-    public boolean hasSearchField() {
-        return elem != null && elem.searchField != null;
-    }
-
-    public String getSearchField() {
-        return elem.searchField.name;
-    }
-
     public String getFieldType() {
         if (elem != null && elem.fieldType != null) return elem.fieldType;
         return "text";
-    }
-
-    public SummaryField getSummaryField() {
-        if (elem != null && elem.summaryField != null) return elem.summaryField;
-        return null;
     }
 
     public boolean isAttr() {
@@ -231,10 +220,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (editPath != null && !path.isFamilyOf(editPath.getPath())) return;
         if (nodeMappings.isEmpty()) {
             if (optRoot != null) { // maybe create a virtual node mapping if all kids agree
-                Path childrenInputPath = getSingleInputPathOfChildren();
-                if (childrenInputPath != null) {
-                    NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPath(childrenInputPath);
+                Set<Path> siblingPaths = getSiblingInputPathsOfChildren();
+                if (siblingPaths != null) {
+                    NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
                     nodeMapping.recDefNode = this;
+                    nodeMapping.codeOut = codeOut.createChild();
                     childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
                     return;
                 }
@@ -385,18 +375,28 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return !elem.elemList.isEmpty();
     }
 
-    public Path getSingleInputPathOfChildren() {
+    public Set<Path> getSiblingInputPathsOfChildren() {
         List<NodeMapping> subMappings = new ArrayList<NodeMapping>();
         for (RecDefNode sub : children) sub.collectNodeMappings(subMappings);
         Set<Path> inputPaths = new TreeSet<Path>();
-        for (NodeMapping subMapping : subMappings) inputPaths.add(subMapping.inputPath);
-        return inputPaths.size() == 1 ? inputPaths.iterator().next() : null;
+        Path parent = null;
+        for (NodeMapping subMapping : subMappings) {
+            if (parent == null) {
+                parent = subMapping.inputPath.parent();
+            }
+            else {
+                if (!subMapping.inputPath.parent().equals(parent)) return null; // different parents
+            }
+            inputPaths.add(subMapping.inputPath);
+        }
+        return inputPaths;
     }
 
     private void startBuilderCall(String comment, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         boolean hasOpt = optRoot != null;
         if (hasActiveAttributes()) {
-            codeOut.line_("%s ( // %s%s", getTag().toBuilderCall(), comment, hasOpt ? "(opt)" : "");
+            Tag tag = getTag();
+            codeOut.line_("%s ( // %s%s", tag.toBuilderCall(), comment, hasOpt ? "(opt)" : "");
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
@@ -437,7 +437,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public String toString() {
-        String name = isAttr() ? attr.tag.toString() : elem.tag.toString();
+        String name = isAttr() ? attr.tag.toString(defaultPrefix) : elem.tag.toString(defaultPrefix);
         if (optRoot != null) name += String.format("[%s]", optRoot.content);
         if (optKey != null || optValue != null) name += "{Constant}";
         return name;

@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.prefs.Preferences;
 
+import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
+
 /**
  * This model is behind the whole sip creator, as a facade for all the models related to a data set
  *
@@ -72,6 +74,11 @@ public class SipModel {
     private NodeTransferHandler nodeTransferHandler = new NodeTransferHandler(this);
     private MappingSaveTimer mappingSaveTimer = new MappingSaveTimer(this);
     private volatile boolean converting, validating, analyzing, importing;
+
+    public DataSetState getDataSetState() {
+        if (!dataSetModel.hasDataSet()) return DataSetState.EMPTY;
+        return dataSetModel.getDataSet().getState();
+    }
 
     public interface AnalysisListener {
         boolean analysisProgress(long elementCount);
@@ -527,7 +534,7 @@ public class SipModel {
                 boolean noDataSet = !hasDataSet();
                 boolean noRecordRoot = !statsModel.hasRecordRoot();
                 DataSetState state = dataSetModel.getDataSet().getState();
-                if (noDataSet || noRecordRoot || state.ordinal() < DataSetState.ANALYZED_SOURCE.ordinal()) {
+                if (noDataSet || noRecordRoot || !state.atLeast(ANALYZED_SOURCE)) {
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                     return;
                 }

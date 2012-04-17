@@ -16,4 +16,14 @@
             <string>&quot;$spec/$hash&quot;.toString()</string>
         </groovy-code>
     </mapping-function>
+    <mapping-function name="toLocalId">
+        <sample-input>
+            <string>1231231</string>
+            <string>232455</string>
+            <string>12345</string>
+        </sample-input>
+        <groovy-code>
+            <string>&quot;${spec}/${it}&quot;</string>
+        </groovy-code>
+    </mapping-function>
 </mapping-function-list>
