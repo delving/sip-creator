@@ -363,7 +363,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         private void markDelimiters(boolean selected, SourceTreeNode node) {
             Utility.setDelimitedColor(this, selected);
             setOpaque(!selected);
-            setBorder(BorderFactory.createEtchedBorder());
+//            setBorder(BorderFactory.createEtchedBorder());
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
         }
 
@@ -379,7 +379,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 setBackground(color);
                 setForeground(Color.BLACK);
             }
-            setBorder(BorderFactory.createEtchedBorder());
+//            setBorder(BorderFactory.createEtchedBorder());
             StringBuilder commaList = new StringBuilder();
             Iterator<NodeMapping> walk = node.nodeMappings.iterator();
             while (walk.hasNext()) {

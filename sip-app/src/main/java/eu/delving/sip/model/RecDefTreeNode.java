@@ -230,7 +230,7 @@ public class RecDefTreeNode extends FilterNode {
                 setBackground(color);
                 setForeground(Color.BLACK);
             }
-            setBorder(BorderFactory.createEtchedBorder());
+//            setBorder(BorderFactory.createEtchedBorder());
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node)));
         }
 
