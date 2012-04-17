@@ -88,7 +88,7 @@ public class TargetFrame extends FrameBase {
     }
 
     private JPanel createNorthPanel() {
-        JPanel p = new JPanel(new GridLayout(0, 1));
+        JPanel p = new JPanel(new BorderLayout());
         p.add(createNorthCenterPanel(), BorderLayout.CENTER);
         p.add(createNorthEastPanel(), BorderLayout.EAST);
         return p;
