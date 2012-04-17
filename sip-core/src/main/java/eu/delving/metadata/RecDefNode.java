@@ -239,7 +239,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 if (siblingPaths != null) {
                     NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
                     nodeMapping.recDefNode = this;
-                    nodeMapping.codeOut = codeOut.createChild();
                     childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
                     return;
                 }
