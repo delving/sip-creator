@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
+import eu.delving.sip.files.DataSetState;
 
 import javax.swing.tree.TreePath;
 import java.util.Iterator;
@@ -67,12 +68,6 @@ public class CreateModel {
             }
         }
         for (Listener listener : listeners) listener.sourceTreeNodesSet(this);
-    }
-
-    public void setRecDefTreePath(Path path) {
-        TreePath treePath = sipModel.getMappingModel().getTreePath(path);
-        RecDefTreeNode node = ((RecDefTreeNode) (treePath.getLastPathComponent()));
-        setRecDefTreeNode(node);
     }
 
     public void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
@@ -141,7 +136,8 @@ public class CreateModel {
     }
 
     public boolean canCreate() {
-        if (recDefTreeNode != null && sourceTreeNodes != null) {
+        boolean mappingState = sipModel.hasDataSet() && sipModel.getDataSetModel().getDataSet().getState().ordinal() >= DataSetState.MAPPING.ordinal();
+        if (recDefTreeNode != null && sourceTreeNodes != null && mappingState) {
             if (nodeMappingEntry == null) {
                 nextNodeMapping:
                 for (NodeMapping mapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
