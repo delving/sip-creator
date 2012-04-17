@@ -110,22 +110,9 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return elem != null ? elem.options : attr.options;
     }
 
-    public boolean hasSearchField() {
-        return elem != null && elem.searchField != null;
-    }
-
-    public String getSearchField() {
-        return elem.searchField.name;
-    }
-
     public String getFieldType() {
         if (elem != null && elem.fieldType != null) return elem.fieldType;
         return "text";
-    }
-
-    public SummaryField getSummaryField() {
-        if (elem != null && elem.summaryField != null) return elem.summaryField;
-        return null;
     }
 
     public boolean isAttr() {

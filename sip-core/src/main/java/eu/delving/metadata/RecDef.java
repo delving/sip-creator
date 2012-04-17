@@ -141,7 +141,6 @@ public class RecDef {
 
     private void resolve() {
         root.resolve(Path.create(), this);
-        if (searchFields != null) for (SearchField searchField : searchFields) searchField.resolve(this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
     }
@@ -239,14 +238,7 @@ public class RecDef {
         public String name;
 
         @XStreamAsAttribute
-        public Path path;
-
-        public void resolve(RecDef recDef) {
-            if (path.peek().isAttribute()) throw new RuntimeException("Attribute here?");
-            path = path.withDefaultPrefix(recDef.prefix);
-            Elem elem = recDef.findElem(path);
-            elem.searchField = this;
-        }
+        public String xpath;
     }
 
     @XStreamAlias("summaryField")
@@ -256,14 +248,7 @@ public class RecDef {
         public String name;
 
         @XStreamAsAttribute
-        public Path path;
-
-        public void resolve(RecDef recDef) {
-            if (path.peek().isAttribute()) throw new RuntimeException("Attribute here?");
-            path = path.withDefaultPrefix(recDef.prefix);
-            Elem elem = recDef.findElem(path);
-//            elem.searchField = this; todo
-        }
+        public String xpath;
     }
 
     @XStreamAlias("doc")
@@ -370,9 +355,6 @@ public class RecDef {
         @XStreamAsAttribute
         public String fieldType;
 
-        @XStreamAsAttribute
-        public SummaryField summaryField;
-
         public List<String> options;
 
         @XStreamImplicit
@@ -389,9 +371,6 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
-
-        @XStreamOmitField
-        public SearchField searchField;
 
         @Override
         public String toString() {
