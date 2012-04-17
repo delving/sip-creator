@@ -239,6 +239,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 if (siblingPaths != null) {
                     NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
                     nodeMapping.recDefNode = this;
+                    nodeMapping.codeOut = codeOut.createChild();
                     childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
                     return;
                 }
@@ -410,12 +411,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
         boolean hasOpt = optRoot != null;
         if (hasActiveAttributes()) {
             Tag tag = getTag();
-            if (tag == null) {
-                throw new RuntimeException();
-            }
-            if (codeOut == null) {
-                throw new RuntimeException();
-            }
             codeOut.line_("%s ( // %s%s", tag.toBuilderCall(), comment, hasOpt ? "(opt)" : "");
             boolean comma = false;
             for (RecDefNode sub : children) {
