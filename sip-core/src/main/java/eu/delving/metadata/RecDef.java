@@ -98,6 +98,8 @@ public class RecDef {
 
     public List<FactRef> facts;
 
+    public List<SummaryFieldEntry> summaryFields;
+
     public List<SearchField> searchFields;
 
     public List<Doc> docs;
@@ -244,6 +246,23 @@ public class RecDef {
             path = path.withDefaultPrefix(recDef.prefix);
             Elem elem = recDef.findElem(path);
             elem.searchField = this;
+        }
+    }
+
+    @XStreamAlias("summaryField")
+    public static class SummaryFieldEntry {
+
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamAsAttribute
+        public Path path;
+
+        public void resolve(RecDef recDef) {
+            if (path.peek().isAttribute()) throw new RuntimeException("Attribute here?");
+            path = path.withDefaultPrefix(recDef.prefix);
+            Elem elem = recDef.findElem(path);
+//            elem.searchField = this; todo
         }
     }
 

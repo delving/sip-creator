@@ -235,10 +235,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (editPath != null && !path.isFamilyOf(editPath.getPath())) return;
         if (nodeMappings.isEmpty()) {
             if (optRoot != null) { // maybe create a virtual node mapping if all kids agree
-                Path childrenInputPath = getSingleInputPathOfChildren();
-                if (childrenInputPath != null) {
-                    NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPath(childrenInputPath);
+                Set<Path> siblingPaths = getSiblingInputPathsOfChildren();
+                if (siblingPaths != null) {
+                    NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
                     nodeMapping.recDefNode = this;
+                    nodeMapping.codeOut = codeOut.createChild();
                     childrenInLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
                     return;
                 }
@@ -389,18 +390,34 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return !elem.elemList.isEmpty();
     }
 
-    public Path getSingleInputPathOfChildren() {
+    public Set<Path> getSiblingInputPathsOfChildren() {
         List<NodeMapping> subMappings = new ArrayList<NodeMapping>();
         for (RecDefNode sub : children) sub.collectNodeMappings(subMappings);
         Set<Path> inputPaths = new TreeSet<Path>();
-        for (NodeMapping subMapping : subMappings) inputPaths.add(subMapping.inputPath);
-        return inputPaths.size() == 1 ? inputPaths.iterator().next() : null;
+        Path parent = null;
+        for (NodeMapping subMapping : subMappings) {
+            if (parent == null) {
+                parent = subMapping.inputPath.parent();
+            }
+            else {
+                if (!subMapping.inputPath.parent().equals(parent)) return null; // different parents
+            }
+            inputPaths.add(subMapping.inputPath);
+        }
+        return inputPaths;
     }
 
     private void startBuilderCall(String comment, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         boolean hasOpt = optRoot != null;
         if (hasActiveAttributes()) {
-            codeOut.line_("%s ( // %s%s", getTag().toBuilderCall(), comment, hasOpt ? "(opt)" : "");
+            Tag tag = getTag();
+            if (tag == null) {
+                throw new RuntimeException();
+            }
+            if (codeOut == null) {
+                throw new RuntimeException();
+            }
+            codeOut.line_("%s ( // %s%s", tag.toBuilderCall(), comment, hasOpt ? "(opt)" : "");
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
