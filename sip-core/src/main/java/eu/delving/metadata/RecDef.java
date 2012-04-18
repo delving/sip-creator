@@ -183,6 +183,9 @@ public class RecDef {
     public static class OptList {
 
         @XStreamAsAttribute
+        public String displayName;
+
+        @XStreamAsAttribute
         public Path path;
 
         @XStreamAsAttribute
@@ -190,6 +193,12 @@ public class RecDef {
 
         @XStreamAsAttribute
         public Tag value;
+
+        @XStreamAsAttribute
+        public String schema;
+
+        @XStreamAsAttribute
+        public String schemaUri;
 
         @XStreamImplicit
         public List<Opt> opts;
@@ -215,6 +224,12 @@ public class RecDef {
 
         @XStreamAsAttribute
         public boolean hidden;
+
+        @XStreamAsAttribute
+        public String schema;
+
+        @XStreamAsAttribute
+        public String schemaUri;
 
         public String content;
         
