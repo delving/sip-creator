@@ -4,11 +4,41 @@
     <!--Copying node mappings to this list will make them appear as candidate mappings when-->
     <!--the prefix corresponds to the target format and the inputPath matches one of the-->
     <!--input paths in the source analysis.-->
+    <functions>
+        <mapping-function name="cleanAdlibImageReference">
+          <sample-input>
+            <string>..\..\..\Images PH\OKS 1989-001 [01].JPG</string>
+            <string>../../../Images PH/OKS 1989-001 [01].JPG</string>
+          </sample-input>
+          <groovy-code>
+            <string>it.replaceAll(&apos;; &apos;, &apos;_&apos;).replaceAll(&apos;JPG&apos;, &apos;jpg&apos;).replaceAll(&quot;.*?[\\\\|//]&quot;, &quot;&quot;).replaceAll(&quot; &quot;, &quot;%20&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)</string>
+          </groovy-code>
+        </mapping-function>
+        <mapping-function name="cleanUrl">
+          <sample-input>
+            <string>OKS 1972-[020]</string>
+          </sample-input>
+          <groovy-code>
+            <string>it.replaceAll(&quot; &quot;, &quot;_&quot;).replaceAll(&quot;-&quot;, &quot;_&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)</string>
+          </groovy-code>
+        </mapping-function>
+    </functions>
 
     <node-mappings>
         <node-mapping inputPath="/facts/language" outputPath="/aff:record/aff:thing/@aff:lang"/>
-        <node-mapping inputPath="/input/list" outputPath="/aff:record/aff:events/aff:event"
-                      optKey="http://www.cidoc-crm.org/rdfs/E8.Acquisition"/>
-        <node-mapping inputPath="/input/list/Inhoud" outputPath="/aff:record/aff:thing/aff:displayDescription"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:uri"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:displayIdentification"/>
+        <node-mapping inputPath="/input/title" outputPath="/aff:record/aff:thing/aff:displayTitle"/>
+        <node-mapping inputPath="/input/description" outputPath="/aff:record/aff:thing/aff:displayDescription" operator="COMMA_DELIM"/>
+        <node-mapping inputPath="/input/inscription.content" outputPath="/aff:record/aff:thing/aff:displayInscription" operator="COMMA_DELIM"/>
+        <node-mapping inputPath="/input/production.date.start" outputPath="/aff:record/aff:thing/aff:displayYear" operator="FIRST"/>
+        <node-mapping inputPath="/facts/rights" outputPath="/aff:record/aff:thing/aff:displayRights"/>
+        <node-mapping inputPath="/input/production.date.start" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E12.Production]/aff:displayDate" operator="FIRST"/>
+        <node-mapping inputPath="/input/production.period" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E12.Production]/aff:displayPeriod" operator="COMMA_DELIM"/>
+        <node-mapping inputPath="/input/production.place" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E12.Production]/aff:eventPlace/aff:displayPlace"/>
+        <node-mapping inputPath="/input/acquisition.date" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E8.Acquisition]/aff:displayDate"/>
+        <node-mapping inputPath="/input/acquisition.method" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E8.Acquisition]/aff:displayMethod"/>
+        <node-mapping inputPath="/input/acquisition.place" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E8.Acquisition]/aff:eventPlace/aff:displayPlace"/>
     </node-mappings>
+
 </rec-mapping>
