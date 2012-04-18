@@ -25,10 +25,8 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Utility;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * An entry in the NodeMappingListModel
@@ -91,9 +89,9 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
 
     @Override
     public int compareTo(NodeMappingEntry nodeMappingEntry) {
-        int compare = nodeMapping.outputPath.getTail().compareTo(nodeMappingEntry.getNodeMapping().outputPath.getTail());
+        int compare = nodeMapping.inputPath.getTail().compareTo(nodeMappingEntry.getNodeMapping().inputPath.getTail());
         if (compare != 0) return compare;
-        return nodeMapping.inputPath.compareTo(nodeMappingEntry.getNodeMapping().inputPath);
+        return nodeMapping.outputPath.compareTo(nodeMappingEntry.getNodeMapping().outputPath);
     }
 
     public static class CellRenderer extends DefaultListCellRenderer {

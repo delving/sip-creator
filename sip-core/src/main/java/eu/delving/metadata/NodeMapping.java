@@ -380,12 +380,8 @@ public class NodeMapping {
             }
             input = out.toString();
         }
-        if (groovyCode == null) {
-            return String.format("<html><p>%s &larr; %s</p>", recDefNode.toString(), input);
-        }
-        else {
-            return String.format("<html><b>%s &larr; %s</b>", recDefNode.toString(), input);
-        }
+        String wrap = groovyCode == null ? "p" : "b";
+        return String.format("<html><%s>%s &rarr; %s</%s>", wrap, input, recDefNode.toString(), wrap);
     }
 
     private NodeMapping getAncestorNodeMapping(Path path) {
