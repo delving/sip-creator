@@ -21,13 +21,11 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDef;
-import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
+import eu.delving.sip.menus.ShowOptionMenu;
 import eu.delving.sip.model.*;
 
 import javax.swing.*;
@@ -50,10 +48,8 @@ public class TargetFrame extends FrameBase {
     private JTree recDefTree;
     private JTextField filterField = new JTextField();
     private JPanel treePanel;
-    private OptListModel optListModel = new OptListModel();
     private JCheckBox hideAttributes = new JCheckBox("Hide Attributes");
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
-    private JComboBox optCombo = new JComboBox(optListModel);
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -75,10 +71,25 @@ public class TargetFrame extends FrameBase {
         });
         createRecDefTree(sipModel);
         timer.setRepeats(false);
-        optCombo.setPrototypeDisplayValue("anelement[withanoptinbrackets]");
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
         treePanel.add(Utility.scrollVH("Record Definition", recDefTree));
+        ShowOptionMenu showOptionMenu = new ShowOptionMenu(new ShowOptionMenu.Listener() {
+            @Override
+            public void optSelected(OptList.Opt opt) {
+                if (opt != null) {
+                    RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
+                    model.setSelectedOpt(opt);
+                    RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
+                    Path optPath = opt.parent.path.parent().child(opt.parent.path.peek().withOpt(opt.key));
+                    root.showPath(recDefTree, optPath);
+                }
+            }
+        });
+        sipModel.getMappingModel().addSetListener(showOptionMenu);
+        JMenuBar bar = new JMenuBar();
+        bar.add(showOptionMenu);
+        setJMenuBar(bar);
         wireUp();
     }
 
@@ -103,15 +114,9 @@ public class TargetFrame extends FrameBase {
     }
 
     private JPanel createNorthCenterPanel() {
-        JPanel fp = new JPanel(new GridLayout(1, 0));
-        fp.setBorder(BorderFactory.createTitledBorder("Filter"));
-        fp.add(filterField);
-        JPanel op = new JPanel(new GridLayout(1, 0));
-        op.setBorder(BorderFactory.createTitledBorder("Option to show"));
-        op.add(optCombo);
         JPanel p = new JPanel(new GridLayout(1, 0));
-        p.add(fp);
-        p.add(op);
+        p.setBorder(BorderFactory.createTitledBorder("Filter"));
+        p.add(filterField);
         return p;
     }
 
@@ -147,18 +152,6 @@ public class TargetFrame extends FrameBase {
                     RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
                     model.setAttributesHidden(hideAttributes.isSelected());
                     showPath((RecDefTreeNode) model.getRoot());
-                }
-            }
-        });
-        optCombo.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                OptListModel.OptChoice choice = (OptListModel.OptChoice) itemEvent.getItem();
-                if (choice != null && choice.getPath() != null) {
-                    RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
-                    model.setSelectedOpt(choice.getOpt());
-                    RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
-                    root.showPath(recDefTree, choice.getPath());
                 }
             }
         });
@@ -247,8 +240,6 @@ public class TargetFrame extends FrameBase {
                 RecDefTreeModel model = new RecDefTreeModel(root);
                 recDefTree.setModel(model);
                 model.setAttributesHidden(hideAttributes.isSelected());
-                RecDef recDef = sipModel.getMappingModel().getRecMapping().getRecDefTree().getRecDef();
-                optListModel.setList(recDef);
             }
             else {
                 recDefTree.setModel(new RecDefTreeModel(FilterNode.createMessageNode("No record definition")));
