@@ -33,7 +33,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -262,7 +262,7 @@ public class MappingCompileModel {
             if (type == RECORD) {
                 compileSoon();
             }
-            else if (selected.getNodeMapping() == nodeMapping) {
+            else if (selected != null && selected.getNodeMapping() == nodeMapping) {
                 setNodeMappingEntry(null);
             }
         }

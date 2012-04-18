@@ -176,12 +176,11 @@ public class SourceConverter {
     }
 
     private void outputRecord(XMLEventWriter out) throws XMLStreamException {
-        out.add(eventFactory.createStartElement("", "", RECORD_TAG, null, null));
-        out.add(eventFactory.createCharacters("\n"));
-        out.add(eventFactory.createStartElement("", "", Storage.UNIQUE_TAG, null, null));
-        out.add(eventFactory.createCharacters(unique));
-        out.add(eventFactory.createEndElement("", "", Storage.UNIQUE_TAG, null));
+        Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, unique);
         unique = null;
+        List<Attribute> attrs = new ArrayList<Attribute>();
+        attrs.add(id);
+        out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
         for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
         out.add(eventFactory.createEndElement("", "", RECORD_TAG));
         out.add(eventFactory.createCharacters("\n"));
