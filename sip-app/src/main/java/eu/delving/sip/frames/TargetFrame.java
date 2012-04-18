@@ -76,6 +76,7 @@ public class TargetFrame extends FrameBase {
         createRecDefTree(sipModel);
         timer.setRepeats(false);
         optCombo.setPrototypeDisplayValue("anelement[withanoptinbrackets]");
+        recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
         treePanel.add(Utility.scrollVH("Record Definition", recDefTree));
         wireUp();
