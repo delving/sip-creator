@@ -237,6 +237,7 @@ public class TargetFrame extends FrameBase {
             if (root != null) {
                 RecDefTreeModel model = new RecDefTreeModel(root);
                 recDefTree.setModel(model);
+                showPath(root);
                 model.setAttributesHidden(hideAttributes.isSelected());
             }
             else {
