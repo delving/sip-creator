@@ -31,10 +31,7 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SourceTreeNode;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
@@ -56,7 +53,7 @@ public class StatisticsFrame extends FrameBase {
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel) {
+            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
                 SortedSet<SourceTreeNode> nodes = createModel.getSourceTreeNodes();
                 if (nodes != null && nodes.size() == 1) {
                     setStatistics(nodes.iterator().next().getStatistics());
@@ -64,11 +61,11 @@ public class StatisticsFrame extends FrameBase {
             }
 
             @Override
-            public void recDefTreeNodeSet(CreateModel createModel) {
+            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
             }
 
             @Override
-            public void nodeMappingSet(CreateModel createModel) {
+            public void nodeMappingSet(CreateModel createModel, boolean internal) {
             }
 
             @Override

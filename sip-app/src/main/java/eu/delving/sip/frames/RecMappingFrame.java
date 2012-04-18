@@ -26,17 +26,13 @@ import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.menus.RevertMappingMenu;
-import eu.delving.sip.model.NodeMappingEntry;
-import eu.delving.sip.model.RecDefTreeNode;
-import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.SourceTreeNode;
+import eu.delving.sip.model.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -54,6 +50,31 @@ public class RecMappingFrame extends FrameBase {
         setJMenuBar(createMenuBar());
         nodeMappingList = sipModel.getMappingModel().getNodeMappingListModel().createJList();
         nodeMappingList.addListSelectionListener(new NodeMappingSelection());
+        sipModel.getCreateModel().addListener(new CreateModel.Listener() {
+            @Override
+            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
+            }
+
+            @Override
+            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
+            }
+
+            @Override
+            public void nodeMappingSet(CreateModel createModel, boolean internal) {
+                if (internal) {
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            nodeMappingList.clearSelection(); // todo: make the selections using the node mapping
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void nodeMappingChanged(CreateModel createModel) {
+            }
+        });
     }
 
     private JMenuBar createMenuBar() {
@@ -80,7 +101,7 @@ public class RecMappingFrame extends FrameBase {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        sipModel.getCreateModel().setNodeMapping(selected);
+                        sipModel.getCreateModel().setNodeMapping(selected.getNodeMapping());
                     }
                 });
             }
@@ -100,9 +121,8 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void run() {
-            NodeMappingEntry nodeMappingEntry = sipModel.getCreateModel().getNodeMappingEntry();
-            if (nodeMappingEntry != null) {
-                NodeMapping nodeMapping = nodeMappingEntry.getNodeMapping();
+            NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
+            if (nodeMapping != null) {
                 TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
                 if (treePath != null) {
                     RecDefTreeNode node = (RecDefTreeNode) treePath.getLastPathComponent();

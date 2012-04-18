@@ -29,10 +29,7 @@ import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
-import eu.delving.sip.model.DataSetModel;
-import eu.delving.sip.model.FilterTreeModel;
-import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.SourceTreeNode;
+import eu.delving.sip.model.*;
 import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
 
 import javax.swing.*;
@@ -130,6 +127,31 @@ public class SourceFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sipModel.getCreateModel().addListener(new CreateModel.Listener() {
+            @Override
+            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
+                if (internal) {
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            sourceTree.clearSelection(); // todo: set the selection based on the source tree nodes
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
+            }
+
+            @Override
+            public void nodeMappingSet(CreateModel createModel, boolean internal) {
+            }
+
+            @Override
+            public void nodeMappingChanged(CreateModel createModel) {
+            }
+        });
         sourceTree.getModel().addTreeModelListener(new TreeModelAdapter() {
             @Override
             public void treeStructureChanged(TreeModelEvent treeModelEvent) {
@@ -161,7 +183,7 @@ public class SourceFrame extends FrameBase {
                     String kind = delimited ? "Source" : "Imported";
                     treePanel.setBorder(BorderFactory.createTitledBorder(
                             String.format("%s Data for \"%s\"", kind, dataSet.getSpec()
-                    )));
+                            )));
                     dataSetStateChanged(dataSet, dataSet.getState());
                 }
                 else {
@@ -216,7 +238,7 @@ public class SourceFrame extends FrameBase {
                         }
                     }
                 }
-                Exec.work(new Runnable() {
+                if (!nodeList.isEmpty()) Exec.work(new Runnable() {
                     @Override
                     public void run() {
                         sipModel.getCreateModel().setSourceTreeNodes(nodeList);

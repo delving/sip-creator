@@ -28,7 +28,10 @@ import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
-import eu.delving.sip.model.*;
+import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.MappingCompileModel;
+import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -201,13 +204,13 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (operatorBoxSetting) return;
-                final NodeMappingEntry nodeMappingEntry = sipModel.getCreateModel().getNodeMappingEntry();
-                if (nodeMappingEntry != null) {
+                final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
+                if (nodeMapping != null) {
                     Exec.work(new Runnable() {
                         @Override
                         public void run() {
-                            nodeMappingEntry.getNodeMapping().operator = (Operator) operatorBox.getSelectedItem();
-                            nodeMappingEntry.getNodeMapping().notifyChanged();
+                            nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
+                            nodeMapping.notifyChanged();
                         }
                     });
                 }
@@ -215,25 +218,24 @@ public class FieldMappingFrame extends FrameBase {
         });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel) {
+            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
             }
 
             @Override
-            public void recDefTreeNodeSet(CreateModel createModel) {
+            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
             }
 
             @Override
-            public void nodeMappingSet(CreateModel createModel) {
-                final NodeMappingEntry nodeMappingEntry = createModel.getNodeMappingEntry();
-                if (nodeMappingEntry != null) {
-                    contextVarModel.setList(nodeMappingEntry.getNodeMapping());
-                    sipModel.getFieldCompileModel().setNodeMappingEntry(nodeMappingEntry);
+            public void nodeMappingSet(CreateModel createModel, boolean internal) {
+                final NodeMapping nodeMapping = createModel.getNodeMapping();
+                if (nodeMapping != null) {
+                    contextVarModel.setList(nodeMapping);
+                    sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
-                            NodeMapping nodeMapping = nodeMappingEntry.getNodeMapping();
-                            Utility.setEditable(codeArea, nodeMapping != null && nodeMapping.isUserCodeEditable());
-                            boolean all = nodeMapping == null || nodeMapping.getOperator() == Operator.ALL;
+                            Utility.setEditable(codeArea, nodeMapping.isUserCodeEditable());
+                            boolean all = nodeMapping.getOperator() == Operator.ALL;
                             operatorBoxSetting = true;
                             operatorBox.setSelectedIndex(all ? 0 : 1);
                             operatorBoxSetting = false;
@@ -348,7 +350,7 @@ public class FieldMappingFrame extends FrameBase {
                     @Override
                     public void run() {
                         sipModel.getCreateModel().revertToOriginal();
-                        sipModel.getFieldCompileModel().setNodeMappingEntry(sipModel.getCreateModel().getNodeMappingEntry());
+                        sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
                     }
                 });
             }

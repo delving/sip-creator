@@ -91,6 +91,8 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
     public int compareTo(NodeMappingEntry nodeMappingEntry) {
         int compare = nodeMapping.inputPath.getTail().compareTo(nodeMappingEntry.getNodeMapping().inputPath.getTail());
         if (compare != 0) return compare;
+        compare = nodeMapping.inputPath.compareTo(nodeMappingEntry.getNodeMapping().inputPath);
+        if (compare != 0) return compare;
         return nodeMapping.outputPath.compareTo(nodeMappingEntry.getNodeMapping().outputPath);
     }
 

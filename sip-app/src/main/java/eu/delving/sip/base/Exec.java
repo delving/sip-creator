@@ -21,7 +21,7 @@
 
 package eu.delving.sip.base;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,16 +36,12 @@ public class Exec {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public static void swing(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Call to Swing thread must be made from a Worker thread");
-        }
+        checkWork();
         SwingUtilities.invokeLater(runnable);
     }
 
     public static void swingLater(Runnable runnable) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Call to Swing thread for later must be made from the Swing thread");
-        }
+        checkSwing();
         SwingUtilities.invokeLater(runnable);
     }
 
@@ -66,9 +62,7 @@ public class Exec {
     }
 
     public static void work(Runnable runnable) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Call to Worker thread must be made from Swing");
-        }
+        checkSwing();
         executor.execute(runnable);
     }
 
@@ -77,8 +71,10 @@ public class Exec {
     }
 
     public static void checkSwing() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Must be Swing thread");
-        }
+        if (!SwingUtilities.isEventDispatchThread()) throw new RuntimeException("Must be Swing thread");
+    }
+
+    public static void checkWork() {
+        if (SwingUtilities.isEventDispatchThread()) throw new RuntimeException("Must be Worker thread");
     }
 }

@@ -43,49 +43,6 @@ import java.util.List;
 public class NodeMappingListModel extends AbstractListModel {
     private List<NodeMappingEntry> entries = new ArrayList<NodeMappingEntry>();
 
-    private void clearList() {
-        if (!entries.isEmpty()) {
-            final int size = getSize();
-            entries.clear();
-            if (size > 0) Exec.swing(new Runnable() {
-                @Override
-                public void run() {
-                    fireIntervalRemoved(this, 0, size - 1);
-                }
-            });
-        }
-    }
-
-    public void setList(List<NodeMapping> freshList) {
-        clearList();
-        if (freshList != null) {
-            for (NodeMapping nodeMapping : freshList) entries.add(new NodeMappingEntry(this, nodeMapping));
-            sortEntries();
-        }
-        final int size = getSize();
-        if (size > 0) Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                fireIntervalAdded(this, 0, size);
-            }
-        });
-    }
-
-    public NodeMappingEntry addEntry(NodeMapping nodeMapping) {
-        NodeMappingEntry entry = new NodeMappingEntry(this, nodeMapping);
-        int spot = Collections.binarySearch(entries, entry);
-        if (spot >= 0) return entries.get(spot);
-        entries.add(entry);
-        final int index = sortEntries();
-        if (index >= 0) Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                fireIntervalAdded(this, index, index);
-            }
-        });
-        return entry;
-    }
-
     public JList createJList() {
         JList list = new JList(this) {
             @Override
@@ -112,24 +69,10 @@ public class NodeMappingListModel extends AbstractListModel {
         return entries.get(i);
     }
 
-    public int indexOf(NodeMapping nodeMapping) {
-        int index = 0;
-        for (NodeMappingEntry entry : entries) {
-            if (entry.getNodeMapping() == nodeMapping) return index;
-            index++;
-        }
-        return -1;
-    }
-
-    public void fireChanged(int index) {
-        fireContentsChanged(this, index, index);
-    }
-
     public NodeMappingEntry getEntry(NodeMapping nodeMapping) {
         int index = indexOf(nodeMapping);
         if (index < 0) {
-            return null; // todo: fix this
-//            throw new RuntimeException("Node mapping not found");
+            throw new RuntimeException("Node mapping not found");
         }
         return entries.get(index);
     }
@@ -160,7 +103,8 @@ public class NodeMappingListModel extends AbstractListModel {
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
                 final int index = indexOf(nodeMapping);
-                if (index >= 0) Exec.swing(new Runnable() {
+                if (index < 0) throw new RuntimeException("Node mapping not found: "+nodeMapping);
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         fireChanged(index);
@@ -169,11 +113,12 @@ public class NodeMappingListModel extends AbstractListModel {
             }
 
             @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                final int index = indexOf(nodeMapping);
-                if (index >= 0) Exec.swing(new Runnable() {
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
+                Exec.swing(new Runnable() {
                     @Override
                     public void run() {
+                        entries.add(new NodeMappingEntry(NodeMappingListModel.this, nodeMapping));
+                        int index = sortEntries();
                         fireIntervalAdded(this, index, index);
                     }
                 });
@@ -181,7 +126,10 @@ public class NodeMappingListModel extends AbstractListModel {
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                setList(mappingModel.getRecMapping().getRecDefTree().getNodeMappings());
+                final int index = indexOf(nodeMapping);
+                if (index < 0) throw new RuntimeException("Node mapping not found: "+nodeMapping);
+                entries.remove(index);
+                fireIntervalRemoved(this, index, index);
             }
         };
     }
@@ -190,9 +138,45 @@ public class NodeMappingListModel extends AbstractListModel {
         return new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                setList(mappingModel.hasRecMapping()? mappingModel.getRecMapping().getNodeMappings() : null);
+                setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getNodeMappings() : null);
             }
         };
     }
 
+    public void setList(List<NodeMapping> freshList) {
+        if (!entries.isEmpty()) {
+            final int size = getSize();
+            entries.clear();
+            if (size > 0) Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    fireIntervalRemoved(this, 0, size - 1);
+                }
+            });
+        }
+        if (freshList != null) {
+            for (NodeMapping nodeMapping : freshList) entries.add(new NodeMappingEntry(this, nodeMapping));
+            sortEntries();
+        }
+        final int size = getSize();
+        if (size > 0) Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                fireIntervalAdded(this, 0, size);
+            }
+        });
+    }
+
+    private int indexOf(NodeMapping nodeMapping) {
+        int index = 0;
+        for (NodeMappingEntry entry : entries) {
+            if (entry.getNodeMapping() == nodeMapping) return index;
+            index++;
+        }
+        return -1;
+    }
+
+    public void fireChanged(int index) {
+        fireContentsChanged(this, index, index);
+    }
 }

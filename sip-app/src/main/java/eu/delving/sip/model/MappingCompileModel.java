@@ -58,7 +58,7 @@ public class MappingCompileModel {
     public final static int RUN_DELAY = 100;
     public final static int COMPILE_DELAY = 500;
     private RecMapping recMapping;
-    private NodeMappingEntry selected;
+    private NodeMapping nodeMapping;
     private MetadataRecord metadataRecord;
     private Document codeDocument = new PlainDocument();
     private Document docDocument = new PlainDocument();
@@ -103,8 +103,8 @@ public class MappingCompileModel {
         this.docDocument.addDocumentListener(new DocChangeDelayedListener() {
             @Override
             public void later() {
-                if (selected == null) return;
-                selected.getNodeMapping().setDocumentation(StringUtil.documentToString(docDocument));
+                if (nodeMapping == null) return;
+                nodeMapping.setDocumentation(StringUtil.documentToString(docDocument));
             }
         });
     }
@@ -114,9 +114,9 @@ public class MappingCompileModel {
         if (enabled) triggerCompile();
     }
 
-    public void setNodeMappingEntry(NodeMappingEntry nodeMappingEntry) {
-        this.selected = nodeMappingEntry;
-        Exec.swing(new DocumentSetter(docDocument, selected != null ? selected.getNodeMapping().getDocumentation() : "", false));
+    public void setNodeMapping(NodeMapping nodeMapping) {
+        this.nodeMapping = nodeMapping;
+        Exec.swing(new DocumentSetter(docDocument, this.nodeMapping != null ? this.nodeMapping.getDocumentation() : "", false));
         Exec.swing(new DocumentSetter(codeDocument, getCode(getEditPath(false)), false));
         notifyStateChange(CompileState.ORIGINAL);
     }
@@ -180,11 +180,11 @@ public class MappingCompileModel {
                     return recMapping.toCode(null);
                 }
             case FIELD:
-                if (selected == null || recMapping == null) {
+                if (nodeMapping == null || recMapping == null) {
                     return "// no code";
                 }
                 else {
-                    return selected.getNodeMapping().getCode(editPath, recMapping);
+                    return nodeMapping.getCode(editPath, recMapping);
                 }
             default:
                 throw new RuntimeException();
@@ -192,21 +192,21 @@ public class MappingCompileModel {
     }
 
     private EditPath getEditPath(final boolean fromCodeDocument) {
-        if (selected == null) return null;
+        if (nodeMapping == null) return null;
         return new EditPath() {
             @Override
             public Path getPath() {
-                return selected.getNodeMapping().outputPath;
+                return nodeMapping.outputPath;
             }
 
             @Override
             public String getEditedCode(Path path) {
-                if (!path.equals(selected.getNodeMapping().outputPath)) return null;
+                if (!path.equals(nodeMapping.outputPath)) return null;
                 if (fromCodeDocument) {
                     return StringUtil.documentToString(codeDocument);
                 }
-                else if (selected.getNodeMapping().groovyCode != null) {
-                    return StringUtil.linesToString(selected.getNodeMapping().groovyCode);
+                else if (nodeMapping.groovyCode != null) {
+                    return StringUtil.linesToString(nodeMapping.groovyCode);
                 }
                 else {
                     return null;
@@ -262,8 +262,8 @@ public class MappingCompileModel {
             if (type == RECORD) {
                 compileSoon();
             }
-            else if (selected != null && selected.getNodeMapping() == nodeMapping) {
-                setNodeMappingEntry(null);
+            else if (MappingCompileModel.this.nodeMapping != null && MappingCompileModel.this.nodeMapping == nodeMapping) {
+                setNodeMapping(null);
             }
         }
 
@@ -321,10 +321,10 @@ public class MappingCompileModel {
         }
 
         private void setMappingCode() {
-            if (selected != null && selected.getNodeMapping().isUserCodeEditable()) {
+            if (nodeMapping != null && nodeMapping.isUserCodeEditable()) {
                 String editedCode = StringUtil.documentToString(codeDocument);
-                selected.getNodeMapping().setGroovyCode(editedCode, recMapping);
-                notifyStateChange(selected.getNodeMapping().groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);
+                nodeMapping.setGroovyCode(editedCode, recMapping);
+                notifyStateChange(nodeMapping.groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);
             }
         }
 
@@ -375,7 +375,7 @@ public class MappingCompileModel {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (compiling) return;
-            if (selected == null && type == Type.FIELD) {
+            if (nodeMapping == null && type == Type.FIELD) {
                 try {
                     outputDocument.remove(0, outputDocument.getLength() - 1);
                     return;

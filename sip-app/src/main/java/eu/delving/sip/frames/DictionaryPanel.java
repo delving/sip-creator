@@ -21,10 +21,10 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
-import eu.delving.sip.model.NodeMappingEntry;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
@@ -145,7 +145,7 @@ public class DictionaryPanel extends JPanel {
     }
 
     private static class DictionaryModel extends AbstractTableModel {
-        private NodeMappingEntry nodeMappingEntry;
+        private NodeMapping nodeMapping;
         private List<String[]> rows = new ArrayList<String[]>();
         private Map<Integer, Integer> index;
         private JLabel statusLabel;
@@ -154,16 +154,16 @@ public class DictionaryPanel extends JPanel {
             this.statusLabel = statusLabel;
         }
 
-        public void setNodeMappingEntry(NodeMappingEntry nodeMappingEntry) {
-            this.nodeMappingEntry = nodeMappingEntry;
+        public void setNodeMapping(NodeMapping nodeMapping) {
+            this.nodeMapping = nodeMapping;
             this.index = null;
             int size = rows.size();
             rows.clear();
             if (size > 0) {
                 fireTableRowsDeleted(0, size);
             }
-            if (nodeMappingEntry != null && nodeMappingEntry.getNodeMapping().dictionary != null) {
-                for (Map.Entry<String, String> entry : nodeMappingEntry.getNodeMapping().dictionary.entrySet()) {
+            if (nodeMapping != null && nodeMapping.dictionary != null) {
+                for (Map.Entry<String, String> entry : nodeMapping.dictionary.entrySet()) {
                     rows.add(new String[]{entry.getKey(), entry.getValue()});
                 }
                 fireTableRowsInserted(0, rows.size());
@@ -249,7 +249,7 @@ public class DictionaryPanel extends JPanel {
                     mappedRow = foundRow;
                 }
             }
-            nodeMappingEntry.getNodeMapping().dictionary.put(rows.get(mappedRow)[0], rows.get(mappedRow)[1] = (String) valueObject);
+            nodeMapping.dictionary.put(rows.get(mappedRow)[0], rows.get(mappedRow)[1] = (String) valueObject);
             fireTableCellUpdated(rowIndex, columnIndex);
         }
     }
@@ -260,17 +260,17 @@ public class DictionaryPanel extends JPanel {
             private boolean wasDictionary;
 
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel) {
+            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
                 reactToChange();
             }
 
             @Override
-            public void recDefTreeNodeSet(final CreateModel createModel) {
+            public void recDefTreeNodeSet(final CreateModel createModel, boolean internal) {
                 reactToChange();
             }
 
             @Override
-            public void nodeMappingSet(final CreateModel createModel) {
+            public void nodeMappingSet(final CreateModel createModel, boolean internal) {
                 reactToChange();
             }
 
@@ -289,13 +289,13 @@ public class DictionaryPanel extends JPanel {
                             DELETE_ACTION.setEnabled(isDictionary);
                             if (isDictionary) {
                                 valueModel.setRecDefTreeNode(createModel.getRecDefTreeNode());
-                                dictionaryModel.setNodeMappingEntry(createModel.getNodeMappingEntry());
+                                dictionaryModel.setNodeMapping(createModel.getNodeMapping());
                                 setSelectionPattern();
                             }
                             else {
                                 statusLabel.setText(NO_DICTIONARY);
                                 valueModel.setRecDefTreeNode(null);
-                                dictionaryModel.setNodeMappingEntry(null);
+                                dictionaryModel.setNodeMapping(null);
                             }
                         }
                     }

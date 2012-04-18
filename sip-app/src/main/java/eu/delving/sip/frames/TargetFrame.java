@@ -119,6 +119,31 @@ public class TargetFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sipModel.getCreateModel().addListener(new CreateModel.Listener() {
+            @Override
+            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
+            }
+
+            @Override
+            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
+                if (internal) {
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            recDefTree.clearSelection(); // todo: set the selection based on the rec def node
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void nodeMappingSet(CreateModel createModel, boolean internal) {
+            }
+
+            @Override
+            public void nodeMappingChanged(CreateModel createModel) {
+            }
+        });
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -172,9 +197,6 @@ public class TargetFrame extends FrameBase {
                 if (autoFoldBox.isSelected()) showPath(node);
                 if (node.getRecDefNode().isUnmappable()) return;
                 sipModel.getCreateModel().setRecDefTreeNode(node);
-            }
-            else {
-                sipModel.getCreateModel().setRecDefTreeNode(null);
             }
         }
     }

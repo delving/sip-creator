@@ -90,7 +90,8 @@ public class NodeTransferHandler extends TransferHandler {
                     JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
                     TreePath treePath = location.getPath();
                     if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
-                        createModel.setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
+                        RecDefTreeNode recDefTreeNode = (RecDefTreeNode) treePath.getLastPathComponent();
+                        createModel.setRecDefTreeNode(recDefTreeNode);
                         if (createModel.canCreate()) createModel.createMapping();
                     }
                 }

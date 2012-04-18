@@ -28,10 +28,7 @@ import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.SortedSet;
 
@@ -61,34 +58,55 @@ public class CreateFrame extends FrameBase {
         recDefHtml.setHtml(SELECT_RECDEF);
         createModel.addListener(new CreateModel.Listener() {
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel) {
-                SortedSet<SourceTreeNode> sourceTreeNodes = createModel.getSourceTreeNodes();
-                if (sourceTreeNodes == null) {
-                    statsHtml.setHtml(SELECT_STATS);
-                }
-                else {
-                    StringBuilder out = new StringBuilder("<html><table>");
-                    for (SourceTreeNode node : sourceTreeNodes) {
-                        out.append("<tr><td>");
-                        out.append(node.toHtmlChunk());
-                        out.append("</td></tr>");
+            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
+                final SortedSet<SourceTreeNode> sourceTreeNodes = createModel.getSourceTreeNodes();
+                final boolean canCreate = createModel.canCreate();
+                final boolean nodeMappingExists = createModel.nodeMappingExists();
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (sourceTreeNodes == null) {
+                            statsHtml.setHtml(SELECT_STATS);
+                        }
+                        else {
+                            StringBuilder out = new StringBuilder("<html><table>");
+                            for (SourceTreeNode node : sourceTreeNodes) {
+                                out.append("<tr><td>");
+                                out.append(node.toHtmlChunk());
+                                out.append("</td></tr>");
+                            }
+                            out.append("</table></html>");
+                            statsHtml.setHtml(out.toString());
+                        }
+                        createMappingAction.refresh(canCreate, nodeMappingExists);
                     }
-                    out.append("</table></html>");
-                    statsHtml.setHtml(out.toString());
-                }
-                createMappingAction.refresh();
+                });
             }
 
             @Override
-            public void recDefTreeNodeSet(CreateModel createModel) {
-                RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
-                recDefHtml.setHtml(recDefTreeNode != null ? recDefTreeNode.toHtml() : SELECT_RECDEF);
-                createMappingAction.refresh();
+            public void recDefTreeNodeSet(CreateModel createModel, final boolean internal) {
+                final RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
+                final boolean canCreate = createModel.canCreate();
+                final boolean nodeMappingExists = createModel.nodeMappingExists();
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        recDefHtml.setHtml(recDefTreeNode != null ? recDefTreeNode.toHtml() : SELECT_RECDEF);
+                        if (!internal) createMappingAction.refresh(canCreate, nodeMappingExists);
+                    }
+                });
             }
 
             @Override
-            public void nodeMappingSet(CreateModel createModel) {
-                createMappingAction.refresh();
+            public void nodeMappingSet(final CreateModel createModel, boolean internal) {
+                final boolean canCreate = createModel.canCreate();
+                final boolean nodeMappingExists = createModel.nodeMappingExists();
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        createMappingAction.refresh(canCreate, nodeMappingExists);
+                    }
+                });
             }
 
             @Override
@@ -140,7 +158,7 @@ public class CreateFrame extends FrameBase {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        createModel.createMapping(nodeMappingEntry.getNodeMapping());
+                        createModel.addMapping(nodeMappingEntry.getNodeMapping());
                     }
                 });
             }
@@ -154,7 +172,7 @@ public class CreateFrame extends FrameBase {
 
         private CreateMappingAction() {
             super(SELECT);
-            setEnabled(!createModel.canCreate());
+            setEnabled(false);
         }
 
         @Override
@@ -167,20 +185,23 @@ public class CreateFrame extends FrameBase {
             });
         }
 
-        public void refresh() {
-            if (createModel.canCreate()) {
+        public void refresh(boolean canCreate, boolean nodeMappingExists) {
+            Exec.checkSwing();
+            SortedSet<SourceTreeNode> sourceTreeNodes = createModel.getSourceTreeNodes();
+            RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
+            if (canCreate && !nodeMappingExists && sourceTreeNodes != null && recDefTreeNode != null) { // overkill
                 setEnabled(true);
                 StringBuilder tooltip = new StringBuilder("<html><table cellpadding=10><tr><td><h3>From:</h3><ul>");
-                for (SourceTreeNode node : createModel.getSourceTreeNodes()) {
+                for (SourceTreeNode node : sourceTreeNodes) {
                     tooltip.append("<li>").append(node.getPath(false).toString()).append("</li>");
                 }
                 tooltip.append("</ul><h3>To:</h3><ul>");
-                tooltip.append("<li>").append(createModel.getRecDefTreeNode().getRecDefPath().getTagPath().toString()).append("</li>");
+                tooltip.append("<li>").append(recDefTreeNode.getRecDefPath().getTagPath().toString()).append("</li>");
                 tooltip.append("</ul></td></tr></table></html>");
                 putValue(Action.NAME, CREATE);
                 putValue(Action.SHORT_DESCRIPTION, tooltip.toString());
             }
-            else if (createModel.getNodeMappingEntry() != null) {
+            else if (nodeMappingExists) {
                 setEnabled(false);
                 putValue(Action.NAME, EXISTS);
                 putValue(Action.SHORT_DESCRIPTION, "<html>The mapping has already been created.");
