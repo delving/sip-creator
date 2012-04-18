@@ -21,21 +21,20 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SourceTreeNode;
 
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTree;
-import javax.swing.TransferHandler;
+import javax.swing.*;
 import javax.swing.tree.TreePath;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Handle the dragging and dropping of nodes
@@ -69,10 +68,6 @@ public class NodeTransferHandler extends TransferHandler {
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
         JTree targetTree = (JTree) info.getComponent();
-//        System.out.println("transferable="+info.getTransferable());
-//        System.out.println("component="+targetTree);
-//        System.out.println("drop="+info.isDrop());
-//        System.out.println("flavorsupported=" + info.isDataFlavorSupported(FLAVOR));
         if (targetTree.getDragEnabled()) {
             info.setShowDropLocation(false);
             return false;
@@ -90,20 +85,19 @@ public class NodeTransferHandler extends TransferHandler {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    sipModel.getCreateModel().setSourceTreeNodes(nodeListHolder.nodeSet);
+                    CreateModel createModel = sipModel.getCreateModel();
+                    createModel.setSourceTreeNodes(nodeListHolder.nodeSet);
                     JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
                     TreePath treePath = location.getPath();
                     if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
-                        sipModel.getCreateModel().setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
+                        createModel.setRecDefTreeNode((RecDefTreeNode) treePath.getLastPathComponent());
+                        if (createModel.canCreate()) createModel.createMapping();
                     }
                 }
             });
             return true;
         }
-        catch (UnsupportedFlavorException e) {
-            throw new RuntimeException(e);
-        }
-        catch (IOException e) {
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -128,11 +122,15 @@ public class NodeTransferHandler extends TransferHandler {
         @Override
         public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
             JTree tree = (JTree) component;
-            return tree.getSelectionPath().getLastPathComponent();
+            return new NodeListHolder(tree.getSelectionPaths());
         }
     }
 
     public static class NodeListHolder {
-        public SortedSet<SourceTreeNode> nodeSet;
+        public SortedSet<SourceTreeNode> nodeSet = new TreeSet<SourceTreeNode>();
+
+        public NodeListHolder(TreePath[] selectionPaths) {
+            for (TreePath path : selectionPaths) nodeSet.add((SourceTreeNode) path.getLastPathComponent());
+        }
     }
 }
