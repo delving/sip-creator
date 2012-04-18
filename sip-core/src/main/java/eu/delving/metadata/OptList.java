@@ -28,13 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-* Part of the record definition and the fact definition
+* Part of the record definition
 *
 * @author Gerald de Jong <gerald@delving.eu>
 */
 
 @XStreamAlias("opt-list")
 public class OptList {
+
+    @XStreamAsAttribute
+    public String displayName;
 
     @XStreamAsAttribute
     public Path path;
@@ -44,6 +47,12 @@ public class OptList {
 
     @XStreamAsAttribute
     public Tag value;
+
+    @XStreamAsAttribute
+    public String schema;
+
+    @XStreamAsAttribute
+    public String schemaUri;
 
     @XStreamImplicit
     public List<Opt> opts;
@@ -74,6 +83,12 @@ public class OptList {
 
         @XStreamAsAttribute
         public boolean hidden;
+
+        @XStreamAsAttribute
+        public String schema;
+
+        @XStreamAsAttribute
+        public String schemaUri;
 
         public String content;
 
