@@ -77,13 +77,11 @@ public class TargetFrame extends FrameBase {
         ShowOptionMenu showOptionMenu = new ShowOptionMenu(new ShowOptionMenu.Listener() {
             @Override
             public void optSelected(OptList.Opt opt) {
-                if (opt != null) {
-                    RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
-                    model.setSelectedOpt(opt);
-                    RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
-                    Path optPath = opt.parent.path.parent().child(opt.parent.path.peek().withOpt(opt.key));
-                    root.showPath(recDefTree, optPath);
-                }
+                RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
+                model.setSelectedOpt(opt);
+                RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
+                Path optPath = opt.parent.path.parent().child(opt.parent.path.peek().withOpt(opt.key));
+                root.showPath(recDefTree, optPath);
             }
         });
         sipModel.getMappingModel().addSetListener(showOptionMenu);
