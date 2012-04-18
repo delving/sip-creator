@@ -22,6 +22,7 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.OptList;
 import eu.delving.metadata.Path;
 
 import javax.swing.tree.TreePath;
@@ -181,8 +182,8 @@ public class CreateModel {
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
         if (sourceTreeNode.getStatistics() == null) return false;
         Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
-        List<String> options = nodeMapping.recDefNode.getOptions();
-        return values != null && options != null && nodeMapping.dictionary == null;
+        OptList optList = nodeMapping.recDefNode.getOptList();
+        return values != null && optList != null && nodeMapping.dictionary == null;
     }
 
     private static boolean refreshDictionary(NodeMappingEntry nodeMappingEntry) {

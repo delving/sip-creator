@@ -21,7 +21,6 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.metadata.FactDefinition;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
@@ -49,8 +48,6 @@ public interface DataSet {
     String getOrganization();
 
     String getLatestPrefix();
-
-    List<FactDefinition> getFactDefinitions() throws StorageException;
 
     List<String> getRecDefPrefixes() throws StorageException;
 

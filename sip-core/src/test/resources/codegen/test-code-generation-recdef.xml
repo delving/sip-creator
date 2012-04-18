@@ -4,10 +4,6 @@
         <namespace prefix="lido" uri="http://www.lido-schema.org" schema=""/>
     </namespaces>
 
-    <roles>
-        <role name="admin" i18n="roles.administrator"/>
-    </roles>
-
     <attrs>
         <attr tag="relatedencoding"/>
         <attr tag="type"/>

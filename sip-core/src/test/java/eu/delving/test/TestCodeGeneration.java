@@ -21,7 +21,6 @@
 
 package eu.delving.test;
 
-import com.thoughtworks.xstream.XStream;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import junit.framework.Assert;
@@ -29,10 +28,9 @@ import org.junit.Test;
 import org.w3c.dom.Node;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Make sure the right code is being generated
@@ -205,27 +203,6 @@ public class TestCodeGeneration {
 
     private static RecDefModel recDefModel() {
         return new RecDefModel() {
-            @Override
-            public List<FactDefinition> getFactDefinitions() {
-                try {
-                    InputStream inputStream = getClass().getResource("/codegen/facts-definition-list.xml").openStream();
-                    XStream stream = new XStream();
-                    stream.processAnnotations(FactDefinition.class);
-                    Reader reader = new InputStreamReader(inputStream, "UTF-8");
-                    FactDefinition.FactList factDefinitions = (FactDefinition.FactList) stream.fromXML(reader);
-                    return factDefinitions.factDefinitions;
-                }
-                catch (Exception e) {
-                    throw new RuntimeException("Unable to load fact definitions", e);
-                }
-            }
-
-            @Override
-            public Set<String> getPrefixes() throws MetadataException {
-                Set<String> prefixes = new TreeSet<String>();
-                prefixes.add("lido");
-                return prefixes;
-            }
 
             @Override
             public RecDefTree createRecDef(String prefix) {

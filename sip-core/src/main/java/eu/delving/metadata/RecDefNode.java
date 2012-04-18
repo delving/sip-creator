@@ -47,7 +47,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private Path path;
     private RecDef.Elem elem;
     private RecDef.Attr attr;
-    private RecDef.Opt optRoot, optKey, optValue;
+    private OptList.Opt optRoot, optKey, optValue;
     private String defaultPrefix;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
@@ -70,7 +70,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return new RecDefNode(listener, null, recDef.root, null, null, null, null, recDef.prefix); // only root element
     }
 
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, RecDef.Opt optRoot, RecDef.Opt optKey, RecDef.Opt optValue, String defaultPrefix) {
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, OptList.Opt optRoot, OptList.Opt optKey, OptList.Opt optValue, String defaultPrefix) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
@@ -87,8 +87,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 if (sub.optList == null) {
                     children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot, defaultPrefix));
                 }
+                else if (sub.optList.value == null) {
+                    children.add(new RecDefNode(listener, this, sub, null, null, null, null, defaultPrefix));
+                }
                 else {
-                    for (RecDef.Opt subOpt : sub.optList.opts) { // a child for each option
+                    for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option
                         children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null, defaultPrefix));
                     }
                 }
@@ -101,13 +104,9 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
     }
 
-    public boolean isHiddenOpt(RecDef.Opt shown) {
+    public boolean isHiddenOpt(OptList.Opt shown) {
         if (optRoot == null || optRoot == shown || elem == null) return false;
         return optRoot.hidden;
-    }
-
-    public List<String> getOptions() {
-        return elem != null ? elem.options : attr.options;
     }
 
     public String getFieldType() {
@@ -159,7 +158,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return isAttr() ? attr.doc : elem.doc;
     }
 
-    public RecDef.OptList getOptList() {
+    public OptList getOptList() {
         return isAttr() ? null : elem.optList;
     }
 

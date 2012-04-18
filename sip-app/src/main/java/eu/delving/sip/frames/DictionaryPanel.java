@@ -34,9 +34,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -372,9 +370,9 @@ public class DictionaryPanel extends JPanel {
             int size = values.size();
             values.clear();
             fireIntervalRemoved(this, 0, size);
-            if (recDefTreeNode != null && recDefTreeNode.getRecDefNode().getOptions() != null) {
+            if (recDefTreeNode != null && recDefTreeNode.getRecDefNode().getOptList() != null) {
                 values.add(0, COPY_VERBATIM);
-                values.addAll(recDefTreeNode.getRecDefNode().getOptions());
+                values.addAll(recDefTreeNode.getRecDefNode().getOptList().getValues());
                 fireIntervalAdded(this, 0, values.size());
             }
         }

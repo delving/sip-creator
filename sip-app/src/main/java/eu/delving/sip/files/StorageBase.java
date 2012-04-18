@@ -190,10 +190,6 @@ public class StorageBase {
         return getRecent(files, which, fileType);
     }
 
-    File factDefinitionFile(File dir) {
-        return new File(dir, Storage.FileType.FACT_DEFINITION.getName());
-    }
-
     File recordDefinitionFile(File dir, String prefix) {
         return new File(dir, String.format(FileType.RECORD_DEFINITION.getPattern(), prefix));
     }

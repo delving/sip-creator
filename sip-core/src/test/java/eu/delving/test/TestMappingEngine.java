@@ -23,7 +23,10 @@ package eu.delving.test;
 
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.XmlSerializer;
-import eu.delving.metadata.*;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefModel;
+import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.IndexDocument;
 import eu.delving.sip.MappingEngine;
 import org.apache.commons.io.IOUtils;
@@ -39,10 +42,10 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A unit test of the mapping engine
@@ -134,23 +137,6 @@ public class TestMappingEngine {
 
         private MockRecDefModel(String prefix) {
             this.prefix = prefix;
-        }
-
-        @Override
-        public List<FactDefinition> getFactDefinitions() {
-            try {
-                return FactDefinition.read(file(String.format("/%s/fact-definition-list.xml", prefix)));
-            }
-            catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public Set<String> getPrefixes() throws MetadataException {
-            Set<String> prefixes = new TreeSet<String>();
-            prefixes.add("icn");
-            return prefixes;
         }
 
         @Override
