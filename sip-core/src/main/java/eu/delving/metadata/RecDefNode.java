@@ -87,6 +87,9 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 if (sub.optList == null) {
                     children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot, defaultPrefix));
                 }
+                else if (sub.optList.value == null) {
+                    children.add(new RecDefNode(listener, this, sub, null, null, null, null, defaultPrefix));
+                }
                 else {
                     for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option
                         children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null, defaultPrefix));

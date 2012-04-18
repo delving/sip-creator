@@ -62,8 +62,8 @@ public class OptList {
         if (path == null) throw new RuntimeException("No path for OptList: " + opts);
         if (path.peek().isAttribute()) throw new RuntimeException("An option list may not be connected to an attribute: " + path);
         path = path.withDefaultPrefix(recDef.prefix);
-        key = key.defaultPrefix(recDef.prefix);
-        value = value.defaultPrefix(recDef.prefix);
+        if (key != null) key = key.defaultPrefix(recDef.prefix);
+        if (value != null) value = value.defaultPrefix(recDef.prefix);
         RecDef.Elem elem = recDef.findElem(path);
         elem.optList = this;
     }
