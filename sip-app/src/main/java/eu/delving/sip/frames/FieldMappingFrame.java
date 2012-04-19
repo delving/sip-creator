@@ -217,7 +217,7 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void transition(CreateModel createModel, CreateTransition transition) {
                 if (!transition.nodeMappingChanged) return;
-                if (createModel.nodeMappingExists()) {
+                if (createModel.hasNodeMapping()) {
                     final NodeMapping nodeMapping = createModel.getNodeMapping();
                     contextVarModel.setList(nodeMapping);
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
@@ -347,7 +347,7 @@ public class FieldMappingFrame extends FrameBase {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        sipModel.getCreateModel().revertToOriginal();
+                        if (sipModel.getCreateModel().hasNodeMapping()) sipModel.getCreateModel().getNodeMapping().revertToGenerated();
                         sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
                     }
                 });

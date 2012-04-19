@@ -22,14 +22,12 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.OptList;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
 
 import javax.swing.tree.TreePath;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -128,39 +126,12 @@ public class CreateModel {
         return recDefTreeNode;
     }
 
-    public boolean nodeMappingExists() {
+    public boolean hasNodeMapping() {
         return nodeMapping != null;
     }
 
     public NodeMapping getNodeMapping() {
         return nodeMapping;
-    }
-
-    public void revertToOriginal() {
-        Exec.checkWork();
-        if (nodeMapping != null) nodeMapping.setGroovyCode(null, null);
-    }
-
-    public boolean isDictionaryPossible() {
-        return isDictionaryPossible(nodeMapping);
-    }
-
-    public boolean isDictionaryPresent() {
-        return nodeMapping != null && nodeMapping.dictionary != null;
-    }
-
-    public void refreshDictionary() {
-        refreshDictionary(nodeMapping);
-    }
-
-    public int countNonemptyDictionaryEntries() {
-        int nonemptyEntries = 0;
-        if (isDictionaryPresent()) {
-            for (String value : nodeMapping.dictionary.values()) {
-                if (!value.trim().isEmpty()) nonemptyEntries++;
-            }
-        }
-        return nonemptyEntries;
     }
 
     private void setSourceInternal(SortedSet<SourceTreeNode> sourceTreeNodes) {
@@ -190,22 +161,6 @@ public class CreateModel {
             return nodeMapping;
         }
         return null;
-    }
-
-    private static boolean isDictionaryPossible(NodeMapping nodeMapping) {
-        if (nodeMapping == null || nodeMapping.recDefNode == null || !nodeMapping.hasOneStatsTreeNode()) return false;
-        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
-        if (sourceTreeNode.getStatistics() == null) return false;
-        Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
-        OptList optList = nodeMapping.recDefNode.getOptList();
-        return values != null && optList != null && nodeMapping.dictionary == null;
-    }
-
-    private static boolean refreshDictionary(NodeMapping nodeMapping) {
-        if (!isDictionaryPossible(nodeMapping)) throw new RuntimeException("Should have checked");
-        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
-        if (sourceTreeNode.getStatistics() == null) return false;
-        return nodeMapping.setDictionaryDomain(sourceTreeNode.getStatistics().getHistogramValues());
     }
 
     private void adjustHighlights() {

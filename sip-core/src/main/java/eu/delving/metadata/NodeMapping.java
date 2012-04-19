@@ -185,34 +185,6 @@ public class NodeMapping {
         return this;
     }
 
-    public boolean setDictionaryDomain(Collection<String> domainValues) {
-        boolean changed = false;
-        if (dictionary == null) {
-            dictionary = new TreeMap<String, String>();
-            changed = true;
-        }
-        for (String key : domainValues)
-            if (!dictionary.containsKey(key)) {
-                dictionary.put(key, "");
-                changed = true;
-            }
-        Set<String> unused = new HashSet<String>(dictionary.keySet());
-        unused.removeAll(domainValues);
-        for (String unusedKey : unused) {
-            dictionary.remove(unusedKey);
-            changed = true;
-        }
-        groovyCode = null;
-        if (changed) recDefNode.notifyNodeMappingChange(this);
-        return changed;
-    }
-
-    public void removeDictionary() {
-        dictionary = null;
-        groovyCode = null;
-        notifyChanged();
-    }
-
     public boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
         if (codeString == null) return false;
         List<String> list = Arrays.asList(getCode(getGeneratorEditPath(), recMapping).split("\n"));
@@ -227,6 +199,10 @@ public class NodeMapping {
     public String getCode(EditPath editPath, RecMapping recMapping) {
         recMapping.toCode(editPath);
         return codeOut.toString();
+    }
+
+    public void revertToGenerated() {
+        setGroovyCode(null, null);
     }
 
     public void setGroovyCode(String codeString, RecMapping recMapping) {

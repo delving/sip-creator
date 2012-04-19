@@ -263,7 +263,7 @@ public class DictionaryPanel extends JPanel {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
-                        boolean isDictionary = createModel.isDictionaryPresent();
+                        boolean isDictionary = createModel.hasNodeMapping() && createModel.getNodeMapping().dictionary != null;
                         DELETE_ACTION.setEnabled(isDictionary);
                         if (isDictionary) {
                             valueModel.setRecDefTreeNode(createModel.getRecDefTreeNode());
@@ -318,7 +318,7 @@ public class DictionaryPanel extends JPanel {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        if (createModel.nodeMappingExists()) createModel.getNodeMapping().notifyChanged();
+                        if (createModel.hasNodeMapping()) createModel.getNodeMapping().notifyChanged();
                     }
                 });
                 timer.restart();
@@ -372,7 +372,7 @@ public class DictionaryPanel extends JPanel {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    if (createModel.isDictionaryPossible()) createModel.refreshDictionary();
+                    if (Utility.isDictionaryPossible(createModel.getNodeMapping())) Utility.refreshDictionary(createModel.getNodeMapping());
                 }
             });
         }
@@ -381,7 +381,7 @@ public class DictionaryPanel extends JPanel {
     private final Action DELETE_ACTION = new AbstractAction("Delete") {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            int nonempty = createModel.countNonemptyDictionaryEntries();
+            int nonempty = Utility.countNonemptyDictionaryEntries(createModel.getNodeMapping());
             if (nonempty > 0) {
                 int response = JOptionPane.showConfirmDialog(
                         SwingUtilities.getWindowAncestor(DictionaryPanel.this),
@@ -394,7 +394,7 @@ public class DictionaryPanel extends JPanel {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    if (createModel.nodeMappingExists()) createModel.getNodeMapping().removeDictionary();
+                    Utility.removeDictionary(createModel.getNodeMapping());
                 }
             });
         }

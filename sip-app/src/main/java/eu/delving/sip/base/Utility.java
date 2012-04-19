@@ -21,6 +21,9 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.OptList;
+import eu.delving.sip.model.SourceTreeNode;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
@@ -31,10 +34,13 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
-import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Help with SpringLayout forms
@@ -206,5 +212,59 @@ public class Utility {
         return p;
     }
 
+    public static boolean isDictionaryPossible(NodeMapping nodeMapping) {
+        if (nodeMapping == null || nodeMapping.recDefNode == null || !nodeMapping.hasOneStatsTreeNode()) return false;
+        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
+        if (sourceTreeNode.getStatistics() == null) return false;
+        Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
+        OptList optList = nodeMapping.recDefNode.getOptList();
+        return values != null && optList != null && nodeMapping.dictionary == null;
+    }
 
+    public static boolean refreshDictionary(NodeMapping nodeMapping) {
+        if (!isDictionaryPossible(nodeMapping)) throw new RuntimeException("Should have checked");
+        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
+        if (sourceTreeNode.getStatistics() == null) return false;
+        return setDictionaryDomain(nodeMapping, sourceTreeNode.getStatistics().getHistogramValues());
+    }
+
+    public static int countNonemptyDictionaryEntries(NodeMapping nodeMapping) {
+        int nonemptyEntries = 0;
+        if (nodeMapping != null && nodeMapping.dictionary != null) {
+            for (String value : nodeMapping.dictionary.values()) {
+                if (!value.trim().isEmpty()) nonemptyEntries++;
+            }
+        }
+        return nonemptyEntries;
+    }
+
+    public static boolean setDictionaryDomain(NodeMapping nodeMapping, Collection<String> domainValues) {
+        if (nodeMapping == null) return false;
+        boolean changed = false;
+        if (nodeMapping.dictionary == null) {
+            nodeMapping.dictionary = new TreeMap<String, String>();
+            changed = true;
+        }
+        for (String key : domainValues)
+            if (!nodeMapping.dictionary.containsKey(key)) {
+                nodeMapping.dictionary.put(key, "");
+                changed = true;
+            }
+        Set<String> unused = new HashSet<String>(nodeMapping.dictionary.keySet());
+        unused.removeAll(domainValues);
+        for (String unusedKey : unused) {
+            nodeMapping.dictionary.remove(unusedKey);
+            changed = true;
+        }
+        nodeMapping.groovyCode = null;
+        if (changed) nodeMapping.notifyChanged();
+        return changed;
+    }
+
+    public static void removeDictionary(NodeMapping nodeMapping) {
+        if (nodeMapping == null) return;
+        nodeMapping.dictionary = null;
+        nodeMapping.groovyCode = null;
+        nodeMapping.notifyChanged();
+    }
 }
