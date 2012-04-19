@@ -117,7 +117,7 @@ public class CreateModel {
     }
 
     public boolean canCreate() {
-        return state == SOURCE_AND_TARGET && !sipModel.getDataSetState().atLeast(MAPPING);
+        return state == SOURCE_AND_TARGET && sipModel.getDataSetState().atLeast(MAPPING);
     }
 
     public SortedSet<SourceTreeNode> getSourceTreeNodes() {
