@@ -28,6 +28,8 @@ import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.SortedSet;
@@ -44,6 +46,7 @@ public class CreateFrame extends FrameBase {
     private CreateModel createModel;
     private HtmlPanel statsHtml = new HtmlPanel("Source Statistics");
     private HtmlPanel recDefHtml = new HtmlPanel("Target Documentation");
+    private JTextArea hintDocArea = new JTextArea();
     private JList mappingHintsList;
     private CreateMappingAction createMappingAction;
     private CopyMappingAction copyMappingAction;
@@ -56,6 +59,59 @@ public class CreateFrame extends FrameBase {
         copyMappingAction = new CopyMappingAction();
         statsHtml.setHtml(SELECT_STATS);
         recDefHtml.setHtml(SELECT_RECDEF);
+        wireUp();
+    }
+
+    public CreateMappingAction getCreateMappingAction() {
+        return createMappingAction;
+    }
+
+    @Override
+    protected void buildContent(Container content) {
+        final JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Select", createSelectPanel());
+        tabs.addTab("Hints", createHintsPanel());
+        content.add(tabs);
+    }
+
+    private JComponent createHintsPanel() {
+        JPanel p = new JPanel(new BorderLayout(8, 8));
+        p.add(createHintsCenter(), BorderLayout.CENTER);
+        p.add(new JButton(copyMappingAction), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JComponent createHintsCenter() {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(Utility.scrollV("Mapping Hints", mappingHintsList));
+        p.add(Utility.scrollV("Hint Documentation", hintDocArea));
+        return p;
+    }
+
+    private JComponent createSelectPanel() {
+        JPanel grid = new JPanel(new GridLayout(0, 1, 5, 5));
+        grid.add(statsHtml);
+        grid.add(recDefHtml);
+        JPanel p = new JPanel(new BorderLayout(8, 8));
+        p.add(grid, BorderLayout.CENTER);
+        p.add(new JButton(createMappingAction), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private void wireUp() {
+        mappingHintsList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                if (listSelectionEvent.getValueIsAdjusting()) return;
+                NodeMappingEntry selectedHint = (NodeMappingEntry) mappingHintsList.getSelectedValue();
+                if (selectedHint != null) {
+                    hintDocArea.setText(selectedHint.getNodeMapping().getDocumentation());
+                }
+                else {
+                    hintDocArea.setText("Select a hint above.");
+                }
+            }
+        });
         createModel.addListener(new CreateModel.Listener() {
             @Override
             public void transition(CreateModel createModel, final CreateTransition transition) {
@@ -121,35 +177,6 @@ public class CreateFrame extends FrameBase {
                 });
             }
         });
-    }
-
-    public CreateMappingAction getCreateMappingAction() {
-        return createMappingAction;
-    }
-
-    @Override
-    protected void buildContent(Container content) {
-        final JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Select", createSelectPanel());
-        tabs.addTab("Hints", createHintsPanel());
-        content.add(tabs);
-    }
-
-    private JComponent createHintsPanel() {
-        JPanel p = new JPanel(new BorderLayout(8, 8));
-        p.add(Utility.scrollV("Mapping Hints", mappingHintsList), BorderLayout.CENTER);
-        p.add(new JButton(copyMappingAction), BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JComponent createSelectPanel() {
-        JPanel grid = new JPanel(new GridLayout(0, 1, 5, 5));
-        grid.add(statsHtml);
-        grid.add(recDefHtml);
-        JPanel p = new JPanel(new BorderLayout(8, 8));
-        p.add(grid, BorderLayout.CENTER);
-        p.add(new JButton(createMappingAction), BorderLayout.SOUTH);
-        return p;
     }
 
     private class CopyMappingAction extends AbstractAction {
