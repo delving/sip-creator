@@ -28,8 +28,11 @@ package eu.delving.sip.model;
  */
 
 public enum CreateState {
-    NOTHING(false, false, false), SOURCE_ONLY(true, false, false), TARGET_ONLY(false, true, false),
-    SOURCE_AND_TARGET(true, true, false), COMPLETE(true, true, true);
+    NOTHING(false, false, false),
+    SOURCE_ONLY(true, false, false),
+    TARGET_ONLY(false, true, false),
+    SOURCE_AND_TARGET(true, true, false),
+    COMPLETE(true, true, true);
 
     public final boolean source, target, node;
 
