@@ -290,6 +290,7 @@ public class SipModel {
                     dataSetModel.setDataSet(dataSet);
                     final RecMapping recMapping = dataSetModel.getRecMapping(prefix);
                     dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
+                    mappingHintsModel.initialize(requestedPrefix,  dataSetModel);
                     mappingModel.setRecMapping(recMapping);
                     mappingModel.setFacts(facts);
                     recordCompileModel.setValidator(dataSetModel.newValidator(prefix));
@@ -303,7 +304,7 @@ public class SipModel {
                             Exec.work(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mappingHintsModel.initialize(requestedPrefix, dataSetModel, statsModel.getSourceTree());
+                                    mappingHintsModel.setSourceTree(statsModel.getSourceTree());
                                     for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
                                         statsModel.findNodesForInputPaths(nodeMapping);
                                     }

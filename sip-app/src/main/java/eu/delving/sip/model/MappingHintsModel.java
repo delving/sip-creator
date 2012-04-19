@@ -25,10 +25,7 @@ import eu.delving.metadata.*;
 import eu.delving.sip.files.Storage;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This model is a list of mappings that could be applied
@@ -50,10 +47,17 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
         return nodeMappingListModel;
     }
 
-    public void initialize(String metadataPrefix, RecDefModel recDefModel, SourceTreeNode sourceTree) {
-        this.sourceTree = sourceTree;
+    public void initialize(String metadataPrefix, RecDefModel recDefModel) {
         fetchMappingHints(metadataPrefix, recDefModel);
+    }
+
+    public void setSourceTree(SourceTreeNode sourceTree) {
+        this.sourceTree = sourceTree;
         if (sourceTree != null) fillNodeMappings();
+    }
+
+    public SortedSet<MappingFunction> getFunctions() {
+        return mappingHints != null ? mappingHints.getFunctions() : null;
     }
 
     private void fetchMappingHints(String metadataPrefix, RecDefModel recDefModel) {

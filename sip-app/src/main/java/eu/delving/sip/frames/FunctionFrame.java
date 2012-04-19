@@ -48,6 +48,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.regex.Pattern;
 
 /**
@@ -92,12 +93,6 @@ public class FunctionFrame extends FrameBase {
         libraryList.setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
         functionList.setFont(MONOSPACED);
         wireUp();
-        try {
-            fetchFunctionList();
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         getAction().putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -166,12 +161,6 @@ public class FunctionFrame extends FrameBase {
         return p;
     }
 
-    private void fetchFunctionList() throws IOException {
-        URL functionFile = getClass().getResource("/mapping-functions.xml");
-        MappingFunction.FunctionList functionList = MappingFunction.read(functionFile.openStream());
-        libraryListModel.setList(functionList.functions);
-    }
-
     private JPanel createFunctionPanels() {
         JPanel p = new JPanel(new GridLayout(0, 1));
         p.add(createFunctionsPanel());
@@ -224,6 +213,7 @@ public class FunctionFrame extends FrameBase {
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(final MappingModel mappingModel) {
+                fetchFunctionList();
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
@@ -272,6 +262,24 @@ public class FunctionFrame extends FrameBase {
             }
         });
         sipModel.getFunctionCompileModel().addListener(modelStateListener);
+    }
+
+    private void fetchFunctionList() {
+        try {
+            URL functionFile = getClass().getResource("/templates/global-mapping-functions.xml");
+            final MappingFunction.FunctionList functionList = MappingFunction.read(functionFile.openStream());
+            SortedSet<MappingFunction> hintFunctions = sipModel.getMappingHintsModel().getFunctions();
+            if (hintFunctions != null) functionList.functions.addAll(hintFunctions);
+            Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    libraryListModel.setList(functionList.functions);
+                }
+            });
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void handleEnablement() {
