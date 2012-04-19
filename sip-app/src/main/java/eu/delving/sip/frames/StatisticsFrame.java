@@ -27,6 +27,7 @@ import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.CreateTransition;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SourceTreeNode;
 
@@ -53,23 +54,10 @@ public class StatisticsFrame extends FrameBase {
         summaryLabel.setFont(new Font(summaryLabel.getFont().getFamily(), Font.BOLD, summaryLabel.getFont().getSize()));
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
+            public void transition(CreateModel createModel, CreateTransition transition) {
+                if (!transition.sourceChanged) return;
                 SortedSet<SourceTreeNode> nodes = createModel.getSourceTreeNodes();
-                if (nodes != null && nodes.size() == 1) {
-                    setStatistics(nodes.iterator().next().getStatistics());
-                }
-            }
-
-            @Override
-            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void nodeMappingSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void nodeMappingChanged(CreateModel createModel) {
+                if (nodes != null && nodes.size() == 1) setStatistics(nodes.iterator().next().getStatistics());
             }
         });
     }

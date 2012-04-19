@@ -129,27 +129,18 @@ public class SourceFrame extends FrameBase {
     private void wireUp() {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
-                if (internal) {
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            sourceTree.clearSelection(); // todo: set the selection based on the source tree nodes
-                        }
-                    });
+            public void transition(CreateModel createModel, CreateTransition transition) {
+                switch (transition) {
+                    case COMPLETE_TO_COMPLETE:
+                    case NOTHING_TO_COMPLETE:
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                sourceTree.clearSelection();
+                            }
+                        });
+                        break;
                 }
-            }
-
-            @Override
-            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void nodeMappingSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void nodeMappingChanged(CreateModel createModel) {
             }
         });
         sourceTree.getModel().addTreeModelListener(new TreeModelAdapter() {
@@ -241,7 +232,7 @@ public class SourceFrame extends FrameBase {
                 if (!nodeList.isEmpty()) Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        sipModel.getCreateModel().setSourceTreeNodes(nodeList);
+                        sipModel.getCreateModel().setSource(nodeList);
                     }
                 });
             }

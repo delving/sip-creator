@@ -86,12 +86,12 @@ public class NodeTransferHandler extends TransferHandler {
                 @Override
                 public void run() {
                     CreateModel createModel = sipModel.getCreateModel();
-                    createModel.setSourceTreeNodes(nodeListHolder.nodeSet);
+                    createModel.setSource(nodeListHolder.nodeSet);
                     JTree.DropLocation location = (JTree.DropLocation) info.getDropLocation();
                     TreePath treePath = location.getPath();
                     if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
                         RecDefTreeNode recDefTreeNode = (RecDefTreeNode) treePath.getLastPathComponent();
-                        createModel.setRecDefTreeNode(recDefTreeNode);
+                        createModel.setTarget(recDefTreeNode);
                         if (createModel.canCreate()) createModel.createMapping();
                     }
                 }

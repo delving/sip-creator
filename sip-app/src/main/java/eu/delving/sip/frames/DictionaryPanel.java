@@ -25,6 +25,7 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.CreateTransition;
 import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 
@@ -93,7 +94,7 @@ public class DictionaryPanel extends JPanel {
             }
         });
         p.add(createNorth(), BorderLayout.NORTH);
-        p.add(Utility.scrollV("Dictionary Entries",table), BorderLayout.CENTER);
+        p.add(Utility.scrollV("Dictionary Entries", table), BorderLayout.CENTER);
         return p;
     }
 
@@ -256,47 +257,23 @@ public class DictionaryPanel extends JPanel {
 
     private void wireUp() {
         createModel.addListener(new CreateModel.Listener() {
-
-            private boolean wasDictionary;
-
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
-                reactToChange();
-            }
-
-            @Override
-            public void recDefTreeNodeSet(final CreateModel createModel, boolean internal) {
-                reactToChange();
-            }
-
-            @Override
-            public void nodeMappingSet(final CreateModel createModel, boolean internal) {
-                reactToChange();
-            }
-
-            @Override
-            public void nodeMappingChanged(final CreateModel createModel) {
-                reactToChange();
-            }
-
-            void reactToChange() {
+            public void transition(final CreateModel createModel, CreateTransition transition) {
+                if (!transition.nodeMappingChanged) return;
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
                         boolean isDictionary = createModel.isDictionaryPresent();
-                        if (wasDictionary != isDictionary) {
-                            wasDictionary = isDictionary;
-                            DELETE_ACTION.setEnabled(isDictionary);
-                            if (isDictionary) {
-                                valueModel.setRecDefTreeNode(createModel.getRecDefTreeNode());
-                                dictionaryModel.setNodeMapping(createModel.getNodeMapping());
-                                setSelectionPattern();
-                            }
-                            else {
-                                statusLabel.setText(NO_DICTIONARY);
-                                valueModel.setRecDefTreeNode(null);
-                                dictionaryModel.setNodeMapping(null);
-                            }
+                        DELETE_ACTION.setEnabled(isDictionary);
+                        if (isDictionary) {
+                            valueModel.setRecDefTreeNode(createModel.getRecDefTreeNode());
+                            dictionaryModel.setNodeMapping(createModel.getNodeMapping());
+                            setSelectionPattern();
+                        }
+                        else {
+                            statusLabel.setText(NO_DICTIONARY);
+                            valueModel.setRecDefTreeNode(null);
+                            dictionaryModel.setNodeMapping(null);
                         }
                     }
                 });
@@ -341,7 +318,7 @@ public class DictionaryPanel extends JPanel {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        createModel.fireDictionaryEntriesChanged();
+                        if (createModel.nodeMappingExists()) createModel.getNodeMapping().notifyChanged();
                     }
                 });
                 timer.restart();
@@ -417,7 +394,7 @@ public class DictionaryPanel extends JPanel {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    createModel.removeDictionary();
+                    if (createModel.nodeMappingExists()) createModel.getNodeMapping().removeDictionary();
                 }
             });
         }

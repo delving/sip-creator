@@ -203,14 +203,14 @@ public class NodeMapping {
             changed = true;
         }
         groovyCode = null;
+        if (changed) recDefNode.notifyNodeMappingChange(this);
         return changed;
     }
 
-    public boolean removeDictionary() {
-        if (dictionary == null) return false;
+    public void removeDictionary() {
         dictionary = null;
         groovyCode = null;
-        return true;
+        notifyChanged();
     }
 
     public boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
@@ -229,12 +229,12 @@ public class NodeMapping {
         if (codeString == null || generatedCodeLooksLike(codeString, recMapping)) {
             if (groovyCode != null) {
                 groovyCode = null;
-                recDefNode.notifyNodeMappingChange(this);
+                notifyChanged();
             }
         }
         else if (groovyCode == null || !isSimilar(codeString, groovyCode.iterator())) {
             groovyCode = stringToLines(codeString);
-            recDefNode.notifyNodeMappingChange(this);
+            notifyChanged();
         }
     }
 

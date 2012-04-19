@@ -31,10 +31,7 @@ import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.Action;
-import javax.swing.JDesktopPane;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -114,7 +111,13 @@ public class MappingCodeFrame extends FrameBase {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping != null) {
                 String code = recMapping.toCode(null);
-                codeArea.setText(code);
+                StringBuilder numbered = new StringBuilder();
+                int index = 0;
+                for (String line : code.split("\n")) {
+                    numbered.append(String.format("%3d: ", ++index));
+                    numbered.append(line).append('\n');
+                }
+                codeArea.setText(numbered.toString());
             }
             else {
                 codeArea.setText("// No code");

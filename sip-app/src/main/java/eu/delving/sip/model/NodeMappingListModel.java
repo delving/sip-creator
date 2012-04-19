@@ -167,7 +167,7 @@ public class NodeMappingListModel extends AbstractListModel {
         });
     }
 
-    private int indexOf(NodeMapping nodeMapping) {
+    public int indexOf(NodeMapping nodeMapping) {
         int index = 0;
         for (NodeMappingEntry entry : entries) {
             if (entry.getNodeMapping() == nodeMapping) return index;

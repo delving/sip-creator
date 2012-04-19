@@ -121,27 +121,18 @@ public class TargetFrame extends FrameBase {
     private void wireUp() {
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
-                if (internal) {
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            recDefTree.clearSelection(); // todo: set the selection based on the rec def node
-                        }
-                    });
+            public void transition(CreateModel createModel, CreateTransition transition) {
+                switch (transition) {
+                    case COMPLETE_TO_COMPLETE:
+                    case NOTHING_TO_COMPLETE:
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                recDefTree.clearSelection();
+                            }
+                        });
+                        break;
                 }
-            }
-
-            @Override
-            public void nodeMappingSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void nodeMappingChanged(CreateModel createModel) {
             }
         });
         filterField.getDocument().addDocumentListener(new DocumentListener() {
@@ -186,17 +177,18 @@ public class TargetFrame extends FrameBase {
 
         @Override
         public void valueChanged(TreeSelectionEvent event) {
-            nodeObject = event.getPath().getLastPathComponent();
+            TreePath path = recDefTree.getSelectionPath();
+            nodeObject = path != null ? path.getLastPathComponent() : null;
             Exec.work(this);
         }
 
         @Override
         public void run() {
-            if (nodeObject instanceof RecDefTreeNode) {
+            if (nodeObject != null && nodeObject instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) nodeObject;
                 if (autoFoldBox.isSelected()) showPath(node);
                 if (node.getRecDefNode().isUnmappable()) return;
-                sipModel.getCreateModel().setRecDefTreeNode(node);
+                sipModel.getCreateModel().setTarget(node);
             }
         }
     }

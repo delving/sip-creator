@@ -28,10 +28,7 @@ import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
-import eu.delving.sip.model.CreateModel;
-import eu.delving.sip.model.MappingCompileModel;
-import eu.delving.sip.model.MappingModel;
-import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.*;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -218,17 +215,10 @@ public class FieldMappingFrame extends FrameBase {
         });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void nodeMappingSet(CreateModel createModel, boolean internal) {
-                final NodeMapping nodeMapping = createModel.getNodeMapping();
-                if (nodeMapping != null) {
+            public void transition(CreateModel createModel, CreateTransition transition) {
+                if (!transition.nodeMappingChanged) return;
+                if (createModel.nodeMappingExists()) {
+                    final NodeMapping nodeMapping = createModel.getNodeMapping();
                     contextVarModel.setList(nodeMapping);
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
                     Exec.swing(new Runnable() {
@@ -242,11 +232,19 @@ public class FieldMappingFrame extends FrameBase {
                         }
                     });
                 }
-            }
-
-            @Override
-            public void nodeMappingChanged(CreateModel createModel) {
-                sipModel.getFieldCompileModel().refreshCode();
+                else {
+                    contextVarModel.setList(null);
+                    sipModel.getFieldCompileModel().setNodeMapping(null);
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            Utility.setEditable(codeArea, false);
+                            operatorBoxSetting = true;
+                            operatorBox.setSelectedIndex(0);
+                            operatorBoxSetting = false;
+                        }
+                    });
+                }
             }
         });
         sipModel.getFieldCompileModel().addListener(new MappingCompileModel.Listener() {

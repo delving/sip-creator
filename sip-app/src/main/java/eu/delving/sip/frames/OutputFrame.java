@@ -26,17 +26,11 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.BorderFactory;
-import javax.swing.JDesktopPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.*;
 
 /**
  * The transformation from input record to output
@@ -45,6 +39,7 @@ import java.awt.Dimension;
  */
 
 public class OutputFrame extends FrameBase {
+    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
 
     public OutputFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(Which.OUTPUT, desktop, sipModel, "Output", false);
@@ -65,6 +60,7 @@ public class OutputFrame extends FrameBase {
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
         final JTextArea area = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        area.setFont(MONOSPACED);
         area.setWrapStyleWord(true);
         area.getDocument().addDocumentListener(new DocumentListener() {
             @Override

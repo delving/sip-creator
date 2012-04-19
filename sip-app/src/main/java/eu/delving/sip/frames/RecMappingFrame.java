@@ -45,34 +45,25 @@ public class RecMappingFrame extends FrameBase {
     private RemoveNodeMappingAction removeAction = new RemoveNodeMappingAction();
     private JList nodeMappingList;
 
-    public RecMappingFrame(JDesktopPane desktop, SipModel sipModel) {
+    public RecMappingFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings", false);
         setJMenuBar(createMenuBar());
         nodeMappingList = sipModel.getMappingModel().getNodeMappingListModel().createJList();
         nodeMappingList.addListSelectionListener(new NodeMappingSelection());
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
-            public void sourceTreeNodesSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void recDefTreeNodeSet(CreateModel createModel, boolean internal) {
-            }
-
-            @Override
-            public void nodeMappingSet(CreateModel createModel, boolean internal) {
-                if (internal) {
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            nodeMappingList.clearSelection(); // todo: make the selections using the node mapping
-                        }
-                    });
+            public void transition(CreateModel createModel, CreateTransition transition) {
+                switch (transition) {
+                    case COMPLETE_TO_ARMED_SOURCE:
+                    case COMPLETE_TO_ARMED_TARGET:
+                        Exec.swing(new Runnable() {
+                            @Override
+                            public void run() {
+                                nodeMappingList.clearSelection();
+                            }
+                        });
+                        break;
                 }
-            }
-
-            @Override
-            public void nodeMappingChanged(CreateModel createModel) {
             }
         });
     }
@@ -128,7 +119,7 @@ public class RecMappingFrame extends FrameBase {
                     RecDefTreeNode node = (RecDefTreeNode) treePath.getLastPathComponent();
                     nodeMapping = node.getRecDefNode().removeNodeMapping(nodeMapping.inputPath);
                     SourceTreeNode.removeStatsTreeNodes(nodeMapping);
-                    sipModel.getCreateModel().clearNodeMapping();
+                    sipModel.getCreateModel().setNodeMapping(null);
                 }
             }
         }
