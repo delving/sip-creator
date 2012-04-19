@@ -29,7 +29,7 @@ import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -46,6 +46,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     private SipModel sipModel;
     private Timer triggerTimer = new Timer(200, this);
     private ListReceiver listReceiver;
+    private boolean freezeMode;
 
     public interface ListReceiver {
         void mappingFileList(List<File> mappingFiles);
@@ -57,7 +58,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
         Timer kickTimer = new Timer((int) (Storage.MAPPING_FREEZE_INTERVAL / 10), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                triggerTimer.restart();
+                kick(true);
             }
         });
         kickTimer.start();
@@ -82,7 +83,9 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
                     nextFreeze = System.currentTimeMillis() + Storage.MAPPING_FREEZE_INTERVAL;
                     freeze = true;
                 }
-                sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping, freeze);
+                if (!freezeMode || freeze) {
+                    sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping, freeze);
+                }
                 if (freeze) {
                     if (listReceiver != null) Exec.swing(new Runnable() {
                         @Override
@@ -106,26 +109,31 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void recMappingSet(MappingModel mappingModel) {
-        triggerTimer.restart();
+        kick(false);
     }
 
     @Override
     public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-        triggerTimer.restart();
+        kick(false);
     }
 
     @Override
     public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        triggerTimer.restart();
+        kick(false);
     }
 
     @Override
     public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        triggerTimer.restart();
+        kick(false);
     }
 
     @Override
     public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+        kick(false);
+    }
+
+    private void kick(boolean freeze) {
+        this.freezeMode = freeze;
         triggerTimer.restart();
     }
 }

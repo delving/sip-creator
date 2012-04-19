@@ -220,6 +220,10 @@ public class NodeMapping {
         return isSimilar(codeString, walk);
     }
 
+    public boolean codeLooksLike(String codeString) {
+        return groovyCode == null || isSimilar(codeString, groovyCode.iterator());
+    }
+
     public String getCode(EditPath editPath, RecMapping recMapping) {
         recMapping.toCode(editPath);
         return codeOut.toString();
@@ -232,7 +236,7 @@ public class NodeMapping {
                 notifyChanged();
             }
         }
-        else if (groovyCode == null || !isSimilar(codeString, groovyCode.iterator())) {
+        else if (groovyCode == null || !codeLooksLike(codeString)) {
             groovyCode = stringToLines(codeString);
             notifyChanged();
         }
