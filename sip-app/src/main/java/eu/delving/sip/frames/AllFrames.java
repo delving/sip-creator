@@ -29,7 +29,6 @@ import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,7 +53,6 @@ public class AllFrames {
     private FrameBase[] frames;
     private FunctionFrame functionFrame;
     private MappingCodeFrame mappingCodeFrame;
-    private HelpFrame helpFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
@@ -67,12 +65,11 @@ public class AllFrames {
         analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
-    public AllFrames(JDesktopPane desktop, final SipModel sipModel, HttpClient httpClient) {
+    public AllFrames(JDesktopPane desktop, final SipModel sipModel) {
         this.desktop = desktop;
         this.sipModel = sipModel;
         functionFrame = new FunctionFrame(desktop, sipModel);
         mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
-        helpFrame = new HelpFrame(desktop, sipModel, httpClient);
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
@@ -132,7 +129,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                selectView("");
+                selectNewView("");
             }
         };
     }
@@ -141,7 +138,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                selectView(component.getSize().width > 1600 ? "Decadent Display" : "Quick Mapping");
+                selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Quick Mapping");
             }
         };
     }
@@ -150,7 +147,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                selectView(component.getSize().width > 1600 ? "Decadent Display" : "Big Picture");
+                selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Big Picture");
             }
         };
     }
@@ -159,7 +156,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                selectView("First Contact");
+                selectNewView("First Contact");
             }
         };
     }
@@ -168,7 +165,7 @@ public class AllFrames {
         Exec.swingLater(new Runnable() {
             @Override
             public void run() {
-                selectView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
+                selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
             }
         });
     }
@@ -183,7 +180,6 @@ public class AllFrames {
         menu.addSeparator();
         menu.add(functionFrame.getAction());
         menu.add(mappingCodeFrame.getAction());
-        menu.add(helpFrame.getAction());
         return menu;
     }
 
@@ -224,13 +220,22 @@ public class AllFrames {
         return p;
     }
 
+    public void rebuildView() {
+        if (currentView.isEmpty()) return;
+        selectView(currentView);
+    }
+
     private FrameBase frame(FrameBase.Which which) {
         for (FrameBase frame : frames) if (frame.getWhich() == which) return frame;
         throw new RuntimeException(which + " not found");
     }
 
-    private void selectView(String viewName) {
+    private void selectNewView(String viewName) {
         if (currentView.equals(viewName)) return;
+        selectView(viewName);
+    }
+
+    private void selectView(String viewName) {
         for (Arrangement arrangement : arrangements) {
             if (arrangement.toString().equals(viewName)) {
                 arrangement.actionPerformed(null);
