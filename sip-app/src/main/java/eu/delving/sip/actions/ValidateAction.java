@@ -23,7 +23,7 @@ package eu.delving.sip.actions;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -56,7 +56,7 @@ public class ValidateAction extends AbstractAction {
         this.sipModel = sipModel;
         this.investigate = investigate;
         setEnabled(false);
-        putValue(Action.SMALL_ICON, Utility.VALIDATE_ICON);
+        putValue(Action.SMALL_ICON, SwingHelper.VALIDATE_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -118,7 +118,7 @@ public class ValidateAction extends AbstractAction {
         ));
         progressListener.onFinished(new ProgressListener.End() {
             @Override
-            public void finished(boolean success) {
+            public void finished(ProgressListener progressListener, boolean success) {
                 setEnabled(true);
             }
         });
@@ -163,7 +163,7 @@ public class ValidateAction extends AbstractAction {
             progressListener.setProgressMessage(String.format("<html><h3>Scanning for record %d</h3></html>", recordNumber));
             progressListener.onFinished(new ProgressListener.End() {
                 @Override
-                public void finished(boolean success) {
+                public void finished(ProgressListener progressListener, boolean success) {
                     dialog.setVisible(false);
                 }
             });

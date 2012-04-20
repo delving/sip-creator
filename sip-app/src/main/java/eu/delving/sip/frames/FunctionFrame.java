@@ -28,7 +28,6 @@ import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
@@ -50,6 +49,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.regex.Pattern;
+
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * This panel provides an interface for building and testing global functions
@@ -89,7 +90,7 @@ public class FunctionFrame extends FrameBase {
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
         libraryList.setFont(MONOSPACED);
-        libraryList.setBackground(Utility.UNEDITABLE_BG);
+        libraryList.setBackground(UNEDITABLE_BG);
         libraryList.setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
         functionList.setFont(MONOSPACED);
         wireUp();
@@ -122,20 +123,20 @@ public class FunctionFrame extends FrameBase {
     private JTabbedPane createCodeDoc() {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Groovy Code", createCodePanel());
-        tabs.addTab("Documentation", Utility.scrollVH(docArea));
+        tabs.addTab("Documentation", scrollVH(docArea));
         return tabs;
     }
 
     private JPanel createCodePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(Utility.scrollVH("Groovy Code", codeArea), BorderLayout.CENTER);
+        p.add(scrollVH("Groovy Code", codeArea), BorderLayout.CENTER);
         p.add(createSidePanel(), BorderLayout.EAST);
         return p;
     }
 
     private JPanel createSidePanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(Utility.scrollV("Available Facts", factsList), BorderLayout.CENTER);
+        p.add(scrollV("Available Facts", factsList), BorderLayout.CENTER);
         p.add(createBesideCode(), BorderLayout.SOUTH);
         return p;
     }
@@ -156,8 +157,8 @@ public class FunctionFrame extends FrameBase {
 
     private JPanel createInputOutput() {
         JPanel p = new JPanel(new GridLayout(1, 0));
-        p.add(Utility.scrollVH("Input Lines", inputArea));
-        p.add(Utility.scrollVH("Output Lines", outputArea));
+        p.add(scrollVH("Input Lines", inputArea));
+        p.add(scrollVH("Output Lines", outputArea));
         return p;
     }
 
@@ -174,7 +175,7 @@ public class FunctionFrame extends FrameBase {
         bp.add(new JButton(new RemoveAction()));
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Functions"));
-        p.add(Utility.scrollV(functionList));
+        p.add(scrollV(functionList));
         p.add(bp, BorderLayout.SOUTH);
         return p;
     }
@@ -182,7 +183,7 @@ public class FunctionFrame extends FrameBase {
     private JPanel createFunctionLibPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Library"));
-        p.add(Utility.scrollV(libraryList));
+        p.add(scrollV(libraryList));
         p.add(new JButton(new CopyAction()), BorderLayout.SOUTH);
         return p;
     }
@@ -324,10 +325,10 @@ public class FunctionFrame extends FrameBase {
                 libraryList.clearSelection();
             }
             modelStateListener.setLibrary(this.library);
-            Utility.setEditable(codeArea, !library);
-            Utility.setEditable(docArea, !library);
-            Utility.setEditable(inputArea, !library);
-            Utility.setEditable(outputArea, !library);
+            setEditable(codeArea, !library);
+            setEditable(docArea, !library);
+            setEditable(inputArea, !library);
+            setEditable(outputArea, !library);
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
@@ -501,7 +502,7 @@ public class FunctionFrame extends FrameBase {
                 public void run() {
                     if (state == CompileState.ORIGINAL) undoManager.discardAllEdits();
                     if (lib) {
-                        Utility.setEditable(codeArea, false);
+                        setEditable(codeArea, false);
                     }
                     else {
                         state.setBackgroundOf(codeArea);

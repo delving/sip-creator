@@ -107,14 +107,6 @@ public class AllFrames {
         }
     }
 
-    public FunctionFrame getFunctionFrame() {
-        return functionFrame;
-    }
-
-    public MappingCodeFrame getMappingCodeFrame() {
-        return mappingCodeFrame;
-    }
-
     private void createDefaultFrameArrangements(File file) throws IOException {
         List<String> lines = IOUtils.readLines(getClass().getResource("/frame-arrangements.xml").openStream());
         IOUtils.writeLines(lines, "\n", new FileOutputStream(file));
@@ -137,7 +129,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                selectView("");
+                selectNewView("");
             }
         };
     }
@@ -146,7 +138,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                selectView(component.getSize().width > 1600 ? "Decadent Display" : "Quick Mapping");
+                selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Quick Mapping");
             }
         };
     }
@@ -155,7 +147,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                selectView(component.getSize().width > 1600 ? "Decadent Display" : "Big Picture");
+                selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Big Picture");
             }
         };
     }
@@ -164,7 +156,7 @@ public class AllFrames {
         return new Runnable() {
             @Override
             public void run() {
-                selectView("First Contact");
+                selectNewView("First Contact");
             }
         };
     }
@@ -173,7 +165,7 @@ public class AllFrames {
         Exec.swingLater(new Runnable() {
             @Override
             public void run() {
-                selectView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
+                selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
             }
         });
     }
@@ -228,13 +220,22 @@ public class AllFrames {
         return p;
     }
 
+    public void rebuildView() {
+        if (currentView.isEmpty()) return;
+        selectView(currentView);
+    }
+
     private FrameBase frame(FrameBase.Which which) {
         for (FrameBase frame : frames) if (frame.getWhich() == which) return frame;
         throw new RuntimeException(which + " not found");
     }
 
-    private void selectView(String viewName) {
+    private void selectNewView(String viewName) {
         if (currentView.equals(viewName)) return;
+        selectView(viewName);
+    }
+
+    private void selectView(String viewName) {
         for (Arrangement arrangement : arrangements) {
             if (arrangement.toString().equals(viewName)) {
                 arrangement.actionPerformed(null);

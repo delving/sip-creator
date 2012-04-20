@@ -94,10 +94,38 @@ public class StorageImpl extends StorageBase implements Storage {
         return new File(home, "frame-arrangements.xml");
     }
 
+    @Override
+    public String getHelpHtml() {
+        File helpFile = helpFile(home);
+        if (!helpFile.exists()) return null;
+        try {
+            InputStream in = new FileInputStream(helpFile);
+            String help = IOUtils.toString(in);
+            in.close();
+            return help;
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public void setHelpHtml(String html) {
+        File helpFile = helpFile(home);
+        try {
+            OutputStream out = new FileOutputStream(helpFile);
+            IOUtils.write(html, out, "UTF-8");
+            out.close();
+        }
+        catch (Exception e) {
+//            e.printStackTrace();
+        }
+    }
+
     public class DataSetImpl implements DataSet, Serializable {
 
         private File here;
-        private Map<String,Schema> schemaMap = new TreeMap<String, Schema>();
+        private Map<String, Schema> schemaMap = new TreeMap<String, Schema>();
 
         public DataSetImpl(File here) {
             this.here = here;

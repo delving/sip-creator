@@ -24,7 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.menus.ShowOptionMenu;
 import eu.delving.sip.model.*;
 
@@ -73,7 +73,7 @@ public class TargetFrame extends FrameBase {
         timer.setRepeats(false);
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
-        treePanel.add(Utility.scrollVH("Record Definition", recDefTree));
+        treePanel.add(SwingHelper.scrollVH("Record Definition", recDefTree));
         ShowOptionMenu showOptionMenu = new ShowOptionMenu(new ShowOptionMenu.Listener() {
             @Override
             public void optSelected(OptList.Opt opt) {
@@ -258,7 +258,7 @@ public class TargetFrame extends FrameBase {
                 recDefTree.setModel(new RecDefTreeModel(FilterNode.createMessageNode("No record definition")));
             }
             treePanel.removeAll();
-            treePanel.add(Utility.scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
+            treePanel.add(SwingHelper.scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
         }
     }
 

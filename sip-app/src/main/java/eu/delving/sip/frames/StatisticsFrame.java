@@ -25,7 +25,7 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Histogram;
 import eu.delving.metadata.RandomSample;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.CreateTransition;
 import eu.delving.sip.model.SipModel;
@@ -108,7 +108,7 @@ public class StatisticsFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Random Sample"));
         JList list = new JList(randomSampleModel);
-        p.add(Utility.scrollV(list));
+        p.add(SwingHelper.scrollV(list));
         return p;
     }
 
@@ -116,7 +116,7 @@ public class StatisticsFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Histogram"));
         JList list = new JList(histogramModel);
-        p.add(Utility.scrollV(list));
+        p.add(SwingHelper.scrollV(list));
         return p;
     }
 

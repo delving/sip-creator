@@ -27,13 +27,14 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+
+import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
  * This frame shows the entire builder that is responsible for transforming the input to output,
@@ -101,7 +102,7 @@ public class MappingCodeFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(Utility.scrollVH(codeArea));
+        content.add(scrollVH(codeArea));
     }
 
     private class CodeUpdater implements Runnable {

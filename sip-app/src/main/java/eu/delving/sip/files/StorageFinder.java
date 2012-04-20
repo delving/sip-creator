@@ -21,10 +21,10 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.sip.base.Utility;
-
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
+import javax.jnlp.BasicService;
+import javax.jnlp.ServiceManager;
+import javax.jnlp.UnavailableServiceException;
+import javax.swing.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
@@ -122,7 +122,7 @@ public class StorageFinder {
     private static File createHostPortDirectory(String [] args) {
         if (args.length > 0) {
             String user = args[0];
-            URL codebase = Utility.getCodebase();
+            URL codebase = getCodebase();
             String host = codebase.getHost();
             int port = codebase.getPort();
             if (port < 0) port = 80;
@@ -160,6 +160,16 @@ public class StorageFinder {
         else {
             String hostPort = (String)box.getSelectedItem();
             return createDirectory(hostPort);
+        }
+    }
+
+    public static URL getCodebase() {
+        try {
+            BasicService bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
+            return bs.getCodeBase();
+        }
+        catch (UnavailableServiceException ue) {
+            throw new RuntimeException("Unable to use JNLP service", ue);
         }
     }
 }

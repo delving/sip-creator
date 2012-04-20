@@ -25,7 +25,6 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
@@ -43,6 +42,7 @@ import java.awt.event.MouseEvent;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static eu.delving.sip.base.SwingHelper.scrollVH;
 import static eu.delving.sip.files.DataSetState.ABSENT;
 import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
@@ -91,7 +91,7 @@ public class SourceFrame extends FrameBase {
         sourceTree.setDragEnabled(true);
         sourceTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         timer.setRepeats(false);
-        treePanel.add(Utility.scrollVH(sourceTree), BorderLayout.CENTER);
+        treePanel.add(scrollVH(sourceTree), BorderLayout.CENTER);
         recordRootButton.setEnabled(false);
         selectButtonPanel.add(recordRootButton);
         uniqueElementButton.setEnabled(false);

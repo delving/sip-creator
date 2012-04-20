@@ -27,7 +27,7 @@ import eu.delving.metadata.Operator;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.URLLauncher;
 import eu.delving.sip.model.*;
 
 import javax.swing.*;
@@ -40,10 +40,11 @@ import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * Refining the mapping interactively
@@ -59,7 +60,6 @@ public class FieldMappingFrame extends FrameBase {
     private JTextArea codeArea;
     private JTextArea docArea;
     private JTextArea outputArea;
-    private JEditorPane helpView;
     private boolean operatorBoxSetting = false;
     private JComboBox operatorBox = new JComboBox(Operator.values());
     private FunctionListModel functionModel = new FunctionListModel();
@@ -71,12 +71,6 @@ public class FieldMappingFrame extends FrameBase {
 
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.FIELD_MAPPING, desktop, sipModel, "Field Mapping", false);
-        try {
-            helpView = new JEditorPane(getClass().getResource("/groovy-help.html"));
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);
@@ -90,7 +84,7 @@ public class FieldMappingFrame extends FrameBase {
         outputArea.setWrapStyleWord(true);
         attachAction(UNDO_ACTION);
         attachAction(REDO_ACTION);
-        Utility.attachUrlLauncher(outputArea);
+        new URLLauncher(outputArea, sipModel.getFeedback());
         wireUp();
         handleEnablement();
     }
@@ -124,7 +118,6 @@ public class FieldMappingFrame extends FrameBase {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Field", createCodeOutputPanel());
         tabs.addTab("Dictionary", dictionaryPanel);
-        tabs.addTab("Help", Utility.scrollV(helpView));
         return tabs;
     }
 
@@ -137,11 +130,11 @@ public class FieldMappingFrame extends FrameBase {
 
     private JComponent createCodeDocPanel() {
         JPanel cp = new JPanel(new BorderLayout());
-        cp.add(Utility.scrollVH(codeArea), BorderLayout.CENTER);
+        cp.add(scrollVH(codeArea), BorderLayout.CENTER);
         cp.add(createBesideCode(), BorderLayout.EAST);
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Groovy Code", cp);
-        tabs.addTab("Documentation", Utility.scrollVH(docArea));
+        tabs.addTab("Documentation", scrollVH(docArea));
         return tabs;
     }
 
@@ -159,8 +152,8 @@ public class FieldMappingFrame extends FrameBase {
 
     private JComponent createContextPanel() {
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Functions", Utility.scrollV(functionList));
-        tabs.addTab("Variables", Utility.scrollV(contextVarList));
+        tabs.addTab("Functions", scrollV(functionList));
+        tabs.addTab("Variables", scrollV(contextVarList));
         return tabs;
     }
 
@@ -174,7 +167,7 @@ public class FieldMappingFrame extends FrameBase {
     private JPanel createOutputPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output Record"));
-        p.add(Utility.scrollVH(outputArea), BorderLayout.CENTER);
+        p.add(scrollVH(outputArea), BorderLayout.CENTER);
         p.add(new JLabel("Note: URLs can be launched by double-clicking them.", JLabel.CENTER), BorderLayout.SOUTH);
         return p;
     }
@@ -224,7 +217,7 @@ public class FieldMappingFrame extends FrameBase {
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
-                            Utility.setEditable(codeArea, nodeMapping.isUserCodeEditable());
+                            setEditable(codeArea, nodeMapping.isUserCodeEditable());
                             boolean all = nodeMapping.getOperator() == Operator.ALL;
                             operatorBoxSetting = true;
                             operatorBox.setSelectedIndex(all ? 0 : 1);
@@ -238,7 +231,7 @@ public class FieldMappingFrame extends FrameBase {
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
-                            Utility.setEditable(codeArea, false);
+                            setEditable(codeArea, false);
                             operatorBoxSetting = true;
                             operatorBox.setSelectedIndex(0);
                             operatorBoxSetting = false;

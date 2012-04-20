@@ -23,7 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
 
@@ -83,8 +83,8 @@ public class CreateFrame extends FrameBase {
 
     private JComponent createHintsCenter() {
         JPanel p = new JPanel(new GridLayout(0, 1));
-        p.add(Utility.scrollV("Mapping Hints", mappingHintsList));
-        p.add(Utility.scrollV("Hint Documentation", hintDocArea));
+        p.add(SwingHelper.scrollV("Mapping Hints", mappingHintsList));
+        p.add(SwingHelper.scrollV("Hint Documentation", hintDocArea));
         return p;
     }
 

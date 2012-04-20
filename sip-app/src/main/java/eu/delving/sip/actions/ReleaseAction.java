@@ -23,13 +23,13 @@ package eu.delving.sip.actions;
 
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -46,7 +46,7 @@ public class ReleaseAction extends AbstractAction {
 
     public ReleaseAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Release this data set for others to access");
-        putValue(Action.SMALL_ICON, Utility.RELEASE_ICON);
+        putValue(Action.SMALL_ICON, SwingHelper.RELEASE_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())

@@ -32,6 +32,7 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.xml.AnalysisParser;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
@@ -67,6 +68,7 @@ public class Application {
     private HarvestDialog harvestDialog;
     private HarvestPool harvestPool;
     private StatusPanel statusPanel;
+    private HelpPanel helpPanel;
     private Timer resizeTimer;
 
     private Application(final File storageDirectory) throws StorageException {
@@ -105,9 +107,16 @@ public class Application {
         feedback.setSipModel(sipModel);
         feedback.say("SIP-Creator started");
         home = new JFrame("Delving SIP Creator");
+        home.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent componentEvent) {
+                allFrames.rebuildView();
+            }
+        });
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         allFrames = new AllFrames(desktop, sipModel);
+        helpPanel = new HelpPanel(sipModel, cultureHubClient.getHttpClient());
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new ImportAction(desktop, sipModel, harvestPool);
@@ -249,7 +258,29 @@ public class Application {
         bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
+        bar.add(createHelpMenu());
         return bar;
+    }
+
+    private JMenu createHelpMenu() {
+        JMenu menu = new JMenu("Help");
+        final JCheckBoxMenuItem item = new JCheckBoxMenuItem("Show Help Panel");
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK));
+        item.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (item.isSelected()) {
+                    home.getContentPane().add(helpPanel, BorderLayout.EAST);
+                }
+                else {
+                    home.getContentPane().remove(helpPanel);
+                }
+                home.getContentPane().validate();
+                allFrames.rebuildView();
+            }
+        });
+        menu.add(item);
+        return menu;
     }
 
     private JMenu createFileMenu() {

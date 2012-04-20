@@ -24,7 +24,7 @@ package eu.delving.sip.actions;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
@@ -32,10 +32,7 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -56,7 +53,7 @@ public class UploadAction extends AbstractAction {
 
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Upload this data set");
-        putValue(Action.SMALL_ICON, Utility.UPLOAD_ICON);
+        putValue(Action.SMALL_ICON, SwingHelper.UPLOAD_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -139,7 +136,7 @@ public class UploadAction extends AbstractAction {
         private void buildContent(Container content) {
             JPanel p = new JPanel(new BorderLayout());
             p.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            p.add(Utility.scrollV(list), BorderLayout.CENTER);
+            p.add(SwingHelper.scrollV(list), BorderLayout.CENTER);
             p.add(createButtons(), BorderLayout.SOUTH);
             content.add(p, BorderLayout.CENTER);
         }

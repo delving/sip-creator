@@ -42,6 +42,10 @@ public interface Storage {
 
     File getFrameArrangementFile();
 
+    String getHelpHtml();
+
+    void setHelpHtml(String html);
+
     enum FileType {
         IMPORTED("imported.xml.gz"),
         SOURCE("source.xml.gz", null, null, null, 2),

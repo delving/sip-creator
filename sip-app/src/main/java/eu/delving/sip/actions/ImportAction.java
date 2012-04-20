@@ -24,7 +24,7 @@ package eu.delving.sip.actions;
 import eu.delving.sip.base.HarvestPool;
 import eu.delving.sip.base.Harvestor;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
@@ -62,7 +62,7 @@ public class ImportAction extends AbstractAction {
 
     public ImportAction(JDesktopPane parent, SipModel sipModel, HarvestPool harvestPool) {
         super("Import new data into this data set");
-        putValue(Action.SMALL_ICON, Utility.IMPORT_ICON);
+        putValue(Action.SMALL_ICON, SwingHelper.IMPORT_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -157,7 +157,7 @@ public class ImportAction extends AbstractAction {
             listener.setProgressMessage(String.format("Storing data for %s", spec));
             listener.onFinished(new ProgressListener.End() {
                 @Override
-                public void finished(boolean success) {
+                public void finished(ProgressListener progressListener, boolean success) {
                     setEnabled(true);
                 }
             });
