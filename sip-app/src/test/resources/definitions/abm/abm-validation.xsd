@@ -6,7 +6,7 @@
            xmlns:dc="http://purl.org/dc/elements/1.1/"
            xmlns:dcterms="http://purl.org/dc/terms/"
            xmlns:europeana="http://www.europeana.eu/schemas/ese/"
-           targetNamespace="http://www.icn.nl/schemas/icn/"
+           targetNamespace="http://abmu.org/abm"
            blockDefault="#all">
 
     <xs:import namespace="http://schemas.delving.eu/" schemaLocation="http://schemas.delving.eu/delving-V1.0.xsd"/>
@@ -64,13 +64,13 @@
     </xs:group>
 
 
-    <xs:element name="record" type="icn:recordType" block="substitution"/>
+    <xs:element name="record" type="abm:recordType" block="substitution"/>
 
     <xs:complexType name="recordType">
         <xs:sequence>
             <xs:element name="municipality" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="aboutPerson" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="abm:county" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="county" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="namedPlace" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="landedProperty" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="contentProvider" minOccurs="0" maxOccurs="unbounded"/>
@@ -81,8 +81,8 @@
             <xs:element name="abm:type" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="geo" minOccurs="0" maxOccurs="unbounded"/>
 
-            <xs:group minOccurs="0" maxOccurs="unbounded" ref="icn:dcGroup" />
-            <xs:group minOccurs="0" maxOccurs="unbounded" ref="icn:dctermsGroup" />
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="abm:dcGroup" />
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="abm:dctermsGroup" />
 
             <xs:element ref="europeana:isShownBy" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="europeana:rights" minOccurs="0" maxOccurs="1"/>
