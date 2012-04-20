@@ -29,6 +29,7 @@ import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.HttpClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,6 +54,7 @@ public class AllFrames {
     private FrameBase[] frames;
     private FunctionFrame functionFrame;
     private MappingCodeFrame mappingCodeFrame;
+    private HelpFrame helpFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
@@ -65,11 +67,12 @@ public class AllFrames {
         analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
-    public AllFrames(JDesktopPane desktop, final SipModel sipModel) {
+    public AllFrames(JDesktopPane desktop, final SipModel sipModel, HttpClient httpClient) {
         this.desktop = desktop;
         this.sipModel = sipModel;
         functionFrame = new FunctionFrame(desktop, sipModel);
         mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
+        helpFrame = new HelpFrame(desktop, sipModel, httpClient);
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
         StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
@@ -105,14 +108,6 @@ public class AllFrames {
         catch (IOException e) {
             throw new RuntimeException("Initializing views", e);
         }
-    }
-
-    public FunctionFrame getFunctionFrame() {
-        return functionFrame;
-    }
-
-    public MappingCodeFrame getMappingCodeFrame() {
-        return mappingCodeFrame;
     }
 
     private void createDefaultFrameArrangements(File file) throws IOException {
@@ -188,6 +183,7 @@ public class AllFrames {
         menu.addSeparator();
         menu.add(functionFrame.getAction());
         menu.add(mappingCodeFrame.getAction());
+        menu.add(helpFrame.getAction());
         return menu;
     }
 

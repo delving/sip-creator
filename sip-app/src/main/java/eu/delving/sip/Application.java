@@ -107,7 +107,7 @@ public class Application {
         home = new JFrame("Delving SIP Creator");
         desktop.setBackground(new Color(190, 190, 200));
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
-        allFrames = new AllFrames(desktop, sipModel);
+        allFrames = new AllFrames(desktop, sipModel, cultureHubClient.getHttpClient());
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new ImportAction(desktop, sipModel, harvestPool);
