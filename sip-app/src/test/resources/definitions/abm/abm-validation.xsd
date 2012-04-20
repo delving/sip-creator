@@ -17,7 +17,7 @@
 
 
     <xs:group name="dcGroup">
-        <xs:sequence >
+        <xs:choice >
             <xs:element ref="dc:title" minOccurs="0" maxOccurs="unbounded" />
             <xs:element ref="dc:creator" minOccurs="0" maxOccurs="unbounded" />
             <xs:element ref="dc:subject" minOccurs="0" maxOccurs="unbounded"/>
@@ -33,7 +33,7 @@
             <xs:element ref="dc:relation" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dc:coverage" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dc:rights" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
+        </xs:choice>
     </xs:group>
 
     <xs:group name="dctermsGroup">
