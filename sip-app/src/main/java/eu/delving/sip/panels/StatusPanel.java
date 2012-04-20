@@ -28,7 +28,8 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.GridLayout;
+import javax.swing.border.Border;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ import java.util.List;
 
 public class StatusPanel extends JPanel {
 
+    private static final Border DEFAULT_BORDER = BorderFactory.createTitledBorder("Actions");
     private List<StateAction> actions = new ArrayList<StateAction>();
 
     public StatusPanel(final SipModel sipModel) {
@@ -56,7 +58,8 @@ public class StatusPanel extends JPanel {
                     )));
                 }
                 else {
-                    setBorder(BorderFactory.createEtchedBorder());
+                    setBorder(DEFAULT_BORDER);
+                    for (StateAction action : actions) if (action.isEnabled()) action.setEnabled(false);
                 }
             }
         });
@@ -70,7 +73,7 @@ public class StatusPanel extends JPanel {
             button.setToolTipText(action.state.toHtml());
             add(button);
         }
-        setBorder(BorderFactory.createEtchedBorder());
+        setBorder(DEFAULT_BORDER);
     }
 
     public void setState(DataSetState state) {
@@ -93,6 +96,7 @@ public class StatusPanel extends JPanel {
         private StateAction(DataSetState state) {
             super(state.toTitle());
             this.state = state;
+            setEnabled(false);
         }
 
         public void setWork(Runnable work) {
