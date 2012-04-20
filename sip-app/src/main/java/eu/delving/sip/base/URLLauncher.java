@@ -58,6 +58,7 @@ public class URLLauncher implements CaretListener {
             int min = Math.min(dot, mark);
             int max = Math.min(text.length() - 1, Math.max(dot, mark));
             String urlString = text.substring(min, max);
+            if (urlString.contains("\n")) return;
             if (min > 1 && text.charAt(min - 1) == '>' && max < text.length() && text.charAt(max) == '<') {
                 if (validUrl(urlString)) {
                     showURL(urlString);
