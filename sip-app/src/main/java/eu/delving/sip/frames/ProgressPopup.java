@@ -141,7 +141,7 @@ public class ProgressPopup implements ProgressListener {
                 cancel = true;
                 showTimer.stop();
                 if (dialog.isVisible()) dialog.setVisible(false);
-                for (End end : ends) end.finished(success);
+                for (End end : ends) end.finished(ProgressPopup.this, success);
             }
         });
     }

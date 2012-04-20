@@ -29,8 +29,7 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DateFormat;
@@ -102,32 +101,32 @@ public class VisualFeedback implements Feedback {
             @Override
             public void run() {
                 addToList(message);
-                inYourFace(message);
+                inYourFace(message, null);
             }
         });
     }
 
     @Override
-    public void alert(final String message, Exception exception) {
+    public void alert(final String message, final Exception exception) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message, exception);
         Exec.swingWait(new Runnable() {
             @Override
             public void run() {
                 addToList(message);
-                inYourFace(message);
+                inYourFace(message, exception.getMessage());
             }
         });
     }
 
     @Override
     public ProgressListener progressListener(String title) {
-        if (progressPopup != null) progressPopup.finished(false);
-        final ProgressPopup fresh = progressPopup = new ProgressPopup(desktop, title);
+        if (progressPopup != null) progressPopup.finished(false); // destroy the previous one
+        progressPopup = new ProgressPopup(desktop, title);
         progressPopup.onFinished(new ProgressListener.End() {
             @Override
-            public void finished(boolean success) {
-                if (progressPopup != fresh) progressPopup = null;
+            public void finished(ProgressListener progressListener, boolean success) {
+                if (progressPopup == progressListener) progressPopup = null; // only set to null if it's the current one
             }
         });
         return progressPopup;
@@ -138,9 +137,17 @@ public class VisualFeedback implements Feedback {
         list.ensureIndexIsVisible(listModel.getSize() - 1);
     }
 
-    private void inYourFace(String message) {
-        message = message.replaceAll("<", "&lt;").replaceAll("&", "&amp;");
-        JOptionPane.showMessageDialog(null, String.format("<html><h3>%s</h3>", message));
+    private void inYourFace(String message, String extra) {
+        message = sanitizeHtml(message);
+        extra = sanitizeHtml(extra);
+        String html = String.format("<html><h3>%s</h3>", message);
+        if (extra != null) html = html + String.format("<p>%s</p>", extra);
+        JOptionPane.showMessageDialog(null, html);
+    }
+
+    private static String sanitizeHtml(String string) {
+        if (string == null) return null;
+        return string.replaceAll("<", "&lt;").replaceAll("&", "&amp;");
     }
 
     private class LogFrame extends FrameBase {

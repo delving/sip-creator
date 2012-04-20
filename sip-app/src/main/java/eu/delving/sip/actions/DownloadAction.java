@@ -196,7 +196,7 @@ public class DownloadAction extends AbstractAction {
             listener.setIndeterminateMessage(String.format("<html><h3>Culture hub is preparing '%s' for download.</h3>.", entry.getSpec()));
             listener.onFinished(new ProgressListener.End() {
                 @Override
-                public void finished(boolean success) {
+                public void finished(ProgressListener progressListener, boolean success) {
                     setEnabled(true);
                     downloadDialog.setVisible(false);
                 }

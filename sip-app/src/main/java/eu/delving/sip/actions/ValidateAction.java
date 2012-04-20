@@ -118,7 +118,7 @@ public class ValidateAction extends AbstractAction {
         ));
         progressListener.onFinished(new ProgressListener.End() {
             @Override
-            public void finished(boolean success) {
+            public void finished(ProgressListener progressListener, boolean success) {
                 setEnabled(true);
             }
         });
@@ -163,7 +163,7 @@ public class ValidateAction extends AbstractAction {
             progressListener.setProgressMessage(String.format("<html><h3>Scanning for record %d</h3></html>", recordNumber));
             progressListener.onFinished(new ProgressListener.End() {
                 @Override
-                public void finished(boolean success) {
+                public void finished(ProgressListener progressListener, boolean success) {
                     dialog.setVisible(false);
                 }
             });

@@ -157,7 +157,7 @@ public class ImportAction extends AbstractAction {
             listener.setProgressMessage(String.format("Storing data for %s", spec));
             listener.onFinished(new ProgressListener.End() {
                 @Override
-                public void finished(boolean success) {
+                public void finished(ProgressListener progressListener, boolean success) {
                     setEnabled(true);
                 }
             });

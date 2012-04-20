@@ -46,6 +46,6 @@ public interface ProgressListener {
     void onFinished(End end);
 
     public interface End {
-        void finished(boolean success);
+        void finished(ProgressListener progressListener, boolean success);
     }
 }
