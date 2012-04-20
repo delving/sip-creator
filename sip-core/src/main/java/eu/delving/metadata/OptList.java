@@ -40,6 +40,9 @@ public class OptList {
     public String displayName;
 
     @XStreamAsAttribute
+    public boolean dictionary;
+
+    @XStreamAsAttribute
     public Path path;
 
     @XStreamAsAttribute
@@ -49,10 +52,10 @@ public class OptList {
     public Tag value;
 
     @XStreamAsAttribute
-    public String schema;
+    public Tag schema;
 
     @XStreamAsAttribute
-    public String schemaUri;
+    public Tag schemaUri;
 
     @XStreamImplicit
     public List<Opt> opts;
@@ -62,27 +65,32 @@ public class OptList {
         if (path == null) throw new RuntimeException("No path for OptList: " + opts);
         if (path.peek().isAttribute()) throw new RuntimeException("An option list may not be connected to an attribute: " + path);
         path = path.withDefaultPrefix(recDef.prefix);
-        if (key != null) key = key.defaultPrefix(recDef.prefix);
-        if (value != null) value = value.defaultPrefix(recDef.prefix);
+        key = resolveTag(key, recDef);
+        value = resolveTag(value, recDef);
+        schema = resolveTag(schema, recDef);
+        schemaUri = resolveTag(schemaUri, recDef);
         RecDef.Elem elem = recDef.findElem(path);
         elem.optList = this;
     }
 
+    private static Tag resolveTag(Tag tag, RecDef recDef) {
+        return tag != null ? tag.defaultPrefix(recDef.prefix) : null;
+    }
+
     public List<String> getValues() {
         List<String> values = new ArrayList<String>(opts.size());
-        for (Opt opt : opts) values.add(opt.content);
+        for (Opt opt : opts) values.add(opt.value);
         return values;
     }
 
     @XStreamAlias("opt")
-    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"content"})
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"value"})
     public static class Opt {
 
         @XStreamAsAttribute
         public String key;
 
-        @XStreamAsAttribute
-        public boolean hidden;
+        public String value;
 
         @XStreamAsAttribute
         public String schema;
@@ -90,13 +98,14 @@ public class OptList {
         @XStreamAsAttribute
         public String schemaUri;
 
-        public String content;
+        @XStreamAsAttribute
+        public boolean hidden;
 
         @XStreamOmitField
         public OptList parent;
 
         public String toString() {
-            return String.format("%s: %s", key, content);
+            return String.format("%s: %s", key, value);
         }
     }
 }

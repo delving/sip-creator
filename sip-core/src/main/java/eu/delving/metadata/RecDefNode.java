@@ -47,7 +47,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private Path path;
     private RecDef.Elem elem;
     private RecDef.Attr attr;
-    private OptList.Opt optRoot, optKey, optValue;
+    private OptBox optBox;
     private String defaultPrefix;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
@@ -67,33 +67,44 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public static RecDefNode create(Listener listener, RecDef recDef) {
-        return new RecDefNode(listener, null, recDef.root, null, null, null, null, recDef.prefix); // only root element
+        return new RecDefNode(listener, null, recDef.root, null, recDef.prefix, null); // only root element
     }
 
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, OptList.Opt optRoot, OptList.Opt optKey, OptList.Opt optValue, String defaultPrefix) {
+    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, String defaultPrefix, OptBox optBox) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
         this.attr = attr;
-        this.optRoot = optRoot;
         this.defaultPrefix = defaultPrefix;
-        if (optKey != null && optKey.parent.key.equals(getTag())) this.optKey = optKey;
-        if (optValue != null && optValue.parent.value.equals(getTag())) this.optValue = optValue;
+        OptBox childOptBox = null;
+        if (optBox != null) {
+            switch (optBox.role) {
+                case ROOT:
+                    this.optBox = optBox;
+                    childOptBox = optBox.createChild();
+                    break;
+                case CHILD:
+                    this.optBox = optBox.inRoleFor(getTag());
+                    break;
+            }
+        }
         if (elem != null) {
             for (RecDef.Attr sub : elem.attrList) {
-                children.add(new RecDefNode(listener, this, null, sub, null, optRoot, optRoot, defaultPrefix));
+                children.add(new RecDefNode(listener, this, null, sub, defaultPrefix, childOptBox)); // child  optBox
             }
             for (RecDef.Elem sub : elem.elemList) {
-                if (sub.optList == null) {
-                    children.add(new RecDefNode(listener, this, sub, null, null, optRoot, optRoot, defaultPrefix));
-                }
-                else if (sub.optList.value == null) {
-                    children.add(new RecDefNode(listener, this, sub, null, null, null, null, defaultPrefix));
+                if (sub.optList != null) {
+                    if (sub.optList.dictionary) {
+                        children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, null)); // ignore dictionaries for this
+                    }
+                    else {
+                        for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option (introducing the OptBox instances)
+                            children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, new OptBox(OptRole.ROOT, subOpt)));
+                        }
+                    }
                 }
                 else {
-                    for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option
-                        children.add(new RecDefNode(listener, this, sub, null, subOpt, null, null, defaultPrefix));
-                    }
+                    children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, childOptBox)); // child OptBox
                 }
             }
             if (elem.nodeMapping != null) {
@@ -105,8 +116,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean isHiddenOpt(OptList.Opt shown) {
-        if (optRoot == null || optRoot == shown || elem == null) return false;
-        return optRoot.hidden;
+        return isRootOpt() && optBox.opt != shown && optBox.opt.hidden;
     }
 
     public String getFieldType() {
@@ -130,9 +140,9 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return !isAttr() && elem.unmappable;
     }
 
-    public boolean isSingular() {
-        return !isAttr() && elem.singular;
-    }
+//    public boolean isSingular() { todo: use it
+//        return !isAttr() && elem.singular;
+//    }
 
     public RecDefNode getParent() {
         return parent;
@@ -144,7 +154,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public Tag getTag() {
         Tag tag = isAttr() ? attr.tag : elem.tag;
-        return optRoot == null ? tag : tag.withOpt(optRoot.key);
+        return isRootOpt() ? tag.withOpt(optBox.opt.key) : tag;
     }
 
     public Path getPath() {
@@ -178,7 +188,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean hasConstant() {
-        return optKey != null || optValue != null;
+        return optBox != null && optBox.isChild();
     }
 
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {
@@ -222,7 +232,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (isAttr() || !hasDescendentNodeMappings()) return;
         if (editPath != null && !path.isFamilyOf(editPath.getPath())) return;
         if (nodeMappings.isEmpty()) {
-            if (optRoot != null) { // maybe create a virtual node mapping if all kids agree
+            if (isRootOpt()) { // maybe create a virtual node mapping if all kids agree
                 Set<Path> siblingPaths = getSiblingInputPathsOfChildren();
                 if (siblingPaths != null) {
                     NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
@@ -273,16 +283,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 startBuilderCall("R2x", nodeMapping.codeOut, groovyParams, editPath);
                 for (RecDefNode sub : children) {
                     if (sub.isAttr()) continue;
-                    if (sub.optKey != null) {
+                    if (sub.isChildOpt()) {
                         nodeMapping.codeOut.line(
-                                "%s '%s' // R3k",
-                                sub.getTag().toBuilderCall(), sub.optKey.key
-                        );
-                    }
-                    else if (sub.optValue != null) {
-                        nodeMapping.codeOut.line(
-                                "%s '%s' // R3v",
-                                sub.getTag().toBuilderCall(), sub.optValue.content
+                                "%s '%s' // R3c",
+                                sub.getTag().toBuilderCall(), sub.optBox
                         );
                     }
                     else {
@@ -328,16 +332,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
             startBuilderCall("R5", codeOut, groovyParams, editPath);
             for (RecDefNode sub : children) {
                 if (sub.isAttr()) continue;
-                if (sub.optKey != null) {
+                if (sub.isChildOpt()) {
                     codeOut.line(
-                            "%s '%s'",
-                            sub.getTag().toBuilderCall(), sub.optKey.key
-                    );
-                }
-                else if (sub.optValue != null) {
-                    codeOut.line(
-                            "%s '%s'",
-                            sub.getTag().toBuilderCall(), sub.optValue.content
+                            "%s '%s' // R5c",
+                            sub.getTag().toBuilderCall(), sub.optBox
                     );
                 }
                 else {
@@ -395,22 +393,24 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return inputPaths;
     }
 
+    private boolean isRootOpt() {
+        return elem != null && optBox != null && optBox.role == OptRole.ROOT;
+    }
+
+    private boolean isChildOpt() {
+        return optBox != null && optBox.role != OptRole.ROOT;
+    }
+
     private void startBuilderCall(String comment, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        boolean hasOpt = optRoot != null;
         if (hasActiveAttributes()) {
             Tag tag = getTag();
-            codeOut.line_("%s ( // %s%s", tag.toBuilderCall(), comment, hasOpt ? "(opt)" : "");
+            codeOut.line_("%s ( // %s%s", tag.toBuilderCall(), comment, isRootOpt() ? "(opt)" : "");
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
-                if (sub.optKey != null) {
+                if (sub.isChildOpt()) {
                     if (comma) codeOut.line(",");
-                    codeOut.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optKey.key);
-                    comma = true;
-                }
-                else if (sub.optValue != null) {
-                    if (comma) codeOut.line(",");
-                    codeOut.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.optValue.content);
+                    codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
                     comma = true;
                 }
                 else {
@@ -429,7 +429,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             codeOut._line(") {").in();
         }
         else {
-            codeOut.line_("%s { // %s%s", getTag().toBuilderCall(), comment, hasOpt ? "(opt)" : "");
+            codeOut.line_("%s { // %s%s", getTag().toBuilderCall(), comment, isRootOpt() ? "(opt)" : "");
         }
     }
 
@@ -441,9 +441,56 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public String toString() {
         String name = isAttr() ? attr.tag.toString(defaultPrefix) : elem.tag.toString(defaultPrefix);
-        if (optRoot != null) name += String.format("[%s]", optRoot.content);
-        if (optKey != null || optValue != null) name += "{Constant}";
+        if (isRootOpt()) name += String.format("[%s]", optBox);
+        if (isChildOpt()) name += "{Constant}";
         return name;
     }
 
+    private enum OptRole {ROOT, CHILD, KEY, VALUE, SCHEMA, SCHEMA_URI}
+
+    private static class OptBox {
+        final OptRole role;
+        final OptList.Opt opt;
+
+        OptBox(OptRole role, OptList.Opt opt) {
+            this.role = role;
+            this.opt = opt;
+        }
+
+        OptBox inRoleFor(Tag tag) {
+            if (role == OptRole.CHILD) {
+                if (opt.parent.key != null && opt.parent.key.equals(tag)) return new OptBox(OptRole.KEY, opt);
+                if (opt.parent.value != null && opt.parent.value.equals(tag)) return new OptBox(OptRole.VALUE, opt);
+                if (opt.parent.schema != null && opt.parent.schema.equals(tag)) return new OptBox(OptRole.SCHEMA, opt);
+                if (opt.parent.schemaUri != null && opt.parent.schemaUri.equals(tag)) return new OptBox(OptRole.SCHEMA_URI, opt);
+            }
+            return null;
+        }
+
+        OptBox createChild() {
+            if (role != OptRole.ROOT) throw new RuntimeException();
+            return new OptBox(OptRole.CHILD, opt);
+        }
+
+        public boolean isChild() {
+            return role != OptRole.ROOT;
+        }
+
+        public String toString() {
+            switch (role) {
+                case ROOT:
+                    return opt.value;
+                case KEY:
+                    return opt.key;
+                case VALUE:
+                    return opt.value;
+                case SCHEMA:
+                    return opt.schema;
+                case SCHEMA_URI:
+                    return opt.schemaUri;
+                default:
+                    return "OPT";
+            }
+        }
+    }
 }

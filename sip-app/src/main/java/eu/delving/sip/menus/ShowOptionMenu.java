@@ -73,7 +73,7 @@ public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
         private OptList.Opt opt;
 
         private OptAction(OptList.Opt opt) {
-            super(opt.content);
+            super(opt.value);
             this.opt = opt;
         }
 

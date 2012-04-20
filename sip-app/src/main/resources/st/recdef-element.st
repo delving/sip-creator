@@ -15,7 +15,7 @@ $if (optList)$
     <tr><td>
         <ul>
             $optList.opts:{ opt |
-                <li>$opt.key$ - $opt.content$</li>
+                <li>$opt.key$ - $opt.value$</li>
             }$
         </ul>
     </td></tr>

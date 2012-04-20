@@ -386,7 +386,7 @@ public class RecDef {
             }
             if (optList != null) {
                 indent(out, level).append("// ");
-                for (OptList.Opt opt : optList.opts) out.append(String.format("%s=%s, ", opt.key, opt.content));
+                for (OptList.Opt opt : optList.opts) out.append(String.format("%s=%s, ", opt.key, opt.value));
                 out.append("\n");
             }
             indent(out, level).append("lido.");
