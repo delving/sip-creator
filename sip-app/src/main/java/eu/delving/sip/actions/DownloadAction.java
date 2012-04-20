@@ -24,7 +24,7 @@ package eu.delving.sip.actions;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
@@ -63,7 +63,7 @@ public class DownloadAction extends AbstractAction {
 
     public DownloadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Download another data set");
-        putValue(Action.SMALL_ICON, Utility.DOWNLOAD_ICON);
+        putValue(Action.SMALL_ICON, SwingHelper.DOWNLOAD_ICON);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -108,7 +108,7 @@ public class DownloadAction extends AbstractAction {
         private JPanel createListPanel() {
             JPanel p = new JPanel(new BorderLayout());
             p.setBorder(BorderFactory.createTitledBorder("Data sets"));
-            p.add(Utility.scrollV(list), BorderLayout.CENTER);
+            p.add(SwingHelper.scrollV(list), BorderLayout.CENTER);
             return p;
         }
 

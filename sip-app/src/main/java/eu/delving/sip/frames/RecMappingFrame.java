@@ -24,7 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.menus.RevertMappingMenu;
 import eu.delving.sip.model.*;
 
@@ -78,7 +78,7 @@ public class RecMappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(Utility.scrollV("Node Mappings", nodeMappingList), BorderLayout.CENTER);
+        content.add(SwingHelper.scrollV("Node Mappings", nodeMappingList), BorderLayout.CENTER);
         content.add(new JButton(removeAction), BorderLayout.SOUTH);
     }
 

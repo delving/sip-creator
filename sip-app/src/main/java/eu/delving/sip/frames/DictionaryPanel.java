@@ -23,7 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.CreateTransition;
 import eu.delving.sip.model.RecDefTreeNode;
@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static eu.delving.sip.base.DictionaryHelper.*;
 
 /**
  * Dictionary editing
@@ -94,7 +96,7 @@ public class DictionaryPanel extends JPanel {
             }
         });
         p.add(createNorth(), BorderLayout.NORTH);
-        p.add(Utility.scrollV("Dictionary Entries", table), BorderLayout.CENTER);
+        p.add(SwingHelper.scrollV("Dictionary Entries", table), BorderLayout.CENTER);
         return p;
     }
 
@@ -121,7 +123,7 @@ public class DictionaryPanel extends JPanel {
 
     private JPanel createEast() {
         JPanel p = new JPanel(new BorderLayout());
-        p.add(Utility.scrollV("Target Values", valueList), BorderLayout.CENTER);
+        p.add(SwingHelper.scrollV("Target Values", valueList), BorderLayout.CENTER);
         p.add(assign, BorderLayout.SOUTH);
         return p;
     }
@@ -372,7 +374,7 @@ public class DictionaryPanel extends JPanel {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    if (Utility.isDictionaryPossible(createModel.getNodeMapping())) Utility.refreshDictionary(createModel.getNodeMapping());
+                    if (isDictionaryPossible(createModel.getNodeMapping())) refreshDictionary(createModel.getNodeMapping());
                 }
             });
         }
@@ -381,7 +383,7 @@ public class DictionaryPanel extends JPanel {
     private final Action DELETE_ACTION = new AbstractAction("Delete") {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            int nonempty = Utility.countNonemptyDictionaryEntries(createModel.getNodeMapping());
+            int nonempty = countNonemptyDictionaryEntries(createModel.getNodeMapping());
             if (nonempty > 0) {
                 int response = JOptionPane.showConfirmDialog(
                         SwingUtilities.getWindowAncestor(DictionaryPanel.this),
@@ -394,7 +396,7 @@ public class DictionaryPanel extends JPanel {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    Utility.removeDictionary(createModel.getNodeMapping());
+                    removeDictionary(createModel.getNodeMapping());
                 }
             });
         }

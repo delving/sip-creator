@@ -24,7 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;
@@ -38,8 +38,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import static eu.delving.sip.base.Utility.HILIGHTED_COLOR;
-import static eu.delving.sip.base.Utility.MAPPED_COLOR;
+import static eu.delving.sip.base.SwingHelper.HILIGHTED_COLOR;
+import static eu.delving.sip.base.SwingHelper.MAPPED_COLOR;
 
 /**
  * Represent an element in the JTree
@@ -105,7 +105,7 @@ public class RecDefTreeNode extends FilterNode {
 
     public String toHtml() {
         if (html == null) {
-            StringTemplate t = Utility.getTemplate(recDefNode.isAttr() ? "recdef-attribute" : "recdef-element");
+            StringTemplate t = SwingHelper.getTemplate(recDefNode.isAttr() ? "recdef-attribute" : "recdef-element");
             t.setAttribute("name", recDefNode.getTag());
             t.setAttribute("doc", recDefNode.getDoc());
             t.setAttribute("optList", recDefNode.getOptList());
@@ -197,23 +197,23 @@ public class RecDefTreeNode extends FilterNode {
             if (value instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) value;
                 if (node.recDefNode.isUnmappable()) {
-                    setIcon(Utility.UNMAPPABLE_ICON);
+                    setIcon(SwingHelper.UNMAPPABLE_ICON);
                 }
                 else if (node.recDefNode.isAttr()) {
-                    setIcon(Utility.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ATTRIBUTE_ICON);
                 }
                 else if (node.hasChildElements()) {
-                    setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
                 }
                 else {
-                    setIcon(Utility.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
                 }
                 if (!node.recDefNode.getNodeMappings().isEmpty()) {
                     markNodeMappings(sel, node);
                 }
             }
             else {
-                setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
             }
             return component;
         }

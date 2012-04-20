@@ -25,7 +25,7 @@ import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.Storage;
 import org.antlr.stringtemplate.StringTemplate;
 
@@ -39,8 +39,7 @@ import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 
-import static eu.delving.sip.base.Utility.HILIGHTED_COLOR;
-import static eu.delving.sip.base.Utility.MAPPED_COLOR;
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * A node of the analysis tree
@@ -94,7 +93,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     private SourceTreeNode(SourceTreeNode parent, Map.Entry<String, String> entry) {
         this(parent, Tag.create(entry.getKey()));
-        StringTemplate template = Utility.getTemplate("fact-brief");
+        StringTemplate template = SwingHelper.getTemplate("fact-brief");
         template.setAttribute("fact", entry);
         this.htmlChunk = template.toString();
     }
@@ -106,7 +105,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     public void setStatistics(FieldStatistics fieldStatistics) {
         this.fieldStatistics = fieldStatistics;
-        StringTemplate template = Utility.getTemplate("stats-brief");
+        StringTemplate template = SwingHelper.getTemplate("stats-brief");
         template.setAttribute("stats", fieldStatistics);
         this.htmlChunk = template.toString();
     }
@@ -338,13 +337,13 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             if (value instanceof SourceTreeNode) {
                 SourceTreeNode node = (SourceTreeNode) value;
                 if (node.getTag().isAttribute()) {
-                    setIcon(Utility.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ATTRIBUTE_ICON);
                 }
                 else if (node.getChildNodes().iterator().hasNext()) {
-                    setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
                 }
                 else {
-                    setIcon(Utility.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
                 }
                 if (node.isRecordRoot() || node.isUniqueElement()) {
                     markDelimiters(sel, node);
@@ -361,7 +360,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         }
 
         private void markDelimiters(boolean selected, SourceTreeNode node) {
-            Utility.setDelimitedColor(this, selected);
+            setDelimitedColor(this, selected);
             setOpaque(!selected);
 //            setBorder(BorderFactory.createEtchedBorder());
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));

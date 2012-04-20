@@ -21,16 +21,13 @@
 
 package eu.delving.sip.panels;
 
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -49,7 +46,7 @@ public class HtmlPanel extends JPanel {
         setBorder(BorderFactory.createTitledBorder(title));
         view.setContentType("text/html");
         view.setDocument(doc);
-        add(Utility.scrollV(view));
+        add(SwingHelper.scrollV(view));
         setPreferredSize(new Dimension(200, 200));
     }
 

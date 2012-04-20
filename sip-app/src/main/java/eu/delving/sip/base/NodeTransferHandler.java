@@ -52,7 +52,7 @@ public class NodeTransferHandler extends TransferHandler {
 
     @Override
     public Icon getVisualRepresentation(Transferable transferable) {
-        return Utility.VALUE_ELEMENT_ICON;
+        return SwingHelper.VALUE_ELEMENT_ICON;
     }
 
     @Override

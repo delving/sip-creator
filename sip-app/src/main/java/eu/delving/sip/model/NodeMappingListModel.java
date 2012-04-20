@@ -25,7 +25,6 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.Utility;
 import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;
@@ -33,6 +32,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static eu.delving.sip.base.SwingHelper.getTemplate;
 
 /**
  * A list of node mappings
@@ -50,7 +51,7 @@ public class NodeMappingListModel extends AbstractListModel {
                 int index = locationToIndex(evt.getPoint());
                 if (index < 0) return "?";
                 NodeMappingEntry entry = (NodeMappingEntry) getModel().getElementAt(index);
-                StringTemplate template = Utility.getTemplate("node-mapping");
+                StringTemplate template = getTemplate("node-mapping");
                 template.setAttribute("nodeMapping", entry.getNodeMapping());
                 return template.toString();
             }

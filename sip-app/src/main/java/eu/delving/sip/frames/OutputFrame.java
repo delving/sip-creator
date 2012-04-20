@@ -23,7 +23,6 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Utility;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -31,6 +30,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
+
+import static eu.delving.sip.base.SwingHelper.scrollVH;
+import static eu.delving.sip.base.SwingHelper.setError;
 
 /**
  * The transformation from input record to output
@@ -71,7 +73,7 @@ public class OutputFrame extends FrameBase {
                     Exec.swingLater(new Runnable() {
                         @Override
                         public void run() {
-                            Utility.setError(area, error);
+                            setError(area, error);
                             area.setBackground(error ? new Color(1.0f, 0.9f, 0.9f) : Color.WHITE);
                             area.setLineWrap(error);
                             area.setCaretPosition(0);
@@ -91,7 +93,7 @@ public class OutputFrame extends FrameBase {
             public void changedUpdate(DocumentEvent documentEvent) {
             }
         });
-        p.add(Utility.scrollVH(area));
+        p.add(scrollVH(area));
         return p;
     }
 

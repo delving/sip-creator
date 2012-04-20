@@ -23,7 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,16 +101,16 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
             JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, selected, cellHasFocus);
             NodeMappingEntry entry = (NodeMappingEntry) value;
             if (entry.getNodeMapping().recDefNode.isAttr()) {
-                setIcon(Utility.ATTRIBUTE_ICON);
+                setIcon(SwingHelper.ATTRIBUTE_ICON);
             }
             else if (entry.getNodeMapping().recDefNode.isLeafElem()) {
-                setIcon(Utility.VALUE_ELEMENT_ICON);
+                setIcon(SwingHelper.VALUE_ELEMENT_ICON);
             }
             else {
-                setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
             }
             if (entry.isHighlighted()) {
-                setBackground(Utility.HILIGHTED_COLOR);
+                setBackground(SwingHelper.HILIGHTED_COLOR);
             }
             else {
                 setBackground(selected ? list.getSelectionBackground() : list.getBackground());

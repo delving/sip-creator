@@ -26,7 +26,7 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.Utility;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -39,6 +39,8 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
  * The transformation from input record to output
@@ -96,7 +98,7 @@ public class InputFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(Utility.scrollVH(recordTree), BorderLayout.CENTER);
+        content.add(scrollVH(recordTree), BorderLayout.CENTER);
         content.add(createRecordButtonPanel(), BorderLayout.SOUTH);
     }
 
@@ -276,17 +278,17 @@ public class InputFrame extends FrameBase {
             if (value instanceof GroovyTreeNode) {
                 GroovyTreeNode node = (GroovyTreeNode) value;
                 if (node.attrKey != null) {
-                    setIcon(Utility.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ATTRIBUTE_ICON);
                 }
                 else if (!node.isLeaf()) {
-                    setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
                 }
                 else {
-                    setIcon(Utility.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
                 }
             }
             else {
-                setIcon(Utility.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
             }
             return component;
         }
@@ -295,7 +297,7 @@ public class InputFrame extends FrameBase {
     private RewindAction rewind = new RewindAction();
     private class RewindAction extends AbstractAction {
         private RewindAction() {
-            putValue(Action.SMALL_ICON, Utility.REWIND_ICON);
+            putValue(Action.SMALL_ICON, SwingHelper.REWIND_ICON);
         }
 
         @Override
@@ -308,7 +310,7 @@ public class InputFrame extends FrameBase {
     private PlayAction play = new PlayAction();
     private class PlayAction extends AbstractAction {
         private PlayAction() {
-            putValue(Action.SMALL_ICON, Utility.PLAY_ICON);
+            putValue(Action.SMALL_ICON, SwingHelper.PLAY_ICON);
         }
 
         @Override
