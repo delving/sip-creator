@@ -64,14 +64,14 @@
         <elem tag="dcterms:temporal"/>          <!-- ESE 3.4 -->
         <elem tag="dcterms:rightsHolder"/>      <!-- NOT part of ESE 3.4 -->
 
-        <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
         <elem tag="europeana:object"/>          <!-- ESE 3.4 -->
         <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
-        <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
         <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
         <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
