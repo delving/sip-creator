@@ -82,6 +82,14 @@
         <elem tag="europeana:userTag"/>
         <elem tag="europeana:hasDigitalObject"/>
         <elem tag="europeana:year"/>
+
+        <!-- original delving namespace -->
+        <elem tag="delving:year"/>
+        <elem tag="delving:thumbnail"/>
+        <elem tag="delving:deepZoomUrl"/>
+        <elem tag="delving:fullTextObjectUrl"/>
+        <elem tag="delving:fullText"/>
+
     </root>
 
     <summaryFields>

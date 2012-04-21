@@ -104,6 +104,12 @@
             <xs:element ref="europeana:hasDigitalObject" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="europeana:year" minOccurs="0" maxOccurs="unbounded"/>
 
+            <xs:element ref="delving:year" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="delving:thumbnail" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="delving:deepZoomUrl" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="delving:fullTextObjectUrl" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="delving:fullText" minOccurs="0" maxOccurs="unbounded"/>
+
         </xs:sequence>
     </xs:complexType>
 
