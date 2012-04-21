@@ -6,7 +6,7 @@
         </sample-input>
         <documentation></documentation>
         <groovy-code>
-            <string>def uriBytes = it.getBytes(&quot;UTF-8&quot;);</string>
+            <string>def uriBytes = it.toString().getBytes(&quot;UTF-8&quot;);</string>
             <string>def digest = java.security.MessageDigest.getInstance(&quot;SHA-1&quot;)</string>
             <string>def hash = new StringBuilder()</string>
             <string>for (Byte b in digest.digest(uriBytes)) {</string>
