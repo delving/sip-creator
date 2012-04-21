@@ -66,11 +66,11 @@
 
         <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt" summaryField="LANDING_PAGE"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:object"/>          <!-- ESE 3.4 -->
-        <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
+        <elem tag="europeana:object" summaryField="THUMBNAIL"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:provider" summaryField="PROVIDER"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:dataProvider" summaryField="OWNER"/>      <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
         <elem tag="europeana:uri" type="string"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
         <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
