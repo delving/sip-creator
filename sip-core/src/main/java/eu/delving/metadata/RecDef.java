@@ -95,6 +95,8 @@ public class RecDef {
 
     public List<FactRef> facts;
 
+    public List<SummaryFieldEntry> summaryFields;
+
     public List<SearchField> searchFields;
 
     public List<Doc> docs;
