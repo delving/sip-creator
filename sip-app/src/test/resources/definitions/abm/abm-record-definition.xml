@@ -66,13 +66,13 @@
 
         <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownAt" summaryField="LANDING_PAGE"/>       <!-- ESE 3.4 -->
-        <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:object" summaryField="THUMBNAIL"/>          <!-- ESE 3.4 -->
-        <elem tag="europeana:provider" summaryField="PROVIDER"/>       <!-- ESE 3.4 -->
-        <elem tag="europeana:dataProvider" summaryField="OWNER"/>      <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt" />       <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored" />        <!-- ESE 3.4 -->
+        <elem tag="europeana:object" />          <!-- ESE 3.4 -->
+        <elem tag="europeana:provider" />       <!-- ESE 3.4 -->
+        <elem tag="europeana:dataProvider" />      <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
-        <elem tag="europeana:uri" type="string"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
+        <elem tag="europeana:uri" fieldType="string"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
         <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
@@ -84,18 +84,21 @@
         <elem tag="europeana:year"/>
     </root>
 
+    <summaryFields>
+        <summaryField name="CREATOR"          xpath="/record/dc:creator"/>
+        <summaryField name="TITLE"            xpath="/record/dc:title"/>
+        <summaryField name="DESCRIPTION"      xpath="/record/dc:description"/>
+        <summaryField name="OWNER"            xpath="/record/europeana:dataProvider"/>
+        <summaryField name="LANDING_PAGE"     xpath="/record/europeana:isShownAt"/>
+        <summaryField name="THUMBNAIL"        xpath="/record/europeana:object"/>
+        <summaryField name="THUMBNAIL"        xpath="/record/delving:thumbnail"/>
+    </summaryFields>
+
     <searchFields>
-        <searchField name="CREATOR" path="/record/dc:creator"/>
-        <searchField name="TITLE" path="/record/dc:title"/>
-        <searchField name="DESCRIPTION" path="/record/dc:description"/>
-        <searchField name="OWNER" path="/record/europeana:dataProvider"/>
-        <searchField name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
-        <searchField name="THUMBNAIL" path="/record/europeana:object"/>
-        <searchField name="THUMBNAIL" path="/record/delving:thumbnail"/>
-        <searchField name="SNIPPET" path="/record/delving:fullText"/>
-        <searchField name="SNIPPET" path="/record/dc:subject"/>
-        <searchField name="SNIPPET" path="/record/dcterms:alternative"/>
-        <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
+        <searchField name="SNIPPET"           xpath="/record/delving:fullText"/>
+        <searchField name="SNIPPET"           xpath="/record/dc:subject"/>
+        <searchField name="SNIPPET"           xpath="/record/dcterms:alternative"/>
+        <searchField name="SNIPPET"           xpath="/record/europeana:collectionTitle"/>
     </searchFields>
 
     <facts>
