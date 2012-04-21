@@ -94,18 +94,21 @@
     <opts>
     </opts>
 
+    <summaryFields>
+        <summaryField name="CREATOR"          xpath="//dc:creator"/>
+        <summaryField name="TITLE"            xpath="//dc:title"/>
+        <summaryField name="DESCRIPTION"      xpath="//dc:description"/>
+        <summaryField name="OWNER"            xpath="//europeana:dataProvider"/>
+        <summaryField name="LANDING_PAGE"     xpath="//europeana:isShownAt"/>
+        <summaryField name="THUMBNAIL"        xpath="//europeana:object"/>
+        <summaryField name="THUMBNAIL"        xpath="//delving:thumbnail"/>
+    </summaryFields>
+
     <searchFields>
-        <searchField name="CREATOR" path="/record/dc:creator"/>
-        <searchField name="TITLE" path="/record/dc:title"/>
-        <searchField name="DESCRIPTION" path="/record/dc:description"/>
-        <searchField name="OWNER" path="/record/europeana:dataProvider"/>
-        <searchField name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
-        <searchField name="THUMBNAIL" path="/record/europeana:object"/>
-        <searchField name="THUMBNAIL" path="/record/delving:thumbnail"/>
-        <searchField name="SNIPPET" path="/record/delving:fullText"/>
-        <searchField name="SNIPPET" path="/record/dc:subject"/>
-        <searchField name="SNIPPET" path="/record/dcterms:alternative"/>
-        <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
+        <searchField name="SNIPPET"           xpath="//delving:fullText"/>
+        <searchField name="SNIPPET"           xpath="//dc:subject"/>
+        <searchField name="SNIPPET"           xpath="//dcterms:alternative"/>
+        <searchField name="SNIPPET"           xpath="//europeana:collectionTitle"/>
     </searchFields>
 
     <facts>
