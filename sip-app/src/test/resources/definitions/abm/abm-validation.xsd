@@ -79,25 +79,25 @@
             <xs:element name="lat" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="long" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="type" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="geo" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="geo" minOccurs="0" maxOccurs="1"/>
 
             <xs:group minOccurs="0" maxOccurs="unbounded" ref="abm:dcGroup" />
             <xs:group minOccurs="0" maxOccurs="unbounded" ref="abm:dctermsGroup" />
 
-            <xs:element ref="europeana:isShownBy" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="europeana:rights" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="europeana:isShownBy" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="europeana:rights" minOccurs="1" maxOccurs="1"/>
             <xs:element ref="europeana:isShownAt" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="europeana:unstored" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="europeana:object" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="europeana:provider" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="europeana:dataProvider" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="europeana:type" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="europeana:unstored" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="europeana:object" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="europeana:provider" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:dataProvider" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:type" minOccurs="1" maxOccurs="1"/>
 
-            <xs:element ref="europeana:uri" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:language" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:country" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:collectionName" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:collectionTitle" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="europeana:uri" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:language" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:country" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:collectionName" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:collectionTitle" minOccurs="1" maxOccurs="1"/>
             <xs:element ref="europeana:source" minOccurs="0" maxOccurs="unbounded"/>
 
             <xs:element ref="europeana:userTag" minOccurs="0" maxOccurs="unbounded"/>

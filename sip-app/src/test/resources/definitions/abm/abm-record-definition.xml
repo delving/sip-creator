@@ -21,7 +21,7 @@
         <elem tag="abm:lat"/>
         <elem tag="abm:long"/>
         <elem tag="abm:type"/>
-        <elem tag="abm:geo"/>
+        <elem tag="abm:geo" type="location"/>
 
 
         <elem tag="dc:contributor"/>            <!-- ESE 3.4 -->
@@ -72,7 +72,7 @@
         <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
         <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
-        <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
+        <elem tag="europeana:uri" type="string"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
         <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
@@ -85,22 +85,29 @@
     </root>
 
     <searchFields>
+        <searchField name="CREATOR" path="/record/dc:creator"/>
+        <searchField name="TITLE" path="/record/dc:title"/>
         <searchField name="DESCRIPTION" path="/record/dc:description"/>
-        <searchField name="TITLE" path="/record//dc:title"/>
         <searchField name="OWNER" path="/record/europeana:dataProvider"/>
-        <searchField name="THUMBNAIL" path="/record/europeana:isShownBy"/>
+        <searchField name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+        <searchField name="THUMBNAIL" path="/record/europeana:object"/>
+        <searchField name="THUMBNAIL" path="/record/delving:thumbnail"/>
+        <searchField name="SNIPPET" path="/record/delving:fullText"/>
+        <searchField name="SNIPPET" path="/record/dc:subject"/>
+        <searchField name="SNIPPET" path="/record/dcterms:alternative"/>
+        <searchField name="SNIPPET" path="/record/europeana:collectionTitle"/>
     </searchFields>
 
-    <!--<facts>-->
-        <!--<fact name="spec" path="/icn:collectionName"/>-->
-        <!--<fact name="name" path="/icn:collectionTitle"/>-->
-        <!--<fact name="country" path="/icn:country"/>-->
-        <!--<fact name="dataProvider" path="/icn:dataProvider"/>-->
-        <!--<fact name="language" path="/icn:language"/>-->
-        <!--<fact name="provider" path="/icn:provider"/>-->
-        <!--<fact name="rights" path="/icn:rights"/>-->
-        <!--<fact name="type" path="/icn:type"/>-->
-    <!--</facts>-->
+    <facts>
+        <fact-ref name="spec" path="/record/europeana:collectionName"/>
+        <fact-ref name="name" path="/record/europeana:collectionTitle"/>
+        <fact-ref name="country" path="/record/europeana:country"/>
+        <fact-ref name="dataProvider" path="/record/europeana:dataProvider"/>
+        <fact-ref name="language" path="/record/europeana:language"/>
+        <fact-ref name="provider" path="/record/europeana:provider"/>
+        <fact-ref name="rights" path="/record/europeana:rights"/>
+        <fact-ref name="type" path="/record/europeana:type"/>
+    </facts>
 
     <!--<converters>-->
         <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>-->
