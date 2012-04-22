@@ -108,11 +108,9 @@ public class TestCodeGeneration {
         oneTwoTarget.addNodeMapping(mapping("/input/leadup/record/fromOne"));
         oneTwoTarget.addNodeMapping(mapping("/input/leadup/record/fromTwo"));
 
-        String code = recMapping.toCode(null);
-        printWithLineNumbers(code);
-
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
+        printWithLineNumbers(mappingRunner.getCode());
         Node node = mappingRunner.runMapping(createInputRecord());
 
         String xml = XmlSerializer.toXml(node);
@@ -144,8 +142,8 @@ public class TestCodeGeneration {
         n(member2, "name", "O'Pokey");
         n(member2, "name", "McPokey");
         n(member2, "concept", "sidekick");
-        n(record, "fromOne");
-        n(record, "fromTwo");
+        n(record, "fromOne", "1");
+        n(record, "fromTwo", "2");
 
         Map<String, String> ns = new TreeMap<String, String>();
         ns.put("lido", "http://lidoland");
@@ -156,6 +154,14 @@ public class TestCodeGeneration {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                     "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"backward\">\n" +
                     "    <lido:descriptiveMetadata>\n" +
+                    "        <lido:objectClassificationWrap>\n" +
+                    "            <lido:classificationWrap>\n" +
+                    "                <lido:classification>\n" +
+                    "                    <lido:conceptID>1</lido:conceptID>\n" +
+                    "                    <lido:conceptID>2</lido:conceptID>\n" +
+                    "                </lido:classification>\n" +
+                    "            </lido:classificationWrap>\n" +
+                    "        </lido:objectClassificationWrap>\n" +
                     "        <lido:objectRelationWrap>\n" +
                     "            <lido:subjectWrap>\n" +
                     "                <lido:subjectSet lido:sortorder=\"23\">\n" +
