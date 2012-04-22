@@ -103,6 +103,11 @@ public class TestCodeGeneration {
                         "}",
                 recMapping
         );
+
+        RecDefNode oneTwoTarget = node("/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/conceptID");
+        oneTwoTarget.addNodeMapping(mapping("/input/leadup/record/fromOne"));
+        oneTwoTarget.addNodeMapping(mapping("/input/leadup/record/fromTwo"));
+
         String code = recMapping.toCode(null);
         printWithLineNumbers(code);
 
@@ -123,7 +128,7 @@ public class TestCodeGeneration {
     }
 
     private MetadataRecord createInputRecord() {
-        GroovyNode input, leadup, record, list, member1, member2;
+        GroovyNode input, leadup, record, list, member1, member2, fromOne, fromTwo;
         input = n(null, "input");
         leadup = n(input, "leadup");
         leadup.attributes().put("orderofsort", "backward");
@@ -139,6 +144,9 @@ public class TestCodeGeneration {
         n(member2, "name", "O'Pokey");
         n(member2, "name", "McPokey");
         n(member2, "concept", "sidekick");
+        n(record, "fromOne");
+        n(record, "fromTwo");
+
         Map<String, String> ns = new TreeMap<String, String>();
         ns.put("lido", "http://lidoland");
         return new MetadataRecordFactory(ns).fromGroovyNode(input, -1, 1);
@@ -208,7 +216,7 @@ public class TestCodeGeneration {
             public RecDefTree createRecDef(String prefix) {
                 if (!"lido".equals(prefix)) throw new RuntimeException();
                 try {
-                    URL url = getClass().getResource("/codegen/test-code-generation-recdef.xml");
+                    URL url = TestCodeGeneration.class.getResource("/codegen/test-code-generation-recdef.xml");
                     InputStream inputStream = url.openStream();
                     return RecDefTree.create(RecDef.read(inputStream));
                 }
