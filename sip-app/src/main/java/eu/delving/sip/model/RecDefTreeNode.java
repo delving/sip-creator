@@ -67,7 +67,7 @@ public class RecDefTreeNode extends FilterNode {
         this.recDefNode = recDefNode;
         if (parent != null) parent.children.add(this);
         for (RecDefNode subRecDefNode : recDefNode.getChildren()) {
-            if (!subRecDefNode.isSystemField()) new RecDefTreeNode(this, subRecDefNode);
+            if (!subRecDefNode.isHidden()) new RecDefTreeNode(this, subRecDefNode);
         }
     }
 

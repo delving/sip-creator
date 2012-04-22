@@ -137,14 +137,14 @@ public class RecMapping {
 
     private void resolve() {
         if (nodeMappings.isEmpty()) {
-            if (recDefTree.getRecDef().facts != null) {
-                for (RecDef.FactRef factRef : recDefTree.getRecDef().facts) {
-                    Path path = factRef.path.withDefaultPrefix(recDefTree.getRecDef().prefix);
-                    RecDefNode recDefNode = recDefTree.getRecDefNode(path);
-                    if (recDefNode != null) {
-                        NodeMapping nodeMapping = new NodeMapping().setInputPath(Path.create().child(Tag.create("facts")).child(Tag.create(factRef.name)));
-                        recDefNode.addNodeMapping(nodeMapping);
-                    }
+            List<RecDef.FieldMarker> fieldMarkers = recDefTree.getRecDef().fieldMarkers;
+            if (fieldMarkers != null) for (RecDef.FieldMarker marker : fieldMarkers) {
+                if (!"fact".equals(marker.type)) continue;
+                Path path = marker.path.withDefaultPrefix(recDefTree.getRecDef().prefix);
+                RecDefNode recDefNode = recDefTree.getRecDefNode(path);
+                if (recDefNode != null) {
+                    NodeMapping nodeMapping = new NodeMapping().setInputPath(Path.create().child(Tag.create("facts")).child(Tag.create(marker.name)));
+                    recDefNode.addNodeMapping(nodeMapping);
                 }
             }
         }

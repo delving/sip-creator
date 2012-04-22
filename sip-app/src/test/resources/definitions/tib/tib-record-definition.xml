@@ -110,15 +110,15 @@
 
     </root>
 
-    <searchFields>
-        <searchField name="THUMBNAIL" path="/record/tib:thumbLarge"/>
-        <searchField name="SNIPPET" path="/record/delving:fullText"/>
-        <searchField name="CREATOR" path="/record/dc:creator"/>
-        <searchField name="SNIPPET" path="/record/dc:description"/>
-        <searchField name="TITLE" path="/record/dc:title"/>
-        <searchField name="OWNER" path="/record/europeana:dataProvider"/>
-        <searchField name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
-    </searchFields>
+    <field-markers>
+        <field-marker type="search" name="THUMBNAIL" path="/record/tib:thumbLarge"/>
+        <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
+        <field-marker type="search" name="CREATOR" path="/record/dc:creator"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dc:description"/>
+        <field-marker type="search" name="TITLE" path="/record/dc:title"/>
+        <field-marker type="search" name="OWNER" path="/record/europeana:dataProvider"/>
+        <field-marker type="search" name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+    </field-markers>
 
 </record-definition>
 

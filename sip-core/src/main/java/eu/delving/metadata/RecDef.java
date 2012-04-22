@@ -93,11 +93,8 @@ public class RecDef {
 
     public List<OptList> opts;
 
-    public List<FactRef> facts;
-
-    public List<SummaryFieldEntry> summaryFields;
-
-    public List<SearchField> searchFields;
+    @XStreamAlias("field-markers")
+    public List<FieldMarker> fieldMarkers;
 
     public List<Doc> docs;
 
@@ -139,6 +136,7 @@ public class RecDef {
     private void resolve() {
         root.resolve(Path.create(), this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
+        if (fieldMarkers != null) for (FieldMarker marker : fieldMarkers) marker.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
     }
 
@@ -166,34 +164,25 @@ public class RecDef {
         return found;
     }
 
-    @XStreamAlias("fact-ref")
-    public static class FactRef {
+    @XStreamAlias("field-marker")
+    public static class FieldMarker {
+
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamAsAttribute
+        public String type;
 
         @XStreamAsAttribute
         public Path path;
 
-        @XStreamAsAttribute
-        public String name;
-    }
-
-    @XStreamAlias("searchField")
-    public static class SearchField {
-
-        @XStreamAsAttribute
-        public String name;
-
-        @XStreamAsAttribute
-        public String xpath;
-    }
-
-    @XStreamAlias("summaryField")
-    public static class SummaryFieldEntry {
-
-        @XStreamAsAttribute
-        public String name;
-
-        @XStreamAsAttribute
-        public String xpath;
+        public void resolve(RecDef recDef) {
+            Elem elem;
+            path = path.withDefaultPrefix(recDef.prefix);
+            elem = recDef.root.findElem(path, 0);
+            if (elem == null) throw new RuntimeException("Cannot find path " + path);
+            elem.fieldMarker = this;
+        }
     }
 
     @XStreamAlias("doc")
@@ -261,11 +250,11 @@ public class RecDef {
         public Tag tag;
 
         @XStreamAsAttribute
-        public boolean systemField;
+        public boolean hidden;
 
         @XStreamOmitField
         public Doc doc;
-        
+
         public String toString() {
             return tag.toString();
         }
@@ -290,7 +279,7 @@ public class RecDef {
         public boolean singular;
 
         @XStreamAsAttribute
-        public boolean systemField;
+        public boolean hidden;
 
         @XStreamAsAttribute
         public boolean unmappable;
@@ -312,6 +301,9 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
+
+        @XStreamOmitField
+        public FieldMarker fieldMarker;
 
         @Override
         public String toString() {

@@ -110,19 +110,18 @@
 
     </root>
 
-    <searchFields>
-        <searchField name="dolving_gumby" path="/record/admin/displayProvider"/>
-    </searchFields>
+    <field-markers>
 
-    <facts>
-        <fact-ref path="/record/admin/ownerUri" name="dataOwnerUri"/>
-        <fact-ref path="/record/admin/displayOwner" name="dataOwnerName"/>
-        <fact-ref path="/record/admin/displayOwnerCountry" name="dataOwnerCountry"/>
-        <fact-ref path="/record/admin/providerUri" name="dataProviderUri"/>
-        <fact-ref path="/record/admin/displayProvider" name="dataProviderName"/>
-        <fact-ref path="/record/admin/rights" name="rights"/>
-        <fact-ref path="/record/thing/language" name="language"/>
-    </facts>
+        <field-marker type="search" name="dolving_gumby" path="/record/admin/displayProvider"/>
+
+        <field-marker type="fact" path="/record/admin/ownerUri" name="dataOwnerUri"/>
+        <field-marker type="fact" path="/record/admin/displayOwner" name="dataOwnerName"/>
+        <field-marker type="fact" path="/record/admin/displayOwnerCountry" name="dataOwnerCountry"/>
+        <field-marker type="fact" path="/record/admin/providerUri" name="dataProviderUri"/>
+        <field-marker type="fact" path="/record/admin/displayProvider" name="dataProviderName"/>
+        <field-marker type="fact" path="/record/admin/rights" name="rights"/>
+        <field-marker type="fact" path="/record/thing/language" name="language"/>
+    </field-markers>
 
     <docs>
         <doc path="/record/admin/displayProvider">

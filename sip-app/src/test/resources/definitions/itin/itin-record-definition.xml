@@ -10,8 +10,8 @@
 
     <attrs>
 
-        <attr tag="type" systemField="true"/>
-        <attr tag="label" systemField="true"/>
+        <attr tag="type" hidden="true"/>
+        <attr tag="label" hidden="true"/>
 
         <attr tag="sourceId"/>
         <attr tag="type"/>
@@ -489,14 +489,10 @@
     </opts>
 
 
-    <facts>
-        <fact-ref path="/record/admin/displayDataProvider" name="dataProvider"/>
-        <fact-ref path="/record/admin/displayDataProviderCountry" name="country"/>
-        <fact-ref path="/record/admin/displayProvider" name="provider"/>
-        <!--<fact-ref path="/record/admin/@dataProviderUri" name="provider"/>-->
-        <!--<fact-ref path="/record/admin/@providerUri" name="dataProviderUri"/>-->
-        <!--<fact-ref path="/record/admin/@providerHubUri" name="providerHubUri"/>-->
-        <!--<fact-ref path="/record/admin/displayProviderHub" name="dataProvider"/>-->
-    </facts>
+    <field-markers>
+        <field-marker type="fact" path="/record/admin/displayDataProvider" name="dataProvider"/>
+        <field-marker type="fact" path="/record/admin/displayDataProviderCountry" name="country"/>
+        <field-marker type="fact" path="/record/admin/displayProvider" name="provider"/>
+    </field-markers>
 
 </record-definition>

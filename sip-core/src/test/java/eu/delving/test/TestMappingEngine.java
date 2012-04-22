@@ -27,12 +27,10 @@ import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecDefTree;
-import eu.delving.sip.IndexDocument;
 import eu.delving.sip.MappingEngine;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
@@ -44,6 +42,7 @@ import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -61,9 +60,9 @@ public class TestMappingEngine {
                 "lido", "http://www.lido-schema.org"
         ));
         System.out.println(mappingEngine.getCode());
-        Node node = mappingEngine.toNode(input("lido"));
-        System.out.println(XmlSerializer.toXml(node));
-        Source source = new DOMSource(node);
+        MappingEngine.Result result = mappingEngine.execute(input("lido"));
+        System.out.println(XmlSerializer.toXml(result.root()));
+        Source source = new DOMSource(result.root());
         validator("lido").validate(source);
     }
 
@@ -75,8 +74,8 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "icn", "http://www.icn.nl/schemas/icn/"
         ));
-        Node node = mappingEngine.toNode(input("icn"));
-        Source source = new DOMSource(node);
+        MappingEngine.Result result = mappingEngine.execute(input("icn"));
+        Source source = new DOMSource(result.root());
         validator("icn").validate(source);
     }
 
@@ -88,11 +87,11 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "icn", "http://www.icn.nl/schemas/icn/"
         ));
-        Node node = mappingEngine.toNode(input("icn"));
-        System.out.println(XmlSerializer.toXml(node));
-        IndexDocument indexDocument = mappingEngine.toIndexDocument(input("icn"));
-        System.out.println(indexDocument);
-        Assert.assertFalse(indexDocument.getMap().isEmpty());
+        MappingEngine.Result result = mappingEngine.execute(input("icn"));
+        System.out.println(XmlSerializer.toXml(result.root()));
+        Map<String,List<String>> allFields = result.allFields();
+        System.out.println(allFields);
+        Assert.assertFalse(allFields.isEmpty());
     }
 
     @Test
@@ -101,8 +100,8 @@ public class TestMappingEngine {
                 "lido", "http://www.lido-schema.org"
         ));
         System.out.println(mappingEngine.getCode());
-        Node node = mappingEngine.toNode(input("aff"));
-        System.out.println(XmlSerializer.toXml(node));
+        MappingEngine.Result result = mappingEngine.execute(input("aff"));
+        System.out.println(XmlSerializer.toXml(result.root()));
     }
 
     @Test
@@ -111,11 +110,11 @@ public class TestMappingEngine {
                 "lido", "http://www.lido-schema.org"
         ));
         System.out.println(mappingEngine.getCode());
-        Node node = mappingEngine.toNode(input("aff"));
-        System.out.println(XmlSerializer.toXml(node));
-        IndexDocument indexDocument = mappingEngine.toIndexDocument(input("aff"));
-        System.out.println(indexDocument);
-        Assert.assertFalse(indexDocument.getMap().isEmpty());
+        MappingEngine.Result result = mappingEngine.execute(input("aff"));
+        System.out.println(XmlSerializer.toXml(result.root()));
+        Map<String,List<String>> allFields = result.allFields();
+        System.out.println(allFields);
+        Assert.assertFalse(allFields.isEmpty());
     }
 
     private Map<String, String> namespaces(String... arg) {

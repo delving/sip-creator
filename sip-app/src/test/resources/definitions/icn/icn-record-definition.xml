@@ -91,44 +91,30 @@
 
     </root>
 
-    <opts>
-    </opts>
+    <field-markers>
+        <field-marker name="CREATOR" path="/record/dc:creator"/>
+        <field-marker name="TITLE" path="/record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/record/dc:description"/>
+        <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
+        <field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>
 
-    <summaryFields>
-        <summaryField name="CREATOR"          xpath="//dc:creator"/>
-        <summaryField name="TITLE"            xpath="//dc:title"/>
-        <summaryField name="DESCRIPTION"      xpath="//dc:description"/>
-        <summaryField name="OWNER"            xpath="//europeana:dataProvider"/>
-        <summaryField name="LANDING_PAGE"     xpath="//europeana:isShownAt"/>
-        <summaryField name="THUMBNAIL"        xpath="//europeana:object"/>
-        <summaryField name="THUMBNAIL"        xpath="//delving:thumbnail"/>
-    </summaryFields>
+        <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dc:subject"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dcterms:alternative"/>
+        <field-marker type="search" name="SNIPPET" path="/record/europeana:collectionTitle"/>
 
-    <searchFields>
-        <searchField name="SNIPPET"           xpath="//delving:fullText"/>
-        <searchField name="SNIPPET"           xpath="//dc:subject"/>
-        <searchField name="SNIPPET"           xpath="//dcterms:alternative"/>
-        <searchField name="SNIPPET"           xpath="//europeana:collectionTitle"/>
-    </searchFields>
+        <field-marker type="fact" name="spec" path="/record/europeana:collectionName"/>
+        <field-marker type="fact" name="name" path="/record/europeana:collectionTitle"/>
+        <field-marker type="fact" name="country" path="/record/europeana:country"/>
+        <field-marker type="fact" name="dataProvider" path="/record/europeana:dataProvider"/>
+        <field-marker type="fact" name="language" path="/record/europeana:language"/>
+        <field-marker type="fact" name="provider" path="/record/europeana:provider"/>
+        <field-marker type="fact" name="rights" path="/record/europeana:rights"/>
+        <field-marker type="fact" name="type" path="/record/europeana:type"/>
+    </field-markers>
 
-    <facts>
-        <fact-ref name="spec" path="/record/europeana:collectionName"/>
-        <fact-ref name="name" path="/record/europeana:collectionTitle"/>
-        <fact-ref name="country" path="/record/europeana:country"/>
-        <fact-ref name="dataProvider" path="/record/europeana:dataProvider"/>
-        <fact-ref name="language" path="/record/europeana:language"/>
-        <fact-ref name="provider" path="/record/europeana:provider"/>
-        <fact-ref name="rights" path="/record/europeana:rights"/>
-        <fact-ref name="type" path="/record/europeana:type"/>
-    </facts>
-
-    <!--<converters>-->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfBirth"/>-->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/icn:creatorYearOfDeath"/>-->
-        <!--<converter call=".toLocalId(spec)" path="/europeana:uri"/>-->
-        <!--<converter multipleOutput="true" call=".extractYear()" path="/delving:year"/>-->
-    <!--</converters>-->
-    
     <docs>
         <doc path="/record/dc:contributor">
             <string name="Dublin Core definition">An entity responsible for making contributions to the content of the resource. Examples of a Contributor include a person, an organization or a service. Typically, the name of a Contributor should be used to indicate the entity.</string>

@@ -27,11 +27,11 @@
         <attr tag="dataProviderUri"/>
         <attr tag="providerUri"/>
         <attr tag="providerHubUri"/>
-        <attr tag="type" systemField="true"/>
-        <attr tag="key" systemField="true"/>
-        <attr tag="hubId" systemField="true"/>
-        <attr tag="hubRecordUrl" systemField="true"/>
-        <attr tag="delvingMediaUri" systemField="true"/>
+        <attr tag="type" hidden="true"/>
+        <attr tag="key" hidden="true"/>
+        <attr tag="hubId" hidden="true"/>
+        <attr tag="hubRecordUrl" hidden="true"/>
+        <attr tag="delvingMediaUri" hidden="true"/>
     </attrs>
 
     <elems>
@@ -145,17 +145,6 @@
 
     </root>
 
-
-    <facts>
-        <fact-ref path="/record/admin/displayDataProvider" name="dataProvider"/>
-        <fact-ref path="/record/admin/displayDataProviderCountry" name="country"/>
-        <fact-ref path="/record/admin/displayProvider" name="provider"/>
-        <!--<fact-ref path="/record/admin/@dataProviderUri" name="provider"/>-->
-        <!--<fact-ref path="/record/admin/@providerUri" name="dataProviderUri"/>-->
-        <!--<fact-ref path="/record/admin/@providerHubUri" name="providerHubUri"/>-->
-        <!--<fact-ref path="/record/admin/displayProviderHub" name="dataProvider"/>-->
-    </facts>
-
     <opts>
 
         <!-- todo: this is an example of a choice, like the old <options>, indicated by lack of "key"-->
@@ -244,16 +233,19 @@
 
     </opts>
 
-    <!--<summaryFields>-->
-        <!--<summaryField name="CREATOR" xpath="/record/thing/displayTitle/"/>-->
-        <!--<summaryField name="TITLE" xpath="/record/thing/displayTitle/"/>-->
-        <!--<summaryField name="DESCRIPTION" xpath="/record/thing/displayDescription/"/>-->
-        <!--<summaryField name="OWNER" xpath="/record/admin/dataProvider"/>-->
-        <!--<summaryField name="LANDING_PAGE" xpath="/record/thing/displayTitle/"/>-->
-        <!--<summaryField name="THUMBNAIL" xpath="/record/thing/displayTitle/"/>-->
-        <!--<summaryField name="SNIPPET" xpath="/record/thing/displayDescription"/>-->
-    <!--</summaryFields>-->
+    <field-markers>
+        <field-marker type="fact" path="/record/admin/displayDataProvider" name="dataProvider"/>
+        <field-marker type="fact" path="/record/admin/displayDataProviderCountry" name="country"/>
+        <field-marker type="fact" path="/record/admin/displayProvider" name="provider"/>
 
+        <!--<field-marker name="CREATOR" xpath="/record/thing/displayTitle/"/>-->
+        <!--<field-marker name="TITLE" xpath="/record/thing/displayTitle/"/>-->
+        <!--<field-marker name="DESCRIPTION" xpath="/record/thing/displayDescription/"/>-->
+        <!--<field-marker name="OWNER" xpath="/record/admin/dataProvider"/>-->
+        <!--<field-marker name="LANDING_PAGE" xpath="/record/thing/displayTitle/"/>-->
+        <!--<field-marker name="THUMBNAIL" xpath="/record/thing/displayTitle/"/>-->
+        <!--<field-marker name="SNIPPET" xpath="/record/thing/displayDescription"/>-->
+    </field-markers>
 
     <docs>
         <doc path="/record/thing/displayTitle">

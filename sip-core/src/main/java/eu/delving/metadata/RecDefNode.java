@@ -132,8 +132,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return elem != null && elem.elemList.isEmpty();
     }
 
-    public boolean isSystemField() {
-        return isAttr() ? attr.systemField : elem.systemField;
+    public RecDef.FieldMarker getFieldMarker() {
+        return elem != null ? elem.fieldMarker : null;
+    }
+
+    public boolean isHidden() {
+        return isAttr() ? attr.hidden : elem.hidden;
     }
 
     public boolean isUnmappable() {
