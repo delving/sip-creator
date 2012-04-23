@@ -89,7 +89,7 @@ public class TestMappingEngine {
         ));
         MappingEngine.Result result = mappingEngine.execute(input("icn"));
         System.out.println(XmlSerializer.toXml(result.root()));
-        Map<String,List<String>> allFields = result.allFields();
+        Map<String,List<String>> allFields = result.fields();
         System.out.println(allFields);
         Assert.assertFalse(allFields.isEmpty());
     }
@@ -112,7 +112,7 @@ public class TestMappingEngine {
         System.out.println(mappingEngine.getCode());
         MappingEngine.Result result = mappingEngine.execute(input("aff"));
         System.out.println(XmlSerializer.toXml(result.root()));
-        Map<String,List<String>> allFields = result.allFields();
+        Map<String,List<String>> allFields = result.fields();
         System.out.println(allFields);
         Assert.assertFalse(allFields.isEmpty());
     }

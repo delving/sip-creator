@@ -49,7 +49,7 @@ public class MappingEngine {
 
         Node root();
 
-        Map<String, List<String>> allFields();
+        Map<String, List<String>> fields();
 
         Map<String, List<String>> systemFields();
 
@@ -90,7 +90,7 @@ public class MappingEngine {
         }
 
         @Override
-        public Map<String, List<String>> allFields() {
+        public Map<String, List<String>> fields() {
             return allFields;
         }
 
@@ -182,12 +182,10 @@ public class MappingEngine {
 
         private void putSystem(String key, String value) {
             put(systemFields, key, value);
-            put(key, value);
         }
 
         private void putSearch(String key, String value) {
             put(searchFields, key, value);
-            put(key, value);
         }
 
         private void put(String key, String value) {
