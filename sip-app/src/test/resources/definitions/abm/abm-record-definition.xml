@@ -146,18 +146,19 @@
 
     <field-markers>
 
-        <field-marker name="CREATOR" path="//dc:creator"/>
-        <field-marker name="TITLE" path="//dc:title"/>
-        <field-marker name="DESCRIPTION" path="//dc:description"/>
-        <field-marker name="OWNER" path="//europeana:dataProvider"/>
-        <field-marker name="LANDING_PAGE" path="//europeana:isShownAt"/>
-        <field-marker name="THUMBNAIL" path="//europeana:object"/>
-        <field-marker name="THUMBNAIL" path="//delving:thumbnail"/>
+        <!-- system fields -->
+        <field-marker name="CREATOR" path="/record/dc:creator"/>
+        <field-marker name="TITLE" path="/record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/record/dc:description"/>
+        <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
+        <field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>
 
-        <field-marker type="search" name="SNIPPET" path="//delving:fullText"/>
-        <field-marker type="search" name="SNIPPET" path="//dc:subject"/>
-        <field-marker type="search" name="SNIPPET" path="//dcterms:alternative"/>
-        <field-marker type="search" name="SNIPPET" path="//europeana:collectionTitle"/>
+        <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dc:subject"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dcterms:alternative"/>
+        <field-marker type="search" name="SNIPPET" path="/record/europeana:collectionTitle"/>
 
         <field-marker type="fact" name="spec" path="/record/europeana:collectionName"/>
         <field-marker type="fact" name="name" path="/record/europeana:collectionTitle"/>

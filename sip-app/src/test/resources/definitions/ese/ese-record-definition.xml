@@ -63,6 +63,14 @@
     </root>
 
     <field-markers>
+        <!-- system fields -->
+        <field-marker name="CREATOR" path="/record/dc:creator"/>
+        <field-marker name="TITLE" path="/record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/record/dc:description"/>
+        <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
+
         <field-marker type="fact" name="spec" path="/record/europeana:collectionName"/>
         <field-marker type="fact" name="name" path="/record/europeana:collectionTitle"/>
         <field-marker type="fact" name="country" path="/record/europeana:country"/>
