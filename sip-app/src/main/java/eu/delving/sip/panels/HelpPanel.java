@@ -101,6 +101,17 @@ public class HelpPanel extends HtmlPanel {
 
     @Override
     public void setHtml(String html) {
-        super.setHtml(String.format("<html><body bgcolor=\"F3F3FF\"><table cellpadding=\"10\"><tr><td>%s</td></tr></table></html>", html));
+        super.setHtml(String.format("<html><body bgcolor=\"F3F3FF\">%s</html>", html));
+    }
+
+    @Override
+    protected String[] getCSSRules() {
+        return new String[]{
+                "p {margin: 10 10 10 10; }",
+                "h1 { text-align:center }",
+                "h2 { text-indent:15 }",
+                "h3 { text-indent:25 }",
+                "h4 { text-indent:35 }",
+        };
     }
 }

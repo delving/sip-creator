@@ -25,8 +25,10 @@ import eu.delving.sip.base.SwingHelper;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
@@ -39,18 +41,19 @@ import java.io.StringReader;
 
 public class HtmlPanel extends JPanel {
     private JEditorPane view = new JEditorPane();
-    private HTMLDocument doc = (HTMLDocument) new HTMLEditorKit().createDefaultDocument();
 
     public HtmlPanel(String title) {
         super(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder(title));
         view.setContentType("text/html");
-        view.setDocument(doc);
+        view.setDocument(createHtmlDocument());
+        view.setEditable(false);
         add(SwingHelper.scrollV(view));
         setPreferredSize(new Dimension(200, 200));
     }
 
     public void setHtml(String html) {
+        HTMLDocument doc = (HTMLDocument) view.getDocument();
         int docLength = doc.getLength();
         try {
             doc.remove(0, docLength);
@@ -67,5 +70,18 @@ public class HtmlPanel extends JPanel {
         }
     }
 
+    private Document createHtmlDocument() {
+        HTMLEditorKit kit = new HTMLEditorKit();
+        // fresh sheet, otherwise you affect the one used everywhere!
+        StyleSheet sheet = new StyleSheet();
+        sheet.addStyleSheet(kit.getStyleSheet());
+        for (String rule : getCSSRules()) sheet.addRule(rule);
+        kit.setStyleSheet(sheet);
+        return kit.createDefaultDocument();
+    }
+
+    protected String [] getCSSRules() {
+        return new String[] {};
+    }
 
 }
