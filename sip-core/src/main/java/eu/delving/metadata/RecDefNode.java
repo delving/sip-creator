@@ -236,120 +236,121 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (isAttr() || !hasDescendentNodeMappings()) return;
         if (editPath != null && !path.isFamilyOf(editPath.getPath())) return;
         if (nodeMappings.isEmpty()) {
-            if (isRootOpt()) { // maybe create a virtual node mapping if all kids agree
+            if (isRootOpt()) {
                 Set<Path> siblingPaths = getSiblingInputPathsOfChildren();
                 if (siblingPaths != null) {
                     NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
                     nodeMapping.recDefNode = this;
                     nodeMapping.codeOut = codeOut.createChild();
-                    toLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
+                    toNodeMappingLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
                     return;
                 }
             }
-            toBranchOrLeaf(null, codeOut, groovyParams, editPath);
-            return;
+            if (!isLeafElem()) {
+                toBranchCode(codeOut, groovyParams, editPath);
+            }
+            else if (hasActiveAttributes()) {
+                startBuilderCall("R0", codeOut, groovyParams, editPath);
+                codeOut.line("// no node mappings");
+                codeOut._line("}");
+            }
         }
-        for (NodeMapping nodeMapping : nodeMappings.values()) {
-            nodeMapping.codeOut = codeOut.createChild();
-            toLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
+        else {
+            for (NodeMapping nodeMapping : nodeMappings.values()) {
+                nodeMapping.codeOut = codeOut.createChild();
+                toNodeMappingLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
+            }
         }
     }
 
-    private void toLoop(NodeMapping nodeMapping, Path path, Stack<String> groovyParams, CodeOut codeOut, EditPath editPath) {
+    private void toNodeMappingLoop(NodeMapping contextNodeMapping, Path path, Stack<String> groovyParams, CodeOut codeOut, EditPath editPath) {
         if (path.isEmpty()) throw new RuntimeException("Empty path");
         if (path.size() == 1) {
-            toBranchOrLeaf(nodeMapping, codeOut, groovyParams, editPath);
+            if (isLeafElem()) {
+                toLeafCode(contextNodeMapping, codeOut, groovyParams, editPath);
+            }
+            else {
+                toBranchCode(codeOut, groovyParams, editPath);
+            }
         }
-        else if (nodeMapping.hasMap() && path.size() == 2) {
-            boolean needLoop = !groovyParams.contains(nodeMapping.getMapName());
+        else if (contextNodeMapping.hasMap() && path.size() == 2) {
+            boolean needLoop = !groovyParams.contains(contextNodeMapping.getMapName());
             if (needLoop) {
-                if (nodeMapping.isVirtual()) {
+                if (contextNodeMapping.isVirtual()) {
                     codeOut.line_(
-                            "if (%s) { // R1v",
-                            toMapExpression(nodeMapping)
+                            "if (%s) { // R1",
+                            toMapExpression(contextNodeMapping)
                     );
                 }
                 else {
                     codeOut.line_(
-                            "%s * { %s -> // R1",
-                            toMapExpression(nodeMapping),
-                            nodeMapping.getMapName()
+                            "%s * { %s -> // R2",
+                            toMapExpression(contextNodeMapping),
+                            contextNodeMapping.getMapName()
                     );
-                    groovyParams.push(nodeMapping.getMapName());
+                    groovyParams.push(contextNodeMapping.getMapName());
                 }
             }
             if (isLeafElem()) {
-                startBuilderCall("R2", codeOut, groovyParams, editPath);
-                nodeMapping.toLeafElementCode(groovyParams, editPath);
+                startBuilderCall("R3", codeOut, groovyParams, editPath);
+                contextNodeMapping.toLeafElementCode(groovyParams, editPath);
                 codeOut._line("}");
             }
             else {
-                startBuilderCall("R2x", nodeMapping.codeOut, groovyParams, editPath);
+                startBuilderCall("R4", contextNodeMapping.codeOut, groovyParams, editPath);
                 for (RecDefNode sub : children) {
                     if (sub.isAttr()) continue;
                     if (sub.isChildOpt()) {
-                        nodeMapping.codeOut.line(
-                                "%s '%s' // R3c",
+                        contextNodeMapping.codeOut.line(
+                                "%s '%s' // R5",
                                 sub.getTag().toBuilderCall(), sub.optBox
                         );
                     }
                     else {
-                        sub.toElementCode(nodeMapping.codeOut, groovyParams, editPath);
+                        sub.toElementCode(contextNodeMapping.codeOut, groovyParams, editPath);
                     }
                 }
-                nodeMapping.codeOut._line("}");
+                contextNodeMapping.codeOut._line("}");
             }
             if (needLoop) {
-                if (!nodeMapping.isVirtual()) groovyParams.pop();
+                if (!contextNodeMapping.isVirtual()) groovyParams.pop();
                 codeOut._line("}");
             }
         }
         else { // path should never be empty
-            Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
+            Operator operator = (path.size() == 2) ? contextNodeMapping.getOperator() : Operator.ALL;
             String param = toLoopGroovyParam(path);
             boolean needLoop = !groovyParams.contains(param);
             if (needLoop) {
-                if (nodeMapping.isVirtual()) {
+                if (contextNodeMapping.isVirtual()) {
                     codeOut.line_(
-                            "if (%s) { // R4v",
+                            "if (%s) { // R6",
                             toLoopRef(path)
                     );
                 }
                 else {
                     codeOut.line_(
-                            "%s %s { %s -> // R4",
+                            "%s %s { %s -> // R7",
                             toLoopRef(path), operator.getChar(), param
                     );
                     groovyParams.push(param);
                 }
             }
-            toLoop(nodeMapping, path.withRootRemoved(), groovyParams, codeOut, editPath);
+            toNodeMappingLoop(contextNodeMapping, path.withRootRemoved(), groovyParams, codeOut, editPath);
             if (needLoop) {
-                if (!nodeMapping.isVirtual()) groovyParams.pop();
+                if (!contextNodeMapping.isVirtual()) groovyParams.pop();
                 codeOut._line("}");
             }
         }
     }
 
-    private void toBranchOrLeaf(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        if (hasChildren() || (hasActiveAttributes() && nodeMappings.isEmpty())) {
-            toBranchCode(codeOut, groovyParams, editPath);
-        }
-        else if (nodeMapping != null) {
-            toLeafCode(nodeMapping, codeOut, groovyParams, editPath);
-        }
-        else for (NodeMapping localNodeMapping : nodeMappings.values()) {
-            toLeafCode(localNodeMapping, codeOut, groovyParams, editPath);
-        }
-    }
-
     private void toBranchCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        startBuilderCall("R5", codeOut, groovyParams, editPath);
+        startBuilderCall("R8", codeOut, groovyParams, editPath);
         for (RecDefNode sub : children) {
             if (sub.isAttr()) continue;
             if (sub.isChildOpt()) {
                 codeOut.line(
-                        "%s '%s' // R5c",
+                        "%s '%s' // R9",
                         sub.getTag().toBuilderCall(), sub.optBox
                 );
             }
@@ -363,25 +364,21 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private void toLeafCode(NodeMapping localNodeMapping, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (localNodeMapping.hasMap()) {
             codeOut.line_(
-                    "%s %s { %s -> // R8",
+                    "%s %s { %s -> // R10",
                     toMapExpression(localNodeMapping), localNodeMapping.getOperator().getChar(), localNodeMapping.getMapName()
             );
-            startBuilderCall("R9", codeOut, groovyParams, editPath);
+            startBuilderCall("R11", codeOut, groovyParams, editPath);
             localNodeMapping.codeOut = codeOut.createChild();
             localNodeMapping.toLeafElementCode(groovyParams, editPath);
             codeOut._line("}");
             codeOut._line("}");
         }
         else {
-            startBuilderCall("R7", codeOut, groovyParams, editPath);
+            startBuilderCall("R12", codeOut, groovyParams, editPath);
             localNodeMapping.codeOut = codeOut.createChild();
             localNodeMapping.toLeafElementCode(groovyParams, editPath);
             codeOut._line("}");
         }
-    }
-
-    private boolean hasChildren() {
-        return !elem.elemList.isEmpty();
     }
 
     public Set<Path> getSiblingInputPathsOfChildren() {
@@ -442,8 +439,9 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     private boolean hasActiveAttributes() {
-        for (RecDefNode sub : children)
+        for (RecDefNode sub : children) {
             if (sub.isAttr() && (sub.hasDescendentNodeMappings() || sub.hasConstant())) return true;
+        }
         return false;
     }
 
