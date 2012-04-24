@@ -71,11 +71,7 @@
         <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
         <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
 
-        <field-marker type="fact" name="spec" path="/record/europeana:collectionName"/>
-        <field-marker type="fact" name="name" path="/record/europeana:collectionTitle"/>
-        <field-marker type="fact" name="country" path="/record/europeana:country"/>
         <field-marker type="fact" name="dataProvider" path="/record/europeana:dataProvider"/>
-        <field-marker type="fact" name="language" path="/record/europeana:language"/>
         <field-marker type="fact" name="provider" path="/record/europeana:provider"/>
         <field-marker type="fact" name="rights" path="/record/europeana:rights"/>
         <field-marker type="fact" name="type" path="/record/europeana:type"/>
