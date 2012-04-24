@@ -22,8 +22,8 @@
 package eu.delving.sip;
 
 import eu.delving.metadata.Path;
-import eu.delving.metadata.UniquenessException;
 import eu.delving.sip.xml.SourceConverter;
+import eu.delving.sip.xml.UniquenessException;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;

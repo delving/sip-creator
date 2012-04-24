@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.sip.xml;
 
 import java.io.*;
 import java.util.HashSet;
@@ -41,18 +41,18 @@ import java.util.TreeSet;
 
 public class Uniqueness {
     private static final int HOLD_THRESHOLD = 50000;
-    private static final int TEXT_SIZE_LIMIT = 100;
+    private static final int VALUE_SIZE_LIMIT = 100;
     private Set<String> all = new HashSet<String>(HOLD_THRESHOLD * 3 / 2);
     private File tempFile;
     private Writer out;
     private int count;
 
-    public boolean isRepeated(String text) {
+    public boolean isStillUnique(String value) {
         count++;
-        if (text.length() > TEXT_SIZE_LIMIT) text = text.substring(0, TEXT_SIZE_LIMIT);
+        if (value.length() > VALUE_SIZE_LIMIT) value = value.substring(0, VALUE_SIZE_LIMIT);
         if (all != null) {
-            if (all.contains(text)) return true;
-            all.add(text);
+            if (all.contains(value)) return false;
+            all.add(value);
             if (all.size() > HOLD_THRESHOLD) {
                 try {
                     tempFile = File.createTempFile("Uniqueness", ".tmp");
@@ -69,17 +69,17 @@ public class Uniqueness {
                     throw new RuntimeException("Unable to create temporary file!", e);
                 }
             }
-            return false;
+            return true;
         }
         else {
             try {
-                out.write(text);
+                out.write(value);
                 out.write('\n');
             }
             catch (IOException e) {
                 throw new RuntimeException("Unable to write to temporary file!", e);
             }
-            return false;
+            return true;
         }
     }
 

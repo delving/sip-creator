@@ -1,7 +1,7 @@
 <table>
 
 <tr><td>
-<h3>$stats.path.tail$ ($stats.total$)</h3>
+<h3>$path.tail$ ($stats.total$)</h3>
 </td></tr>
 
 <tr><td>
@@ -20,21 +20,20 @@ $stats.histogram.firstValues:{ counter |
 </table>
 </td></tr>
 
-$else$
-$if (stats.randomSample)$
+$endif$
+$if (stats.sample)$
 
 <tr><td>
 <h4>Sample</h4>
 </td></tr>
 <tr><td>
 <table>
-$stats.randomSample.firstValues:{ value |
+$stats.sample.firstValues:{ value |
 <tr><td>$value$</td></tr>
 }$
 </table>
 </td></tr>
 
-$endif$
 $endif$
 
 </table>

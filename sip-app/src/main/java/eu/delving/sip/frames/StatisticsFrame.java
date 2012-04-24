@@ -21,19 +21,19 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.FieldStatistics;
-import eu.delving.metadata.Histogram;
-import eu.delving.metadata.RandomSample;
+import eu.delving.metadata.Path;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.CreateTransition;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SourceTreeNode;
+import eu.delving.sip.xml.Stats;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -47,7 +47,7 @@ public class StatisticsFrame extends FrameBase {
     private final String EMPTY = "<html><center><h3>No Statistics</h3><b>Select an item from the document structure<br>or an input variable</b><br><br>";
     private JLabel summaryLabel = new JLabel(EMPTY, JLabel.CENTER);
     private HistogramModel histogramModel = new HistogramModel();
-    private RandomSampleModel randomSampleModel = new RandomSampleModel();
+    private RandomSampleModel sampleModel = new RandomSampleModel();
 
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.STATISTICS, desktop, sipModel, "Statistics", false);
@@ -57,20 +57,24 @@ public class StatisticsFrame extends FrameBase {
             public void transition(CreateModel createModel, CreateTransition transition) {
                 if (!transition.sourceChanged) return;
                 SortedSet<SourceTreeNode> nodes = createModel.getSourceTreeNodes();
-                if (nodes != null && nodes.size() == 1) setStatistics(nodes.iterator().next().getStatistics());
+                if (nodes != null && nodes.size() == 1) {
+                    SourceTreeNode node = nodes.iterator().next();
+                    Path path = node.getPath(true);
+                    setStatistics(path, node.getStats());
+                }
             }
         });
     }
 
-    public void setStatistics(FieldStatistics fieldStatistics) {
-        setSummary(fieldStatistics);
-        if (fieldStatistics == null) {
+    public void setStatistics(Path path, Stats.PathStats pathStats) {
+        setSummary(path, pathStats);
+        if (pathStats == null) {
             histogramModel.setHistogram(null);
-            randomSampleModel.setRandomSample(null);
+            sampleModel.setSample(null);
         }
         else {
-            histogramModel.setHistogram(fieldStatistics.getHistogram());
-            randomSampleModel.setRandomSample(fieldStatistics.getRandomSample());
+            histogramModel.setHistogram(pathStats.histogram);
+            sampleModel.setSample(pathStats.sample);
         }
     }
 
@@ -80,12 +84,12 @@ public class StatisticsFrame extends FrameBase {
         add(createListPanels(), BorderLayout.CENTER);
     }
 
-    private void setSummary(FieldStatistics fieldStatistics) {
-        if (fieldStatistics == null) {
+    private void setSummary(Path path, Stats.PathStats pathStats) {
+        if (pathStats == null) {
             summaryLabel.setText(EMPTY);
         }
         else {
-            summaryLabel.setText(String.format("<html><center><h3>%s</h3><b>%s</b><br><br>", fieldStatistics.getPath(), fieldStatistics.getSummary()));
+            summaryLabel.setText(String.format("<html><center><h3>%s</h3><b>%s</b><br><br>", path, pathStats.getSummary()));
         }
     }
 
@@ -98,16 +102,16 @@ public class StatisticsFrame extends FrameBase {
     }
 
     private JComponent createListPanels() {
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createRandomSamplePanel(), createHistogramPanel());
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createSamplePanel(), createHistogramPanel());
         split.setDividerLocation(0.5);
         split.setResizeWeight(0.5);
         return split;
     }
 
-    private JComponent createRandomSamplePanel() {
+    private JComponent createSamplePanel() {
         JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Random Sample"));
-        JList list = new JList(randomSampleModel);
+        p.setBorder(BorderFactory.createTitledBorder("Sample"));
+        JList list = new JList(sampleModel);
         p.add(SwingHelper.scrollV(list));
         return p;
     }
@@ -120,16 +124,16 @@ public class StatisticsFrame extends FrameBase {
         return p;
     }
 
-    private class HistogramModel extends AbstractListModel {
+    private static class HistogramModel extends AbstractListModel {
+        private List<Stats.Counter> list = new ArrayList<Stats.Counter>();
 
-        private List<Histogram.Counter> list = new ArrayList<Histogram.Counter>();
-
-        public void setHistogram(Histogram histogram) {
+        public void setHistogram(Stats.Histogram histogram) {
             int size = getSize();
             list.clear();
             fireIntervalRemoved(this, 0, size);
             if (histogram != null) {
-                list.addAll(histogram.getCounters());
+                list.addAll(histogram.counterMap.values());
+                Collections.sort(list);
                 fireIntervalAdded(this, 0, getSize());
             }
         }
@@ -141,8 +145,8 @@ public class StatisticsFrame extends FrameBase {
 
         @Override
         public Object getElementAt(int i) {
-            Histogram.Counter counter = list.get(i);
-            return String.format("   %d (%s) : '%s'", counter.getCount(), counter.getPercentage(), counter.getValue());
+            Stats.Counter counter = list.get(i);
+            return String.format("   %d (%s) : '%s'", counter.count, counter.percentage, counter.value);
         }
     }
 
@@ -150,12 +154,12 @@ public class StatisticsFrame extends FrameBase {
 
         private List<String> list = new ArrayList<String>();
 
-        public void setRandomSample(RandomSample randomSample) {
+        public void setSample(Stats.Sample sample) {
             int size = getSize();
             list.clear();
             fireIntervalRemoved(this, 0, size);
-            if (randomSample != null) {
-                list.addAll(randomSample.getValues());
+            if (sample != null) {
+                list.addAll(sample.values);
                 fireIntervalAdded(this, 0, getSize());
             }
         }

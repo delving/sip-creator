@@ -27,13 +27,13 @@ import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.FilterTreeModel;
 import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.MetadataParser;
+import eu.delving.sip.xml.Stats;
 import org.apache.log4j.Logger;
 import org.junit.*;
 import org.w3c.dom.Node;
@@ -147,16 +147,16 @@ public class TestMappingValidation {
         assertEquals(7, mock.fileCount());
         assertEquals(DELIMITED, dataSet().getState());
 
-        assertFalse(dataSet().getLatestStatistics().isSourceFormat());
+        assertFalse(dataSet().getLatestStats().sourceFormat);
         dataSet().importedToSource(null);
         assertEquals(8, mock.fileCount());
         assertEquals(SOURCED, dataSet().getState());
 
         performAnalysis();
         assertEquals(9, mock.fileCount());
-        Statistics statistics = dataSet().getLatestStatistics();
-        assertTrue(statistics.isSourceFormat());
-        SourceTreeNode tree = SourceTreeNode.create(statistics.getFieldStatisticsList(), dataSet().getDataSetFacts());
+        Stats stats = dataSet().getLatestStats();
+        assertTrue(stats.sourceFormat);
+        SourceTreeNode tree = SourceTreeNode.create(stats.pathMap, dataSet().getDataSetFacts());
         assertEquals(Tag.element(Storage.ENVELOPE_TAG), tree.getTag());
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
@@ -183,7 +183,7 @@ public class TestMappingValidation {
     private void performAnalysis() {
         new AnalysisParser(dataSet(), new AnalysisParser.Listener() {
             @Override
-            public void success(Statistics statistics) {
+            public void success(Stats stats) {
                 try {
                     Path recordRoot = null;
                     switch (dataSet().getState()) {
@@ -196,8 +196,8 @@ public class TestMappingValidation {
                         default:
                             Assert.fail("Unexpected state " + dataSet().getState());
                     }
-                    dataSet().setStatistics(statistics);
-                    sourceTree = SourceTreeNode.create(statistics.getFieldStatisticsList(), dataSet().getDataSetFacts());
+                    dataSet().setStats(stats);
+                    sourceTree = SourceTreeNode.create(stats.pathMap, dataSet().getDataSetFacts());
                     new FilterTreeModel(sourceTree);
                     int recordCount = sourceTree.setRecordRoot(recordRoot);
                     mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));

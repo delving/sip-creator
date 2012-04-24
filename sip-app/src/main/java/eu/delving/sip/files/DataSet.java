@@ -25,6 +25,7 @@ import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.xml.Stats;
 
 import javax.xml.validation.Validator;
 import java.io.File;
@@ -79,11 +80,11 @@ public interface DataSet {
 
     File renameInvalidImport() throws StorageException;
 
-    Statistics getLatestStatistics();
+    Stats getLatestStats();
 
-    Statistics getStatistics(boolean sourceFormat);
+    Stats getStats(boolean sourceFormat, String prefix);
 
-    void setStatistics(Statistics statistics) throws StorageException;
+    void setStats(Stats stats) throws StorageException;
 
     RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException;
 

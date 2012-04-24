@@ -24,8 +24,6 @@ package eu.delving.sip.xml;
 import com.ctc.wstx.stax.WstxInputFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.metadata.Uniqueness;
-import eu.delving.metadata.UniquenessException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
 import org.apache.commons.io.IOUtils;
@@ -123,7 +121,7 @@ public class SourceConverter {
                             else {
                                 if (!uniqueElementPath.peek().isAttribute() && path.equals(uniqueElementPath)) {
                                     unique = StringUtils.join(lines, ' ');
-                                    if (uniqueness.isRepeated(unique)) {
+                                    if (!uniqueness.isStillUnique(unique)) {
                                         throw new UniquenessException(uniqueElementPath, recordCount);
                                     }
                                 }

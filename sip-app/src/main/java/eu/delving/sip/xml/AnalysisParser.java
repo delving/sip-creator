@@ -21,11 +21,9 @@
 
 package eu.delving.sip.xml;
 
-import eu.delving.metadata.FieldStatistics;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.StorageException;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.stax2.XMLInputFactory2;
@@ -36,7 +34,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.InputStream;
-import java.util.*;
 
 /**
  * Analyze xml input and compile statistics. When analysis fails, the .error will be appended to the filename
@@ -48,14 +45,13 @@ import java.util.*;
 
 public class AnalysisParser implements Runnable {
     public static final int ELEMENT_STEP = 10000;
-    private Map<Path, FieldStatistics> statisticsMap = new HashMap<Path, FieldStatistics>();
-    private Map<String, String> namespaces = new TreeMap<String, String>();
+    private Stats stats = new Stats();
     private Listener listener;
     private DataSet dataSet;
 
     public interface Listener {
 
-        void success(Statistics statistics);
+        void success(Stats stats);
 
         void failure(String message, Exception exception);
 
@@ -77,7 +73,6 @@ public class AnalysisParser implements Runnable {
             xmlif.configureForSpeed();
             Path path = Path.create();
             boolean running = true;
-            boolean sourceFormat = false;
             InputStream inputStream = null;
             try {
                 switch (dataSet.getState()) {
@@ -86,7 +81,7 @@ public class AnalysisParser implements Runnable {
                         break;
                     case SOURCED:
                         inputStream = dataSet.openSourceInputStream();
-                        sourceFormat = true;
+                        stats.sourceFormat = true;
                         break;
                     default:
                         throw new IllegalStateException("Unexpected state: " + dataSet.getState());
@@ -101,14 +96,14 @@ public class AnalysisParser implements Runnable {
                                 if (listener != null && !listener.progress(count)) running = false;
                             }
                             for (int walk = 0; walk < input.getNamespaceCount(); walk++) {
-                                namespaces.put(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
+                                stats.recordNamespace(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
                             }
                             path = path.child(Tag.element(input.getName()));
                             if (input.getAttributeCount() > 0) {
                                 for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                     QName attributeName = input.getAttributeName(walk);
                                     Path withAttr = path.child(Tag.attribute(attributeName));
-                                    recordValue(withAttr, input.getAttributeValue(walk));
+                                    stats.recordValue(withAttr, input.getAttributeValue(walk));
                                 }
                             }
                             break;
@@ -117,7 +112,7 @@ public class AnalysisParser implements Runnable {
                             text.append(input.getText());
                             break;
                         case XMLEvent.END_ELEMENT:
-                            recordValue(path, text.toString().trim());
+                            stats.recordValue(path, text.toString().trim());
                             text.setLength(0);
                             path = path.parent();
                             break;
@@ -130,8 +125,8 @@ public class AnalysisParser implements Runnable {
                 IOUtils.closeQuietly(inputStream);
             }
             if (running) {
-                List<FieldStatistics> fieldStatisticsList = new ArrayList<FieldStatistics>(statisticsMap.values());
-                listener.success(new Statistics(namespaces, fieldStatisticsList, sourceFormat));
+                stats.finish();
+                listener.success(stats);
             }
             else {
                 listener.failure(null, null);
@@ -157,15 +152,5 @@ public class AnalysisParser implements Runnable {
                 listener.failure("Error renaming file", e);
             }
         }
-    }
-
-    private void recordValue(Path path, String value) {
-        value = value.trim();
-        FieldStatistics fieldStatistics = statisticsMap.get(path);
-        if (fieldStatistics == null) {
-            statisticsMap.put(path, fieldStatistics = new FieldStatistics(path));
-        }
-        if (!value.isEmpty()) fieldStatistics.recordValue(value);
-        fieldStatistics.recordOccurrence();
     }
 }

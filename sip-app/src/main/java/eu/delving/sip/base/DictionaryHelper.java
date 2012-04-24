@@ -24,6 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.OptList;
 import eu.delving.sip.model.SourceTreeNode;
+import eu.delving.sip.xml.Stats;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -41,8 +42,9 @@ public class DictionaryHelper {
     public static boolean isDictionaryPossible(NodeMapping nodeMapping) {
         if (nodeMapping == null || nodeMapping.recDefNode == null || !nodeMapping.hasOneStatsTreeNode()) return false;
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
-        if (sourceTreeNode.getStatistics() == null) return false;
-        Set<String> values = sourceTreeNode.getStatistics().getHistogramValues();
+        Stats.PathStats stats = sourceTreeNode.getStats();
+        if (stats == null || stats.histogram == null) return false;
+        Set<String> values = stats.histogram.counterMap.keySet();
         OptList optList = nodeMapping.recDefNode.getOptList();
         return values != null && optList != null && nodeMapping.dictionary == null;
     }
@@ -50,8 +52,10 @@ public class DictionaryHelper {
     public static boolean refreshDictionary(NodeMapping nodeMapping) {
         if (!isDictionaryPossible(nodeMapping)) throw new RuntimeException("Should have checked");
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
-        if (sourceTreeNode.getStatistics() == null) return false;
-        return setDictionaryDomain(nodeMapping, sourceTreeNode.getStatistics().getHistogramValues());
+        Stats.PathStats stats = sourceTreeNode.getStats();
+        if (stats == null || stats.histogram == null) return false;
+        Set<String> values = stats.histogram.counterMap.keySet();
+        return setDictionaryDomain(nodeMapping, values);
     }
 
     public static int countNonemptyDictionaryEntries(NodeMapping nodeMapping) {

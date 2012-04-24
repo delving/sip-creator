@@ -24,6 +24,7 @@ package eu.delving.sip.files;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.xml.SourceConverter;
+import eu.delving.sip.xml.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
@@ -70,12 +71,17 @@ public class StorageImpl extends StorageBase implements Storage {
     public Map<String, DataSet> getDataSets() {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
-        for (File directory : list) {
-            if (!directory.isDirectory()) continue;
-            boolean hasFiles = false;
-            for (File sub : directory.listFiles()) if (sub.isFile()) hasFiles = true;
-            if (!hasFiles) continue;
-            map.put(directory.getName(), new DataSetImpl(directory));
+        if (list != null) {
+            for (File directory : list) {
+                if (!directory.isDirectory()) continue;
+                boolean hasFiles = false;
+                File[] files = directory.listFiles();
+                if (files != null) {
+                    for (File file : files) if (file.isFile()) hasFiles = true;
+                    if (!hasFiles) continue;
+                    map.put(directory.getName(), new DataSetImpl(directory));
+                }
+            }
         }
         return map;
     }
@@ -200,7 +206,7 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         private DataSetState importedState(File imported) {
-            File statistics = statisticsFile(here, false);
+            File statistics = statsFile(here, false, null);
             if (statistics.exists() && statistics.lastModified() >= imported.lastModified()) {
                 return allHintsSet(getHints()) ? DELIMITED : ANALYZED_IMPORT;
             }
@@ -210,7 +216,7 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         private DataSetState postSourceState(File source) {
-            File statistics = statisticsFile(here, true);
+            File statistics = statsFile(here, true, null);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = latestMappingFileOrNull(here);
                 if (mapping != null) {
@@ -324,51 +330,48 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public Statistics getLatestStatistics() {
-            File analysis = statisticsFile(here, false);
-            File source = statisticsFile(here, true);
+        public Stats getLatestStats() {
+            File analysis = statsFile(here, false, null);
+            File source = statsFile(here, true, null);
             if (analysis.exists()) {
                 if (source.exists()) {
-                    return getStatistics(source.lastModified() >= analysis.lastModified());
+                    return getStats(source.lastModified() >= analysis.lastModified(), null);
                 }
                 else {
-                    return getStatistics(false);
+                    return getStats(false, null);
                 }
             }
             else {
-                return getStatistics(true);
+                return getStats(true, null);
             }
         }
 
         @Override
-        public Statistics getStatistics(boolean sourceFormat) {
-            File statisticsFile = statisticsFile(here, sourceFormat);
-            if (statisticsFile.exists()) {
-                ObjectInputStream objectInputStream = null;
+        public Stats getStats(boolean sourceFormat, String prefix) {
+            File statsFile = statsFile(here, sourceFormat, prefix);
+            if (statsFile.exists()) {
+                InputStream in = null;
                 try {
-                    objectInputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(statisticsFile)));
-                    return (Statistics) objectInputStream.readObject();
+                    in = zipIn(statsFile);
+                    return Stats.read(in);
                 }
                 catch (Exception e) {
-                    FileUtils.deleteQuietly(statisticsFile);
+                    FileUtils.deleteQuietly(statsFile);
                 }
                 finally {
-                    IOUtils.closeQuietly(objectInputStream);
+                    IOUtils.closeQuietly(in);
                 }
             }
             return null;
         }
 
         @Override
-        public void setStatistics(Statistics statistics) throws StorageException {
-            File statisticsFile = statisticsFile(here, statistics.isSourceFormat());
-            ObjectOutputStream out = null;
+        public void setStats(Stats stats) throws StorageException {
+            File statsFile = statsFile(here, stats.sourceFormat, stats.prefix);
+            OutputStream out = null;
             try {
-                out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(statisticsFile)));
-                out.writeObject(statistics);
-            }
-            catch (IOException e) {
-                throw new StorageException(String.format("Unable to save statistics file to %s", statisticsFile.getAbsolutePath()), e);
+                out = zipOut(statsFile);
+                Stats.write(stats, out);
             }
             finally {
                 IOUtils.closeQuietly(out);
@@ -528,7 +531,7 @@ public class StorageImpl extends StorageBase implements Storage {
                     hasher.update(buffer, bytesRead);
                 }
                 if (progressListener != null) progressListener.finished(!cancelled);
-                delete(statisticsFile(here, false));
+                delete(statsFile(here, false, null));
             }
             catch (Exception e) {
                 if (progressListener != null) progressListener.finished(false);
@@ -555,7 +558,7 @@ public class StorageImpl extends StorageBase implements Storage {
             if (!isRecentlyImported()) {
                 throw new StorageException("Import to source would be redundant, since source is newer");
             }
-            if (!statisticsFile(here, false).exists()) {
+            if (!statsFile(here, false, null).exists()) {
                 throw new StorageException("No analysis stats so conversion doesn't trust the record count");
             }
             try {
@@ -563,8 +566,8 @@ public class StorageImpl extends StorageBase implements Storage {
                 Path recordRoot = getRecordRoot(hints);
                 int recordCount = getRecordCount(hints);
                 Path uniqueElement = getUniqueElement(hints);
-                Statistics statistics = getStatistics(false);
-                SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement, statistics.getNamespaces());
+                Stats stats = getStats(false, null);
+                SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement, stats.namespaces);
                 converter.setProgressListener(progressListener);
                 Hasher hasher = new Hasher();
                 DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, FileType.SOURCE.getName())));
@@ -573,7 +576,7 @@ public class StorageImpl extends StorageBase implements Storage {
                 File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
                 if (hashedSource.exists()) FileUtils.deleteQuietly(hashedSource);
                 FileUtils.moveFile(source, hashedSource);
-                FileUtils.deleteQuietly(statisticsFile(here, true));
+                FileUtils.deleteQuietly(statsFile(here, true, null));
             }
             catch (StorageException e) {
                 throw e;

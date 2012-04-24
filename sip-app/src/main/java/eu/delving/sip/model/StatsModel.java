@@ -24,11 +24,11 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
-import eu.delving.sip.files.Statistics;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.xml.Stats;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
@@ -57,12 +57,12 @@ public class StatsModel {
         hintsModel.addListener(new HintSaveTimer());
     }
 
-    public void setStatistics(Statistics statistics) {
+    public void setStatistics(Stats stats) {
         Path recordRoot = null;
         Path uniqueElement = null;
-        if (statistics != null) {
-            sourceTree = SourceTreeNode.create(statistics.getFieldStatisticsList(), sipModel.getDataSetFacts().getFacts());
-            if (statistics.isSourceFormat()) {
+        if (stats != null) {
+            sourceTree = SourceTreeNode.create(stats.pathMap, sipModel.getDataSetFacts().getFacts());
+            if (stats.sourceFormat) {
                 recordRoot = Storage.RECORD_ROOT;
                 uniqueElement = Storage.UNIQUE_ELEMENT;
             }

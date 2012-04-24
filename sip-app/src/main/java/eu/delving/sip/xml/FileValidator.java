@@ -24,7 +24,6 @@ package eu.delving.sip.xml;
 import eu.delving.groovy.*;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecMapping;
-import eu.delving.metadata.Uniqueness;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;

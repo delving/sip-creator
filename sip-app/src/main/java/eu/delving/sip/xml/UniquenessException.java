@@ -19,7 +19,9 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.sip.xml;
+
+import eu.delving.metadata.Path;
 
 /**
  * Thrown when a field is marked as unique, but isn't.

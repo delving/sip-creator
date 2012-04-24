@@ -29,10 +29,14 @@ import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.files.*;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileValidator;
 import eu.delving.sip.xml.MetadataParser;
+import eu.delving.sip.xml.Stats;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 
@@ -283,7 +287,7 @@ public class SipModel {
             @Override
             public void run() {
                 try {
-                    final Statistics statistics = dataSet.getLatestStatistics();
+                    final Stats stats = dataSet.getLatestStats();
                     final Map<String, String> facts = dataSet.getDataSetFacts();
                     final Map<String, String> hints = dataSet.getHints();
                     final String prefix = requestedPrefix.isEmpty() ? dataSet.getLatestPrefix() : requestedPrefix;
@@ -300,7 +304,7 @@ public class SipModel {
                         public void run() {
                             dataSetFacts.set(facts);
                             statsModel.set(hints);
-                            statsModel.setStatistics(statistics);
+                            statsModel.setStatistics(stats);
                             Exec.work(new Runnable() {
                                 @Override
                                 public void run() {
@@ -357,15 +361,15 @@ public class SipModel {
             feedback.say("Analyzing data from " + dataSetModel.getDataSet().getSpec());
             Exec.work(new AnalysisParser(dataSetModel.getDataSet(), new AnalysisParser.Listener() {
                 @Override
-                public void success(final Statistics statistics) {
+                public void success(final Stats stats) {
                     analyzing = false;
                     try {
-                        dataSetModel.getDataSet().setStatistics(statistics);
+                        dataSetModel.getDataSet().setStats(stats);
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
-                                statsModel.setStatistics(statistics);
-                                if (statistics.isSourceFormat()) {
+                                statsModel.setStatistics(stats);
+                                if (stats.sourceFormat) {
                                     seekFirstRecord();
                                 }
                                 else {

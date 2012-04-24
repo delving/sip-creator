@@ -167,9 +167,13 @@ public class StorageBase {
         return new File(dir, String.format(REPORT.getPattern(), recMapping.getPrefix()));
     }
 
-    File statisticsFile(File dir, boolean sourceFormat) {
-        String name = sourceFormat ? SOURCE_STATS.getName() : ANALYSIS_STATS.getName();
-        return new File(dir, name);
+    File statsFile(File dir, boolean sourceFormat, String prefix) {
+        if (prefix == null) {
+            return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
+        }
+        else {
+            return new File(dir, String.format(FileType.RESULT_STATS.getPattern(), prefix));
+        }
     }
 
     private File findOrCreate(File directory, Storage.FileType fileType) {
@@ -197,7 +201,7 @@ public class StorageBase {
     File recordDefinitionFile(File dir, String prefix) {
         return new File(dir, String.format(FileType.RECORD_DEFINITION.getPattern(), prefix));
     }
-    
+
     File schemaFile(File dir, String prefix) {
         return new File(dir, String.format(FileType.SCHEMA.getPattern(), prefix));
     }

@@ -49,12 +49,13 @@ public interface Storage {
     enum FileType {
         IMPORTED("imported.xml.gz"),
         SOURCE("source.xml.gz", null, null, null, 2),
-        ANALYSIS_STATS("analysis_stats.ser"),
-        SOURCE_STATS("source_stats.ser"),
+        IMPORT_STATS("stats_import.xml.gz"),
+        SOURCE_STATS("stats_source.xml.gz"),
         FACTS("dataset_facts.txt"),
         HINTS("hints.txt"),
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         VALIDATION(null, "validation_", null, "validation_%s.int", 1),
+        RESULT_STATS(null, "stats_result_", null, "stats_result_%s.int", 1),
         REPORT(null, null, null, "report_%s.txt", 1),
         RECORD_DEFINITION(null, null, "-record-definition.xml", "%s-record-definition.xml", 1),
         SCHEMA(null, null, "-validation.xsd", "%s-validation.xsd", 1);
