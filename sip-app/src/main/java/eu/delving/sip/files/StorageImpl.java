@@ -413,7 +413,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException {
-            File file = new File(here, String.format(FileType.MAPPING.getPattern(), recMapping.getPrefix()));
+            File file = new File(here, FileType.MAPPING.getName(recMapping.getPrefix()));
             RecMapping.write(file, recMapping);
             if (freeze) {
                 try {
@@ -452,7 +452,7 @@ public class StorageImpl extends StorageBase implements Storage {
                 deleteValidation(metadataPrefix);
             }
             else {
-                File file = new File(here, String.format(FileType.VALIDATION.getPattern(), metadataPrefix));
+                File file = new File(here, FileType.VALIDATION.getName(metadataPrefix));
                 DataOutputStream out = null;
                 try {
                     out = new DataOutputStream(new FileOutputStream(file));
@@ -473,7 +473,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public PrintWriter openReportWriter(RecMapping recMapping) throws StorageException {
-            File file = new File(here, String.format(FileType.REPORT.getPattern(), recMapping.getPrefix()));
+            File file = new File(here, FileType.REPORT.getName(recMapping.getPrefix()));
             try {
                 return new PrintWriter(file);
             }
@@ -593,11 +593,13 @@ public class StorageImpl extends StorageBase implements Storage {
             try {
                 List<File> files = new ArrayList<File>();
                 files.add(Hasher.ensureFileHashed(hintsFile(here)));
-                for (File file : findLatestMappingFiles(here)) {
-                    File validationFile = validationFile(here, file);
+                for (File mappingFile : findLatestMappingFiles(here)) {
+                    File validationFile = validationFile(here, mappingFile);
                     if (validationFile.exists()) {
-                        files.add(Hasher.ensureFileHashed(file));
+                        files.add(Hasher.ensureFileHashed(mappingFile));
                         files.add(Hasher.ensureFileHashed(validationFile));
+                        File statsFile = statsFile(here, mappingFile);
+                        if (statsFile.exists()) files.add(Hasher.ensureFileHashed(statsFile));
                     }
                 }
                 files.add(Hasher.ensureFileHashed(sourceFile(here)));

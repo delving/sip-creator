@@ -24,6 +24,7 @@ package eu.delving.sip.xml;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.stax2.XMLInputFactory2;
@@ -81,6 +82,7 @@ public class AnalysisParser implements Runnable {
                         break;
                     case SOURCED:
                         inputStream = dataSet.openSourceInputStream();
+                        stats.setRecordRoot(Storage.RECORD_ROOT);
                         stats.sourceFormat = true;
                         break;
                     default:

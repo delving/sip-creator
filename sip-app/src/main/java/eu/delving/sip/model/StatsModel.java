@@ -61,7 +61,7 @@ public class StatsModel {
         Path recordRoot = null;
         Path uniqueElement = null;
         if (stats != null) {
-            sourceTree = SourceTreeNode.create(stats.pathMap, sipModel.getDataSetFacts().getFacts());
+            sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
             if (stats.sourceFormat) {
                 recordRoot = Storage.RECORD_ROOT;
                 uniqueElement = Storage.UNIQUE_ELEMENT;

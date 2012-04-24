@@ -76,15 +76,22 @@ public class Stats {
         namespaces.put(prefix, uri);
     }
 
+    public void setRecordRoot(Path recordRoot) {
+        if (recordStats != null) throw new RuntimeException("Already known!");
+        recordStats = new RecordStats();
+        recordStats.recordRoot = recordRoot;
+    }
+
     public void recordValue(Path path, String value) {
-        PathStats pathStats = pathMap.get(path);
-        if (pathStats == null) pathMap.put(path, pathStats = new PathStats());
+        PathStats pathStats = fieldValueMap.get(path);
+        if (pathStats == null) fieldValueMap.put(path, pathStats = new PathStats());
         pathStats.recordOccurrence();
         if (value != null) pathStats.recordValue(value.trim());
+        if (recordStats != null) recordStats.recordOccurrence(path);
     }
 
     public void finish() {
-        for (PathStats stats : pathMap.values()) stats.finish();
+        for (PathStats stats : fieldValueMap.values()) stats.finish();
     }
 
     @XStreamAsAttribute
@@ -95,10 +102,45 @@ public class Stats {
 
     public Map<String, String> namespaces = new HashMap<String, String>();
 
-    @XStreamAlias("field-statistics")
-    public Map<Path, PathStats> pathMap = new HashMap<Path, PathStats>();
+    public RecordStats recordStats;
 
-    @XStreamAlias("path-statistics")
+    @XStreamAlias("field-value-stats")
+    public Map<Path, PathStats> fieldValueMap = new HashMap<Path, PathStats>();
+
+    @XStreamAlias("record-stats")
+    public static class RecordStats {
+
+        @XStreamAsAttribute
+        public Path recordRoot;
+
+        @XStreamAsAttribute
+        public int recordCount;
+
+        @XStreamAlias("field-frequency-stats")
+        public Map<Path, Histogram> fieldFrequencyStats = new HashMap<Path, Histogram>();
+
+        @XStreamOmitField
+        private Map<Path, Integer> countPerRecord = new HashMap<Path, Integer>();
+
+        public void recordOccurrence(Path path) {
+            if (path.size() < recordRoot.size()) return;
+            if (!path.equals(recordRoot)) {
+                Integer count = countPerRecord.get(path);
+                countPerRecord.put(path, count == null ? 1 : count + 1);
+            }
+            else {
+                for (Map.Entry<Path, Integer> entry : countPerRecord.entrySet()) {
+                    Histogram histogram = fieldFrequencyStats.get(entry.getKey());
+                    if (histogram == null) fieldFrequencyStats.put(entry.getKey(), histogram = new Histogram());
+                    histogram.recordValue(entry.getValue().toString());
+                }
+                countPerRecord.clear();
+                recordCount++;
+            }
+        }
+    }
+
+    @XStreamAlias("path-stats")
     public static class PathStats {
 
         @XStreamAsAttribute

@@ -110,9 +110,9 @@ public class ValidateAction extends AbstractAction {
     }
 
     private void performValidation(boolean allowInvalidRecords) {
-        ProgressListener progressListener = sipModel.getFeedback().progressListener("Validating");
+        ProgressListener progressListener = sipModel.getFeedback().progressListener("Validating and Analyzing");
         progressListener.setProgressMessage(String.format(
-                "<html><h3>Transforming the raw data of '%s' into '%s' format and validating</h3>",
+                "<html><h3>Mapping raw data of '%s' into '%s' format, validating and gathering statistics</h3>",
                 sipModel.getDataSetModel().getDataSet().getSpec(),
                 sipModel.getMappingModel().getRecMapping().getPrefix()
         ));

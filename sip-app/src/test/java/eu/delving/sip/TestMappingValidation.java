@@ -156,7 +156,7 @@ public class TestMappingValidation {
         assertEquals(9, mock.fileCount());
         Stats stats = dataSet().getLatestStats();
         assertTrue(stats.sourceFormat);
-        SourceTreeNode tree = SourceTreeNode.create(stats.pathMap, dataSet().getDataSetFacts());
+        SourceTreeNode tree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
         assertEquals(Tag.element(Storage.ENVELOPE_TAG), tree.getTag());
         assertEquals(ANALYZED_SOURCE, dataSet().getState());
 
@@ -197,7 +197,7 @@ public class TestMappingValidation {
                             Assert.fail("Unexpected state " + dataSet().getState());
                     }
                     dataSet().setStats(stats);
-                    sourceTree = SourceTreeNode.create(stats.pathMap, dataSet().getDataSetFacts());
+                    sourceTree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
                     new FilterTreeModel(sourceTree);
                     int recordCount = sourceTree.setRecordRoot(recordRoot);
                     mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));

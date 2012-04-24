@@ -23,13 +23,17 @@ package eu.delving.sip.xml;
 
 import eu.delving.groovy.*;
 import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.Path;
 import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.Tag;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
@@ -47,9 +51,9 @@ import java.util.Set;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class FileValidator implements Runnable {
+public class FileProcessor implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(FileValidator.class);
+    private static final Logger LOG = Logger.getLogger(FileProcessor.class);
     private SipModel sipModel;
     private GroovyCodeResource groovyCodeResource;
     private ProgressListener progressListener;
@@ -57,16 +61,17 @@ public class FileValidator implements Runnable {
     private volatile boolean aborted = false;
     private boolean allowInvalid;
     private int validCount, invalidCount;
+    private Stats stats = new Stats();
 
     public interface Listener {
         void mappingFailed(MappingException exception);
 
         void outputInvalid(int recordNumber, Node node, String message);
 
-        void finished(BitSet valid, int recordCount);
+        void finished(Stats stats, BitSet valid, int recordCount);
     }
 
-    public FileValidator(
+    public FileProcessor(
             SipModel sipModel,
             boolean allowInvalidRecords,
             GroovyCodeResource groovyCodeResource,
@@ -90,6 +95,8 @@ public class FileValidator implements Runnable {
         try {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping == null) return;
+            stats.setRecordRoot(recMapping.getRecDefTree().getRoot().getPath());
+            stats.prefix = recMapping.getPrefix();
             Validator validator = sipModel.getDataSetModel().newValidator(recMapping.getPrefix());
             validator.setErrorHandler(null);
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
@@ -109,6 +116,7 @@ public class FileValidator implements Runnable {
                         outputNode = mappingRunner.runMapping(record);
                         Source source = new DOMSource(outputNode);
                         validator.validate(source);
+                        recordStatistics((Element) outputNode, Path.create());
                         validCount++;
                         valid.set(record.getRecordNumber());
                     }
@@ -185,15 +193,54 @@ public class FileValidator implements Runnable {
             IOUtils.closeQuietly(out);
             if (aborted) {
                 sipModel.getFeedback().say("Validation canceled");
-                listener.finished(null, 0);
+                listener.finished(null, null, 0);
             }
             else {
                 sipModel.getFeedback().say("Finished validating");
-                listener.finished(aborted ? null : valid, sipModel.getStatsModel().getRecordCount());
+                listener.finished(aborted ? null : stats, aborted ? null : valid, sipModel.getStatsModel().getRecordCount());
             }
             uniqueness.destroy();
             if (!aborted) progressListener.finished(true);
         }
+    }
+
+    private void recordStatistics(Element element, Path path) {
+        String prefix = element.getPrefix();
+        String name = element.getLocalName();
+        String namespaceUri = element.getNamespaceURI();
+        path = path.child(Tag.element(prefix, name, null));
+        if (!prefix.isEmpty()) stats.recordNamespace(prefix, namespaceUri);
+        stats.recordValue(path, getTextContent(element));
+        NodeList childNodes = element.getChildNodes();
+        for (int walk = 0; walk < childNodes.getLength(); walk++) {
+            Node kid = childNodes.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.ATTRIBUTE_NODE:
+                    break;
+                case Node.TEXT_NODE:
+                    break;
+                case Node.ELEMENT_NODE:
+                    recordStatistics((Element)kid, path);
+                    break;
+                default:
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
+            }
+        }
+    }
+
+    private String getTextContent(Element element) {
+        NodeList childNodes = element.getChildNodes();
+        String text = null;
+        for (int walk = 0; walk < childNodes.getLength(); walk++) {
+            Node kid = childNodes.item(walk);
+            if (kid.getNodeType() == Node.TEXT_NODE) {
+                String content = kid.getTextContent().trim();
+                if (content.isEmpty()) continue;
+                if (text != null) throw new RuntimeException("Multiple text nodes??");
+                text = content;
+            }
+        }
+        return text;
     }
 
     private void abort() {

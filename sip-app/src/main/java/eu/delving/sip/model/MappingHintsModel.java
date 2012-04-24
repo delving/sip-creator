@@ -62,7 +62,7 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
 
     private void fetchMappingHints(String metadataPrefix, RecDefModel recDefModel) {
         mappingHints = null;
-        URL resource = getClass().getResource("/templates/" + String.format(Storage.FileType.MAPPING.getPattern(), metadataPrefix));
+        URL resource = getClass().getResource("/templates/" + Storage.FileType.MAPPING.getName(metadataPrefix));
         if (resource == null) return;
         try {
             mappingHints = RecMapping.read(resource.openStream(), recDefModel);

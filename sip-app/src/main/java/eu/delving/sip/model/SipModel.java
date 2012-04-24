@@ -34,7 +34,7 @@ import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.AnalysisParser;
-import eu.delving.sip.xml.FileValidator;
+import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.sip.xml.Stats;
 import org.apache.log4j.Logger;
@@ -454,12 +454,12 @@ public class SipModel {
                     dataSetModel.getDataSet().getSpec(),
                     allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
             ));
-            Exec.work(new FileValidator(
+            Exec.work(new FileProcessor(
                     this,
                     allowInvalidRecords,
                     groovyCodeResource,
                     progressListener,
-                    new FileValidator.Listener() {
+                    new FileProcessor.Listener() {
                         @Override
                         public void mappingFailed(final MappingException exception) {
                             String xml = XmlSerializer.toXml(exception.getMetadataRecord().getRootNode());
@@ -473,9 +473,11 @@ public class SipModel {
                         }
 
                         @Override
-                        public void finished(final BitSet valid, int recordCount) {
+                        public void finished(final Stats stats, final BitSet valid, int recordCount) {
                             try {
-                                dataSetModel.getDataSet().setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
+                                DataSet dataSet = dataSetModel.getDataSet();
+                                dataSet.setStats(stats);
+                                dataSet.setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
                             }
                             catch (StorageException e) {
                                 feedback.alert("Unable to store validation results", e);

@@ -31,8 +31,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
 
-import static eu.delving.sip.files.Storage.*;
 import static eu.delving.sip.files.Storage.FileType.*;
+import static eu.delving.sip.files.Storage.*;
 
 /**
  * This class contains helpers for the StorageImpl to lean on
@@ -150,13 +150,12 @@ public class StorageBase {
 
     File validationFile(File dir, File mappingFile) {
         String prefix = extractName(mappingFile, MAPPING);
-        String name = String.format(VALIDATION.getPattern(), prefix);
+        String name = VALIDATION.getName(prefix);
         return findOrCreate(dir, name, new NameFileFilter(name), VALIDATION);
     }
 
     File[] validationFiles(File dir, String prefix) {
-        String name = String.format(VALIDATION.getPattern(), prefix);
-        return dir.listFiles(new NameFileFilter(name));
+        return dir.listFiles(new NameFileFilter(VALIDATION.getName(prefix)));
     }
 
     File[] validationFiles(File dir) {
@@ -164,7 +163,7 @@ public class StorageBase {
     }
 
     File reportFile(File dir, RecMapping recMapping) {
-        return new File(dir, String.format(REPORT.getPattern(), recMapping.getPrefix()));
+        return new File(dir, REPORT.getName(recMapping.getPrefix()));
     }
 
     File statsFile(File dir, boolean sourceFormat, String prefix) {
@@ -172,24 +171,26 @@ public class StorageBase {
             return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
         }
         else {
-            return new File(dir, String.format(FileType.RESULT_STATS.getPattern(), prefix));
+            return findOrCreate(dir, RESULT_STATS.getName(prefix), new PrefixFileFilter(RESULT_STATS), RESULT_STATS);
         }
     }
 
+    File statsFile(File dir, File mappingFile) {
+        String prefix = extractName(mappingFile, MAPPING);
+        String name = RESULT_STATS.getName(prefix);
+        return findOrCreate(dir, name, new NameFileFilter(name), RESULT_STATS);
+    }
+
     private File findOrCreate(File directory, Storage.FileType fileType) {
-        String filter = fileType.getPattern() != null ? fileType.getPattern() : fileType.getName();
-        File file = findOrNull(directory, 0, new NameFileFilter(filter), fileType);
-        if (file == null) {
-            file = new File(directory, fileType.getName());
-        }
+        if (fileType.getName() == null) throw new RuntimeException("Expected name");
+        File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName()), fileType);
+        if (file == null) file = new File(directory, fileType.getName());
         return file;
     }
 
     private File findOrCreate(File directory, String name, FileFilter fileFilter, Storage.FileType fileType) {
         File file = findOrNull(directory, 0, fileFilter, fileType);
-        if (file == null) {
-            file = new File(directory, name);
-        }
+        if (file == null) file = new File(directory, name);
         return file;
     }
 
@@ -199,11 +200,11 @@ public class StorageBase {
     }
 
     File recordDefinitionFile(File dir, String prefix) {
-        return new File(dir, String.format(FileType.RECORD_DEFINITION.getPattern(), prefix));
+        return new File(dir, RECORD_DEFINITION.getName(prefix));
     }
 
     File schemaFile(File dir, String prefix) {
-        return new File(dir, String.format(FileType.SCHEMA.getPattern(), prefix));
+        return new File(dir, SCHEMA.getName(prefix));
     }
 
     List<File> findRecordDefinitionFiles(File dir) {
@@ -217,7 +218,7 @@ public class StorageBase {
             String prefix = extractName(file, MAPPING);
             if (prefix.equals(metadataPrefix)) mappingFile = file;
         }
-        if (mappingFile == null) mappingFile = new File(dir, String.format(MAPPING.getPattern(), metadataPrefix));
+        if (mappingFile == null) mappingFile = new File(dir, MAPPING.getName(metadataPrefix));
         return mappingFile;
     }
 
@@ -288,7 +289,7 @@ public class StorageBase {
         private String ending;
 
         HashedMappingFileFilter(String prefix) {
-            this.ending = String.format(MAPPING.getPattern(), prefix);
+            this.ending = MAPPING.getName(prefix);
         }
 
         @Override

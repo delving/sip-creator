@@ -55,7 +55,7 @@ public interface Storage {
         HINTS("hints.txt"),
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         VALIDATION(null, "validation_", null, "validation_%s.int", 1),
-        RESULT_STATS(null, "stats_result_", null, "stats_result_%s.int", 1),
+        RESULT_STATS(null, "stats_result_", null, "stats_result_%s.xml.gz", 1),
         REPORT(null, null, null, "report_%s.txt", 1),
         RECORD_DEFINITION(null, null, "-record-definition.xml", "%s-record-definition.xml", 1),
         SCHEMA(null, null, "-validation.xsd", "%s-validation.xsd", 1);
@@ -79,16 +79,17 @@ public interface Storage {
             return name;
         }
 
+        public String getName(String prefix) {
+            if (pattern == null) throw new RuntimeException("No pattern");
+            return String.format(pattern, prefix);
+        }
+
         public String getPrefix() {
             return prefix;
         }
 
         public String getSuffix() {
             return suffix;
-        }
-
-        public String getPattern() {
-            return pattern;
         }
 
         public int getHistorySize() {
