@@ -103,7 +103,7 @@ public class ChartHelper {
             sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
         }
         for (Stats.Counter counter : sorted) data.addValue(counter.count, "Count", counter.value);
-        if (remainder > 0) data.addValue(remainder, "Count", "Remainder");
+        if (remainder > 0) data.addValue(remainder, "Count", "+");
         JFreeChart chart = ChartFactory.createBarChart(
                 "Word Count",
                 "Number of Words",
@@ -134,7 +134,7 @@ public class ChartHelper {
         }
         data.addValue(histogram.absent, "Frequency", "0");
         for (Stats.Counter counter : sorted) data.addValue(counter.count, "Frequency", counter.value);
-        if (remainder > 0) data.addValue(remainder, "Frequency", "Remainder");
+        if (remainder > 0) data.addValue(remainder, "Frequency", "+");
         JFreeChart chart = ChartFactory.createBarChart(
                 "Field frequency within record",
                 "Cardinality",
@@ -154,6 +154,7 @@ public class ChartHelper {
         barrenderer.setItemLabelAnchorOffset(9D);
         barrenderer.setBaseItemLabelsVisible(true);
         barrenderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        barrenderer.setMaximumBarWidth(0.03);
         CategoryAxis categoryaxis = categoryplot.getDomainAxis();
         categoryaxis.setCategoryMargin(0.25D);
         categoryaxis.setUpperMargin(0.02D);

@@ -46,13 +46,15 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
  */
 
 public class StatisticsFrame extends FrameBase {
-    private final String EMPTY = "<html><center><h3>No Statistics</h3><b>Select an item from the document structure<br>or an input variable</b><br><br>";
+    private final String EMPTY = "<html><center><h3>No Statistics</h3><b>Select an item with statistics</b><br><br>";
     private JLabel summaryLabel = new JLabel(EMPTY, JLabel.CENTER);
     private ChartHelper chartHelper;
-    private HistogramModel histogramModel = new HistogramModel();
     private RandomSampleModel sampleModel = new RandomSampleModel();
-    private JTabbedPane tabs = new JTabbedPane();
     private JComponent samplePanel = scrollV("Sample", new JList(sampleModel));
+    private HistogramModel histogramModel = new HistogramModel();
+    private JComponent histogramPanel = scrollV("Histogram", new JList(histogramModel));
+    private JPanel wordCountPanel = emptyPanel();
+    private JPanel fieldFrequencyPanel = emptyPanel();
 
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.STATISTICS, desktop, sipModel, "Statistics", false);
@@ -109,6 +111,12 @@ public class StatisticsFrame extends FrameBase {
         });
     }
 
+    @Override
+    protected void buildContent(Container content) {
+        add(createSummary(), BorderLayout.NORTH);
+        add(createCenter(), BorderLayout.CENTER);
+    }
+
     public void setStats(Stats stats) {
         Exec.checkSwing();
         this.chartHelper = stats == null ? null : new ChartHelper(stats);
@@ -117,27 +125,21 @@ public class StatisticsFrame extends FrameBase {
 
     public void setPath(Path path) {
         Exec.checkSwing();
-        tabs.removeAll();
-        tabs.add("Sample", samplePanel);
         if (path != null) {
             if (chartHelper == null) return;
             Stats.ValueStats valueStats = chartHelper.setPath(path);
             setSummary(path, valueStats);
             sampleModel.setSample(valueStats == null ? null : valueStats.sample);
-            if (chartHelper.hasFrequencyChart()) tabs.add("Frequency", chartHelper.getFieldFrequencyChart());
-            if (chartHelper.hasWordCountChart()) tabs.add("Word Counts", chartHelper.getWordCountChart());
+            histogramModel.setHistogram(valueStats == null ? null : valueStats.values);
+            setPanelContent(fieldFrequencyPanel, chartHelper.hasFrequencyChart() ? chartHelper.getFieldFrequencyChart() : emptyLabel());
+            setPanelContent(wordCountPanel, chartHelper.hasFrequencyChart() ? chartHelper.getWordCountChart() : emptyLabel());
         }
         else {
             setSummary(null, null);
             sampleModel.setSample(null);
+            setPanelContent(fieldFrequencyPanel, emptyLabel());
+            setPanelContent(wordCountPanel,emptyLabel());
         }
-        tabs.validate();
-    }
-
-    @Override
-    protected void buildContent(Container content) {
-        add(createSummary(), BorderLayout.NORTH);
-        add(createCenter(), BorderLayout.CENTER);
     }
 
     private void setSummary(Path path, Stats.ValueStats valueStats) {
@@ -158,8 +160,31 @@ public class StatisticsFrame extends FrameBase {
     }
 
     private JComponent createCenter() {
+        JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Sample", samplePanel);
+        tabs.addTab("Histogram", histogramPanel);
+        tabs.addTab("Word Count", scrollV(wordCountPanel));
+        tabs.addTab("Field Frequency", scrollV(fieldFrequencyPanel));
         return tabs;
+    }
+
+    private void setPanelContent(JPanel panel, JComponent content) {
+        if (!(panel.getLayout() instanceof BoxLayout)) throw new RuntimeException();
+        panel.removeAll();
+        panel.add(content);
+        panel.add(Box.createVerticalGlue());
+        panel.validate();
+    }
+
+    private JPanel emptyPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        setPanelContent(p, emptyLabel());
+        return p;
+    }
+
+    private JComponent emptyLabel() {
+        return new JLabel("Empty", JLabel.CENTER);
     }
 
     private static class HistogramModel extends AbstractListModel {
