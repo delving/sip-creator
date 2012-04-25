@@ -474,9 +474,10 @@ public class SipModel {
 
                         @Override
                         public void finished(final Stats stats, final BitSet valid, int recordCount) {
+                            // todo: if stats and bitset are null, clear things
                             try {
                                 DataSet dataSet = dataSetModel.getDataSet();
-                                dataSet.setStats(stats);
+                                if (stats != null) dataSet.setStats(stats);
                                 dataSet.setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
                             }
                             catch (StorageException e) {

@@ -367,6 +367,7 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void setStats(Stats stats) throws StorageException {
+            if (stats == null) return; // todo: delete something??
             File statsFile = statsFile(here, stats.sourceFormat, stats.prefix);
             OutputStream out = null;
             try {

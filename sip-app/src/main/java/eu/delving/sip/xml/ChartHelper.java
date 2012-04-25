@@ -112,23 +112,7 @@ public class ChartHelper {
                 PlotOrientation.HORIZONTAL,
                 false, true, false
         );
-        CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
-        categoryplot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
-        categoryplot.setRangePannable(true);
-        BarRenderer barrenderer = (BarRenderer) categoryplot.getRenderer();
-        barrenderer.setItemLabelAnchorOffset(9D);
-        barrenderer.setBaseItemLabelsVisible(true);
-        barrenderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
-//        barrenderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("{0}, {1}) = {2} per 100,000", new DecimalFormat("0")));
-        CategoryAxis categoryaxis = categoryplot.getDomainAxis();
-        categoryaxis.setCategoryMargin(0.25D);
-        categoryaxis.setUpperMargin(0.02D);
-        categoryaxis.setLowerMargin(0.02D);
-        NumberAxis numberaxis = (NumberAxis) categoryplot.getRangeAxis();
-        numberaxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-        numberaxis.setUpperMargin(0.10000000000000001D);
-        ChartUtilities.applyCurrentTheme(chart);
-        return chart;
+        return horizontalBarChart(chart);
     }
 
     private static JFreeChart createFieldFrequencyChart(Stats.RecordStats recordStats, Path path) {
@@ -159,6 +143,10 @@ public class ChartHelper {
                 PlotOrientation.HORIZONTAL,
                 false, true, false
         );
+        return horizontalBarChart(chart);
+    }
+
+    private static JFreeChart horizontalBarChart(JFreeChart chart) {
         CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
         categoryplot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
         categoryplot.setRangePannable(true);
@@ -166,7 +154,6 @@ public class ChartHelper {
         barrenderer.setItemLabelAnchorOffset(9D);
         barrenderer.setBaseItemLabelsVisible(true);
         barrenderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
-//        barrenderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("{0}, {1}) = {2} per 100,000", new DecimalFormat("0")));
         CategoryAxis categoryaxis = categoryplot.getDomainAxis();
         categoryaxis.setCategoryMargin(0.25D);
         categoryaxis.setUpperMargin(0.02D);
@@ -177,5 +164,4 @@ public class ChartHelper {
         ChartUtilities.applyCurrentTheme(chart);
         return chart;
     }
-
 }
