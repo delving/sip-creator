@@ -196,7 +196,7 @@ public class TestMappingValidation {
                         default:
                             Assert.fail("Unexpected state " + dataSet().getState());
                     }
-                    dataSet().setStats(stats);
+                    dataSet().setStats(stats, stats.sourceFormat, null);
                     sourceTree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
                     new FilterTreeModel(sourceTree);
                     int recordCount = sourceTree.setRecordRoot(recordRoot);

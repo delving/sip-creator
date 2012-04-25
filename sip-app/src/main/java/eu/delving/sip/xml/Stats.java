@@ -305,7 +305,7 @@ public class Stats {
         public void finish(int total) {
             present = 0;
             for (Map.Entry<String, Counter> entry : counterMap.entrySet()) {
-                present++;
+                present += entry.getValue().count;
                 entry.getValue().value = entry.getKey();
                 entry.getValue().setTotal(total);
             }

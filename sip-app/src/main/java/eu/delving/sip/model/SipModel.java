@@ -364,7 +364,7 @@ public class SipModel {
                 public void success(final Stats stats) {
                     analyzing = false;
                     try {
-                        dataSetModel.getDataSet().setStats(stats);
+                        dataSetModel.getDataSet().setStats(stats, stats.sourceFormat, null);
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
@@ -474,10 +474,9 @@ public class SipModel {
 
                         @Override
                         public void finished(final Stats stats, final BitSet valid, int recordCount) {
-                            // todo: if stats and bitset are null, clear things
                             try {
                                 DataSet dataSet = dataSetModel.getDataSet();
-                                if (stats != null) dataSet.setStats(stats);
+                                dataSet.setStats(stats, false, mappingModel.getRecMapping().getPrefix());
                                 dataSet.setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
                             }
                             catch (StorageException e) {

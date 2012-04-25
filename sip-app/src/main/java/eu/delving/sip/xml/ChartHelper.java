@@ -102,12 +102,12 @@ public class ChartHelper {
             for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
             sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
         }
-        for (Stats.Counter counter : sorted) data.addValue(counter.count, "Word Count", counter.value);
-        if (remainder > 0) data.addValue(remainder, "Word Count", "Remainder");
+        for (Stats.Counter counter : sorted) data.addValue(counter.count, "Count", counter.value);
+        if (remainder > 0) data.addValue(remainder, "Count", "Remainder");
         JFreeChart chart = ChartFactory.createBarChart(
                 "Word Count",
                 "Number of Words",
-                "Frequency",
+                "Count",
                 data,
                 PlotOrientation.HORIZONTAL,
                 false, true, false
@@ -136,7 +136,7 @@ public class ChartHelper {
         for (Stats.Counter counter : sorted) data.addValue(counter.count, "Frequency", counter.value);
         if (remainder > 0) data.addValue(remainder, "Frequency", "Remainder");
         JFreeChart chart = ChartFactory.createBarChart(
-                "Field Frequency",
+                "Field frequency within record",
                 "Cardinality",
                 "Frequency",
                 data,

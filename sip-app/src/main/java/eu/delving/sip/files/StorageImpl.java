@@ -366,16 +366,20 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public void setStats(Stats stats) throws StorageException {
-            if (stats == null) return; // todo: delete something??
-            File statsFile = statsFile(here, stats.sourceFormat, stats.prefix);
-            OutputStream out = null;
-            try {
-                out = zipOut(statsFile);
-                Stats.write(stats, out);
+        public void setStats(Stats stats, boolean sourceFormat, String prefix) throws StorageException {
+            File statsFile = statsFile(here, sourceFormat, prefix);
+            if (stats == null) {
+                delete(statsFile);
             }
-            finally {
-                IOUtils.closeQuietly(out);
+            else {
+                OutputStream out = null;
+                try {
+                    out = zipOut(statsFile);
+                    Stats.write(stats, out);
+                }
+                finally {
+                    IOUtils.closeQuietly(out);
+                }
             }
         }
 

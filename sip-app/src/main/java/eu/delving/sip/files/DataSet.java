@@ -84,7 +84,7 @@ public interface DataSet {
 
     Stats getStats(boolean sourceFormat, String prefix);
 
-    void setStats(Stats stats) throws StorageException;
+    void setStats(Stats stats, boolean sourceFormat, String prefix) throws StorageException;
 
     RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException;
 
