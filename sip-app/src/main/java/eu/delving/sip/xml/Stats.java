@@ -342,6 +342,13 @@ public class Stats {
         public String toString() {
             return count + " [" + value + "] " + percentage;
         }
+
+        public Counter copy() {
+            Counter fresh = new Counter();
+            fresh.count = count;
+            fresh.value = value;
+            return fresh;
+        }
     }
 
     private static XStream stream() {

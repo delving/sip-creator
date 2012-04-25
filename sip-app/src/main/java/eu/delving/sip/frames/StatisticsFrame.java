@@ -55,6 +55,7 @@ public class StatisticsFrame extends FrameBase {
     private JComponent histogramPanel = scrollV("Histogram", new JList(histogramModel));
     private JPanel wordCountPanel = emptyPanel();
     private JPanel fieldFrequencyPanel = emptyPanel();
+    private JPanel presentAbsentPanel = emptyPanel();
 
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.STATISTICS, desktop, sipModel, "Statistics", false);
@@ -120,6 +121,9 @@ public class StatisticsFrame extends FrameBase {
     public void setStats(Stats stats) {
         Exec.checkSwing();
         this.chartHelper = stats == null ? null : new ChartHelper(stats);
+        if (chartHelper != null && chartHelper.hasPresentAbsentChart()) {
+            setPanelContent(presentAbsentPanel, chartHelper.getPresentAbsentChart());
+        }
         setPath(null);
     }
 
@@ -161,6 +165,7 @@ public class StatisticsFrame extends FrameBase {
 
     private JComponent createCenter() {
         JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Present/ Absent", presentAbsentPanel);
         tabs.addTab("Sample", samplePanel);
         tabs.addTab("Histogram", histogramPanel);
         tabs.addTab("Word Count", scrollV(wordCountPanel));

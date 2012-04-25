@@ -36,10 +36,7 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Build charts based on stats
@@ -53,9 +50,11 @@ public class ChartHelper {
     private Path path;
     private JFreeChart fieldFrequencyChart;
     private JFreeChart wordCountChart;
+    private JFreeChart presentAbsentChart;
 
     public ChartHelper(Stats stats) {
         this.stats = stats;
+        this.presentAbsentChart = createPresentAbsentChart(stats.recordStats);
     }
 
     public Stats.ValueStats setPath(Path path) {
@@ -82,6 +81,16 @@ public class ChartHelper {
 
     public JComponent getWordCountChart() {
         ChartPanel panel = new ChartPanel(wordCountChart);
+        panel.setMouseWheelEnabled(true);
+        return panel;
+    }
+
+    public boolean hasPresentAbsentChart() {
+        return presentAbsentChart != null;
+    }
+
+    public JComponent getPresentAbsentChart() {
+        ChartPanel panel = new ChartPanel(presentAbsentChart);
         panel.setMouseWheelEnabled(true);
         return panel;
     }
@@ -142,6 +151,24 @@ public class ChartHelper {
                 data,
                 PlotOrientation.HORIZONTAL,
                 false, true, false
+        );
+        return horizontalBarChart(chart);
+    }
+
+    private static JFreeChart createPresentAbsentChart(Stats.RecordStats recordStats) {
+        if (recordStats == null) return null;
+        DefaultCategoryDataset data = new DefaultCategoryDataset();
+        for (Map.Entry<Path, Stats.Histogram> histogramEntry : recordStats.frequencies.entrySet()) {
+            data.addValue(histogramEntry.getValue().absent, "Absent", histogramEntry.getKey().getTail());
+            data.addValue(histogramEntry.getValue().present, "Present", histogramEntry.getKey().getTail());
+        }
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Present / Absent",
+                "Field",
+                "Record Count",
+                data,
+                PlotOrientation.HORIZONTAL,
+                true, true, false
         );
         return horizontalBarChart(chart);
     }
