@@ -31,12 +31,9 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.util.Rotation;
 
 import javax.swing.*;
 import java.util.*;
@@ -48,10 +45,8 @@ import java.util.*;
  */
 
 public class ChartHelper {
-    private static final int MAX_PIE_CHART_SIZE = 10;
     private static final int MAX_BAR_CHART_SIZE = 30;
     private Stats stats;
-    private Path path;
     private JFreeChart fieldFrequencyChart;
     private JFreeChart wordCountChart;
     private JFreeChart presentAbsentChart;
@@ -62,7 +57,6 @@ public class ChartHelper {
     }
 
     public Stats.ValueStats setPath(Path path) {
-        this.path = path;
         Stats.ValueStats valueStats = stats.fieldValueMap.get(path);
         this.wordCountChart = valueStats == null ? null : createWordCountChart(valueStats);
         this.fieldFrequencyChart = stats.recordStats == null ? null : createFieldFrequencyChart(stats.recordStats, path);
@@ -77,10 +71,6 @@ public class ChartHelper {
         ChartPanel panel = new ChartPanel(fieldFrequencyChart);
         panel.setMouseWheelEnabled(true);
         return panel;
-    }
-
-    public boolean hasWordCountChart() {
-        return wordCountChart != null;
     }
 
     public JComponent getWordCountChart() {
@@ -109,36 +99,23 @@ public class ChartHelper {
                 return Integer.valueOf(a.value).compareTo(Integer.valueOf(b.value));
             }
         });
-        if (sorted.size() < MAX_PIE_CHART_SIZE) {
-            DefaultPieDataset data = new DefaultPieDataset();
-            for (Stats.Counter counter : sorted) data.setValue(counter.value, counter.count);
-            JFreeChart chart = ChartFactory.createPieChart3D(
-                    "Field frequency within record",
-                    data,
-                    false, true, false
-            );
-            return pieChart(chart);
+        int remainder = 0;
+        if (sorted.size() > MAX_BAR_CHART_SIZE) {
+            for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
+            sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
         }
-        else {
-
-            int remainder = 0;
-            if (sorted.size() > MAX_BAR_CHART_SIZE) {
-                for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
-                sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
-            }
-            DefaultCategoryDataset data = new DefaultCategoryDataset();
-            for (Stats.Counter counter : sorted) data.addValue(counter.count, "Count", counter.value);
-            if (remainder > 0) data.addValue(remainder, "Count", "+");
-            JFreeChart chart = ChartFactory.createBarChart(
-                    "Word Count",
-                    "Number of Words",
-                    "Count",
-                    data,
-                    PlotOrientation.HORIZONTAL,
-                    false, true, false
-            );
-            return horizontalBarChart(chart);
-        }
+        DefaultCategoryDataset data = new DefaultCategoryDataset();
+        for (Stats.Counter counter : sorted) data.addValue(counter.count, "Count", counter.value);
+        if (remainder > 0) data.addValue(remainder, "Count", "+");
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Word Count",
+                "Number of Words",
+                "Count",
+                data,
+                PlotOrientation.HORIZONTAL,
+                false, true, false
+        );
+        return horizontalBarChart(chart);
     }
 
     private static JFreeChart createFieldFrequencyChart(Stats.RecordStats recordStats, Path path) {
@@ -152,46 +129,42 @@ public class ChartHelper {
                 return b.count - a.count;
             }
         });
-        if (sorted.size() < MAX_PIE_CHART_SIZE) {
-            DefaultPieDataset data = new DefaultPieDataset();
-            for (Stats.Counter counter : sorted) data.setValue(counter.value, counter.count);
-            JFreeChart chart = ChartFactory.createPieChart3D(
-                    "Field frequency within record",
-                    data,
-                    false, true, false
-            );
-            return pieChart(chart);
+        int remainder = 0;
+        if (sorted.size() > MAX_BAR_CHART_SIZE) {
+            for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
+            sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
         }
-        else {
-            int remainder = 0;
-            if (sorted.size() > MAX_BAR_CHART_SIZE) {
-                for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
-                sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
-            }
-            DefaultCategoryDataset data = new DefaultCategoryDataset();
-            data.addValue(histogram.absent, "Frequency", "0");
-            for (Stats.Counter counter : sorted) data.addValue(counter.count, "Frequency", counter.value);
-            if (remainder > 0) data.addValue(remainder, "Frequency", "+");
-            JFreeChart chart = ChartFactory.createBarChart(
-                    "Field frequency within record",
-                    "Cardinality",
-                    "Frequency",
-                    data,
-                    PlotOrientation.HORIZONTAL,
-                    false, true, false
-            );
-            return horizontalBarChart(chart);
-        }
+        DefaultCategoryDataset data = new DefaultCategoryDataset();
+        data.addValue(histogram.absent, "Frequency", "0");
+        for (Stats.Counter counter : sorted) data.addValue(counter.count, "Frequency", counter.value);
+        if (remainder > 0) data.addValue(remainder, "Frequency", "+");
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Field frequency within record",
+                "Cardinality",
+                "Frequency",
+                data,
+                PlotOrientation.HORIZONTAL,
+                false, true, false
+        );
+        return horizontalBarChart(chart);
     }
 
-    private static JFreeChart pieChart(JFreeChart chart) {
-        PiePlot3D pieplot3d = (PiePlot3D) chart.getPlot();
-        pieplot3d.setStartAngle(290D);
-        pieplot3d.setDirection(Rotation.CLOCKWISE);
-        pieplot3d.setForegroundAlpha(0.5F);
-        pieplot3d.setNoDataMessage("No data to display");
-        return chart;
-    }
+//    DefaultPieDataset data = new DefaultPieDataset();
+//    for (Stats.Counter counter : sorted) data.setValue(counter.value, counter.count);
+//    JFreeChart chart = ChartFactory.createPieChart3D(
+//            "Field frequency within record",
+//            data,
+//            false, true, false
+//    );
+//    return pieChart(chart);
+//    private static JFreeChart pieChart(JFreeChart chart) {
+//        PiePlot3D pieplot3d = (PiePlot3D) chart.getPlot();
+//        pieplot3d.setStartAngle(290D);
+//        pieplot3d.setDirection(Rotation.CLOCKWISE);
+//        pieplot3d.setForegroundAlpha(0.5F);
+//        pieplot3d.setNoDataMessage("No data to display");
+//        return chart;
+//    }
 
     private static JFreeChart createPresentAbsentChart(Stats.RecordStats recordStats) {
         if (recordStats == null) return null;
