@@ -98,6 +98,7 @@ public class Stats {
 
     public void finish() {
         for (ValueStats stats : fieldValueMap.values()) stats.finish();
+        if (recordStats != null) recordStats.finish();
     }
 
     @XStreamAsAttribute
@@ -141,6 +142,10 @@ public class Stats {
             }
             countPerRecord.clear();
             recordCount++;
+        }
+
+        public void finish() {
+            for (Histogram histogram : frequencies.values()) histogram.finish(recordCount);
         }
     }
 
@@ -216,6 +221,7 @@ public class Stats {
                 }
             }
             if (wordCounts != null && wordCounts.counterMap.size() == 1) wordCounts = null;
+            if (wordCounts != null) wordCounts.finish(total);
         }
     }
 
@@ -254,6 +260,12 @@ public class Stats {
     @XStreamAlias("histogram")
     public static class Histogram {
 
+        @XStreamAsAttribute
+        public int present;
+
+        @XStreamAsAttribute
+        public int absent;
+
         @XStreamImplicit
         public Map<String, Counter> counterMap = new HashMap<String, Counter>((int) (HISTOGRAM_MAX_SIZE * HISTOGRAM_OVERSAMPLING));
 
@@ -291,10 +303,13 @@ public class Stats {
         }
 
         public void finish(int total) {
+            present = 0;
             for (Map.Entry<String, Counter> entry : counterMap.entrySet()) {
+                present++;
                 entry.getValue().value = entry.getKey();
-                entry.getValue().setPercentageTotal(total);
+                entry.getValue().setTotal(total);
             }
+            absent = total - present;
         }
     }
 
@@ -310,9 +325,12 @@ public class Stats {
         @XStreamOmitField
         public String value;
 
-        public void setPercentageTotal(int total) {
-            double percent = (double) count / total;
-            this.percentage = PERCENT.format(percent);
+        @XStreamOmitField
+        public double proportion;
+
+        public void setTotal(int total) {
+            this.proportion = (double) count / total;
+            this.percentage = PERCENT.format(proportion);
         }
 
         @Override

@@ -22,12 +22,12 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.SwingHelper;
-import eu.delving.sip.model.CreateModel;
-import eu.delving.sip.model.CreateTransition;
-import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.SourceTreeNode;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.model.*;
+import eu.delving.sip.xml.ChartHelper;
 import eu.delving.sip.xml.Stats;
 
 import javax.swing.*;
@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
+
+import static eu.delving.sip.base.SwingHelper.scrollV;
 
 /**
  * Show statistics in an html panel, with special tricks for separately threading the html generation
@@ -46,8 +48,11 @@ import java.util.SortedSet;
 public class StatisticsFrame extends FrameBase {
     private final String EMPTY = "<html><center><h3>No Statistics</h3><b>Select an item from the document structure<br>or an input variable</b><br><br>";
     private JLabel summaryLabel = new JLabel(EMPTY, JLabel.CENTER);
+    private ChartHelper chartHelper;
     private HistogramModel histogramModel = new HistogramModel();
     private RandomSampleModel sampleModel = new RandomSampleModel();
+    private JTabbedPane tabs = new JTabbedPane();
+    private JComponent samplePanel = scrollV("Sample", new JList(sampleModel));
 
     public StatisticsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.STATISTICS, desktop, sipModel, "Statistics", false);
@@ -59,29 +64,80 @@ public class StatisticsFrame extends FrameBase {
                 SortedSet<SourceTreeNode> nodes = createModel.getSourceTreeNodes();
                 if (nodes != null && nodes.size() == 1) {
                     SourceTreeNode node = nodes.iterator().next();
-                    Path path = node.getPath(true);
-                    setStatistics(path, node.getStats());
+                    final Path path = node.getPath(true);
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            setPath(path);
+                        }
+                    });
+                }
+            }
+        });
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void dataSetChanged(DataSet dataSet) {
+                dataSetStateChanged(dataSet, dataSet.getState());
+            }
+
+            @Override
+            public void dataSetRemoved() {
+                // todo: clear
+            }
+
+            @Override
+            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+                switch (dataSetState) {
+                    case ABSENT:
+                    case EMPTY:
+                    case IMPORTED:
+                        setStats(null);
+                        break;
+                    case ANALYZED_IMPORT:
+                    case DELIMITED:
+                    case SOURCED:
+                        setStats(dataSet.getStats(false, null));
+                        break;
+                    case MAPPING:
+                    case ANALYZED_SOURCE:
+                        setStats(dataSet.getStats(true, null));
+                        break;
+                    case VALIDATED:
+                        break;
                 }
             }
         });
     }
 
-    public void setStatistics(Path path, Stats.ValueStats valueStats) {
-        setSummary(path, valueStats);
-        if (valueStats == null) {
-            histogramModel.setHistogram(null);
-            sampleModel.setSample(null);
+    public void setStats(Stats stats) {
+        Exec.checkSwing();
+        this.chartHelper = stats == null ? null : new ChartHelper(stats);
+        setPath(null);
+    }
+
+    public void setPath(Path path) {
+        Exec.checkSwing();
+        tabs.removeAll();
+        tabs.add("Sample", samplePanel);
+        if (path != null) {
+            if (chartHelper == null) return;
+            Stats.ValueStats valueStats = chartHelper.setPath(path);
+            setSummary(path, valueStats);
+            sampleModel.setSample(valueStats == null ? null : valueStats.sample);
+            if (chartHelper.hasFrequencyChart()) tabs.add("Frequency", chartHelper.getFieldFrequencyChart());
+            if (chartHelper.hasWordCountChart()) tabs.add("Word Counts", chartHelper.getWordCountChart());
         }
         else {
-            histogramModel.setHistogram(valueStats.values);
-            sampleModel.setSample(valueStats.sample);
+            setSummary(null, null);
+            sampleModel.setSample(null);
         }
+        tabs.validate();
     }
 
     @Override
     protected void buildContent(Container content) {
         add(createSummary(), BorderLayout.NORTH);
-        add(createListPanels(), BorderLayout.CENTER);
+        add(createCenter(), BorderLayout.CENTER);
     }
 
     private void setSummary(Path path, Stats.ValueStats valueStats) {
@@ -101,27 +157,9 @@ public class StatisticsFrame extends FrameBase {
         return p;
     }
 
-    private JComponent createListPanels() {
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createSamplePanel(), createHistogramPanel());
-        split.setDividerLocation(0.5);
-        split.setResizeWeight(0.5);
-        return split;
-    }
-
-    private JComponent createSamplePanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Sample"));
-        JList list = new JList(sampleModel);
-        p.add(SwingHelper.scrollV(list));
-        return p;
-    }
-
-    private JComponent createHistogramPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBorder(BorderFactory.createTitledBorder("Histogram"));
-        JList list = new JList(histogramModel);
-        p.add(SwingHelper.scrollV(list));
-        return p;
+    private JComponent createCenter() {
+        tabs.addTab("Sample", samplePanel);
+        return tabs;
     }
 
     private static class HistogramModel extends AbstractListModel {
