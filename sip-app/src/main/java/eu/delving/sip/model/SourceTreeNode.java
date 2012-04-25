@@ -52,7 +52,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private List<SourceTreeNode> children = new ArrayList<SourceTreeNode>();
     private Tag tag;
     private boolean recordRoot, uniqueElement;
-    private Stats.PathStats pathStats;
+    private Stats.ValueStats valueStats;
     private String htmlChunk;
     private List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
 
@@ -60,7 +60,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
     }
 
-    public static SourceTreeNode create(Map<Path, Stats.PathStats> pathMap, Map<String, String> facts) {
+    public static SourceTreeNode create(Map<Path, Stats.ValueStats> pathMap, Map<String, String> facts) {
         SourceTreeNode root = createSubtree(pathMap, Path.create(), null);
         if (root == null) {
             root = new SourceTreeNode("No statistics", "<h3>No statistics</h3>");
@@ -98,16 +98,16 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         this.htmlChunk = template.toString();
     }
 
-    private SourceTreeNode(SourceTreeNode parent, Tag tag, Stats.PathStats pathStats) {
+    private SourceTreeNode(SourceTreeNode parent, Tag tag, Stats.ValueStats valueStats) {
         this(parent, tag);
-        setStats(pathStats);
+        setStats(valueStats);
     }
 
-    public void setStats(Stats.PathStats pathStats) {
-        this.pathStats = pathStats;
+    public void setStats(Stats.ValueStats valueStats) {
+        this.valueStats = valueStats;
         StringTemplate template = SwingHelper.getTemplate("stats-brief");
         template.setAttribute("path", getPath(true));
-        template.setAttribute("stats", pathStats);
+        template.setAttribute("stats", valueStats);
         this.htmlChunk = template.toString();
     }
 
@@ -120,8 +120,8 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         for (SourceTreeNode child : children) child.getPaths(sourcePaths);
     }
 
-    public Stats.PathStats getStats() {
-        return pathStats;
+    public Stats.ValueStats getStats() {
+        return valueStats;
     }
 
     public List<NodeMapping> getNodeMappings() {
@@ -179,11 +179,11 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public boolean couldBeRecordRoot() {
-        return pathStats != null && !pathStats.hasValues();
+        return valueStats != null && !valueStats.hasValues();
     }
 
     public boolean couldBeUniqueElement() {
-        if (pathStats == null || !pathStats.unique) return false;
+        if (valueStats == null || !valueStats.unique) return false;
         SourceTreeNode walk = parent;
         while (walk != null) { // ancestor must be record root
             if (walk.isRecordRoot()) return true;
@@ -257,8 +257,8 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         if (tag == null) {
             return "?";
         }
-        else if (pathStats != null) {
-            return String.format("%s (%d)", tag.toString(), pathStats.total);
+        else if (valueStats != null) {
+            return String.format("%s (%d)", tag.toString(), valueStats.total);
         }
         else {
             return tag.toString();
@@ -291,37 +291,37 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         if (this.nodeMappings.remove(nodeMapping)) fireChanged();
     }
 
-    private static SourceTreeNode createSubtree(Map<Path, Stats.PathStats> pathMap, Path path, SourceTreeNode parent) {
-        Map<Tag, Map<Path, Stats.PathStats>> statisticsMap = new TreeMap<Tag, Map<Path, Stats.PathStats>>();
-        for (Map.Entry<Path, Stats.PathStats> entry : pathMap.entrySet()) {
+    private static SourceTreeNode createSubtree(Map<Path, Stats.ValueStats> pathMap, Path path, SourceTreeNode parent) {
+        Map<Tag, Map<Path, Stats.ValueStats>> statisticsMap = new TreeMap<Tag, Map<Path, Stats.ValueStats>>();
+        for (Map.Entry<Path, Stats.ValueStats> entry : pathMap.entrySet()) {
             Path key = entry.getKey();
             Path subPath = key.takeFirst(path.size());
             if (subPath.equals(path) && key.size() == path.size() + 1) {
                 Tag tag = key.getTag(path.size());
                 if (tag == null) continue;
-                Map<Path, Stats.PathStats> map = statisticsMap.get(tag);
-                if (map == null) statisticsMap.put(tag, map = new TreeMap<Path, Stats.PathStats>());
+                Map<Path, Stats.ValueStats> map = statisticsMap.get(tag);
+                if (map == null) statisticsMap.put(tag, map = new TreeMap<Path, Stats.ValueStats>());
                 map.put(key, entry.getValue());
             }
         }
         if (statisticsMap.isEmpty()) return null;
         Tag tag = path.peek();
         SourceTreeNode node = tag == null ? null : new SourceTreeNode(parent, tag);
-        for (Map.Entry<Tag, Map<Path, Stats.PathStats>> entry : statisticsMap.entrySet()) {
+        for (Map.Entry<Tag, Map<Path, Stats.ValueStats>> entry : statisticsMap.entrySet()) {
             Path childPath = path.child(entry.getKey());
-            Stats.PathStats pathStatsForChild = null;
-            for (Map.Entry<Path,Stats.PathStats> pathStatsEntry : entry.getValue().entrySet()) {
+            Stats.ValueStats valueStatsForChild = null;
+            for (Map.Entry<Path,Stats.ValueStats> pathStatsEntry : entry.getValue().entrySet()) {
                 if (pathStatsEntry.getKey().equals(childPath)) {
-                    pathStatsForChild = pathStatsEntry.getValue();
+                    valueStatsForChild = pathStatsEntry.getValue();
                 }
             }
             SourceTreeNode child = createSubtree(pathMap, childPath, node);
             if (child != null) {
                 if (node == null) node = child;
-                child.setStats(pathStatsForChild);
+                child.setStats(valueStatsForChild);
             }
-            else if (pathStatsForChild != null) {
-                SourceTreeNode fresh = new SourceTreeNode(node, entry.getKey(), pathStatsForChild);
+            else if (valueStatsForChild != null) {
+                SourceTreeNode fresh = new SourceTreeNode(node, entry.getKey(), valueStatsForChild);
                 if (node == null) node = fresh;
             }
         }

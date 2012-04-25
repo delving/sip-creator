@@ -66,15 +66,15 @@ public class StatisticsFrame extends FrameBase {
         });
     }
 
-    public void setStatistics(Path path, Stats.PathStats pathStats) {
-        setSummary(path, pathStats);
-        if (pathStats == null) {
+    public void setStatistics(Path path, Stats.ValueStats valueStats) {
+        setSummary(path, valueStats);
+        if (valueStats == null) {
             histogramModel.setHistogram(null);
             sampleModel.setSample(null);
         }
         else {
-            histogramModel.setHistogram(pathStats.histogram);
-            sampleModel.setSample(pathStats.sample);
+            histogramModel.setHistogram(valueStats.values);
+            sampleModel.setSample(valueStats.sample);
         }
     }
 
@@ -84,12 +84,12 @@ public class StatisticsFrame extends FrameBase {
         add(createListPanels(), BorderLayout.CENTER);
     }
 
-    private void setSummary(Path path, Stats.PathStats pathStats) {
-        if (pathStats == null) {
+    private void setSummary(Path path, Stats.ValueStats valueStats) {
+        if (valueStats == null) {
             summaryLabel.setText(EMPTY);
         }
         else {
-            summaryLabel.setText(String.format("<html><center><h3>%s</h3><b>%s</b><br><br>", path, pathStats.getSummary()));
+            summaryLabel.setText(String.format("<html><center><h3>%s</h3><b>%s</b><br><br>", path, valueStats.getSummary()));
         }
     }
 

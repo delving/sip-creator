@@ -41,12 +41,11 @@ import java.util.*;
 
 @XStreamAlias("delving-statistics")
 public class Stats {
-    private static final int SAMPLE_SIZE = 300;
+    private static final int SAMPLE_SIZE = 200;
     private static final int SAMPLE_SMALL_SIZE = 30;
-    private static final int SAMPLE_MAX_VALUE_LENGTH = 40;
+    private static final int SAMPLE_MAX_VALUE_LENGTH = 100;
     private static final int HISTOGRAM_MAX_STORAGE = 1024 * 512;
-    private static final int HISTOGRAM_MAX_SIZE = 5000;
-    private static final int HISTOGRAM_MAX_SAMPLE_SIZE = 15;
+    private static final int HISTOGRAM_MAX_SIZE = 1000;
     private static final DecimalFormat PERCENT = new DecimalFormat("#0.00%");
     private static final double HISTOGRAM_OVERSAMPLING = 1.3;
 
@@ -77,21 +76,28 @@ public class Stats {
     }
 
     public void setRecordRoot(Path recordRoot) {
+        this.recordRoot = recordRoot;
         if (recordStats != null) throw new RuntimeException("Already known!");
         recordStats = new RecordStats();
-        recordStats.recordRoot = recordRoot;
     }
 
     public void recordValue(Path path, String value) {
-        PathStats pathStats = fieldValueMap.get(path);
-        if (pathStats == null) fieldValueMap.put(path, pathStats = new PathStats());
-        pathStats.recordOccurrence();
-        if (value != null) pathStats.recordValue(value.trim());
-        if (recordStats != null) recordStats.recordOccurrence(path);
+        ValueStats valueStats = fieldValueMap.get(path);
+        if (valueStats == null) fieldValueMap.put(path, valueStats = new ValueStats());
+        valueStats.recordOccurrence();
+        if (value != null) valueStats.recordValue(value.trim());
+        if (recordStats != null) {
+            if (path.equals(recordRoot)) {
+                recordStats.recordRecordEnd();
+            }
+            else {
+                recordStats.recordOccurrence(path);
+            }
+        }
     }
 
     public void finish() {
-        for (PathStats stats : fieldValueMap.values()) stats.finish();
+        for (ValueStats stats : fieldValueMap.values()) stats.finish();
     }
 
     @XStreamAsAttribute
@@ -100,56 +106,58 @@ public class Stats {
     @XStreamAsAttribute
     public String prefix;
 
+    @XStreamAsAttribute
+    public Path recordRoot;
+
     public Map<String, String> namespaces = new HashMap<String, String>();
 
     public RecordStats recordStats;
 
     @XStreamAlias("field-value-stats")
-    public Map<Path, PathStats> fieldValueMap = new HashMap<Path, PathStats>();
+    public Map<Path, ValueStats> fieldValueMap = new HashMap<Path, ValueStats>();
 
     @XStreamAlias("record-stats")
     public static class RecordStats {
 
         @XStreamAsAttribute
-        public Path recordRoot;
-
-        @XStreamAsAttribute
         public int recordCount;
 
-        @XStreamAlias("field-frequency-stats")
-        public Map<Path, Histogram> fieldFrequencyStats = new HashMap<Path, Histogram>();
+        @XStreamAlias("frequency-within-record")
+        public Map<Path, Histogram> frequencies = new HashMap<Path, Histogram>();
 
         @XStreamOmitField
         private Map<Path, Integer> countPerRecord = new HashMap<Path, Integer>();
 
         public void recordOccurrence(Path path) {
-            if (path.size() < recordRoot.size()) return;
-            if (!path.equals(recordRoot)) {
-                Integer count = countPerRecord.get(path);
-                countPerRecord.put(path, count == null ? 1 : count + 1);
+            Integer count = countPerRecord.get(path);
+            countPerRecord.put(path, count == null ? 1 : count + 1);
+        }
+
+        public void recordRecordEnd() {
+            for (Map.Entry<Path, Integer> entry : countPerRecord.entrySet()) {
+                Histogram histogram = frequencies.get(entry.getKey());
+                if (histogram == null) frequencies.put(entry.getKey(), histogram = new Histogram());
+                histogram.recordValue(entry.getValue().toString());
             }
-            else {
-                for (Map.Entry<Path, Integer> entry : countPerRecord.entrySet()) {
-                    Histogram histogram = fieldFrequencyStats.get(entry.getKey());
-                    if (histogram == null) fieldFrequencyStats.put(entry.getKey(), histogram = new Histogram());
-                    histogram.recordValue(entry.getValue().toString());
-                }
-                countPerRecord.clear();
-                recordCount++;
-            }
+            countPerRecord.clear();
+            recordCount++;
         }
     }
 
-    @XStreamAlias("path-stats")
-    public static class PathStats {
+    @XStreamAlias("value-stats")
+    public static class ValueStats {
 
         @XStreamAsAttribute
         public int total;
 
         @XStreamAsAttribute
-        public boolean unique = true;
+        public Boolean unique;
 
-        public Histogram histogram;
+        @XStreamAlias("values")
+        public Histogram values;
+
+        @XStreamAlias("word-counts")
+        public Histogram wordCounts;
 
         public Sample sample;
 
@@ -164,21 +172,24 @@ public class Stats {
         }
 
         public void recordValue(String value) {
+            if (value.isEmpty()) return;
             if (sample == null) sample = new Sample();
             sample.recordValue(value);
+            if (wordCounts == null) wordCounts = new Histogram();
+            int wordCount = 0;
+            for (StringTokenizer token = new StringTokenizer(value); token.hasMoreTokens(); token.nextToken()) wordCount++;
+            wordCounts.recordValue(String.valueOf(wordCount));
             if (!histogramExploded) {
-                if (histogram == null) histogram = new Histogram();
-                if (!histogram.recordValue(value)) {
+                if (values == null) values = new Histogram();
+                if (!values.recordValue(value)) {
                     histogramExploded = true;
                 }
-                if (histogram.trimmed) histogramExploded = true;
+                if (values.trimmed) histogramExploded = true;
             }
-            if (unique) {
+            if (unique == null || unique) {
                 if (uniqueness == null) uniqueness = new Uniqueness();
-                if (!uniqueness.isStillUnique(value)) {
-                    unique = false;
-                    uniqueness = null;
-                }
+                unique = uniqueness.isStillUnique(value);
+                if (!unique) uniqueness = null;
             }
         }
 
@@ -188,27 +199,23 @@ public class Stats {
 
         public String getSummary() {
             if (sample != null) {
-                if (unique) {
-                    return String.format("All %d values are completely unique", total);
-                }
-                if (histogram == null) {
-                    return String.format("Histogram became too large, discarded.");
-                }
-                if (histogram.trimmed) {
-                    return String.format("Histogram begame too large, so histogram is incomplete.");
-                }
-                if (histogram.counterMap.size() != 1) {
-                    return String.format("There were %d different values, not all unique.", histogram.counterMap.size());
-                }
-                Counter counter = histogram.counterMap.values().iterator().next();
-                return String.format("The single value '%s' appears %d times.", counter.value, counter.count);
+                if (unique != null && unique) return String.format("All %d values are completely unique", total);
+                return (values == null ? "No" : (values.trimmed ? "Trimmed" : "Full"))+" histogram of values available";
             }
             if (total == 1) return "Element appears just once.";
             return String.format("Element appears %d times.", total);
         }
 
         public void finish() {
-            if (histogram != null) histogram.finish(total);
+            if (values != null) {
+                if (values.counterMap.size() == 1 || unique != null && unique) {
+                    values = null;
+                }
+                else {
+                    values.finish(total);
+                }
+            }
+            if (wordCounts != null && wordCounts.counterMap.size() == 1) wordCounts = null;
         }
     }
 
@@ -216,33 +223,31 @@ public class Stats {
     public static class Sample {
 
         @XStreamImplicit
-        public Set<String> values = new TreeSet<String>();
+        public Set<String> values = new HashSet<String>();
 
         public void recordValue(String value) {
-            if (values.size() < SAMPLE_SIZE || Math.random() > 0.1) {
-                values.add(value);
-            }
+            String trimmedValue = value.length() > SAMPLE_MAX_VALUE_LENGTH ? value.substring(0, SAMPLE_MAX_VALUE_LENGTH) + "..." : value;
+            if (values.size() < SAMPLE_SIZE || Math.random() > 0.1) values.add(trimmedValue);
             if (values.size() > SAMPLE_SIZE * 2) {
                 Iterator<String> walk = values.iterator();
                 while (walk.hasNext()) {
                     walk.next();
-                    if (Math.random() > 0.5) {
-                        walk.remove();
-                    }
+                    if (Math.random() > 0.5) walk.remove();
                 }
             }
         }
 
-        public List<String> getFirstValues() {
-            List<String> first = new ArrayList<String>(SAMPLE_SMALL_SIZE);
-            Iterator<String> it = values.iterator();
-            for (int walk = 0; walk < SAMPLE_SMALL_SIZE; walk++) {
-                if (it.hasNext()) {
-                    String value = it.next();
-                    first.add(value.length() > SAMPLE_MAX_VALUE_LENGTH ? value.substring(0, SAMPLE_MAX_VALUE_LENGTH) + "..." : value);
-                }
+        public Set<String> getSelection() {
+            if (values.size() <= SAMPLE_SMALL_SIZE) return values;
+            List<String> list = new ArrayList<String>(values.size());
+            list.addAll(values);
+            Set<String> values = new HashSet<String>();
+            while (values.size() < SAMPLE_SMALL_SIZE) {
+                int index = (int)(Math.random() * list.size());
+                values.add(list.get(index));
+                list.remove(index);
             }
-            return first;
+            return values;
         }
     }
 
@@ -268,13 +273,6 @@ public class Stats {
             counter.count++;
             trimIfNecessary();
             return storageSize <= HISTOGRAM_MAX_STORAGE;
-        }
-
-        public List<Counter> getFirstValues() {
-            List<Counter> values = new ArrayList<Counter>(counterMap.size());
-            values.addAll(counterMap.values());
-            Collections.sort(values);
-            return values.subList(0, Math.min(HISTOGRAM_MAX_SAMPLE_SIZE, values.size()));
         }
 
         private void trimIfNecessary() {

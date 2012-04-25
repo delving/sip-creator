@@ -42,9 +42,9 @@ public class DictionaryHelper {
     public static boolean isDictionaryPossible(NodeMapping nodeMapping) {
         if (nodeMapping == null || nodeMapping.recDefNode == null || !nodeMapping.hasOneStatsTreeNode()) return false;
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
-        Stats.PathStats stats = sourceTreeNode.getStats();
-        if (stats == null || stats.histogram == null) return false;
-        Set<String> values = stats.histogram.counterMap.keySet();
+        Stats.ValueStats stats = sourceTreeNode.getStats();
+        if (stats == null || stats.values == null) return false;
+        Set<String> values = stats.values.counterMap.keySet();
         OptList optList = nodeMapping.recDefNode.getOptList();
         return values != null && optList != null && nodeMapping.dictionary == null;
     }
@@ -52,9 +52,9 @@ public class DictionaryHelper {
     public static boolean refreshDictionary(NodeMapping nodeMapping) {
         if (!isDictionaryPossible(nodeMapping)) throw new RuntimeException("Should have checked");
         SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
-        Stats.PathStats stats = sourceTreeNode.getStats();
-        if (stats == null || stats.histogram == null) return false;
-        Set<String> values = stats.histogram.counterMap.keySet();
+        Stats.ValueStats stats = sourceTreeNode.getStats();
+        if (stats == null || stats.values == null) return false;
+        Set<String> values = stats.values.counterMap.keySet();
         return setDictionaryDomain(nodeMapping, values);
     }
 
