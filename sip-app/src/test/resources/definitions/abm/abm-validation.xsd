@@ -80,6 +80,7 @@
             <xs:element name="long" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="type" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="geo" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="creatorUri" minOccurs="0" maxOccurs="unbounded"/>
 
             <xs:group minOccurs="0" maxOccurs="unbounded" ref="abm:dcGroup" />
             <xs:group minOccurs="0" maxOccurs="unbounded" ref="abm:dctermsGroup" />
