@@ -220,7 +220,6 @@ public class Stats {
                     values.finish(total);
                 }
             }
-            if (wordCounts != null && wordCounts.counterMap.size() == 1) wordCounts = null;
             if (wordCounts != null) wordCounts.finish(total);
         }
     }
