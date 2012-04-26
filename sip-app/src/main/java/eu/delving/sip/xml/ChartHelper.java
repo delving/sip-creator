@@ -109,14 +109,7 @@ public class ChartHelper {
 
     private static JFreeChart createWordCountChart(Stats.ValueStats valueStats, Path path) {
         if (valueStats.wordCounts == null) return null;
-        List<Stats.Counter> sorted = new ArrayList<Stats.Counter>(valueStats.wordCounts.counterMap.size());
-        sorted.addAll(valueStats.wordCounts.counterMap.values());
-        Collections.sort(sorted, new Comparator<Stats.Counter>() {
-            @Override
-            public int compare(Stats.Counter a, Stats.Counter b) {
-                return Integer.valueOf(a.value).compareTo(Integer.valueOf(b.value));
-            }
-        });
+        List<Stats.Counter> sorted = sort(valueStats.wordCounts.counterMap.values());
         int remainder = 0;
         if (sorted.size() > MAX_BAR_CHART_SIZE) {
             for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
@@ -139,14 +132,7 @@ public class ChartHelper {
     private static JFreeChart createFieldFrequencyChart(Stats.RecordStats recordStats, Path path) {
         Stats.Histogram histogram = recordStats.frequencies.get(path);
         if (histogram == null) return null;
-        List<Stats.Counter> sorted = new ArrayList<Stats.Counter>(histogram.counterMap.size());
-        sorted.addAll(histogram.counterMap.values());
-        Collections.sort(sorted, new Comparator<Stats.Counter>() {
-            @Override
-            public int compare(Stats.Counter a, Stats.Counter b) {
-                return b.count - a.count;
-            }
-        });
+        List<Stats.Counter> sorted = sort(histogram.counterMap.values());
         int remainder = 0;
         if (sorted.size() > MAX_BAR_CHART_SIZE) {
             for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
@@ -204,14 +190,7 @@ public class ChartHelper {
 
     private static JFreeChart createFieldCountChart(Stats.RecordStats recordStats, String which) {
         if (recordStats == null) return null;
-        List<Stats.Counter> sorted = new ArrayList<Stats.Counter>(recordStats.fieldOccurrence.counterMap.size());
-        sorted.addAll(recordStats.fieldOccurrence.counterMap.values());
-        Collections.sort(sorted, new Comparator<Stats.Counter>() {
-            @Override
-            public int compare(Stats.Counter a, Stats.Counter b) {
-                return Integer.valueOf(a.value).compareTo(Integer.valueOf(b.value));
-            }
-        });
+        List<Stats.Counter> sorted = sort(recordStats.fieldOccurrence.counterMap.values());
         DefaultCategoryDataset data = new DefaultCategoryDataset();
         for (Stats.Counter counter : sorted) data.addValue(counter.count, "Count", counter.value);
         JFreeChart chart = ChartFactory.createBarChart(
@@ -250,6 +229,18 @@ public class ChartHelper {
         numberaxis.setUpperMargin(0.10000000000000001D);
         ChartUtilities.applyCurrentTheme(chart);
         return chart;
+    }
+
+    private static List<Stats.Counter> sort(Collection<Stats.Counter> original) {
+        List<Stats.Counter> sorted = new ArrayList<Stats.Counter>(original.size());
+        sorted.addAll(original);
+        Collections.sort(sorted, new Comparator<Stats.Counter>() {
+            @Override
+            public int compare(Stats.Counter a, Stats.Counter b) {
+                return Integer.valueOf(a.value).compareTo(Integer.valueOf(b.value));
+            }
+        });
+        return sorted;
     }
 
     static class CustomRenderer extends BarRenderer {
