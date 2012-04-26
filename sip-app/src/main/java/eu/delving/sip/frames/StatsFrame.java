@@ -58,6 +58,7 @@ public class StatsFrame extends FrameBase {
     private JPanel wordCountPanel = emptyPanel();
     private JPanel fieldFrequencyPanel = emptyPanel();
     private JPanel presentAbsentPanel = emptyPanel();
+    private JPanel uniqueFieldCountPanel = emptyPanel();
 
     public StatsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.STATS, desktop, sipModel, "Statistics", false);
@@ -93,7 +94,8 @@ public class StatsFrame extends FrameBase {
 
     private JComponent createCenter() {
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Present/ Absent", presentAbsentPanel);
+        tabs.addTab("Unique Field Count", uniqueFieldCountPanel);
+        tabs.addTab("Present/Absent", presentAbsentPanel);
         tabs.addTab("Word Count", wordCountPanel);
         tabs.addTab("Field Frequency", fieldFrequencyPanel);
         return tabs;
@@ -194,15 +196,20 @@ public class StatsFrame extends FrameBase {
                 setPanelContent(treePanel, tree);
                 treeModel.setRoot(root);
                 expand = true;
-                setPanelContent(presentAbsentPanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresentAbsentChart() : emptyLabel());
+                setRecordStatPanels();
             }
         }
 
         private void select() {
-            setPanelContent(presentAbsentPanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresentAbsentChart() : emptyLabel());
+            setRecordStatPanels();
             TreePath treePath = tree.getSelectionModel().getSelectionPath();
             setPath(treePath == null ? null : ((StatsNode)treePath.getLastPathComponent()).getPath(true));
             expandIfNecessary();
+        }
+
+        private void setRecordStatPanels() {
+            setPanelContent(uniqueFieldCountPanel, chartHelper.hasUniqueFieldCountChart() ? chartHelper.getUniqueFieldCountChart() : emptyLabel());
+            setPanelContent(presentAbsentPanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresentAbsentChart() : emptyLabel());
         }
 
         private void expandIfNecessary() {

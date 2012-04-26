@@ -123,6 +123,9 @@ public class Stats {
         @XStreamAsAttribute
         public int recordCount;
 
+        @XStreamAlias("field-count")
+        public Histogram fieldOccurrence = new Histogram();
+
         @XStreamAlias("frequency-within-record")
         public Map<Path, Histogram> frequencies = new HashMap<Path, Histogram>();
 
@@ -140,12 +143,14 @@ public class Stats {
                 if (histogram == null) frequencies.put(entry.getKey(), histogram = new Histogram());
                 histogram.recordValue(entry.getValue().toString());
             }
+            fieldOccurrence.recordValue(String.valueOf(countPerRecord.size()));
             countPerRecord.clear();
             recordCount++;
         }
 
         public void finish() {
             for (Histogram histogram : frequencies.values()) histogram.finish(recordCount);
+            fieldOccurrence.finish(recordCount);
         }
     }
 

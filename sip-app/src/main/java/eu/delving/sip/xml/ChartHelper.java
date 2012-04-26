@@ -56,10 +56,12 @@ public class ChartHelper {
     private JFreeChart fieldFrequencyChart;
     private JFreeChart wordCountChart;
     private JFreeChart presentAbsentChart;
+    private JFreeChart uniqueFieldCountChart;
 
     public ChartHelper(Stats stats, String which) {
         this.stats = stats;
         this.presentAbsentChart = createPresentAbsentChart(stats.recordStats, which);
+        this.uniqueFieldCountChart = createFieldCountChart(stats.recordStats, which);
     }
 
     public Stats.ValueStats setPath(Path path) {
@@ -74,9 +76,7 @@ public class ChartHelper {
     }
 
     public JComponent getFieldFrequencyChart() {
-        ChartPanel panel = new ChartPanel(fieldFrequencyChart);
-        panel.setMouseWheelEnabled(true);
-        return panel;
+        return wrap(fieldFrequencyChart);
     }
 
     public boolean hasWordCountChart() {
@@ -84,9 +84,7 @@ public class ChartHelper {
     }
 
     public JComponent getWordCountChart() {
-        ChartPanel panel = new ChartPanel(wordCountChart);
-        panel.setMouseWheelEnabled(true);
-        return panel;
+        return wrap(wordCountChart);
     }
 
     public boolean hasPresentAbsentChart() {
@@ -94,9 +92,19 @@ public class ChartHelper {
     }
 
     public JComponent getPresentAbsentChart() {
-        ChartPanel panel = new ChartPanel(presentAbsentChart);
-        panel.setMouseWheelEnabled(true);
-        return panel;
+        return wrap(presentAbsentChart);
+    }
+
+    public boolean hasUniqueFieldCountChart() {
+        return uniqueFieldCountChart != null;
+    }
+
+    public JComponent getUniqueFieldCountChart() {
+        return wrap(uniqueFieldCountChart);
+    }
+
+    private static JComponent wrap(JFreeChart chart) {
+        return new ChartPanel(chart);
     }
 
     private static JFreeChart createWordCountChart(Stats.ValueStats valueStats, Path path) {
@@ -187,6 +195,29 @@ public class ChartHelper {
                 String.format("Fields present/absent in %s", which),
                 "Field",
                 "Record Count",
+                data,
+                PlotOrientation.VERTICAL,
+                true, true, false
+        );
+        return finishBarChart(chart);//, new Color(220, 20, 60), new Color(50, 205, 50));
+    }
+
+    private static JFreeChart createFieldCountChart(Stats.RecordStats recordStats, String which) {
+        if (recordStats == null) return null;
+        List<Stats.Counter> sorted = new ArrayList<Stats.Counter>(recordStats.fieldOccurrence.counterMap.size());
+        sorted.addAll(recordStats.fieldOccurrence.counterMap.values());
+        Collections.sort(sorted, new Comparator<Stats.Counter>() {
+            @Override
+            public int compare(Stats.Counter a, Stats.Counter b) {
+                return Integer.valueOf(a.value).compareTo(Integer.valueOf(b.value));
+            }
+        });
+        DefaultCategoryDataset data = new DefaultCategoryDataset();
+        for (Stats.Counter counter : sorted) data.addValue(counter.count, "Count", counter.value);
+        JFreeChart chart = ChartFactory.createBarChart(
+                String.format("Unique Fields in %s", which),
+                "Unique Fields",
+                "Count",
                 data,
                 PlotOrientation.VERTICAL,
                 true, true, false
