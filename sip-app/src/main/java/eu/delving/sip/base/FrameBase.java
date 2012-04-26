@@ -66,7 +66,7 @@ public abstract class FrameBase extends JInternalFrame {
         SOURCE,
         CREATE,
         TARGET,
-        STATISTICS,
+        STATS,
         INPUT,
         REC_MAPPING,
         FIELD_MAPPING,

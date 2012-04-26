@@ -63,7 +63,7 @@ public class SourceFrame extends FrameBase {
     private JPanel filterPanel = new JPanel(new BorderLayout(10, 10));
     private JTextField filterField = new JTextField();
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
-    private StatisticsFrame statisticsFrame;
+    private StatsFrame statsFrame;
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -75,9 +75,8 @@ public class SourceFrame extends FrameBase {
         }
     });
 
-    public SourceFrame(JDesktopPane desktop, SipModel sipModel, StatisticsFrame statisticsFrame) {
+    public SourceFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.SOURCE, desktop, sipModel, "Source", false);
-        this.statisticsFrame = statisticsFrame;
         sourceTree = new JTree(sipModel.getStatsModel().getSourceTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {
@@ -122,8 +121,8 @@ public class SourceFrame extends FrameBase {
     }
 
     private void onDoubleClick() {
-        statisticsFrame.setPlacement(getPlacement());
-        statisticsFrame.openFrame();
+        statsFrame.setPlacement(getPlacement());
+        statsFrame.openFrame();
     }
 
     private void wireUp() {
@@ -269,8 +268,54 @@ public class SourceFrame extends FrameBase {
         root.showPath(sourceTree, node.getPath(true));
     }
 
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(270, 300);
-    }
+//    private static class HistogramModel extends AbstractListModel {
+//        private java.util.List<Stats.Counter> list = new ArrayList<Stats.Counter>();
+//
+//        public void setHistogram(Stats.Histogram histogram) {
+//            int size = getSize();
+//            list.clear();
+//            fireIntervalRemoved(this, 0, size);
+//            if (histogram != null) {
+//                list.addAll(histogram.counterMap.values());
+//                Collections.sort(list);
+//                fireIntervalAdded(this, 0, getSize());
+//            }
+//        }
+//
+//        @Override
+//        public int getSize() {
+//            return list.size();
+//        }
+//
+//        @Override
+//        public Object getElementAt(int i) {
+//            Stats.Counter counter = list.get(i);
+//            return String.format("   %d (%s) : '%s'", counter.count, counter.percentage, counter.value);
+//        }
+//    }
+//
+//    private class RandomSampleModel extends AbstractListModel {
+//
+//        private java.util.List<String> list = new ArrayList<String>();
+//
+//        public void setSample(Stats.Sample sample) {
+//            int size = getSize();
+//            list.clear();
+//            fireIntervalRemoved(this, 0, size);
+//            if (sample != null) {
+//                list.addAll(sample.values);
+//                fireIntervalAdded(this, 0, getSize());
+//            }
+//        }
+//
+//        @Override
+//        public int getSize() {
+//            return list.size();
+//        }
+//
+//        @Override
+//        public Object getElementAt(int i) {
+//            return "   " + list.get(i);
+//        }
+//    }
 }

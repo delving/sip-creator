@@ -1,9 +1,5 @@
 <?xml version="1.0"?>
 <frame-arrangements>
-    <arrangement name="First Contact">
-        <frame where="0011" which="SOURCE"/>
-        <frame where="1011" which="STATISTICS"/>
-    </arrangement>
     <arrangement name="Quick Mapping">
         <frame where="0013" which="SOURCE"/>
         <frame where="1012" which="CREATE"/>

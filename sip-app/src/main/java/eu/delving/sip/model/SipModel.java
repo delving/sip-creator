@@ -121,12 +121,6 @@ public class SipModel {
         mappingModel.addChangeListener(mappingHintsModel);
         mappingModel.addSetListener(mappingSaveTimer);
         mappingModel.addChangeListener(mappingSaveTimer);
-        mappingModel.addSetListener(new MappingModel.SetListener() {
-            @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                clearValidation(mappingModel.getRecMapping());
-            }
-        });
         mappingModel.addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {

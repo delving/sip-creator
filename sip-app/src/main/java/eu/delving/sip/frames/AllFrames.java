@@ -53,6 +53,7 @@ public class AllFrames {
     private FrameBase[] frames;
     private FunctionFrame functionFrame;
     private MappingCodeFrame mappingCodeFrame;
+    private StatsFrame statsFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
@@ -70,10 +71,10 @@ public class AllFrames {
         this.sipModel = sipModel;
         functionFrame = new FunctionFrame(desktop, sipModel);
         mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
+        statsFrame = new StatsFrame(desktop, sipModel);
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
-        StatisticsFrame statistics = new StatisticsFrame(desktop, sipModel);
-        FrameBase source = new SourceFrame(desktop, sipModel, statistics);
+        FrameBase source = new SourceFrame(desktop, sipModel);
         addSpaceBarCreate(create, source);
         TargetFrame target = new TargetFrame(desktop, sipModel);
         addSpaceBarCreate(create, target);
@@ -85,7 +86,6 @@ public class AllFrames {
                 source,
                 create,
                 target,
-                statistics,
                 input,
                 recMapping,
                 fieldMapping,
@@ -124,7 +124,7 @@ public class AllFrames {
             arrangement.source = view;
         }
     }
-    
+
     public Runnable prepareForNothing() {
         return new Runnable() {
             @Override
@@ -178,6 +178,7 @@ public class AllFrames {
             menu.add(frame.getAction());
         }
         menu.addSeparator();
+        menu.add(statsFrame.getAction());
         menu.add(functionFrame.getAction());
         menu.add(mappingCodeFrame.getAction());
         return menu;
@@ -209,15 +210,22 @@ public class AllFrames {
 
     public JPanel getBigWindowsPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1));
-        JButton function = new JButton(functionFrame.getAction());
-        KeyStroke stroke = (KeyStroke) functionFrame.getAction().getValue(Action.ACCELERATOR_KEY);
-        function.setText(function.getText() + " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + KeyEvent.getKeyText(stroke.getKeyCode()));
-        p.add(function);
-        JButton code = new JButton(mappingCodeFrame.getAction());
-        stroke = (KeyStroke) mappingCodeFrame.getAction().getValue(Action.ACCELERATOR_KEY);
-        code.setText(code.getText() + " " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + KeyEvent.getKeyText(stroke.getKeyCode()));
-        p.add(code);
+        p.add(createHotkeyButton(statsFrame));
+        p.add(createHotkeyButton(functionFrame));
+        p.add(createHotkeyButton(mappingCodeFrame));
         return p;
+    }
+
+    private JButton createHotkeyButton(FrameBase frame) {
+        Action action = frame.getAction();
+        JButton button = new JButton(action);
+        KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        if (stroke != null) {
+            String modifiers = KeyEvent.getKeyModifiersText(stroke.getModifiers());
+            String keyText = KeyEvent.getKeyText(stroke.getKeyCode());
+            button.setText(button.getText() + " " + modifiers + keyText);
+        }
+        return button;
     }
 
     public void rebuildView() {
@@ -359,7 +367,7 @@ public class AllFrames {
             });
         }
     }
-    
+
     private class EditAction extends AbstractAction {
         public EditAction() {
             super("Edit Frame Arrangements");
@@ -396,7 +404,7 @@ public class AllFrames {
                 Situation situation = block.situate(size, rows, cols, false);
                 g.drawRect(x + situation.getLocation().x + 1, y + situation.getLocation().y + 1, situation.getSize().width, situation.getSize().height);
             }
-            
+
         }
 
         @Override
@@ -408,7 +416,7 @@ public class AllFrames {
         public int getIconHeight() {
             return size.height + 4;
         }
-        
+
         public void refresh() {
             component.repaint();
         }
