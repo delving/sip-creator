@@ -116,7 +116,7 @@ public class AllFrames {
         XStream stream = new XStream();
         stream.processAnnotations(FrameArrangements.class);
         frameArrangements = (FrameArrangements) stream.fromXML(inputStream);
-        int viewIndex = 0;
+        int viewIndex = 1;
         for (XArrangement view : frameArrangements.arrangements) {
             Arrangement arrangement = new Arrangement(view, viewIndex++);
             for (XFrame frame : view.frames) arrangement.blocks.add(new Block(frame));
