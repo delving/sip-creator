@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2011 DELVING BV
+  ~ Copyri
   ~
   ~ Licensed under the EUPL, Version 1.1 or as soon they
   ~ will be approved by the European Commission - subsequent
@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
     <artifactId>sip-creator</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>SIP-Creator</name>
     <description>

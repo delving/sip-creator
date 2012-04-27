@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -26,7 +26,7 @@ import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
-import eu.delving.sip.xml.Stats;
+import eu.delving.stats.Stats;
 
 import javax.swing.*;
 import javax.swing.tree.TreeModel;

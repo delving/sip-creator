@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.xml;
+package eu.delving.stats;
 
 import eu.delving.metadata.Path;
 import org.jfree.chart.ChartFactory;
@@ -75,7 +75,11 @@ public class ChartHelper {
         return fieldFrequencyChart != null;
     }
 
-    public JComponent getFieldFrequencyChart() {
+    public JFreeChart getFieldFrequencyChart() {
+        return fieldFrequencyChart;
+    }
+
+    public JComponent getFieldFrequencyPanel() {
         return wrap(fieldFrequencyChart);
     }
 
@@ -83,7 +87,11 @@ public class ChartHelper {
         return wordCountChart != null;
     }
 
-    public JComponent getWordCountChart() {
+    public JFreeChart getWordCountChart() {
+        return wordCountChart;
+    }
+
+    public JComponent getWordCountPanel() {
         return wrap(wordCountChart);
     }
 
@@ -91,7 +99,11 @@ public class ChartHelper {
         return presentAbsentChart != null;
     }
 
-    public JComponent getPresentAbsentChart() {
+    public JFreeChart getPresentAbsentChart() {
+        return presentAbsentChart;
+    }
+
+    public JComponent getPresentAbsentPanel() {
         return wrap(presentAbsentChart);
     }
 
@@ -99,7 +111,11 @@ public class ChartHelper {
         return uniqueFieldCountChart != null;
     }
 
-    public JComponent getUniqueFieldCountChart() {
+    public JFreeChart getUniqueFieldCountChart() {
+        return uniqueFieldCountChart;
+    }
+
+    public JComponent getUniqueFieldCountPanel() {
         return wrap(uniqueFieldCountChart);
     }
 

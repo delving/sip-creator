@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -24,7 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.OptList;
 import eu.delving.sip.model.SourceTreeNode;
-import eu.delving.sip.xml.Stats;
+import eu.delving.stats.Stats;
 
 import java.util.Collection;
 import java.util.HashSet;

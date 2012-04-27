@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  * Licensed under the EUPL, Version 1.0 or? as soon they
  * will be approved by the European Commission - subsequent
@@ -26,6 +26,7 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
+import eu.delving.stats.Uniqueness;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 

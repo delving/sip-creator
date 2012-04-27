@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  * Licensed under the EUPL, Version 1.0 or? as soon they
  * will be approved by the European Commission - subsequent
@@ -26,6 +26,7 @@ import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.stats.Stats;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;

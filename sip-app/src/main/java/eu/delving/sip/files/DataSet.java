@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -25,7 +25,7 @@ import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.xml.Stats;
+import eu.delving.stats.Stats;
 
 import javax.xml.validation.Validator;
 import java.io.File;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  * Licensed under the EUPL, Version 1.0 or? as soon they
  * will be approved by the European Commission - subsequent
@@ -29,8 +29,8 @@ import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.StatsNode;
-import eu.delving.sip.xml.ChartHelper;
-import eu.delving.sip.xml.Stats;
+import eu.delving.stats.ChartHelper;
+import eu.delving.stats.Stats;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -208,8 +208,8 @@ public class StatsFrame extends FrameBase {
         }
 
         private void setRecordStatPanels() {
-            setPanelContent(uniqueFieldCountPanel, chartHelper.hasUniqueFieldCountChart() ? chartHelper.getUniqueFieldCountChart() : emptyLabel());
-            setPanelContent(presentAbsentPanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresentAbsentChart() : emptyLabel());
+            setPanelContent(uniqueFieldCountPanel, chartHelper.hasUniqueFieldCountChart() ? chartHelper.getUniqueFieldCountPanel() : emptyLabel());
+            setPanelContent(presentAbsentPanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresentAbsentPanel() : emptyLabel());
         }
 
         private void expandIfNecessary() {
@@ -223,8 +223,8 @@ public class StatsFrame extends FrameBase {
             if (path != null) {
                 if (chartHelper == null) return;
                 chartHelper.setPath(path);
-                setPanelContent(fieldFrequencyPanel, chartHelper.hasFrequencyChart() ? chartHelper.getFieldFrequencyChart() : emptyLabel());
-                setPanelContent(wordCountPanel, chartHelper.hasWordCountChart() ? chartHelper.getWordCountChart() : emptyLabel());
+                setPanelContent(fieldFrequencyPanel, chartHelper.hasFrequencyChart() ? chartHelper.getFieldFrequencyPanel() : emptyLabel());
+                setPanelContent(wordCountPanel, chartHelper.hasWordCountChart() ? chartHelper.getWordCountPanel() : emptyLabel());
             }
             else {
                 setPanelContent(fieldFrequencyPanel, emptyLabel());

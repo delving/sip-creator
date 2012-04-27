@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  * Licensed under the EUPL, Version 1.0 or? as soon they
  * will be approved by the European Commission - subsequent
@@ -21,13 +21,14 @@
 
 package eu.delving.test;
 
+import eu.delving.MappingEngine;
+import eu.delving.MappingResult;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecDefTree;
-import eu.delving.sip.MappingEngine;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -59,8 +60,8 @@ public class TestMappingEngine {
         MappingEngine mappingEngine = new MappingEngine(mapping("lido"), classLoader(), new MockRecDefModel("lido"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
-        System.out.println(mappingEngine.getCode());
-        MappingEngine.Result result = mappingEngine.execute(input("lido"));
+        System.out.println(mappingEngine);
+        MappingResult result = mappingEngine.execute(input("lido"));
         System.out.println(XmlSerializer.toXml(result.root()));
         Source source = new DOMSource(result.root());
         validator("lido").validate(source);
@@ -74,7 +75,7 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "icn", "http://www.icn.nl/schemas/icn/"
         ));
-        MappingEngine.Result result = mappingEngine.execute(input("icn"));
+        MappingResult result = mappingEngine.execute(input("icn"));
         Source source = new DOMSource(result.root());
         validator("icn").validate(source);
     }
@@ -87,7 +88,7 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "icn", "http://www.icn.nl/schemas/icn/"
         ));
-        MappingEngine.Result result = mappingEngine.execute(input("icn"));
+        MappingResult result = mappingEngine.execute(input("icn"));
         System.out.println(XmlSerializer.toXml(result.root()));
         Map<String,List<String>> allFields = result.fields();
         System.out.println(allFields);
@@ -99,8 +100,8 @@ public class TestMappingEngine {
         MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
-        System.out.println(mappingEngine.getCode());
-        MappingEngine.Result result = mappingEngine.execute(input("aff"));
+        System.out.println(mappingEngine);
+        MappingResult result = mappingEngine.execute(input("aff"));
         System.out.println(XmlSerializer.toXml(result.root()));
     }
 
@@ -109,8 +110,8 @@ public class TestMappingEngine {
         MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
-        System.out.println(mappingEngine.getCode());
-        MappingEngine.Result result = mappingEngine.execute(input("aff"));
+        System.out.println(mappingEngine);
+        MappingResult result = mappingEngine.execute(input("aff"));
         System.out.println(XmlSerializer.toXml(result.root()));
         Map<String,List<String>> allFields = result.fields();
         System.out.println(allFields);

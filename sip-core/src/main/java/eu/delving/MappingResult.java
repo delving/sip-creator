@@ -19,33 +19,26 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.base;
+package eu.delving;
+
+import org.w3c.dom.Node;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * Ties a process to a ProgressMonitor
+ * This is how mapping results are given back from the MappingEngine
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface ProgressListener {
+public interface MappingResult {
 
-    long PATIENCE = 250;
+    Node root();
 
-    void setProgressMessage(String message);
+    Map<String, List<String>> fields();
 
-    void setIndeterminateMessage(String message);
+    Map<String, List<String>> systemFields();
 
-    void setProgressString(String message);
-
-    void prepareFor(int total);
-
-    boolean setProgress(int progress);
-
-    void finished(boolean success);
-
-    void onFinished(End end);
-
-    public interface End {
-        void finished(ProgressListener progressListener, boolean success);
-    }
+    Map<String, List<String>> searchFields();
 }

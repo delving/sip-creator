@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  * Licensed under the EUPL, Version 1.0 or? as soon they
  * will be approved by the European Commission - subsequent
@@ -24,7 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
 
-import javax.swing.AbstractListModel;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
