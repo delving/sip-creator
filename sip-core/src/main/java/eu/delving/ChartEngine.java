@@ -74,7 +74,13 @@ public class ChartEngine {
     }
 
     public void writePresentAbsentChart(OutputStream outputStream) throws IOException {
-        writePNG(outputStream, chartHelper.getPresenceChart());
+        if (chartHelper.getPresenceCharts().length == 1) {
+            writePNG(outputStream, chartHelper.getPresenceCharts()[0]);
+        }
+        else {
+            writePNG(outputStream, chartHelper.getPresenceCharts()[0]);
+            System.out.println("### multiple charts, only giving the first");
+        }
     }
 
     public boolean hasUniqueFieldCountChart() {

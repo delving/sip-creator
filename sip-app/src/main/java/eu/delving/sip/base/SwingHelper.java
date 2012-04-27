@@ -99,6 +99,13 @@ public class SwingHelper {
         return scroll;
     }
 
+    public static JComponent scrollH(JComponent content) {
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        return scroll;
+    }
+
     public static JComponent scrollV(String title, JComponent content) {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder(title));

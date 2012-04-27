@@ -59,13 +59,13 @@ public class ChartHelper {
     private Stats stats;
     private JFreeChart fieldFrequencyChart;
     private JFreeChart wordCountChart;
-    private JFreeChart presenceChart;
+    private JFreeChart[] presenceCharts;
     private JFreeChart fieldCountChart;
     private String name;
 
     public ChartHelper(Stats stats, String which, String name) {
         this.stats = stats;
-        this.presenceChart = createPresenceChart(stats.recordStats, which, name);
+        this.presenceCharts = createPresenceCharts(stats.recordStats, which, name);
         this.fieldCountChart = createFieldCountChart(stats.recordStats, which, name);
         this.name = name;
     }
@@ -102,15 +102,29 @@ public class ChartHelper {
     }
 
     public boolean hasPresentAbsentChart() {
-        return presenceChart != null;
+        return presenceCharts != null;
     }
 
-    public JFreeChart getPresenceChart() {
-        return presenceChart;
+    public JFreeChart[] getPresenceCharts() {
+        return presenceCharts;
     }
 
     public JComponent getPresencePanel() {
-        return wrap(presenceChart);
+        ChartPanel[] panels = new ChartPanel[presenceCharts.length];
+        int index = 0;
+        for (JFreeChart chart : presenceCharts) {
+            panels[index] = wrap(chart);
+            index++;
+        }
+        if (panels.length > 1) {
+            JTabbedPane tabs = new JTabbedPane();
+            index = 0;
+            for (ChartPanel panel : panels) tabs.addTab(String.format("Chart %d", index++), panel);
+            return tabs;
+        }
+        else {
+            return panels[0];
+        }
     }
 
     public boolean hasFieldCountChart() {
@@ -125,7 +139,7 @@ public class ChartHelper {
         return wrap(fieldCountChart);
     }
 
-    private static JComponent wrap(JFreeChart chart) {
+    private static ChartPanel wrap(JFreeChart chart) {
         return new ChartPanel(chart);
     }
 
@@ -165,22 +179,37 @@ public class ChartHelper {
         return finishBarChart(chart, new Color(30, 144, 225));
     }
 
-    private static JFreeChart createPresenceChart(Stats.RecordStats recordStats, String which, String name) {
+    private static JFreeChart[] createPresenceCharts(Stats.RecordStats recordStats, String which, String name) {
         if (recordStats == null) return null;
-        DefaultCategoryDataset data = new DefaultCategoryDataset();
-        for (Map.Entry<Path, Stats.Histogram> histogramEntry : recordStats.frequencies.entrySet()) {
-            data.addValue(histogramEntry.getValue().absent, "Absent", histogramEntry.getKey().getTail());
-            data.addValue(histogramEntry.getValue().present, "Present", histogramEntry.getKey().getTail());
+        int bars = recordStats.frequencies.size();
+        JFreeChart[] charts;
+        if (bars > MAX_BAR_CHART_SIZE) {
+            charts = new JFreeChart[bars / MAX_BAR_CHART_SIZE + 1];
         }
-        JFreeChart chart = ChartFactory.createBarChart(
-                String.format("Fields presence in %s of %s", which, name),
-                "Field",
-                "Record count",
-                data,
-                PlotOrientation.VERTICAL,
-                true, true, false
-        );
-        return finishBarChart(chart);//, new Color(220, 20, 60), new Color(50, 205, 50));
+        else {
+            charts = new JFreeChart[1];
+        }
+        Iterator<Map.Entry<Path, Stats.Histogram>> entryWalk = recordStats.frequencies.entrySet().iterator();
+        int chartSize = bars / charts.length;
+        for (int walk = 0; walk < charts.length; walk++) {
+            DefaultCategoryDataset data = new DefaultCategoryDataset();
+            if (walk == charts.length - 1) chartSize = MAX_BAR_CHART_SIZE;
+            for (int count = 0; count < chartSize; count++) {
+                if (!entryWalk.hasNext()) continue;
+                Map.Entry<Path, Stats.Histogram> histogramEntry = entryWalk.next();
+                data.addValue(histogramEntry.getValue().absent, "Absent", histogramEntry.getKey().getTail());
+                data.addValue(histogramEntry.getValue().present, "Present", histogramEntry.getKey().getTail());
+            }
+            charts[walk] = finishBarChart(ChartFactory.createBarChart(
+                    String.format("Fields presence in %s of %s", which, name),
+                    "Field",
+                    "Record count",
+                    data,
+                    PlotOrientation.VERTICAL,
+                    true, true, false
+            ));
+        }
+        return charts;
     }
 
     private static JFreeChart createFieldCountChart(Stats.RecordStats recordStats, String which, String name) {

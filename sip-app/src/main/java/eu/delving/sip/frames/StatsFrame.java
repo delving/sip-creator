@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -101,20 +102,31 @@ public class StatsFrame extends FrameBase {
         return tabs;
     }
 
-    private void setPanelContent(JPanel panel, JComponent content) {
+    private void clearPanel(JPanel panel) {
         panel.removeAll();
-        panel.add(content);
+        panel.add(emptyLabel());
         panel.validate();
+    }
+
+    private void setPanelContent(JPanel panel, JComponent content, boolean verticalScroll) {
+        if (content == null) {
+            clearPanel(panel);
+        }
+        else {
+            panel.removeAll();
+            panel.add(verticalScroll ? SwingHelper.scrollV(content) : SwingHelper.scrollH(content));
+            panel.validate();
+        }
     }
 
     private JPanel emptyPanel() {
         JPanel p = new JPanel(new BorderLayout());
-        setPanelContent(p, emptyLabel());
+        clearPanel(p);
         return p;
     }
 
     private JComponent emptyLabel() {
-        return new JLabel("No chart available", JLabel.CENTER);
+        return new JLabel("Not Available", JLabel.CENTER);
     }
 
     private void wireUp() {
@@ -188,13 +200,13 @@ public class StatsFrame extends FrameBase {
             if (stats == null) {
                 chartHelper = null;
                 treeModel.setRoot(StatsNode.create("Empty"));
-                setPanelContent(treePanel, emptyLabel());
+                clearPanel(treePanel);
             }
             else {
                 String name = (stats.name == null) ? sipModel.getDataSetModel().getDataSet().getSpec() : stats.name;
                 chartHelper = new ChartHelper(stats, statsSetName, name);
                 final StatsNode root = StatsNode.create(stats.fieldValueMap.keySet());
-                setPanelContent(treePanel, tree);
+                setPanelContent(treePanel, tree, true);
                 treeModel.setRoot(root);
                 expand = true;
                 setRecordStatPanels();
@@ -209,8 +221,14 @@ public class StatsFrame extends FrameBase {
         }
 
         private void setRecordStatPanels() {
-            setPanelContent(fieldCountPanel, chartHelper.hasFieldCountChart() ? chartHelper.getFieldCountPanel() : emptyLabel());
-            setPanelContent(presencePanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresencePanel() : emptyLabel());
+            if (chartHelper != null) {
+                setPanelContent(fieldCountPanel, chartHelper.hasFieldCountChart() ? chartHelper.getFieldCountPanel() : null, false);
+                setPanelContent(presencePanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresencePanel() : null, false);
+            }
+            else {
+                clearPanel(fieldCountPanel);
+                clearPanel(presencePanel);
+            }
         }
 
         private void expandIfNecessary() {
@@ -224,12 +242,12 @@ public class StatsFrame extends FrameBase {
             if (path != null) {
                 if (chartHelper == null) return;
                 chartHelper.setPath(path);
-                setPanelContent(fieldFrequencyPanel, chartHelper.hasFrequencyChart() ? chartHelper.getFieldFrequencyPanel() : emptyLabel());
-                setPanelContent(wordCountPanel, chartHelper.hasWordCountChart() ? chartHelper.getWordCountPanel() : emptyLabel());
+                setPanelContent(fieldFrequencyPanel, chartHelper.hasFrequencyChart() ? chartHelper.getFieldFrequencyPanel() : null, false);
+                setPanelContent(wordCountPanel, chartHelper.hasWordCountChart() ? chartHelper.getWordCountPanel() : null, false);
             }
             else {
-                setPanelContent(fieldFrequencyPanel, emptyLabel());
-                setPanelContent(wordCountPanel, emptyLabel());
+                clearPanel(fieldFrequencyPanel);
+                clearPanel(wordCountPanel);
             }
         }
     }
