@@ -90,8 +90,8 @@ public class Stats {
             if (path.equals(recordRoot)) {
                 recordStats.recordRecordEnd();
             }
-            else {
-                recordStats.recordOccurrence(path);
+            else if (value != null) {
+                recordStats.recordNonemptyOccurrence(path);
             }
         }
     }
@@ -100,6 +100,9 @@ public class Stats {
         for (ValueStats stats : fieldValueMap.values()) stats.finish();
         if (recordStats != null) recordStats.finish();
     }
+
+    @XStreamAsAttribute
+    public String name;
 
     @XStreamAsAttribute
     public boolean sourceFormat;
@@ -124,7 +127,7 @@ public class Stats {
         public int recordCount;
 
         @XStreamAlias("field-count")
-        public Histogram fieldOccurrence = new Histogram();
+        public Histogram fieldCount = new Histogram();
 
         @XStreamAlias("frequency-within-record")
         public Map<Path, Histogram> frequencies = new HashMap<Path, Histogram>();
@@ -132,7 +135,7 @@ public class Stats {
         @XStreamOmitField
         private Map<Path, Integer> countPerRecord = new HashMap<Path, Integer>();
 
-        public void recordOccurrence(Path path) {
+        public void recordNonemptyOccurrence(Path path) {
             Integer count = countPerRecord.get(path);
             countPerRecord.put(path, count == null ? 1 : count + 1);
         }
@@ -143,14 +146,14 @@ public class Stats {
                 if (histogram == null) frequencies.put(entry.getKey(), histogram = new Histogram());
                 histogram.recordValue(entry.getValue().toString());
             }
-            fieldOccurrence.recordValue(String.valueOf(countPerRecord.size()));
+            fieldCount.recordValue(String.valueOf(countPerRecord.size()));
             countPerRecord.clear();
             recordCount++;
         }
 
         public void finish() {
             for (Histogram histogram : frequencies.values()) histogram.finish(recordCount);
-            fieldOccurrence.finish(recordCount);
+            fieldCount.finish(recordCount);
         }
     }
 

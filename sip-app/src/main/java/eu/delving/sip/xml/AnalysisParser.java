@@ -89,6 +89,7 @@ public class AnalysisParser implements Runnable {
                     default:
                         throw new IllegalStateException("Unexpected state: " + dataSet.getState());
                 }
+                stats.name = dataSet.getDataSetFacts().get("name");
                 XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
                 StringBuilder text = new StringBuilder();
                 long count = 0;

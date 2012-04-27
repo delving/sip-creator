@@ -99,6 +99,7 @@ public class FileProcessor implements Runnable {
             if (recMapping == null) return;
             stats.setRecordRoot(recMapping.getRecDefTree().getRoot().getPath());
             stats.prefix = recMapping.getPrefix();
+            stats.name = sipModel.getDataSetFacts().get("name");
             Validator validator = sipModel.getDataSetModel().newValidator(recMapping.getPrefix());
             validator.setErrorHandler(null);
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);

@@ -50,15 +50,15 @@ import java.awt.event.KeyEvent;
  */
 
 public class StatsFrame extends FrameBase {
-    private StatsSet [] statsSets = {
+    private StatsSet[] statsSets = {
             new StatsSet("Import"),
             new StatsSet("Source"),
             new StatsSet("Result"),
     };
     private JPanel wordCountPanel = emptyPanel();
     private JPanel fieldFrequencyPanel = emptyPanel();
-    private JPanel presentAbsentPanel = emptyPanel();
-    private JPanel uniqueFieldCountPanel = emptyPanel();
+    private JPanel presencePanel = emptyPanel();
+    private JPanel fieldCountPanel = emptyPanel();
 
     public StatsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.STATS, desktop, sipModel, "Statistics", false);
@@ -77,7 +77,7 @@ public class StatsFrame extends FrameBase {
 
     private JComponent createWest() {
         final JTabbedPane tabs = new JTabbedPane();
-        for (StatsSet statsSet : statsSets) tabs.addTab(statsSet.name, statsSet.treePanel);
+        for (StatsSet statsSet : statsSets) tabs.addTab(statsSet.statsSetName, statsSet.treePanel);
         int width = getFontMetrics(getFont()).stringWidth("this is a very long string to determine width");
         tabs.setPreferredSize(new Dimension(width, 10));
         tabs.addChangeListener(new ChangeListener() {
@@ -94,10 +94,10 @@ public class StatsFrame extends FrameBase {
 
     private JComponent createCenter() {
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Unique Field Count", uniqueFieldCountPanel);
-        tabs.addTab("Present/Absent", presentAbsentPanel);
         tabs.addTab("Word Count", wordCountPanel);
         tabs.addTab("Field Frequency", fieldFrequencyPanel);
+        tabs.addTab("Field Count", fieldCountPanel);
+        tabs.addTab("Presence in Record", presencePanel);
         return tabs;
     }
 
@@ -114,7 +114,7 @@ public class StatsFrame extends FrameBase {
     }
 
     private JComponent emptyLabel() {
-        return new JLabel("Empty", JLabel.CENTER);
+        return new JLabel("No chart available", JLabel.CENTER);
     }
 
     private void wireUp() {
@@ -158,15 +158,15 @@ public class StatsFrame extends FrameBase {
     }
 
     private class StatsSet {
-        private String name;
+        private String statsSetName;
         private DefaultTreeModel treeModel = new DefaultTreeModel(StatsNode.create("Empty"));
         private JTree tree = new JTree(treeModel);
         private JPanel treePanel = emptyPanel();
         private ChartHelper chartHelper;
         private boolean expand = false;
 
-        private StatsSet(String name) {
-            this.name = name;
+        private StatsSet(String statsSetName) {
+            this.statsSetName = statsSetName;
             tree.setCellRenderer(new StatsNode.Renderer());
             tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
             tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
@@ -177,7 +177,7 @@ public class StatsFrame extends FrameBase {
                         setPath(null);
                     }
                     else {
-                        setPath(((StatsNode)treePath.getLastPathComponent()).getPath(true));
+                        setPath(((StatsNode) treePath.getLastPathComponent()).getPath(true));
                     }
                 }
             });
@@ -191,7 +191,8 @@ public class StatsFrame extends FrameBase {
                 setPanelContent(treePanel, emptyLabel());
             }
             else {
-                chartHelper = new ChartHelper(stats, name);
+                String name = (stats.name == null) ? sipModel.getDataSetModel().getDataSet().getSpec() : stats.name;
+                chartHelper = new ChartHelper(stats, statsSetName, name);
                 final StatsNode root = StatsNode.create(stats.fieldValueMap.keySet());
                 setPanelContent(treePanel, tree);
                 treeModel.setRoot(root);
@@ -203,13 +204,13 @@ public class StatsFrame extends FrameBase {
         private void select() {
             setRecordStatPanels();
             TreePath treePath = tree.getSelectionModel().getSelectionPath();
-            setPath(treePath == null ? null : ((StatsNode)treePath.getLastPathComponent()).getPath(true));
+            setPath(treePath == null ? null : ((StatsNode) treePath.getLastPathComponent()).getPath(true));
             expandIfNecessary();
         }
 
         private void setRecordStatPanels() {
-            setPanelContent(uniqueFieldCountPanel, chartHelper.hasUniqueFieldCountChart() ? chartHelper.getUniqueFieldCountPanel() : emptyLabel());
-            setPanelContent(presentAbsentPanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresentAbsentPanel() : emptyLabel());
+            setPanelContent(fieldCountPanel, chartHelper.hasFieldCountChart() ? chartHelper.getFieldCountPanel() : emptyLabel());
+            setPanelContent(presencePanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresencePanel() : emptyLabel());
         }
 
         private void expandIfNecessary() {

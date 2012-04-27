@@ -30,19 +30,23 @@ import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.ui.TextAnchor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+
+import static org.jfree.chart.labels.ItemLabelAnchor.INSIDE12;
+import static org.jfree.chart.labels.ItemLabelAnchor.OUTSIDE12;
+import static org.jfree.ui.TextAnchor.CENTER_LEFT;
+import static org.jfree.ui.TextAnchor.CENTER_RIGHT;
 
 /**
  * Build charts based on stats
@@ -55,19 +59,21 @@ public class ChartHelper {
     private Stats stats;
     private JFreeChart fieldFrequencyChart;
     private JFreeChart wordCountChart;
-    private JFreeChart presentAbsentChart;
-    private JFreeChart uniqueFieldCountChart;
+    private JFreeChart presenceChart;
+    private JFreeChart fieldCountChart;
+    private String name;
 
-    public ChartHelper(Stats stats, String which) {
+    public ChartHelper(Stats stats, String which, String name) {
         this.stats = stats;
-        this.presentAbsentChart = createPresentAbsentChart(stats.recordStats, which);
-        this.uniqueFieldCountChart = createFieldCountChart(stats.recordStats, which);
+        this.presenceChart = createPresenceChart(stats.recordStats, which, name);
+        this.fieldCountChart = createFieldCountChart(stats.recordStats, which, name);
+        this.name = name;
     }
 
     public Stats.ValueStats setPath(Path path) {
         Stats.ValueStats valueStats = stats.fieldValueMap.get(path);
-        this.wordCountChart = valueStats == null ? null : createWordCountChart(valueStats, path);
-        this.fieldFrequencyChart = stats.recordStats == null ? null : createFieldFrequencyChart(stats.recordStats, path);
+        this.wordCountChart = valueStats == null ? null : createWordCountChart(valueStats, path, name);
+        this.fieldFrequencyChart = stats.recordStats == null ? null : createFieldFrequencyChart(stats.recordStats, path, name);
         return valueStats;
     }
 
@@ -96,97 +102,70 @@ public class ChartHelper {
     }
 
     public boolean hasPresentAbsentChart() {
-        return presentAbsentChart != null;
+        return presenceChart != null;
     }
 
-    public JFreeChart getPresentAbsentChart() {
-        return presentAbsentChart;
+    public JFreeChart getPresenceChart() {
+        return presenceChart;
     }
 
-    public JComponent getPresentAbsentPanel() {
-        return wrap(presentAbsentChart);
+    public JComponent getPresencePanel() {
+        return wrap(presenceChart);
     }
 
-    public boolean hasUniqueFieldCountChart() {
-        return uniqueFieldCountChart != null;
+    public boolean hasFieldCountChart() {
+        return fieldCountChart != null;
     }
 
-    public JFreeChart getUniqueFieldCountChart() {
-        return uniqueFieldCountChart;
+    public JFreeChart getFieldCountChart() {
+        return fieldCountChart;
     }
 
-    public JComponent getUniqueFieldCountPanel() {
-        return wrap(uniqueFieldCountChart);
+    public JComponent getFieldCountPanel() {
+        return wrap(fieldCountChart);
     }
 
     private static JComponent wrap(JFreeChart chart) {
         return new ChartPanel(chart);
     }
 
-    private static JFreeChart createWordCountChart(Stats.ValueStats valueStats, Path path) {
+    private static JFreeChart createWordCountChart(Stats.ValueStats valueStats, Path path, String name) {
         if (valueStats.wordCounts == null) return null;
-        List<Stats.Counter> sorted = sort(valueStats.wordCounts.counterMap.values());
-        int remainder = 0;
-        if (sorted.size() > MAX_BAR_CHART_SIZE) {
-            for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
-            sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
-        }
+        List<Stats.Counter> sorted = sort(valueStats.wordCounts.counterMap.values(), MAX_BAR_CHART_SIZE, valueStats.total);
         DefaultCategoryDataset data = new DefaultCategoryDataset();
         for (Stats.Counter counter : sorted) data.addValue(counter.count, "Count", counter.value);
-        if (remainder > 0) data.addValue(remainder, "Count", "+");
         JFreeChart chart = ChartFactory.createBarChart(
-                String.format("Word Count of %s", path),
+                String.format("Word count per occurrence in %s", name),
                 "Number of Words",
-                "Count",
+                "Record count",
                 data,
                 PlotOrientation.VERTICAL,
                 false, true, false
         );
+        chart.addSubtitle(new TextTitle(path.toString()));
         return finishBarChart(chart, new Color(218, 112, 214));
     }
 
-    private static JFreeChart createFieldFrequencyChart(Stats.RecordStats recordStats, Path path) {
+    private static JFreeChart createFieldFrequencyChart(Stats.RecordStats recordStats, Path path, String name) {
         Stats.Histogram histogram = recordStats.frequencies.get(path);
         if (histogram == null) return null;
-        List<Stats.Counter> sorted = sort(histogram.counterMap.values());
-        int remainder = 0;
-        if (sorted.size() > MAX_BAR_CHART_SIZE) {
-            for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
-            sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
-        }
+        List<Stats.Counter> sorted = sort(histogram.counterMap.values(), MAX_BAR_CHART_SIZE, recordStats.recordCount);
         DefaultCategoryDataset data = new DefaultCategoryDataset();
         data.addValue(histogram.absent, "Frequency", "0");
         for (Stats.Counter counter : sorted) data.addValue(counter.count, "Frequency", counter.value);
-        if (remainder > 0) data.addValue(remainder, "Frequency", "+");
         JFreeChart chart = ChartFactory.createBarChart(
-                String.format("Frequency of %s within record", path),
-                "Cardinality",
+                String.format("Frequency within record in %s", name),
+                "Occurrences",
                 "Frequency",
                 data,
                 PlotOrientation.VERTICAL,
                 false, true, false
         );
+        chart.addSubtitle(new TextTitle(path.toString()));
         return finishBarChart(chart, new Color(30, 144, 225));
     }
 
-//    DefaultPieDataset data = new DefaultPieDataset();
-//    for (Stats.Counter counter : sorted) data.setValue(counter.value, counter.count);
-//    JFreeChart chart = ChartFactory.createPieChart3D(
-//            "Field frequency within record",
-//            data,
-//            false, true, false
-//    );
-//    return pieChart(chart);
-//    private static JFreeChart pieChart(JFreeChart chart) {
-//        PiePlot3D pieplot3d = (PiePlot3D) chart.getPlot();
-//        pieplot3d.setStartAngle(290D);
-//        pieplot3d.setDirection(Rotation.CLOCKWISE);
-//        pieplot3d.setForegroundAlpha(0.5F);
-//        pieplot3d.setNoDataMessage("No data to display");
-//        return chart;
-//    }
-
-    private static JFreeChart createPresentAbsentChart(Stats.RecordStats recordStats, String which) {
+    private static JFreeChart createPresenceChart(Stats.RecordStats recordStats, String which, String name) {
         if (recordStats == null) return null;
         DefaultCategoryDataset data = new DefaultCategoryDataset();
         for (Map.Entry<Path, Stats.Histogram> histogramEntry : recordStats.frequencies.entrySet()) {
@@ -194,9 +173,9 @@ public class ChartHelper {
             data.addValue(histogramEntry.getValue().present, "Present", histogramEntry.getKey().getTail());
         }
         JFreeChart chart = ChartFactory.createBarChart(
-                String.format("Fields present/absent in %s", which),
+                String.format("Fields presence in %s of %s", which, name),
                 "Field",
-                "Record Count",
+                "Record count",
                 data,
                 PlotOrientation.VERTICAL,
                 true, true, false
@@ -204,18 +183,18 @@ public class ChartHelper {
         return finishBarChart(chart);//, new Color(220, 20, 60), new Color(50, 205, 50));
     }
 
-    private static JFreeChart createFieldCountChart(Stats.RecordStats recordStats, String which) {
+    private static JFreeChart createFieldCountChart(Stats.RecordStats recordStats, String which, String name) {
         if (recordStats == null) return null;
-        List<Stats.Counter> sorted = sort(recordStats.fieldOccurrence.counterMap.values());
+        List<Stats.Counter> sorted = sort(recordStats.fieldCount.counterMap.values());
         DefaultCategoryDataset data = new DefaultCategoryDataset();
         for (Stats.Counter counter : sorted) data.addValue(counter.count, "Count", counter.value);
         JFreeChart chart = ChartFactory.createBarChart(
-                String.format("Unique Fields in %s", which),
-                "Unique Fields",
-                "Count",
+                String.format("Unique fields per record in %s of %s", which, name),
+                "Unique field count",
+                "Record count",
                 data,
                 PlotOrientation.VERTICAL,
-                true, true, false
+                false, true, false
         );
         return finishBarChart(chart);//, new Color(220, 20, 60), new Color(50, 205, 50));
     }
@@ -231,9 +210,9 @@ public class ChartHelper {
         barrenderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
         barrenderer.setMaximumBarWidth(0.05);
         barrenderer.setItemMargin(0.03D);
-        ItemLabelPosition itemlabelposition = new ItemLabelPosition(ItemLabelAnchor.INSIDE12, TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, -1.5707963267948966D);
+        ItemLabelPosition itemlabelposition = new ItemLabelPosition(INSIDE12, CENTER_RIGHT, CENTER_RIGHT, -1.5707963267948966D);
         barrenderer.setBasePositiveItemLabelPosition(itemlabelposition);
-        ItemLabelPosition itemlabelposition1 = new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.CENTER_LEFT, TextAnchor.CENTER_LEFT, -1.5707963267948966D);
+        ItemLabelPosition itemlabelposition1 = new ItemLabelPosition(OUTSIDE12, CENTER_LEFT, CENTER_LEFT, -1.5707963267948966D);
         barrenderer.setPositiveItemLabelPositionFallback(itemlabelposition1);
         CategoryAxis categoryaxis = categoryplot.getDomainAxis();
         categoryaxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
@@ -245,6 +224,23 @@ public class ChartHelper {
         numberaxis.setUpperMargin(0.10000000000000001D);
         ChartUtilities.applyCurrentTheme(chart);
         return chart;
+    }
+
+    private static List<Stats.Counter> sort(Collection<Stats.Counter> original, int maxSize, int total) {
+        List<Stats.Counter> sorted = sort(original);
+        if (sorted.size() > maxSize) {
+            int remainder = 0;
+            for (Stats.Counter counter : sorted.subList(MAX_BAR_CHART_SIZE, sorted.size())) remainder += counter.count;
+            sorted = sorted.subList(0, MAX_BAR_CHART_SIZE);
+            if (remainder > 0) {
+                Stats.Counter counter = new Stats.Counter();
+                counter.count = remainder;
+                counter.value = "+";
+                counter.setTotal(total);
+                sorted.add(counter);
+            }
+        }
+        return sorted;
     }
 
     private static List<Stats.Counter> sort(Collection<Stats.Counter> original) {

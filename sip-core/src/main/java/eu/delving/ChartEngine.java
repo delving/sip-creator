@@ -44,7 +44,7 @@ public class ChartEngine {
 
     public ChartEngine(String statsXML, String name, int width, int height) {
         Stats stats = Stats.read(new ByteArrayInputStream(statsXML.getBytes()));
-        chartHelper = new ChartHelper(stats, name);
+        chartHelper = new ChartHelper(stats, "result", name);
         this.width = width;
         this.height = height;
     }
@@ -74,15 +74,15 @@ public class ChartEngine {
     }
 
     public void writePresentAbsentChart(OutputStream outputStream) throws IOException {
-        writePNG(outputStream, chartHelper.getPresentAbsentChart());
+        writePNG(outputStream, chartHelper.getPresenceChart());
     }
 
     public boolean hasUniqueFieldCountChart() {
-        return chartHelper.hasUniqueFieldCountChart();
+        return chartHelper.hasFieldCountChart();
     }
 
     public void writeUniqueFieldCountChart(OutputStream outputStream) throws IOException {
-        writePNG(outputStream, chartHelper.getUniqueFieldCountChart());
+        writePNG(outputStream, chartHelper.getFieldCountChart());
     }
 
     private void writePNG(OutputStream outputStream, JFreeChart chart) throws IOException {
