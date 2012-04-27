@@ -21,6 +21,7 @@
 
 package eu.delving;
 
+import eu.delving.metadata.Path;
 import eu.delving.stats.ChartHelper;
 import eu.delving.stats.Stats;
 import org.jfree.chart.ChartUtilities;
@@ -46,6 +47,10 @@ public class ChartEngine {
         chartHelper = new ChartHelper(stats, name);
         this.width = width;
         this.height = height;
+    }
+
+    public void setPath(Path path) {
+        chartHelper.setPath(path);
     }
 
     public boolean hasFrequencyChart() {
