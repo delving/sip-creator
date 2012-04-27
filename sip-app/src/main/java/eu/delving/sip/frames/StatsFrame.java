@@ -24,7 +24,6 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -43,6 +42,10 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import static eu.delving.sip.base.SwingHelper.scrollV;
 
 /**
  * Show statistics in an html panel, with special tricks for separately threading the html generation
@@ -60,6 +63,7 @@ public class StatsFrame extends FrameBase {
     private JPanel fieldFrequencyPanel = emptyPanel();
     private JPanel presencePanel = emptyPanel();
     private JPanel fieldCountPanel = emptyPanel();
+    private JPanel valueHistogramPanel = emptyPanel();
 
     public StatsFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.STATS, desktop, sipModel, "Statistics", false);
@@ -95,10 +99,11 @@ public class StatsFrame extends FrameBase {
 
     private JComponent createCenter() {
         JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Presence in Record", presencePanel);
+        tabs.addTab("Field Count", fieldCountPanel);
         tabs.addTab("Word Count", wordCountPanel);
         tabs.addTab("Field Frequency", fieldFrequencyPanel);
-        tabs.addTab("Field Count", fieldCountPanel);
-        tabs.addTab("Presence in Record", presencePanel);
+        tabs.addTab("Values Histogram", valueHistogramPanel);
         return tabs;
     }
 
@@ -108,13 +113,13 @@ public class StatsFrame extends FrameBase {
         panel.validate();
     }
 
-    private void setPanelContent(JPanel panel, JComponent content, boolean verticalScroll) {
+    private void setPanelContent(JPanel panel, JComponent content) {
         if (content == null) {
             clearPanel(panel);
         }
         else {
             panel.removeAll();
-            panel.add(verticalScroll ? SwingHelper.scrollV(content) : SwingHelper.scrollH(content));
+            panel.add(content);
             panel.validate();
         }
     }
@@ -206,7 +211,7 @@ public class StatsFrame extends FrameBase {
                 String name = (stats.name == null) ? sipModel.getDataSetModel().getDataSet().getSpec() : stats.name;
                 chartHelper = new ChartHelper(stats, statsSetName, name);
                 final StatsNode root = StatsNode.create(stats.fieldValueMap.keySet());
-                setPanelContent(treePanel, tree, true);
+                setPanelContent(treePanel, scrollV(tree));
                 treeModel.setRoot(root);
                 expand = true;
                 setRecordStatPanels();
@@ -222,8 +227,8 @@ public class StatsFrame extends FrameBase {
 
         private void setRecordStatPanels() {
             if (chartHelper != null) {
-                setPanelContent(fieldCountPanel, chartHelper.hasFieldCountChart() ? chartHelper.getFieldCountPanel() : null, false);
-                setPanelContent(presencePanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresencePanel() : null, false);
+                setPanelContent(fieldCountPanel, chartHelper.hasFieldCountChart() ? chartHelper.getFieldCountPanel() : null);
+                setPanelContent(presencePanel, chartHelper.hasPresentAbsentChart() ? chartHelper.getPresencePanel() : null);
             }
             else {
                 clearPanel(fieldCountPanel);
@@ -241,14 +246,51 @@ public class StatsFrame extends FrameBase {
         private void setPath(Path path) {
             if (path != null) {
                 if (chartHelper == null) return;
-                chartHelper.setPath(path);
-                setPanelContent(fieldFrequencyPanel, chartHelper.hasFrequencyChart() ? chartHelper.getFieldFrequencyPanel() : null, false);
-                setPanelContent(wordCountPanel, chartHelper.hasWordCountChart() ? chartHelper.getWordCountPanel() : null, false);
+                Stats.ValueStats valueStats = chartHelper.setPath(path);
+                setPanelContent(fieldFrequencyPanel, chartHelper.hasFrequencyChart() ? chartHelper.getFieldFrequencyPanel() : null);
+                setPanelContent(wordCountPanel, chartHelper.hasWordCountChart() ? chartHelper.getWordCountPanel() : null);
+                Stats.Histogram values = valueStats == null ? null : valueStats.values;
+                setPanelContent(valueHistogramPanel, values != null ? createHistogramList(values) : null);
             }
             else {
                 clearPanel(fieldFrequencyPanel);
                 clearPanel(wordCountPanel);
+                clearPanel(valueHistogramPanel);
             }
         }
     }
+
+    private JComponent createHistogramList(Stats.Histogram values) {
+        HistogramModel histogramModel = new HistogramModel();
+        histogramModel.setHistogram(values);
+        JList list = new JList(histogramModel);
+        return scrollV(list);
+    }
+
+    private static class HistogramModel extends AbstractListModel {
+        private java.util.List<Stats.Counter> list = new ArrayList<Stats.Counter>();
+
+        public void setHistogram(Stats.Histogram histogram) {
+            int size = getSize();
+            list.clear();
+            fireIntervalRemoved(this, 0, size);
+            if (histogram != null) {
+                list.addAll(histogram.counterMap.values());
+                Collections.sort(list);
+                fireIntervalAdded(this, 0, getSize());
+            }
+        }
+
+        @Override
+        public int getSize() {
+            return list.size();
+        }
+
+        @Override
+        public Object getElementAt(int i) {
+            Stats.Counter counter = list.get(i);
+            return String.format("   %d (%s) : '%s'", counter.count, counter.percentage, counter.value);
+        }
+    }
+
 }
