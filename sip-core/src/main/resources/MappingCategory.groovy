@@ -78,19 +78,6 @@ public class MappingCategory {
         return node.text().substring(from, to);
     }
 
-    static List ifAbsentUse(List list, Object factVariable) {
-        if (!list) {
-            list += factVariable
-        }
-        else if (list.size() == 1) {
-            GroovyNode node = (GroovyNode) list[0]
-            if (!node.text()) {
-                list += factVariable
-            }
-        }
-        return list
-    }
-
     // concatenate lists
     static Object plus(List a, List b) { // operator +
         List both = new NodeList()

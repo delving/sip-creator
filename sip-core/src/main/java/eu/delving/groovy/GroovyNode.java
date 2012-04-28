@@ -178,7 +178,7 @@ public class GroovyNode {
      * @param key the name (or shortcut key) of the node(s) of interest
      * @return the nodes which match key
      */
-    public List get(String key) {
+    public Object get(String key) {
         if (key != null && key.charAt(0) == '@') {
             List answer = new ArrayList();
             String value = attributes().get(key.substring(1));
@@ -186,7 +186,10 @@ public class GroovyNode {
             return answer;
         }
         if ("*".equals(key)) return children();
-        if ("_".equals(key)) return getValueNodes();
+        if (key != null && key.endsWith("_")) {
+            List<Object> valueNodes = getValueNodes(key.substring(0, key.length()-1));
+            return valueNodes.isEmpty() ? "" : valueNodes.get(0);
+        }
         return getByName(key);
     }
 
@@ -225,28 +228,25 @@ public class GroovyNode {
         return answer;
     }
 
-    private List<Object> getValueNodes() {
+    private List<Object> getValueNodes(String name) {
         List answer = new NodeList();
-        getValueNodes(answer);
+        getValueNodes(name, answer);
         return answer;
     }
 
-    private void getValueNodes(List answer) {
+    private void getValueNodes(String name, List answer) {
         if (value instanceof List) {
             for (Object object : ((List) value)) {
                 if (object instanceof GroovyNode) {
-                    ((GroovyNode) object).getValueNodes(answer);
+                    ((GroovyNode) object).getValueNodes(name, answer);
                 }
                 else {
-                    getValueNodes((List) object);
+                    getValueNodes(name, (List) object);
                 }
             }
         }
-        else if (value instanceof String && !((String) value).trim().isEmpty()) {
-            answer.add(this);
-        }
-        else {
-            throw new RuntimeException(value.getClass().getName());
+        else if (name.equals(this.name())) {
+            if (value instanceof String && !((String) value).trim().isEmpty()) answer.add(this);
         }
     }
 
