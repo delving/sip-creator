@@ -51,7 +51,8 @@ public class HelpPanel extends HtmlPanel {
         this.sipModel = sipModel;
         this.httpClient = httpClient;
         Exec.work(new PageFetcher());
-        setPreferredSize(new Dimension(360, 400));
+        int width = getFontMetrics(getFont()).stringWidth("this string determines the width of the help panel, yeah");
+        setPreferredSize(new Dimension(width, 400));
         setMinimumSize(getPreferredSize());
         setBackground(TINT);
     }
