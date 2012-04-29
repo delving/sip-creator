@@ -40,8 +40,8 @@ import java.util.TreeMap;
 public class DictionaryHelper {
 
     public static boolean isDictionaryPossible(NodeMapping nodeMapping) {
-        if (nodeMapping == null || nodeMapping.recDefNode == null || !nodeMapping.hasOneStatsTreeNode()) return false;
-        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
+        if (nodeMapping == null || nodeMapping.recDefNode == null || !nodeMapping.hasOneSourceTreeNode()) return false;
+        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleSourceTreeNode();
         Stats.ValueStats stats = sourceTreeNode.getStats();
         if (stats == null || stats.values == null) return false;
         Set<String> values = stats.values.counterMap.keySet();
@@ -51,7 +51,7 @@ public class DictionaryHelper {
 
     public static boolean refreshDictionary(NodeMapping nodeMapping) {
         if (!isDictionaryPossible(nodeMapping)) throw new RuntimeException("Should have checked");
-        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleStatsTreeNode();
+        SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleSourceTreeNode();
         Stats.ValueStats stats = sourceTreeNode.getStats();
         if (stats == null || stats.values == null) return false;
         Set<String> values = stats.values.counterMap.keySet();

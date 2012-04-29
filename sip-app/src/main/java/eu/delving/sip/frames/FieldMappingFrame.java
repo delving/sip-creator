@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Operator;
+import eu.delving.metadata.Path;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -44,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static eu.delving.metadata.StringUtil.toGroovyFirstIdentifier;
+import static eu.delving.metadata.StringUtil.toGroovyIdentifier;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
@@ -122,24 +125,26 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private JPanel createCodeOutputPanel() {
-        JPanel p = new JPanel(new GridLayout(0, 1, 5, 5));
-        p.add(createCodeDocPanel());
-        p.add(createOutputPanel());
+        JPanel center = new JPanel(new GridLayout(0, 1, 5, 5));
+        center.add(createCodeDocPanel());
+        center.add(createOutputPanel());
+        JPanel p = new JPanel(new BorderLayout(5,5));
+        p.add(center, BorderLayout.CENTER);
+        p.add(createBesideCodeOutput(), BorderLayout.EAST);
         return p;
     }
 
     private JComponent createCodeDocPanel() {
         JPanel cp = new JPanel(new BorderLayout());
         cp.add(scrollVH(codeArea), BorderLayout.CENTER);
-        cp.add(createBesideCode(), BorderLayout.EAST);
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Groovy Code", cp);
         tabs.addTab("Documentation", scrollVH(docArea));
         return tabs;
     }
 
-    private JPanel createBesideCode() {
-        JPanel pp = new JPanel(new GridLayout(0, 1));
+    private JPanel createBesideCodeOutput() {
+        JPanel pp = new JPanel(new GridLayout(0, 1, 5, 5));
         pp.add(operatorBox);
         pp.add(createActionButton(UNDO_ACTION));
         pp.add(createActionButton(REDO_ACTION));
@@ -151,10 +156,10 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private JComponent createContextPanel() {
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Functions", scrollV(functionList));
-        tabs.addTab("Variables", scrollV(contextVarList));
-        return tabs;
+        JPanel p = new JPanel(new GridLayout(0,1));
+        p.add(scrollV("Variables", contextVarList));
+        p.add(scrollV("Functions", functionList));
+        return p;
     }
 
     private JButton createActionButton(Action action) {
@@ -224,8 +229,7 @@ public class FieldMappingFrame extends FrameBase {
                             operatorBoxSetting = false;
                         }
                     });
-                }
-                else {
+                } else {
                     contextVarModel.setList(null);
                     sipModel.getFieldCompileModel().setNodeMapping(null);
                     Exec.swing(new Runnable() {
@@ -310,7 +314,7 @@ public class FieldMappingFrame extends FrameBase {
             if (size > 0) {
                 fireIntervalRemoved(this, 0, size);
             }
-            if (nodeMapping != null) vars.addAll(nodeMapping.getContextVariables());
+            if (nodeMapping != null) vars.addAll(getContextVariables(nodeMapping));
             size = getSize();
             if (size > 0) {
                 fireIntervalAdded(this, 0, size);
@@ -326,6 +330,28 @@ public class FieldMappingFrame extends FrameBase {
         public Object getElementAt(int i) {
             return vars.get(i);
         }
+
+        public List<String> getContextVariables(NodeMapping nodeMapping) {
+            List<String> variables = new ArrayList<String>();
+            Path back = nodeMapping.inputPath;
+            while (!back.isEmpty()) {
+                variables.add(0, toGroovyIdentifier(back.peek()));
+                back = back.parent();
+            }
+            SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleSourceTreeNode();
+            if (sourceTreeNode != null) {
+                for (SourceTreeNode treeNode : sourceTreeNode.getChildren()) {
+                    if (treeNode.getTag().isAttribute()) continue;
+                    variables.add(String.format(
+                            "%s.%s",
+                            toGroovyIdentifier(nodeMapping.inputPath.peek()),
+                            toGroovyFirstIdentifier(treeNode.getTag()))
+                    );
+                }
+            }
+            variables.add(0, "_uniqueIdentifier");
+            return variables;
+        }
     }
 
     private class RevertAction extends AbstractAction {
@@ -340,7 +366,8 @@ public class FieldMappingFrame extends FrameBase {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        if (sipModel.getCreateModel().hasNodeMapping()) sipModel.getCreateModel().getNodeMapping().revertToGenerated();
+                        if (sipModel.getCreateModel().hasNodeMapping())
+                            sipModel.getCreateModel().getNodeMapping().revertToGenerated();
                         sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
                     }
                 });
@@ -383,8 +410,7 @@ public class FieldMappingFrame extends FrameBase {
                     try {
                         Document doc = codeArea.getDocument();
                         doc.insertString(start, contextVar, null);
-                    }
-                    catch (BadLocationException e) {
+                    } catch (BadLocationException e) {
                         throw new RuntimeException("What?", e);
                     }
                 }
@@ -418,12 +444,12 @@ public class FieldMappingFrame extends FrameBase {
                 if (selectedText != null && mappingFunction != null) {
                     int start = codeArea.getSelectionStart();
                     try {
-                        if (selectedText.endsWith("\n")) selectedText = selectedText.substring(0, selectedText.length() - 1);
+                        if (selectedText.endsWith("\n"))
+                            selectedText = selectedText.substring(0, selectedText.length() - 1);
                         Document doc = codeArea.getDocument();
                         doc.remove(start, selectedText.length());
                         doc.insertString(start, String.format("%s(%s)", mappingFunction.name, selectedText), null);
-                    }
-                    catch (BadLocationException e) {
+                    } catch (BadLocationException e) {
                         throw new RuntimeException("What?", e);
                     }
                 }

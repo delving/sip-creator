@@ -174,10 +174,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         return uniqueElement;
     }
 
-    public Iterable<? extends SourceTreeNode> getChildNodes() {
-        return children;
-    }
-
     public boolean couldBeRecordRoot() {
         return valueStats != null && !valueStats.hasValues();
     }
@@ -275,7 +271,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public static void removeStatsTreeNodes(final NodeMapping nodeMapping) {
-        if (nodeMapping.hasStatsTreeNodes()) {
+        if (nodeMapping.hasSourceTreeNodes()) {
             for (Object nodeObject : nodeMapping.getSourceTreeNodes()) {
                 ((SourceTreeNode) nodeObject).removeMappedIn(nodeMapping);
             }
@@ -338,7 +334,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 if (node.getTag().isAttribute()) {
                     setIcon(SwingHelper.ATTRIBUTE_ICON);
                 }
-                else if (node.getChildNodes().iterator().hasNext()) {
+                else if (node.getChildren().iterator().hasNext()) {
                     setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
                 }
                 else {

@@ -72,7 +72,7 @@ public class NodeMapping {
     public CodeOut codeOut;
 
     @XStreamOmitField
-    private SortedSet statsTreeNodes;
+    private SortedSet sourceTreeNodes;
 
     @Override
     public boolean equals(Object o) {
@@ -107,27 +107,28 @@ public class NodeMapping {
     }
 
     public void clearStatsTreeNodes() {
-        statsTreeNodes = null;
+        sourceTreeNodes = null;
     }
 
     public boolean hasMap() {
         return siblings != null;
     }
 
-    public boolean hasStatsTreeNodes() {
-        return statsTreeNodes != null;
+    public boolean hasSourceTreeNodes() {
+        return sourceTreeNodes != null;
     }
 
-    public boolean hasOneStatsTreeNode() {
-        return hasStatsTreeNodes() && statsTreeNodes.size() == 1;
+    public boolean hasOneSourceTreeNode() {
+        return hasSourceTreeNodes() && sourceTreeNodes.size() == 1;
     }
 
-    public Object getSingleStatsTreeNode() {
-        return statsTreeNodes.iterator().next();
+    public Object getSingleSourceTreeNode() {
+        Iterator walk = sourceTreeNodes.iterator();
+        return walk.hasNext() ? walk.next() : null;
     }
 
     public SortedSet getSourceTreeNodes() {
-        return statsTreeNodes;
+        return sourceTreeNodes;
     }
 
     public void attachTo(RecDefNode recDefNode) {
@@ -138,7 +139,7 @@ public class NodeMapping {
     // this method should be called from exactly ONE place!
     public NodeMapping setStatsTreeNodes(SortedSet statsTreeNodes, List<Path> inputPaths) {
         if (statsTreeNodes.isEmpty()) throw new RuntimeException();
-        this.statsTreeNodes = statsTreeNodes;
+        this.sourceTreeNodes = statsTreeNodes;
         setInputPaths(inputPaths);
         return this;
     }
@@ -158,8 +159,7 @@ public class NodeMapping {
         for (Path input : inputPaths) {
             if (parent == null) {
                 parent = input.parent();
-            }
-            else if (!parent.equals(input.parent())) {
+            } else if (!parent.equals(input.parent())) {
                 throw new RuntimeException(String.format("Input path %s should all be from the same parent %s", input, parent));
             }
         }
@@ -211,8 +211,7 @@ public class NodeMapping {
                 groovyCode = null;
                 notifyChanged();
             }
-        }
-        else if (groovyCode == null || !codeLooksLike(codeString)) {
+        } else if (groovyCode == null || !codeLooksLike(codeString)) {
             groovyCode = stringToLines(codeString);
             notifyChanged();
         }
@@ -253,14 +252,12 @@ public class NodeMapping {
                 if (editPath.getEditedCode(outputPath) != null) {
                     indentCode(editPath.getEditedCode(outputPath), codeOut);
                     return;
-                }
-                else if (groovyCode != null) {
+                } else if (groovyCode != null) {
                     indentCode(groovyCode, codeOut);
                     return;
                 }
             }
-        }
-        else if (groovyCode != null) {
+        } else if (groovyCode != null) {
             indentCode(groovyCode, codeOut);
             return;
         }
@@ -272,23 +269,18 @@ public class NodeMapping {
         if (path.size() == 1) {
             if (dictionary != null) {
                 codeOut.line("from%s(%s)", toDictionaryName(this), toLeafGroovyParam(path));
-            }
-            else if (hasMap()) {
+            } else if (hasMap()) {
                 codeOut.line(getMapUsage());
-            }
-            else {
+            } else {
                 if (path.peek().getLocalName().equals("constant")) {
                     codeOut.line("'CONSTANT'");
-                }
-                else {
+                } else {
                     codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
                 }
             }
-        }
-        else if (recDefNode.isLeafElem()) {
+        } else if (recDefNode.isLeafElem()) {
             toInnerLoop(path.withRootRemoved(), groovyParams);
-        }
-        else {
+        } else {
             boolean needLoop;
             if (hasMap()) {
                 needLoop = !groovyParams.contains(getMapName());
@@ -297,8 +289,7 @@ public class NodeMapping {
                             "%s %s { %s ->",
                             toMapExpression(this), getOperator().getChar(), getMapName());
                 }
-            }
-            else {
+            } else {
                 String param = toLoopGroovyParam(path);
                 needLoop = !groovyParams.contains(param);
                 if (needLoop) {
@@ -314,21 +305,9 @@ public class NodeMapping {
         NodeMapping ancestor = getAncestorNodeMapping(inputPath);
         if (ancestor.inputPath.isAncestorOf(inputPath)) {
             return inputPath.extendAncestor(ancestor.inputPath);
-        }
-        else {
+        } else {
             return inputPath;
         }
-    }
-
-    public List<String> getContextVariables() {
-        List<String> variables = new ArrayList<String>();
-        variables.add("_uniqueIdentifier");
-        Path back = inputPath;
-        while (!back.isEmpty()) {
-            variables.add(toGroovyIdentifier(back.peek()));
-            back = back.parent();
-        }
-        return variables;
     }
 
     private String getMapUsage() {

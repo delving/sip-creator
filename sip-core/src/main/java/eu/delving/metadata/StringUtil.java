@@ -83,7 +83,7 @@ public class StringUtil {
     public static String toLoopRef(Path path) {
         Tag outer = path.getTag(0);
         Tag inner = path.getTag(1);
-        if (outer == null || inner == null) throw new RuntimeException("toLoopRef called on "+path);
+        if (outer == null || inner == null) throw new RuntimeException("toLoopRef called on " + path);
         return toGroovyIdentifier(outer) + toGroovyReference(inner);
     }
 
@@ -105,6 +105,10 @@ public class StringUtil {
         return "_" + StringUtil.tagToVariable(tag.toString()) + (tag.isDescendent() ? "_" + tag.getDescendency() : "");
     }
 
+    public static String toGroovyFirstIdentifier(Tag tag) {
+        return StringUtil.tagToVariable(tag.toString()) + (tag.isDescendent() ? "_" + tag.getDescendency() : "") + "_";
+    }
+
     private static String toGroovyReference(Tag tag) {
         return tag.isAttribute() ? String.format("['@%s']", tag.toString()) : "." + tagToVariable(tag.toString());
     }
@@ -113,8 +117,7 @@ public class StringUtil {
         try {
             int length = document.getLength();
             return document.getText(0, length);
-        }
-        catch (BadLocationException e) {
+        } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }
     }
@@ -192,8 +195,7 @@ public class StringUtil {
             int pos = UNICODE.indexOf(c);
             if (pos > -1) {
                 sb.append(PLAIN_ASCII.charAt(pos));
-            }
-            else if (DELETED.indexOf(c) < 0) {
+            } else if (DELETED.indexOf(c) < 0) {
                 sb.append(c);
             }
         }

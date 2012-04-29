@@ -127,7 +127,7 @@ public class StatsModel {
         if (!(sourceTreeModel.getRoot() instanceof SourceTreeNode)) {
             nodeMapping.clearStatsTreeNodes();
         }
-        else if (!nodeMapping.hasStatsTreeNodes()) {
+        else if (!nodeMapping.hasSourceTreeNodes()) {
             for (Path path : nodeMapping.getInputPaths()) {
                 TreePath treePath = findNodeForInputPath(path, (SourceTreeNode) sourceTreeModel.getRoot());
                 if (treePath != null) nodes.add((SourceTreeNode) treePath.getLastPathComponent());
