@@ -159,7 +159,8 @@ public class NodeMapping {
         for (Path input : inputPaths) {
             if (parent == null) {
                 parent = input.parent();
-            } else if (!parent.equals(input.parent())) {
+            }
+            else if (!parent.equals(input.parent())) {
                 throw new RuntimeException(String.format("Input path %s should all be from the same parent %s", input, parent));
             }
         }
@@ -211,7 +212,8 @@ public class NodeMapping {
                 groovyCode = null;
                 notifyChanged();
             }
-        } else if (groovyCode == null || !codeLooksLike(codeString)) {
+        }
+        else if (groovyCode == null || !codeLooksLike(codeString)) {
             groovyCode = stringToLines(codeString);
             notifyChanged();
         }
@@ -248,16 +250,17 @@ public class NodeMapping {
 
     private void toUserCode(Stack<String> groovyParams, EditPath editPath) {
         if (editPath != null) {
-            if (!editPath.generated()) {
-                if (editPath.getEditedCode(outputPath) != null) {
-                    indentCode(editPath.getEditedCode(outputPath), codeOut);
-                    return;
-                } else if (groovyCode != null) {
-                    indentCode(groovyCode, codeOut);
-                    return;
-                }
+            String editedCode = editPath.getEditedCode();
+            if (editedCode != null) {
+                indentCode(editedCode, codeOut);
+                return;
             }
-        } else if (groovyCode != null) {
+            else if (groovyCode != null) {
+                indentCode(groovyCode, codeOut);
+                return;
+            }
+        }
+        else if (groovyCode != null) {
             indentCode(groovyCode, codeOut);
             return;
         }
@@ -269,18 +272,23 @@ public class NodeMapping {
         if (path.size() == 1) {
             if (dictionary != null) {
                 codeOut.line("from%s(%s)", toDictionaryName(this), toLeafGroovyParam(path));
-            } else if (hasMap()) {
+            }
+            else if (hasMap()) {
                 codeOut.line(getMapUsage());
-            } else {
+            }
+            else {
                 if (path.peek().getLocalName().equals("constant")) {
                     codeOut.line("'CONSTANT'");
-                } else {
+                }
+                else {
                     codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
                 }
             }
-        } else if (recDefNode.isLeafElem()) {
+        }
+        else if (recDefNode.isLeafElem()) {
             toInnerLoop(path.withRootRemoved(), groovyParams);
-        } else {
+        }
+        else {
             boolean needLoop;
             if (hasMap()) {
                 needLoop = !groovyParams.contains(getMapName());
@@ -289,7 +297,8 @@ public class NodeMapping {
                             "%s %s { %s ->",
                             toMapExpression(this), getOperator().getChar(), getMapName());
                 }
-            } else {
+            }
+            else {
                 String param = toLoopGroovyParam(path);
                 needLoop = !groovyParams.contains(param);
                 if (needLoop) {
@@ -305,7 +314,8 @@ public class NodeMapping {
         NodeMapping ancestor = getAncestorNodeMapping(inputPath);
         if (ancestor.inputPath.isAncestorOf(inputPath)) {
             return inputPath.extendAncestor(ancestor.inputPath);
-        } else {
+        }
+        else {
             return inputPath;
         }
     }
@@ -354,19 +364,15 @@ public class NodeMapping {
 
     private EditPath getGeneratorEditPath() {
         return new EditPath() {
+
             @Override
-            public Path getPath() {
-                return outputPath;
+            public NodeMapping getNodeMapping() {
+                return NodeMapping.this;
             }
 
             @Override
-            public String getEditedCode(Path path) {
+            public String getEditedCode() {
                 return null;
-            }
-
-            @Override
-            public boolean generated() {
-                return true;
             }
         };
     }
