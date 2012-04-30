@@ -121,10 +121,6 @@ public class MappingCompileModel {
         notifyStateChange(CompileState.ORIGINAL);
     }
 
-    public void refreshCode() {
-        Exec.swing(new DocumentSetter(codeDocument, getCode(null), false));
-    }
-
     public MappingModel.ChangeListener getMappingModelChangeListener() {
         return mappingModelEar;
     }
@@ -195,13 +191,12 @@ public class MappingCompileModel {
         if (nodeMapping == null) return null;
         return new EditPath() {
             @Override
-            public Path getPath() {
-                return nodeMapping.outputPath;
+            public NodeMapping getNodeMapping() {
+                return nodeMapping;
             }
 
             @Override
-            public String getEditedCode(Path path) {
-                if (!path.equals(nodeMapping.outputPath)) return null;
+            public String getEditedCode() {
                 if (fromCodeDocument) {
                     return StringUtil.documentToString(codeDocument);
                 }
@@ -211,11 +206,6 @@ public class MappingCompileModel {
                 else {
                     return null;
                 }
-            }
-
-            @Override
-            public boolean generated() {
-                return false;
             }
         };
     }
@@ -284,6 +274,7 @@ public class MappingCompileModel {
                 if (mappingRunner == null) {
                     feedback.say("Compiling " + type);
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getEditPath(true));
+                    System.out.println(mappingRunner.getCode()); // todo: remove
                 }
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);

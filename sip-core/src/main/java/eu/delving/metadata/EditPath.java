@@ -30,9 +30,7 @@ package eu.delving.metadata;
 
 public interface EditPath {
 
-    Path getPath();
+    NodeMapping getNodeMapping();
 
-    String getEditedCode(Path path);
-
-    boolean generated();
+    String getEditedCode();
 }

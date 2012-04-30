@@ -234,7 +234,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public void toElementCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (isAttr() || !hasDescendentNodeMappings()) return;
-        if (editPath != null && !path.isFamilyOf(editPath.getPath())) return;
+        if (editPath != null && !path.isFamilyOf(editPath.getNodeMapping().outputPath)) return;
         if (nodeMappings.isEmpty()) {
             if (isRootOpt()) {
                 Set<Path> siblingPaths = getSiblingInputPathsOfChildren();
@@ -254,6 +254,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 codeOut.line("// no node mappings");
                 codeOut._line("}");
             }
+        }
+        else if (editPath != null) {
+            NodeMapping nodeMapping = editPath.getNodeMapping();
+            nodeMapping.codeOut = codeOut.createChild();
+            toNodeMappingLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
         }
         else {
             for (NodeMapping nodeMapping : nodeMappings.values()) {
