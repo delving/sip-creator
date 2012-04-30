@@ -23,61 +23,73 @@ package eu.delving.sip.files;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import java.io.*;
 
 /**
- * Fetch XML resources and cache them. // todo: make it work
+ * Fetch XML resources and cache them.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class CachingResourceResolver implements LSResourceResolver {
-    private File home;
+    private Storage storage;
     private HttpClient httpClient;
 
-    public CachingResourceResolver(File home, HttpClient httpClient) {
-        this.home = home;
+    public CachingResourceResolver(Storage storage, HttpClient httpClient) {
+        this.storage = storage;
         this.httpClient = httpClient;
     }
 
     @Override
     public LSInput resolveResource(String type, final String namespaceUri, final String publicId, final String systemId, final String baseUri) {
-        File resourceFile = createResourceFile(systemId);
+        File resourceFile = createResourceFile(systemId, baseUri);
         if (!resourceFile.exists()) {
             try {
-                InputStream inputStream = fetchResource(systemId);
-                OutputStream out = new FileOutputStream(resourceFile);
-                IOUtils.copy(inputStream, out);
-                IOUtils.closeQuietly(out);
+                String schemaText = fetchResource(systemId, baseUri);
+                FileOutputStream fileOutputStream = new FileOutputStream(resourceFile);
+                IOUtils.write(schemaText, fileOutputStream, "UTF-8");
+                IOUtils.closeQuietly(fileOutputStream);
             }
             catch (Exception e) {
-                throw new RuntimeException("Unable to store the fetched resource", e);
+                throw new RuntimeException("Unable to fetch and store resource", e);
             }
         }
         return new FileBasedInput(publicId, systemId, baseUri, resourceFile);
     }
 
-    private InputStream fetchResource(String url) {
-        try {
-            HttpGet get = new HttpGet(url);
-            HttpResponse response = httpClient.execute(get);
-            return response.getEntity().getContent();
+    private String fetchResource(String systemId, String baseUri) throws IOException {
+        String url = systemId;
+        if (!url.startsWith("http:")) {
+            if (!baseUri.startsWith("http:")) throw new IOException("No URL found");
+            String baseURL = baseUri.substring(0, baseUri.lastIndexOf('/') + 1);
+            url = baseURL + systemId;
         }
-        catch (Exception e) {
-            throw new RuntimeException("Cannot fetch "+url, e);
+        HttpGet get = new HttpGet(url);
+        HttpResponse response = httpClient.execute(get);
+        StatusLine line = response.getStatusLine();
+        if (line.getStatusCode() != HttpStatus.SC_OK) {
+            throw new IOException("HTTP Error " + line.getStatusCode() + " " + line.getReasonPhrase());
         }
+        return EntityUtils.toString(response.getEntity());
     }
 
-    private File createResourceFile(String url) {
-        int lastSlash = url.lastIndexOf("/");
-        if (lastSlash < 0) throw new RuntimeException("Strange resource system id: " + url);
-        String schemaName = url.substring(lastSlash + 1);
-        return new File(home, schemaName);
+    private File createResourceFile(String systemId, String baseUri) {
+        int lastSlash = systemId.lastIndexOf("/");
+        if (lastSlash < 0) {
+            return storage.cache(systemId);
+        }
+        else {
+            String schemaName = systemId.substring(lastSlash + 1);
+            return storage.cache(schemaName);
+        }
     }
 
     private static class FileBasedInput implements LSInput {

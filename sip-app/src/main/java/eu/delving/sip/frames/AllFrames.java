@@ -27,6 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
 
@@ -92,7 +93,7 @@ public class AllFrames {
                 output
         };
         try {
-            File file = sipModel.getStorage().getFrameArrangementFile();
+            File file = frameArrangementsFile();
             if (!file.exists()) createDefaultFrameArrangements(file);
             try {
                 addFrameArrangements(new FileInputStream(file));
@@ -105,6 +106,10 @@ public class AllFrames {
         catch (IOException e) {
             throw new RuntimeException("Initializing views", e);
         }
+    }
+
+    private File frameArrangementsFile() {
+        return this.sipModel.getStorage().cache(Storage.FRAME_ARRANGEMENTS_FILE);
     }
 
     private void createDefaultFrameArrangements(File file) throws IOException {
@@ -358,7 +363,7 @@ public class AllFrames {
                     XStream stream = new XStream();
                     stream.processAnnotations(FrameArrangements.class);
                     try {
-                        stream.toXML(frameArrangements, new FileOutputStream(sipModel.getStorage().getFrameArrangementFile()));
+                        stream.toXML(frameArrangements, new FileOutputStream(frameArrangementsFile()));
                     }
                     catch (FileNotFoundException e) {
                         // eat it.

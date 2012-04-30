@@ -28,9 +28,9 @@ import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
+import org.apache.http.client.HttpClient;
 import org.xml.sax.SAXException;
 
-import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
@@ -52,9 +52,12 @@ import static eu.delving.sip.files.DataSetState.*;
 
 public class StorageImpl extends StorageBase implements Storage {
     private File home;
+    private HttpClient httpClient;
+    private SchemaFactory schemaFactory;
 
-    public StorageImpl(File home) throws StorageException {
+    public StorageImpl(File home, HttpClient httpClient) throws StorageException {
         this.home = home;
+        this.httpClient = httpClient;
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new StorageException(String.format("Unable to create storage directory in %s", home.getAbsolutePath()));
@@ -65,6 +68,13 @@ public class StorageImpl extends StorageBase implements Storage {
     @Override
     public String getUsername() {
         return StorageFinder.getUser(home);
+    }
+
+    @Override
+    public File cache(String fileName) {
+        File cacheDir = new File(home, CACHE_DIR);
+        if (!cacheDir.exists() && !cacheDir.mkdirs()) throw new RuntimeException("Couldn't create cache dir");
+        return new File(cacheDir, fileName);
     }
 
     @Override
@@ -95,43 +105,9 @@ public class StorageImpl extends StorageBase implements Storage {
         return new DataSetImpl(directory);
     }
 
-    @Override
-    public File getFrameArrangementFile() {
-        return new File(home, "frame-arrangements.xml");
-    }
-
-    @Override
-    public String getHelpHtml() {
-        File helpFile = helpFile(home);
-        if (!helpFile.exists()) return null;
-        try {
-            InputStream in = new FileInputStream(helpFile);
-            String help = IOUtils.toString(in);
-            in.close();
-            return help;
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Override
-    public void setHelpHtml(String html) {
-        File helpFile = helpFile(home);
-        try {
-            OutputStream out = new FileOutputStream(helpFile);
-            IOUtils.write(html, out, "UTF-8");
-            out.close();
-        }
-        catch (Exception e) {
-//            e.printStackTrace();
-        }
-    }
-
     public class DataSetImpl implements DataSet, Serializable {
 
         private File here;
-        private Map<String, Schema> schemaMap = new TreeMap<String, Schema>();
 
         public DataSetImpl(File here) {
             this.here = here;
@@ -437,18 +413,14 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public Validator newValidator(String prefix) throws StorageException {
-            if (!schemaMap.containsKey(prefix)) { // lazy
-                SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+            try {
                 File schemaFile = schemaFile(here, prefix);
-                if (!schemaFile.exists()) throw new StorageException(String.format("Schema %s missing", schemaFile));
-                try {
-                    schemaMap.put(prefix, factory.newSchema(schemaFile));
-                }
-                catch (SAXException e) {
-                    throw new StorageException("Unable to create schema validator for " + prefix, e);
-                }
+                if (!schemaFile.exists()) throw new StorageException("Schema file not found: "+schemaFile.getAbsolutePath());
+                return schemaFactory().newSchema(schemaFile).newValidator();
             }
-            return schemaMap.get(prefix).newValidator();
+            catch (SAXException e) {
+                throw new StorageException("Unable to create a validator", e);
+            }
         }
 
         @Override
@@ -720,5 +692,13 @@ public class StorageImpl extends StorageBase implements Storage {
         public String toString() {
             return getSpec();
         }
+    }
+
+    private SchemaFactory schemaFactory() {
+        if (schemaFactory == null) {
+            schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+            if (httpClient != null) schemaFactory.setResourceResolver(new CachingResourceResolver(this, httpClient));
+        }
+        return schemaFactory;
     }
 }

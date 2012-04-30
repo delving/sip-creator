@@ -124,10 +124,6 @@ public class StorageBase {
         FileUtils.writeLines(file, lines);
     }
 
-    File helpFile(File dir) {
-        return new File(dir, "help.html");
-    }
-
     File factsFile(File dir) {
         return findOrCreate(dir, FACTS);
     }

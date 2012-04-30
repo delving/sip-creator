@@ -22,14 +22,16 @@
 package eu.delving.sip.panels;
 
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
 import java.awt.*;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Show help fetched from github
@@ -75,7 +77,7 @@ public class HelpPanel extends HtmlPanel {
                             setHtml("<html>" + ourPage);
                         }
                     });
-                    sipModel.getStorage().setHelpHtml(ourPage);
+                    setHelpHtml(ourPage);
                 }
                 else {
                     throw new IOException("Unable to find markers on the page");
@@ -83,7 +85,7 @@ public class HelpPanel extends HtmlPanel {
             }
             catch (Exception e) {
                 sipModel.getFeedback().say("Unable to fetch help page via https");
-                final String page = sipModel.getStorage().getHelpHtml();
+                final String page = getHelpHtml();
                 if (page == null) {
                     sipModel.getFeedback().say("Unable to fetch help page from workspace");
                 }
@@ -98,6 +100,38 @@ public class HelpPanel extends HtmlPanel {
                 }
             }
         }
+
+        public String getHelpHtml() {
+            File helpFile = helpFile();
+            if (!helpFile.exists()) return null;
+            try {
+                InputStream in = new FileInputStream(helpFile);
+                String help = IOUtils.toString(in);
+                in.close();
+                return help;
+            }
+            catch (Exception e) {
+                return null;
+            }
+        }
+
+        private File helpFile() {
+            return sipModel.getStorage().cache(Storage.HELP_FILE);
+        }
+
+        public void setHelpHtml(String html) {
+            File helpFile = helpFile();
+            try {
+                OutputStream out = new FileOutputStream(helpFile);
+                IOUtils.write(html, out, "UTF-8");
+                out.close();
+            }
+            catch (Exception e) {
+//            e.printStackTrace();
+            }
+        }
+
+
     }
 
     @Override

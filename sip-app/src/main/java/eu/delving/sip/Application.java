@@ -72,7 +72,6 @@ public class Application {
     private Timer resizeTimer;
 
     private Application(final File storageDirectory) throws StorageException {
-        Storage storage = new StorageImpl(storageDirectory);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -100,6 +99,8 @@ public class Application {
             }
         });
         feedback = new VisualFeedback(desktop);
+        CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
+        Storage storage = new StorageImpl(storageDirectory, cultureHubClient.getHttpClient());
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
         statusPanel = new StatusPanel(sipModel);
         harvestPool = new HarvestPool(sipModel);
@@ -114,7 +115,6 @@ public class Application {
             }
         });
         desktop.setBackground(new Color(190, 190, 200));
-        CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         allFrames = new AllFrames(desktop, sipModel);
         helpPanel = new HelpPanel(sipModel, cultureHubClient.getHttpClient());
         home.getContentPane().add(desktop, BorderLayout.CENTER);

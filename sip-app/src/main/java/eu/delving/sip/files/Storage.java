@@ -36,15 +36,11 @@ public interface Storage {
 
     String getUsername();
 
+    File cache(String fileName);
+
     Map<String, DataSet> getDataSets();
 
     DataSet createDataSet(String spec, String organization) throws StorageException;
-
-    File getFrameArrangementFile();
-
-    String getHelpHtml();
-
-    void setHelpHtml(String html);
 
     enum FileType {
         IMPORTED("imported.xml.gz"),
@@ -109,6 +105,9 @@ public interface Storage {
     String HARVEST_URL = "harvestUrl";
     String HARVEST_PREFIX = "harvestPrefix";
     String HARVEST_SPEC = "harvestSpec";
+    String CACHE_DIR = "Cache";
+    String HELP_FILE = "help.html";
+    String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", ENVELOPE_TAG, RECORD_TAG, UNIQUE_ATTR));
     Path CONSTANT_PATH = Path.create(String.format("/%s", CONSTANT_TAG));
