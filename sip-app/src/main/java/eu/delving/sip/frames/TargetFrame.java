@@ -48,8 +48,8 @@ public class TargetFrame extends FrameBase {
     private JTree recDefTree;
     private JTextField filterField = new JTextField();
     private JPanel treePanel;
-    private JCheckBox hideAttributes = new JCheckBox("Hide Attributes");
-    private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
+    private JCheckBoxMenuItem hideAttributes = new JCheckBoxMenuItem("Hide Attributes");
+    private JCheckBoxMenuItem autoFold = new JCheckBoxMenuItem("Auto-Fold");
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -87,6 +87,11 @@ public class TargetFrame extends FrameBase {
         sipModel.getMappingModel().addSetListener(showOptionMenu);
         JMenuBar bar = new JMenuBar();
         bar.add(showOptionMenu);
+        JMenu expand = new JMenu("View");
+        expand.add(new ExpandRootAction());
+        expand.add(hideAttributes);
+        expand.add(autoFold);
+        bar.add(expand);
         setJMenuBar(bar);
         wireUp();
     }
@@ -98,20 +103,6 @@ public class TargetFrame extends FrameBase {
     }
 
     private JPanel createNorthPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.add(createNorthCenterPanel(), BorderLayout.CENTER);
-        p.add(createNorthEastPanel(), BorderLayout.EAST);
-        return p;
-    }
-
-    private JPanel createNorthEastPanel() {
-        JPanel p = new JPanel(new GridLayout(0, 1));
-        p.add(hideAttributes);
-        p.add(autoFoldBox);
-        return p;
-    }
-
-    private JPanel createNorthCenterPanel() {
         JPanel p = new JPanel(new GridLayout(1, 0));
         p.setBorder(BorderFactory.createTitledBorder("Filter"));
         p.add(filterField);
@@ -186,7 +177,7 @@ public class TargetFrame extends FrameBase {
         public void run() {
             if (nodeObject != null && nodeObject instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) nodeObject;
-                if (autoFoldBox.isSelected()) showPath(node);
+                if (autoFold.isSelected()) showPath(node);
                 if (node.getRecDefNode().isUnmappable()) return;
                 sipModel.getCreateModel().setTarget(node);
             }
@@ -238,6 +229,23 @@ public class TargetFrame extends FrameBase {
         });
     }
 
+    private class ExpandRootAction extends AbstractAction {
+
+        private ExpandRootAction() {
+            super("Expand All");
+            putValue(
+                    Action.ACCELERATOR_KEY,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+            );
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
+            if (root != null) showPath(root);
+        }
+    }
+
     private class TreeUpdater implements Runnable {
         private String prefix;
 
@@ -251,7 +259,6 @@ public class TargetFrame extends FrameBase {
             if (root != null) {
                 RecDefTreeModel model = new RecDefTreeModel(root);
                 recDefTree.setModel(model);
-                showPath(root);
                 model.setAttributesHidden(hideAttributes.isSelected());
             }
             else {

@@ -43,7 +43,7 @@ public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
     }
 
     public ShowOptionMenu(Listener listener) {
-        super("Options to Show");
+        super("Options");
         this.listener = listener;
     }
 
