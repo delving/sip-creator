@@ -38,4 +38,6 @@ public interface Feedback {
     void alert(String message, Exception exception);
 
     ProgressListener progressListener(String title);
+
+    String ask(String question);
 }

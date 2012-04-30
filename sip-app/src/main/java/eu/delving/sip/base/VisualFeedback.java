@@ -132,6 +132,11 @@ public class VisualFeedback implements Feedback {
         return progressPopup;
     }
 
+    @Override
+    public String ask(String question) {
+        return JOptionPane.showInputDialog(desktop, question, "CONSTANT");
+    }
+
     private void addToList(final String message) {
         listModel.add(String.format("%s - %s", TIMESTAMP_FORMAT.format(new Date()), message));
         list.ensureIndexIsVisible(listModel.getSize() - 1);

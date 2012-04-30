@@ -65,13 +65,11 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         if (root == null) {
             root = new SourceTreeNode("No statistics", "<h3>No statistics</h3>");
         }
-        else {
-            if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
-                SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
-                root.getChildren().add(0, factNode);
-                for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, entry);
-            }
-            root.getChildren().add(0, new SourceTreeNode(root, "constant", "<html>Constant value which you can adjust in the code snippet"));
+        else if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
+            SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
+            root.getChildren().add(0, factNode);
+            for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, entry);
+            root.getChildren().add(0, new SourceTreeNode(root, Storage.CONSTANT_TAG, "<html>Constant value which you can adjust in the code snippet"));
         }
         return root;
     }
@@ -306,7 +304,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         for (Map.Entry<Tag, Map<Path, Stats.ValueStats>> entry : statisticsMap.entrySet()) {
             Path childPath = path.child(entry.getKey());
             Stats.ValueStats valueStatsForChild = null;
-            for (Map.Entry<Path,Stats.ValueStats> pathStatsEntry : entry.getValue().entrySet()) {
+            for (Map.Entry<Path, Stats.ValueStats> pathStatsEntry : entry.getValue().entrySet()) {
                 if (pathStatsEntry.getKey().equals(childPath)) {
                     valueStatsForChild = pathStatsEntry.getValue();
                 }
