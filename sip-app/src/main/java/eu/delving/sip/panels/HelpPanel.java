@@ -113,6 +113,7 @@ public class HelpPanel extends HtmlPanel {
                 "h2 { text-indent:15 }",
                 "h3 { text-indent:25 }",
                 "h4 { text-indent:35 }",
+                "pre { margin: 15 15 15 15; }",
         };
     }
 }

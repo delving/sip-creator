@@ -100,6 +100,7 @@ public interface Storage {
     String HARVEST_TAG = "delving-harvest";
     String ENVELOPE_TAG = "delving-sip-source";
     String FACTS_TAG = "facts";
+    String CONSTANT_TAG = "constant";
     String UNIQUE_ATTR = "id";
     String RECORD_TAG = "input";
     String RECORD_ROOT_PATH = "recordRootPath";
@@ -110,5 +111,6 @@ public interface Storage {
     String HARVEST_SPEC = "harvestSpec";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", ENVELOPE_TAG, RECORD_TAG, UNIQUE_ATTR));
+    Path CONSTANT_PATH = Path.create(String.format("/%s", CONSTANT_TAG));
     long MAPPING_FREEZE_INTERVAL = 60000;
 }

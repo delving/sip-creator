@@ -21,9 +21,11 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.metadata.CodeOut;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.files.Storage;
 
 import javax.swing.tree.TreePath;
 import java.util.Iterator;
@@ -97,6 +99,11 @@ public class CreateModel {
         created.recDefNode = recDefTreeNode.getRecDefNode();
         SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
+        if (created.hasOneSourceTreeNode() && created.inputPath.equals(Storage.CONSTANT_PATH)) {
+            created.codeOut = CodeOut.create();
+            String answer = sipModel.getFeedback().ask("Please enter the constant value");
+            created.setGroovyCode(String.format("'%s'", answer), sipModel.getMappingModel().getRecMapping());
+        }
         setNodeMappingInternal(created);
         adjustHighlights();
         fireStateChanged();

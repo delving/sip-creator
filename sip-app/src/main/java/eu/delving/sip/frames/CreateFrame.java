@@ -41,8 +41,12 @@ import java.util.SortedSet;
  */
 
 public class CreateFrame extends FrameBase {
-    private static final String SELECT_STATS = "<html><center><h1>Select</h1></center></html>";
-    private static final String SELECT_RECDEF = "<html><center><h1>Select</h1></center></html>";
+    private static final String SELECT_STATS = "<html><center><h3>Select Source</h3></center>" +
+            "<p>When you select from the source tree, this panel will" +
+            "show statistical information about your selection</p></html>";
+    private static final String SELECT_RECDEF = "<html><center><h3>Select Target</h3></center>" +
+            "<p>When you select from the target tree, this panel will" +
+            "show documentation about your selection</p></html>";
     private CreateModel createModel;
     private HtmlPanel statsHtml = new HtmlPanel("Source Statistics");
     private HtmlPanel recDefHtml = new HtmlPanel("Target Documentation");
@@ -200,9 +204,9 @@ public class CreateFrame extends FrameBase {
     }
 
     private class CreateMappingAction extends AbstractAction {
-        private static final String CREATE = "<html><h3>Create mapping</h3></html>";
+        private static final String CREATE = "<html><h3>Create this mapping</h3></html>";
         private static final String EXISTS = "<html><h3>Mapping has been created</h3></html>";
-        private static final String SELECT = "<html><h3>Select source and target</h3></html>";
+        private static final String SELECT = "<html><h3>Make selections first</h3></html>";
 
         private CreateMappingAction() {
             super(SELECT);
@@ -222,13 +226,13 @@ public class CreateFrame extends FrameBase {
         public void setIncomplete() {
             setEnabled(false);
             putValue(Action.NAME, SELECT);
-            putValue(Action.SHORT_DESCRIPTION, "<html>Choose values from the input and output.");
+            putValue(Action.SHORT_DESCRIPTION, "<html>Source and target not yet selected");
         }
 
         public void setComplete() {
             setEnabled(false);
             putValue(Action.NAME, EXISTS);
-            putValue(Action.SHORT_DESCRIPTION, "<html>The mapping has already been created.");
+            putValue(Action.SHORT_DESCRIPTION, "<html>This mapping already exists so it cannot be created");
         }
 
         public void setArmed() {
