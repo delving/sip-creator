@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011, 2012 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -21,16 +21,16 @@
 
 package eu.delving.groovy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Something to hold the groovy node and turn it into a string
+ * The MetadataParser delivers instances of this class for each record that it
+ * consumes.  The XML content is recorded in the composite tree of GroovyNode and
+ * GroovyList instances, and we also hold the record number and the total number
+ * of records.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class MetadataRecord {
@@ -59,73 +59,21 @@ public class MetadataRecord {
         return recordCount;
     }
 
-    public List<MetadataVariable> getVariables() {
-        List<MetadataVariable> variables = new ArrayList<MetadataVariable>();
-        getVariables(rootNode, variables);
-        return variables;
-    }
-
     private boolean checkFor(GroovyNode groovyNode, Pattern pattern) {
         if (groovyNode.value() instanceof List) {
             List list = (List) groovyNode.value();
             for (Object member : list) {
                 GroovyNode childNode = (GroovyNode) member;
-                if (checkFor(childNode, pattern)) {
-                    return true;
-                }
+                if (checkFor(childNode, pattern)) return true;
             }
             return false;
         }
         else {
-            return pattern.matcher(groovyNode.text()).matches();
+            return pattern.matcher(groovyNode.text()).find();
         }
-    }
-
-    private void getVariables(GroovyNode groovyNode, List<MetadataVariable> variables) {
-        if (groovyNode.value() instanceof List) {
-            List list = (List) groovyNode.value();
-            for (Object member : list) {
-                GroovyNode childNode = (GroovyNode) member;
-                getVariables(childNode, variables);
-            }
-        }
-        else {
-            List<GroovyNode> path = new ArrayList<GroovyNode>();
-            GroovyNode walk = groovyNode;
-            while (walk != null) {
-                path.add(walk);
-                walk = walk.parent();
-            }
-            Collections.reverse(path);
-            StringBuilder out = new StringBuilder();
-            Iterator<GroovyNode> nodeWalk = path.iterator();
-            while (nodeWalk.hasNext()) {
-                String nodeName = nodeWalk.next().name();
-                out.append(nodeName);
-                if (nodeWalk.hasNext()) {
-                    out.append('.');
-                }
-            }
-            String variableName = out.toString();
-            variables.add(new MetadataVariable(variableName, (String) groovyNode.value()));
-        }
-    }
-
-    public String toHtml() {
-        StringBuilder out = new StringBuilder(String.format("<html><strong>Record Number %d</strong><dl>", recordNumber));
-        for (MetadataVariable variable : getVariables()) {
-            out.append(String.format("<dt>%s</dt><dd><strong>%s</strong></dd>", variable.getName(), variable.getValue()));
-        }
-        out.append("</dl><html>");
-        return out.toString();
     }
 
     public String toString() {
-        StringBuilder out = new StringBuilder();
-        out.append("Record #").append(recordNumber).append('\n');
-        for (MetadataVariable variable : getVariables()) {
-            out.append(variable.toString()).append('\n');
-        }
-        return out.toString();
+        return String.format("MetadataRecord(%d / %d)", recordNumber, recordCount);
     }
 }

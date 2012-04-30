@@ -1,13 +1,55 @@
-import eu.delving.groovy.DiscardRecordException
+/*
+ * Copyright 2011, 2012 Delving BV
+ *
+ *  Licensed under the EUPL, Version 1.0 or? as soon they
+ *  will be approved by the European Commission - subsequent
+ *  versions of the EUPL (the "Licence");
+ *  you may not use this work except in compliance with the
+ *  Licence.
+ *  You may obtain a copy of the Licence at:
+ *
+ *  http://ec.europa.eu/idabc/eupl
+ *
+ *  Unless required by applicable law or agreed to in
+ *  writing, software distributed under the Licence is
+ *  distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ *  express or implied.
+ *  See the Licence for the specific language governing
+ *  permissions and limitations under the Licence.
+ */
+
 import eu.delving.groovy.GroovyNode
 
-// MappingCategory is a class used as a Groovy Category to add methods to existing classes
+/**
+ * This category is used to give DSL features to the Groovy builder
+ * code that does the mapping transformation.
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
+ */
 
 public class MappingCategory {
 
-    private static NodeList unwrap(a) {
+    public static class TupleMap extends TreeMap {
+        @Override
+        public Object get(Object key) {
+            Object value = super.get(key);
+            if (value == null) value = "";
+            return value;
+        }
+    }
+
+    public static class TupleList extends ArrayList {
+        @Override
+        public String toString() {
+            return 'TUPLE' + super.toString();
+        }
+    }
+
+    private static List unwrap(a) {
         if (!a) return new NodeList(0);
         if (a instanceof NodeList) return a;
+        if (a instanceof TupleList) return a
         if (a instanceof List && ((List) a).size() == 1) return unwrap(((List) a)[0])
         NodeList list = new NodeList();
         list.add(a)
@@ -18,10 +60,6 @@ public class MappingCategory {
         if (list.isEmpty()) return false;
         if (list.size() == 1 && list[0] instanceof List) return list[0].asBoolean()
         return true;
-    }
-
-    static void discard(Boolean condition, String why) {
-        if (condition) throw new DiscardRecordException(why)
     }
 
     static String getAt(GroovyNode node, Object what) {
@@ -40,19 +78,6 @@ public class MappingCategory {
         return node.text().substring(from, to);
     }
 
-    static List ifAbsentUse(List list, Object factVariable) {
-        if (!list) {
-            list += factVariable
-        }
-        else if (list.size() == 1) {
-            GroovyNode node = (GroovyNode) list[0]
-            if (!node.text()) {
-                list += factVariable
-            }
-        }
-        return list
-    }
-
     // concatenate lists
     static Object plus(List a, List b) { // operator +
         List both = new NodeList()
@@ -61,33 +86,79 @@ public class MappingCategory {
         return both;
     }
 
-    // make tuples out of the entries in two lists
+    // make maps out of the entries in two lists
     static Object or(List a, List b) { // operator |
         a = unwrap(a)
         b = unwrap(b)
-        List tupleList = new NodeList()
-        int max = Math.min(a.size(), b.size());
-        for (Integer index: 0..(max - 1)) {
-            if (a[index] instanceof List) {
-                tupleList.add(a[index] += b[index]);
+        TupleList list = new TupleList()
+        Iterator aa = a.iterator()
+        Iterator bb = b.iterator()
+        while (aa.hasNext() || bb.hasNext()) {
+            if (aa.hasNext() && bb.hasNext()) {
+                def ma = aa.next()
+                GroovyNode mb = (GroovyNode)bb.next()
+                if (ma instanceof Map) {
+                    ma[mb.name()] = mb
+                    list.add(ma);
+                }
+                else {
+                    GroovyNode na = (GroovyNode) ma
+                    GroovyNode nb = (GroovyNode) mb
+                    Map map = new TupleMap()
+                    map[na.name()] = na
+                    map[nb.name()] = nb
+                    list.add(map)
+                }
             }
-            else {
-                tupleList.add([a[index], b[index]])
+            else if (aa.hasNext()) {
+                def ma = aa.next()
+                if (ma instanceof TupleMap) {
+                    list.add(ma)
+                }
+                else {
+                    GroovyNode na = (GroovyNode) ma;
+                    Map map = new TupleMap()
+                    map[na.name()] = na
+                    list.add(map)
+                }
+            }
+            else { // bb only
+                def mb = bb.next()
+                GroovyNode nb = (GroovyNode) mb;
+                Map map = new TupleMap()
+                map[nb.name()] = nb
+                list.add(map)
             }
         }
-        return tupleList
+        return list
     }
 
     // run a closure on each member of the list
-    static boolean multiply(List a, Closure closure) { // operator *
+    static List multiply(List a, Closure closure) { // operator *
         a = unwrap(a)
-        boolean any = !a.isEmpty()
-        for (Object child: a) closure.call(child)
-        return any
+        List output = new ArrayList();
+        for (Object child : a) {
+            Object returnValue = closure.call(child)
+            if (returnValue) {
+                if (returnValue instanceof Object[]) {
+                    output.addAll(returnValue)
+                }
+                else if (returnValue instanceof List) {
+                    output.addAll(returnValue)
+                }
+                else if (returnValue instanceof String) {
+                    output.add(returnValue)
+                }
+                else if (!(returnValue instanceof org.w3c.dom.Node)) {
+                    output.add(returnValue.toString())
+                }
+            }
+        }
+        return output
     }
 
     // run the closure once for the concatenated values
-    static List concat(List a, String delimiter) {
+    static List multiply(List a, String delimiter) {
         a = unwrap(a)
         Iterator walk = a.iterator();
         StringBuilder out = new StringBuilder()
@@ -101,102 +172,11 @@ public class MappingCategory {
     // call closure for the first if there is one
     static Object power(List a, Closure closure) {  // operator **
         a = unwrap(a)
-        for (Object child: a) {
+        for (Object child : a) {
             closure.call(child)
             break
         }
         return null
-    }
-
-    static List extractYear(a) {
-        a = unwrap(a)
-        String text = a.text()
-        List result = new NodeList()
-        switch (text) {
-
-            case ~/$normalYear/:
-                result += (text =~ /$year/)[0]
-                break
-
-            case ~/$yearAD/:
-                result += (text =~ /$yr/)[0] + ' AD'
-                break
-
-            case ~/$yearBC/:
-                result += (text =~ /$yr/)[0] + ' BC'
-                break
-
-            case ~/$yearRange/:
-                def list = text =~ /$year/
-                if (list[0] == list[1]) {
-                    result += list[0]
-                }
-                else {
-                    result += list[0]
-                    result += list[1]
-                }
-                break
-
-            case ~/$yearRangeBrief/:
-                def list = text =~ /\d{1,4}/
-                result += list[0]
-                result += list[0][0] + list[0][1] + list[1]
-                break
-
-            case ~/$yr/:
-                result += text + ' AD'
-                break
-
-            default:
-                text.eachMatch(/$year/) {
-                    result += it
-                }
-                break
-        }
-        return result
-    }
-
-    static List toId(a, spec) {
-        a = unwrap(a)
-        String identifier = a[0].toString()
-        if (!spec) throw new MissingPropertyException("spec", String.class)
-        if (!identifier) throw new MissingPropertyException("Identifier passed to toId", String.class)
-        def uriBytes = identifier.toString().getBytes("UTF-8");
-        def digest = java.security.MessageDigest.getInstance("SHA-1")
-        def hash = new StringBuilder()
-        for (Byte b in digest.digest(uriBytes)) {
-            hash.append('0123456789ABCDEF'[(b & 0xF0) >> 4])
-            hash.append('0123456789ABCDEF'[b & 0x0F])
-        }
-        return ["$spec/$hash"]
-    }
-
-    static List toLegacyId(a, spec) {
-      a = unwrap(a)
-      String identifier = a[0].toString()
-      if (!spec) {
-        throw new MissingPropertyException("spec", String.class)
-      }
-      if (!identifier) {
-        throw new MissingPropertyException("Identifier passed to toId", String.class)
-      }
-      def oldIdentifier = "[" + identifier + "]"
-      def uriBytes =  oldIdentifier.getBytes("UTF-8");
-      def digest = java.security.MessageDigest.getInstance("SHA-1")
-      def hash = new StringBuilder()
-      for (Byte b in digest.digest(uriBytes)) {
-        hash.append('0123456789ABCDEF'[(b & 0xF0) >> 4])
-        hash.append('0123456789ABCDEF'[b & 0x0F])
-      }
-      return ["$spec/$hash"]
-    }
-
-  static List toLocalId(a, spec) {
-        a = unwrap(a)
-        String identifier = a[0].toString()
-        if (!spec) throw new MissingPropertyException("spec", String.class)
-        if (!identifier) throw new MissingPropertyException("Identifier passed to toId", String.class)
-        return ["$spec/$identifier"]
     }
 
     static String sanitize(GroovyNode node) {
@@ -207,25 +187,10 @@ public class MappingCategory {
         return sanitize(list.toString())
     }
 
-    static String sanitize(String text) { // same effect as in Sanitizer.sanitizeGroovy, except apostrophe removal
+    static String sanitize(String text) { // same effect as in StringUtil.sanitizeGroovy, except apostrophe removal
         text = (text =~ /\n/).replaceAll(' ')
         text = (text =~ / +/).replaceAll(' ')
         return text
     }
 
-    static year = /\d{4}/
-    static dateSlashA = /$year\/\d\d\/\d\d\//
-    static dateDashA = /$year-\d\d-\d\d/
-    static dateSlashB = /\d\d\/\d\d\/$year/
-    static dateDashB = /\d\d-\d\d-$year/
-    static ad = /(ad|AD|a\.d\.|A\.D\.)/
-    static bc = /(bc|BC|b\.c\.|B\.C\.)/
-    static yr = /\d{1,3}/
-    static yearAD = /$yr\s?$ad/
-    static yearBC = /$yr\s?$bc/
-    static normalYear = /($year|$dateSlashA|$dateSlashB|$dateDashA|$dateDashB)/
-    static yearRangeDash = /$normalYear-$normalYear/
-    static yearRangeTo = /$normalYear to $normalYear/
-    static yearRange = /($yearRangeDash|$yearRangeTo)/
-    static yearRangeBrief = /$year-\d\d/
 }

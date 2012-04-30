@@ -1,0 +1,256 @@
+<?xml version="1.0"?>
+<record-definition prefix="lido">
+    <namespaces>
+        <namespace prefix="lido" uri="http://www.lido-schema.org" schema=""/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="relatedencoding"/>
+        <attr tag="type"/>
+        <attr tag="politicalEntity"/>
+        <attr tag="geographicalEntity"/>
+        <attr tag="addedSearchTerm"/>
+        <attr tag="pref"/>
+        <attr tag="encodinganalog"/>
+        <attr tag="label"/>
+        <attr tag="xml:lang"/>
+        <attr tag="sortorder"/>
+        <attr tag="codecResource"/>
+        <attr tag="source"/>
+        <attr tag="formatResource"/>
+    </attrs>
+
+    <elems>
+        <elem tag="conceptID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="term" attrs="pref, addedSearchTerm, xml:lang, encodinganalog, label"/>
+
+        <elem tag="appellationValue" attrs="pref, xml:lang, encodinganalog, label" required="true"/>
+        <elem tag="sourceAppellation" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="appellationName" singular="true"/>
+
+        <!-- legal stuff and text for testing commit-->
+        <elem tag="legalBodyID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="legalBodyName" elems="appellationValue, appellationName"/>
+        <elem tag="legalBodyWeblink" attrs="pref, formatResource,xml:lang, encodinganalog, label"/>
+
+        <!-- rights -->
+        <elem tag="rightsType" elems="conceptID, term"/>
+        <elem tag="rightsDate" elems="earliestDate, latestDate" singular="true"/>
+        <elem tag="rightsHolder" elems="legalBodyID, legalBodyName, legalBodyWeblink" attrs="sortorder"/>
+        <elem tag="creditLine" attrs="xml:lang, encodinganalog, label"/>
+
+        <!-- descriptive: super-elements: eventDescriptionSet; inscriptionDescription; objectDescriptionSet -->
+        <elem tag="descriptiveNoteID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="descriptiveNoteValue" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="sourceDescriptiveNote" attrs="xml:lang, encodinganalog, label"/>
+
+        <!-- dates: super-elements: eventDate; subjectDate -->
+        <elem tag="displayDate" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="date" elems="earliestDate, latestDate" singular="true"/>
+        <elem tag="earliestDate" attrs="type, source, encodinganalog, label" singular="true"/>
+        <elem tag="latestDate" attrs="type, source, encodinganalog, label" singular="true"/>
+
+        <!-- measurement -->
+        <elem tag="measurementType" attrs="xml:lang, encodinganalog, label" required="true"/>
+        <elem tag="measurementUnit" attrs="xml:lang, encodinganalog, label" required="true"/>
+        <elem tag="measurementValue" attrs="xml:lang, encodinganalog, label" required="true" singular="true"/>
+
+        <!-- actors: super-elements:  -->
+        <elem tag="displayActor" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="displayActorInRole" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="actorInRole" elems="actor, roleActor, attributionQualifierActor, extentActor" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="roleActor" elems="conceptID, term" attrs="sortorder"/>
+        <elem tag="attributionQualifierActor" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="extentActor" attrs="xml:lang, encodinganalog, label"/>
+
+        <elem tag="actor" elems="actorID, nameActorSet, nationalityActor,vitalDatesActor, genderActor" attrs="type" singular="true"/>
+        <elem tag="actorID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="nameActorSet" elems="appellationValue, sourceAppellation" required="yes"/>
+        <elem tag="nationalityActor" elems="conceptID, term" attrs="sortorder"/>
+        <elem tag="vitalDatesActor" elems="earliestDate, latestDate" singular="true"/>
+        <elem tag="genderActor" attrs="xml:lang, encodinganalog, label"/>
+
+        <!-- event: super-elements: eventSet; relatedEvent; subjectEvent -->
+        <elem tag="displayEvent" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="event" elems="eventID, eventType, roleInEvent, eventName, eventActor, culture, eventDate, periodName, eventPlace, eventMethod, eventMaterialsTech, thingPresent, relatedEventSet, eventDescriptionSet"  singular="true"/>
+        <elem tag="eventID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="eventType" elems="conceptID, term" required="true" singular="true"/>
+        <elem tag="roleInEvent" elems="conceptID, term"/>
+        <elem tag="eventName" elems="appellationValue,sourceAppellation"/>
+        <elem tag="eventActor" elems="displayActorInRole, actorInRole" attrs="sortorder"/>
+        <elem tag="culture" elems="conceptID, term" attrs="sortorder"/>
+        <elem tag="eventDate" elems="displayDate, date" singular="true"/>
+        <elem tag="periodName" elems="conceptID, term" attrs="type, sortorder"/>
+        <elem tag="eventPlace" elems="displayPlace, place" attrs="type, sortorder"/>
+        <elem tag="eventMethod" elems="conceptID, term" attrs="sortorder"/>
+        <elem tag="eventMaterialsTech" elems="displayMaterialsTech, materialsTech" attrs="sortorder"/>
+        <elem tag="thingPresent" elems="displayObject, object" attrs="sortorder"/>
+
+        <!-- temp, se below -->
+        <elem tag="relatedEventSet" attrs="sortorder"/>
+        <!-- related event gives java.lang.StackOverflowError:
+        <elem tag="relatedEventSet" elems="relatedEvent, relatedEventRelType" attrs="sortorder"/>
+            <elem tag="relatedEvent" elems="relatedEventSet, event"/>
+            <elem tag="relatedEventRelType" elems="conceptID, term"/>
+        -->
+        <elem tag="eventDescriptionSet" elems="descriptiveNoteID, descriptiveNoteValue, sourceDescriptiveNote" singular="true"/>
+
+        <!-- places: super-elements: eventPlace; subjectPlace OBS!! CHECK NESTED PARTOFPLACES-->
+        <elem tag="displayPlace" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="place" elems="placeID, namePlaceSet, gml, partOfPlace, placeClassification" singular="true"/>
+        <elem tag="placeID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="namePlaceSet" elems="appellationValue, sourceAppellation"/>
+        <elem tag="gml" elems="gml:point, gml:LineString, gml:Polygon, " attrs="xml:lang"/>
+        <elem tag="gml:point" singular="true"/>
+        <elem tag="gml:LineString" singular="true"/>
+        <elem tag="gml:Polygon" singular="true"/>
+        <!-- OBS Part of place should have elem="partofplace .-->
+        <elem tag="partOfPlace" elems="placeID, namePlaceSet, gml, placeClassification" attrs="politicalEntity, geographicalEntity"/>
+        <elem tag="placeClassification" elems="conceptID, term" attrs="type"/>
+
+        <!-- objects: super-elements: relatedWork; subjectObject; thingPresent -->
+        <elem tag="displayObject" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="object" elems="objectWebResource, objectID, objectNote" singular="true"/>
+        <elem tag="objectWebResource" attrs="pref, formatResource, xml:lang, encodinganalog, label"/>
+        <elem tag="objectID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="objectNote" attrs="type"/>
+
+        <!-- material: super-elements: relatedWork; subjectObject; thingPresent -->
+        <elem tag="displayMaterialsTech" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="materialsTech" elems="termMaterialsTech, extentMaterialsTech, sourceMaterialsTech" singular="true"/>
+        <elem tag="termMaterialsTech" elems="conceptID, term" attrs="type, sortorder"/>
+        <elem tag="extentMaterialsTech" attrs="xml:lang, encodinganalog, label"/>
+        <elem tag="sourceMaterialsTech" attrs="xml:lang, encodinganalog, label"/>
+
+    </elems>
+
+    <root tag="lido" attrs="sortorder" required="true">
+        <elem tag="lidoRecID" attrs="pref, type, source, encodinganalog, label" required="true"/>
+        <elem tag="objectPublishedID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="category" elems="term, conceptID" singular="true"/>
+
+        <elem tag="descriptiveMetadata" attrs="xml:lang" required="true">
+
+            <elem tag="objectClassificationWrap" required="true" singular="true">
+                <elem tag="objectWorkTypeWrap" required="yes" singular="true">
+                    <elem tag="objectWorkType" elems="conceptID, term" attrs="type, sortorder" required="true"/>
+                </elem>
+                <elem tag="classificationWrap" singular="true">
+                    <elem tag="classification" elems="conceptID, term" attrs="type, sortorder" />
+                </elem>
+            </elem>
+
+            <elem tag="objectIdentificationWrap" required="true" singular="true">
+                <elem tag="titleWrap" required="true" singular="true">
+                    <elem tag="titleSet" elems="appellationValue, sourceAppellation" attrs="type, sortorder" required="true"/>
+                </elem>
+
+                <elem tag="inscriptionsWrap" singular="true">
+                    <elem tag="inscriptions" attrs="type, sortorder">
+                        <elem tag="inscriptionTranscription" attrs="xml:lang, encodinganalog, label"/>
+                        <elem tag="inscriptionDescription" attrs="type, sortorder">
+                            <elem tag="descriptiveNoteID" attrs="pref, type, source, encodinganalog, label"/>
+                            <elem tag="descriptiveNoteValue" attrs="xml:lang, encodinganalog, label"/>
+                            <elem tag="sourceDescriptiveNote" attrs="xml:lang, encodinganalog, label"/>
+                        </elem>
+                    </elem>
+                </elem>
+
+                <!-- NESTED PArtOFPlace MISSING-->
+                <elem tag="repositoryWrap" singular="true">
+                    <elem tag="repositorySet" attrs="type, sortorder">
+                        <elem tag="repositoryName" elems="legalBodyID, legalBodyName, legalBodyWeblink" singular="true"/>
+                        <elem tag="workID" attrs="type, sortorder, encodinganalog, label"/>
+                        <elem tag="repositoryLocation" elems="placeID, namePlaceSet, gml, partOfPlace, placeClassification" attrs="politicalEntity, geographicalEntity" singular="true"/>
+                    </elem>
+                </elem>
+
+                <elem tag="displayStateEditionWrap" singular="true">
+                    <elem tag="displayState" attrs="xml:lang, encodinganalog, label"/>
+                    <elem tag="displayEdition" attrs="xml:lang, encodinganalog, label"/>
+                    <elem tag="sourceStateEdition" attrs="xml:lang, encodinganalog, label"/>
+                </elem>
+
+                <elem tag="objectDescriptionWrap" singular="true">
+                    <elem tag="objectDescriptionSet" elems="descriptiveNoteID, descriptiveNoteValue, sourceDescriptiveNote" attrs="type, sortorder"/>
+                </elem>
+
+                <elem tag="objectMeasurementsWrap" singular="true">
+                    <elem tag="objectMeasurementsSet" attrs="sortorder">
+                        <elem tag="displayObjectMeasurements" attrs="xml:lang, encodinganalog, label"/>
+                        <elem tag="objectMeasurements" singular="true">
+                            <elem tag="measurementsSet" elems="measurementType, measurementUnit, measurementValue" attrs="sortorder"/>
+                            <elem tag="extentMeasurements" attrs="sortorder"/>
+                            <elem tag="qualifierMeasurements" attrs="sortorder"/>
+                            <elem tag="formatMeasurements" attrs="sortorder"/>
+                            <elem tag="shapeMeasurements" attrs="sortorder"/>
+                            <elem tag="scaleMeasurements" attrs="sortorder"/>
+                        </elem>
+                    </elem>
+                </elem>
+            </elem>
+
+            <elem tag="eventWrap" singular="true">
+                <elem tag="eventSet" elems="displayEvent, event" attrs="sortorder"/>
+            </elem>
+
+            <elem tag="objectRelationWrap" singular="true">
+                <elem tag="subjectWrap" singular="true">
+                    <elem tag="subjectSet" attrs="sortorder">
+                        <elem tag="displaySubject" attrs="xml:lang, encodinganalog, label"/>
+                        <elem tag="subject" attrs="type" singular="true">
+                            <elem tag="extentSubject" attrs="xml:lang, encodinganalog, label"/>
+                            <elem tag="subjectConcept" elems="conceptID, term" attrs="sortorder"/>
+                            <elem tag="subjectActor" elems="displayActor, actor" singular="true"/>
+                            <elem tag="subjectDate" elems="displayDate, date" attrs="sortorder"/>
+                            <elem tag="subjectEvent" elems="displayEvent, event" attrs="sortorder"/>
+                            <elem tag="subjectPlace" elems="displayPlace, place" attrs="sortorder"/>
+                            <elem tag="subjectObject" elems="displayObject, object" attrs="sortorder"/>
+                        </elem>
+                    </elem>
+                </elem>
+
+                <elem tag="relatedWorksWrap" singular="true">
+                    <elem tag="relatedWorkSet" attrs="sortorder">
+                        <elem tag="relatedWork" elems="displayObject, object" singular="true"/>
+                        <elem tag="relatedWorkRelType" elems="conceptID, term" singular="true"/>
+                    </elem>
+                </elem>
+            </elem>
+        </elem>
+
+        <elem tag="administrativeMetadata" attrs="xml:lang" required="true">
+            <elem tag="rightsWorkWrap" singular="true">
+                <elem tag="rightsWorkSet" elems="rightsType, rightsDate, rightsHolder, creditLine" attrs="sortorder" singular="true"/>
+            </elem>
+            <elem tag="recordWrap" singular="true">
+                <elem tag="recordID" attrs="pref, type, source, encodinganalog, label" required="true"/>
+                <elem tag="recordType" elems="conceptID, term" required="true" singular="true"/>
+                <elem tag="recordSource" elems="legalBodyID, legalBodyName, legalBodyWeblink" attrs="type, sortorder"/>
+                <elem tag="recordRights" elems="rightsType, rightsDate, rightsHolder, creditLine" />
+                <elem tag="recordInfoSet" attrs="type">
+                    <elem tag="recordInfoID" attrs="pref, type, source, encodinganalog, label"/>
+                    <elem tag="recordInfoLink" attrs="pref, formatResource,xml:lang, encodinganalog, label"/>
+                    <elem tag="recordMetadataDate" attrs="type,source"/>
+                </elem>
+            </elem>
+            <elem tag="resourceWrap" singular="true">
+                <elem tag="resourceSet" attrs="sortorder">
+                    <elem tag="resourceID" attrs="pref, type, source, encodinganalog, label" singular="true"/>
+                    <elem tag="resourceRepresentation" attrs="type">
+                        <elem tag="linkResource" attrs="codecResource" required="true" singular="true"/>
+                        <elem tag="resourceMeasurementsSet" elems="measurementType, measurementUnit, measurementValue" />
+                    </elem>
+                    <elem tag="resourceType" elems="conceptID, term" singular="true"/>
+                    <elem tag="resourceRelType" elems="conceptID, term" singular="true"/>
+                    <elem tag="resourcePerspective" elems="conceptID, term"/>
+                    <elem tag="resourceDescription" attrs="type, sortorder"/>
+                    <elem tag="resourceSource" elems="legalBodyID, legalBodyName, legalBodyWeblink" attrs="type, sortorder"/>
+                    <elem tag="rightsResource" elems="rightsType, rightsDate, rightsHolder, creditLine" singular="true"/>
+                </elem>
+            </elem>
+        </elem>
+
+    </root>
+
+</record-definition>

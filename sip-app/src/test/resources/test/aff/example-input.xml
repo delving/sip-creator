@@ -1,0 +1,547 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+<lido:lidoWrap xmlns:lido="http://www.lido-schema.org">
+    <lido:lido>
+        <lido:lidoRecID lido:type="local"
+                        lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg">DE-Mb112/lido/obj/00000001</lido:lidoRecID>
+        <lido:category>
+            <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
+            <lido:term xml:lang="eng">Man-Made Object</lido:term>
+        </lido:category>
+        <lido:descriptiveMetadata xml:lang="deu">
+            <lido:objectClassificationWrap>
+                <lido:objectWorkTypeWrap>
+                    <lido:objectWorkType lido:type="Sachbegriff">
+                        <lido:term>Bild</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Bildwerk</lido:term>
+                    </lido:objectWorkType>
+                </lido:objectWorkTypeWrap>
+                <lido:classificationWrap>
+                    <lido:classification lido:type="Gattung">
+                        <lido:term>Tafelmalerei</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Malerei</lido:term>
+                    </lido:classification>
+                </lido:classificationWrap>
+            </lido:objectClassificationWrap>
+            <lido:objectIdentificationWrap>
+                <lido:titleWrap>
+                    <lido:titleSet>
+                        <lido:appellationValue lido:pref="preferred">Via San Giovanni in Laterano mit
+                            Blick auf das Kolosseum
+                        </lido:appellationValue>
+                    </lido:titleSet>
+                </lido:titleWrap>
+                <lido:repositoryWrap>
+                    <lido:repositorySet lido:type="current">
+                        <lido:repositoryName>
+                            <lido:legalBodyName>
+                                <lido:appellationValue>Museen der Stadt Aachen — Suermondt-Ludwig-Museum
+                                    (Aachen)
+                                </lido:appellationValue>
+                            </lido:legalBodyName>
+                        </lido:repositoryName>
+                        <lido:workID lido:type="Inventarnummer">4</lido:workID>
+                        <lido:repositoryLocation>
+                            <lido:placeID lido:type="local" lido:source="TGN">7004799</lido:placeID>
+                            <lido:namePlaceSet>
+                                <lido:appellationValue>Aachen</lido:appellationValue>
+                            </lido:namePlaceSet>
+                            <lido:partOfPlace lido:politicalEntity="Kreis">
+                                <lido:namePlaceSet>
+                                    <lido:appellationValue>kreisfrei</lido:appellationValue>
+                                </lido:namePlaceSet>
+                                <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
+                                    <lido:namePlaceSet>
+                                        <lido:appellationValue>Aachen, Regierungsbezirk
+                                        </lido:appellationValue>
+                                    </lido:namePlaceSet>
+                                    <lido:partOfPlace lido:politicalEntity="Bundesland">
+                                        <lido:namePlaceSet>
+                                            <lido:appellationValue>Nordrhein-Westfalen
+                                            </lido:appellationValue>
+                                        </lido:namePlaceSet>
+                                        <lido:partOfPlace lido:politicalEntity="Staat">
+                                            <lido:namePlaceSet>
+                                                <lido:appellationValue>Deutschland
+                                                </lido:appellationValue>
+                                            </lido:namePlaceSet>
+                                        </lido:partOfPlace>
+                                    </lido:partOfPlace>
+                                </lido:partOfPlace>
+                            </lido:partOfPlace>
+                        </lido:repositoryLocation>
+                    </lido:repositorySet>
+                </lido:repositoryWrap>
+                <lido:objectMeasurementsWrap>
+                    <lido:objectMeasurementsSet>
+                        <lido:displayObjectMeasurements>Höhe x Breite: 130 x 110 cm
+                        </lido:displayObjectMeasurements>
+                        <lido:objectMeasurements>
+                            <lido:measurementsSet>
+                                <lido:measurementType>Höhe x Breite</lido:measurementType>
+                                <lido:measurementUnit>cm</lido:measurementUnit>
+                                <lido:measurementValue>130 x 110</lido:measurementValue>
+                            </lido:measurementsSet>
+                        </lido:objectMeasurements>
+                    </lido:objectMeasurementsSet>
+                </lido:objectMeasurementsWrap>
+            </lido:objectIdentificationWrap>
+            <lido:eventWrap>
+                <lido:eventSet>
+                    <lido:event>
+                        <lido:eventType>
+                            <lido:term>Herstellung</lido:term>
+                            <lido:term lido:addedSearchTerm="yes">Herstellung</lido:term>
+                        </lido:eventType>
+                        <lido:eventActor>
+                            <lido:actorInRole>
+                                <lido:actor lido:type="person">
+                                    <lido:actorID lido:type="local" lido:source="Bildindex-KUE-Datei">
+                                        kue/02530967
+                                    </lido:actorID>
+                                    <lido:nameActorSet>
+                                        <lido:appellationValue lido:pref="preferred">Achenbach, Andreas
+                                        </lido:appellationValue>
+                                    </lido:nameActorSet>
+                                    <lido:nationalityActor>
+                                        <lido:term>Deutschland</lido:term>
+                                    </lido:nationalityActor>
+                                    <lido:vitalDatesActor>
+                                        <lido:earliestDate lido:type="birthDate">1815-09-29
+                                        </lido:earliestDate>
+                                        <lido:latestDate lido:type="deathDate">1910-04-01
+                                        </lido:latestDate>
+                                    </lido:vitalDatesActor>
+                                    <lido:genderActor>männlich</lido:genderActor>
+                                </lido:actor>
+                                <lido:roleActor>
+                                    <lido:term>Maler</lido:term>
+                                </lido:roleActor>
+                            </lido:actorInRole>
+                        </lido:eventActor>
+                        <lido:eventDate>
+                            <lido:displayDate>1875</lido:displayDate>
+                            <lido:date>
+                                <lido:earliestDate>1875</lido:earliestDate>
+                                <lido:latestDate>1875</lido:latestDate>
+                            </lido:date>
+                        </lido:eventDate>
+                        <lido:eventMaterialsTech>
+                            <lido:materialsTech>
+                                <lido:termMaterialsTech lido:type="Material">
+                                    <lido:term>Öl</lido:term>
+                                    <lido:term lido:addedSearchTerm="yes">Farbmaterial</lido:term>
+                                </lido:termMaterialsTech>
+                            </lido:materialsTech>
+                        </lido:eventMaterialsTech>
+                        <lido:eventMaterialsTech>
+                            <lido:materialsTech>
+                                <lido:termMaterialsTech lido:type="Material">
+                                    <lido:term>Leinwand</lido:term>
+                                    <lido:term lido:addedSearchTerm="yes">Textil</lido:term>
+                                </lido:termMaterialsTech>
+                            </lido:materialsTech>
+                        </lido:eventMaterialsTech>
+                    </lido:event>
+                </lido:eventSet>
+            </lido:eventWrap>
+            <lido:objectRelationWrap>
+                <lido:subjectWrap>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/11Q758
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">11 Q 75 8</lido:term>
+                                <lido:term lido:pref="alternative">Prozessionen in der christlichen
+                                    Religion
+                                </lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/11P31521
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">11 P 31 52 1</lido:term>
+                                <lido:term lido:pref="alternative">Mönch(e), Klosterbrüder</lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/25I141:
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">25 I 14 1 :</lido:term>
+                                <lido:term lido:pref="alternative">Straße</lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/61F(VIA SAN GIOVANNI IN LATERANO)
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">61 F (VIA SAN GIOVANNI IN LATERANO)
+                                </lido:term>
+                                <lido:term lido:pref="alternative">Namen historischer Gebäude,
+                                    Örtlichkeiten, Straßen, etc. (mit NAMEN)
+                                </lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/61E(ROMA)
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">61 E (ROMA)</lido:term>
+                                <lido:term lido:pref="alternative">Namen von Städten und Dörfern (mit
+                                    NAMEN)
+                                </lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/43C8:
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">43 C 8 :</lido:term>
+                                <lido:term lido:pref="alternative">Plätze, Anlagen, Einrichtungen für
+                                    Sport, Spiele und körperliche Freizeitbeschäftigungen
+                                </lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/61F(KOLOSSEUM)
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">61 F (KOLOSSEUM)</lido:term>
+                                <lido:term lido:pref="alternative">Namen historischer Gebäude,
+                                    Örtlichkeiten, Straßen, etc. (mit NAMEN)
+                                </lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                </lido:subjectWrap>
+                <lido:relatedWorksWrap>
+                    <lido:relatedWorkSet>
+                        <lido:relatedWork>
+                            <lido:object>
+                                <lido:objectID lido:type="local" lido:source="Bildindex-LIT-Datei">
+                                    lit/05017576
+                                </lido:objectID>
+                                <lido:objectNote lido:type="Kurztitel">Achenbach, Andreas u. Oswald,
+                                    Düsseld.-Hamburg-Linz, 1997-98, S. 132
+                                </lido:objectNote>
+                            </lido:object>
+                        </lido:relatedWork>
+                        <lido:relatedWorkRelType>
+                            <lido:term>dokumentiert in</lido:term>
+                        </lido:relatedWorkRelType>
+                    </lido:relatedWorkSet>
+                </lido:relatedWorksWrap>
+            </lido:objectRelationWrap>
+        </lido:descriptiveMetadata>
+        <lido:administrativeMetadata xml:lang="deu">
+            <lido:recordWrap>
+                <lido:recordID lido:type="local">obj/00000001</lido:recordID>
+                <lido:recordType>
+                    <lido:term>Einzelobjekt</lido:term>
+                </lido:recordType>
+                <lido:recordSource>
+                    <lido:legalBodyName>
+                        <lido:appellationValue>Foto Marburg</lido:appellationValue>
+                    </lido:legalBodyName>
+                </lido:recordSource>
+                <lido:recordRights>
+                    <lido:rightsHolder>
+                        <lido:legalBodyName>
+                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
+                        </lido:legalBodyName>
+                    </lido:rightsHolder>
+                </lido:recordRights>
+                <lido:recordInfoSet>
+                    <lido:recordInfoLink lido:formatResource="html">
+                        http://www.bildindex.de/dokumente/html/obj00000001
+                    </lido:recordInfoLink>
+                </lido:recordInfoSet>
+            </lido:recordWrap>
+            <lido:resourceWrap>
+                <lido:resourceSet>
+                    <lido:resourceID lido:type="local">192.356</lido:resourceID>
+                    <lido:resourceRepresentation lido:type="image_thumb">
+                        <lido:linkResource lido:formatResource="jpg">
+                            http://www.bildindex.de/bilder/mi00012a01b.jpg
+                        </lido:linkResource>
+                    </lido:resourceRepresentation>
+                    <lido:resourceType>
+                        <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
+                    </lido:resourceType>
+                    <lido:resourceDateTaken>
+                        <lido:displayDate>1945/1946</lido:displayDate>
+                    </lido:resourceDateTaken>
+                    <lido:resourceSource lido:type="Fotoverwalter">
+                        <lido:legalBodyName>
+                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
+                        </lido:legalBodyName>
+                    </lido:resourceSource>
+                    <lido:rightsResource>
+                        <lido:rightsHolder>
+                            <lido:legalBodyName>
+                                <lido:appellationValue>Foto Marburg</lido:appellationValue>
+                            </lido:legalBodyName>
+                        </lido:rightsHolder>
+                    </lido:rightsResource>
+                </lido:resourceSet>
+            </lido:resourceWrap>
+        </lido:administrativeMetadata>
+    </lido:lido>
+    <lido:lido>
+        <lido:lidoRecID lido:type="local"
+                        lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg">
+            DE-Mb112/lido/obj/00000002
+        </lido:lidoRecID>
+        <lido:category>
+            <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
+            <lido:term xml:lang="eng">Man-Made Object</lido:term>
+        </lido:category>
+        <lido:descriptiveMetadata xml:lang="deu">
+            <lido:objectClassificationWrap>
+                <lido:objectWorkTypeWrap>
+                    <lido:objectWorkType lido:type="Sachbegriff">
+                        <lido:term>Bild</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Bildwerk</lido:term>
+                    </lido:objectWorkType>
+                </lido:objectWorkTypeWrap>
+                <lido:classificationWrap>
+                    <lido:classification lido:type="Gattung">
+                        <lido:term>Tafelmalerei</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Malerei</lido:term>
+                    </lido:classification>
+                </lido:classificationWrap>
+            </lido:objectClassificationWrap>
+            <lido:objectIdentificationWrap>
+                <lido:titleWrap>
+                    <lido:titleSet>
+                        <lido:appellationValue lido:pref="preferred">Marktszene</lido:appellationValue>
+                    </lido:titleSet>
+                </lido:titleWrap>
+                <lido:repositoryWrap>
+                    <lido:repositorySet lido:type="current">
+                        <lido:repositoryName>
+                            <lido:legalBodyName>
+                                <lido:appellationValue>Museen der Stadt Aachen — Suermondt-Ludwig-Museum
+                                    (Aachen)
+                                </lido:appellationValue>
+                            </lido:legalBodyName>
+                        </lido:repositoryName>
+                        <lido:workID lido:type="Inventarnummer">11</lido:workID>
+                        <lido:repositoryLocation>
+                            <lido:placeID lido:type="local" lido:source="TGN">7004799</lido:placeID>
+                            <lido:namePlaceSet>
+                                <lido:appellationValue>Aachen</lido:appellationValue>
+                            </lido:namePlaceSet>
+                            <lido:partOfPlace lido:politicalEntity="Kreis">
+                                <lido:namePlaceSet>
+                                    <lido:appellationValue>kreisfrei</lido:appellationValue>
+                                </lido:namePlaceSet>
+                                <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
+                                    <lido:namePlaceSet>
+                                        <lido:appellationValue>Aachen, Regierungsbezirk
+                                        </lido:appellationValue>
+                                    </lido:namePlaceSet>
+                                    <lido:partOfPlace lido:politicalEntity="Bundesland">
+                                        <lido:namePlaceSet>
+                                            <lido:appellationValue>Nordrhein-Westfalen
+                                            </lido:appellationValue>
+                                        </lido:namePlaceSet>
+                                        <lido:partOfPlace lido:politicalEntity="Staat">
+                                            <lido:namePlaceSet>
+                                                <lido:appellationValue>Deutschland
+                                                </lido:appellationValue>
+                                            </lido:namePlaceSet>
+                                        </lido:partOfPlace>
+                                    </lido:partOfPlace>
+                                </lido:partOfPlace>
+                            </lido:partOfPlace>
+                        </lido:repositoryLocation>
+                    </lido:repositorySet>
+                </lido:repositoryWrap>
+                <lido:objectMeasurementsWrap>
+                    <lido:objectMeasurementsSet>
+                        <lido:displayObjectMeasurements>Höhe x Breite: 69 x 135 cm
+                        </lido:displayObjectMeasurements>
+                        <lido:objectMeasurements>
+                            <lido:measurementsSet>
+                                <lido:measurementType>Höhe x Breite</lido:measurementType>
+                                <lido:measurementUnit>cm</lido:measurementUnit>
+                                <lido:measurementValue>69 x 135</lido:measurementValue>
+                            </lido:measurementsSet>
+                        </lido:objectMeasurements>
+                    </lido:objectMeasurementsSet>
+                </lido:objectMeasurementsWrap>
+            </lido:objectIdentificationWrap>
+            <lido:eventWrap>
+                <lido:eventSet>
+                    <lido:event>
+                        <lido:eventType>
+                            <lido:term>Herstellung</lido:term>
+                            <lido:term lido:addedSearchTerm="yes">Herstellung</lido:term>
+                        </lido:eventType>
+                        <lido:eventActor>
+                            <lido:actorInRole>
+                                <lido:actor lido:type="person">
+                                    <lido:actorID lido:type="local" lido:source="Bildindex-KUE-Datei">
+                                        kue/02553237
+                                    </lido:actorID>
+                                    <lido:nameActorSet>
+                                        <lido:appellationValue lido:pref="preferred">Aertsen, Pieter
+                                        </lido:appellationValue>
+                                    </lido:nameActorSet>
+                                    <lido:nameActorSet>
+                                        <lido:appellationValue lido:pref="alternative">Aertsz, Pieter
+                                        </lido:appellationValue>
+                                    </lido:nameActorSet>
+                                    <lido:nameActorSet>
+                                        <lido:appellationValue lido:pref="alternative">Aertszone, Pieter
+                                        </lido:appellationValue>
+                                    </lido:nameActorSet>
+                                    <lido:nameActorSet>
+                                        <lido:appellationValue lido:pref="alternative">Lange Pier
+                                        </lido:appellationValue>
+                                    </lido:nameActorSet>
+                                    <lido:nationalityActor>
+                                        <lido:term>Niederlande</lido:term>
+                                    </lido:nationalityActor>
+                                    <lido:vitalDatesActor>
+                                        <lido:earliestDate lido:type="birthDate">1508
+                                        </lido:earliestDate>
+                                        <lido:latestDate lido:type="deathDate">1575-06-02
+                                        </lido:latestDate>
+                                    </lido:vitalDatesActor>
+                                    <lido:genderActor>männlich</lido:genderActor>
+                                </lido:actor>
+                                <lido:roleActor>
+                                    <lido:term>Maler</lido:term>
+                                </lido:roleActor>
+                            </lido:actorInRole>
+                        </lido:eventActor>
+                        <lido:eventDate>
+                            <lido:displayDate>1559?</lido:displayDate>
+                            <lido:date>
+                                <lido:earliestDate>1559</lido:earliestDate>
+                                <lido:latestDate>1559</lido:latestDate>
+                            </lido:date>
+                        </lido:eventDate>
+                        <lido:eventMaterialsTech>
+                            <lido:materialsTech>
+                                <lido:termMaterialsTech lido:type="Material">
+                                    <lido:term>Öl</lido:term>
+                                    <lido:term lido:addedSearchTerm="yes">Farbmaterial</lido:term>
+                                </lido:termMaterialsTech>
+                            </lido:materialsTech>
+                        </lido:eventMaterialsTech>
+                        <lido:eventMaterialsTech>
+                            <lido:materialsTech>
+                                <lido:termMaterialsTech lido:type="Material">
+                                    <lido:term>Eichenholz</lido:term>
+                                    <lido:term lido:addedSearchTerm="yes">Holz</lido:term>
+                                </lido:termMaterialsTech>
+                            </lido:materialsTech>
+                        </lido:eventMaterialsTech>
+                    </lido:event>
+                </lido:eventSet>
+            </lido:eventWrap>
+            <lido:objectRelationWrap>
+                <lido:subjectWrap>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/46B11
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">46 B 11</lido:term>
+                                <lido:term lido:pref="alternative">Markt</lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                    <lido:subjectSet>
+                        <lido:subject lido:type="Ikonographie">
+                            <lido:subjectConcept>
+                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
+                                    http://iconclass.org/41C6
+                                </lido:conceptID>
+                                <lido:term lido:pref="preferred">41 C 6</lido:term>
+                                <lido:term lido:pref="alternative">Lebensmittel; Stilleben mit
+                                    Lebensmitteln
+                                </lido:term>
+                            </lido:subjectConcept>
+                        </lido:subject>
+                    </lido:subjectSet>
+                </lido:subjectWrap>
+            </lido:objectRelationWrap>
+        </lido:descriptiveMetadata>
+        <lido:administrativeMetadata xml:lang="deu">
+            <lido:recordWrap>
+                <lido:recordID lido:type="local">obj/00000002</lido:recordID>
+                <lido:recordType>
+                    <lido:term>Einzelobjekt</lido:term>
+                </lido:recordType>
+                <lido:recordSource>
+                    <lido:legalBodyName>
+                        <lido:appellationValue>Foto Marburg</lido:appellationValue>
+                    </lido:legalBodyName>
+                </lido:recordSource>
+                <lido:recordRights>
+                    <lido:rightsHolder>
+                        <lido:legalBodyName>
+                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
+                        </lido:legalBodyName>
+                    </lido:rightsHolder>
+                </lido:recordRights>
+                <lido:recordInfoSet>
+                    <lido:recordInfoLink lido:formatResource="html">
+                        http://www.bildindex.de/dokumente/html/obj00000002
+                    </lido:recordInfoLink>
+                </lido:recordInfoSet>
+            </lido:recordWrap>
+            <lido:resourceWrap>
+                <lido:resourceSet>
+                    <lido:resourceID lido:type="local">192.357</lido:resourceID>
+                    <lido:resourceRepresentation lido:type="image_thumb">
+                        <lido:linkResource lido:formatResource="jpg">
+                            http://www.bildindex.de/bilder/mi00012a02b.jpg
+                        </lido:linkResource>
+                    </lido:resourceRepresentation>
+                    <lido:resourceType>
+                        <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
+                    </lido:resourceType>
+                    <lido:resourceSource lido:type="Fotoverwalter">
+                        <lido:legalBodyName>
+                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
+                        </lido:legalBodyName>
+                    </lido:resourceSource>
+                    <lido:rightsResource>
+                        <lido:rightsHolder>
+                            <lido:legalBodyName>
+                                <lido:appellationValue>Foto Marburg</lido:appellationValue>
+                            </lido:legalBodyName>
+                        </lido:rightsHolder>
+                    </lido:rightsResource>
+                </lido:resourceSet>
+            </lido:resourceWrap>
+        </lido:administrativeMetadata>
+    </lido:lido>
+</lido:lidoWrap>

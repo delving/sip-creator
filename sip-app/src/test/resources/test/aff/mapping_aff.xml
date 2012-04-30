@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="aff">
+    <facts>
+        <entry>
+            <string>spec</string>
+            <string>HolyData</string>
+        </entry>
+        <entry>
+            <string>dataProvider</string>
+            <string>Pope</string>
+        </entry>
+        <entry>
+            <string>name</string>
+            <string>Secret</string>
+        </entry>
+        <entry>
+            <string>rights</string>
+            <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
+        </entry>
+        <entry>
+            <string>provider</string>
+            <string>The Vaticanm</string>
+        </entry>
+        <entry>
+            <string>language</string>
+            <string>it</string>
+        </entry>
+        <entry>
+            <string>type</string>
+            <string>IMAGE</string>
+        </entry>
+        <entry>
+            <string>country</string>
+            <string>Vatican</string>
+        </entry>
+    </facts>
+    <node-mappings>
+        <node-mapping inputPath="/facts/dataProvider" outputPath="/aff:record/aff:admin/aff:displayDataProvider"/>
+        <node-mapping inputPath="/facts/provider" outputPath="/aff:record/aff:admin/aff:displayProvider"/>
+        <node-mapping inputPath="/facts/language" outputPath="/aff:record/aff:thing/@aff:lang"/>
+        <node-mapping inputPath="/input/lido:lidoRecID" outputPath="/aff:record/aff:thing/aff:uri"/>
+        <node-mapping inputPath="/input/lido:lidoRecID" outputPath="/aff:record/aff:thing/aff:displayIdentification"/>
+    </node-mappings>
+</rec-mapping>
+

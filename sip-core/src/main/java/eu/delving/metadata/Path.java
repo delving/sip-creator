@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 DELVING BV
+ * Copyright 2011, 2012 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -21,80 +21,129 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+
 import java.io.Serializable;
-import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * A path consisting of a stack of instances of QName, representing the paths
- * of elements that came from the analysis process.
+ * A very frequently used class which stores a stack of Tag instances, which
+ * correspond to a QName's prefix and localPart, and which can be either
+ * for an element or an attribute.
+ * <p/>
+ * The string representation is cached for efficiency, since it is used a lot.
+ * <p/>
+ * There is a static converter class at the bottom so that these things can be
+ * used easily in XStream.
  *
- * @author Gerald de Jong, Delving BV, <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
+@XStreamAlias("path")
 public class Path implements Comparable<Path>, Serializable {
-    private Stack<Tag> stack = new Stack<Tag>();
+    private static final Pattern PAT = Pattern.compile("/([^\\[/]*)(\\[([^\\]]*)\\])?");
+    private static final Path ROOT = new Path();
+    private Path parent;
+    private Tag tag;
     private String string;
 
-    public Path() {
+    public static Path create() {
+        return ROOT;
     }
 
-    public Path(String pathString) {
-        if (pathString != null) {
-            if (!pathString.startsWith("/")) {
-                pathString = "/" + pathString;
+    public static Path create(String pathString) {
+        if (pathString == null) return create();
+        if (!pathString.startsWith("/")) pathString = "/" + pathString;
+        Path path = create();
+        Matcher matcher = PAT.matcher(pathString);
+        while (matcher.find()) {
+            String part = matcher.group(0).substring(1);
+            int at = part.indexOf("@");
+            if (at > 0) throw new IllegalArgumentException(String.format("@ only at the beginning '%s' in path %s", part, pathString));
+            Tag newTag;
+            if (at == 0) {
+                newTag = Tag.attribute(part.substring(1));
             }
-            for (String part : pathString.substring(1).split("/")) {
-                int at = part.indexOf("@");
-                if (at > 0) {
-                    String element = part.substring(0, at);
-                    String attribute = part.substring(at + 1);
-                    stack.push(Tag.element(element));
-                    stack.push(Tag.attribute(attribute));
-                }
-                else {
-                    stack.push(Tag.element(part));
-                }
+            else {
+                newTag = Tag.element(part);
             }
+            newTag.inContextOf(path);
+            path = path.child(newTag);
+        }
+        return path;
+    }
+
+    private Path() {
+    }
+
+    private Path(Path parent, Tag tag) {
+        this.parent = parent;
+        this.tag = tag;
+    }
+
+    // modifiers
+
+    public Path child(Tag newTag) {
+        return new Path(this, newTag);
+    }
+
+    public Path parent() {
+        return parent;
+    }
+
+    public Path withDefaultPrefix(String prefix) {
+        if (parent.isEmpty()) {
+            return parent.child(tag.defaultPrefix(prefix));
+        }
+        else {
+            return parent.withDefaultPrefix(prefix).child(tag.defaultPrefix(prefix));
         }
     }
 
-    public Path(Path path) {
-        if (path.stack != null) {
-            for (Tag name : path.stack) {
-                stack.push(name);
-            }
+    public Path takeFirst(int count) {
+        return size() > count ? parent.takeFirst(count) : this;
+    }
+
+    public Path takeFirst() {
+        Path ancestor = this.parent;
+        while (!ancestor.isEmpty()) ancestor = ancestor.parent;
+        return ancestor;
+    }
+
+    public Path withRootRemoved() {
+        if (parent == null || parent.parent == null) throw new RuntimeException("Cannot remove root");
+        if (parent.parent.isEmpty()) {
+            return create().child(tag);
+        }
+        else {
+            return parent.withRootRemoved().child(tag);
         }
     }
 
-    public Path(Path path, int count) {
-        for (Tag name : path.stack) {
-            if (count-- > 0) {
-                stack.push(name);
-            }
+    public Path extendAncestor(Path ancestor) {
+        if (equals(ancestor)) {
+            return create().child(ancestor.peek());
+        }
+        else {
+            return parent.extendAncestor(ancestor).child(tag);
         }
     }
 
-    public Path extend(Tag tag) {
-        Path extended = new Path(this);
-        extended.push(tag);
-        return extended;
+    // getters
+
+    public boolean isFamilyOf(Path other) {
+        return equals(other) || this.isAncestorOf(other) || other.isAncestorOf(this);
     }
 
-    public void push(Tag tag) {
-        stack.push(tag);
-        string = null;
-    }
-
-    public Path pop() {
-        stack.pop();
-        string = null;
-        return this;
+    public boolean isAncestorOf(Path other) {
+        return !other.isEmpty() && !isEmpty() && (equals(other.parent) || isAncestorOf(other.parent()));
     }
 
     @Override
     public boolean equals(Object path) {
-        if (path == null || !(path instanceof Path)) return false;
-        return toString().equals(path.toString());
+        return !(path == null || !(path instanceof Path)) && toString().equals(path.toString());
     }
 
     @Override
@@ -103,38 +152,72 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     @Override
-    public int compareTo(Path path) {
-        return toString().compareTo(path.toString());
+    public int compareTo(Path that) {
+        if (this.isEmpty() && that.isEmpty()) return 0;
+        else if (this.isEmpty()) return -1;
+        else if (that.isEmpty()) return 1;
+        if (this.parent.isEmpty() && that.parent.isEmpty()) {
+            int comparison = this.tag.compareTo(that.tag);
+            if (comparison != 0) return comparison;
+        }
+        else if (this.parent.isEmpty()) {
+            int comparison = this.compareTo(that.parent);
+            if (comparison != 0) return comparison;
+        }
+        else if (that.parent.isEmpty()) {
+            int comparison = this.parent.compareTo(that);
+            if (comparison != 0) return comparison;
+        }
+        int comparison = this.parent.compareTo(that.parent);
+        if (comparison != 0) return comparison;
+        return this.tag.compareTo(that.tag);
     }
 
     public Tag getTag(int level) {
-        if (level < stack.size()) {
-            return stack.get(level);
-        }
-        else {
-            return null;
-        }
+        int ourLevel = getLevel();
+        if (ourLevel < level) return null;
+        if (ourLevel == level) return tag;
+        return parent.getTag(level);
     }
 
     public Tag peek() {
-        if (stack.isEmpty()) {
-            return null;
-        }
-        return stack.peek();
+        return tag;
+    }
+
+    public int getLevel() {
+        if (isEmpty()) return -1;
+        return parent.getLevel() + 1;
+    }
+
+    public String getTail() {
+        return peek().toString();
+    }
+
+    public boolean isEmpty() {
+        return tag == null;
     }
 
     public int size() {
-        return stack.size();
+        if (parent != null) return parent.size() + 1;
+        return 0;
     }
 
     public String toString() {
-        if (string == null) {
-            StringBuilder builder = new StringBuilder(150);
-            for (Tag tag : stack) {
-                builder.append(tag.toPathElement());
-            }
-            string = builder.toString();
-        }
+        if (tag == null) return "";
+        if (string == null) string = parent.toString() + tag.toPathElement();
         return string;
+    }
+
+    public static class Converter extends AbstractSingleValueConverter {
+
+        @Override
+        public boolean canConvert(Class type) {
+            return Path.class.equals(type);
+        }
+
+        @Override
+        public Object fromString(String str) {
+            return create(str);
+        }
     }
 }

@@ -1,0 +1,65 @@
+<_id>36</_id>
+<priref>36</priref>
+<edit_source>collect&gt;intern</edit_source>
+<edit_source>collect&gt;intern</edit_source>
+<edit_source>collect&gt;intern</edit_source>
+<input_source>Schilder</input_source>
+<edit_time>11:10:40</edit_time>
+<edit_time>13:43:22</edit_time>
+<edit_time>11:32:32</edit_time>
+<creator_history/>
+<edit_name>daniel</edit_name>
+<edit_name>daniel</edit_name>
+<edit_name>fredau</edit_name>
+<input_name>Conversie AIS</input_name>
+<creator_date_of_death>1900</creator_date_of_death>
+<creator_date_of_birth>2000</creator_date_of_birth>
+<edit_date>2006-08-09</edit_date>
+<edit_date>2005-09-28</edit_date>
+<edit_date>2005-06-21</edit_date>
+<input_date>2004-12-17</input_date>
+<dimension_value>50.7</dimension_value>
+<dimension_value>40.3</dimension_value>
+<acquisition_method>schenking</acquisition_method>
+<creator>onbekend</creator>
+<acquisition_source>Wicheren, mej. M.A.J. van</acquisition_source>
+<acquisition_date>1985</acquisition_date>
+<condition>goed</condition>
+<title>Portret van Pieter van Wicheren</title>
+<location>P02-96B</location>
+<location_date_start>2005-06-23</location_date_start>
+<number_of_parts>1</number_of_parts>
+<acquisition_place>Groningen</acquisition_place>
+<object_name>schilderij</object_name>
+<location_default>P02-96B</location_default>
+<material>olieverf</material>
+<material>doek</material>
+<location_check_date>2005-06-23</location_check_date>
+<location_check_name option="AT" value="AT">
+    <text language="0">AT</text>
+    <text language="1">AT</text>
+    <text language="2">AT</text>
+    <text language="3">AT</text>
+</location_check_name>
+<object_number>S1985-011</object_number>
+<inscription_notes>omstreeks</inscription_notes>
+<institution_code>0057</institution_code>
+<current_owner>Fries Museum</current_owner>
+<content_motif_general>portret</content_motif_general>
+<creator_role>vervaardiger</creator_role>
+<dimension_unit>cm</dimension_unit>
+<dimension_unit>cm</dimension_unit>
+<production_date_start>1845</production_date_start>
+<production_date_notes>omstreeks 1850</production_date_notes>
+<dimension_type>hoogte</dimension_type>
+<dimension_type>breedte</dimension_type>
+<production_date_end>1854</production_date_end>
+<institution_place/>
+<description>Busteportret.</description>
+<institution_name>Fries Museum</institution_name>
+<administration_name option="Schilderkunst tot 1925" value="Schilderkunst tot 1925">
+    <text language="0">Schilderkunst tot 1925</text>
+    <text language="1">Schilderkunst tot 1925</text>
+    <text language="2">Schilderkunst tot 1925</text>
+    <text language="3">Schilderkunst tot 1925</text>
+</administration_name>

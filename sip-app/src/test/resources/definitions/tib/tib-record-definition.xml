@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<record-definition prefix="tib" flat="true">
+
+    <namespaces>
+        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
+        <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
+        <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
+        <namespace prefix="tib" uri="http://www.tib.nl/schemas/tib/" schema="TIB-1.0.xsd"/>
+        <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
+    </namespaces>
+
+    <root tag="record">
+
+        <!-- tib -->
+        <elem tag="tib:citName"/>
+        <elem tag="tib:citOldId"/>
+        <elem tag="tib:thumbLarge"/>
+        <elem tag="tib:thumbSmall"/>
+        <elem tag="tib:collection"/>
+        <elem tag="tib:creatorRole"/>
+        <elem tag="tib:productionPeriod"/>
+        <elem tag="tib:productionStart"/>
+        <elem tag="tib:productionEnd"/>
+        <elem tag="tib:creatorBirthYear"/>
+        <elem tag="tib:creatorDeathYear"/>
+        <elem tag="tib:formatted"/>
+        <elem tag="tib:year"/>
+        <elem tag="tib:dimension"/>
+        <elem tag="tib:objectNumber"/>
+        <elem tag="tib:objectSoort"/>
+        <elem tag="tib:material"/>
+        <elem tag="tib:place"/>
+        <elem tag="tib:technique"/>
+        <elem tag="tib:date"/>
+        <elem tag="tib:collectionPart"/>
+        <elem tag="tib:person"/>
+        <elem tag="tib:region"/>
+        <elem tag="tib:event"/>
+        <elem tag="tib:theme"/>
+        <elem tag="tib:pageStart"/>
+        <elem tag="tib:pageEnd"/>
+        <elem tag="tib:pages"/>
+        <elem tag="tib:vindplaats"/>
+        <elem tag="tib:location"/>
+
+        <!-- dc -->
+        <elem tag="dc:contributor"/>            <!-- ESE 3.4 -->
+        <elem tag="dc:coverage"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:creator"/>                <!-- ESE 3.4 -->
+        <elem tag="dc:date"/>                   <!-- ESE 3.4 -->
+        <elem tag="dc:description"/>            <!-- ESE 3.4 -->
+        <elem tag="dc:format"/>                 <!-- ESE 3.4 -->
+        <elem tag="dc:identifier"/>             <!-- ESE 3.4 -->
+        <elem tag="dc:language"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:publisher"/>              <!-- ESE 3.4 -->
+        <elem tag="dc:relation"/>               <!-- ESE 3.4 -->
+        <elem tag="dc:rights"/>                 <!-- ESE 3.4 -->
+        <elem tag="dc:source"/>                 <!-- ESE 3.4 -->
+        <elem tag="dc:subject"/>                <!-- ESE 3.4 -->
+        <elem tag="dc:title"/>                  <!-- ESE 3.4 -->
+        <elem tag="dc:type"/>                   <!-- ESE 3.4 -->
+
+        <!-- dcterms -->
+        <elem tag="dcterms:alternative"/>       <!-- ESE 3.4 -->
+        <elem tag="dcterms:conformsTo"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:created"/>           <!-- ESE 3.4 -->
+        <elem tag="dcterms:extent"/>            <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasFormat"/>         <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasPart"/>           <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasVersion"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isFormatOf"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isPartOf"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:isReferencedBy"/>    <!-- ESE 3.4 -->
+        <elem tag="dcterms:isReplacedBy"/>      <!-- ESE 3.4 -->
+        <elem tag="dcterms:isRequiredBy"/>      <!-- ESE 3.4 -->
+        <elem tag="dcterms:isVersionOf"/>       <!-- ESE 3.4 -->
+        <elem tag="dcterms:issued"/>            <!-- ESE 3.4 -->
+        <elem tag="dcterms:medium"/>            <!-- ESE 3.4 -->
+        <elem tag="dcterms:provenance"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:references"/>        <!-- ESE 3.4 -->
+        <elem tag="dcterms:replaces"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:requires"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:spatial"/>           <!-- ESE 3.4 -->
+        <elem tag="dcterms:tableOfContents"/>   <!-- ESE 3.4 -->
+        <elem tag="dcterms:temporal"/>          <!-- ESE 3.4 -->
+        <elem tag="dcterms:rightsHolder"/>      <!-- NOT part of ESE 3.4 -->
+
+        <!-- europeana -->
+        <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:object"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
+        <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored"/>        <!-- ESE 3.4 -->
+        <elem tag="europeana:uri"/>             <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
+        <elem tag="europeana:language"/>        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
+        <elem tag="europeana:country"/>         <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
+        <elem tag="europeana:collectionName"/>  <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:collectionTitle"/> <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:source"/>          <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:year"/>          <!-- NOT part of ESE 3.4 -->
+
+        <!-- delving -->
+        <elem tag="delving:year"/>
+        <elem tag="delving:deepZoomUrl"/>
+        <elem tag="delving:fullTextObjectUrl"/>
+        <elem tag="delving:fullText"/>
+
+    </root>
+
+    <field-markers>
+        <!-- system fields -->
+        <field-marker name="CREATOR" path="/record/dc:creator"/>
+        <field-marker name="TITLE" path="/record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/record/dc:description"/>
+        <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
+
+        <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
+    </field-markers>
+
+</record-definition>
+
+

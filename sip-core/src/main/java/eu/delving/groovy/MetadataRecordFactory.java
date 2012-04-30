@@ -1,3 +1,24 @@
+/*
+ * Copyright 2011, 2012 Delving BV
+ *
+ *  Licensed under the EUPL, Version 1.0 or? as soon they
+ *  will be approved by the European Commission - subsequent
+ *  versions of the EUPL (the "Licence");
+ *  you may not use this work except in compliance with the
+ *  Licence.
+ *  You may obtain a copy of the Licence at:
+ *
+ *  http://ec.europa.eu/idabc/eupl
+ *
+ *  Unless required by applicable law or agreed to in
+ *  writing, software distributed under the Licence is
+ *  distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ *  express or implied.
+ *  See the Licence for the specific language governing
+ *  permissions and limitations under the Licence.
+ */
+
 package eu.delving.groovy;
 
 import com.ctc.wstx.exc.WstxParsingException;
@@ -13,9 +34,11 @@ import java.io.StringReader;
 import java.util.Map;
 
 /**
- * Fabricate metadata records
+ * When the MetadataRecord instances are not coming from the parse of an input file
+ * using the MetadataParser, they can be produced one by one using the fromXml method, which
+ * first cleverly wraps the record and then parses it.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class MetadataRecordFactory {
@@ -55,7 +78,12 @@ public class MetadataRecordFactory {
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                 QName attributeName = input.getAttributeName(walk);
-                                node.attributes().put(attributeName.getLocalPart(), input.getAttributeValue(walk));
+                                if (attributeName.getPrefix() == null || attributeName.getPrefix().isEmpty()) {
+                                    node.attributes().put(attributeName.getLocalPart(), input.getAttributeValue(walk));
+                                }
+                                else {
+                                    node.attributes().put(String.format("%s:%s", attributeName.getPrefix(), attributeName.getLocalPart()), input.getAttributeValue(walk));
+                                }
                             }
                         }
                         value.setLength(0);
@@ -65,14 +93,10 @@ public class MetadataRecordFactory {
                         value.append(input.getText());
                         break;
                     case XMLEvent.END_ELEMENT:
-                        if (node == null) {
-                            throw new RuntimeException("Node cannot be null");
-                        }
-                        String valueString = value.toString().replaceAll("\n", " ").replaceAll(" +", " ").trim();
+                        if (node == null) throw new RuntimeException("Node cannot be null");
+                        String valueString = value.toString().trim();
                         value.setLength(0);
-                        if (valueString.length() > 0) {
-                            node.setValue(valueString);
-                        }
+                        if (valueString.length() > 0) node.setValue(valueString);
                         node = node.parent();
                         break;
                     case XMLEvent.END_DOCUMENT: {

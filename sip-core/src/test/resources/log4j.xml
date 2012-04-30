@@ -9,7 +9,7 @@
     </appender>
     <root>
         <priority value="INFO"/>
-        <appender-ref ref="console"/>
+        <appender-marker marker="console"/>
     </root>
 </log4j:configuration>
 

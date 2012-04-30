@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011, 2012 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -21,22 +21,25 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.Sanitizer;
+import eu.delving.metadata.StringUtil;
 import groovy.lang.DelegatingMetaClass;
 import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
 import groovy.util.NodeList;
 import groovy.xml.QName;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
- * A simpler adaptation of groovy.util.Node
+ * A variation on the Groovy Node class which is used to store XML-like data
+ * in memory.
+ * <p/>
+ * Trimmed down from the original and with some added or modified functions to make
+ * it easier to use these as input variables in the mapping code.
+ * <p/>
+ * The MetadataParser produces records containing structures of these nodes.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 @SuppressWarnings("unchecked")
@@ -77,9 +80,7 @@ public class GroovyNode {
         this.qName = qName;
         this.attributes = attributes;
         this.value = value;
-        if (parent != null) {
-            getParentList(parent).add(this);
-        }
+        if (parent != null) getParentList(parent).add(this);
     }
 
     public String text() {
@@ -108,10 +109,8 @@ public class GroovyNode {
             if (buffer != null) {
                 return buffer.toString();
             }
-            else {
-                if (previousText != null) {
-                    return previousText;
-                }
+            else if (previousText != null) {
+                return previousText;
             }
         }
         return "";
@@ -137,14 +136,7 @@ public class GroovyNode {
     }
 
     public String name() {
-        if (stringName == null) {
-            if (qName.getPrefix().isEmpty()) {
-                stringName = Sanitizer.tagToVariable(qName.getLocalPart());
-            }
-            else {
-                stringName = qName.getPrefix() + "_" + Sanitizer.tagToVariable(qName.getLocalPart());
-            }
-        }
+        if (stringName == null) stringName = StringUtil.tagToVariable(qName.getPrefix() + qName.getLocalPart());
         return stringName;
     }
 
@@ -188,19 +180,21 @@ public class GroovyNode {
      */
     public Object get(String key) {
         if (key != null && key.charAt(0) == '@') {
-            String attributeName = key.substring(1);
-            return attributes().get(attributeName);
+            List answer = new ArrayList();
+            String value = attributes().get(key.substring(1));
+            if (value != null) answer.add(value);
+            return answer;
         }
-        if ("..".equals(key)) {
-            return parent();
-        }
-        if ("*".equals(key)) {
-            return children();
-        }
-        if ("_".equals(key)) {
-            return getValueNodes();
+        if ("*".equals(key)) return children();
+        if (key != null && key.endsWith("_")) {
+            List<Object> valueNodes = getValueNodes(key.substring(0, key.length()-1));
+            return valueNodes.isEmpty() ? "" : valueNodes.get(0);
         }
         return getByName(key);
+    }
+
+    public boolean equals(Object other) {
+        return other != null && toString().equals(other.toString());
     }
 
     public String toString() {
@@ -228,39 +222,31 @@ public class GroovyNode {
         for (Object child : children()) {
             if (child instanceof GroovyNode) {
                 GroovyNode childNode = (GroovyNode) child;
-                if (childNode.value() instanceof List && ((List) childNode.value).isEmpty()) {
-                    continue;
-                }
-                if (name.equals(childNode.name())) {
-                    answer.add(childNode);
-                }
+                if (name.equals(childNode.name())) answer.add(childNode);
             }
         }
         return answer;
     }
 
-    private List<Object> getValueNodes() {
+    private List<Object> getValueNodes(String name) {
         List answer = new NodeList();
-        getValueNodes(answer);
+        getValueNodes(name, answer);
         return answer;
     }
 
-    private void getValueNodes(List answer) {
+    private void getValueNodes(String name, List answer) {
         if (value instanceof List) {
             for (Object object : ((List) value)) {
                 if (object instanceof GroovyNode) {
-                    ((GroovyNode) object).getValueNodes(answer);
+                    ((GroovyNode) object).getValueNodes(name, answer);
                 }
                 else {
-                    getValueNodes((List) object);
+                    getValueNodes(name, (List) object);
                 }
             }
         }
-        else if (value instanceof String && !((String) value).trim().isEmpty()) {
-            answer.add(this);
-        }
-        else {
-            throw new RuntimeException(value.getClass().getName());
+        else if (name.equals(this.name())) {
+            if (value instanceof String && !((String) value).trim().isEmpty()) answer.add(this);
         }
     }
 

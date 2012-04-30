@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2011, 2012 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -21,96 +21,85 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.NamespaceDefinition;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecordDefinition;
-import eu.delving.metadata.RecordMapping;
-import groovy.lang.*;
-import groovy.util.Node;
-import groovy.util.NodeBuilder;
-import groovy.xml.NamespaceBuilder;
+import eu.delving.metadata.EditPath;
+import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.RecMapping;
+import groovy.lang.Binding;
+import groovy.lang.MissingPropertyException;
+import groovy.lang.Script;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
 import org.codehaus.groovy.syntax.SyntaxException;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class takes code, a record, and produces a record, using the code
- * as the mapping.
+ * This core class takes a RecMapping and execute the code that it can generate to
+ * transform an input to output in the form of a tree of Groovy Nodes using a custom
+ * DOMBuilder class.
+ * <p/>
+ * It wraps the mapping code in the MappingCategory for DSL features, and before
+ * executing the mapping it binds the input and output to the script to be run.
+ * <p/>
+ * There is a special case in which a specific selected path of the record definition
+ * is being compiled, potentially even with edited code.  In this case the whole builder
+ * is not created, but only the necessary code to render the given path.  This is for
+ * showing results while the user is adjusting the code of a single snippet, and only
+ * gives that part of the record output.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class MappingRunner {
     private Script script;
-    private GroovyShell groovyShell;
-    private RecordMapping recordMapping;
+    private GroovyCodeResource groovyCodeResource;
+    private RecMapping recMapping;
+    private GroovyNode factsNode = new GroovyNode(null, "facts");
     private String code;
     private int counter = 0;
 
-    public MappingRunner(GroovyCodeResource groovyCodeResource, RecordMapping recordMapping, Path selectedPath, String editedCode) {
-        this.groovyShell = groovyCodeResource.getCategoryShell();
-        this.recordMapping = recordMapping;
-        this.code = recordMapping.toCompileCode(selectedPath, editedCode);
+    public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath) {
+        this.groovyCodeResource = groovyCodeResource;
+        this.recMapping = recMapping;
+        this.code = recMapping.toCode(editPath);
         script = groovyCodeResource.createMappingScript(code);
+        for (Map.Entry<String,String> entry : recMapping.getFacts().entrySet()) {
+            new GroovyNode(factsNode, entry.getKey(), entry.getValue());
+        }
     }
 
-    public MappingRunner(GroovyCodeResource groovyCodeResource, RecordMapping recordMapping) {
-        this(groovyCodeResource, recordMapping, null, null);
+    public RecDefTree getRecDefTree() {
+        return recMapping.getRecDefTree();
     }
 
-    public RecordDefinition getRecordDefinition() {
-        return recordMapping.getRecordDefinition();
+    public String getCode() {
+        return code;
     }
 
-    public Node runMapping(MetadataRecord metadataRecord) throws MappingException, DiscardRecordException {
-
-        // Groovy generates classes for each script evaluation
-        // this ends up eating up all permGen space
-        // thus we clear the caches referencing those classes so that GC can remove them
-
-        // additionally Groovy also at each script evaluation generates instances of MetaMethodIndex$Elem
-        // those are SoftReferences so they only disappear when the used memory reaches its max allowed heap
-        // but they also pretty much impact on the execution time, probably because method cache lookup time increases
-        // (maybe because of a poorly implemented equals() & hashcode() implementation)
-        // thus in order to get rid of this performance impact we need a reasonabily low -XX:MaxPermSize
-        // yet it can't be too low because otherwise Groovy won't be able to generate its classes anymore
-        // this is why we now clear those every 50 iterations.
-
-        GroovySystem.setKeepJavaMetaClasses(false);
-        if((counter % 50) == 0) {
-
-            for(Iterator it = GroovySystem.getMetaClassRegistry().iterator(); it.hasNext();) {
-                it.remove();
-            }
-
-            this.groovyShell.resetLoadedClasses();
-            this.groovyShell.getClassLoader().clearCache();
+    public Node runMapping(MetadataRecord metadataRecord) throws MappingException, AssertionError {
+        if ((counter % 50) == 0) {
+            groovyCodeResource.flush();
         }
         if (metadataRecord == null) {
             throw new RuntimeException("Null input metadata record");
         }
         counter += 1;
-//        long now = System.currentTimeMillis();
         try {
             Binding binding = new Binding();
-            NodeBuilder builder = NodeBuilder.newInstance();
-            NamespaceBuilder xmlns = new NamespaceBuilder(builder);
+            DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getNamespaces());
             binding.setVariable("output", builder);
-            for (NamespaceDefinition ns : recordMapping.getRecordDefinition().namespaces) {
-                binding.setVariable(ns.prefix, xmlns.namespace(ns.uri, ns.prefix));
-            }
-            binding.setVariable("input", metadataRecord.getRootNode());
+            binding.setVariable("input", wrap(metadataRecord.getRootNode()));
+            binding.setVariable("_facts", wrap(factsNode));
             script.setBinding(binding);
-            return (Node) script.run();
-        }
-        catch (DiscardRecordException e) {
-            throw e;
+            return stripEmptyElements(script.run());
         }
         catch (MissingPropertyException e) {
             throw new MappingException(metadataRecord, "Missing Property " + e.getProperty(), e);
@@ -128,15 +117,46 @@ public class MappingRunner {
         catch (Exception e) {
             String codeLines = fetchCodeLines(e);
             if (codeLines != null) {
-                throw new MappingException(metadataRecord, "Script Exception:\n"+codeLines, e);
+                throw new MappingException(metadataRecord, "Script Exception:\n" + codeLines, e);
             }
             else {
                 throw new MappingException(metadataRecord, "Unexpected: " + e.toString(), e);
             }
         }
-//        finally {
-//            System.out.println("Mapping time: "+ (System.currentTimeMillis() - now));
-//        }
+    }
+
+    private Node stripEmptyElements(Object nodeObject) {
+        Node node = (Node) nodeObject;
+        stripEmpty(node);
+        return node;
+    }
+
+    private void stripEmpty(Node node) {
+        NodeList kids = node.getChildNodes();
+        List<Node> dead = new ArrayList<Node>();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.ATTRIBUTE_NODE:
+                    break;
+                case Node.TEXT_NODE:
+                    if (kid.getTextContent().trim().isEmpty()) dead.add(kid);
+                    break;
+                case Node.ELEMENT_NODE:
+                    stripEmpty(kid);
+                    if (!(kid.hasChildNodes() || kid.hasAttributes())) dead.add(kid);
+                    break;
+                default:
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
+            }
+        }
+        for (Node kill : dead) node.removeChild(kill);
+    }
+
+    private List<GroovyNode> wrap(GroovyNode node) {
+        List<GroovyNode> array = new ArrayList<GroovyNode>(1);
+        array.add(node);
+        return array;
     }
 
     // a dirty hack which parses the exception's stack trace.  any better strategy welcome, but it works.

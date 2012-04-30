@@ -1,13 +1,32 @@
+/*
+ * Copyright 2011, 2012 Delving BV
+ *
+ *  Licensed under the EUPL, Version 1.0 or? as soon they
+ *  will be approved by the European Commission - subsequent
+ *  versions of the EUPL (the "Licence");
+ *  you may not use this work except in compliance with the
+ *  Licence.
+ *  You may obtain a copy of the Licence at:
+ *
+ *  http://ec.europa.eu/idabc/eupl
+ *
+ *  Unless required by applicable law or agreed to in
+ *  writing, software distributed under the Licence is
+ *  distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ *  express or implied.
+ *  See the Licence for the specific language governing
+ *  permissions and limitations under the Licence.
+ */
+
 package eu.delving.groovy;
 
 import groovy.util.IndentPrinter;
-import groovy.util.Node;
 import groovy.xml.QName;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +39,7 @@ import java.util.Map;
  * didn't do the job as it also removes the prefix.</li>
  * <li>Indentation; linebreaks only after the closing element.</li>
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  * @see groovy.util.XmlNodePrinter
  */
@@ -59,7 +78,7 @@ public class XmlNodePrinter {
         this(new PrintWriter(new OutputStreamWriter(System.out)));
     }
 
-    public void print(Node node) {
+    public void print(GroovyNode node) {
         print(node, new NamespaceContext());
     }
 
@@ -100,7 +119,7 @@ public class XmlNodePrinter {
         this.quote = quote;
     }
 
-    protected void print(Node node, NamespaceContext ctx) {
+    protected void print(GroovyNode node, NamespaceContext ctx) {
         /*
          * Handle empty elements like '<br/>', '<img/> or '<hr noshade="noshade"/>.
          */
@@ -173,8 +192,8 @@ public class XmlNodePrinter {
             /*
              * If the current value is a node, recurse into that node.
              */
-            if (value instanceof Node) {
-                print((Node) value, context);
+            if (value instanceof GroovyNode) {
+                print((GroovyNode) value, context);
                 continue;
             }
             printSimpleItem(value);
@@ -186,9 +205,9 @@ public class XmlNodePrinter {
         printEscaped(InvokerHelper.toString(value));
     }
 
-    protected void printName(Node node, NamespaceContext ctx, boolean begin, boolean sameLine) {
+    protected void printName(GroovyNode node, NamespaceContext ctx, boolean begin, boolean sameLine) {
         if (node == null) {
-            throw new NullPointerException("Node must not be null.");
+            throw new NullPointerException("GroovyNode must not be null.");
         }
         Object name = node.name();
         if (name == null) {
@@ -209,14 +228,14 @@ public class XmlNodePrinter {
         out.print(">");
     }
 
-    protected boolean printSpecialNode(Node node) {
+    protected boolean printSpecialNode(GroovyNode node) {
         return false;
     }
 
     protected void printNamespace(Object object, NamespaceContext ctx) {
         if (namespaceAware) {
-            if (object instanceof Node) {
-                printNamespace(((Node) object).name(), ctx);
+            if (object instanceof GroovyNode) {
+                printNamespace(((GroovyNode) object).name(), ctx);
             }
             else if (object instanceof QName) {
                 QName qname = (QName) object;
@@ -262,9 +281,9 @@ public class XmlNodePrinter {
         }
     }
 
-    private boolean isEmptyElement(Node node) {
+    private boolean isEmptyElement(GroovyNode node) {
         if (node == null) {
-            throw new IllegalArgumentException("Node must not be null!");
+            throw new IllegalArgumentException("GroovyNode must not be null!");
         }
         return node.children().isEmpty() && node.text().length() == 0;
     }
@@ -280,8 +299,8 @@ public class XmlNodePrinter {
             }
             return qname.getQualifiedName();
         }
-        else if (object instanceof Node) {
-            Object name = ((Node) object).name();
+        else if (object instanceof GroovyNode) {
+            Object name = ((GroovyNode) object).name();
             return getName(name);
         }
         return object.toString();
@@ -356,12 +375,5 @@ public class XmlNodePrinter {
             Object uri = namespaceMap.get(prefix);
             return (uri == null) ? null : uri.toString();
         }
-    }
-
-    public static String serialize(Node outputNode) {
-        StringWriter writer = new StringWriter();
-        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
-        xmlNodePrinter.print(outputNode);
-        return writer.toString();
     }
 }

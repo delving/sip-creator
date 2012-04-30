@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="icn">
+    <facts>
+        <entry>
+            <string>spec</string>
+            <string>icn</string>
+        </entry>
+        <entry>
+            <string>dataProvider</string>
+            <string>Sourcer</string>
+        </entry>
+        <entry>
+            <string>name</string>
+            <string>ICN Test</string>
+        </entry>
+        <entry>
+            <string>rights</string>
+            <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
+        </entry>
+        <entry>
+            <string>provider</string>
+            <string>Testmeister</string>
+        </entry>
+        <entry>
+            <string>language</string>
+            <string>nl</string>
+        </entry>
+        <entry>
+            <string>type</string>
+            <string>IMAGE</string>
+        </entry>
+        <entry>
+            <string>country</string>
+            <string>netherlands</string>
+        </entry>
+    </facts>
+    <functions/>
+    <node-mappings>
+        <node-mapping inputPath="/input/creator.date_of_birth" outputPath="/icn:record/icn:creatorYearOfBirth"/>
+        <node-mapping inputPath="/input/creator.date_of_death" outputPath="/icn:record/icn:creatorYearOfDeath"/>
+        <node-mapping inputPath="/input/description" outputPath="/icn:record/dc:description"/>
+        <node-mapping inputPath="/input/priref" outputPath="/icn:record/europeana:uri"/>
+        <node-mapping inputPath="/input/priref" outputPath="/icn:record/europeana:isShownAt" operator="FIRST">
+            <groovy-code>
+                <string>&quot;http://www.jhm.nl/collectie/museumstukken/${_priref}&quot;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/input/priref" outputPath="/icn:record/europeana:object" operator="FIRST">
+            <groovy-code>
+                <string>&quot;http://www.jhm.nl/collectie/museumstukken/${_priref}&quot;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/input/priref" outputPath="/icn:record/delving:thumbnail">
+            <groovy-code>
+                <string>&quot;http://www.jhm.nl/collectie/museumstukken/${_priref}&quot;</string>
+            </groovy-code>
+        </node-mapping>
+    </node-mappings>
+</rec-mapping>

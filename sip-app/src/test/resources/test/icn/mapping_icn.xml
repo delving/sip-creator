@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="icn">
+    <node-mappings>
+        <!--/input/creator.date_of_birth-->
+        <!--/record/icn:creatorYearOfBirth-->
+
+        <!--/input/creator.date_of_death-->
+        <!--/record/icn:creatorYearOfDeath-->
+
+        <!--/input/priref-->
+        <!--/record/europeana:uri-->
+
+        <!--/input/description-->
+        <!--/record/dc:description-->
+
+    </node-mappings>
+</rec-mapping>
+

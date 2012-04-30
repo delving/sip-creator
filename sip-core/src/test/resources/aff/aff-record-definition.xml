@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<record-definition prefix="aff" flat="false">
+
+
+    <namespaces>
+        <namespace prefix="aff" uri="http://schemas.delving.eu/aff/"
+                   schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="localId"/>
+        <attr tag="localUri"/>
+        <attr tag="sourceUri"/>
+        <attr tag="sourceName"/>
+    </attrs>
+
+    <elems>
+        <elem tag="rights"/>
+        <elem tag="date" elems="earliestDate, latestDate"/>
+        <elem tag="earliestDate"/>
+        <elem tag="latestDate"/>
+        <elem tag="placeAdmin"
+              elems="displayAdmin1, displayAdmin2, displayAdmin3, displayAdmin4, displayCountry, lat, long"/>
+        <elem tag="displayAdmin1"/>
+        <elem tag="displayAdmin2"/>
+        <elem tag="displayAdmin3"/>
+        <elem tag="displayAdmin4"/>
+        <elem tag="displayCountry"/>
+        <elem tag="lat"/>
+        <elem tag="long"/>
+    </elems>
+
+    <root tag="record">
+
+        <elem tag="admin" elems="rights" singular="true">
+            <elem tag="ownerUri"/>
+            <elem tag="displayOwner"/>
+            <elem tag="displayOwnerCountry"/>
+            <elem tag="providerUri"/>
+            <elem tag="displayProvider"/>
+        </elem>
+
+        <elem tag="thing" elems="rights" attrs="localId" singular="true">
+            <elem tag="thingUri">
+                <node-mapping inputPath="/input/_id">
+                    <groovy-code>
+                        <string>"${spec}/${_id}"</string>
+                    </groovy-code>
+                </node-mapping>
+            </elem>
+            <elem tag="displayWorkType"/>
+            <elem tag="displayTitle" summaryField="TITLE"/>
+            <elem tag="displayDescription"/>
+            <elem tag="language"/>
+            <elem tag="displayDimensions"/>
+            <elem tag="displayYear"/>
+            <elem tag="landingPage"/>
+            <elem tag="partOfLocalUri"/>
+        </elem>
+
+        <elem tag="collections" attrs="localId" singular="true">
+            <elem tag="collectionUri"/>
+            <elem tag="displayCollection"/>
+        </elem>
+
+        <elem tag="classifications" attrs="localId, localUri, sourceName, sourceUri">
+            <elem tag="displayClassification"/>
+        </elem>
+
+        <elem tag="subjects" attrs="localId, localUri, sourceName, sourceUri">
+            <elem tag="displaySubject"/>
+        </elem>
+
+        <elem tag="materials" attrs="localId, localUri, sourceName, sourceUri">
+            <elem tag="displayMaterial"/>
+        </elem>
+
+        <elem tag="techniques" attrs="localId, localUri, sourceName, sourceUri">
+            <elem tag="displayTechnique"/>
+        </elem>
+
+        <elem tag="events" singular="true">
+            <elem tag="event" elems="date">
+                <elem tag="eventTypeUri"/>
+                <elem tag="displayEventType"/>
+                <elem tag="displayEvent"/>
+                <elem tag="displayDate"/>
+
+                <elem tag="eventPlace" elems="placeAdmin" attrs="localId, localUri, sourceName, sourceUri">
+                    <elem tag="displayPlaceInRole"/>
+                    <elem tag="placeInRoleUri"/>
+                    <elem tag="displayPlace"/>
+                    <elem tag="displayPlaceType"/>
+                </elem>
+
+                <elem tag="eventActor" attrs="localId, localUri, sourceName, sourceUri">
+                    <elem tag="displayActorInRole"/>
+                    <elem tag="actorInRoleUri"/>
+                    <elem tag="displayActor"/>
+                </elem>
+            </elem>
+        </elem>
+
+        <elem tag="medias">
+            <elem tag="mediaURL"/>
+            <elem tag="mediaType"/>
+            <elem tag="mediaMimeType"/>
+            <!-- <elem tag="delvingMediaURI"/> -->
+        </elem>
+
+    </root>
+
+    <field-markers>
+
+        <field-marker type="search" name="dolving_gumby" path="/record/admin/displayProvider"/>
+
+        <field-marker type="fact" path="/record/admin/ownerUri" name="dataOwnerUri"/>
+        <field-marker type="fact" path="/record/admin/displayOwner" name="dataOwnerName"/>
+        <field-marker type="fact" path="/record/admin/displayOwnerCountry" name="dataOwnerCountry"/>
+        <field-marker type="fact" path="/record/admin/providerUri" name="dataProviderUri"/>
+        <field-marker type="fact" path="/record/admin/displayProvider" name="dataProviderName"/>
+        <field-marker type="fact" path="/record/admin/rights" name="rights"/>
+        <field-marker type="fact" path="/record/thing/language" name="language"/>
+    </field-markers>
+
+    <docs>
+        <doc path="/record/admin/displayProvider">
+            <string name="Dublin Core definition">An entity responsible for making contributions to the content of the
+                resource. Examples of a Contributor include a person, an organization or a service. Typically, the name
+                of a Contributor should be used to indicate the entity.
+            </string>
+            <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
+            <string name="Europeana note">The name of contributors to the original analog or born digital object. This
+                could be a person, an organisation or a service.
+            </string>
+        </doc>
+    </docs>
+
+</record-definition>
