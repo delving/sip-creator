@@ -29,9 +29,9 @@
         <attr tag="providerHubUri"/>
         <attr tag="type" hidden="true"/>
         <attr tag="key" hidden="true"/>
-        <attr tag="hubId" hidden="true"/>
-        <attr tag="hubRecordUrl" hidden="true"/>
-        <attr tag="delvingMediaUri" hidden="true"/>
+        <attr tag="hubId" systemField="true"/>
+        <attr tag="hubRecordUrl" systemField="true"/>
+        <attr tag="delvingMediaUri" systemField="true"/>
     </attrs>
 
     <elems>
@@ -71,13 +71,21 @@
         <elem tag="thing" attrs="localId, lang, hubId" singular="true" unmapable="true">
             <elem tag="uri"/>
             <elem tag="displayIdentification"/>
-            <elem tag="displayTitle"/>
-            <elem tag="displayDescription"/>
-            <elem tag="displayInscription"/>
+            <elem tag="titles">
+                <elem tag="displayTitle"/>
+            </elem>
+            <elem tag="descriptions">
+                <elem tag="displayDescription"/>
+            </elem>
+            <elem tag="inscriptions">
+                <elem tag="displayInscription"/>
+            </elem>
             <elem tag="dimensions">
                 <elem tag="displayDimension"/>
             </elem>
-            <elem tag="displayYear"/>
+            <elem tag="years">
+                <elem tag="year"/>
+            </elem>
             <elem tag="displayRights"/>
         </elem>
 
@@ -154,24 +162,24 @@
         <!--</opt-list>-->
 
 
-        <!--<opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">-->
-            <!--<opt hidden="true" key="http://www.cidoc-crm.org/rdfs/E78.Collection">collection</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#fonds">fonds</opt>-->
-        <!--</opt-list>-->
+        <opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">
+            <opt hidden="true" key="http://www.cidoc-crm.org/rdfs/E78.Collection">collection</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fonds">fonds</opt>
+        </opt-list>
 
-        <!--<opt-list path="/record/facets/facet/childFacet" key="@key" value="@type" displayName="Facets">-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#fond">series</opt>-->
-        <!--</opt-list>-->
+        <opt-list path="/record/facets/facet/childFacet" key="@key" value="@type" displayName="Facets">
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fond">series</opt>
+        </opt-list>
 
-        <!--<opt-list path="/record/facets/facet/childFacet/childFacet" key="@key" value="@type" displayName="Facets">-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#file">file</opt>-->
-        <!--</opt-list>-->
+        <opt-list path="/record/facets/facet/childFacet/childFacet" key="@key" value="@type" displayName="Facets">
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#file">file</opt>
+        </opt-list>
 
-        <!--<opt-list path="/record/relations/relation" key="@key" value="@type" displayName="Relations">-->
-            <!--<opt key="http://id.culturecloud.eu/concepts/#isPartOf">isPartof</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#hasPart">hasPart</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#sameaAs">sameAs</opt>-->
-        <!--</opt-list>-->
+        <opt-list path="/record/relations/relation" key="@key" value="@type" displayName="Relations">
+            <opt key="http://id.culturecloud.eu/concepts/#isPartOf">isPartof</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#hasPart">hasPart</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#sameaAs">sameAs</opt>
+        </opt-list>
 
         <opt-list path="/record/events/event" key="@key" value="@type" schema="@schema" schemaUri="@schemaUri" displayName="Events">
             <opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production">Production</opt>
@@ -187,8 +195,8 @@
             <opt hidden="true" key="crm_e66" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E66.Formation">Formation</opt>
             <opt hidden="true" key="crm_e85" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E85.Joining">Joining</opt>
             <opt hidden="true" key="crm_e86" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E86.Leaving">Leaving</opt>
-            <opt hidden="true" key="frbr_f30" schema="cidoc-crm" schemaUri="http://www.??????????/rdfs/F30.Publication_Event">PublicationEvent</opt> <!-- FRBRoo -->
-            <opt hidden="true" key="frbr_f31" schema="cidoc-crm" schemaUri="http://www.??????????.org/rdfs/F31.Performance">Performance</opt> <!-- FRBRoo -->
+            <opt hidden="true" key="frbr_f30" schema="cidoc-crm" schemaUri="http://www.??????????/rdfs/F30.Publication_Event">PublicationEvent</opt> <!-- FRBRoo namespace in mid June 2012-->
+            <opt hidden="true" key="frbr_f31" schema="cidoc-crm" schemaUri="http://www.??????????.org/rdfs/F31.Performance">Performance</opt> <!-- FRBRoo namespace in mid June 2012-->
             <opt hidden="true" key="cc_collecting" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Collecting">Collecting</opt>
             <opt hidden="true" key="cc_commissioning" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Commissioning">Commissioning</opt>
             <opt hidden="true" key="cc_designing" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Designing">Designing</opt>
@@ -205,31 +213,31 @@
             <opt key="crm_e69" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E69.Death">Death</opt>
         </opt-list>
 
-        <!--<opt-list path="/record/events/event/eventPlace/partOfPlace" key="@key" value="@type" displayName="Event place">-->
-            <!--<opt key="http://www.geonames.org/#admin2">municipality</opt>-->
-            <!--<opt key="http://www.geonames.org/#admin1">region</opt>-->
-            <!--<opt key="http://www.geonames.org/#countryCode">country</opt>-->
-        <!--</opt-list>-->
+        <opt-list path="/record/events/event/eventPlace/partOfPlace" key="@key" value="@type" displayName="Event place">
+            <opt key="A.ADM2" schema="geonames" schemaUri="http://www.geonames.org/ontology#A.ADM2">Municipality</opt>
+            <opt key="A.ADM1" schema="geonames" schemaUri="http://www.geonames.org/ontology#A.ADM1">Region</opt>
+            <opt key="http://www.geonames.org/#countryCode">Country</opt>
+        </opt-list>
 
-        <!--<opt-list path="/record/concepts/concept" key="@key" value="@type" displayName="Concepts">-->
-            <!--<opt key="http://id.culturecloud.eu/concepts/#workType">workType</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#objectName">keyword</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#classification">classification</opt>-->
-            <!--<opt hidden="true" key="http://www.cidoc-crm.org/rdfs/P129B.is_subject_of">subject</opt>-->
-            <!--<opt hidden="true" key="http://www.cidoc-crm.org/rdfs/E57.Material">material</opt>-->
-            <!--<opt hidden="true" key="http://www.cidoc-crm.org/rdfs/P32F_used_general_technique">technique</opt>-->
-        <!--</opt-list>-->
+        <opt-list path="/record/concepts/concept" key="@key" value="@type" displayName="Concepts">
+            <opt key="http://id.culturecloud.eu/concepts/#workType">workType</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#objectName">keyword</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#classification">classification</opt>
+            <opt hidden="true" key="http://www.cidoc-crm.org/rdfs/P129B.is_subject_of">subject</opt>
+            <opt hidden="true" key="http://www.cidoc-crm.org/rdfs/E57.Material">material</opt>
+            <opt hidden="true" key="http://www.cidoc-crm.org/rdfs/P32F_used_general_technique">technique</opt>
+        </opt-list>
 
-        <!--<opt-list path="/record/resources/resource" key="@key" value="@type" displayName="Resources">-->
-            <!--<opt key="http://id.culturecloud.eu/concepts/#thumbnail">thumbnail</opt>-->
-            <!--<opt key="http://id.culturecloud.eu/concepts/#fullImage">fullImage</opt>-->
-            <!--<opt key="http://id.culturecloud.eu/concepts/#landingPage">landingPage</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#hubRecordUrl">hubUrl</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#deepZoom">deepZoomImage</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#document">documentFile</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#dound">soundFile</opt>-->
-            <!--<opt hidden="true" key="http://id.culturecloud.eu/concepts/#video">videoFile</opt>-->
-        <!--</opt-list>-->
+        <opt-list path="/record/resources/resource" key="@key" value="@type" displayName="Resources">
+            <opt key="http://id.culturecloud.eu/concepts/#thumbnail">thumbnail</opt>
+            <opt key="http://id.culturecloud.eu/concepts/#fullImage">fullImage</opt>
+            <opt key="http://id.culturecloud.eu/concepts/#landingPage">landingPage</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#hubRecordUrl">hubUrl</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#deepZoom">deepZoomImage</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#document">documentFile</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#dound">soundFile</opt>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#video">videoFile</opt>
+        </opt-list>
 
     </opts>
 
@@ -248,7 +256,7 @@
     </field-markers>
 
     <docs>
-        <doc path="/record/thing/displayTitle">
+        <doc path="/record/thing/titles/displayTitle">
             <string>Description: The name given to the resource. Typically, a Title will be a name by which the resource is formally known.</string>
         </doc>
     </docs>
