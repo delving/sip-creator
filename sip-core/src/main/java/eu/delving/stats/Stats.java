@@ -41,7 +41,7 @@ import java.util.*;
 
 @XStreamAlias("delving-statistics")
 public class Stats {
-    public static final int DEFAULT_MAX_UNIQUE_VALUE_LENGTH = 30;
+    public static final int DEFAULT_MAX_UNIQUE_VALUE_LENGTH = 40;
     private static final int SAMPLE_SIZE = 200;
     private static final int SAMPLE_SMALL_SIZE = 30;
     private static final int SAMPLE_MAX_VALUE_LENGTH = 100;
