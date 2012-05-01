@@ -86,7 +86,7 @@ public class TestSourceConverter {
         namespaces.put("b", "http://b");
         namespaces.put("c", "http://c");
     }
-    private SourceConverter converter = new SourceConverter(ROOT, 2, UNIQ, namespaces);
+    private SourceConverter converter = new SourceConverter(ROOT, 2, UNIQ, 100, namespaces);
 
     @Test
     public void runThrough() throws IOException, XMLStreamException, UniquenessException {

@@ -68,13 +68,14 @@ public class SourceConverter {
     private List<XMLEvent> eventBuffer = new ArrayList<XMLEvent>();
     private List<String> lines = new ArrayList<String>();
     private boolean finished = false;
-    private final Uniqueness uniqueness = new Uniqueness();
+    private final Uniqueness uniqueness;
 
-    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath, Map<String, String> namespaces) {
+    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath, int maxUniqueValueLength, Map<String, String> namespaces) {
         this.recordRootPath = recordRootPath;
         this.totalRecords = totalRecords;
         this.uniqueElementPath = uniqueElementPath;
         this.namespaces = namespaces;
+        this.uniqueness = new Uniqueness(maxUniqueValueLength);
     }
 
     public void setProgressListener(ProgressListener progressListener) {

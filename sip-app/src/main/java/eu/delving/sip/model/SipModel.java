@@ -353,7 +353,7 @@ public class SipModel {
         else {
             analyzing = true;
             feedback.say("Analyzing data from " + dataSetModel.getDataSet().getSpec());
-            Exec.work(new AnalysisParser(dataSetModel.getDataSet(), new AnalysisParser.Listener() {
+            Exec.work(new AnalysisParser(dataSetModel.getDataSet(), statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
                 @Override
                 public void success(final Stats stats) {
                     analyzing = false;

@@ -35,6 +35,7 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.xml.AnalysisParser;
+import eu.delving.stats.Stats;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.lang.StringUtils;
@@ -235,10 +236,10 @@ public class Application {
         ));
         statusPanel.setReaction(DataSetState.ABSENT, allFrames.prepareForNothing());
         statusPanel.setReaction(DataSetState.EMPTY, importAction);
-        statusPanel.setReaction(DataSetState.IMPORTED, new AnalysisPerformer());
+        statusPanel.setReaction(DataSetState.IMPORTED, new InputAnalyzer(true));
         statusPanel.setReaction(DataSetState.ANALYZED_IMPORT, allFrames.prepareForDelimiting());
         statusPanel.setReaction(DataSetState.DELIMITED, new ConvertPerformer());
-        statusPanel.setReaction(DataSetState.SOURCED, new AnalysisPerformer());
+        statusPanel.setReaction(DataSetState.SOURCED, new InputAnalyzer(false));
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
         statusPanel.setReaction(DataSetState.VALIDATED, uploadAction);
@@ -293,9 +294,34 @@ public class Application {
         return menu;
     }
 
-    private class AnalysisPerformer implements Runnable {
+    private class InputAnalyzer implements Runnable {
+        private boolean askForMaxUniqueValueLength;
+
+        private InputAnalyzer(boolean askForMaxUniqueValueLength) {
+            this.askForMaxUniqueValueLength = askForMaxUniqueValueLength;
+        }
+
         @Override
         public void run() {
+            if (askForMaxUniqueValueLength) {
+                while (true) {
+                    String answer = JOptionPane.showInputDialog(
+                            desktop,
+                            "Enter the maximum length for unique element value",
+                            String.valueOf(Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH)
+                    );
+                    if (answer == null) continue;
+                    answer = answer.trim();
+                    try {
+                        int max = Integer.parseInt(answer);
+                        sipModel.getStatsModel().setMaxUniqueValueLength(max);
+                        break;
+                    }
+                    catch (NumberFormatException e) {
+                        feedback.alert("Not a number: " + answer);
+                    }
+                }
+            }
             final ProgressListener progress = sipModel.getFeedback().progressListener("Analyzing");
             progress.setProgressMessage(String.format(
                     "<html><h3>Analyzing data of '%s'</h3>",

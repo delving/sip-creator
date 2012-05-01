@@ -24,6 +24,7 @@ package eu.delving.sip.files;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecMapping;
+import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -80,6 +81,11 @@ public class StorageBase {
         String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
         if (uniqueElement == null) throw new StorageException("Must have unique element path");
         return Path.create(uniqueElement);
+    }
+
+    public static int getMaxUniqueValueLength(Map<String, String> hints) {
+        String max = hints.get(MAX_UNIQUE_VALUE_LENGTH);
+        return max == null ? Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH : Integer.parseInt(max);
     }
 
     Map<String, String> readFacts(File file) throws IOException {
