@@ -333,17 +333,18 @@ public class RecDefNode implements Comparable<RecDefNode> {
                             toLoopRef(path)
                     );
                 }
-                codeOut.line_(
-                        "%s %s { %s -> // R7",
-                        toLoopRef(path), operator.getChar(), param
-                );
-                groovyParams.push(param);
+                else {
+                    codeOut.line_(
+                            "%s %s { %s -> // R7",
+                            toLoopRef(path), operator.getChar(), param
+                    );
+                    groovyParams.push(param);
+                }
             }
             toNodeMappingLoop(contextNodeMapping, path.withRootRemoved(), groovyParams, codeOut, editPath);
             if (needLoop) {
-                if (contextNodeMapping.isVirtual()) codeOut._line("}");
+                if (!contextNodeMapping.isVirtual()) groovyParams.pop();
                 codeOut._line("}");
-                groovyParams.pop();
             }
         }
     }
