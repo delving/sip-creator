@@ -333,18 +333,17 @@ public class RecDefNode implements Comparable<RecDefNode> {
                             toLoopRef(path)
                     );
                 }
-                else {
-                    codeOut.line_(
-                            "%s %s { %s -> // R7",
-                            toLoopRef(path), operator.getChar(), param
-                    );
-                    groovyParams.push(param);
-                }
+                codeOut.line_(
+                        "%s %s { %s -> // R7",
+                        toLoopRef(path), operator.getChar(), param
+                );
+                groovyParams.push(param);
             }
             toNodeMappingLoop(contextNodeMapping, path.withRootRemoved(), groovyParams, codeOut, editPath);
             if (needLoop) {
-                if (!contextNodeMapping.isVirtual()) groovyParams.pop();
+                if (contextNodeMapping.isVirtual()) codeOut._line("}");
                 codeOut._line("}");
+                groovyParams.pop();
             }
         }
     }
@@ -473,7 +472,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 if (opt.parent.key != null && opt.parent.key.equals(tag)) return new OptBox(OptRole.KEY, opt);
                 if (opt.parent.value != null && opt.parent.value.equals(tag)) return new OptBox(OptRole.VALUE, opt);
                 if (opt.parent.schema != null && opt.parent.schema.equals(tag)) return new OptBox(OptRole.SCHEMA, opt);
-                if (opt.parent.schemaUri != null && opt.parent.schemaUri.equals(tag)) return new OptBox(OptRole.SCHEMA_URI, opt);
+                if (opt.parent.schemaUri != null && opt.parent.schemaUri.equals(tag))
+                    return new OptBox(OptRole.SCHEMA_URI, opt);
             }
             return null;
         }
