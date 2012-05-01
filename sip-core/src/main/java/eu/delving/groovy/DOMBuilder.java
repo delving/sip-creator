@@ -28,9 +28,7 @@ import groovy.lang.MissingMethodException;
 import groovy.util.BuilderSupport;
 import groovy.xml.FactorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -197,9 +195,16 @@ public class DOMBuilder extends BuilderSupport {
             node.appendChild(document.createTextNode(result.string));
         }
         if (result.list != null && !result.list.isEmpty()) {
+            // todo: post-processing instead of multiple-nodes?
             node.appendChild(document.createTextNode(result.list.get(0)));
             for (int walk = 1; walk < result.list.size(); walk++) {
-                Node child = (Node) createNode(node.getNodeName(), result.list.get(walk));
+                Map<String, String> attributes = new TreeMap<String,String>();
+                NamedNodeMap nodeAttributes = node.getAttributes();
+                for (int a=0; a < nodeAttributes.getLength(); a++) {
+                    Attr attr = (Attr) nodeAttributes.item(a);
+                    attributes.put(attr.getName(), attr.getValue());
+                }
+                Node child = (Node) createNode(node.getNodeName(), attributes, result.list.get(walk));
                 Node parent = node.getParentNode();
                 if (parent == null) throw new RuntimeException("Node has no parent: " + node);
                 parent.appendChild(child);
