@@ -162,11 +162,16 @@ public class MappingCategory {
         a = unwrap(a)
         Iterator walk = a.iterator();
         StringBuilder out = new StringBuilder()
+        GroovyNode node = null
         while (walk.hasNext()) {
-            out.append(walk.next())
+            GroovyNode listNode = (GroovyNode)walk.next()
+            if (node == null) node = new GroovyNode(null, listNode.qName(), listNode.attributes(), '*replace*');
+            out.append(listNode.toString())
             if (walk.hasNext()) out.append(delimiter)
         }
-        return [out.toString()]
+        if (node == null) return []
+        node.setValue(out.toString())
+        return [node]
     }
 
     // call closure for the first if there is one
