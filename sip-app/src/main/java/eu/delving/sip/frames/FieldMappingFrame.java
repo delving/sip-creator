@@ -429,7 +429,7 @@ public class FieldMappingFrame extends FrameBase {
                     timer.restart();
                 }
             });
-            setPrototypeCellValue("aVeryLongVariableNameIndeed");
+            setPrototypeCellValue("alongvariablenamehere");
             setToolTipText("Clicking here will insert a variable name into the code");
         }
     }

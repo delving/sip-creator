@@ -232,22 +232,22 @@ public class RecDefNode implements Comparable<RecDefNode> {
         listener.nodeMappingChanged(this, nodeMapping);
     }
 
-    public void toElementCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+    public void toElementCode(boolean virtual, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (isAttr() || !hasDescendentNodeMappings()) return;
         if (editPath != null && !path.isFamilyOf(editPath.getNodeMapping().outputPath)) return;
         if (nodeMappings.isEmpty()) {
-            if (isRootOpt()) {
+            if (isRootOpt() && !virtual) {
                 Set<Path> siblingPaths = getSiblingInputPathsOfChildren();
                 if (siblingPaths != null) {
                     NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
                     nodeMapping.recDefNode = this;
                     nodeMapping.codeOut = codeOut.createChild();
-                    toNodeMappingLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
+                    toNodeMappingLoop(true, nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
                     return;
                 }
             }
             if (!isLeafElem()) {
-                toBranchCode(codeOut, groovyParams, editPath);
+                toBranchCode(false, codeOut, groovyParams, editPath);
             }
             else if (hasActiveAttributes()) {
                 startBuilderCall("R0", codeOut, groovyParams, editPath);
@@ -258,76 +258,58 @@ public class RecDefNode implements Comparable<RecDefNode> {
         else if (editPath != null) {
             NodeMapping nodeMapping = editPath.getNodeMapping();
             nodeMapping.codeOut = codeOut.createChild();
-            toNodeMappingLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
+            toNodeMappingLoop(false, nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
         }
         else {
             for (NodeMapping nodeMapping : nodeMappings.values()) {
                 nodeMapping.codeOut = codeOut.createChild();
-                toNodeMappingLoop(nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
+                toNodeMappingLoop(false, nodeMapping, nodeMapping.getLocalPath(), groovyParams, codeOut, editPath);
             }
         }
     }
 
-    private void toNodeMappingLoop(NodeMapping contextNodeMapping, Path path, Stack<String> groovyParams, CodeOut codeOut, EditPath editPath) {
+    private void toNodeMappingLoop(boolean virtual, NodeMapping nodeMapping, Path path, Stack<String> groovyParams, CodeOut codeOut, EditPath editPath) {
         if (path.isEmpty()) throw new RuntimeException("Empty path");
         if (path.size() == 1) {
             if (isLeafElem()) {
-                toLeafCode(contextNodeMapping, codeOut, groovyParams, editPath);
+                toLeafCode(nodeMapping, codeOut, groovyParams, editPath);
             }
             else {
-                toBranchCode(codeOut, groovyParams, editPath);
+                toBranchCode(virtual, codeOut, groovyParams, editPath);
             }
         }
-        else if (contextNodeMapping.hasMap() && path.size() == 2) {
-            boolean needLoop = !groovyParams.contains(contextNodeMapping.getMapName());
-            if (needLoop) {
-                if (contextNodeMapping.isVirtual()) {
+        else if (nodeMapping.hasMap() && path.size() == 2) {
+            if (groovyParams.contains(nodeMapping.getMapName())) {
+                toMapNodeMapping(virtual, nodeMapping, codeOut, groovyParams, editPath);
+            }
+            else {
+                if (virtual) {
                     codeOut.line_(
                             "if (%s) { // R1",
-                            toMapExpression(contextNodeMapping)
+                            toMapExpression(nodeMapping)
                     );
                 }
                 else {
                     codeOut.line_(
                             "%s * { %s -> // R2",
-                            toMapExpression(contextNodeMapping),
-                            contextNodeMapping.getMapName()
+                            toMapExpression(nodeMapping),
+                            nodeMapping.getMapName()
                     );
-                    groovyParams.push(contextNodeMapping.getMapName());
+                    groovyParams.push(nodeMapping.getMapName());
                 }
-            }
-            if (isLeafElem()) {
-                startBuilderCall("R3", codeOut, groovyParams, editPath);
-                contextNodeMapping.toLeafElementCode(groovyParams, editPath);
-                codeOut._line("}");
-            }
-            else {
-                startBuilderCall("R4", contextNodeMapping.codeOut, groovyParams, editPath);
-                for (RecDefNode sub : children) {
-                    if (sub.isAttr()) continue;
-                    if (sub.isChildOpt()) {
-                        contextNodeMapping.codeOut.line(
-                                "%s '%s' // R5",
-                                sub.getTag().toBuilderCall(), sub.optBox
-                        );
-                    }
-                    else {
-                        sub.toElementCode(contextNodeMapping.codeOut, groovyParams, editPath);
-                    }
-                }
-                contextNodeMapping.codeOut._line("}");
-            }
-            if (needLoop) {
-                if (!contextNodeMapping.isVirtual()) groovyParams.pop();
+                toMapNodeMapping(false /* no longer virtual */, nodeMapping, codeOut, groovyParams, editPath);
+                if (!virtual) groovyParams.pop();
                 codeOut._line("}");
             }
         }
         else { // path should never be empty
-            Operator operator = (path.size() == 2) ? contextNodeMapping.getOperator() : Operator.ALL;
+            Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
             String param = toLoopGroovyParam(path);
-            boolean needLoop = !groovyParams.contains(param);
-            if (needLoop) {
-                if (contextNodeMapping.isVirtual()) {
+            if (groovyParams.contains(param)) {
+                toNodeMappingLoop(false, nodeMapping, path.withRootRemoved(), groovyParams, codeOut, editPath);
+            }
+            else {
+                if (virtual) {
                     codeOut.line_(
                             "if (%s) { // R6",
                             toLoopRef(path)
@@ -340,16 +322,38 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     );
                     groovyParams.push(param);
                 }
-            }
-            toNodeMappingLoop(contextNodeMapping, path.withRootRemoved(), groovyParams, codeOut, editPath);
-            if (needLoop) {
-                if (!contextNodeMapping.isVirtual()) groovyParams.pop();
+                toNodeMappingLoop(false /* no longer virtual */, nodeMapping, path.withRootRemoved(), groovyParams, codeOut, editPath);
+                if (!virtual) groovyParams.pop();
                 codeOut._line("}");
             }
         }
     }
 
-    private void toBranchCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+    private void toMapNodeMapping(boolean virtual, NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+        if (isLeafElem()) {
+            startBuilderCall("R3", codeOut, groovyParams, editPath);
+            nodeMapping.toLeafElementCode(groovyParams, editPath);
+            codeOut._line("}");
+        }
+        else {
+            startBuilderCall("R4", nodeMapping.codeOut, groovyParams, editPath);
+            for (RecDefNode sub : children) {
+                if (sub.isAttr()) continue;
+                if (sub.isChildOpt()) {
+                    nodeMapping.codeOut.line(
+                            "%s '%s' // R5",
+                            sub.getTag().toBuilderCall(), sub.optBox
+                    );
+                }
+                else {
+                    sub.toElementCode(virtual, nodeMapping.codeOut, groovyParams, editPath);
+                }
+            }
+            nodeMapping.codeOut._line("}");
+        }
+    }
+
+    private void toBranchCode(boolean virtual, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         startBuilderCall("R8", codeOut, groovyParams, editPath);
         for (RecDefNode sub : children) {
             if (sub.isAttr()) continue;
@@ -360,28 +364,28 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 );
             }
             else {
-                sub.toElementCode(codeOut, groovyParams, editPath);
+                sub.toElementCode(virtual, codeOut, groovyParams, editPath);
             }
         }
         codeOut._line("}");
     }
 
-    private void toLeafCode(NodeMapping localNodeMapping, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        if (localNodeMapping.hasMap()) {
+    private void toLeafCode(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+        if (nodeMapping.hasMap()) {
             codeOut.line_(
                     "%s %s { %s -> // R10",
-                    toMapExpression(localNodeMapping), localNodeMapping.getOperator().getChar(), localNodeMapping.getMapName()
+                    toMapExpression(nodeMapping), nodeMapping.getOperator().getChar(), nodeMapping.getMapName()
             );
             startBuilderCall("R11", codeOut, groovyParams, editPath);
-            localNodeMapping.codeOut = codeOut.createChild();
-            localNodeMapping.toLeafElementCode(groovyParams, editPath);
+            nodeMapping.codeOut = codeOut.createChild();
+            nodeMapping.toLeafElementCode(groovyParams, editPath);
             codeOut._line("}");
             codeOut._line("}");
         }
         else {
             startBuilderCall("R12", codeOut, groovyParams, editPath);
-            localNodeMapping.codeOut = codeOut.createChild();
-            localNodeMapping.toLeafElementCode(groovyParams, editPath);
+            nodeMapping.codeOut = codeOut.createChild();
+            nodeMapping.toLeafElementCode(groovyParams, editPath);
             codeOut._line("}");
         }
     }
@@ -398,7 +402,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             else {
                 if (!subMapping.inputPath.parent().equals(parent)) return null; // different parents
             }
-            inputPaths.add(subMapping.inputPath);
+            inputPaths.addAll(subMapping.getInputPaths());
         }
         return inputPaths;
     }
