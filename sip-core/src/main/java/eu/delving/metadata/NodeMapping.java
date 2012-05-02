@@ -89,10 +89,6 @@ public class NodeMapping {
         return inputPath.hashCode();
     }
 
-    public boolean isVirtual() {
-        return !recDefNode.getNodeMappings().containsKey(inputPath);
-    }
-
     public String getDocumentation() {
         return linesToString(documentation);
     }
