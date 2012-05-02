@@ -152,7 +152,7 @@
 
     <opts>
 
-        <opt-list path="/record/thing/category" key="@key" schemaUri="@schemaUri"  displayName="Category">
+        <opt-list dictionary="true" path="/record/thing/category" key="@key" schemaUri="@schemaUri" displayName="Category">
             <opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>
             <opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>
             <opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>
