@@ -32,5 +32,5 @@ public interface EditPath {
 
     NodeMapping getNodeMapping();
 
-    String getEditedCode();
+    String getEditedCode(Path path);
 }

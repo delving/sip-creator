@@ -430,13 +430,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 else {
                     for (NodeMapping nodeMapping : sub.nodeMappings.values()) {
                         nodeMapping.codeOut = codeOut.createChild();
-                        if (sub.isAttr()) {
-                            if (comma) codeOut.line(",");
-                            codeOut.line_("%s : {", sub.getTag().toBuilderCall());
-                            nodeMapping.toAttributeCode(groovyParams, editPath);
-                            codeOut._line("}");
-                            comma = true;
-                        }
+                        if (comma) codeOut.line(",");
+                        codeOut.line_("%s : {", sub.getTag().toBuilderCall());
+                        nodeMapping.toAttributeCode(groovyParams, editPath);
+                        codeOut._line("}");
+                        comma = true;
                     }
                 }
             }

@@ -246,7 +246,7 @@ public class NodeMapping {
 
     private void toUserCode(Stack<String> groovyParams, EditPath editPath) {
         if (editPath != null) {
-            String editedCode = editPath.getEditedCode();
+            String editedCode = editPath.getEditedCode(recDefNode.getPath());
             if (editedCode != null) {
                 indentCode(editedCode, codeOut);
                 return;
@@ -291,14 +291,18 @@ public class NodeMapping {
                 if (needLoop) {
                     codeOut.line_(
                             "%s %s { %s ->",
-                            toMapExpression(this), getOperator().getChar(), getMapName());
+                            toMapExpression(this), getOperator().getChar(), getMapName()
+                    );
                 }
             }
             else {
                 String param = toLoopGroovyParam(path);
                 needLoop = !groovyParams.contains(param);
                 if (needLoop) {
-                    codeOut.line_("%s %s { %s ->", toLoopRef(path), getOperator().getChar(), param);
+                    codeOut.line_(
+                            "%s %s { %s ->",
+                            toLoopRef(path), getOperator().getChar(), param
+                    );
                 }
             }
             toInnerLoop(path.withRootRemoved(), groovyParams);
@@ -367,7 +371,7 @@ public class NodeMapping {
             }
 
             @Override
-            public String getEditedCode() {
+            public String getEditedCode(Path path) {
                 return null;
             }
         };

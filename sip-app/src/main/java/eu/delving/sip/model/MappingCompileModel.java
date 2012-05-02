@@ -196,16 +196,16 @@ public class MappingCompileModel {
             }
 
             @Override
-            public String getEditedCode() {
-                if (fromCodeDocument) {
-                    return StringUtil.documentToString(codeDocument);
+            public String getEditedCode(Path path) {
+                if (path.equals(nodeMapping.recDefNode.getPath())) {
+                    if (fromCodeDocument) {
+                        return StringUtil.documentToString(codeDocument);
+                    }
+                    else if (nodeMapping.groovyCode != null) {
+                        return StringUtil.linesToString(nodeMapping.groovyCode);
+                    }
                 }
-                else if (nodeMapping.groovyCode != null) {
-                    return StringUtil.linesToString(nodeMapping.groovyCode);
-                }
-                else {
-                    return null;
-                }
+                return null;
             }
         };
     }
@@ -274,7 +274,7 @@ public class MappingCompileModel {
                 if (mappingRunner == null) {
                     feedback.say("Compiling " + type);
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getEditPath(true));
-                    System.out.println(mappingRunner.getCode()); // todo: remove
+//                    if (type == FIELD) System.out.println(mappingRunner.getCode()); // todo: remove
                 }
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
