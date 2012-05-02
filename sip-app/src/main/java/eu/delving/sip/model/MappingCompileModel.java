@@ -239,9 +239,7 @@ public class MappingCompileModel {
 
         @Override
         public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            if (!nodeMapping.codeLooksLike(StringUtil.documentToString(codeDocument))) {
-                compileSoon();
-            }
+            compileSoon();
         }
 
         @Override
