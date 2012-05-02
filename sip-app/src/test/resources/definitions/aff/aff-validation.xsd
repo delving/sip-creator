@@ -8,6 +8,7 @@
     <xs:element name="record" type="aff:recordType"/>
 
     <xs:attribute name="localId" type="xs:string"/>
+    <xs:attribute name="level" type="xs:string"/>
     <xs:attribute name="conceptType" type="xs:string"/>
     <xs:attribute name="categoryUri" type="xs:string"/>
     <xs:attribute name="schema" type="xs:string"/>
@@ -73,6 +74,7 @@
         </xs:sequence>
         <xs:attribute ref="aff:type"/>
         <xs:attribute ref="aff:key"/>
+        <xs:attribute ref="aff:level"/>
         <xs:attribute ref="aff:localId"/>
         <xs:attribute ref="aff:uri"/>
         <xs:attribute ref="aff:lang"/>
@@ -93,8 +95,8 @@
 
     <xs:complexType name="thingType">
         <xs:sequence>
-            <xs:element name="uri"  type="xs:anyURI" minOccurs="1" maxOccurs="1"/>
-            <!--<xs:element name="displayCategory" type="aff:categoryType" minOccurs="1" maxOccurs="1"/>-->
+            <xs:element name="uri" type="xs:anyURI" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="category" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="displayIdentification"  type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element type="aff:titlesType" name="titles" minOccurs="0" maxOccurs="1"/>
             <xs:element type="aff:descriptionsType" name="descriptions" minOccurs="0" maxOccurs="1"/>

@@ -11,6 +11,7 @@
     <attrs>
         <attr tag="id"/>
         <attr tag="localId"/>
+        <attr tag="level"/>
         <attr tag="conceptType"/>
         <attr tag="categoryUri"/>
         <attr tag="schema"/>
@@ -52,15 +53,15 @@
         </elem>
 
         <elem tag="facets" singular="true" unmapable="true">
-            <elem tag="facet" attrs="type, key, lang, localId, uri" unmapable="true">
+            <elem tag="facet" attrs="type, key, lang, level, localId, uri" unmapable="true">
                 <elem tag="displayFacet"/>
                 <elem tag="displayDescription"/>
 
-                <elem tag="childFacet" attrs="type, key, localId, uri" unmapable="true">
+                <elem tag="childFacet" attrs="type, key, level, localId, uri" unmapable="true">
                     <elem tag="displayFacet"/>
                     <elem tag="displayDescription"/>
 
-                    <elem tag="childFacet" attrs="type, key, localId, uri" unmapable="true">
+                    <elem tag="childFacet" attrs="type, key, level, localId, uri" unmapable="true">
                         <elem tag="displayFacet"/>
                         <elem tag="displayDescription"/>
                     </elem>
@@ -70,16 +71,11 @@
 
         <elem tag="thing" attrs="localId, lang, hubId" singular="true" unmapable="true">
             <elem tag="uri"/>
+            <elem tag="category" attrs="key, schemaUri"/>
             <elem tag="displayIdentification"/>
-            <elem tag="titles">
-                <elem tag="displayTitle"/>
-            </elem>
-            <elem tag="descriptions">
-                <elem tag="displayDescription"/>
-            </elem>
-            <elem tag="inscriptions">
-                <elem tag="displayInscription"/>
-            </elem>
+            <elem tag="displayTitle"/>
+            <elem tag="displayDescription"/>
+            <elem tag="displayInscription"/>
             <elem tag="dimensions">
                 <elem tag="displayDimension"/>
             </elem>
@@ -96,8 +92,8 @@
         </elem>
 
         <elem tag="concepts" singular="true" unmapable="true">
-            <elem tag="concept" attrs="type, key">
-                <elem attrs="conceptType, localId, lang, schema, schemaUri" tag="displayConcept"/>
+            <elem tag="concept" attrs="type, key, conceptType, localId, lang, schema, schemaUri">
+                <elem tag="displayConcept"/>
             </elem>
         </elem>
 
@@ -153,21 +149,23 @@
 
     </root>
 
+
     <opts>
 
-        <!-- todo: this is an example of a choice, like the old <options>, indicated by lack of "key"-->
-        <!--<opt-list path="/record/admin/defaultLang" displayName="Language Experiment">-->
-        <!--<opt value="en"/>-->
-        <!--<opt value="nl"/>-->
-        <!--</opt-list>-->
+        <opt-list path="/record/thing/category" key="@key" schemaUri="@schemaUri"  displayName="Category">
+            <opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>
+            <opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>
+            <opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>
+            <opt key="crm_e31" scehamUri="http://www.cidoc-crm.org/rdfs/E31.Document" value="Document"/>
+        </opt-list>
 
 
         <opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">
             <opt hidden="true" key="http://www.cidoc-crm.org/rdfs/E78.Collection" value="collection"/>
             <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fonds" value="fonds">
                 <opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">
-                    <opt value="gumby"/>
-                    <opt value="pokey"/>
+                    <opt value="A"/>
+                    <opt value="B"/>
                 </opt-list>
             </opt>
         </opt-list>
@@ -263,7 +261,7 @@
     </field-markers>
 
     <docs>
-        <doc path="/record/thing/titles/displayTitle">
+        <doc path="/record/thing/displayTitle">
             <string>Description: The name given to the resource. Typically, a Title will be a name by which the resource
                 is formally known.
             </string>
