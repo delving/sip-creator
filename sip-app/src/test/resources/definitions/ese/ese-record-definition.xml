@@ -8,7 +8,7 @@
         <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.4.xsd"/>
     </namespaces>
 
-    <root tag="record">
+    <root tag="europeana:record">
 
 
         <elem tag="dc:title"/>
