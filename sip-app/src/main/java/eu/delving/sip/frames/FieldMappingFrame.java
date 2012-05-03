@@ -224,7 +224,7 @@ public class FieldMappingFrame extends FrameBase {
                         public void run() {
                             setEditable(codeArea, nodeMapping.isUserCodeEditable());
                             operatorBoxSetting = true;
-                            operatorBox.setSelectedIndex(nodeMapping.operator.ordinal());
+                            operatorBox.setSelectedIndex(nodeMapping.getOperator().ordinal());
                             operatorBoxSetting = false;
                         }
                     });
