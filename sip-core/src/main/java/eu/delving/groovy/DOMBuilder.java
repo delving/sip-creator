@@ -81,7 +81,7 @@ public class DOMBuilder extends BuilderSupport {
     @Override
     protected Object createNode(Object name, Object value) {
         Element element = (Element) createNode(name);
-        element.appendChild(document.createTextNode(value.toString()));
+        element.appendChild(toNode(value.toString()));
         return element;
     }
 
@@ -126,7 +126,7 @@ public class DOMBuilder extends BuilderSupport {
     @Override
     protected Object createNode(Object name, Map attributes, Object value) {
         Element element = (Element) createNode(name, attributes);
-        element.appendChild(document.createTextNode(value.toString()));
+        element.appendChild(toNode(value.toString()));
         return element;
     }
 
@@ -192,7 +192,7 @@ public class DOMBuilder extends BuilderSupport {
     private void setValuesFromClosure(Node node, Closure closure) {
         ClosureResult result = runClosure(node, closure);
         if (result.string != null) {
-            node.appendChild(document.createTextNode(result.string));
+            node.appendChild(toNode(result.string));
         }
         if (result.list != null && !result.list.isEmpty()) {
 //            if (isPunctuation(result.list.get(0))) {
@@ -201,10 +201,10 @@ public class DOMBuilder extends BuilderSupport {
 //                    value.append(result.list.get(walk));
 //                    if (walk<result.list.size() - 1) value.append(result.list.get(0));
 //                }
-//                node.appendChild(document.createTextNode(value.toString()));
+//                node.appendChild(toNode(value.toString()));
 //            }
 //            else {
-                node.appendChild(document.createTextNode(result.list.get(0)));
+                node.appendChild(toNode(result.list.get(0)));
                 for (int walk = 1; walk < result.list.size(); walk++) {
                     Map<String, String> attributes = new TreeMap<String,String>();
                     NamedNodeMap nodeAttributes = node.getAttributes();
@@ -335,5 +335,9 @@ public class DOMBuilder extends BuilderSupport {
             return uri;
         }
         return colon > 0 ? namespaces.get(name.substring(0, colon)) : null;
+    }
+
+    private Node toNode(String text) {
+        return document.createTextNode(text);
     }
 }
