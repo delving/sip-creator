@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import org.antlr.stringtemplate.StringTemplate;
@@ -103,7 +104,7 @@ public class NodeMappingListModel extends AbstractListModel {
             }
 
             @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
                 final int index = indexOf(nodeMapping);
                 if (index < 0) throw new RuntimeException("Node mapping not found: "+nodeMapping);
                 Exec.swing(new Runnable() {

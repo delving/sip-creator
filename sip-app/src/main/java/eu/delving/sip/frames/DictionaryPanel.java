@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static eu.delving.metadata.NodeMappingChange.DICTIONARY;
 import static eu.delving.sip.base.DictionaryHelper.*;
 
 /**
@@ -320,7 +321,7 @@ public class DictionaryPanel extends JPanel {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        if (createModel.hasNodeMapping()) createModel.getNodeMapping().notifyChanged();
+                        if (createModel.hasNodeMapping()) createModel.getNodeMapping().notifyChanged(DICTIONARY);
                     }
                 });
                 timer.restart();

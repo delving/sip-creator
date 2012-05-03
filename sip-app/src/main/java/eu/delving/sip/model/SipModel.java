@@ -128,7 +128,7 @@ public class SipModel {
             }
 
             @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
                 clearValidation(mappingModel.getRecMapping());
             }
 

@@ -41,10 +41,10 @@ import java.util.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class RecDefTree implements RecDefNode.Listener {
+public class RecDefTree implements RecDefNodeListener {
     private RecDef recDef;
     private RecDefNode root;
-    private RecDefNode.Listener listener;
+    private RecDefNodeListener listener;
 
     public static RecDefTree create(RecDef recDef) {
         return new RecDefTree(recDef);
@@ -55,7 +55,7 @@ public class RecDefTree implements RecDefNode.Listener {
         this.root = RecDefNode.create(this, recDef);
     }
 
-    public void setListener(RecDefNode.Listener listener) {
+    public void setListener(RecDefNodeListener listener) {
         this.listener = listener;
     }
 
@@ -114,8 +114,8 @@ public class RecDefTree implements RecDefNode.Listener {
     }
 
     @Override
-    public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping) {
-        if (listener != null) listener.nodeMappingChanged(recDefNode, nodeMapping);
+    public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping, NodeMappingChange change) {
+        if (listener != null) listener.nodeMappingChanged(recDefNode, nodeMapping, change);
     }
 
     @Override

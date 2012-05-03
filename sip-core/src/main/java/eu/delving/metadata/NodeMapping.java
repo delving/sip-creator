@@ -27,6 +27,8 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.*;
 
+import static eu.delving.metadata.NodeMappingChange.CODE;
+import static eu.delving.metadata.NodeMappingChange.DOCUMENTATION;
 import static eu.delving.metadata.StringUtil.*;
 
 /**
@@ -53,10 +55,10 @@ public class NodeMapping {
     @XStreamAsAttribute
     public Path outputPath;
 
+    public List<Path> siblings;
+
     @XStreamAsAttribute
     public Operator operator;
-
-    public List<Path> siblings;
 
     public Map<String, String> dictionary;
 
@@ -95,7 +97,7 @@ public class NodeMapping {
 
     public void setDocumentation(String documentation) {
         this.documentation = stringToLines(documentation);
-        recDefNode.notifyNodeMappingChange(this);
+        notifyChanged(DOCUMENTATION);
     }
 
     public Operator getOperator() {
@@ -145,8 +147,8 @@ public class NodeMapping {
         return this;
     }
 
-    public void notifyChanged() {
-        if (recDefNode != null) recDefNode.notifyNodeMappingChange(this);
+    public void notifyChanged(NodeMappingChange change) {
+        if (recDefNode != null) recDefNode.notifyNodeMappingChange(this, change);
     }
 
     public NodeMapping setInputPaths(Collection<Path> inputPaths) {
@@ -206,12 +208,12 @@ public class NodeMapping {
         if (codeString == null || generatedCodeLooksLike(codeString, recMapping)) {
             if (groovyCode != null) {
                 groovyCode = null;
-                notifyChanged();
+                notifyChanged(CODE);
             }
         }
         else if (groovyCode == null || !codeLooksLike(codeString)) {
             groovyCode = stringToLines(codeString);
-            notifyChanged();
+            notifyChanged(CODE);
         }
     }
 

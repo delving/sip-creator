@@ -21,10 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
-import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -251,7 +248,7 @@ public class FunctionFrame extends FrameBase {
             }
 
             @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
             }
 
             @Override

@@ -21,10 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
-import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.MappingModel;
@@ -34,6 +31,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
+import static eu.delving.metadata.NodeMappingChange.DOCUMENTATION;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
@@ -64,8 +62,8 @@ public class MappingCodeFrame extends FrameBase {
             }
 
             @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                refresh();
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+                if (change != DOCUMENTATION) refresh();
             }
 
             @Override

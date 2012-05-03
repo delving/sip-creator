@@ -229,39 +229,38 @@ public class MappingCompileModel {
         @Override
         public void recMappingSet(MappingModel mappingModel) {
             recMapping = mappingModel.getRecMapping();
-            compileSoon();
+            triggerCompile();
         }
 
         @Override
         public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-            compileSoon();
+            triggerCompile();
         }
 
         @Override
-        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            if (!nodeMapping.codeLooksLike(StringUtil.documentToString(codeDocument))) {
-                // todo: also check if the operator has changed!
-                compileSoon();
+        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            switch (change) {
+                case CODE:
+                case OPERATOR:
+                case DICTIONARY:
+                    triggerCompile();
+                    break;
             }
         }
 
         @Override
         public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            if (type == RECORD) compileSoon();
+            if (type == RECORD) triggerCompile();
         }
 
         @Override
         public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             if (type == RECORD) {
-                compileSoon();
+                triggerCompile();
             }
             else if (MappingCompileModel.this.nodeMapping != null && MappingCompileModel.this.nodeMapping == nodeMapping) {
                 setNodeMapping(null);
             }
-        }
-
-        private void compileSoon() {
-            triggerCompile();
         }
     }
 
