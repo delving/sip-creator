@@ -21,7 +21,7 @@
     </attrs>
 
     <elems>
-        <elem tag="conceptID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="conceptID" attrs="pref, type, source, encodinganalog, label" fieldType="link"/>
         <elem tag="term" attrs="pref, addedSearchTerm, xml:lang, encodinganalog, label"/>
 
         <elem tag="appellationValue" attrs="pref, xml:lang, encodinganalog, label" required="true"/>

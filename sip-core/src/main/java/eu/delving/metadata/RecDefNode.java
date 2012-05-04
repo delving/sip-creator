@@ -136,6 +136,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return !isAttr() && elem.unmappable;
     }
 
+    public boolean isURI() {
+        return "link".equals(isAttr() ? attr.fieldType : elem.fieldType);
+    }
+
 //    public boolean isSingular() { todo: use it
 //        return !isAttr() && elem.singular;
 //    }

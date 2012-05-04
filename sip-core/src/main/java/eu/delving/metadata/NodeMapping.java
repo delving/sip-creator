@@ -278,6 +278,9 @@ public class NodeMapping {
                 if (path.peek().getLocalName().equals("constant")) {
                     codeOut.line("'CONSTANT'");
                 }
+                else if (recDefNode.isURI()) {
+                    codeOut.line("\"${%s.sanitizeURI()}\"", toLeafGroovyParam(path));
+                }
                 else {
                     codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
                 }

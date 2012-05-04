@@ -198,4 +198,27 @@ public class MappingCategory {
         return text
     }
 
+    static String sanitizeURI(Object object) {
+        StringBuilder out = new StringBuilder()
+        for (char c : object.toString().chars) {
+            switch (c) {
+                case ' ':
+                    out.append('%20')
+                    break;
+                case '[':
+                    out.append('%5B')
+                    break;
+                case ']':
+                    out.append('%5D')
+                    break;
+                case '\\':
+                    out.append('%5C')
+                    break;
+                default:
+                    out.append(c);
+            }
+        }
+        return out.toString()
+    }
+
 }

@@ -142,7 +142,7 @@ public class TestCodeGeneration {
         n(member2, "name", "O'Pokey");
         n(member2, "name", "McPokey");
         n(member2, "concept", "sidekick");
-        n(record, "fromOne", "1");
+        n(record, "fromOne", "http://uri.com/but with spaces/whichis[weird\\stupid]/");
         n(record, "fromTwo", "2");
 
         Map<String, String> ns = new TreeMap<String, String>();
@@ -157,7 +157,7 @@ public class TestCodeGeneration {
                     "        <lido:objectClassificationWrap>\n" +
                     "            <lido:classificationWrap>\n" +
                     "                <lido:classification>\n" +
-                    "                    <lido:conceptID>1</lido:conceptID>\n" +
+                    "                    <lido:conceptID>http://uri.com/but%20with%20spaces/whichis%5Bweird%5Cstupid%5D/</lido:conceptID>\n" +
                     "                    <lido:conceptID>2</lido:conceptID>\n" +
                     "                </lido:classification>\n" +
                     "            </lido:classificationWrap>\n" +
