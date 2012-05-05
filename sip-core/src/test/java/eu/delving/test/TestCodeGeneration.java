@@ -139,7 +139,7 @@ public class TestCodeGeneration {
         n(member1, "concept", "savior");
         member2 = n(list, "member");
         member2.attributes().put("index", "45");
-        n(member2, "name", "O'Pokey");
+        n(member2, "name", "<![CDATA[<]]>O'Po<![CDATA[k]]>ey<![CDATA[>]]>");
         n(member2, "name", "McPokey");
         n(member2, "concept", "sidekick");
         n(record, "fromOne", "http://uri.com/but with spaces/whichis[weird\\stupid]/");
@@ -181,7 +181,7 @@ public class TestCodeGeneration {
                     "                            <lido:term lido:pref=\"45\">Clay Horse</lido:term>\n" +
                     "                        </lido:subjectConcept>\n" +
                     "                        <lido:subjectActor>\n" +
-                    "                            <lido:displayActor>O'Pokey</lido:displayActor>\n" +
+                    "                            <lido:displayActor><![CDATA[<]]>O'Po<![CDATA[k]]>ey<![CDATA[>]]></lido:displayActor>\n" +
                     "                            <lido:displayActor>McPokey</lido:displayActor>\n" +
                     "                        </lido:subjectActor>\n" +
                     "                    </lido:subject>\n" +

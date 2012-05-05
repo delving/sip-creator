@@ -87,14 +87,14 @@ public class MetadataParser {
                     path = path.child(Tag.element(input.getName()));
                     if (node == null && path.equals(Storage.RECORD_ROOT)) {
                         node = new GroovyNode(null, "input");
-                        if (input.getAttributeCount() != 1 || !Storage.UNIQUE_ATTR.equals(input.getAttributeLocalName(0))) throw new IOException("Expected record root to have @id");
+                        if (input.getAttributeCount() != 1 || !Storage.UNIQUE_ATTR.equals(input.getAttributeLocalName(0))) {
+                            throw new IOException("Expected record root to have @id");
+                        }
                         node.attributes().put(Storage.UNIQUE_ATTR, input.getAttributeValue(0));
                     }
                     else if (node != null) {
                         node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
-                        if (!input.getPrefix().isEmpty()) {
-                            namespaces.put(input.getPrefix(), input.getNamespaceURI());
-                        }
+                        if (!input.getPrefix().isEmpty()) namespaces.put(input.getPrefix(), input.getNamespaceURI());
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                 QName qName = input.getAttributeName(walk);
@@ -112,10 +112,10 @@ public class MetadataParser {
                     }
                     break;
                 case XMLEvent.CHARACTERS:
+                    if (node != null) value.append(input.getText());
+                    break;
                 case XMLEvent.CDATA:
-                    if (node != null) {
-                        value.append(input.getText());
-                    }
+                    if (node != null) value.append(String.format("<![CDATA[%s]]>", input.getText()));
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (node != null) {
@@ -123,14 +123,10 @@ public class MetadataParser {
                         value.setLength(0);
                         if (!valueString.isEmpty()) node.setValue(valueString);
                         if (path.equals(Storage.RECORD_ROOT)) {
-                            if (node.parent() != null) {
-                                throw new RuntimeException("Expected to be at root node");
-                            }
+                            if (node.parent() != null) throw new RuntimeException("Expected to be at root node");
                             metadataRecord = factory.fromGroovyNode(node, recordIndex++, recordCount);
-                            if (progressListener != null) {
-                                if (!progressListener.setProgress(recordIndex)) {
-                                    throw new AbortException();
-                                }
+                            if (progressListener != null && !progressListener.setProgress(recordIndex)) {
+                                throw new AbortException();
                             }
                             node = null;
                         }
@@ -146,9 +142,7 @@ public class MetadataParser {
             }
             if (!input.hasNext()) {
                 inputStream.close();
-                if (progressListener != null) {
-                    progressListener.finished(true);
-                }
+                if (progressListener != null) progressListener.finished(true);
                 break;
             }
             input.next();

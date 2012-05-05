@@ -140,6 +140,7 @@ public class MappingRunner {
                 case Node.ATTRIBUTE_NODE:
                     break;
                 case Node.TEXT_NODE:
+                case Node.CDATA_SECTION_NODE:
                     if (kid.getTextContent().trim().isEmpty()) dead.add(kid);
                     break;
                 case Node.ELEMENT_NODE:

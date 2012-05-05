@@ -40,6 +40,7 @@ import java.util.Map;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
+@Deprecated
 public class NodeBuilder extends BuilderSupport {
 
     public static NodeBuilder newInstance() {

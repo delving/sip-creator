@@ -93,9 +93,8 @@ public class MappingResultImpl implements MappingResult {
                 case Node.TEXT_NODE:
                     throw new RuntimeException("Text Nodes not implemented");
                 case Node.ELEMENT_NODE:
-                    Node textNode = getTextNode(kid);
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
-                    String value = textNode.getNodeValue();
+                    String value = getTextFromChildren(kid);
                     put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), value);
                     handleMarkedField(recDefNode, value);
                     break;
@@ -117,9 +116,7 @@ public class MappingResultImpl implements MappingResult {
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
                     if (recDefNode.isLeafElem()) {
-                        Node textNode = getTextNode(kid);
-                        if (textNode == null) throw new RuntimeException("No text subnode for content of " + recDefNode);
-                        String value = textNode.getNodeValue();
+                        String value = getTextFromChildren(kid);
                         put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), value);
                         handleMarkedField(recDefNode, value);
                     }
@@ -176,12 +173,19 @@ public class MappingResultImpl implements MappingResult {
         return recDefNode;
     }
 
-    private Node getTextNode(Node parent) {
+    private String getTextFromChildren(Node parent) {
+        StringBuilder text = new StringBuilder();
         NodeList kids = parent.getChildNodes();
-        if (kids.getLength() != 1) throw new RuntimeException("Expected only one grandchild node");
-        Node textNode = kids.item(0);
-        if (textNode.getNodeType() != Node.TEXT_NODE) throw new RuntimeException("Expected text grandchild node");
-        return textNode;
+        for (int walk=0; walk<kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.TEXT_NODE:
+                case Node.CDATA_SECTION_NODE:
+                    text.append(kid.getNodeValue());
+                    break;
+            }
+        }
+        return text.toString();
     }
 
     private void dump(Node node, int level) {
