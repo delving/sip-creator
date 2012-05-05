@@ -1,7 +1,7 @@
 <_id>VeryUnique</_id>
 <lido:lidoRecID lido:type="local"
                 lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg">
-    DE-Mb112/lido/obj/00000001
+    <![CDATA[<badass>]]>DE-Mb112<![CDATA[</badass>]]>/lido/obj/00000001
 </lido:lidoRecID>
 <lido:category>
 <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>

@@ -89,8 +89,10 @@ public class MetadataRecordFactory {
                         value.setLength(0);
                         break;
                     case XMLEvent.CHARACTERS:
-                    case XMLEvent.CDATA:
                         value.append(input.getText());
+                        break;
+                    case XMLEvent.CDATA:
+                        value.append(String.format("<![CDATA[%s]]>", input.getText()));
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (node == null) throw new RuntimeException("Node cannot be null");

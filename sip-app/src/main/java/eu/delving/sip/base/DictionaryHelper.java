@@ -31,6 +31,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static eu.delving.metadata.NodeMappingChange.CODE;
+import static eu.delving.metadata.NodeMappingChange.DICTIONARY;
+
 /**
  * Help with handling the dictionary contained in a NodeMapping
  *
@@ -87,7 +90,7 @@ public class DictionaryHelper {
             changed = true;
         }
         nodeMapping.groovyCode = null;
-        if (changed) nodeMapping.notifyChanged();
+        if (changed) nodeMapping.notifyChanged(DICTIONARY);
         return changed;
     }
 
@@ -95,6 +98,6 @@ public class DictionaryHelper {
         if (nodeMapping == null) return;
         nodeMapping.dictionary = null;
         nodeMapping.groovyCode = null;
-        nodeMapping.notifyChanged();
+        nodeMapping.notifyChanged(CODE);
     }
 }

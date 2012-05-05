@@ -122,6 +122,7 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
+    @Ignore
     @Test
     public void testAff() throws Exception {
         mock.prepareDataset(

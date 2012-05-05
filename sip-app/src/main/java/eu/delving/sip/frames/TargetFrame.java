@@ -210,7 +210,7 @@ public class TargetFrame extends FrameBase {
             }
 
             @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
             }
 
             @Override

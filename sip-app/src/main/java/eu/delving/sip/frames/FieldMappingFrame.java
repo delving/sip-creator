@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static eu.delving.metadata.NodeMappingChange.OPERATOR;
 import static eu.delving.metadata.StringUtil.toGroovyFirstIdentifier;
 import static eu.delving.metadata.StringUtil.toGroovyIdentifier;
 import static eu.delving.sip.base.SwingHelper.*;
@@ -205,7 +206,7 @@ public class FieldMappingFrame extends FrameBase {
                         @Override
                         public void run() {
                             nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
-                            nodeMapping.notifyChanged();
+                            nodeMapping.notifyChanged(OPERATOR);
                         }
                     });
                 }
@@ -224,7 +225,7 @@ public class FieldMappingFrame extends FrameBase {
                         public void run() {
                             setEditable(codeArea, nodeMapping.isUserCodeEditable());
                             operatorBoxSetting = true;
-                            operatorBox.setSelectedIndex(nodeMapping.operator.ordinal());
+                            operatorBox.setSelectedIndex(nodeMapping.getOperator().ordinal());
                             operatorBoxSetting = false;
                         }
                     });

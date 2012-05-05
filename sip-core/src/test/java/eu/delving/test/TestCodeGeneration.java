@@ -45,9 +45,9 @@ public class TestCodeGeneration {
     static {
         try {
             recMapping = RecMapping.create("lido", recDefModel());
-            recMapping.getRecDefTree().setListener(new RecDefNode.Listener() {
+            recMapping.getRecDefTree().setListener(new RecDefNodeListener() {
                 @Override
-                public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping) {
+                public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping, NodeMappingChange change) {
                     System.out.println("Mapping changed: " + recDefNode);
                 }
 
@@ -139,10 +139,10 @@ public class TestCodeGeneration {
         n(member1, "concept", "savior");
         member2 = n(list, "member");
         member2.attributes().put("index", "45");
-        n(member2, "name", "O'Pokey");
+        n(member2, "name", "<![CDATA[<]]>O'Po<![CDATA[k]]>ey<![CDATA[>]]>");
         n(member2, "name", "McPokey");
         n(member2, "concept", "sidekick");
-        n(record, "fromOne", "1");
+        n(record, "fromOne", "http://uri.com/but with spaces/whichis[weird\\stupid]/");
         n(record, "fromTwo", "2");
 
         Map<String, String> ns = new TreeMap<String, String>();
@@ -157,7 +157,7 @@ public class TestCodeGeneration {
                     "        <lido:objectClassificationWrap>\n" +
                     "            <lido:classificationWrap>\n" +
                     "                <lido:classification>\n" +
-                    "                    <lido:conceptID>1</lido:conceptID>\n" +
+                    "                    <lido:conceptID>http://uri.com/but%20with%20spaces/whichis%5Bweird%5Cstupid%5D/</lido:conceptID>\n" +
                     "                    <lido:conceptID>2</lido:conceptID>\n" +
                     "                </lido:classification>\n" +
                     "            </lido:classificationWrap>\n" +
@@ -181,7 +181,7 @@ public class TestCodeGeneration {
                     "                            <lido:term lido:pref=\"45\">Clay Horse</lido:term>\n" +
                     "                        </lido:subjectConcept>\n" +
                     "                        <lido:subjectActor>\n" +
-                    "                            <lido:displayActor>O'Pokey</lido:displayActor>\n" +
+                    "                            <lido:displayActor><![CDATA[<]]>O'Po<![CDATA[k]]>ey<![CDATA[>]]></lido:displayActor>\n" +
                     "                            <lido:displayActor>McPokey</lido:displayActor>\n" +
                     "                        </lido:subjectActor>\n" +
                     "                    </lido:subject>\n" +

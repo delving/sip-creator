@@ -40,7 +40,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class MappingModel implements RecDefNode.Listener {
+public class MappingModel implements RecDefNodeListener {
     private RecMapping recMapping;
     private RecDefTreeNode recDefTreeRoot;
     private NodeMappingListModel nodeMappingListModel = new NodeMappingListModel();
@@ -89,9 +89,9 @@ public class MappingModel implements RecDefNode.Listener {
     }
 
     @Override
-    public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping) {
+    public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping, NodeMappingChange change) {
         for (ChangeListener changeListener : changeListeners)
-            changeListener.nodeMappingChanged(this, recDefNode, nodeMapping);
+            changeListener.nodeMappingChanged(this, recDefNode, nodeMapping, change);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class MappingModel implements RecDefNode.Listener {
 
         void functionChanged(MappingModel mappingModel, MappingFunction function);
 
-        void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
+        void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change);
 
         void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 

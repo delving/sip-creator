@@ -51,26 +51,18 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private String defaultPrefix;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
-    private Listener listener;
+    private RecDefNodeListener listener;
 
     @Override
     public int compareTo(RecDefNode recDefNode) {
         return getTag().compareTo(recDefNode.getTag());
     }
 
-    public interface Listener {
-        void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping);
-
-        void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping);
-
-        void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping);
-    }
-
-    public static RecDefNode create(Listener listener, RecDef recDef) {
+    public static RecDefNode create(RecDefNodeListener listener, RecDef recDef) {
         return new RecDefNode(listener, null, recDef.root, null, recDef.prefix, null); // only root element
     }
 
-    private RecDefNode(Listener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, String defaultPrefix, OptBox optBox) {
+    private RecDefNode(RecDefNodeListener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, String defaultPrefix, OptBox optBox) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
@@ -142,6 +134,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public boolean isUnmappable() {
         return !isAttr() && elem.unmappable;
+    }
+
+    public boolean isURI() {
+        return "link".equals(isAttr() ? attr.fieldType : elem.fieldType);
     }
 
 //    public boolean isSingular() { todo: use it
@@ -228,8 +224,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
     }
 
-    public void notifyNodeMappingChange(NodeMapping nodeMapping) {
-        listener.nodeMappingChanged(this, nodeMapping);
+    public void notifyNodeMappingChange(NodeMapping nodeMapping, NodeMappingChange change) {
+        listener.nodeMappingChanged(this, nodeMapping, change);
     }
 
     public void toElementCode(boolean virtual, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
