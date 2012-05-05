@@ -28,6 +28,7 @@ import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.HarvestDialog;
 import eu.delving.sip.menus.DataSetMenu;
+import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.MappingModel;
@@ -235,10 +236,10 @@ public class Application {
         ));
         statusPanel.setReaction(DataSetState.ABSENT, allFrames.prepareForNothing());
         statusPanel.setReaction(DataSetState.EMPTY, importAction);
-        statusPanel.setReaction(DataSetState.IMPORTED, new AnalysisPerformer());
+        statusPanel.setReaction(DataSetState.IMPORTED, new InputAnalyzer());
         statusPanel.setReaction(DataSetState.ANALYZED_IMPORT, allFrames.prepareForDelimiting());
         statusPanel.setReaction(DataSetState.DELIMITED, new ConvertPerformer());
-        statusPanel.setReaction(DataSetState.SOURCED, new AnalysisPerformer());
+        statusPanel.setReaction(DataSetState.SOURCED, new InputAnalyzer());
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
         statusPanel.setReaction(DataSetState.VALIDATED, uploadAction);
@@ -258,6 +259,7 @@ public class Application {
         bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
+        bar.add(new ExpertMenu(sipModel, desktop));
         bar.add(createHelpMenu());
         return bar;
     }
@@ -293,7 +295,7 @@ public class Application {
         return menu;
     }
 
-    private class AnalysisPerformer implements Runnable {
+    private class InputAnalyzer implements Runnable {
         @Override
         public void run() {
             final ProgressListener progress = sipModel.getFeedback().progressListener("Analyzing");

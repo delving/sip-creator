@@ -39,6 +39,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static eu.delving.sip.files.Storage.MAX_UNIQUE_VALUE_LENGTH;
+
 /**
  * An observable hole to put the things related to analysis: statistics, analysis tree, some list models
  *
@@ -112,6 +114,15 @@ public class StatsModel {
 
     public Path getUniqueElement() {
         return Path.create(hintsModel.get(Storage.UNIQUE_ELEMENT_PATH));
+    }
+
+    public void setMaxUniqueValueLength(int max) {
+        hintsModel.set(Storage.MAX_UNIQUE_VALUE_LENGTH, String.valueOf(max));
+    }
+
+    public int getMaxUniqueValueLength() {
+        String max = hintsModel.get(MAX_UNIQUE_VALUE_LENGTH);
+        return max == null ? Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH : Integer.parseInt(max);
     }
 
     public SourceTreeNode getSourceTree() {

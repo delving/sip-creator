@@ -162,11 +162,16 @@ public class MappingCategory {
         a = unwrap(a)
         Iterator walk = a.iterator();
         StringBuilder out = new StringBuilder()
+        GroovyNode node = null
         while (walk.hasNext()) {
-            out.append(walk.next())
+            GroovyNode listNode = (GroovyNode)walk.next()
+            if (node == null) node = new GroovyNode(null, listNode.qName(), listNode.attributes(), '*replace*');
+            out.append(listNode.toString())
             if (walk.hasNext()) out.append(delimiter)
         }
-        return [out.toString()]
+        if (node == null) return []
+        node.setValue(out.toString())
+        return [node]
     }
 
     // call closure for the first if there is one
@@ -191,6 +196,29 @@ public class MappingCategory {
         text = (text =~ /\n/).replaceAll(' ')
         text = (text =~ / +/).replaceAll(' ')
         return text
+    }
+
+    static String sanitizeURI(Object object) {
+        StringBuilder out = new StringBuilder()
+        for (char c : object.toString().chars) {
+            switch (c) {
+                case ' ':
+                    out.append('%20')
+                    break;
+                case '[':
+                    out.append('%5B')
+                    break;
+                case ']':
+                    out.append('%5D')
+                    break;
+                case '\\':
+                    out.append('%5C')
+                    break;
+                default:
+                    out.append(c);
+            }
+        }
+        return out.toString()
     }
 
 }

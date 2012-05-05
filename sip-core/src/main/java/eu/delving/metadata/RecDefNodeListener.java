@@ -22,15 +22,16 @@
 package eu.delving.metadata;
 
 /**
- * This interface combines a path in the RecDefTree with the edited code for that path so
- * that editing of code can be done for only one part of the tree at a time.
+ * How can node mappings in a rec def node change?
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface EditPath {
+public interface RecDefNodeListener {
 
-    NodeMapping getNodeMapping();
+    void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping, NodeMappingChange change);
 
-    String getEditedCode(Path path);
+    void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping);
+
+    void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping);
 }

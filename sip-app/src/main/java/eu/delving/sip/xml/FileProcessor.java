@@ -30,7 +30,6 @@ import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import eu.delving.stats.Stats;
-import eu.delving.stats.Uniqueness;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
@@ -45,7 +44,6 @@ import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.BitSet;
-import java.util.Set;
 
 /**
  * Take the input and config informationm and produce an output xml file
@@ -91,7 +89,6 @@ public class FileProcessor implements Runnable {
         if (!sipModel.hasDataSet() || !sipModel.hasPrefix()) {
             throw new RuntimeException("No data set selected");
         }
-        Uniqueness uniqueness = new Uniqueness();
         BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
         PrintWriter out = null;
         try {
@@ -100,6 +97,7 @@ public class FileProcessor implements Runnable {
             stats.setRecordRoot(recMapping.getRecDefTree().getRoot().getPath());
             stats.prefix = recMapping.getPrefix();
             stats.name = sipModel.getDataSetFacts().get("name");
+            stats.maxUniqueValueLength = sipModel.getStatsModel().getMaxUniqueValueLength();
             Validator validator = sipModel.getDataSetModel().newValidator(recMapping.getPrefix());
             validator.setErrorHandler(null);
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
@@ -153,14 +151,6 @@ public class FileProcessor implements Runnable {
                         e.printStackTrace(out);
                     }
                 }
-                Set<String> repeated = uniqueness.getRepeated();
-                if (!repeated.isEmpty()) {
-                    out.println("There were non-unique identifiers:");
-                    for (String line : repeated) {
-                        out.println(line);
-                    }
-                    sipModel.getFeedback().alert("Identifier should be unique, but there were %d repeated values");
-                }
                 out.println();
                 if (aborted) {
                     out.println("Validation was aborted!");
@@ -202,7 +192,6 @@ public class FileProcessor implements Runnable {
                 sipModel.getFeedback().say("Finished validating");
                 listener.finished(aborted ? null : stats, aborted ? null : valid, sipModel.getStatsModel().getRecordCount());
             }
-            uniqueness.destroy();
             if (!aborted) progressListener.finished(true);
         }
     }

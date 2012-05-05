@@ -21,10 +21,7 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.RecDefNode;
-import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -118,7 +115,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     }
 
     @Override
-    public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+    public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
         kick(false);
     }
 

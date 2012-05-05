@@ -41,15 +41,19 @@ import java.util.TreeSet;
 
 public class Uniqueness {
     private static final int HOLD_THRESHOLD = 50000;
-    private static final int VALUE_SIZE_LIMIT = 100;
     private Set<String> all = new HashSet<String>(HOLD_THRESHOLD * 3 / 2);
+    private int maxValueSize;
     private File tempFile;
     private Writer out;
     private int count;
 
+    public Uniqueness(int maxValueSize) {
+        this.maxValueSize = maxValueSize;
+    }
+
     public boolean isStillUnique(String value) {
         count++;
-        if (value.length() > VALUE_SIZE_LIMIT) value = value.substring(0, VALUE_SIZE_LIMIT);
+        if (value.length() > maxValueSize) value = value.substring(0, maxValueSize);
         if (all != null) {
             if (all.contains(value)) return false;
             all.add(value);

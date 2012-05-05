@@ -60,9 +60,10 @@ public class AnalysisParser implements Runnable {
         boolean progress(long elementCount);
     }
 
-    public AnalysisParser(DataSet dataSet, Listener listener) {
+    public AnalysisParser(DataSet dataSet, int maxUniqueValueLength, Listener listener) {
         this.dataSet = dataSet;
         this.listener = listener;
+        stats.maxUniqueValueLength = maxUniqueValueLength;
     }
 
     @Override

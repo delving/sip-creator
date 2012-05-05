@@ -95,7 +95,7 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
     }
 
     @Override
-    public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+    public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
     }
 
     @Override
