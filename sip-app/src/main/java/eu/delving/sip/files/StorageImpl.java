@@ -229,8 +229,9 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void setHints(Map<String, String> hints) throws StorageException {
+            File hintsFile = new File(here, FileType.HINTS.getName());
             try {
-                writeFacts(hintsFile(here), hints);
+                writeFacts(hintsFile, hints);
             }
             catch (IOException e) {
                 throw new StorageException("Unable to set hints", e);
@@ -543,8 +544,9 @@ public class StorageImpl extends StorageBase implements Storage {
                 Path recordRoot = getRecordRoot(hints);
                 int recordCount = getRecordCount(hints);
                 Path uniqueElement = getUniqueElement(hints);
+                int maxUniqueValueLength = getMaxUniqueValueLength(hints);
                 Stats stats = getStats(false, null);
-                SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement, stats.namespaces);
+                SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement, maxUniqueValueLength, stats.namespaces);
                 converter.setProgressListener(progressListener);
                 Hasher hasher = new Hasher();
                 DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, FileType.SOURCE.getName())));

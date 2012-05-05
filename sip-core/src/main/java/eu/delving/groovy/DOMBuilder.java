@@ -28,9 +28,7 @@ import groovy.lang.MissingMethodException;
 import groovy.util.BuilderSupport;
 import groovy.xml.FactorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,6 +43,8 @@ import java.util.*;
  */
 
 public class DOMBuilder extends BuilderSupport {
+    public static final String CDATA_BEFORE = "<![CDATA[";
+    public static final String CDATA_AFTER = "]]>";
     private Document document;
     private DocumentBuilder documentBuilder;
     private Map<String, String> namespaces = new TreeMap<String, String>();
@@ -83,7 +83,7 @@ public class DOMBuilder extends BuilderSupport {
     @Override
     protected Object createNode(Object name, Object value) {
         Element element = (Element) createNode(name);
-        element.appendChild(document.createTextNode(value.toString()));
+        toTextNodes(value.toString(), element);
         return element;
     }
 
@@ -128,7 +128,7 @@ public class DOMBuilder extends BuilderSupport {
     @Override
     protected Object createNode(Object name, Map attributes, Object value) {
         Element element = (Element) createNode(name, attributes);
-        element.appendChild(document.createTextNode(value.toString()));
+        toTextNodes(value.toString(), element);
         return element;
     }
 
@@ -194,15 +194,15 @@ public class DOMBuilder extends BuilderSupport {
     private void setValuesFromClosure(Node node, Closure closure) {
         ClosureResult result = runClosure(node, closure);
         if (result.string != null) {
-            node.appendChild(document.createTextNode(result.string));
+            toTextNodes(result.string, node);
         }
         if (result.list != null && !result.list.isEmpty()) {
-            node.appendChild(document.createTextNode(result.list.get(0)));
+            toTextNodes(result.list.get(0), node);
+            Map<String, String> attributes = getAttributeMap(node);
             for (int walk = 1; walk < result.list.size(); walk++) {
-                Node child = (Node) createNode(node.getNodeName(), result.list.get(walk));
-                Node parent = node.getParentNode();
-                if (parent == null) throw new RuntimeException("Node has no parent: " + node);
-                parent.appendChild(child);
+                Node child = (Node) createNode(node.getNodeName(), attributes);
+                toTextNodes(result.list.get(walk), child);
+                makeSibling(node, child);
             }
         }
     }
@@ -317,5 +317,43 @@ public class DOMBuilder extends BuilderSupport {
             return uri;
         }
         return colon > 0 ? namespaces.get(name.substring(0, colon)) : null;
+    }
+
+    private void makeSibling(Node node, Node sibling) {
+        Node parent = node.getParentNode();
+        if (parent == null) throw new RuntimeException("Node has no parent: " + node);
+        parent.appendChild(sibling);
+    }
+
+    private Map<String, String> getAttributeMap(Node node) {
+        Map<String, String> attributes = new TreeMap<String, String>();
+        NamedNodeMap nodeAttributes = node.getAttributes();
+        for (int a = 0; a < nodeAttributes.getLength(); a++) {
+            Attr attr = (Attr) nodeAttributes.item(a);
+            attributes.put(attr.getName(), attr.getValue());
+        }
+        return attributes;
+    }
+
+    private void toTextNodes(String text, Node parent) {
+        while (!text.isEmpty()) {
+            int before = text.indexOf(CDATA_BEFORE);
+            if (before < 0) {
+                parent.appendChild(document.createTextNode(text));
+                break; // finished
+            }
+            if (before > 0) {
+                parent.appendChild(document.createTextNode(text.substring(0, before)));
+                text = text.substring(before);
+            }
+            else { // starts with CDATA
+                text = text.substring(CDATA_BEFORE.length());
+                int after = text.indexOf(CDATA_AFTER);
+                if (after < 0) throw new RuntimeException("No CDATA terminator");
+                String cdata = text.substring(0, after);
+                parent.appendChild(document.createCDATASection(cdata));
+                text = text.substring(cdata.length() + CDATA_AFTER.length());
+            }
+        }
     }
 }

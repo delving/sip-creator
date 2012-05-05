@@ -196,16 +196,16 @@ public class MappingCompileModel {
             }
 
             @Override
-            public String getEditedCode() {
-                if (fromCodeDocument) {
-                    return StringUtil.documentToString(codeDocument);
+            public String getEditedCode(Path path) {
+                if (path.equals(nodeMapping.recDefNode.getPath())) {
+                    if (fromCodeDocument) {
+                        return StringUtil.documentToString(codeDocument);
+                    }
+                    else if (nodeMapping.groovyCode != null) {
+                        return StringUtil.linesToString(nodeMapping.groovyCode);
+                    }
                 }
-                else if (nodeMapping.groovyCode != null) {
-                    return StringUtil.linesToString(nodeMapping.groovyCode);
-                }
-                else {
-                    return null;
-                }
+                return null;
             }
         };
     }
@@ -229,38 +229,38 @@ public class MappingCompileModel {
         @Override
         public void recMappingSet(MappingModel mappingModel) {
             recMapping = mappingModel.getRecMapping();
-            compileSoon();
+            triggerCompile();
         }
 
         @Override
         public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-            compileSoon();
+            triggerCompile();
         }
 
         @Override
-        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            if (!nodeMapping.codeLooksLike(StringUtil.documentToString(codeDocument))) {
-                compileSoon();
+        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            switch (change) {
+                case CODE:
+                case OPERATOR:
+                case DICTIONARY:
+                    triggerCompile();
+                    break;
             }
         }
 
         @Override
         public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            if (type == RECORD) compileSoon();
+            if (type == RECORD) triggerCompile();
         }
 
         @Override
         public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             if (type == RECORD) {
-                compileSoon();
+                triggerCompile();
             }
             else if (MappingCompileModel.this.nodeMapping != null && MappingCompileModel.this.nodeMapping == nodeMapping) {
                 setNodeMapping(null);
             }
-        }
-
-        private void compileSoon() {
-            triggerCompile();
         }
     }
 
@@ -274,7 +274,7 @@ public class MappingCompileModel {
                 if (mappingRunner == null) {
                     feedback.say("Compiling " + type);
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getEditPath(true));
-                    System.out.println(mappingRunner.getCode()); // todo: remove
+//                    if (type == FIELD) System.out.println(mappingRunner.getCode()); // todo: remove
                 }
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);

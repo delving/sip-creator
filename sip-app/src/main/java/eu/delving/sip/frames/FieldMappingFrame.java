@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static eu.delving.metadata.NodeMappingChange.OPERATOR;
 import static eu.delving.metadata.StringUtil.toGroovyFirstIdentifier;
 import static eu.delving.metadata.StringUtil.toGroovyIdentifier;
 import static eu.delving.sip.base.SwingHelper.*;
@@ -128,7 +129,7 @@ public class FieldMappingFrame extends FrameBase {
         JPanel center = new JPanel(new GridLayout(0, 1, 5, 5));
         center.add(createCodeDocPanel());
         center.add(createOutputPanel());
-        JPanel p = new JPanel(new BorderLayout(5,5));
+        JPanel p = new JPanel(new BorderLayout(5, 5));
         p.add(center, BorderLayout.CENTER);
         p.add(createBesideCodeOutput(), BorderLayout.EAST);
         return p;
@@ -156,7 +157,7 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private JComponent createContextPanel() {
-        JPanel p = new JPanel(new GridLayout(0,1));
+        JPanel p = new JPanel(new GridLayout(0, 1));
         p.add(scrollV("Variables", contextVarList));
         p.add(scrollV("Functions", functionList));
         return p;
@@ -205,7 +206,7 @@ public class FieldMappingFrame extends FrameBase {
                         @Override
                         public void run() {
                             nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
-                            nodeMapping.notifyChanged();
+                            nodeMapping.notifyChanged(OPERATOR);
                         }
                     });
                 }
@@ -223,13 +224,13 @@ public class FieldMappingFrame extends FrameBase {
                         @Override
                         public void run() {
                             setEditable(codeArea, nodeMapping.isUserCodeEditable());
-                            boolean all = nodeMapping.getOperator() == Operator.ALL;
                             operatorBoxSetting = true;
-                            operatorBox.setSelectedIndex(all ? 0 : 1);
+                            operatorBox.setSelectedIndex(nodeMapping.getOperator().ordinal());
                             operatorBoxSetting = false;
                         }
                     });
-                } else {
+                }
+                else {
                     contextVarModel.setList(null);
                     sipModel.getFieldCompileModel().setNodeMapping(null);
                     Exec.swing(new Runnable() {
@@ -410,7 +411,8 @@ public class FieldMappingFrame extends FrameBase {
                     try {
                         Document doc = codeArea.getDocument();
                         doc.insertString(start, contextVar, null);
-                    } catch (BadLocationException e) {
+                    }
+                    catch (BadLocationException e) {
                         throw new RuntimeException("What?", e);
                     }
                 }
@@ -429,7 +431,7 @@ public class FieldMappingFrame extends FrameBase {
                     timer.restart();
                 }
             });
-            setPrototypeCellValue("aVeryLongVariableNameIndeed");
+            setPrototypeCellValue("alongvariablenamehere");
             setToolTipText("Clicking here will insert a variable name into the code");
         }
     }
@@ -449,7 +451,8 @@ public class FieldMappingFrame extends FrameBase {
                         Document doc = codeArea.getDocument();
                         doc.remove(start, selectedText.length());
                         doc.insertString(start, String.format("%s(%s)", mappingFunction.name, selectedText), null);
-                    } catch (BadLocationException e) {
+                    }
+                    catch (BadLocationException e) {
                         throw new RuntimeException("What?", e);
                     }
                 }

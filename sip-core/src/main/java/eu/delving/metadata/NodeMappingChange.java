@@ -22,15 +22,14 @@
 package eu.delving.metadata;
 
 /**
- * This interface combines a path in the RecDefTree with the edited code for that path so
- * that editing of code can be done for only one part of the tree at a time.
+ * What can change within a node mapping
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface EditPath {
-
-    NodeMapping getNodeMapping();
-
-    String getEditedCode(Path path);
+public enum NodeMappingChange {
+    CODE,
+    DOCUMENTATION,
+    OPERATOR,
+    DICTIONARY
 }

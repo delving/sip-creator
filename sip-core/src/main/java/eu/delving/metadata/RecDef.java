@@ -252,6 +252,9 @@ public class RecDef {
         @XStreamAsAttribute
         public boolean hidden;
 
+        @XStreamAsAttribute
+        public String fieldType;
+
         @XStreamOmitField
         public Doc doc;
 

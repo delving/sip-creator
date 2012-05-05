@@ -21,8 +21,10 @@
 
 package eu.delving.metadata;
 
-import com.thoughtworks.xstream.annotations.*;
-import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,12 +86,12 @@ public class OptList {
     }
 
     @XStreamAlias("opt")
-    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"value"})
     public static class Opt {
 
         @XStreamAsAttribute
         public String key;
 
+        @XStreamAsAttribute
         public String value;
 
         @XStreamAsAttribute
@@ -100,6 +102,9 @@ public class OptList {
 
         @XStreamAsAttribute
         public boolean hidden;
+
+        @XStreamAlias("opt-list")
+        public OptList optList;
 
         @XStreamOmitField
         public OptList parent;

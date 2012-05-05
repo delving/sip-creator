@@ -41,6 +41,7 @@ import java.util.*;
 
 @XStreamAlias("delving-statistics")
 public class Stats {
+    public static final int DEFAULT_MAX_UNIQUE_VALUE_LENGTH = 40;
     private static final int SAMPLE_SIZE = 200;
     private static final int SAMPLE_SMALL_SIZE = 30;
     private static final int SAMPLE_MAX_VALUE_LENGTH = 100;
@@ -85,7 +86,8 @@ public class Stats {
         ValueStats valueStats = fieldValueMap.get(path);
         if (valueStats == null) fieldValueMap.put(path, valueStats = new ValueStats());
         valueStats.recordOccurrence();
-        if (value != null) valueStats.recordValue(value.trim());
+        if (maxUniqueValueLength == 0) maxUniqueValueLength = DEFAULT_MAX_UNIQUE_VALUE_LENGTH;
+        if (value != null) valueStats.recordValue(value.trim(), maxUniqueValueLength);
         if (recordStats != null) {
             if (path.equals(recordRoot)) {
                 recordStats.recordRecordEnd();
@@ -112,6 +114,9 @@ public class Stats {
 
     @XStreamAsAttribute
     public Path recordRoot;
+
+    @XStreamAsAttribute
+    public int maxUniqueValueLength;
 
     public Map<String, String> namespaces = new HashMap<String, String>();
 
@@ -184,7 +189,7 @@ public class Stats {
             total++;
         }
 
-        public void recordValue(String value) {
+        public void recordValue(String value, int maxUniqueValueLength) {
             if (value.isEmpty()) return;
             if (sample == null) sample = new Sample();
             sample.recordValue(value);
@@ -200,7 +205,7 @@ public class Stats {
                 if (values.trimmed) histogramExploded = true;
             }
             if (unique == null || unique) {
-                if (uniqueness == null) uniqueness = new Uniqueness();
+                if (uniqueness == null) uniqueness = new Uniqueness(maxUniqueValueLength);
                 unique = uniqueness.isStillUnique(value);
                 if (!unique) uniqueness = null;
             }
