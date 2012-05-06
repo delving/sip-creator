@@ -87,9 +87,9 @@
 
         <!-- europeana -->
         <elem tag="europeana:dataProvider"/>    <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownAt"/>       <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownBy"/>       <!-- ESE 3.4 -->
-        <elem tag="europeana:object"/>          <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt" fieldType="link"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownBy" fieldType="link"/>       <!-- ESE 3.4 -->
+        <elem tag="europeana:object" fieldType="link"/>          <!-- ESE 3.4 -->
         <elem tag="europeana:provider"/>        <!-- ESE 3.4 -->
         <elem tag="europeana:rights"/>          <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>            <!-- ESE 3.4 -->
@@ -104,8 +104,8 @@
 
         <!-- delving -->
         <elem tag="delving:year"/>
-        <elem tag="delving:deepZoomUrl"/>
-        <elem tag="delving:fullTextObjectUrl"/>
+        <elem tag="delving:deepZoomUrl" fieldType="link"/>
+        <elem tag="delving:fullTextObjectUrl" fieldType="link"/>
         <elem tag="delving:fullText"/>
 
     </root>

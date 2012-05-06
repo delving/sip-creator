@@ -15,6 +15,7 @@
     <xs:import namespace="http://purl.org/dc/terms/" schemaLocation="http://schemas.delving.eu/dcterms-local.xsd"/>
     <xs:import namespace="http://www.europeana.eu/schemas/ese/" schemaLocation="http://schemas.delving.eu/ese-local.xsd"/>
 
+    <xs:element name="thumbnail" type="xs:anyURI"/>
 
     <xs:group name="dcGroup">
         <xs:choice >

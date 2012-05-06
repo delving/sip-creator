@@ -65,11 +65,11 @@
         <elem tag="dcterms:rightsHolder"/>                             <!-- NOT part of ESE 3.4 -->
 
 
-        <elem tag="europeana:isShownBy"/>                              <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownBy" fieldType="link"/>                              <!-- ESE 3.4 -->
         <elem tag="europeana:rights"/>                                 <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownAt" summaryField="LANDING_PAGE"/>  <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt" summaryField="LANDING_PAGE" fieldType="link"/>  <!-- ESE 3.4 -->
         <elem tag="europeana:unstored"/>                               <!-- ESE 3.4 -->
-        <elem tag="europeana:object" summaryField="THUMBNAIL"/>        <!-- ESE 3.4 -->
+        <elem tag="europeana:object" summaryField="THUMBNAIL" fieldType="link"/>        <!-- ESE 3.4 -->
         <elem tag="europeana:provider" summaryField="PROVIDER"/>       <!-- ESE 3.4 -->
         <elem tag="europeana:dataProvider" summaryField="OWNER"/>      <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>                                   <!-- ESE 3.4 -->
@@ -84,9 +84,9 @@
 
         <!-- original delving namespace -->
         <elem tag="delving:year"/>
-        <elem tag="delving:thumbnail"/>
-        <elem tag="delving:deepZoomUrl"/>
-        <elem tag="delving:fullTextObjectUrl"/>
+        <elem tag="delving:thumbnail" fieldType="link"/>
+        <elem tag="delving:deepZoomUrl" fieldType="link"/>
+        <elem tag="delving:fullTextObjectUrl" fieldType="link"/>
         <elem tag="delving:fullText"/>
 
     </root>

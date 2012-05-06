@@ -10,7 +10,6 @@
 
     <root tag="europeana:record">
 
-
         <elem tag="dc:title"/>
         <elem tag="dc:creator"/>
         <elem tag="dc:subject"/>
@@ -26,8 +25,8 @@
         <elem tag="dc:relation"/>
         <elem tag="dc:coverage"/>
         <elem tag="dc:rights"/>
-        <elem tag="dcterms:provenance"/>
 
+        <elem tag="dcterms:provenance"/>
         <elem tag="dcterms:alternative"/>
         <elem tag="dcterms:conformsTo"/>        
         <elem tag="dcterms:created"/>           
@@ -51,13 +50,13 @@
         <elem tag="dcterms:temporal"/>
 
         <elem tag="europeana:unstored"/>
-        <elem tag="europeana:object"/>
+        <elem tag="europeana:object" fieldType="link"/>
         <elem tag="europeana:provider"/>        <!-- required -->
         <elem tag="europeana:type"/>            <!-- required -->
         <elem tag="europeana:rights"/>          <!-- required -->
         <elem tag="europeana:dataProvider"/>    <!-- required -->
-        <elem tag="europeana:isShownBy"/>       <!-- required or below-->
-        <elem tag="europeana:isShownAt"/>       <!-- required or above-->
+        <elem tag="europeana:isShownBy" fieldType="link"/>       <!-- required or below-->
+        <elem tag="europeana:isShownAt" fieldType="link"/>       <!-- required or above-->
         <elem tag="europeana:UGC"/>            <!-- required -->
 
     </root>
