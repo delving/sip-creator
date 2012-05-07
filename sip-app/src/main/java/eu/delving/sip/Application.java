@@ -163,8 +163,8 @@ public class Application {
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet) {
-                dataSetStateChanged(dataSet, dataSet.getState());
+            public void dataSetChanged(DataSet dataSet, String prefix) {
+                dataSetStateChanged(dataSet, prefix, dataSet.getState(prefix));
             }
 
             @Override
@@ -187,7 +187,7 @@ public class Application {
             }
 
             @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
                 statusPanel.setState(dataSetState);
             }
         });

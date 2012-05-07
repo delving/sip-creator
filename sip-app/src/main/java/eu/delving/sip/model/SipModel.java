@@ -69,9 +69,8 @@ public class SipModel {
     private MetadataParser metadataParser;
     private StatsModel statsModel;
     private MappingHintsModel mappingHintsModel;
-    private DataSetModel dataSetModel = new DataSetModel();
     private FactModel dataSetFacts = new FactModel();
-    private MappingModel mappingModel = new MappingModel();
+    private DataSetModel dataSetModel = new DataSetModel();
     private CreateModel createModel = new CreateModel(this);
     private ReportFileModel reportFileModel = new ReportFileModel(this);
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
@@ -81,7 +80,7 @@ public class SipModel {
 
     public DataSetState getDataSetState() {
         if (!dataSetModel.hasDataSet()) return DataSetState.EMPTY;
-        return dataSetModel.getDataSet().getState();
+        return dataSetModel.getDataSetState();
     }
 
     public interface AnalysisListener {
@@ -107,6 +106,7 @@ public class SipModel {
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
+        MappingModel mappingModel = dataSetModel.getMappingModel();
         functionCompileModel = new FunctionCompileModel(mappingModel, feedback, groovyCodeResource);
         recordCompileModel = new MappingCompileModel(MappingCompileModel.Type.RECORD, feedback, groovyCodeResource);
         fieldCompileModel = new MappingCompileModel(MappingCompileModel.Type.FIELD, feedback, groovyCodeResource);
@@ -124,22 +124,22 @@ public class SipModel {
         mappingModel.addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-                clearValidation(mappingModel.getRecMapping());
+                clearValidation();
             }
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
-                clearValidation(mappingModel.getRecMapping());
+                clearValidation();
             }
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                clearValidation(mappingModel.getRecMapping());
+                clearValidation();
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                clearValidation(mappingModel.getRecMapping());
+                clearValidation();
             }
         });
 
@@ -154,13 +154,13 @@ public class SipModel {
             @Override
             public void recordRootSet(Path recordRootPath) {
                 deleteSourceFile();
-                clearValidation(mappingModel.getRecMapping());
+                clearValidation();
             }
 
             @Override
             public void uniqueElementSet(Path uniqueElementPath) {
                 deleteSourceFile();
-                clearValidation(mappingModel.getRecMapping());
+                clearValidation();
             }
 
             private void deleteSourceFile() {
@@ -175,11 +175,11 @@ public class SipModel {
         });
     }
 
-    private void clearValidation(RecMapping recMapping) {
+    private void clearValidation() {
         try {
-            if (dataSetModel.hasDataSet() && recMapping != null) {
-                if (dataSetModel.getDataSet().deleteValidation(recMapping.getPrefix())) {
-                    feedback.say(String.format("Validation cleared for %s", recMapping.getPrefix()));
+            if (dataSetModel.hasDataSet() && dataSetModel.hasPrefix()) {
+                if (dataSetModel.deleteValidation()) {
+                    feedback.say(String.format("Validation cleared for %s", dataSetModel.getPrefix()));
                 }
             }
         }
@@ -225,7 +225,7 @@ public class SipModel {
     }
 
     public MappingModel getMappingModel() {
-        return mappingModel;
+        return dataSetModel.getMappingModel();
     }
 
     public MappingHintsModel getMappingHintsModel() {
@@ -245,7 +245,7 @@ public class SipModel {
     }
 
     public boolean hasPrefix() {
-        return mappingModel.getRecMapping() != null;
+        return dataSetModel.hasPrefix();
     }
 
     public StatsModel getStatsModel() {
@@ -285,14 +285,13 @@ public class SipModel {
                     final Map<String, String> facts = dataSet.getDataSetFacts();
                     final Map<String, String> hints = dataSet.getHints();
                     final String prefix = requestedPrefix.isEmpty() ? dataSet.getLatestPrefix() : requestedPrefix;
-                    dataSetModel.setDataSet(dataSet);
-                    final RecMapping recMapping = dataSetModel.getRecMapping(prefix);
+                    dataSetModel.setDataSet(dataSet, prefix);
+                    final RecMapping recMapping = dataSetModel.getRecMapping();
                     dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
                     mappingHintsModel.initialize(requestedPrefix,  dataSetModel);
-                    mappingModel.setRecMapping(recMapping);
-                    mappingModel.setFacts(facts);
-                    recordCompileModel.setValidator(dataSetModel.newValidator(prefix));
-                    feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), prefix));
+                    dataSetModel.getMappingModel().setFacts(facts);
+                    recordCompileModel.setValidator(dataSetModel.newValidator());
+                    feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), dataSetModel.getPrefix()));
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
@@ -353,7 +352,7 @@ public class SipModel {
         else {
             analyzing = true;
             feedback.say("Analyzing data from " + dataSetModel.getDataSet().getSpec());
-            Exec.work(new AnalysisParser(dataSetModel.getDataSet(), statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
+            Exec.work(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
                 @Override
                 public void success(final Stats stats) {
                     analyzing = false;
@@ -444,7 +443,7 @@ public class SipModel {
             validating = true;
             feedback.say(String.format(
                     "Validating mapping %s for data set %s, %s",
-                    mappingModel.getRecMapping().getPrefix(),
+                    mappingModel().getRecMapping().getPrefix(),
                     dataSetModel.getDataSet().getSpec(),
                     allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
             ));
@@ -470,7 +469,7 @@ public class SipModel {
                         public void finished(final Stats stats, final BitSet valid, int recordCount) {
                             try {
                                 DataSet dataSet = dataSetModel.getDataSet();
-                                dataSet.setStats(stats, false, mappingModel.getRecMapping().getPrefix());
+                                dataSet.setStats(stats, false, mappingModel().getRecMapping().getPrefix());
                                 dataSet.setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
                             }
                             catch (StorageException e) {
@@ -533,7 +532,7 @@ public class SipModel {
             try {
                 boolean noDataSet = !hasDataSet();
                 boolean noRecordRoot = !statsModel.hasRecordRoot();
-                DataSetState state = dataSetModel.getDataSet().getState();
+                DataSetState state = dataSetModel.getDataSet().getState(mappingModel().getRecMapping().getPrefix());
                 if (noDataSet || noRecordRoot || !state.atLeast(ANALYZED_SOURCE)) {
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                     return;
@@ -563,5 +562,9 @@ public class SipModel {
                 metadataParser = null;
             }
         }
+    }
+
+    private MappingModel mappingModel() {
+        return dataSetModel.getMappingModel();
     }
 }

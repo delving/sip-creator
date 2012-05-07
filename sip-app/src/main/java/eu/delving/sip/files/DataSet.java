@@ -54,7 +54,7 @@ public interface DataSet {
 
     RecDef getRecDef(String prefix) throws StorageException;
 
-    DataSetState getState();
+    DataSetState getState(String prefix);
 
     Map<String, String> getDataSetFacts();
 

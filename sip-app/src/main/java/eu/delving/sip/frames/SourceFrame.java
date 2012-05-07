@@ -167,14 +167,15 @@ public class SourceFrame extends FrameBase {
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(final DataSet dataSet) {
+            public void dataSetChanged(final DataSet dataSet, String prefix) {
                 if (dataSet != null) {
-                    reactToState(dataSet.getState());
+                    DataSetState state = dataSet.getState(prefix);
+                    reactToState(state);
                     String kind = delimited ? "Source" : "Imported";
                     treePanel.setBorder(BorderFactory.createTitledBorder(
                             String.format("%s Data for \"%s\"", kind, dataSet.getSpec()
                             )));
-                    dataSetStateChanged(dataSet, dataSet.getState());
+                    dataSetStateChanged(dataSet, prefix, state);
                 }
                 else {
                     treePanel.setBorder(BorderFactory.createEtchedBorder());
@@ -187,7 +188,7 @@ public class SourceFrame extends FrameBase {
             }
 
             @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
                 reactToState(dataSetState);
             }
         });

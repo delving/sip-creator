@@ -76,7 +76,7 @@ public class ImportAction extends AbstractAction {
         prepareChooser(sipModel);
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet) {
+            public void dataSetChanged(DataSet dataSet, String prefix) {
                 setEnabled(true);
             }
 
@@ -86,7 +86,7 @@ public class ImportAction extends AbstractAction {
             }
 
             @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
                 setEnabled(true);
             }
         });

@@ -131,8 +131,8 @@ public class StatusPanel extends JPanel {
         }
 
         @Override
-        public void dataSetChanged(DataSet dataSet) {
-            dataSetStateChanged(dataSet, dataSet.getState());
+        public void dataSetChanged(DataSet dataSet, String prefix) {
+            dataSetStateChanged(dataSet, prefix, dataSet.getState(prefix));
         }
 
         @Override
@@ -140,7 +140,7 @@ public class StatusPanel extends JPanel {
         }
 
         @Override
-        public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+        public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
             if (dataSetState == DataSetState.SOURCED) sourcedAction.actionPerformed(null);
         }
     }

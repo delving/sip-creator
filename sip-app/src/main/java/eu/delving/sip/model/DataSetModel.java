@@ -43,13 +43,35 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
     private DataSetState dataSetState = DataSetState.EMPTY;
+    private MappingModel mappingModel = new MappingModel();
 
     public DataSetModel() {
         new StateCheckTimer();
     }
 
+    public MappingModel getMappingModel() {
+        return mappingModel;
+    }
+
     public boolean hasDataSet() {
         return dataSet != null;
+    }
+
+    public DataSetState getDataSetState() {
+        return dataSet.getState(mappingModel.getPrefix());
+    }
+
+    public RecMapping getRecMapping() throws StorageException {
+        if (!hasPrefix()) throw new StorageException("No prefix available");
+        return getDataSet().getRecMapping(getPrefix(), this);
+    }
+
+    public boolean hasPrefix() {
+        return mappingModel.hasRecMapping();
+    }
+
+    public String getPrefix() {
+        return mappingModel.getPrefix();
     }
 
     public DataSet getDataSet() {
@@ -59,9 +81,9 @@ public class DataSetModel implements RecDefModel {
         return dataSet;
     }
 
-    public Validator newValidator(String metadataPrefix) throws MetadataException {
+    public Validator newValidator() throws MetadataException {
         try {
-            return dataSet.newValidator(metadataPrefix);
+            return dataSet.newValidator(getPrefix());
         }
         catch (StorageException e) {
             throw new MetadataException("Unable to get validator", e);
@@ -93,33 +115,19 @@ public class DataSetModel implements RecDefModel {
         }
     }
 
-    public void setDataSet(final DataSet dataSet) throws StorageException {
+    public void setDataSet(final DataSet dataSet, String prefix) throws StorageException {
         this.dataSet = dataSet;
         if (dataSet != null) {
-            this.dataSetState = dataSet.getState();
-            if (SwingUtilities.isEventDispatchThread()) {
-                for (Listener listener : listeners) {
-                    listener.dataSetChanged(dataSet);
-                }
-            }
-            else {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Listener listener : listeners) {
-                            listener.dataSetChanged(dataSet);
-                        }
-                    }
-                });
-            }
+            mappingModel.setRecMapping(dataSet.getRecMapping(prefix, this));
         }
         else {
+            mappingModel.setRecMapping(null);
             clearDataSet();
         }
     }
 
-    public RecMapping getRecMapping(String prefix) throws StorageException {
-        return getDataSet().getRecMapping(prefix, this);
+    public boolean deleteValidation() throws StorageException {
+        return hasDataSet() && hasPrefix() && dataSet.deleteValidation(getPrefix());
     }
 
     private class StateCheckTimer implements Runnable, ActionListener {
@@ -133,14 +141,14 @@ public class DataSetModel implements RecDefModel {
         @Override
         public void run() {
             if (hasDataSet()) {
-                final DataSetState actualState = dataSet.getState();
+                final DataSetState actualState = getDataSetState();
                 if (actualState != dataSetState) {
                     dataSetState = actualState;
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
                             for (Listener listener : listeners) {
-                                listener.dataSetStateChanged(dataSet, actualState);
+                                listener.dataSetStateChanged(dataSet, getPrefix(), actualState);
                             }
                         }
                     });
@@ -162,10 +170,10 @@ public class DataSetModel implements RecDefModel {
 
     public interface Listener {
 
-        void dataSetChanged(DataSet dataSet);
+        void dataSetChanged(DataSet dataSet, String prefix);
 
         void dataSetRemoved();
 
-        void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState);
+        void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState);
     }
 }

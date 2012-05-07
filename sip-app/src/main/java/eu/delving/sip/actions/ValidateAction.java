@@ -63,8 +63,8 @@ public class ValidateAction extends AbstractAction {
         );
         this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet) {
-                enableAccordingTo(dataSet.getState());
+            public void dataSetChanged(DataSet dataSet, String prefix) {
+                enableAccordingTo(dataSet.getState(prefix));
             }
 
             @Override
@@ -73,7 +73,7 @@ public class ValidateAction extends AbstractAction {
             }
 
             @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
+            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
                 enableAccordingTo(dataSetState);
             }
         });

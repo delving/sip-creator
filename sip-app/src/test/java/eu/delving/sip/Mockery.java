@@ -85,7 +85,7 @@ public class Mockery {
         File definitionSourceDir = new File(getClass().getResource(String.format("/definitions/%s", prefix)).getFile());
         if (!definitionSourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(definitionSourceDir, dataSetDir);
-        dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()));
+        dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()), prefix);
         recMapping = RecMapping.create(prefix, dataSetModel);
     }
 
