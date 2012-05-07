@@ -162,19 +162,19 @@ public class StorageImpl extends StorageBase implements Storage {
         }
 
         @Override
-        public DataSetState getState() {
+        public DataSetState getState(String prefix) {
             File imported = importedFile(here);
             File source = sourceFile(here);
             if (imported.exists()) {
                 if (source.exists() && source.lastModified() >= imported.lastModified()) {
-                    return postSourceState(source);
+                    return postSourceState(source, prefix);
                 }
                 else {
                     return importedState(imported);
                 }
             }
             else if (source.exists()) {
-                return postSourceState(source);
+                return postSourceState(source, prefix);
             }
             else {
                 return EMPTY;
@@ -191,10 +191,10 @@ public class StorageImpl extends StorageBase implements Storage {
             }
         }
 
-        private DataSetState postSourceState(File source) {
+        private DataSetState postSourceState(File source, String prefix) {
             File statistics = statsFile(here, true, null);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
-                File mapping = latestMappingFileOrNull(here);
+                File mapping = findLatestMappingFile(here, prefix);
                 if (mapping != null) {
                     return validationFile(here, mapping).exists() ? VALIDATED : MAPPING;
                 }

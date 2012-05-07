@@ -27,6 +27,7 @@ import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.FilterTreeModel;
@@ -137,21 +138,21 @@ public class TestMappingValidation {
         assertEquals(4, mock.fileCount());
         dataSet().externalToImported(mock.sampleInputFile(), null);
         assertEquals(5, mock.fileCount());
-        assertEquals(IMPORTED, dataSet().getState());
+        assertEquals(IMPORTED, state());
 
         performAnalysis();
         assertEquals(6, mock.fileCount());
-        assertEquals(ANALYZED_IMPORT, dataSet().getState());
+        assertEquals(ANALYZED_IMPORT, state());
 
         assertEquals(String.valueOf(expectedRecords), mock.hints().get(Storage.RECORD_COUNT));
         dataSet().setHints(mock.hints());
         assertEquals(7, mock.fileCount());
-        assertEquals(DELIMITED, dataSet().getState());
+        assertEquals(DELIMITED, state());
 
         assertFalse(dataSet().getLatestStats().sourceFormat);
         dataSet().importedToSource(null);
         assertEquals(8, mock.fileCount());
-        assertEquals(SOURCED, dataSet().getState());
+        assertEquals(SOURCED, state());
 
         performAnalysis();
         assertEquals(9, mock.fileCount());
@@ -159,7 +160,7 @@ public class TestMappingValidation {
         assertTrue(stats.sourceFormat);
         SourceTreeNode tree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
         assertEquals(Tag.element(Storage.ENVELOPE_TAG), tree.getTag());
-        assertEquals(ANALYZED_SOURCE, dataSet().getState());
+        assertEquals(ANALYZED_SOURCE, state());
 
         mock.createMapping();
         System.out.println(mock.mapping());
@@ -182,12 +183,12 @@ public class TestMappingValidation {
     }
 
     private void performAnalysis() {
-        new AnalysisParser(dataSet(), 100, new AnalysisParser.Listener() {
+        new AnalysisParser(mock.model(), 100, new AnalysisParser.Listener() {
             @Override
             public void success(Stats stats) {
                 try {
                     Path recordRoot = null;
-                    switch (dataSet().getState()) {
+                    switch (state()) {
                         case IMPORTED:
                             recordRoot = Path.create(mock.hints().get(Storage.RECORD_ROOT_PATH));
                             break;
@@ -195,7 +196,7 @@ public class TestMappingValidation {
                             recordRoot = Storage.RECORD_ROOT;
                             break;
                         default:
-                            Assert.fail("Unexpected state " + dataSet().getState());
+                            Assert.fail("Unexpected state " + state());
                     }
                     dataSet().setStats(stats, stats.sourceFormat, null);
                     sourceTree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
@@ -222,5 +223,9 @@ public class TestMappingValidation {
 
     private DataSet dataSet() {
         return mock.model().getDataSet();
+    }
+
+    private DataSetState state() {
+        return mock.model().getDataSetState();
     }
 }

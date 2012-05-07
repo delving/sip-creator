@@ -98,7 +98,7 @@ public class FileProcessor implements Runnable {
             stats.prefix = recMapping.getPrefix();
             stats.name = sipModel.getDataSetFacts().get("name");
             stats.maxUniqueValueLength = sipModel.getStatsModel().getMaxUniqueValueLength();
-            Validator validator = sipModel.getDataSetModel().newValidator(recMapping.getPrefix());
+            Validator validator = sipModel.getDataSetModel().newValidator();
             validator.setErrorHandler(null);
             MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
             MetadataParser parser = new MetadataParser(
