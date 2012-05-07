@@ -118,6 +118,7 @@ public class MappingCompileModel {
         this.nodeMapping = nodeMapping;
         Exec.swing(new DocumentSetter(docDocument, this.nodeMapping != null ? this.nodeMapping.getDocumentation() : "", false));
         Exec.swing(new DocumentSetter(codeDocument, getCode(getEditPath(false)), false));
+        Exec.swing(new DocumentSetter(outputDocument, "", true));
         notifyStateChange(CompileState.ORIGINAL);
     }
 
@@ -154,6 +155,12 @@ public class MappingCompileModel {
     }
 
     // === privates
+
+    private void clear() {
+        Exec.swing(new DocumentSetter(docDocument, "", true));
+        Exec.swing(new DocumentSetter(codeDocument, "", true));
+        Exec.swing(new DocumentSetter(outputDocument, "", true));
+    }
 
     private void triggerCompile() {
         if (!enabled) return;
@@ -228,6 +235,7 @@ public class MappingCompileModel {
 
         @Override
         public void recMappingSet(MappingModel mappingModel) {
+            setNodeMapping(null);
             recMapping = mappingModel.getRecMapping();
             triggerCompile();
         }
@@ -241,6 +249,7 @@ public class MappingCompileModel {
         public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
             switch (change) {
                 case CODE:
+                    if (nodeMapping.codeLooksLike(StringUtil.documentToString(codeDocument))) break;
                 case OPERATOR:
                 case DICTIONARY:
                     triggerCompile();

@@ -34,6 +34,8 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static eu.delving.sip.files.DataSetState.EMPTY;
+
 /**
  * An observable hole to put the current data set
  *
@@ -42,26 +44,45 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
-    private DataSetState dataSetState = DataSetState.EMPTY;
+    private DataSetState dataSetState = EMPTY;
+    private MappingModel mappingModel = new MappingModel();
 
     public DataSetModel() {
         new StateCheckTimer();
+    }
+
+    public MappingModel getMappingModel() {
+        return mappingModel;
     }
 
     public boolean hasDataSet() {
         return dataSet != null;
     }
 
+    public boolean hasPrefix() {
+        return mappingModel.hasRecMapping();
+    }
+
+    public DataSetState getDataSetState() {
+        return hasPrefix() && hasDataSet() ? dataSet.getState(mappingModel.getPrefix()) : EMPTY;
+    }
+
+    public RecMapping getRecMapping() throws StorageException {
+        if (!hasPrefix()) throw new StorageException("No prefix available");
+        return getDataSet().getRecMapping(getPrefix(), this);
+    }
+
     public DataSet getDataSet() {
-        if (dataSet == null) {
-            throw new IllegalStateException("There is no data set in the model!");
-        }
         return dataSet;
     }
 
-    public Validator newValidator(String metadataPrefix) throws MetadataException {
+    public String getPrefix() {
+        return mappingModel.getPrefix();
+    }
+
+    public Validator newValidator() throws MetadataException {
         try {
-            return dataSet.newValidator(metadataPrefix);
+            return dataSet.newValidator(getPrefix());
         }
         catch (StorageException e) {
             throw new MetadataException("Unable to get validator", e);
@@ -79,47 +100,23 @@ public class DataSetModel implements RecDefModel {
         }
     }
 
-    public void clearDataSet() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            for (Listener listener : listeners) listener.dataSetRemoved();
-        }
-        else {
-            Exec.swing(new Runnable() {
-                @Override
-                public void run() {
-                    for (Listener listener : listeners) listener.dataSetRemoved();
-                }
-            });
-        }
-    }
-
-    public void setDataSet(final DataSet dataSet) throws StorageException {
+    public void setDataSet(final DataSet dataSet, String prefix) throws StorageException {
         this.dataSet = dataSet;
         if (dataSet != null) {
-            this.dataSetState = dataSet.getState();
-            if (SwingUtilities.isEventDispatchThread()) {
-                for (Listener listener : listeners) {
-                    listener.dataSetChanged(dataSet);
-                }
-            }
-            else {
-                Exec.swing(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Listener listener : listeners) {
-                            listener.dataSetChanged(dataSet);
-                        }
-                    }
-                });
-            }
+            mappingModel.setRecMapping(dataSet.getRecMapping(prefix, this));
         }
         else {
-            clearDataSet();
+            mappingModel.setRecMapping(null);
         }
     }
 
-    public RecMapping getRecMapping(String prefix) throws StorageException {
-        return getDataSet().getRecMapping(prefix, this);
+    public void clearDataSet() {
+        dataSet = null;
+        mappingModel.setRecMapping(null);
+    }
+
+    public boolean deleteValidation() throws StorageException {
+        return hasDataSet() && hasPrefix() && dataSet.deleteValidation(getPrefix());
     }
 
     private class StateCheckTimer implements Runnable, ActionListener {
@@ -133,15 +130,13 @@ public class DataSetModel implements RecDefModel {
         @Override
         public void run() {
             if (hasDataSet()) {
-                final DataSetState actualState = dataSet.getState();
+                final DataSetState actualState = getDataSetState();
                 if (actualState != dataSetState) {
                     dataSetState = actualState;
                     Exec.swing(new Runnable() {
                         @Override
                         public void run() {
-                            for (Listener listener : listeners) {
-                                listener.dataSetStateChanged(dataSet, actualState);
-                            }
+                            for (Listener listener : listeners) listener.stateChanged(DataSetModel.this, actualState);
                         }
                     });
                 }
@@ -162,10 +157,7 @@ public class DataSetModel implements RecDefModel {
 
     public interface Listener {
 
-        void dataSetChanged(DataSet dataSet);
+        void stateChanged(DataSetModel model, DataSetState state);
 
-        void dataSetRemoved();
-
-        void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState);
     }
 }

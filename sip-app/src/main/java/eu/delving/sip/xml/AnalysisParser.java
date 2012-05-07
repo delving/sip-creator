@@ -23,9 +23,9 @@ package eu.delving.sip.xml;
 
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.DataSetModel;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.stax2.XMLInputFactory2;
@@ -49,7 +49,7 @@ public class AnalysisParser implements Runnable {
     public static final int ELEMENT_STEP = 10000;
     private Stats stats = new Stats();
     private Listener listener;
-    private DataSet dataSet;
+    private DataSetModel dataSetModel;
 
     public interface Listener {
 
@@ -60,8 +60,8 @@ public class AnalysisParser implements Runnable {
         boolean progress(long elementCount);
     }
 
-    public AnalysisParser(DataSet dataSet, int maxUniqueValueLength, Listener listener) {
-        this.dataSet = dataSet;
+    public AnalysisParser(DataSetModel dataSetModel, int maxUniqueValueLength, Listener listener) {
+        this.dataSetModel = dataSetModel;
         this.listener = listener;
         stats.maxUniqueValueLength = maxUniqueValueLength;
     }
@@ -77,20 +77,21 @@ public class AnalysisParser implements Runnable {
             Path path = Path.create();
             boolean running = true;
             InputStream inputStream = null;
+            if (!dataSetModel.hasDataSet() || !dataSetModel.hasPrefix()) return;
             try {
-                switch (dataSet.getState()) {
+                switch (dataSetModel.getDataSetState()) {
                     case IMPORTED:
-                        inputStream = dataSet.openImportedInputStream();
+                        inputStream = dataSetModel.getDataSet().openImportedInputStream();
                         break;
                     case SOURCED:
-                        inputStream = dataSet.openSourceInputStream();
+                        inputStream = dataSetModel.getDataSet().openSourceInputStream();
                         stats.setRecordRoot(Storage.RECORD_ROOT);
                         stats.sourceFormat = true;
                         break;
                     default:
-                        throw new IllegalStateException("Unexpected state: " + dataSet.getState());
+                        throw new IllegalStateException("Unexpected state: " + dataSetModel.getDataSetState());
                 }
-                stats.name = dataSet.getDataSetFacts().get("name");
+                stats.name = dataSetModel.getDataSet().getDataSetFacts().get("name");
                 XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
                 StringBuilder text = new StringBuilder();
                 long count = 0;
@@ -140,16 +141,16 @@ public class AnalysisParser implements Runnable {
         catch (Exception e) {
             try {
                 File renamedTo;
-                switch (dataSet.getState()) {
+                switch (dataSetModel.getDataSetState()) {
                     case IMPORTED:
                     case DELIMITED:
-                        renamedTo = dataSet.renameInvalidImport();
+                        renamedTo = dataSetModel.getDataSet().renameInvalidImport();
                         break;
                     case SOURCED:
-                        renamedTo = dataSet.renameInvalidSource();
+                        renamedTo = dataSetModel.getDataSet().renameInvalidSource();
                         break;
                     default:
-                        throw new IllegalStateException("Unexpected state " + dataSet.getState(), e);
+                        throw new IllegalStateException("Unexpected state " + dataSetModel.getDataSetState(), e);
                 }
                 listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
             }
