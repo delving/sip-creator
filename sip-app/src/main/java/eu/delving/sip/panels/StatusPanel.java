@@ -21,7 +21,6 @@
 
 package eu.delving.sip.panels;
 
-import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
@@ -33,6 +32,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import static eu.delving.sip.files.DataSetState.SOURCED;
+import static eu.delving.sip.files.DataSetState.values;
 
 /**
  * The bottom of the main screen, below the desktop pane
@@ -63,10 +65,10 @@ public class StatusPanel extends JPanel {
                 }
             }
         });
-        for (DataSetState state : DataSetState.values()) {
+        for (DataSetState state : values()) {
             StateAction action = new StateAction(state);
             actions.add(action);
-            if (state == DataSetState.SOURCED) sipModel.getDataSetModel().addListener(new SourcedListener(action));
+            if (state == SOURCED) sipModel.getDataSetModel().addListener(new SourcedListener(action));
         }
         for (StateAction action : actions) {
             JButton button = new JButton(action);
@@ -131,17 +133,8 @@ public class StatusPanel extends JPanel {
         }
 
         @Override
-        public void dataSetChanged(DataSet dataSet, String prefix) {
-            dataSetStateChanged(dataSet, prefix, dataSet.getState(prefix));
-        }
-
-        @Override
-        public void dataSetRemoved() {
-        }
-
-        @Override
-        public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
-            if (dataSetState == DataSetState.SOURCED) sourcedAction.actionPerformed(null);
+        public void stateChanged(DataSetModel model, DataSetState state) {
+            if (state == SOURCED) sourcedAction.actionPerformed(null);
         }
     }
 }

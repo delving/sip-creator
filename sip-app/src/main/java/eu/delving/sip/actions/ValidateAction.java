@@ -24,7 +24,6 @@ package eu.delving.sip.actions;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.SwingHelper;
-import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
@@ -63,18 +62,8 @@ public class ValidateAction extends AbstractAction {
         );
         this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet, String prefix) {
-                enableAccordingTo(dataSet.getState(prefix));
-            }
-
-            @Override
-            public void dataSetRemoved() {
-                setEnabled(false);
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
-                enableAccordingTo(dataSetState);
+            public void stateChanged(DataSetModel model, DataSetState state) {
+                enableAccordingTo(state);
             }
         });
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Invalid Record", Dialog.ModalityType.APPLICATION_MODAL);

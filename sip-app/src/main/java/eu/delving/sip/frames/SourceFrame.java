@@ -25,7 +25,6 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.*;
@@ -43,8 +42,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
-import static eu.delving.sip.files.DataSetState.ABSENT;
 import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
+import static eu.delving.sip.files.DataSetState.EMPTY;
 
 /**
  * The structure of the input data, tree, variables and statistics.
@@ -167,29 +166,18 @@ public class SourceFrame extends FrameBase {
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(final DataSet dataSet, String prefix) {
-                if (dataSet != null) {
-                    DataSetState state = dataSet.getState(prefix);
-                    reactToState(state);
-                    String kind = delimited ? "Source" : "Imported";
-                    treePanel.setBorder(BorderFactory.createTitledBorder(
-                            String.format("%s Data for \"%s\"", kind, dataSet.getSpec()
-                            )));
-                    dataSetStateChanged(dataSet, prefix, state);
-                }
-                else {
+            public void stateChanged(DataSetModel model, DataSetState state) {
+                if (state == EMPTY) {
                     treePanel.setBorder(BorderFactory.createEtchedBorder());
                 }
-            }
-
-            @Override
-            public void dataSetRemoved() {
-                reactToState(ABSENT);
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
-                reactToState(dataSetState);
+                else {
+                    String kind = delimited ? "Source" : "Imported";
+                    treePanel.setBorder(BorderFactory.createTitledBorder(String.format(
+                            "%s Data for \"%s\"",
+                            kind, model.getDataSet().getSpec()
+                    )));
+                }
+                reactToState(state);
             }
         });
         sourceTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {

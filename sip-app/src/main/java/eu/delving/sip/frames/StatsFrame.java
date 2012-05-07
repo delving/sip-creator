@@ -137,18 +137,9 @@ public class StatsFrame extends FrameBase {
     private void wireUp() {
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet, String prefix) {
-                dataSetStateChanged(dataSet, prefix, dataSet.getState(prefix));
-            }
-
-            @Override
-            public void dataSetRemoved() {
-                for (StatsSet statsSet : statsSets) statsSet.setStats(null);
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
-                switch (dataSetState) {
+            public void stateChanged(DataSetModel model, DataSetState state) {
+                DataSet dataSet = model.getDataSet();
+                switch (state) {
                     case ABSENT:
                     case EMPTY:
                     case IMPORTED:

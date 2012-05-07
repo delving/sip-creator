@@ -25,7 +25,6 @@ import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.SwingHelper;
-import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
@@ -65,18 +64,8 @@ public class UploadAction extends AbstractAction {
         setActionEnabled(false);
         this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet, String prefix) {
-                dataSetStateChanged(dataSet, prefix, dataSet.getState(prefix));
-            }
-
-            @Override
-            public void dataSetRemoved() {
-                setActionEnabled(false);
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
-                setActionEnabled(dataSetState == DataSetState.VALIDATED);
+            public void stateChanged(DataSetModel model, DataSetState state) {
+                setActionEnabled(state == DataSetState.VALIDATED);
             }
         });
     }

@@ -49,6 +49,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+import static eu.delving.sip.files.DataSetState.EMPTY;
+
 /**
  * The main application
  *
@@ -163,32 +165,20 @@ public class Application {
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet, String prefix) {
-                dataSetStateChanged(dataSet, prefix, dataSet.getState(prefix));
-            }
-
-            @Override
-            public void dataSetRemoved() {
-                Exec.work(new Runnable() {
-                    @Override
-                    public void run() {
-                        sipModel.getMappingModel().setRecMapping(null);
-                        sipModel.getDataSetFacts().set(null);
-                        Exec.swing(new Runnable() {
-                            @Override
-                            public void run() {
-                                dataSetMenu.refreshAndChoose(null);
-                                sipModel.getStatsModel().setStatistics(null);
-                                sipModel.seekReset();
-                            }
-                        });
-                    }
-                });
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, String prefix, DataSetState dataSetState) {
-                statusPanel.setState(dataSetState);
+            public void stateChanged(DataSetModel model, DataSetState state) {
+                statusPanel.setState(state);
+                if (state == EMPTY) {
+                    sipModel.getMappingModel().setRecMapping(null);
+                    sipModel.getDataSetFacts().set(null);
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            dataSetMenu.refreshAndChoose(null);
+                            sipModel.getStatsModel().setStatistics(null);
+                            sipModel.seekReset();
+                        }
+                    });
+                }
             }
         });
         harvestPool.addListDataListener(new ListDataListener() {
@@ -235,7 +225,7 @@ public class Application {
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
         ));
         statusPanel.setReaction(DataSetState.ABSENT, allFrames.prepareForNothing());
-        statusPanel.setReaction(DataSetState.EMPTY, importAction);
+        statusPanel.setReaction(EMPTY, importAction);
         statusPanel.setReaction(DataSetState.IMPORTED, new InputAnalyzer());
         statusPanel.setReaction(DataSetState.ANALYZED_IMPORT, allFrames.prepareForDelimiting());
         statusPanel.setReaction(DataSetState.DELIMITED, new ConvertPerformer());
