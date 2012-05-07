@@ -63,17 +63,17 @@
 
     <field-markers>
         <!-- system fields -->
-        <field-marker name="CREATOR" path="/record/dc:creator"/>
-        <field-marker name="TITLE" path="/record/dc:title"/>
-        <field-marker name="DESCRIPTION" path="/record/dc:description"/>
-        <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
-        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
-        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
+        <field-marker name="CREATOR" path="/europeana:record/dc:creator"/>
+        <field-marker name="TITLE" path="/europeana:record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/europeana:record/dc:description"/>
+        <field-marker name="OWNER" path="/europeana:record/europeana:dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/europeana:record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/europeana:record/europeana:object"/>
 
-        <field-marker type="fact" name="dataProvider" path="/record/europeana:dataProvider"/>
-        <field-marker type="fact" name="provider" path="/record/europeana:provider"/>
-        <field-marker type="fact" name="rights" path="/record/europeana:rights"/>
-        <field-marker type="fact" name="type" path="/record/europeana:type"/>
+        <field-marker type="fact" name="dataProvider" path="/europeana:record/europeana:dataProvider"/>
+        <field-marker type="fact" name="provider" path="/europeana:record/europeana:provider"/>
+        <field-marker type="fact" name="rights" path="/europeana:record/europeana:rights"/>
+        <field-marker type="fact" name="type" path="/europeana:record/europeana:type"/>
     </field-markers>
 
 </record-definition>
