@@ -154,7 +154,7 @@ public class UploadAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (!sipModel.hasDataSet()) {
+            if (sipModel.getDataSetModel().isEmpty()) {
                 JOptionPane.showInternalMessageDialog(parent, "Data set and mapping must be selected");
                 return;
             }

@@ -43,7 +43,6 @@ import java.util.TreeSet;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
-import static eu.delving.sip.files.DataSetState.EMPTY;
 
 /**
  * The structure of the input data, tree, variables and statistics.
@@ -167,15 +166,18 @@ public class SourceFrame extends FrameBase {
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
-                if (state == EMPTY) {
-                    treePanel.setBorder(BorderFactory.createEtchedBorder());
-                }
-                else {
-                    String kind = delimited ? "Source" : "Imported";
-                    treePanel.setBorder(BorderFactory.createTitledBorder(String.format(
-                            "%s Data for \"%s\"",
-                            kind, model.getDataSet().getSpec()
-                    )));
+                switch (state) {
+                    case ABSENT:
+                    case NO_DATA:
+                        treePanel.setBorder(BorderFactory.createEtchedBorder());
+                        break;
+                    default:
+                        String kind = delimited ? "Source" : "Imported";
+                        treePanel.setBorder(BorderFactory.createTitledBorder(String.format(
+                                "%s Data for \"%s\"",
+                                kind, model.getDataSet().getSpec()
+                        )));
+                        break;
                 }
                 reactToState(state);
             }

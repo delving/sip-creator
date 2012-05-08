@@ -52,7 +52,7 @@ public class StatusPanel extends JPanel {
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                if (sipModel.getDataSetModel().hasDataSet() && mappingModel.hasRecMapping()) {
+                if (mappingModel.hasRecMapping()) {
                     setBorder(BorderFactory.createTitledBorder(String.format(
                             "Actions - [%s -> %s]",
                             sipModel.getDataSetModel().getDataSet().getSpec(),
@@ -61,7 +61,6 @@ public class StatusPanel extends JPanel {
                 }
                 else {
                     setBorder(DEFAULT_BORDER);
-                    for (StateAction action : actions) if (action.isEnabled()) action.setEnabled(false);
                 }
             }
         });

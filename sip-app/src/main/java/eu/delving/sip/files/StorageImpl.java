@@ -178,7 +178,7 @@ public class StorageImpl implements Storage {
                 return postSourceState(source, prefix);
             }
             else {
-                return EMPTY;
+                return NO_DATA;
             }
         }
 

@@ -77,7 +77,7 @@ public class AnalysisParser implements Runnable {
             Path path = Path.create();
             boolean running = true;
             InputStream inputStream = null;
-            if (!dataSetModel.hasDataSet() || !dataSetModel.hasPrefix()) return;
+            if (dataSetModel.isEmpty()) return;
             try {
                 switch (dataSetModel.getDataSetState()) {
                     case IMPORTED:
