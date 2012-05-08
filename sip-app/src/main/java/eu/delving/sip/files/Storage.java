@@ -50,8 +50,8 @@ public interface Storage {
         FACTS("dataset_facts.txt"),
         HINTS("hints.txt"),
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
-        VALIDATION(null, "validation_", null, "validation_%s.int", 1),
-        RESULT_STATS(null, "stats-result_", null, "stats-result_%s.xml.gz", 1),
+        VALIDATION(null, "validation_", ".int", "validation_%s.int", 1),
+        RESULT_STATS(null, "stats-result_", ".xml.gz", "stats-result_%s.xml.gz", 1),
         REPORT(null, null, null, "report_%s.txt", 1),
         RECORD_DEFINITION(null, null, "-record-definition.xml", "%s-record-definition.xml", 1),
         SCHEMA(null, null, "-validation.xsd", "%s-validation.xsd", 1);

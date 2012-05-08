@@ -32,8 +32,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
 
-import static eu.delving.sip.files.Storage.FileType.*;
 import static eu.delving.sip.files.Storage.*;
+import static eu.delving.sip.files.Storage.FileType.*;
 
 /**
  * This class contains helpers for the StorageImpl to lean on
@@ -150,12 +150,6 @@ public class StorageHelper {
         return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
     }
 
-    static File validationFile(File dir, File mappingFile) {
-        String prefix = extractName(mappingFile, MAPPING);
-        String name = VALIDATION.getName(prefix);
-        return findOrCreate(dir, name, new NameFileFilter(name), VALIDATION);
-    }
-
     static File[] validationFiles(File dir, String prefix) {
         return dir.listFiles(new NameFileFilter(VALIDATION.getName(prefix)));
     }
@@ -214,18 +208,25 @@ public class StorageHelper {
         return Arrays.asList(files);
     }
 
-    static File findLatestMappingFile(File dir, String metadataPrefix) {
-        File mappingFile = null;
-        for (File file : findLatestFiles(dir, MAPPING)) {
-            String prefix = extractName(file, MAPPING);
-            if (prefix.equals(metadataPrefix)) mappingFile = file;
+    static File findLatestHashed(File dir, FileType fileType, String prefix) throws StorageException {
+        File latestFile = findLatestFile(dir, fileType, prefix);
+        if (!latestFile.exists()) throw new StorageException("Missing mapping file for "+prefix);
+        try {
+            return Hasher.ensureFileHashed(latestFile);
         }
-        if (mappingFile == null) mappingFile = new File(dir, MAPPING.getName(metadataPrefix));
-        return mappingFile;
+        catch (IOException e) {
+            throw new StorageException("Unable to hash file "+latestFile);
+        }
     }
 
-    static Collection<File> findLatestMappingFiles(File dir) {
-        return findLatestFiles(dir, MAPPING);
+    static File findLatestFile(File dir, FileType fileType, String prefix) {
+        File latestFile = null;
+        for (File file : findLatestFiles(dir, fileType)) {
+            String filePrefix = extractName(file, fileType);
+            if (filePrefix.equals(prefix)) latestFile = file;
+        }
+        if (latestFile == null) latestFile = new File(dir, fileType.getName(prefix));
+        return latestFile;
     }
 
     static List<File> findHashedMappingFiles(File dir, String prefix) {
