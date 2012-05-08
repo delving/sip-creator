@@ -41,7 +41,7 @@
                 <string>D:/Documents/Schilderij/010.jpg</string>
             </sample-input>
             <groovy-code>
-                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg&apos;, &apos;&apos;)}/180&quot;</string>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg&apos;, &apos;&apos;)}/500&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="lowercase">
@@ -204,6 +204,7 @@
 
         <field-marker type="fact" name="spec" path="/record/europeana:collectionName"/>
         <field-marker type="fact" name="name" path="/record/europeana:collectionTitle"/>
+        <field-marker type="fact" name="name" path="/record/tib:collection"/>
         <field-marker type="fact" name="country" path="/record/europeana:country"/>
         <field-marker type="fact" name="dataProvider" path="/record/europeana:dataProvider"/>
         <field-marker type="fact" name="language" path="/record/europeana:language"/>
