@@ -182,7 +182,7 @@ public class SipModel {
 
     private void clearValidations() {
         try {
-            dataSetModel.getDataSet().deleteValidations();
+            dataSetModel.getDataSet().deleteAllValidations();
             feedback.say("Validation cleared for all mappings");
         }
         catch (StorageException e) {
@@ -512,10 +512,9 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                boolean noDataSet = dataSetModel.isEmpty();
                 boolean noRecordRoot = !statsModel.hasRecordRoot();
-                DataSetState state = dataSetModel.getDataSet().getState(mappingModel().getRecMapping().getPrefix());
-                if (noDataSet || noRecordRoot || !state.atLeast(ANALYZED_SOURCE)) {
+                DataSetState state = dataSetModel.getDataSetState();
+                if (noRecordRoot || !state.atLeast(ANALYZED_SOURCE)) {
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                     return;
                 }

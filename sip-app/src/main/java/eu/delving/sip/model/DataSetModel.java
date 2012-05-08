@@ -31,6 +31,7 @@ import javax.swing.*;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -44,7 +45,7 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
 
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
-    private DataSetState currentState;
+    private DataSetState currentState = ABSENT;
     private MappingModel mappingModel = new MappingModel();
 
     public DataSetModel() {
@@ -61,6 +62,16 @@ public class DataSetModel implements RecDefModel {
 
     public DataSetState getDataSetState() {
         return isEmpty() ? ABSENT : dataSet.getState(getPrefix());
+    }
+
+    public List<String> getInvalidPrefixes() throws StorageException {
+        List<String> invalid = new ArrayList<String>();
+        if (!isEmpty()) {
+            for (String prefix : dataSet.getPrefixes()) {
+                if (!dataSet.isValidated(prefix)) invalid.add(prefix);
+            }
+        }
+        return invalid;
     }
 
     public RecMapping getRecMapping() throws StorageException {

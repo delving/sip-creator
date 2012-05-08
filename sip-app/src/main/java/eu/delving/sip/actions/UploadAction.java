@@ -36,6 +36,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Upload files, after having seen the validation report
@@ -49,6 +51,8 @@ public class UploadAction extends AbstractAction {
     private CultureHubClient cultureHubClient;
     private ReportFilePopup reportFilePopup;
     private RealUploadAction realUploadAction = new RealUploadAction();
+    private List<String> invalidPrefixes = new ArrayList<String>();
+    private boolean busyUploading;
 
     public UploadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Upload this data set");
@@ -61,13 +65,7 @@ public class UploadAction extends AbstractAction {
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
         this.reportFilePopup = new ReportFilePopup();
-        setActionEnabled(false);
-        this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
-            @Override
-            public void stateChanged(DataSetModel model, DataSetState state) {
-                setActionEnabled(state == DataSetState.VALIDATED);
-            }
-        });
+        this.sipModel.getDataSetModel().addListener(new Enabler());
     }
 
     @Override
@@ -78,18 +76,14 @@ public class UploadAction extends AbstractAction {
             reportFilePopup.upload.requestFocusInWindow();
         }
         else {
-            JOptionPane.showMessageDialog(parent, "Upload not permitted until data set is validated");
+            JOptionPane.showMessageDialog(parent, "Upload not permitted until prefixes validated. Still invalid: " + invalidPrefixes);
         }
     }
 
     private void addIfAbsent() {
         boolean add = true;
         JInternalFrame[] frames = parent.getAllFrames();
-        for (JInternalFrame frame : frames) {
-            if (frame == reportFilePopup) {
-                add = false;
-            }
-        }
+        for (JInternalFrame frame : frames) if (frame == reportFilePopup) add = false;
         if (add) {
             reportFilePopup.setLocation(
                     (parent.getSize().width - reportFilePopup.getSize().width) / 2,
@@ -99,9 +93,33 @@ public class UploadAction extends AbstractAction {
         }
     }
 
+    private class InvalidPrefixesFetcher implements Runnable {
+        @Override
+        public void run() {
+            try {
+                final List<String> freshInvalidPrefixes = sipModel.getDataSetModel().getInvalidPrefixes();
+                if (invalidPrefixes.isEmpty()) {
+                    Exec.swing(new Runnable() {
+                        @Override
+                        public void run() {
+                            invalidPrefixes = freshInvalidPrefixes;
+                            realUploadAction.setEnabled(invalidPrefixes.isEmpty());
+                        }
+                    });
+                }
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to fetch invalid prefixes", e);
+            }
+        }
+    }
 
-    private void setActionEnabled(boolean enabled) {
-        realUploadAction.setEnabled(enabled);
+    private class Enabler implements DataSetModel.Listener {
+        @Override
+        public void stateChanged(DataSetModel model, DataSetState state) {
+            if (realUploadAction.isEnabled()) realUploadAction.setEnabled(false);
+            if (state.atLeast(DataSetState.VALIDATED)) Exec.work(new InvalidPrefixesFetcher());
+        }
     }
 
     private class ReportFilePopup extends JInternalFrame {
@@ -154,12 +172,13 @@ public class UploadAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            if (busyUploading) return;
             if (sipModel.getDataSetModel().isEmpty()) {
                 JOptionPane.showInternalMessageDialog(parent, "Data set and mapping must be selected");
                 return;
             }
             try {
-                setActionEnabled(false);
+                busyUploading = true;
                 reportFilePopup.setVisible(false);
                 cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new CultureHubClient.UploadListener() {
                     @Override
@@ -188,12 +207,12 @@ public class UploadAction extends AbstractAction {
 
                     @Override
                     public void finished(final boolean success) {
+                        busyUploading = false;
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
                                 disappear();
                                 JOptionPane.showMessageDialog(parent, success ? "Upload complete" : "Upload failed");
-                                setActionEnabled(true);
                             }
                         });
                     }
@@ -201,14 +220,13 @@ public class UploadAction extends AbstractAction {
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to complete uploading", e);
-                setActionEnabled(true);
+                busyUploading = false;
             }
         }
 
         private void disappear() {
             reportFilePopup.setVisible(false);
-            setActionEnabled(true);
+            busyUploading = false;
         }
-
     }
 }

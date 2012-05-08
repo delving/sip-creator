@@ -161,26 +161,27 @@ public class Application {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 statusPanel.setState(state);
-                if (state == NO_DATA) {
-                    Exec.work(new Runnable() {
-                        @Override
-                        public void run() {
-                            sipModel.getMappingModel().setRecMapping(null);
-                            sipModel.getDataSetFacts().set(null);
-                            sipModel.getStatsModel().setStatistics(null);
-                        }
-                    });
-                    home.setTitle("Delving SIP Creator");
-                    sipModel.seekReset();
-                    dataSetMenu.refreshAndChoose(null);
-                }
-                else {
-
-                    DataSetModel dataSetModel = sipModel.getDataSetModel();
-                    home.setTitle(String.format(
-                            "Delving SIP Creator - [%s -> %s]",
-                            dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
-                    ));
+                switch (state) {
+                    case ABSENT:
+                        Exec.work(new Runnable() {
+                            @Override
+                            public void run() {
+                                sipModel.getMappingModel().setRecMapping(null);
+                                sipModel.getDataSetFacts().set(null);
+                                sipModel.getStatsModel().setStatistics(null);
+                            }
+                        });
+                        home.setTitle("Delving SIP Creator");
+                        sipModel.seekReset();
+                        dataSetMenu.refreshAndChoose(null);
+                        break;
+                    default:
+                        DataSetModel dataSetModel = sipModel.getDataSetModel();
+                        home.setTitle(String.format(
+                                "Delving SIP Creator - [%s -> %s]",
+                                dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
+                        ));
+                        break;
                 }
             }
         });
