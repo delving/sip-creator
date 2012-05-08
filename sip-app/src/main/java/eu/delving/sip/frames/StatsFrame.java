@@ -141,7 +141,7 @@ public class StatsFrame extends FrameBase {
                 DataSet dataSet = model.getDataSet();
                 switch (state) {
                     case ABSENT:
-                    case EMPTY:
+                    case NO_DATA:
                     case IMPORTED:
                         for (StatsSet statsSet : statsSets) statsSet.setStats(null);
                         break;
