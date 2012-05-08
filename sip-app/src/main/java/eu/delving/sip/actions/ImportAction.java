@@ -43,7 +43,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import static eu.delving.sip.files.DataSetState.EMPTY;
+import static eu.delving.sip.files.DataSetState.ABSENT;
 
 /**
  * Import a new file
@@ -78,7 +78,7 @@ public class ImportAction extends AbstractAction {
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
-                setEnabled(state != EMPTY);
+                setEnabled(state != ABSENT);
             }
         });
     }
@@ -128,7 +128,7 @@ public class ImportAction extends AbstractAction {
     }
 
     public boolean selectInputFile(File file) {
-        if (!file.exists() || !sipModel.hasDataSet()) return false;
+        if (!file.exists() || sipModel.getDataSetModel().isEmpty()) return false;
         String spec = sipModel.getDataSetModel().getDataSet().getSpec();
         int doImport = JOptionPane.showConfirmDialog(
                 parent,
@@ -184,7 +184,7 @@ public class ImportAction extends AbstractAction {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             dialog.setVisible(false);
-            if (!sipModel.hasDataSet()) return;
+            if (sipModel.getDataSetModel().isEmpty()) return;
             Map<String, String> hints = sipModel.getDataSetModel().getDataSet().getHints();
             String url = hints.get(Storage.HARVEST_URL);
             String prefix = hints.get(Storage.HARVEST_PREFIX);

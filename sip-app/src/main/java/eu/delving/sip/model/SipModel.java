@@ -78,11 +78,6 @@ public class SipModel {
     private MappingSaveTimer mappingSaveTimer = new MappingSaveTimer(this);
     private volatile boolean converting, validating, analyzing, importing;
 
-    public DataSetState getDataSetState() {
-        if (!dataSetModel.hasDataSet()) return DataSetState.EMPTY;
-        return dataSetModel.getDataSetState();
-    }
-
     public interface AnalysisListener {
         boolean analysisProgress(long elementCount);
 
@@ -154,13 +149,13 @@ public class SipModel {
             @Override
             public void recordRootSet(Path recordRootPath) {
                 deleteSourceFile();
-                clearValidation();
+                clearValidations();
             }
 
             @Override
             public void uniqueElementSet(Path uniqueElementPath) {
                 deleteSourceFile();
-                clearValidation();
+                clearValidations();
             }
 
             private void deleteSourceFile() {
@@ -177,26 +172,21 @@ public class SipModel {
 
     private void clearValidation() {
         try {
-            if (dataSetModel.hasDataSet() && dataSetModel.hasPrefix()) {
-                if (dataSetModel.deleteValidation()) {
-                    feedback.say(String.format("Validation cleared for %s", dataSetModel.getPrefix()));
-                }
-            }
+            dataSetModel.deleteValidation();
+            feedback.say("Validation cleared for this mappings");
         }
         catch (StorageException e) {
-            LOG.warn(String.format("Error while deleting file: %s%n", e));
+            LOG.warn(String.format("Error while deleting validation file %s", e));
         }
     }
 
     private void clearValidations() {
         try {
-            if (dataSetModel.hasDataSet()) {
-                dataSetModel.getDataSet().deleteValidations();
-            }
+            dataSetModel.getDataSet().deleteAllValidations();
             feedback.say("Validation cleared for all mappings");
         }
         catch (StorageException e) {
-            LOG.warn(String.format("Error while deleting file: %s%n", e));
+            LOG.warn(String.format("Error while deleting validation files %s", e));
         }
     }
 
@@ -240,14 +230,6 @@ public class SipModel {
         return nodeTransferHandler;
     }
 
-    public boolean hasDataSet() {
-        return dataSetModel.hasDataSet();
-    }
-
-    public boolean hasPrefix() {
-        return dataSetModel.hasPrefix();
-    }
-
     public StatsModel getStatsModel() {
         return statsModel;
     }
@@ -275,7 +257,7 @@ public class SipModel {
     public interface DataSetCompletion {
         void complete(boolean success);
     }
-    
+
     public void setDataSet(final DataSet dataSet, final String requestedPrefix, final DataSetCompletion completion) {
         Exec.work(new Runnable() {
             @Override
@@ -288,7 +270,7 @@ public class SipModel {
                     dataSetModel.setDataSet(dataSet, prefix);
                     final RecMapping recMapping = dataSetModel.getRecMapping();
                     dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-                    mappingHintsModel.initialize(requestedPrefix,  dataSetModel);
+                    mappingHintsModel.initialize(requestedPrefix, dataSetModel);
                     dataSetModel.getMappingModel().setFacts(facts);
                     recordCompileModel.setValidator(dataSetModel.newValidator());
                     feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), dataSetModel.getPrefix()));
@@ -530,10 +512,9 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                boolean noDataSet = !hasDataSet();
                 boolean noRecordRoot = !statsModel.hasRecordRoot();
-                DataSetState state = dataSetModel.getDataSet().getState(mappingModel().getRecMapping().getPrefix());
-                if (noDataSet || noRecordRoot || !state.atLeast(ANALYZED_SOURCE)) {
+                DataSetState state = dataSetModel.getDataSetState();
+                if (noRecordRoot || !state.atLeast(ANALYZED_SOURCE)) {
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                     return;
                 }

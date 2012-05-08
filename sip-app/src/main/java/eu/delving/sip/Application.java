@@ -49,7 +49,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
-import static eu.delving.sip.files.DataSetState.EMPTY;
+import static eu.delving.sip.files.DataSetState.NO_DATA;
 
 /**
  * The main application
@@ -151,15 +151,9 @@ public class Application {
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                if (sipModel.getDataSetModel().hasDataSet() && mappingModel.hasRecMapping()) {
-                    home.setTitle(String.format(
-                            "Delving SIP Creator - [%s -> %s]",
-                            sipModel.getDataSetModel().getDataSet().getSpec(),
-                            mappingModel.getRecMapping().getPrefix().toUpperCase()
-                    ));
+                if (sipModel.getDataSetModel().isEmpty()) {
                 }
                 else {
-                    home.setTitle("Delving SIP Creator");
                 }
             }
         });
@@ -167,17 +161,27 @@ public class Application {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 statusPanel.setState(state);
-                if (state == EMPTY) {
-                    sipModel.getMappingModel().setRecMapping(null);
-                    sipModel.getDataSetFacts().set(null);
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            dataSetMenu.refreshAndChoose(null);
-                            sipModel.getStatsModel().setStatistics(null);
-                            sipModel.seekReset();
-                        }
-                    });
+                switch (state) {
+                    case ABSENT:
+                        Exec.work(new Runnable() {
+                            @Override
+                            public void run() {
+                                sipModel.getMappingModel().setRecMapping(null);
+                                sipModel.getDataSetFacts().set(null);
+                                sipModel.getStatsModel().setStatistics(null);
+                            }
+                        });
+                        home.setTitle("Delving SIP Creator");
+                        sipModel.seekReset();
+                        dataSetMenu.refreshAndChoose(null);
+                        break;
+                    default:
+                        DataSetModel dataSetModel = sipModel.getDataSetModel();
+                        home.setTitle(String.format(
+                                "Delving SIP Creator - [%s -> %s]",
+                                dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
+                        ));
+                        break;
                 }
             }
         });
@@ -225,7 +229,7 @@ public class Application {
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
         ));
         statusPanel.setReaction(DataSetState.ABSENT, allFrames.prepareForNothing());
-        statusPanel.setReaction(EMPTY, importAction);
+        statusPanel.setReaction(NO_DATA, importAction);
         statusPanel.setReaction(DataSetState.IMPORTED, new InputAnalyzer());
         statusPanel.setReaction(DataSetState.ANALYZED_IMPORT, allFrames.prepareForDelimiting());
         statusPanel.setReaction(DataSetState.DELIMITED, new ConvertPerformer());

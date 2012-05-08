@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="aff">
+
+    <!--Copying node mappings to this list will make them appear as candidate mappings when-->
+    <!--the prefix corresponds to the target format and the inputPath matches one of the-->
+    <!--input paths in the source analysis.-->
+    <functions>
+
+    </functions>
+
+    <node-mappings>
+
+    </node-mappings>
+
+</rec-mapping>

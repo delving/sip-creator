@@ -75,7 +75,7 @@ public class DataSetMenu extends JMenu {
         final ButtonGroup buttonGroup = new ButtonGroup();
         try {
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
-                for (String prefix : dataSet.getRecDefPrefixes()) {
+                for (String prefix : dataSet.getPrefixes()) {
                     final DataSetItem item = new DataSetItem(dataSet, prefix);
                     buttonGroup.add(item);
                     add(item);

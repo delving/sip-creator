@@ -42,7 +42,7 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static eu.delving.sip.files.DataSetState.*;
+import static eu.delving.sip.files.Storage.FileType.*;
 import static eu.delving.sip.files.StorageHelper.*;
 
 /**
@@ -131,24 +131,29 @@ public class StorageImpl implements Storage {
             Iterator<File> defWalk = findRecordDefinitionFiles(here).iterator();
             if (!defWalk.hasNext()) return null;
             String name = defWalk.next().getName();
-            return name.substring(0, name.length() - Storage.FileType.RECORD_DEFINITION.getSuffix().length());
+            return name.substring(0, name.length() - RECORD_DEFINITION.getSuffix().length());
         }
 
         @Override
-        public List<String> getRecDefPrefixes() throws StorageException {
+        public List<String> getPrefixes() throws StorageException {
             List<String> prefixes = new ArrayList<String>();
             try {
                 List<File> recDefFile = findRecordDefinitionFiles(here);
                 for (File file : recDefFile) {
                     String fileName = file.getName();
-                    String prefix = fileName.substring(0, fileName.length() - Storage.FileType.RECORD_DEFINITION.getSuffix().length());
+                    String prefix = fileName.substring(0, fileName.length() - RECORD_DEFINITION.getSuffix().length());
                     prefixes.add(prefix);
                 }
             }
             catch (Exception e) {
-                throw new StorageException("Unable to load metadata model");
+                throw new StorageException("Unable to load metadata model", e);
             }
             return prefixes;
+        }
+
+        @Override
+        public boolean isValidated(String prefix) throws StorageException {
+            return findLatestFile(here, VALIDATION, prefix).exists();
         }
 
         @Override
@@ -178,33 +183,34 @@ public class StorageImpl implements Storage {
                 return postSourceState(source, prefix);
             }
             else {
-                return EMPTY;
+                return DataSetState.NO_DATA;
             }
         }
 
         private DataSetState importedState(File imported) {
             File statistics = statsFile(here, false, null);
             if (statistics.exists() && statistics.lastModified() >= imported.lastModified()) {
-                return allHintsSet(getHints()) ? DELIMITED : ANALYZED_IMPORT;
+                return allHintsSet(getHints()) ? DataSetState.DELIMITED : DataSetState.ANALYZED_IMPORT;
             }
             else {
-                return IMPORTED;
+                return DataSetState.IMPORTED;
             }
         }
 
         private DataSetState postSourceState(File source, String prefix) {
             File statistics = statsFile(here, true, null);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
-                File mapping = findLatestMappingFile(here, prefix);
+                File mapping = findLatestFile(here, MAPPING, prefix);
                 if (mapping != null) {
-                    return validationFile(here, mapping).exists() ? VALIDATED : MAPPING;
+                    File validation = findLatestFile(here, VALIDATION, prefix);
+                    return validation.exists() ? DataSetState.VALIDATED : DataSetState.MAPPING;
                 }
                 else {
-                    return ANALYZED_SOURCE;
+                    return DataSetState.ANALYZED_SOURCE;
                 }
             }
             else {
-                return SOURCED;
+                return DataSetState.SOURCED;
             }
         }
 
@@ -252,9 +258,9 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public boolean deleteValidation(String metadataPrefix) throws StorageException {
+        public boolean deleteValidation(String prefix) throws StorageException {
             boolean deleted = false;
-            for (File file : validationFiles(here, metadataPrefix)) {
+            for (File file : validationFiles(here, prefix)) {
                 delete(file);
                 deleted = true;
             }
@@ -262,7 +268,7 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public void deleteValidations() throws StorageException {
+        public void deleteAllValidations() throws StorageException {
             for (File file : validationFiles(here)) delete(file);
         }
 
@@ -363,7 +369,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException {
-            File file = findLatestMappingFile(here, prefix);
+            File file = findLatestFile(here, MAPPING, prefix);
             if (file.exists()) {
                 try {
                     return RecMapping.read(file, recDefModel);
@@ -417,7 +423,8 @@ public class StorageImpl implements Storage {
         public Validator newValidator(String prefix) throws StorageException {
             try {
                 File schemaFile = schemaFile(here, prefix);
-                if (!schemaFile.exists()) throw new StorageException("Schema file not found: "+schemaFile.getAbsolutePath());
+                if (!schemaFile.exists())
+                    throw new StorageException("Schema file not found: " + schemaFile.getAbsolutePath());
                 return schemaFactory().newSchema(schemaFile).newValidator();
             }
             catch (SAXException e) {
@@ -573,14 +580,10 @@ public class StorageImpl implements Storage {
             try {
                 List<File> files = new ArrayList<File>();
                 files.add(Hasher.ensureFileHashed(hintsFile(here)));
-                for (File mappingFile : findLatestMappingFiles(here)) {
-                    File validationFile = validationFile(here, mappingFile);
-                    if (validationFile.exists()) {
-                        files.add(Hasher.ensureFileHashed(mappingFile));
-                        files.add(Hasher.ensureFileHashed(validationFile));
-                        File statsFile = statsFile(here, mappingFile);
-                        if (statsFile.exists()) files.add(Hasher.ensureFileHashed(statsFile));
-                    }
+                for (String prefix : getPrefixes()) {
+                    files.add(findLatestHashed(here, MAPPING, prefix));
+                    files.add(findLatestHashed(here, VALIDATION, prefix));
+                    files.add(findLatestHashed(here, RESULT_STATS, prefix));
                 }
                 files.add(Hasher.ensureFileHashed(sourceFile(here)));
                 return files;

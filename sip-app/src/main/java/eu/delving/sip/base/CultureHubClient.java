@@ -372,12 +372,12 @@ public class CultureHubClient {
         }
     }
 
-    public class FileUploader extends Attempt {
+    private class FileUploader extends Attempt {
         private DataSet dataSet;
         private List<File> uploadFiles;
         private UploadListener uploadListener;
 
-        public FileUploader(int attempt, DataSet dataSet, UploadListener uploadListener) throws StorageException {
+        FileUploader(int attempt, DataSet dataSet, UploadListener uploadListener) throws StorageException {
             super(attempt);
             this.dataSet = dataSet;
             this.uploadFiles = dataSet.getUploadFiles();

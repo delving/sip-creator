@@ -50,7 +50,9 @@ public interface DataSet {
 
     String getLatestPrefix();
 
-    List<String> getRecDefPrefixes() throws StorageException;
+    List<String> getPrefixes() throws StorageException;
+
+    boolean isValidated(String prefix) throws StorageException;
 
     RecDef getRecDef(String prefix) throws StorageException;
 
@@ -66,9 +68,9 @@ public interface DataSet {
 
     void deleteConverted() throws StorageException;
 
-    boolean deleteValidation(String metadataPrefix) throws StorageException;
+    boolean deleteValidation(String prefix) throws StorageException;
 
-    void deleteValidations() throws StorageException;
+    void deleteAllValidations() throws StorageException;
 
     File importedOutput() throws StorageException;
 

@@ -17,7 +17,8 @@
 
 
     <xs:group name="dcGroup">
-        <xs:sequence >
+        <xs:choice >
+            <xs:element ref="dc:title" minOccurs="0" maxOccurs="unbounded" />
             <xs:element ref="dc:creator" minOccurs="0" maxOccurs="unbounded" />
             <xs:element ref="dc:subject" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dc:description" minOccurs="0" maxOccurs="unbounded"/>
@@ -32,12 +33,11 @@
             <xs:element ref="dc:relation" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dc:coverage" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dc:rights" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
+        </xs:choice>
     </xs:group>
 
     <xs:group name="dctermsGroup">
         <xs:choice>
-            <xs:element ref="dcterms:conformsTo" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dcterms:created" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dcterms:extent" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="dcterms:hasFormat" minOccurs="0" maxOccurs="unbounded"/>
@@ -69,11 +69,11 @@
     <xs:complexType name="recordType">
         <xs:sequence>
 
-            <xs:element name="citName" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="citOldId" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="citName" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="citOldId" minOccurs="0" maxOccurs="1"/>
             <xs:element name="thumbLarge" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="thumbSmall" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="collection" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="collection" minOccurs="1" maxOccurs="1"/>
             <xs:element name="creatorRole" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="productionPeriod" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="productionStart" minOccurs="0" maxOccurs="unbounded"/>
@@ -83,7 +83,7 @@
             <xs:element name="formatted" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="year" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="dimension" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="objectNumber" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="objectNumber" minOccurs="1" maxOccurs="1"/>
             <xs:element name="objectSoort" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="material" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="place" minOccurs="0" maxOccurs="unbounded"/>
@@ -112,15 +112,16 @@
             <xs:element ref="europeana:dataProvider" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="europeana:type" minOccurs="0" maxOccurs="1"/>
 
-            <xs:element ref="europeana:uri" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:language" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:country" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:collectionName" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:collectionTitle" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="europeana:uri" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:language" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:country" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:collectionName" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:collectionTitle" minOccurs="1" maxOccurs="1"/>
             <xs:element ref="europeana:source" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="europeana:year" minOccurs="0" maxOccurs="unbounded"/>
 
             <xs:element ref="delving:year" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="delving:thumbnail" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:deepZoomUrl" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:fullTextObjectUrl" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:fullText" minOccurs="0" maxOccurs="unbounded"/>
