@@ -43,6 +43,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static eu.delving.sip.files.DataSetState.*;
+import static eu.delving.sip.files.StorageHelper.*;
 
 /**
  * This is an implementation of the Storage interface
@@ -50,7 +51,7 @@ import static eu.delving.sip.files.DataSetState.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class StorageImpl extends StorageBase implements Storage {
+public class StorageImpl implements Storage {
     private File home;
     private HttpClient httpClient;
     private SchemaFactory schemaFactory;
@@ -655,17 +656,11 @@ public class StorageImpl extends StorageBase implements Storage {
 
         @Override
         public void remove() throws StorageException {
+            for (File file : here.listFiles(ATTIC_FILTER)) delete(file);
             String now = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
             File saveDirectory = new File(here, now);
             try {
-                for (File file : here.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File file) {
-                        return file.isFile();
-                    }
-                })) {
-                    FileUtils.moveFileToDirectory(file, saveDirectory, true);
-                }
+                for (File file : here.listFiles(FILE_FILTER)) FileUtils.moveFileToDirectory(file, saveDirectory, true);
             }
             catch (IOException e) {
                 throw new StorageException(String.format("Unable to save files in %s to directory %s", here.getName(), now), e);

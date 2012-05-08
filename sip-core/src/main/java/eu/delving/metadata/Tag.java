@@ -57,6 +57,7 @@ public class Tag implements Comparable<Tag>, Serializable {
             prefix = localName.substring(0, colon);
             localName = localName.substring(colon + 1);
         }
+        if (opt != null && opt.isEmpty()) opt = null;
         return new Tag(false, prefix, localName, opt);
     }
 

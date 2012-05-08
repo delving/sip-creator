@@ -167,7 +167,10 @@ public class MappingResultImpl implements MappingResult {
             elements.add(0, element);
             element = (Element) element.getParentNode();
         }
-        for (Element el : elements) path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), null));
+        for (Element el : elements) {
+            String key = el.getAttribute("aff:key");
+            path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), key));
+        }
         RecDefNode recDefNode = recDefTree.getRecDefNode(path);
         if (recDefNode == null) throw new RuntimeException("No recdef node for " + path);
         return recDefNode;

@@ -41,32 +41,32 @@ import static eu.delving.sip.files.Storage.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class StorageBase {
-    public static final int BLOCK_SIZE = 4096;
+public class StorageHelper {
+    static final int BLOCK_SIZE = 4096;
 
-    public static File createDataSetDirectory(File home, String spec, String organization) {
+    static File createDataSetDirectory(File home, String spec, String organization) {
         return new File(home, String.format("%s_%s", spec, organization));
     }
 
-    public static String getSpecFromDirectory(File directory) {
+    static String getSpecFromDirectory(File directory) {
         int underscore = directory.getName().indexOf("_");
         if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
         return directory.getName().substring(0, underscore);
     }
 
-    public static String getOrganizationFromDirectory(File directory) {
+    static String getOrganizationFromDirectory(File directory) {
         int underscore = directory.getName().indexOf("_");
         if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
         return directory.getName().substring(underscore + 1);
     }
 
-    public static Path getRecordRoot(Map<String, String> hints) throws StorageException {
+    static Path getRecordRoot(Map<String, String> hints) throws StorageException {
         String recordRoot = hints.get(RECORD_ROOT_PATH);
         if (recordRoot == null) throw new StorageException("Must have record root path");
         return Path.create(recordRoot);
     }
 
-    public static int getRecordCount(Map<String, String> hints) throws StorageException {
+    static int getRecordCount(Map<String, String> hints) throws StorageException {
         String recordCount = hints.get(RECORD_COUNT);
         int count = 0;
         try {
@@ -77,18 +77,18 @@ public class StorageBase {
         return count;
     }
 
-    public static Path getUniqueElement(Map<String, String> hints) throws StorageException {
+    static Path getUniqueElement(Map<String, String> hints) throws StorageException {
         String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
         if (uniqueElement == null) throw new StorageException("Must have unique element path");
         return Path.create(uniqueElement);
     }
 
-    public static int getMaxUniqueValueLength(Map<String, String> hints) {
+    static int getMaxUniqueValueLength(Map<String, String> hints) {
         String max = hints.get(MAX_UNIQUE_VALUE_LENGTH);
         return max == null ? Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH : Integer.parseInt(max);
     }
 
-    Map<String, String> readFacts(File file) throws IOException {
+    static Map<String, String> readFacts(File file) throws IOException {
         Map<String, String> facts = new TreeMap<String, String>();
         if (file.exists()) {
             List<String> lines = FileUtils.readLines(file, "UTF-8");
@@ -106,7 +106,7 @@ public class StorageBase {
         return facts;
     }
 
-    boolean allHintsSet(Map<String, String> hints) {
+    static boolean allHintsSet(Map<String, String> hints) {
         String recordRoot = hints.get(RECORD_ROOT_PATH);
         String recordCount = hints.get(RECORD_COUNT);
         String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
@@ -121,7 +121,7 @@ public class StorageBase {
         return true;
     }
 
-    void writeFacts(File file, Map<String, String> facts) throws IOException {
+    static void writeFacts(File file, Map<String, String> facts) throws IOException {
         List<String> lines = new ArrayList<String>();
         lines.add("#SIPCreator - facts");
         for (Map.Entry<String, String> entry : facts.entrySet()) {
@@ -130,45 +130,45 @@ public class StorageBase {
         FileUtils.writeLines(file, lines);
     }
 
-    File factsFile(File dir) {
+    static File factsFile(File dir) {
         return findOrCreate(dir, FACTS);
     }
 
-    File hintsFile(File dir) {
+    static File hintsFile(File dir) {
         return findOrCreate(dir, HINTS);
     }
 
-    File importedFile(File dir) {
+    static File importedFile(File dir) {
         return findOrCreate(dir, IMPORTED);
     }
 
-    File sourceFile(File dir) {
+    static File sourceFile(File dir) {
         return findOrCreate(dir, SOURCE);
     }
 
-    File latestMappingFileOrNull(File dir) {
+    static File latestMappingFileOrNull(File dir) {
         return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
     }
 
-    File validationFile(File dir, File mappingFile) {
+    static File validationFile(File dir, File mappingFile) {
         String prefix = extractName(mappingFile, MAPPING);
         String name = VALIDATION.getName(prefix);
         return findOrCreate(dir, name, new NameFileFilter(name), VALIDATION);
     }
 
-    File[] validationFiles(File dir, String prefix) {
+    static File[] validationFiles(File dir, String prefix) {
         return dir.listFiles(new NameFileFilter(VALIDATION.getName(prefix)));
     }
 
-    File[] validationFiles(File dir) {
+    static File[] validationFiles(File dir) {
         return dir.listFiles(new PrefixFileFilter(VALIDATION));
     }
 
-    File reportFile(File dir, RecMapping recMapping) {
+    static File reportFile(File dir, RecMapping recMapping) {
         return new File(dir, REPORT.getName(recMapping.getPrefix()));
     }
 
-    File statsFile(File dir, boolean sourceFormat, String prefix) {
+    static File statsFile(File dir, boolean sourceFormat, String prefix) {
         if (prefix == null) {
             return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
         }
@@ -177,44 +177,44 @@ public class StorageBase {
         }
     }
 
-    File statsFile(File dir, File mappingFile) {
+    static File statsFile(File dir, File mappingFile) {
         String prefix = extractName(mappingFile, MAPPING);
         String name = RESULT_STATS.getName(prefix);
         return findOrCreate(dir, name, new NameFileFilter(name), RESULT_STATS);
     }
 
-    private File findOrCreate(File directory, Storage.FileType fileType) {
+    static File findOrCreate(File directory, Storage.FileType fileType) {
         if (fileType.getName() == null) throw new RuntimeException("Expected name");
         File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName()), fileType);
         if (file == null) file = new File(directory, fileType.getName());
         return file;
     }
 
-    private File findOrCreate(File directory, String name, FileFilter fileFilter, Storage.FileType fileType) {
+    static File findOrCreate(File directory, String name, FileFilter fileFilter, Storage.FileType fileType) {
         File file = findOrNull(directory, 0, fileFilter, fileType);
         if (file == null) file = new File(directory, name);
         return file;
     }
 
-    private File findOrNull(File directory, int which, FileFilter fileFilter, Storage.FileType fileType) {
+    static File findOrNull(File directory, int which, FileFilter fileFilter, Storage.FileType fileType) {
         File[] files = directory.listFiles(fileFilter);
         return getRecent(files, which, fileType);
     }
 
-    File recordDefinitionFile(File dir, String prefix) {
+    static File recordDefinitionFile(File dir, String prefix) {
         return new File(dir, RECORD_DEFINITION.getName(prefix));
     }
 
-    File schemaFile(File dir, String prefix) {
+    static File schemaFile(File dir, String prefix) {
         return new File(dir, SCHEMA.getName(prefix));
     }
 
-    List<File> findRecordDefinitionFiles(File dir) {
+    static List<File> findRecordDefinitionFiles(File dir) {
         File[] files = dir.listFiles(new SuffixFileFilter(Storage.FileType.RECORD_DEFINITION));
         return Arrays.asList(files);
     }
 
-    File findLatestMappingFile(File dir, String metadataPrefix) {
+    static File findLatestMappingFile(File dir, String metadataPrefix) {
         File mappingFile = null;
         for (File file : findLatestFiles(dir, MAPPING)) {
             String prefix = extractName(file, MAPPING);
@@ -224,18 +224,18 @@ public class StorageBase {
         return mappingFile;
     }
 
-    Collection<File> findLatestMappingFiles(File dir) {
+    static Collection<File> findLatestMappingFiles(File dir) {
         return findLatestFiles(dir, MAPPING);
     }
 
-    List<File> findHashedMappingFiles(File dir, String prefix) {
+    static List<File> findHashedMappingFiles(File dir, String prefix) {
         File[] files = dir.listFiles(new HashedMappingFileFilter(prefix));
         List<File> sorted = new ArrayList<File>(Arrays.asList(files));
         Collections.sort(sorted, new LastModifiedComparator());
         return sorted;
     }
 
-    Collection<File> findLatestFiles(File dir, Storage.FileType fileType) {
+    static Collection<File> findLatestFiles(File dir, Storage.FileType fileType) {
         File[] files = dir.listFiles(new PrefixFileFilter(fileType));
         Map<String, List<File>> map = new TreeMap<String, List<File>>();
         for (File file : files) {
@@ -259,7 +259,7 @@ public class StorageBase {
         return latestFiles;
     }
 
-    class PrefixFileFilter implements FileFilter {
+    static class PrefixFileFilter implements FileFilter {
         private Storage.FileType fileType;
 
         PrefixFileFilter(Storage.FileType fileType) {
@@ -273,7 +273,7 @@ public class StorageBase {
         }
     }
 
-    class SuffixFileFilter implements FileFilter {
+    static class SuffixFileFilter implements FileFilter {
         private Storage.FileType fileType;
 
         SuffixFileFilter(Storage.FileType fileType) {
@@ -287,21 +287,7 @@ public class StorageBase {
         }
     }
 
-    class HashedMappingFileFilter implements FileFilter {
-        private String ending;
-
-        HashedMappingFileFilter(String prefix) {
-            this.ending = MAPPING.getName(prefix);
-        }
-
-        @Override
-        public boolean accept(File file) {
-            String name = file.getName();
-            return file.isFile() && name.endsWith(ending);
-        }
-    }
-
-    String extractName(File file, Storage.FileType fileType) {
+    static String extractName(File file, Storage.FileType fileType) {
         String name = Hasher.extractFileName(file);
         if (name.startsWith(fileType.getPrefix()) && name.endsWith(fileType.getSuffix())) {
             name = name.substring(fileType.getPrefix().length());
@@ -311,7 +297,6 @@ public class StorageBase {
         else {
             return null;
         }
-
     }
 
     static void delete(File file) throws StorageException {
@@ -326,7 +311,7 @@ public class StorageBase {
         }
     }
 
-    File getRecent(File[] files, int which, Storage.FileType fileType) {
+    static File getRecent(File[] files, int which, Storage.FileType fileType) {
         int maxHistory = fileType.getHistorySize();
         if (files == null || files.length <= which || which > maxHistory) {
             return null;
@@ -341,10 +326,24 @@ public class StorageBase {
         return files[which];
     }
 
-    private class NameFileFilter implements FileFilter {
+    static class HashedMappingFileFilter implements FileFilter {
+        private String ending;
+
+        HashedMappingFileFilter(String prefix) {
+            this.ending = MAPPING.getName(prefix);
+        }
+
+        @Override
+        public boolean accept(File file) {
+            String name = file.getName();
+            return file.isFile() && name.endsWith(ending);
+        }
+    }
+
+    static class NameFileFilter implements FileFilter {
         private String name;
 
-        private NameFileFilter(String name) {
+        NameFileFilter(String name) {
             this.name = name;
         }
 
@@ -354,7 +353,7 @@ public class StorageBase {
         }
     }
 
-    public static class LastModifiedComparator implements Comparator<File> {
+    static class LastModifiedComparator implements Comparator<File> {
 
         @Override
         public int compare(File a, File b) {
@@ -381,4 +380,19 @@ public class StorageBase {
             }
         }
     }
+
+    static final FileFilter FILE_FILTER = new FileFilter() {
+        @Override
+        public boolean accept(File file) {
+            return file.isFile();
+        }
+    };
+
+    static final FileFilter ATTIC_FILTER = new FileFilter() {
+        @Override
+        public boolean accept(File file) {
+            return file.isDirectory() && file.getName().matches("\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}");
+        }
+    };
+
 }

@@ -3,6 +3,7 @@
 
     <!--<version>1.0</version>-->
 
+
     <namespaces>
         <namespace prefix="aff" uri="http://schemas.delving.eu/aff/"
                    schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
