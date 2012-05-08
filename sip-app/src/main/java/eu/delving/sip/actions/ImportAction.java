@@ -25,7 +25,6 @@ import eu.delving.sip.base.HarvestPool;
 import eu.delving.sip.base.Harvestor;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.SwingHelper;
-import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -43,6 +42,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+
+import static eu.delving.sip.files.DataSetState.EMPTY;
 
 /**
  * Import a new file
@@ -76,18 +77,8 @@ public class ImportAction extends AbstractAction {
         prepareChooser(sipModel);
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
-            public void dataSetChanged(DataSet dataSet) {
-                setEnabled(true);
-            }
-
-            @Override
-            public void dataSetRemoved() {
-                setEnabled(false);
-            }
-
-            @Override
-            public void dataSetStateChanged(DataSet dataSet, DataSetState dataSetState) {
-                setEnabled(true);
+            public void stateChanged(DataSetModel model, DataSetState state) {
+                setEnabled(state != EMPTY);
             }
         });
     }

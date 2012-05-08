@@ -57,6 +57,11 @@ public class MappingModel implements RecDefNodeListener {
         fireRecMappingSet();
     }
 
+    public String getPrefix() {
+        if (!hasRecMapping()) return "ERROR";
+        return recMapping.getPrefix();
+    }
+
     public boolean hasRecMapping() {
         return recMapping != null;
     }
