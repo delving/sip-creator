@@ -101,6 +101,7 @@ public class NodeMapping {
     }
 
     public Operator getOperator() {
+        if (recDefNode.hasOperator()) return recDefNode.getOperator();
         return operator == null ? Operator.ALL : operator;
     }
 
@@ -278,8 +279,8 @@ public class NodeMapping {
                 if (path.peek().getLocalName().equals("constant")) {
                     codeOut.line("'CONSTANT'");
                 }
-                else if (recDefNode.isURI()) {
-                    codeOut.line("\"${%s.sanitizeURI()}\"", toLeafGroovyParam(path));
+                else if (recDefNode.hasFunction()) {
+                    codeOut.line("\"${%s(%s)}\"", recDefNode.getFunction(), toLeafGroovyParam(path));
                 }
                 else {
                     codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
