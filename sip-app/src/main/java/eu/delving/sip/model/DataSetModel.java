@@ -31,10 +31,11 @@ import javax.swing.*;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static eu.delving.sip.files.DataSetState.EMPTY;
+import static eu.delving.sip.files.DataSetState.ABSENT;
 
 /**
  * An observable hole to put the current data set
@@ -44,7 +45,7 @@ import static eu.delving.sip.files.DataSetState.EMPTY;
 
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
-    private DataSetState dataSetState = EMPTY;
+    private DataSetState currentState = ABSENT;
     private MappingModel mappingModel = new MappingModel();
 
     public DataSetModel() {
@@ -55,20 +56,25 @@ public class DataSetModel implements RecDefModel {
         return mappingModel;
     }
 
-    public boolean hasDataSet() {
-        return dataSet != null;
-    }
-
-    public boolean hasPrefix() {
-        return mappingModel.hasRecMapping();
+    public boolean isEmpty() {
+        return dataSet == null;
     }
 
     public DataSetState getDataSetState() {
-        return hasPrefix() && hasDataSet() ? dataSet.getState(mappingModel.getPrefix()) : EMPTY;
+        return isEmpty() ? ABSENT : dataSet.getState(getPrefix());
+    }
+
+    public List<String> getInvalidPrefixes() throws StorageException {
+        List<String> invalid = new ArrayList<String>();
+        if (!isEmpty()) {
+            for (String prefix : dataSet.getPrefixes()) {
+                if (!dataSet.isValidated(prefix)) invalid.add(prefix);
+            }
+        }
+        return invalid;
     }
 
     public RecMapping getRecMapping() throws StorageException {
-        if (!hasPrefix()) throw new StorageException("No prefix available");
         return getDataSet().getRecMapping(getPrefix(), this);
     }
 
@@ -102,6 +108,7 @@ public class DataSetModel implements RecDefModel {
 
     public void setDataSet(final DataSet dataSet, String prefix) throws StorageException {
         this.dataSet = dataSet;
+        this.currentState = null;
         if (dataSet != null) {
             mappingModel.setRecMapping(dataSet.getRecMapping(prefix, this));
         }
@@ -116,7 +123,7 @@ public class DataSetModel implements RecDefModel {
     }
 
     public boolean deleteValidation() throws StorageException {
-        return hasDataSet() && hasPrefix() && dataSet.deleteValidation(getPrefix());
+        return !isEmpty() && dataSet.deleteValidation(getPrefix());
     }
 
     private class StateCheckTimer implements Runnable, ActionListener {
@@ -129,17 +136,15 @@ public class DataSetModel implements RecDefModel {
 
         @Override
         public void run() {
-            if (hasDataSet()) {
-                final DataSetState actualState = getDataSetState();
-                if (actualState != dataSetState) {
-                    dataSetState = actualState;
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (Listener listener : listeners) listener.stateChanged(DataSetModel.this, actualState);
-                        }
-                    });
-                }
+            final DataSetState freshState = getDataSetState();
+            if (freshState != currentState) {
+                currentState = freshState;
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Listener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);
+                    }
+                });
             }
         }
 

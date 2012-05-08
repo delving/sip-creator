@@ -85,6 +85,8 @@ public class RecDef {
 
     public List<Namespace> namespaces;
 
+    public List<MappingFunction> functions;
+
     public List<Attr> attrs;
 
     public List<Elem> elems;
@@ -289,6 +291,12 @@ public class RecDef {
 
         @XStreamAsAttribute
         public String fieldType;
+
+        @XStreamAsAttribute
+        public String function;
+
+        @XStreamAsAttribute
+        public Operator operator;
 
         @XStreamImplicit
         public List<Elem> elemList = new ArrayList<Elem>();

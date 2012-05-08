@@ -141,7 +141,7 @@ public class StatsFrame extends FrameBase {
                 DataSet dataSet = model.getDataSet();
                 switch (state) {
                     case ABSENT:
-                    case EMPTY:
+                    case NO_DATA:
                     case IMPORTED:
                         for (StatsSet statsSet : statsSets) statsSet.setStats(null);
                         break;
@@ -158,7 +158,7 @@ public class StatsFrame extends FrameBase {
                     case VALIDATED:
                         statsSets[0].setStats(dataSet.getStats(false, null));
                         statsSets[1].setStats(dataSet.getStats(true, null));
-                        statsSets[2].setStats(dataSet.getStats(true, sipModel.getMappingModel().getRecMapping().getPrefix()));
+                        statsSets[2].setStats(dataSet.getStats(true, model.getPrefix()));
                         break;
                 }
             }

@@ -136,10 +136,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return !isAttr() && elem.unmappable;
     }
 
-    public boolean isURI() {
-        return "link".equals(isAttr() ? attr.fieldType : elem.fieldType);
-    }
-
 //    public boolean isSingular() { todo: use it
 //        return !isAttr() && elem.singular;
 //    }
@@ -189,6 +185,22 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public boolean hasConstant() {
         return optBox != null && optBox.isChild();
+    }
+
+    public boolean hasFunction() {
+        return !isAttr() && elem.function != null;
+    }
+
+    public boolean hasOperator() {
+        return !isAttr() && elem.operator != null;
+    }
+
+    public Operator getOperator() {
+        return elem.operator;
+    }
+
+    public String getFunction() {
+        return elem.function;
     }
 
     public void collectNodeMappings(List<NodeMapping> nodeMappings) {

@@ -86,9 +86,7 @@ public class FileProcessor implements Runnable {
     }
 
     public void run() {
-        if (!sipModel.hasDataSet() || !sipModel.hasPrefix()) {
-            throw new RuntimeException("No data set selected");
-        }
+        if (sipModel.getDataSetModel().isEmpty()) throw new RuntimeException("No data set selected");
         BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
         PrintWriter out = null;
         try {

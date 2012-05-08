@@ -235,7 +235,6 @@ public class MappingCompileModel {
 
         @Override
         public void recMappingSet(MappingModel mappingModel) {
-            setNodeMapping(null);
             recMapping = mappingModel.getRecMapping();
             triggerCompile();
         }

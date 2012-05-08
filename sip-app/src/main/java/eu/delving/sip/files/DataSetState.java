@@ -29,7 +29,7 @@ package eu.delving.sip.files;
 
 public enum DataSetState {
     ABSENT("Clear", "There is currently no dataset selected", "Press here to clear the screen"),
-    EMPTY("Import", "This dataset is currently empty", "Press here to import data into it"),
+    NO_DATA("Import", "This dataset is currently empty", "Press here to import data into it"),
     IMPORTED("Analyze Imp", "There is data imported for this dataset", "Press here to analyze the imported data"),
     ANALYZED_IMPORT("Delimit", "The dataset is analyzed", "Press here to show analysis frames"),
     DELIMITED("Convert", "The delimiters have been set", "Press here to convert the data to source format"),
