@@ -1,547 +1,361 @@
-<?xml version ="1.0" encoding="UTF-8"?>
-<lido:lidoWrap xmlns:lido="http://www.lido-schema.org">
-    <lido:lido>
-        <lido:lidoRecID lido:type="local"
-                        lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg">DE-Mb112/lido/obj/00000001</lido:lidoRecID>
-        <lido:category>
-            <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
-            <lido:term xml:lang="eng">Man-Made Object</lido:term>
-        </lido:category>
-        <lido:descriptiveMetadata xml:lang="deu">
-            <lido:objectClassificationWrap>
-                <lido:objectWorkTypeWrap>
-                    <lido:objectWorkType lido:type="Sachbegriff">
-                        <lido:term>Bild</lido:term>
-                        <lido:term lido:addedSearchTerm="yes">Bildwerk</lido:term>
-                    </lido:objectWorkType>
-                </lido:objectWorkTypeWrap>
-                <lido:classificationWrap>
-                    <lido:classification lido:type="Gattung">
-                        <lido:term>Tafelmalerei</lido:term>
-                        <lido:term lido:addedSearchTerm="yes">Malerei</lido:term>
-                    </lido:classification>
-                </lido:classificationWrap>
-            </lido:objectClassificationWrap>
-            <lido:objectIdentificationWrap>
-                <lido:titleWrap>
-                    <lido:titleSet>
-                        <lido:appellationValue lido:pref="preferred">Via San Giovanni in Laterano mit
-                            Blick auf das Kolosseum
-                        </lido:appellationValue>
-                    </lido:titleSet>
-                </lido:titleWrap>
-                <lido:repositoryWrap>
-                    <lido:repositorySet lido:type="current">
-                        <lido:repositoryName>
-                            <lido:legalBodyName>
-                                <lido:appellationValue>Museen der Stadt Aachen — Suermondt-Ludwig-Museum
-                                    (Aachen)
-                                </lido:appellationValue>
-                            </lido:legalBodyName>
-                        </lido:repositoryName>
-                        <lido:workID lido:type="Inventarnummer">4</lido:workID>
-                        <lido:repositoryLocation>
-                            <lido:placeID lido:type="local" lido:source="TGN">7004799</lido:placeID>
-                            <lido:namePlaceSet>
-                                <lido:appellationValue>Aachen</lido:appellationValue>
-                            </lido:namePlaceSet>
-                            <lido:partOfPlace lido:politicalEntity="Kreis">
-                                <lido:namePlaceSet>
-                                    <lido:appellationValue>kreisfrei</lido:appellationValue>
-                                </lido:namePlaceSet>
-                                <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
-                                    <lido:namePlaceSet>
-                                        <lido:appellationValue>Aachen, Regierungsbezirk
-                                        </lido:appellationValue>
-                                    </lido:namePlaceSet>
-                                    <lido:partOfPlace lido:politicalEntity="Bundesland">
-                                        <lido:namePlaceSet>
-                                            <lido:appellationValue>Nordrhein-Westfalen
-                                            </lido:appellationValue>
-                                        </lido:namePlaceSet>
-                                        <lido:partOfPlace lido:politicalEntity="Staat">
-                                            <lido:namePlaceSet>
-                                                <lido:appellationValue>Deutschland
-                                                </lido:appellationValue>
-                                            </lido:namePlaceSet>
-                                        </lido:partOfPlace>
-                                    </lido:partOfPlace>
-                                </lido:partOfPlace>
-                            </lido:partOfPlace>
-                        </lido:repositoryLocation>
-                    </lido:repositorySet>
-                </lido:repositoryWrap>
-                <lido:objectMeasurementsWrap>
-                    <lido:objectMeasurementsSet>
-                        <lido:displayObjectMeasurements>Höhe x Breite: 130 x 110 cm
-                        </lido:displayObjectMeasurements>
-                        <lido:objectMeasurements>
-                            <lido:measurementsSet>
-                                <lido:measurementType>Höhe x Breite</lido:measurementType>
-                                <lido:measurementUnit>cm</lido:measurementUnit>
-                                <lido:measurementValue>130 x 110</lido:measurementValue>
-                            </lido:measurementsSet>
-                        </lido:objectMeasurements>
-                    </lido:objectMeasurementsSet>
-                </lido:objectMeasurementsWrap>
-            </lido:objectIdentificationWrap>
-            <lido:eventWrap>
-                <lido:eventSet>
-                    <lido:event>
-                        <lido:eventType>
-                            <lido:term>Herstellung</lido:term>
-                            <lido:term lido:addedSearchTerm="yes">Herstellung</lido:term>
-                        </lido:eventType>
-                        <lido:eventActor>
-                            <lido:actorInRole>
-                                <lido:actor lido:type="person">
-                                    <lido:actorID lido:type="local" lido:source="Bildindex-KUE-Datei">
-                                        kue/02530967
-                                    </lido:actorID>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="preferred">Achenbach, Andreas
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nationalityActor>
-                                        <lido:term>Deutschland</lido:term>
-                                    </lido:nationalityActor>
-                                    <lido:vitalDatesActor>
-                                        <lido:earliestDate lido:type="birthDate">1815-09-29
-                                        </lido:earliestDate>
-                                        <lido:latestDate lido:type="deathDate">1910-04-01
-                                        </lido:latestDate>
-                                    </lido:vitalDatesActor>
-                                    <lido:genderActor>männlich</lido:genderActor>
-                                </lido:actor>
-                                <lido:roleActor>
-                                    <lido:term>Maler</lido:term>
-                                </lido:roleActor>
-                            </lido:actorInRole>
-                        </lido:eventActor>
-                        <lido:eventDate>
-                            <lido:displayDate>1875</lido:displayDate>
-                            <lido:date>
-                                <lido:earliestDate>1875</lido:earliestDate>
-                                <lido:latestDate>1875</lido:latestDate>
-                            </lido:date>
-                        </lido:eventDate>
-                        <lido:eventMaterialsTech>
-                            <lido:materialsTech>
-                                <lido:termMaterialsTech lido:type="Material">
-                                    <lido:term>Öl</lido:term>
-                                    <lido:term lido:addedSearchTerm="yes">Farbmaterial</lido:term>
-                                </lido:termMaterialsTech>
-                            </lido:materialsTech>
-                        </lido:eventMaterialsTech>
-                        <lido:eventMaterialsTech>
-                            <lido:materialsTech>
-                                <lido:termMaterialsTech lido:type="Material">
-                                    <lido:term>Leinwand</lido:term>
-                                    <lido:term lido:addedSearchTerm="yes">Textil</lido:term>
-                                </lido:termMaterialsTech>
-                            </lido:materialsTech>
-                        </lido:eventMaterialsTech>
-                    </lido:event>
-                </lido:eventSet>
-            </lido:eventWrap>
-            <lido:objectRelationWrap>
-                <lido:subjectWrap>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/11Q758
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">11 Q 75 8</lido:term>
-                                <lido:term lido:pref="alternative">Prozessionen in der christlichen
-                                    Religion
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/11P31521
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">11 P 31 52 1</lido:term>
-                                <lido:term lido:pref="alternative">Mönch(e), Klosterbrüder</lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/25I141:
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">25 I 14 1 :</lido:term>
-                                <lido:term lido:pref="alternative">Straße</lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/61F(VIA SAN GIOVANNI IN LATERANO)
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">61 F (VIA SAN GIOVANNI IN LATERANO)
-                                </lido:term>
-                                <lido:term lido:pref="alternative">Namen historischer Gebäude,
-                                    Örtlichkeiten, Straßen, etc. (mit NAMEN)
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/61E(ROMA)
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">61 E (ROMA)</lido:term>
-                                <lido:term lido:pref="alternative">Namen von Städten und Dörfern (mit
-                                    NAMEN)
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/43C8:
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">43 C 8 :</lido:term>
-                                <lido:term lido:pref="alternative">Plätze, Anlagen, Einrichtungen für
-                                    Sport, Spiele und körperliche Freizeitbeschäftigungen
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/61F(KOLOSSEUM)
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">61 F (KOLOSSEUM)</lido:term>
-                                <lido:term lido:pref="alternative">Namen historischer Gebäude,
-                                    Örtlichkeiten, Straßen, etc. (mit NAMEN)
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                </lido:subjectWrap>
-                <lido:relatedWorksWrap>
-                    <lido:relatedWorkSet>
-                        <lido:relatedWork>
-                            <lido:object>
-                                <lido:objectID lido:type="local" lido:source="Bildindex-LIT-Datei">
-                                    lit/05017576
-                                </lido:objectID>
-                                <lido:objectNote lido:type="Kurztitel">Achenbach, Andreas u. Oswald,
-                                    Düsseld.-Hamburg-Linz, 1997-98, S. 132
-                                </lido:objectNote>
-                            </lido:object>
-                        </lido:relatedWork>
-                        <lido:relatedWorkRelType>
-                            <lido:term>dokumentiert in</lido:term>
-                        </lido:relatedWorkRelType>
-                    </lido:relatedWorkSet>
-                </lido:relatedWorksWrap>
-            </lido:objectRelationWrap>
-        </lido:descriptiveMetadata>
-        <lido:administrativeMetadata xml:lang="deu">
-            <lido:recordWrap>
-                <lido:recordID lido:type="local">obj/00000001</lido:recordID>
-                <lido:recordType>
-                    <lido:term>Einzelobjekt</lido:term>
-                </lido:recordType>
-                <lido:recordSource>
-                    <lido:legalBodyName>
-                        <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                    </lido:legalBodyName>
-                </lido:recordSource>
-                <lido:recordRights>
-                    <lido:rightsHolder>
-                        <lido:legalBodyName>
-                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                        </lido:legalBodyName>
-                    </lido:rightsHolder>
-                </lido:recordRights>
-                <lido:recordInfoSet>
-                    <lido:recordInfoLink lido:formatResource="html">
-                        http://www.bildindex.de/dokumente/html/obj00000001
-                    </lido:recordInfoLink>
-                </lido:recordInfoSet>
-            </lido:recordWrap>
-            <lido:resourceWrap>
-                <lido:resourceSet>
-                    <lido:resourceID lido:type="local">192.356</lido:resourceID>
-                    <lido:resourceRepresentation lido:type="image_thumb">
-                        <lido:linkResource lido:formatResource="jpg">
-                            http://www.bildindex.de/bilder/mi00012a01b.jpg
-                        </lido:linkResource>
-                    </lido:resourceRepresentation>
-                    <lido:resourceType>
-                        <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
-                    </lido:resourceType>
-                    <lido:resourceDateTaken>
-                        <lido:displayDate>1945/1946</lido:displayDate>
-                    </lido:resourceDateTaken>
-                    <lido:resourceSource lido:type="Fotoverwalter">
-                        <lido:legalBodyName>
-                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                        </lido:legalBodyName>
-                    </lido:resourceSource>
-                    <lido:rightsResource>
-                        <lido:rightsHolder>
-                            <lido:legalBodyName>
-                                <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                            </lido:legalBodyName>
-                        </lido:rightsHolder>
-                    </lido:rightsResource>
-                </lido:resourceSet>
-            </lido:resourceWrap>
-        </lido:administrativeMetadata>
-    </lido:lido>
-    <lido:lido>
-        <lido:lidoRecID lido:type="local"
-                        lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg">
-            DE-Mb112/lido/obj/00000002
-        </lido:lidoRecID>
-        <lido:category>
-            <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
-            <lido:term xml:lang="eng">Man-Made Object</lido:term>
-        </lido:category>
-        <lido:descriptiveMetadata xml:lang="deu">
-            <lido:objectClassificationWrap>
-                <lido:objectWorkTypeWrap>
-                    <lido:objectWorkType lido:type="Sachbegriff">
-                        <lido:term>Bild</lido:term>
-                        <lido:term lido:addedSearchTerm="yes">Bildwerk</lido:term>
-                    </lido:objectWorkType>
-                </lido:objectWorkTypeWrap>
-                <lido:classificationWrap>
-                    <lido:classification lido:type="Gattung">
-                        <lido:term>Tafelmalerei</lido:term>
-                        <lido:term lido:addedSearchTerm="yes">Malerei</lido:term>
-                    </lido:classification>
-                </lido:classificationWrap>
-            </lido:objectClassificationWrap>
-            <lido:objectIdentificationWrap>
-                <lido:titleWrap>
-                    <lido:titleSet>
-                        <lido:appellationValue lido:pref="preferred">Marktszene</lido:appellationValue>
-                    </lido:titleSet>
-                </lido:titleWrap>
-                <lido:repositoryWrap>
-                    <lido:repositorySet lido:type="current">
-                        <lido:repositoryName>
-                            <lido:legalBodyName>
-                                <lido:appellationValue>Museen der Stadt Aachen — Suermondt-Ludwig-Museum
-                                    (Aachen)
-                                </lido:appellationValue>
-                            </lido:legalBodyName>
-                        </lido:repositoryName>
-                        <lido:workID lido:type="Inventarnummer">11</lido:workID>
-                        <lido:repositoryLocation>
-                            <lido:placeID lido:type="local" lido:source="TGN">7004799</lido:placeID>
-                            <lido:namePlaceSet>
-                                <lido:appellationValue>Aachen</lido:appellationValue>
-                            </lido:namePlaceSet>
-                            <lido:partOfPlace lido:politicalEntity="Kreis">
-                                <lido:namePlaceSet>
-                                    <lido:appellationValue>kreisfrei</lido:appellationValue>
-                                </lido:namePlaceSet>
-                                <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
-                                    <lido:namePlaceSet>
-                                        <lido:appellationValue>Aachen, Regierungsbezirk
-                                        </lido:appellationValue>
-                                    </lido:namePlaceSet>
-                                    <lido:partOfPlace lido:politicalEntity="Bundesland">
-                                        <lido:namePlaceSet>
-                                            <lido:appellationValue>Nordrhein-Westfalen
-                                            </lido:appellationValue>
-                                        </lido:namePlaceSet>
-                                        <lido:partOfPlace lido:politicalEntity="Staat">
-                                            <lido:namePlaceSet>
-                                                <lido:appellationValue>Deutschland
-                                                </lido:appellationValue>
-                                            </lido:namePlaceSet>
-                                        </lido:partOfPlace>
-                                    </lido:partOfPlace>
-                                </lido:partOfPlace>
-                            </lido:partOfPlace>
-                        </lido:repositoryLocation>
-                    </lido:repositorySet>
-                </lido:repositoryWrap>
-                <lido:objectMeasurementsWrap>
-                    <lido:objectMeasurementsSet>
-                        <lido:displayObjectMeasurements>Höhe x Breite: 69 x 135 cm
-                        </lido:displayObjectMeasurements>
-                        <lido:objectMeasurements>
-                            <lido:measurementsSet>
-                                <lido:measurementType>Höhe x Breite</lido:measurementType>
-                                <lido:measurementUnit>cm</lido:measurementUnit>
-                                <lido:measurementValue>69 x 135</lido:measurementValue>
-                            </lido:measurementsSet>
-                        </lido:objectMeasurements>
-                    </lido:objectMeasurementsSet>
-                </lido:objectMeasurementsWrap>
-            </lido:objectIdentificationWrap>
-            <lido:eventWrap>
-                <lido:eventSet>
-                    <lido:event>
-                        <lido:eventType>
-                            <lido:term>Herstellung</lido:term>
-                            <lido:term lido:addedSearchTerm="yes">Herstellung</lido:term>
-                        </lido:eventType>
-                        <lido:eventActor>
-                            <lido:actorInRole>
-                                <lido:actor lido:type="person">
-                                    <lido:actorID lido:type="local" lido:source="Bildindex-KUE-Datei">
-                                        kue/02553237
-                                    </lido:actorID>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="preferred">Aertsen, Pieter
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="alternative">Aertsz, Pieter
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="alternative">Aertszone, Pieter
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="alternative">Lange Pier
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nationalityActor>
-                                        <lido:term>Niederlande</lido:term>
-                                    </lido:nationalityActor>
-                                    <lido:vitalDatesActor>
-                                        <lido:earliestDate lido:type="birthDate">1508
-                                        </lido:earliestDate>
-                                        <lido:latestDate lido:type="deathDate">1575-06-02
-                                        </lido:latestDate>
-                                    </lido:vitalDatesActor>
-                                    <lido:genderActor>männlich</lido:genderActor>
-                                </lido:actor>
-                                <lido:roleActor>
-                                    <lido:term>Maler</lido:term>
-                                </lido:roleActor>
-                            </lido:actorInRole>
-                        </lido:eventActor>
-                        <lido:eventDate>
-                            <lido:displayDate>1559?</lido:displayDate>
-                            <lido:date>
-                                <lido:earliestDate>1559</lido:earliestDate>
-                                <lido:latestDate>1559</lido:latestDate>
-                            </lido:date>
-                        </lido:eventDate>
-                        <lido:eventMaterialsTech>
-                            <lido:materialsTech>
-                                <lido:termMaterialsTech lido:type="Material">
-                                    <lido:term>Öl</lido:term>
-                                    <lido:term lido:addedSearchTerm="yes">Farbmaterial</lido:term>
-                                </lido:termMaterialsTech>
-                            </lido:materialsTech>
-                        </lido:eventMaterialsTech>
-                        <lido:eventMaterialsTech>
-                            <lido:materialsTech>
-                                <lido:termMaterialsTech lido:type="Material">
-                                    <lido:term>Eichenholz</lido:term>
-                                    <lido:term lido:addedSearchTerm="yes">Holz</lido:term>
-                                </lido:termMaterialsTech>
-                            </lido:materialsTech>
-                        </lido:eventMaterialsTech>
-                    </lido:event>
-                </lido:eventSet>
-            </lido:eventWrap>
-            <lido:objectRelationWrap>
-                <lido:subjectWrap>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/46B11
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">46 B 11</lido:term>
-                                <lido:term lido:pref="alternative">Markt</lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/41C6
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">41 C 6</lido:term>
-                                <lido:term lido:pref="alternative">Lebensmittel; Stilleben mit
-                                    Lebensmitteln
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                </lido:subjectWrap>
-            </lido:objectRelationWrap>
-        </lido:descriptiveMetadata>
-        <lido:administrativeMetadata xml:lang="deu">
-            <lido:recordWrap>
-                <lido:recordID lido:type="local">obj/00000002</lido:recordID>
-                <lido:recordType>
-                    <lido:term>Einzelobjekt</lido:term>
-                </lido:recordType>
-                <lido:recordSource>
-                    <lido:legalBodyName>
-                        <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                    </lido:legalBodyName>
-                </lido:recordSource>
-                <lido:recordRights>
-                    <lido:rightsHolder>
-                        <lido:legalBodyName>
-                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                        </lido:legalBodyName>
-                    </lido:rightsHolder>
-                </lido:recordRights>
-                <lido:recordInfoSet>
-                    <lido:recordInfoLink lido:formatResource="html">
-                        http://www.bildindex.de/dokumente/html/obj00000002
-                    </lido:recordInfoLink>
-                </lido:recordInfoSet>
-            </lido:recordWrap>
-            <lido:resourceWrap>
-                <lido:resourceSet>
-                    <lido:resourceID lido:type="local">192.357</lido:resourceID>
-                    <lido:resourceRepresentation lido:type="image_thumb">
-                        <lido:linkResource lido:formatResource="jpg">
-                            http://www.bildindex.de/bilder/mi00012a02b.jpg
-                        </lido:linkResource>
-                    </lido:resourceRepresentation>
-                    <lido:resourceType>
-                        <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
-                    </lido:resourceType>
-                    <lido:resourceSource lido:type="Fotoverwalter">
-                        <lido:legalBodyName>
-                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                        </lido:legalBodyName>
-                    </lido:resourceSource>
-                    <lido:rightsResource>
-                        <lido:rightsHolder>
-                            <lido:legalBodyName>
-                                <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                            </lido:legalBodyName>
-                        </lido:rightsHolder>
-                    </lido:rightsResource>
-                </lido:resourceSet>
-            </lido:resourceWrap>
-        </lido:administrativeMetadata>
-    </lido:lido>
-</lido:lidoWrap>
+<recordList>
+    <record>
+        <priref>1</priref>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>photo</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <input.source>FileMakerPro</input.source>
+        <edit.time>14:54:55</edit.time>
+        <edit.time>12:37:39</edit.time>
+        <edit.time>16:05:56</edit.time>
+        <creator.history/>
+        <edit.name>t.kamerling</edit.name>
+        <edit.name>alina</edit.name>
+        <edit.name>Daniel</edit.name>
+        <input.name>Conversie AIS</input.name>
+        <creator.date_of_death/>
+        <creator.date_of_birth/>
+        <edit.date>2011-03-15</edit.date>
+        <edit.date>2009-02-19</edit.date>
+        <edit.date>2006-11-22</edit.date>
+        <input.date>2005-01-14</input.date>
+        <dimension.value>24.3</dimension.value>
+        <dimension.value>2.6</dimension.value>
+        <insurance.value>700.00</insurance.value>
+        <acquisition.method>aankoop</acquisition.method>
+        <creator>onbekend</creator>
+        <acquisition.price.value>592.50</acquisition.price.value>
+        <production.place>Engeland</production.place>
+        <acquisition.source>Ott, J.B.A.M.</acquisition.source>
+        <acquisition.price.currency>NLG</acquisition.price.currency>
+        <insurance.value.currency>NLG</insurance.value.currency>
+        <technique>gevormd</technique>
+        <technique>koperdruk</technique>
+        <technique>loodglazuur</technique>
+        <title>Bord met zwart decor van cartouche met opschrift</title>
+        <condition.notes>schilfers van de rand, ingetrokken vuil.</condition.notes>
+        <technique.part>FORM</technique.part>
+        <technique.part>DEC</technique.part>
+        <technique.part>FIN</technique.part>
+        <location>1.12-K10-P05</location>
+        <reproduction.creator/>
+        <reproduction.type/>
+        <reproduction.date/>
+        <number_of_parts>1</number_of_parts>
+        <acquisition.place>Zutphen</acquisition.place>
+        <phys_characteristic.keyword>cartouche</phys_characteristic.keyword>
+        <phys_characteristic.keyword>opschrift</phys_characteristic.keyword>
+        <phys_characteristic.aspect>creamware</phys_characteristic.aspect>
+        <title.type>toegekend</title.type>
+        <object_name>bord</object_name>
+        <location.default>1.12-K10-P05</location.default>
+        <material.notes>scherf crème</material.notes>
+        <material>hard aardewerk</material>
+        <location_type>DEP</location_type>
+        <location_check.date>2007-12-04</location_check.date>
+        <location_check.name>AD</location_check.name>
+        <object_number>OKS 1989-001</object_number>
+        <inscription.notes>geen</inscription.notes>
+        <institution.code>0061</institution.code>
+        <current_owner>Ottema-Kingma Stichting</current_owner>
+        <creator.role>vervaardiger</creator.role>
+        <reproduction.reference>OKS 1989-001 [01]</reproduction.reference>
+        <reproduction.format/>
+        <reproduction.web_exclusion/>
+        <dimension.unit>cm</dimension.unit>
+        <dimension.unit>cm</dimension.unit>
+        <production.date.start>1791</production.date.start>
+        <production.date.notes>gedateerd</production.date.notes>
+        <dimension.type>diameter</dimension.type>
+        <dimension.type>hoogte</dimension.type>
+        <production.date.end>1791</production.date.end>
+        <institution.place>Leeuwarden</institution.place>
+        <description>De geschulpte rand is voorzien van een versiering in zwart in de vorm van bloemtakken. Op het
+            verdiepte middenvlak is een in Louis XV stijl cartouche aangebracht met tekst.(Ingekorte beschrijving).
+        </description>
+        <description>Opschrift: Welvaart; Tot desen Huijsen Van; Yan en Yoanna Ver Boom; Ao 1797 den 20. Meij
+        </description>
+        <institution.name>Princessehof Leeuwarden</institution.name>
+        <reproduction.identifier_URL>..\..\..\Images PH\OKS 1989-001 [01].jpg</reproduction.identifier_URL>
+        <administration_name>Europa</administration_name>
+        <percentf>1791</percentf>
+        <percentH>creamware</percentH>
+        <percentD>2.6</percentD>
+        <percentC>24.3</percentC>
+    </record>
+    <record>
+        <priref>2</priref>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>photo</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <input.source>FileMakerPro</input.source>
+        <edit.time>14:54:58</edit.time>
+        <edit.time>14:43:06</edit.time>
+        <edit.time>12:52:17</edit.time>
+        <edit.time>16:05:59</edit.time>
+        <creator.history/>
+        <creator.history/>
+        <edit.name>t.kamerling</edit.name>
+        <edit.name>alina</edit.name>
+        <edit.name>peter</edit.name>
+        <edit.name>Daniel</edit.name>
+        <input.name>Conversie AIS</input.name>
+        <creator.date_of_death/>
+        <creator.date_of_death>0</creator.date_of_death>
+        <creator.date_of_birth/>
+        <creator.date_of_birth>0</creator.date_of_birth>
+        <edit.date>2011-03-15</edit.date>
+        <edit.date>2009-01-14</edit.date>
+        <edit.date>2007-01-25</edit.date>
+        <edit.date>2006-11-22</edit.date>
+        <input.date>2005-01-14</input.date>
+        <dimension.value>32.5</dimension.value>
+        <dimension.value>4.0</dimension.value>
+        <insurance.value>5000.00</insurance.value>
+        <acquisition.method>aankoop</acquisition.method>
+        <creator>Tichelaar, gleibakkerij van de familie (1700-1868)</creator>
+        <creator>Hofstra, Douwe Klazes</creator>
+        <acquisition.price.value>3750.00</acquisition.price.value>
+        <production.place>Makkum</production.place>
+        <acquisition.source>Ott, J.B.A.M.</acquisition.source>
+        <acquisition.price.currency>NLG</acquisition.price.currency>
+        <insurance.value.currency>NLG</insurance.value.currency>
+        <technique>gedraaid</technique>
+        <technique>inglazuurschildering</technique>
+        <technique>tinglazuur</technique>
+        <title>Schotel met blauwwit bijbels decor</title>
+        <condition.notes>schilfers, kleine randrestauratie, midden rechts.</condition.notes>
+        <technique.part>FORM</technique.part>
+        <technique.part>DEC</technique.part>
+        <technique.part>FIN</technique.part>
+        <location>0.13-V09-P02</location>
+        <reproduction.creator/>
+        <reproduction.type/>
+        <reproduction.date/>
+        <number_of_parts>1</number_of_parts>
+        <acquisition.place>Zutphen</acquisition.place>
+        <phys_characteristic.keyword>bijbels decor</phys_characteristic.keyword>
+        <phys_characteristic.keyword>opschrift</phys_characteristic.keyword>
+        <phys_characteristic.aspect>faience</phys_characteristic.aspect>
+        <title.type>toegekend</title.type>
+        <object_name>schotel</object_name>
+        <location.default>0.13-V09-P02</location.default>
+        <material>aardewerk</material>
+        <location_type>VAST</location_type>
+        <location_check.date>2007-11-15</location_check.date>
+        <location_check.name>AD</location_check.name>
+        <object_number>OKS 1989-002</object_number>
+        <inscription.notes>geen</inscription.notes>
+        <institution.code>0061</institution.code>
+        <current_owner>Ottema-Kingma Stichting</current_owner>
+        <creator.role>vervaardiger</creator.role>
+        <creator.role>schilder</creator.role>
+        <reproduction.reference>OKS 1989-002 [01]</reproduction.reference>
+        <reproduction.format/>
+        <reproduction.web_exclusion/>
+        <dimension.unit>cm</dimension.unit>
+        <dimension.unit>cm</dimension.unit>
+        <production.date.start>1790</production.date.start>
+        <dimension.type>diameter</dimension.type>
+        <dimension.type>hoogte</dimension.type>
+        <production.date.end>1800</production.date.end>
+        <institution.place>Leeuwarden</institution.place>
+        <description>Iets verdiept liggende bodem, zeer weinig geprononceerde standring, trapsgewijs spreidende wand,
+            gele scherf, grijs/wit tinglazuur, in blauw gedecoreerd, rondom een bloemguirlande, in vieren, op het plat
+            een voorstelling van Judas&apos; verraad van Jezus Opschrift: Mat. 26 vers 47 (En als Hij nog sprak, ziet,
+            Judas, een van de twaalven, kwam, en met hem een grote schare, met zwaarden en stokken, gezonden van de
+            overpriesters en ouderlingen des volks).
+        </description>
+        <institution.name>Princessehof Leeuwarden</institution.name>
+        <reproduction.identifier_URL>..\..\..\Images PH\OKS 1989-002 [01].JPG</reproduction.identifier_URL>
+        <administration_name>Europa</administration_name>
+        <percentf>ca 1790</percentf>
+        <percentG>Makkum</percentG>
+        <percentD>4</percentD>
+        <percentC>32.5</percentC>
+    </record>
+    <record>
+        <priref>3</priref>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <input.source>FileMakerPro</input.source>
+        <edit.time>14:54:59</edit.time>
+        <edit.time>15:32:34</edit.time>
+        <edit.time>11:40:13</edit.time>
+        <edit.time>16:05:59</edit.time>
+        <creator.history/>
+        <edit.name>t.kamerling</edit.name>
+        <edit.name>alina</edit.name>
+        <edit.name>peter</edit.name>
+        <edit.name>Daniel</edit.name>
+        <input.name>Conversie AIS</input.name>
+        <creator.date_of_death/>
+        <creator.date_of_birth/>
+        <edit.date>2011-03-15</edit.date>
+        <edit.date>2008-12-11</edit.date>
+        <edit.date>2008-01-24</edit.date>
+        <edit.date>2006-11-22</edit.date>
+        <input.date>2005-01-14</input.date>
+        <dimension.value>35.2</dimension.value>
+        <dimension.value>4.9</dimension.value>
+        <insurance.value>15000.00</insurance.value>
+        <acquisition.method>aankoop</acquisition.method>
+        <creator>onbekend</creator>
+        <acquisition.price.value>12500.00</acquisition.price.value>
+        <production.place>Harlingen</production.place>
+        <acquisition.source>Vliet, de heer H.C. van</acquisition.source>
+        <acquisition.price.currency>NLG</acquisition.price.currency>
+        <insurance.value.currency>NLG</insurance.value.currency>
+        <technique>gedraaid</technique>
+        <technique>inglazuurschildering</technique>
+        <technique>loodglazuur</technique>
+        <technique>tinglazuur</technique>
+        <title>Schotel met blauwwit decor van landschap en wanlirand</title>
+        <condition.notes>klein schilfertje en glazuur wat mat, gebruikssporen, barst.</condition.notes>
+        <technique.part>FORM</technique.part>
+        <technique.part>DEC</technique.part>
+        <technique.part>FIN</technique.part>
+        <technique.part>FIN</technique.part>
+        <location>0.13-V01.A-P03</location>
+        <reproduction.creator/>
+        <reproduction.type/>
+        <reproduction.date/>
+        <number_of_parts>1</number_of_parts>
+        <acquisition.place>Amsterdam</acquisition.place>
+        <phys_characteristic.keyword>landschap</phys_characteristic.keyword>
+        <phys_characteristic.keyword>Wanli</phys_characteristic.keyword>
+        <phys_characteristic.aspect>majolica</phys_characteristic.aspect>
+        <title.type>toegekend</title.type>
+        <object_name>schotel</object_name>
+        <location.default>0.13-V01.A-P03</location.default>
+        <material.notes>scherf geel</material.notes>
+        <material>aardewerk</material>
+        <location_type>VAST</location_type>
+        <location_check.date>2007-11-06</location_check.date>
+        <location_check.name>AD</location_check.name>
+        <object_number>OKS 1989-003</object_number>
+        <inscription.notes>geen</inscription.notes>
+        <institution.code>0061</institution.code>
+        <current_owner>Ottema-Kingma Stichting</current_owner>
+        <creator.role>vervaardiger</creator.role>
+        <reproduction.reference>OKS 1989-003 [01]</reproduction.reference>
+        <reproduction.format/>
+        <reproduction.web_exclusion/>
+        <dimension.unit>cm</dimension.unit>
+        <dimension.unit>cm</dimension.unit>
+        <production.date.start>1630</production.date.start>
+        <dimension.type>diameter</dimension.type>
+        <dimension.type>hoogte</dimension.type>
+        <production.date.end>1660</production.date.end>
+        <institution.place>Leeuwarden</institution.place>
+        <description>Iets verdiept liggende bodem, ferme standring, ingekrast, getrapt spreidende wand. Gele scherf,
+            helder loodglazuur, voorzijde groenwit tinglazuur in diep blauw gedecoreerd met een vakken rand in
+            kraakstijl en op het plat een Hollands waterlandschap met kerk, boerderij en gesponste boom.
+        </description>
+        <institution.name>Princessehof Leeuwarden</institution.name>
+        <reproduction.identifier_URL>..\..\..\Images PH\OKS 1989-003 [01].JPG</reproduction.identifier_URL>
+        <administration_name>Europa</administration_name>
+        <percentf>ca 1640</percentf>
+        <percentG>noord</percentG>
+        <percentD>4.9</percentD>
+        <percentC>35.2</percentC>
+    </record>
+    <record>
+        <priref>4</priref>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <edit.source>collect&gt;intern</edit.source>
+        <input.source>FileMakerPro</input.source>
+        <edit.time>14:08:11</edit.time>
+        <edit.time>14:58:23</edit.time>
+        <edit.time>13:55:17</edit.time>
+        <edit.time>15:34:08</edit.time>
+        <edit.time>12:10:02</edit.time>
+        <edit.time>12:51:55</edit.time>
+        <edit.time>16:06:00</edit.time>
+        <edit.name>t.kamerling</edit.name>
+        <edit.name>alina</edit.name>
+        <edit.name>alina</edit.name>
+        <edit.name>alina</edit.name>
+        <edit.name>peter</edit.name>
+        <edit.name>peter</edit.name>
+        <edit.name>Daniel</edit.name>
+        <input.name>Conversie AIS</input.name>
+        <edit.date>2011-03-15</edit.date>
+        <edit.date>2008-12-10</edit.date>
+        <edit.date>2008-06-06</edit.date>
+        <edit.date>2008-04-18</edit.date>
+        <edit.date>2008-01-23</edit.date>
+        <edit.date>2007-03-27</edit.date>
+        <edit.date>2006-11-22</edit.date>
+        <input.date>2005-01-14</input.date>
+        <dimension.value>32.6</dimension.value>
+        <dimension.value>69.1</dimension.value>
+        <insurance.value>25000.00</insurance.value>
+        <acquisition.method>aankoop</acquisition.method>
+        <acquisition.price.value>10000.00</acquisition.price.value>
+        <production.place>Japan</production.place>
+        <acquisition.source>Minks, dhr. J.K.</acquisition.source>
+        <acquisition.price.currency>NLG</acquisition.price.currency>
+        <insurance.value.currency>NLG</insurance.value.currency>
+        <technique>gedraaid en opgebouwd</technique>
+        <technique>onderglazuur- en bovenglazuurschildering</technique>
+        <technique>verguld</technique>
+        <technique>polychroom</technique>
+        <technique>glazuur</technique>
+        <title>Vaas met polychroom decor in Imari-palet van landschap en bloemen</title>
+        <condition.notes>gaaf</condition.notes>
+        <technique.part>FORM</technique.part>
+        <technique.part>DEC</technique.part>
+        <technique.part>DEC</technique.part>
+        <technique.part>DEC</technique.part>
+        <technique.part>FIN</technique.part>
+        <location>0.7-GROND</location>
+        <reproduction.creator/>
+        <reproduction.type/>
+        <reproduction.date/>
+        <number_of_parts>1</number_of_parts>
+        <acquisition.place>Stiens</acquisition.place>
+        <phys_characteristic.keyword>landschap</phys_characteristic.keyword>
+        <phys_characteristic.keyword>bloem</phys_characteristic.keyword>
+        <title.type>toegekend</title.type>
+        <object_name>vaas</object_name>
+        <location.default>0.7-GROND</location.default>
+        <material>porselein</material>
+        <location_type>VAST</location_type>
+        <location_check.date>2008-06-06</location_check.date>
+        <location_check.name>AD</location_check.name>
+        <object_number>OKS 1989-004.A</object_number>
+        <inscription.notes>geen</inscription.notes>
+        <institution.code>0061</institution.code>
+        <current_owner>Ottema-Kingma Stichting</current_owner>
+        <reproduction.reference>OKS 1989-004.A [01]</reproduction.reference>
+        <reproduction.format/>
+        <reproduction.web_exclusion/>
+        <dimension.unit>cm</dimension.unit>
+        <dimension.unit>cm</dimension.unit>
+        <production.date.start>1700</production.date.start>
+        <dimension.type>diameter</dimension.type>
+        <dimension.type>hoogte</dimension.type>
+        <production.date.end>1730</production.date.end>
+        <institution.place>Leeuwarden</institution.place>
+        <description>Verdiept liggende bodem met forse proenpunten, forse standring, licht spreidende wand daarna knik -
+            trompetvormige vaas grijzig/wit porselein in blauw onderglazuur en in rood, groen en goud gedecoreerd met
+            bloemranken, waartussen aan een zijde grote bloemrank. Servetwerk aan rand.
+        </description>
+        <institution.name>Princessehof Leeuwarden</institution.name>
+        <reproduction.identifier_URL>..\..\..\Images PH\OKS 1989-004.A [01].JPG</reproduction.identifier_URL>
+        <administration_name>Azië</administration_name>
+        <percentf>ca 1700</percentf>
+        <percentH>porselein</percentH>
+        <percentD>69.1</percentD>
+        <percentC>32.6</percentC>
+    </record>
+</recordList>
