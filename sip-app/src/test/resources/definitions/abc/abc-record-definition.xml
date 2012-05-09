@@ -22,9 +22,9 @@
         <elem tag="abc:dimension"/>
         <elem tag="abc:technique"/>
         <elem tag="abc:material"/>
-        <elem tag="abc:deepzoomUrl"/>
-        <elem tag="abc:smallThumbnail"/>
-        <elem tag="abc:largeThumbnail"/>
+        <elem tag="abc:deepzoomUrl" fieldType="link"/>
+        <elem tag="abc:smallThumbnail"  fieldType="link"/>
+        <elem tag="abc:largeThumbnail" fieldType="link"/>
         <elem tag="abc:description"/>
         <elem tag="abc:name"/>
         <elem tag="abc:school"/>
@@ -44,11 +44,11 @@
         <elem tag="abc:vDeathPlace"/>
         <elem tag="abc:vBiography"/>
 
-        <elem tag="europeana:isShownBy"/>
+        <elem tag="europeana:isShownBy" fieldType="link"/>
         <elem tag="europeana:rights"/>
-        <elem tag="europeana:isShownAt"/>
+        <elem tag="europeana:isShownAt" fieldType="link"/>
         <elem tag="europeana:unstored"/>
-        <elem tag="europeana:object"/>
+        <elem tag="europeana:object" fieldType="link"/>
         <elem tag="europeana:provider"/>
         <elem tag="europeana:dataProvider"/>
         <elem tag="europeana:type"/>

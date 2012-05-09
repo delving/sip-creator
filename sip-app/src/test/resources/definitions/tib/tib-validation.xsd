@@ -69,8 +69,8 @@
     <xs:complexType name="recordType">
         <xs:sequence>
 
-            <xs:element name="citName" minOccurs="1" maxOccurs="1"/>
-            <xs:element name="citOldId" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="citName" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="citOldId" minOccurs="0" maxOccurs="1"/>
             <xs:element name="thumbLarge" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="thumbSmall" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="collection" minOccurs="1" maxOccurs="1"/>
@@ -121,6 +121,7 @@
             <xs:element ref="europeana:year" minOccurs="0" maxOccurs="unbounded"/>
 
             <xs:element ref="delving:year" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="delving:thumbnail" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:deepZoomUrl" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:fullTextObjectUrl" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:fullText" minOccurs="0" maxOccurs="unbounded"/>

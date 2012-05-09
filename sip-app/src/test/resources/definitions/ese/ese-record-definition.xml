@@ -8,8 +8,7 @@
         <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.4.xsd"/>
     </namespaces>
 
-    <root tag="record">
-
+    <root tag="europeana:record">
 
         <elem tag="dc:title"/>
         <elem tag="dc:creator"/>
@@ -26,8 +25,8 @@
         <elem tag="dc:relation"/>
         <elem tag="dc:coverage"/>
         <elem tag="dc:rights"/>
-        <elem tag="dcterms:provenance"/>
 
+        <elem tag="dcterms:provenance"/>
         <elem tag="dcterms:alternative"/>
         <elem tag="dcterms:conformsTo"/>        
         <elem tag="dcterms:created"/>           
@@ -51,30 +50,30 @@
         <elem tag="dcterms:temporal"/>
 
         <elem tag="europeana:unstored"/>
-        <elem tag="europeana:object"/>
+        <elem tag="europeana:object" fieldType="link"/>
         <elem tag="europeana:provider"/>        <!-- required -->
         <elem tag="europeana:type"/>            <!-- required -->
         <elem tag="europeana:rights"/>          <!-- required -->
         <elem tag="europeana:dataProvider"/>    <!-- required -->
-        <elem tag="europeana:isShownBy"/>       <!-- required or below-->
-        <elem tag="europeana:isShownAt"/>       <!-- required or above-->
+        <elem tag="europeana:isShownBy" fieldType="link"/>       <!-- required or below-->
+        <elem tag="europeana:isShownAt" fieldType="link"/>       <!-- required or above-->
         <elem tag="europeana:UGC"/>            <!-- required -->
 
     </root>
 
     <field-markers>
         <!-- system fields -->
-        <field-marker name="CREATOR" path="/record/dc:creator"/>
-        <field-marker name="TITLE" path="/record/dc:title"/>
-        <field-marker name="DESCRIPTION" path="/record/dc:description"/>
-        <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
-        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
-        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
+        <field-marker name="CREATOR" path="/europeana:record/dc:creator"/>
+        <field-marker name="TITLE" path="/europeana:record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/europeana:record/dc:description"/>
+        <field-marker name="OWNER" path="/europeana:record/europeana:dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/europeana:record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/europeana:record/europeana:object"/>
 
-        <field-marker type="fact" name="dataProvider" path="/record/europeana:dataProvider"/>
-        <field-marker type="fact" name="provider" path="/record/europeana:provider"/>
-        <field-marker type="fact" name="rights" path="/record/europeana:rights"/>
-        <field-marker type="fact" name="type" path="/record/europeana:type"/>
+        <field-marker type="fact" name="dataProvider" path="/europeana:record/europeana:dataProvider"/>
+        <field-marker type="fact" name="provider" path="/europeana:record/europeana:provider"/>
+        <field-marker type="fact" name="rights" path="/europeana:record/europeana:rights"/>
+        <field-marker type="fact" name="type" path="/europeana:record/europeana:type"/>
     </field-markers>
 
 </record-definition>

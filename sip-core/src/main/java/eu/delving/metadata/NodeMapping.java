@@ -280,7 +280,12 @@ public class NodeMapping {
                     codeOut.line("'CONSTANT'");
                 }
                 else if (recDefNode.hasFunction()) {
-                    codeOut.line("\"${%s(%s)}\"", recDefNode.getFunction(), toLeafGroovyParam(path));
+                    if (recDefNode.getFieldType().equalsIgnoreCase("link")) {
+                        codeOut.line("\"${%s(%s).sanitizeURI()}\"", recDefNode.getFunction(), toLeafGroovyParam(path));
+                    }
+                    else {
+                        codeOut.line("\"${%s(%s)}\"", recDefNode.getFunction(), toLeafGroovyParam(path));
+                    }
                 }
                 else {
                     codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
