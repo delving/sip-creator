@@ -53,7 +53,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private Tag tag;
     private boolean recordRoot, uniqueElement;
     private Stats.ValueStats valueStats;
-    private String htmlChunk;
+    private String htmlToolTip, htmlDetails;
     private List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
 
     public static SourceTreeNode create(String rootTag) {
@@ -77,7 +77,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private SourceTreeNode(SourceTreeNode parent, String name, String htmlChunk) {
         this.parent = parent;
         this.tag = Tag.create(name);
-        this.htmlChunk = htmlChunk;
+        this.htmlToolTip = this.htmlDetails = htmlChunk;
     }
 
     private SourceTreeNode(String name, String htmlChunk) {
@@ -93,7 +93,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         this(parent, Tag.create(entry.getKey()));
         StringTemplate template = SwingHelper.getTemplate("fact-brief");
         template.setAttribute("fact", entry);
-        this.htmlChunk = template.toString();
+        this.htmlToolTip = this.htmlDetails = template.toString();
     }
 
     private SourceTreeNode(SourceTreeNode parent, Tag tag, Stats.ValueStats valueStats) {
@@ -103,10 +103,14 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     public void setStats(Stats.ValueStats valueStats) {
         this.valueStats = valueStats;
-        StringTemplate template = SwingHelper.getTemplate("stats-brief");
+        StringTemplate template = SwingHelper.getTemplate("stats-tooltip");
         template.setAttribute("path", getPath(true));
         template.setAttribute("stats", valueStats);
-        this.htmlChunk = template.toString();
+        this.htmlToolTip = template.toString();
+        template = SwingHelper.getTemplate("stats-detail");
+        template.setAttribute("path", getPath(true));
+        template.setAttribute("stats", valueStats);
+        this.htmlDetails = template.toString();
     }
 
     public List<SourceTreeNode> getChildren() {
@@ -239,12 +243,12 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         return getPath(true).compareTo(other.getPath(true));
     }
 
-    public String toHtml() {
-        return String.format("<html>%s</html>", toHtmlChunk());
+    public String getHtmlToolTip() {
+        return htmlToolTip;
     }
 
-    public String toHtmlChunk() {
-        return htmlChunk;
+    public String getHtmlDetails() {
+        return htmlDetails;
     }
 
     public String toString() {
