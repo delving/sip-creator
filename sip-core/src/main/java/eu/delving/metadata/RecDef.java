@@ -138,7 +138,8 @@ public class RecDef {
     private void resolve() {
         root.resolve(Path.create(), this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
-        if (fieldMarkers != null) for (FieldMarker marker : fieldMarkers) marker.resolve(this);
+        // todo: fieldMarkers have to be resolved in the RecDefTree
+//        if (fieldMarkers != null) for (FieldMarker marker : fieldMarkers) marker.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
     }
 
