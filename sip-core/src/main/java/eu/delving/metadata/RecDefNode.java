@@ -49,6 +49,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private RecDef.Attr attr;
     private OptBox optBox;
     private String defaultPrefix;
+    private RecDef.FieldMarker fieldMarker;
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private RecDefNodeListener listener;
@@ -124,8 +125,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return elem != null && elem.elemList.isEmpty();
     }
 
+    public void setFieldMarker(RecDef.FieldMarker fieldMarker) {
+        this.fieldMarker = fieldMarker;
+    }
+
     public RecDef.FieldMarker getFieldMarker() {
-        return elem != null ? elem.fieldMarker : null;
+        return fieldMarker;
     }
 
     public boolean isHidden() {

@@ -47,7 +47,9 @@ public class RecDefTree implements RecDefNodeListener {
     private RecDefNodeListener listener;
 
     public static RecDefTree create(RecDef recDef) {
-        return new RecDefTree(recDef);
+        RecDefTree tree = new RecDefTree(recDef);
+        tree.resolve();
+        return tree;
     }
 
     private RecDefTree(RecDef recDef) {
@@ -132,4 +134,7 @@ public class RecDefTree implements RecDefNodeListener {
         if (listener != null) listener.nodeMappingRemoved(recDefNode, nodeMapping);
     }
 
+    private void resolve() {
+        if (recDef.fieldMarkers != null) for (RecDef.FieldMarker marker : recDef.fieldMarkers) marker.resolve(this);
+    }
 }

@@ -201,7 +201,7 @@ public class StorageImpl implements Storage {
             File statistics = statsFile(here, true, null);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = findLatestFile(here, MAPPING, prefix);
-                if (mapping != null) {
+                if (mapping.exists()) {
                     File validation = findLatestFile(here, VALIDATION, prefix);
                     return validation.exists() ? DataSetState.VALIDATED : DataSetState.MAPPING;
                 }
