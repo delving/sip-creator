@@ -138,8 +138,6 @@ public class RecDef {
     private void resolve() {
         root.resolve(Path.create(), this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
-        // todo: fieldMarkers have to be resolved in the RecDefTree
-//        if (fieldMarkers != null) for (FieldMarker marker : fieldMarkers) marker.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
     }
 
@@ -179,12 +177,11 @@ public class RecDef {
         @XStreamAsAttribute
         public Path path;
 
-        public void resolve(RecDef recDef) {
-            Elem elem;
-            path = path.withDefaultPrefix(recDef.prefix);
-            elem = recDef.root.findElem(path, 0);
-            if (elem == null) throw new RuntimeException("Cannot find path " + path);
-            elem.fieldMarker = this;
+        public void resolve(RecDefTree recDefTree) {
+            path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
+            RecDefNode node = recDefTree.getRecDefNode(path);
+            if (node == null) throw new RuntimeException("Cannot find path " + path);
+            node.setFieldMarker(this);
         }
     }
 
@@ -313,9 +310,6 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
-
-        @XStreamOmitField
-        public FieldMarker fieldMarker;
 
         @Override
         public String toString() {
