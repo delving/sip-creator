@@ -123,15 +123,14 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
-    @Ignore
     @Test
     public void testAff() throws Exception {
         mock.prepareDataset(
                 "aff",
-                "/lido:lidoWrap/lido:lido",
-                "/lido:lidoWrap/lido:lido/lido:lidoRecID"
+                "/recordList/record",
+                "/recordList/record/object_number"
         );
-        runFullCycle(2);
+        runFullCycle(4);
     }
 
     private void runFullCycle(int expectedRecords) throws Exception {
