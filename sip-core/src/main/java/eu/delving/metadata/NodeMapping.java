@@ -276,19 +276,15 @@ public class NodeMapping {
                 codeOut.line(getMapUsage());
             }
             else {
+                String sanitize = recDefNode.getFieldType().equalsIgnoreCase("link") ? ".sanitizeURI()" : "";
                 if (path.peek().getLocalName().equals("constant")) {
                     codeOut.line("'CONSTANT'");
                 }
                 else if (recDefNode.hasFunction()) {
-                    if (recDefNode.getFieldType().equalsIgnoreCase("link")) {
-                        codeOut.line("\"${%s(%s).sanitizeURI()}\"", recDefNode.getFunction(), toLeafGroovyParam(path));
-                    }
-                    else {
-                        codeOut.line("\"${%s(%s)}\"", recDefNode.getFunction(), toLeafGroovyParam(path));
-                    }
+                    codeOut.line("\"${%s(%s)%s}\"", recDefNode.getFunction(), toLeafGroovyParam(path), sanitize);
                 }
                 else {
-                    codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
+                    codeOut.line("\"${%s%s}\"", toLeafGroovyParam(path), sanitize);
                 }
             }
         }
