@@ -257,13 +257,14 @@
         <field-marker type="fact" path="/record/admin/displayDataProviderCountry" name="country"/>
         <field-marker type="fact" path="/record/admin/displayProvider" name="provider"/>
 
-        <!--<field-marker name="CREATOR" xpath="/record/thing/displayTitle/"/>-->
-        <!--<field-marker name="TITLE" xpath="/record/thing/displayTitle/"/>-->
-        <!--<field-marker name="DESCRIPTION" xpath="/record/thing/displayDescription/"/>-->
-        <!--<field-marker name="OWNER" xpath="/record/admin/dataProvider"/>-->
-        <!--<field-marker name="LANDING_PAGE" xpath="/record/thing/displayTitle/"/>-->
-        <!--<field-marker name="THUMBNAIL" xpath="/record/thing/displayTitle/"/>-->
-        <!--<field-marker name="SNIPPET" xpath="/record/thing/displayDescription"/>-->
+        <field-marker name="CREATOR" path="/record/events/event[crm_e12]/eventActor/displayActor"/>
+        <field-marker name="TITLE" path="/record/thing/displayTitle/"/>
+        <field-marker name="DESCRIPTION" path="/record/thing/displayDescription"/>
+        <field-marker name="OWNER" path="/record/admin/dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/record/resources/resource[http://id.culturecloud.eu/concepts/#landingPage]/resourceUrl"/>
+        <field-marker name="THUMBNAIL" path="/record/resources/resource[http://id.culturecloud.eu/concepts/#thumbnail]/resourceUrl"/>
+
+        <field-marker type="search" name="SNIPPET" path="/record/thing/displayDescription"/>
     </field-markers>
 
     <docs>
