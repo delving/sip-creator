@@ -21,6 +21,7 @@
 
 package eu.delving.groovy;
 
+import eu.delving.metadata.CodeOut;
 import eu.delving.metadata.EditPath;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
@@ -69,7 +70,9 @@ public class MappingRunner {
     public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath) {
         this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
-        this.code = recMapping.toCode(editPath);
+        CodeOut codeOut = CodeOut.create();
+        recMapping.toCode(codeOut, editPath);
+        code = codeOut.toString();
         script = groovyCodeResource.createMappingScript(code);
         for (Map.Entry<String,String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());

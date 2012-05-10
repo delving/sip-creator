@@ -28,9 +28,30 @@ package eu.delving.metadata;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface EditPath {
+public class EditPath {
+    private NodeMapping nodeMapping;
+    private String editedCode;
+    private boolean generatedCode;
 
-    NodeMapping getNodeMapping();
+    public EditPath(NodeMapping nodeMapping, String editedCode) {
+        this.nodeMapping = nodeMapping;
+        this.editedCode = editedCode;
+    }
 
-    String getEditedCode(Path path);
+    public EditPath(NodeMapping nodeMapping) {
+        this.nodeMapping = nodeMapping;
+        this.generatedCode = true;
+    }
+
+    public NodeMapping getNodeMapping() {
+        return nodeMapping;
+    }
+
+    public boolean isGeneratedCode() {
+        return generatedCode;
+    }
+
+    public String getEditedCode(Path path) {
+        return nodeMapping.recDefNode.getPath().equals(path) ? editedCode : null;
+    }
 }
