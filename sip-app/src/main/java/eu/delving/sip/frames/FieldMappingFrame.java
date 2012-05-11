@@ -332,14 +332,10 @@ public class FieldMappingFrame extends FrameBase {
         public void setList(NodeMapping nodeMapping) {
             int size = getSize();
             vars.clear();
-            if (size > 0) {
-                fireIntervalRemoved(this, 0, size);
-            }
+            if (size > 0) fireIntervalRemoved(this, 0, size);
             if (nodeMapping != null) vars.addAll(getContextVariables(nodeMapping));
             size = getSize();
-            if (size > 0) {
-                fireIntervalAdded(this, 0, size);
-            }
+            if (size > 0) fireIntervalAdded(this, 0, size);
         }
 
         @Override
@@ -387,8 +383,9 @@ public class FieldMappingFrame extends FrameBase {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        if (sipModel.getCreateModel().hasNodeMapping())
+                        if (sipModel.getCreateModel().hasNodeMapping()) {
                             sipModel.getCreateModel().getNodeMapping().revertToGenerated();
+                        }
                         sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
                     }
                 });
@@ -452,7 +449,8 @@ public class FieldMappingFrame extends FrameBase {
                 }
             });
             setPrototypeCellValue("alongvariablenamehere");
-            setToolTipText("Clicking here will insert a variable name into the code");
+            setToolTipText("Clicking here will insert a variable name into the code\n" +
+                    "at the current cursor position");
         }
     }
 
@@ -466,8 +464,9 @@ public class FieldMappingFrame extends FrameBase {
                 if (selectedText != null && mappingFunction != null) {
                     int start = codeArea.getSelectionStart();
                     try {
-                        if (selectedText.endsWith("\n"))
+                        if (selectedText.endsWith("\n")) {
                             selectedText = selectedText.substring(0, selectedText.length() - 1);
+                        }
                         Document doc = codeArea.getDocument();
                         doc.remove(start, selectedText.length());
                         doc.insertString(start, String.format("%s(%s)", mappingFunction.name, selectedText), null);
@@ -492,7 +491,8 @@ public class FieldMappingFrame extends FrameBase {
                 }
             });
             setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
-            setToolTipText("Clicking here will insert a function call around the selected code");
+            setToolTipText("Selecting code and clicking here will insert\n" +
+                    "a function call around the selected code");
         }
     }
 

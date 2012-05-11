@@ -34,6 +34,7 @@ public class CodeOut {
     private StringBuilder code = new StringBuilder();
     private CodeOut nodeMappingCodeOut;
     private String nodeMappingCode;
+    private int depth;
 
     public static CodeOut create(NodeMapping nodeMapping) {
         return new CodeOut(nodeMapping);
@@ -48,13 +49,19 @@ public class CodeOut {
     }
 
     public void start(NodeMapping nodeMapping) {
-        if (this.nodeMapping == nodeMapping) nodeMappingCodeOut = new CodeOut(null);
+        if (this.nodeMapping == nodeMapping) {
+            if (depth == 0) nodeMappingCodeOut = new CodeOut(null);
+            depth++;
+        }
     }
 
     public void end(NodeMapping nodeMapping) {
         if (this.nodeMapping == nodeMapping && nodeMappingCodeOut != null) {
-            nodeMappingCode = nodeMappingCodeOut.toString();
-            nodeMappingCodeOut = null;
+            depth--;
+            if (depth == 0) {
+                nodeMappingCode = nodeMappingCodeOut.toString();
+                nodeMappingCodeOut = null;
+            }
         }
     }
 
@@ -69,11 +76,11 @@ public class CodeOut {
         }
         return this;
     }
-    
+
     public CodeOut line_(String string, Object... params) {
         return line(string, params).in();
     }
-    
+
     public CodeOut _line(String string, Object... params) {
         return out().line(string, params);
     }
