@@ -29,56 +29,80 @@ package eu.delving.metadata;
 
 public class CodeOut {
     private static final String INDENT = "   ";
-    private CodeOut parent;
     private int indentLevel;
-    private StringBuilder stringBuilder = new StringBuilder();
+    private NodeMapping nodeMapping;
+    private StringBuilder code = new StringBuilder();
+    private CodeOut nodeMappingCodeOut;
+    private String nodeMappingCode;
+    private int depth;
+
+    public static CodeOut create(NodeMapping nodeMapping) {
+        return new CodeOut(nodeMapping);
+    }
 
     public static CodeOut create() {
         return new CodeOut(null);
     }
 
-    private CodeOut(CodeOut parent) {
-        this.parent = parent;
+    private CodeOut(NodeMapping nodeMapping) {
+        this.nodeMapping = nodeMapping;
     }
 
-    public CodeOut createChild() {
-        return new CodeOut(this);
+    public void start(NodeMapping nodeMapping) {
+        if (this.nodeMapping == nodeMapping) {
+            if (depth == 0) nodeMappingCodeOut = new CodeOut(null);
+            depth++;
+        }
+    }
+
+    public void end(NodeMapping nodeMapping) {
+        if (this.nodeMapping == nodeMapping && nodeMappingCodeOut != null) {
+            depth--;
+            if (depth == 0) {
+                nodeMappingCode = nodeMappingCodeOut.toString();
+                nodeMappingCodeOut = null;
+            }
+        }
     }
 
     public CodeOut line(String string, Object... params) {
-        if (parent != null) parent.line(string, params);
-        for (int walk = 0; walk < indentLevel; walk++) stringBuilder.append(INDENT);
+        if (nodeMappingCodeOut != null) nodeMappingCodeOut.line(string, params);
+        for (int walk = 0; walk < indentLevel; walk++) code.append(INDENT);
         if (params.length == 0) {
-            stringBuilder.append(string).append('\n');
+            code.append(string).append('\n');
         }
         else {
-            stringBuilder.append(String.format(string, params)).append('\n');
+            code.append(String.format(string, params)).append('\n');
         }
         return this;
     }
-    
+
     public CodeOut line_(String string, Object... params) {
         return line(string, params).in();
     }
-    
+
     public CodeOut _line(String string, Object... params) {
         return out().line(string, params);
     }
 
     public CodeOut in() {
-        if (parent != null) parent.in();
+        if (nodeMappingCodeOut != null) nodeMappingCodeOut.in();
         indentLevel++;
         return this;
     }
 
     public CodeOut out() {
-        if (parent != null) parent.out();
+        if (nodeMappingCodeOut != null) nodeMappingCodeOut.out();
         indentLevel--;
         return this;
     }
 
+    public String getNodeMappingCode() {
+        return nodeMappingCode;
+    }
+
     @Override
     public String toString() {
-        return stringBuilder.toString();
+        return code.toString();
     }
 }

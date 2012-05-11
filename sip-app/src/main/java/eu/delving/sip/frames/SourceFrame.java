@@ -79,7 +79,7 @@ public class SourceFrame extends FrameBase {
             @Override
             public String getToolTipText(MouseEvent evt) {
                 TreePath treePath = sourceTree.getPathForLocation(evt.getX(), evt.getY());
-                return treePath != null ? ((SourceTreeNode) treePath.getLastPathComponent()).toHtml() : "";
+                return treePath != null ? ((SourceTreeNode) treePath.getLastPathComponent()).getHtmlToolTip() : "";
             }
         };
         sourceTree.setToolTipText("?");

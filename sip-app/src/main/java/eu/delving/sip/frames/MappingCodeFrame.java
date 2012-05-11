@@ -109,7 +109,7 @@ public class MappingCodeFrame extends FrameBase {
         public void run() {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping != null) {
-                String code = recMapping.toCode(null);
+                String code = recMapping.toCode();
                 StringBuilder numbered = new StringBuilder();
                 int index = 0;
                 for (String line : code.split("\n")) {

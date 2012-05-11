@@ -61,15 +61,12 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
     }
 
     public void fireChanged() {
-        Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                listModel.fireChanged(index);
-            }
-        });
+        Exec.checkSwing();
+        listModel.fireContentsChanged(index);
     }
 
     public void clearHighlighted() {
+        Exec.checkSwing();
         if (highlighted) {
             highlighted = false;
             fireChanged();
@@ -77,6 +74,7 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
     }
 
     public void setHighlighted() {
+        Exec.checkSwing();
         if (!highlighted) {
             highlighted = true;
             fireChanged();
