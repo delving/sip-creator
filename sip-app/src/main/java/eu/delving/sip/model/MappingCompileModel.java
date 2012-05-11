@@ -115,10 +115,19 @@ public class MappingCompileModel {
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
-        this.nodeMapping = nodeMapping;
-        Exec.swing(new DocumentSetter(docDocument, this.nodeMapping != null ? this.nodeMapping.getDocumentation() : "", false));
-        Exec.swing(new DocumentSetter(codeDocument, getCode(getEditPath(false)), false));
+        Exec.swing(new DocumentSetter(docDocument, "", true));
+        Exec.swing(new DocumentSetter(codeDocument, "", true));
         Exec.swing(new DocumentSetter(outputDocument, "", true));
+        if ((this.nodeMapping = nodeMapping) != null) {
+            Exec.swing(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
+            Exec.swing(new Runnable() {
+                @Override
+                public void run() {
+                    String code = getCode(getEditPath(false));
+                    new DocumentSetter(codeDocument, code, false).run();
+                }
+            });
+        }
         notifyStateChange(CompileState.ORIGINAL);
     }
 
@@ -156,12 +165,6 @@ public class MappingCompileModel {
 
     // === privates
 
-    private void clear() {
-        Exec.swing(new DocumentSetter(docDocument, "", true));
-        Exec.swing(new DocumentSetter(codeDocument, "", true));
-        Exec.swing(new DocumentSetter(outputDocument, "", true));
-    }
-
     private void triggerCompile() {
         if (!enabled) return;
         mappingRunner = null;
@@ -174,21 +177,12 @@ public class MappingCompileModel {
     }
 
     private String getCode(EditPath editPath) {
+        Exec.checkSwing();
         switch (type) {
             case RECORD:
-                if (recMapping == null) {
-                    return "// no mapping";
-                }
-                else {
-                    return recMapping.toCode(null);
-                }
+                return recMapping == null ? "" : recMapping.toCode();
             case FIELD:
-                if (nodeMapping == null || recMapping == null) {
-                    return "// no code";
-                }
-                else {
-                    return nodeMapping.getCode(editPath, recMapping);
-                }
+                return nodeMapping == null || recMapping == null ? "" : nodeMapping.getCode(editPath, recMapping);
             default:
                 throw new RuntimeException();
         }
@@ -196,25 +190,15 @@ public class MappingCompileModel {
 
     private EditPath getEditPath(final boolean fromCodeDocument) {
         if (nodeMapping == null) return null;
-        return new EditPath() {
-            @Override
-            public NodeMapping getNodeMapping() {
-                return nodeMapping;
-            }
-
-            @Override
-            public String getEditedCode(Path path) {
-                if (path.equals(nodeMapping.recDefNode.getPath())) {
-                    if (fromCodeDocument) {
-                        return StringUtil.documentToString(codeDocument);
-                    }
-                    else if (nodeMapping.groovyCode != null) {
-                        return StringUtil.linesToString(nodeMapping.groovyCode);
-                    }
-                }
-                return null;
-            }
-        };
+        Exec.checkSwing();
+        String editedCode = null;
+        if (fromCodeDocument) {
+            editedCode = StringUtil.documentToString(codeDocument);
+        }
+        else if (nodeMapping.groovyCode != null) {
+            editedCode = StringUtil.linesToString(nodeMapping.groovyCode);
+        }
+        return new EditPath(nodeMapping, editedCode);
     }
 
     private class ParseEar implements SipModel.ParseListener {
@@ -226,7 +210,7 @@ public class MappingCompileModel {
                 triggerRun();
             }
             else {
-                Exec.swing(new DocumentSetter(outputDocument, "No input", false));
+                Exec.swing(new DocumentSetter(outputDocument, "", false));
             }
         }
     }
@@ -236,6 +220,7 @@ public class MappingCompileModel {
         @Override
         public void recMappingSet(MappingModel mappingModel) {
             recMapping = mappingModel.getRecMapping();
+            setNodeMapping(null);
             triggerCompile();
         }
 
@@ -274,6 +259,12 @@ public class MappingCompileModel {
 
     private class MappingJob implements Runnable {
 
+        private EditPath editPath;
+
+        private MappingJob(EditPath editPath) {
+            this.editPath = editPath;
+        }
+
         @Override
         public void run() {
             if (metadataRecord == null) return;
@@ -281,8 +272,8 @@ public class MappingCompileModel {
             try {
                 if (mappingRunner == null) {
                     feedback.say("Compiling " + type);
-                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, getEditPath(true));
-//                    if (type == FIELD) System.out.println(mappingRunner.getCode()); // todo: remove
+                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath);
+//                    if (type == Type.FIELD) System.out.println(mappingRunner.getCode()); // todo: remove
                 }
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
@@ -353,6 +344,7 @@ public class MappingCompileModel {
 
         @Override
         public void run() {
+            Exec.checkSwing();
             ignoreDocChanges = ignore;
             int docLength = document.getLength();
             try {
@@ -385,7 +377,7 @@ public class MappingCompileModel {
                     throw new RuntimeException(e);
                 }
             }
-            Exec.work(new MappingJob());
+            Exec.work(new MappingJob(getEditPath(true)));
         }
 
         public void triggerSoon(int delay) {

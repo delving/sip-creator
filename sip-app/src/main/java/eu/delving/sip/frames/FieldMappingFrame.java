@@ -21,10 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.Operator;
-import eu.delving.metadata.Path;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
@@ -263,7 +260,25 @@ public class FieldMappingFrame extends FrameBase {
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                functionModel.setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getFunctions() : null);
+                functionModel.refresh();
+            }
+        });
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+                functionModel.refresh();
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
         });
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
@@ -285,7 +300,12 @@ public class FieldMappingFrame extends FrameBase {
     private class FunctionListModel extends AbstractListModel {
         private List<MappingFunction> functions = new ArrayList<MappingFunction>();
 
-        public void setList(Collection<MappingFunction> functions) {
+        public void refresh() {
+            MappingModel mappingModel = sipModel.getMappingModel();
+            setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getFunctions() : null);
+        }
+
+        private void setList(Collection<MappingFunction> functions) {
             if (!this.functions.isEmpty()) {
                 int size = getSize();
                 this.functions.clear();
@@ -312,14 +332,10 @@ public class FieldMappingFrame extends FrameBase {
         public void setList(NodeMapping nodeMapping) {
             int size = getSize();
             vars.clear();
-            if (size > 0) {
-                fireIntervalRemoved(this, 0, size);
-            }
+            if (size > 0) fireIntervalRemoved(this, 0, size);
             if (nodeMapping != null) vars.addAll(getContextVariables(nodeMapping));
             size = getSize();
-            if (size > 0) {
-                fireIntervalAdded(this, 0, size);
-            }
+            if (size > 0) fireIntervalAdded(this, 0, size);
         }
 
         @Override
@@ -367,8 +383,9 @@ public class FieldMappingFrame extends FrameBase {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        if (sipModel.getCreateModel().hasNodeMapping())
+                        if (sipModel.getCreateModel().hasNodeMapping()) {
                             sipModel.getCreateModel().getNodeMapping().revertToGenerated();
+                        }
                         sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
                     }
                 });
@@ -432,7 +449,8 @@ public class FieldMappingFrame extends FrameBase {
                 }
             });
             setPrototypeCellValue("alongvariablenamehere");
-            setToolTipText("Clicking here will insert a variable name into the code");
+            setToolTipText("Clicking here will insert a variable name into the code\n" +
+                    "at the current cursor position");
         }
     }
 
@@ -446,8 +464,9 @@ public class FieldMappingFrame extends FrameBase {
                 if (selectedText != null && mappingFunction != null) {
                     int start = codeArea.getSelectionStart();
                     try {
-                        if (selectedText.endsWith("\n"))
+                        if (selectedText.endsWith("\n")) {
                             selectedText = selectedText.substring(0, selectedText.length() - 1);
+                        }
                         Document doc = codeArea.getDocument();
                         doc.remove(start, selectedText.length());
                         doc.insertString(start, String.format("%s(%s)", mappingFunction.name, selectedText), null);
@@ -472,7 +491,8 @@ public class FieldMappingFrame extends FrameBase {
                 }
             });
             setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
-            setToolTipText("Clicking here will insert a function call around the selected code");
+            setToolTipText("Selecting code and clicking here will insert\n" +
+                    "a function call around the selected code");
         }
     }
 

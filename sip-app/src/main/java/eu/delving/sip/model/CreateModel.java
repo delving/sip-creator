@@ -21,7 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.CodeOut;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
@@ -65,7 +64,6 @@ public class CreateModel {
         setNodeMappingInternal(findExistingMapping());
         adjustHighlights();
         fireStateChanged();
-        setter = NONE;
     }
 
     public void setTarget(RecDefTreeNode recDefTreeNode) {
@@ -75,7 +73,6 @@ public class CreateModel {
         setNodeMappingInternal(findExistingMapping());
         adjustHighlights();
         fireStateChanged();
-        setter = NONE;
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
@@ -89,7 +86,6 @@ public class CreateModel {
         }
         adjustHighlights();
         fireStateChanged();
-        setter = NONE;
     }
 
     public void createMapping() {
@@ -100,7 +96,6 @@ public class CreateModel {
         SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
         if (created.hasOneSourceTreeNode() && created.inputPath.equals(Storage.CONSTANT_PATH)) {
-            created.codeOut = CodeOut.create();
             String answer = sipModel.getFeedback().ask("Please enter the constant value");
             created.setGroovyCode(String.format("'%s'", answer), sipModel.getMappingModel().getRecMapping());
         }
@@ -171,46 +166,42 @@ public class CreateModel {
     }
 
     private void adjustHighlights() {
-        removeAllHighlights();
-        try {
-            switch (setter) {
-                case SOURCE:
-                    if (sourceTreeNodes == null) return;
-                    for (SourceTreeNode node : sourceTreeNodes) {
-                        for (NodeMapping nodeMapping : node.getNodeMappings()) {
-                            sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping).setHighlighted();
-                            sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode).setHighlighted();
+        Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();
+                sipModel.getStatsModel().getSourceTree().clearHighlighted();
+                sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
+                switch (setter) {
+                    case SOURCE:
+                        if (sourceTreeNodes == null) return;
+                        for (SourceTreeNode node : sourceTreeNodes) {
+                            for (NodeMapping nodeMapping : node.getNodeMappings()) {
+                                sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping).setHighlighted();
+                                sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode).setHighlighted();
+                            }
                         }
-                    }
-                    break;
-                case TARGET:
-                    if (recDefTreeNode == null) return;
-                    for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
-                        NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
-                        entry.setHighlighted();
-                        for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
-                            ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+                        break;
+                    case TARGET:
+                        if (recDefTreeNode == null) return;
+                        for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
+                            NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
+                            entry.setHighlighted();
+                            for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
+                                ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+                            }
                         }
-                    }
-                    break;
-                case NODE_MAPPING:
-                    if (nodeMapping == null) return;
-                    for (Object node : nodeMapping.getSourceTreeNodes()) ((SourceTreeNode) node).setHighlighted();
-                    RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
-                    RecDefTreeNode recDefTreeNode = root.getRecDefTreeNode(nodeMapping.recDefNode);
-                    recDefTreeNode.setHighlighted();
-                    break;
+                        break;
+                    case NODE_MAPPING:
+                        if (nodeMapping == null) return;
+                        for (Object node : nodeMapping.getSourceTreeNodes()) ((SourceTreeNode) node).setHighlighted();
+                        RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
+                        RecDefTreeNode recDefTreeNode = root.getRecDefTreeNode(nodeMapping.recDefNode);
+                        recDefTreeNode.setHighlighted();
+                        break;
+                }
             }
-        }
-        catch (Exception e) {
-            e.printStackTrace(); // it's only highlighting, but i want to know
-        }
-    }
-
-    private void removeAllHighlights() {
-        sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();
-        sipModel.getStatsModel().getSourceTree().clearHighlighted();
-        sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
+        });
     }
 
     // observable

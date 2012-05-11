@@ -64,37 +64,29 @@ public class NodeMappingListModel extends AbstractListModel {
 
     @Override
     public int getSize() {
+        Exec.checkSwing();
         return entries.size();
     }
 
     @Override
     public Object getElementAt(int i) {
+        Exec.checkSwing();
         return entries.get(i);
     }
 
     public NodeMappingEntry getEntry(NodeMapping nodeMapping) {
-        int index = indexOf(nodeMapping);
-        if (index < 0) {
-            throw new RuntimeException("Node mapping not found");
-        }
-        return entries.get(index);
+        Exec.checkSwing();
+        return entries.get(indexOf(nodeMapping));
     }
 
     public void clearHighlighted() {
+        Exec.checkSwing();
         for (NodeMappingEntry entry : entries) entry.clearHighlighted();
     }
 
-    private int sortEntries() {
-        int inserted = -1;
-        Collections.sort(entries);
-        int index = 0;
-        for (NodeMappingEntry entry : entries) {
-            if (entry.getIndex() < 0) inserted = index;
-            index++;
-        }
-        index = 0;
-        for (NodeMappingEntry nodeMappingEntry : entries) nodeMappingEntry.setIndex(index++);
-        return inserted;
+    public void fireContentsChanged(int index) {
+        Exec.checkSwing();
+        fireContentsChanged(this, index, index);
     }
 
     public MappingModel.ChangeListener createMappingChangeEar() {
@@ -104,13 +96,11 @@ public class NodeMappingListModel extends AbstractListModel {
             }
 
             @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
-                final int index = indexOf(nodeMapping);
-                if (index < 0) throw new RuntimeException("Node mapping not found: "+nodeMapping);
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping, NodeMappingChange change) {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
-                        fireChanged(index);
+                        fireContentsChanged(indexOf(nodeMapping));
                     }
                 });
             }
@@ -128,11 +118,15 @@ public class NodeMappingListModel extends AbstractListModel {
             }
 
             @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                final int index = indexOf(nodeMapping);
-                if (index < 0) throw new RuntimeException("Node mapping not found: "+nodeMapping);
-                entries.remove(index);
-                fireIntervalRemoved(this, index, index);
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        int index = indexOf(nodeMapping);
+                        entries.remove(index);
+                        fireIntervalRemoved(this, index, index);
+                    }
+                });
             }
         };
     }
@@ -140,46 +134,53 @@ public class NodeMappingListModel extends AbstractListModel {
     public MappingModel.SetListener createSetEar() {
         return new MappingModel.SetListener() {
             @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getNodeMappings() : null);
+            public void recMappingSet(final MappingModel mappingModel) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getNodeMappings() : null);
+                    }
+                });
             }
         };
     }
 
     public void setList(List<NodeMapping> freshList) {
+        Exec.checkSwing();
         if (!entries.isEmpty()) {
             final int size = getSize();
             entries.clear();
-            if (size > 0) Exec.swing(new Runnable() {
-                @Override
-                public void run() {
-                    fireIntervalRemoved(this, 0, size - 1);
-                }
-            });
+            if (size > 0) fireIntervalRemoved(this, 0, size - 1);
         }
         if (freshList != null) {
             for (NodeMapping nodeMapping : freshList) entries.add(new NodeMappingEntry(this, nodeMapping));
             sortEntries();
         }
         final int size = getSize();
-        if (size > 0) Exec.swing(new Runnable() {
-            @Override
-            public void run() {
-                fireIntervalAdded(this, 0, size);
-            }
-        });
+        if (size > 0) fireIntervalAdded(this, 0, size);
     }
 
     public int indexOf(NodeMapping nodeMapping) {
+        Exec.checkSwing();
         int index = 0;
         for (NodeMappingEntry entry : entries) {
             if (entry.getNodeMapping() == nodeMapping) return index;
             index++;
         }
-        return -1;
+        throw new RuntimeException("Node mapping not found: "+nodeMapping);
     }
 
-    public void fireChanged(int index) {
-        fireContentsChanged(this, index, index);
+    private int sortEntries() {
+        int inserted = -1;
+        Collections.sort(entries);
+        int index = 0;
+        for (NodeMappingEntry entry : entries) {
+            if (entry.getIndex() < 0) inserted = index;
+            index++;
+        }
+        index = 0;
+        for (NodeMappingEntry nodeMappingEntry : entries) nodeMappingEntry.setIndex(index++);
+        return inserted;
     }
+
 }

@@ -42,8 +42,9 @@ import java.util.*;
 @XStreamAlias("delving-statistics")
 public class Stats {
     public static final int DEFAULT_MAX_UNIQUE_VALUE_LENGTH = 40;
-    private static final int SAMPLE_SIZE = 200;
-    private static final int SAMPLE_SMALL_SIZE = 30;
+    private static final int TOOLTIP_SIZE = 10;
+    private static final int SMALL_SIZE = 100;
+    private static final int SAMPLE_SIZE = 300;
     private static final int SAMPLE_MAX_VALUE_LENGTH = 100;
     private static final int HISTOGRAM_MAX_STORAGE = 1024 * 512;
     private static final int HISTOGRAM_MAX_SIZE = 1000;
@@ -255,12 +256,20 @@ public class Stats {
             }
         }
 
-        public Set<String> getSelection() {
-            if (values.size() <= SAMPLE_SMALL_SIZE) return values;
+        public Set<String> getToolTip() {
+            return getSelection(TOOLTIP_SIZE);
+        }
+
+        public Set<String> getDetails() {
+            return getSelection(SMALL_SIZE);
+        }
+
+        private Set<String> getSelection(int size) {
+            if (values.size() <= size) return values;
             List<String> list = new ArrayList<String>(values.size());
             list.addAll(values);
             Set<String> values = new HashSet<String>();
-            while (values.size() < SAMPLE_SMALL_SIZE) {
+            while (values.size() < size) {
                 int index = (int)(Math.random() * list.size());
                 values.add(list.get(index));
                 list.remove(index);
@@ -323,6 +332,21 @@ public class Stats {
             }
             absent = total - present;
         }
+
+        public List<Counter> getToolTip() {
+            return getSelection(TOOLTIP_SIZE);
+        }
+
+        public List<Counter> getDetails() {
+            return getSelection(SMALL_SIZE);
+        }
+
+        private List<Counter> getSelection(int size) {
+            List<Counter> counters = new ArrayList<Counter>(counterMap.values());
+            Collections.sort(counters);
+            return counters.size() <= size ? counters : counters.subList(0, size);
+        }
+
     }
 
     @XStreamAlias("count")
@@ -353,7 +377,7 @@ public class Stats {
         }
 
         public String toString() {
-            return count + " [" + value + "] " + percentage;
+            return count + " \"" + value + "\" " + percentage;
         }
 
         public Counter copy() {

@@ -71,9 +71,6 @@ public class NodeMapping {
     public RecDefNode recDefNode;
 
     @XStreamOmitField
-    public CodeOut codeOut;
-
-    @XStreamOmitField
     private SortedSet sourceTreeNodes;
 
     @Override
@@ -197,8 +194,9 @@ public class NodeMapping {
     }
 
     public String getCode(EditPath editPath, RecMapping recMapping) {
-        recMapping.toCode(editPath);
-        return codeOut.toString();
+        CodeOut codeOut = CodeOut.create(this);
+        recMapping.toCode(codeOut, editPath);
+        return codeOut.getNodeMappingCode();
     }
 
     public void revertToGenerated() {
@@ -218,14 +216,14 @@ public class NodeMapping {
         }
     }
 
-    public void toAttributeCode(Stack<String> groovyParams, EditPath editPath) {
+    public void toAttributeCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (!recDefNode.isAttr()) return;
-        toUserCode(groovyParams, editPath);
+        toUserCode(codeOut, groovyParams, editPath);
     }
 
-    public void toLeafElementCode(Stack<String> groovyParams, EditPath editPath) {
+    public void toLeafElementCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (recDefNode.isAttr() || !recDefNode.isLeafElem()) return;
-        toUserCode(groovyParams, editPath);
+        toUserCode(codeOut, groovyParams, editPath);
     }
 
     public boolean isUserCodeEditable() {
@@ -247,26 +245,28 @@ public class NodeMapping {
         return !walk.hasNext();
     }
 
-    private void toUserCode(Stack<String> groovyParams, EditPath editPath) {
+    private void toUserCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (editPath != null) {
-            String editedCode = editPath.getEditedCode(recDefNode.getPath());
-            if (editedCode != null) {
-                indentCode(editedCode, codeOut);
-                return;
-            }
-            else if (groovyCode != null) {
-                indentCode(groovyCode, codeOut);
-                return;
+            if (!editPath.isGeneratedCode()) {
+                String editedCode = editPath.getEditedCode(recDefNode.getPath());
+                if (editedCode != null) {
+                    indentCode(editedCode, codeOut);
+                    return;
+                }
+                else if (groovyCode != null) {
+                    indentCode(groovyCode, codeOut);
+                    return;
+                }
             }
         }
         else if (groovyCode != null) {
             indentCode(groovyCode, codeOut);
             return;
         }
-        toInnerLoop(getLocalPath(), groovyParams);
+        toInnerLoop(codeOut, getLocalPath(), groovyParams);
     }
 
-    private void toInnerLoop(Path path, Stack<String> groovyParams) {
+    private void toInnerLoop(CodeOut codeOut, Path path, Stack<String> groovyParams) {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
             if (dictionary != null) {
@@ -289,7 +289,7 @@ public class NodeMapping {
             }
         }
         else if (recDefNode.isLeafElem()) {
-            toInnerLoop(path.withRootRemoved(), groovyParams);
+            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams);
         }
         else {
             boolean needLoop;
@@ -297,7 +297,7 @@ public class NodeMapping {
                 needLoop = !groovyParams.contains(getMapName());
                 if (needLoop) {
                     codeOut.line_(
-                            "%s %s { %s ->",
+                            "%s %s { %s -> // N0a",
                             toMapExpression(this), getOperator().getChar(), getMapName()
                     );
                 }
@@ -307,13 +307,13 @@ public class NodeMapping {
                 needLoop = !groovyParams.contains(param);
                 if (needLoop) {
                     codeOut.line_(
-                            "%s %s { %s ->",
+                            "%s %s { %s -> // N0b",
                             toLoopRef(path), getOperator().getChar(), param
                     );
                 }
             }
-            toInnerLoop(path.withRootRemoved(), groovyParams);
-            if (needLoop) codeOut._line("}");
+            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams);
+            if (needLoop) codeOut._line("} // N0");
         }
     }
 
@@ -370,18 +370,7 @@ public class NodeMapping {
     }
 
     private EditPath getGeneratorEditPath() {
-        return new EditPath() {
-
-            @Override
-            public NodeMapping getNodeMapping() {
-                return NodeMapping.this;
-            }
-
-            @Override
-            public String getEditedCode(Path path) {
-                return null;
-            }
-        };
+        return new EditPath(this);
     }
 }
 

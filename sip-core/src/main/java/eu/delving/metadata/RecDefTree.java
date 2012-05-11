@@ -79,8 +79,7 @@ public class RecDefTree implements RecDefNodeListener {
         return nodeMappings;
     }
 
-    public String toCode(Set<MappingFunction> mappingFunctions, Map<String,String> facts, EditPath editPath) {
-        CodeOut codeOut = CodeOut.create();
+    public void toCode(CodeOut codeOut, Set<MappingFunction> mappingFunctions, Map<String,String> facts, EditPath editPath) {
         codeOut.line("// SIP-Creator Generated Mapping Code");
         codeOut.line("// ----------------------------------");
         codeOut.line("// Facts:");
@@ -103,7 +102,7 @@ public class RecDefTree implements RecDefNodeListener {
         codeOut.line("_uniqueIdentifier = _input._id[0].toString()");
         codeOut.line("outputNode = output.");
         if (root.hasDescendentNodeMappings()) {
-            root.toElementCode(false, codeOut, new Stack<String>(), editPath);
+            root.toElementCode(codeOut, false, new Stack<String>(), editPath);
         }
         else {
             codeOut.line("'no' { 'mapping' }");
@@ -112,7 +111,6 @@ public class RecDefTree implements RecDefNodeListener {
         codeOut.line("outputNode");
         codeOut._line("}");
         codeOut.line("// ----------------------------------");
-        return codeOut.toString();
     }
 
     public List<RecDef.Namespace> getNamespaces() {

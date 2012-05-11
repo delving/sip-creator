@@ -22,6 +22,7 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.*;
+import eu.delving.sip.base.Exec;
 import eu.delving.sip.files.Storage;
 
 import java.net.URL;
@@ -73,7 +74,7 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
     }
 
     private void fillNodeMappings() {
-        List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
+        final List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
         Set<Path> sourcePaths = new HashSet<Path>();
         sourceTree.getPaths(sourcePaths);
         Set<Path> mappingPaths = new HashSet<Path>();
@@ -87,7 +88,12 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
                 nodeMappings.add(mapping);
             }
         }
-        nodeMappingListModel.setList(nodeMappings);
+        Exec.swing(new Runnable() {
+            @Override
+            public void run() {
+                nodeMappingListModel.setList(nodeMappings);
+            }
+        });
     }
 
     @Override
