@@ -408,7 +408,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             codeOut.start(nodeMapping);
             nodeMapping.toLeafElementCode(codeOut, groovyParams, editPath);
             codeOut.end(nodeMapping);
-            codeOut._line("}");
+            codeOut._line("} // R12");
         }
     }
 

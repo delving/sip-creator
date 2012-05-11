@@ -115,7 +115,9 @@ public class MappingCompileModel {
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
-        clear();
+        Exec.swing(new DocumentSetter(docDocument, "", true));
+        Exec.swing(new DocumentSetter(codeDocument, "", true));
+        Exec.swing(new DocumentSetter(outputDocument, "", true));
         if ((this.nodeMapping = nodeMapping) != null) {
             Exec.swing(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
             Exec.swing(new Runnable() {
@@ -163,12 +165,6 @@ public class MappingCompileModel {
 
     // === privates
 
-    private void clear() {
-        Exec.swing(new DocumentSetter(docDocument, "", true));
-        Exec.swing(new DocumentSetter(codeDocument, "", true));
-        Exec.swing(new DocumentSetter(outputDocument, "", true));
-    }
-
     private void triggerCompile() {
         if (!enabled) return;
         mappingRunner = null;
@@ -214,7 +210,7 @@ public class MappingCompileModel {
                 triggerRun();
             }
             else {
-                Exec.swing(new DocumentSetter(outputDocument, "No input", false));
+                Exec.swing(new DocumentSetter(outputDocument, "", false));
             }
         }
     }
@@ -224,6 +220,7 @@ public class MappingCompileModel {
         @Override
         public void recMappingSet(MappingModel mappingModel) {
             recMapping = mappingModel.getRecMapping();
+            setNodeMapping(null);
             triggerCompile();
         }
 
@@ -276,7 +273,7 @@ public class MappingCompileModel {
                 if (mappingRunner == null) {
                     feedback.say("Compiling " + type);
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath);
-//                    if (type == FIELD) System.out.println(mappingRunner.getCode()); // todo: remove
+//                    if (type == Type.FIELD) System.out.println(mappingRunner.getCode()); // todo: remove
                 }
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
@@ -347,6 +344,7 @@ public class MappingCompileModel {
 
         @Override
         public void run() {
+            Exec.checkSwing();
             ignoreDocChanges = ignore;
             int docLength = document.getLength();
             try {
