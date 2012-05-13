@@ -70,29 +70,29 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
             mappingHints = RecMapping.read(resource.openStream(), recDefModel);
         }
         catch (Exception e) {
-            sipModel.getFeedback().alert("Unable to read mapping hints file: "+resourceName, e);
+            sipModel.getFeedback().alert("Unable to read mapping hints file: " + resourceName, e);
         }
     }
 
     private void fillNodeMappings() {
-        final List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
+        final List<NodeMapping> mappingHintList = new ArrayList<NodeMapping>();
         Set<Path> sourcePaths = new HashSet<Path>();
         sourceTree.getPaths(sourcePaths);
-        Set<Path> mappingPaths = new HashSet<Path>();
         if (sipModel.getMappingModel().hasRecMapping()) {
-            for (NodeMapping mapping : sipModel.getMappingModel().getRecMapping().getRecDefTree().getNodeMappings()) {
-                mappingPaths.add(mapping.inputPath);
-            }
-        }
-        if (mappingHints != null) for (NodeMapping mapping : mappingHints.getNodeMappings()) {
-            if (sourcePaths.contains(mapping.inputPath) && !mappingPaths.contains(mapping.inputPath)) {
-                nodeMappings.add(mapping);
+            List<NodeMapping> nodeMappingList = sipModel.getMappingModel().getRecMapping().getRecDefTree().getNodeMappings();
+            Set<NodeMapping> existingMappings = new HashSet<NodeMapping>(nodeMappingList);
+            if (mappingHints != null) {
+                for (NodeMapping mapping : mappingHints.getNodeMappings()) {
+                    if (sourcePaths.contains(mapping.inputPath) && !existingMappings.contains(mapping)) {
+                        mappingHintList.add(mapping);
+                    }
+                }
             }
         }
         Exec.swing(new Runnable() {
             @Override
             public void run() {
-                nodeMappingListModel.setList(nodeMappings);
+                nodeMappingListModel.setList(mappingHintList);
             }
         });
     }
