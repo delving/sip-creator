@@ -107,12 +107,16 @@ public class CreateFrame extends FrameBase {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (listSelectionEvent.getValueIsAdjusting()) return;
-                NodeMappingEntry selectedHint = (NodeMappingEntry) mappingHintsList.getSelectedValue();
+                NodeMappingEntry selectedHint = null;
+                for (Object nodeMappingObject : mappingHintsList.getSelectedValues()) {
+                    NodeMappingEntry entry = (NodeMappingEntry) nodeMappingObject;
+                    if (selectedHint == null) selectedHint = entry;
+                }
                 if (selectedHint != null) {
                     hintDocArea.setText(selectedHint.getNodeMapping().getDocumentation());
                 }
                 else {
-                    hintDocArea.setText("Select a hint above.");
+                    hintDocArea.setText("Select hint(s) above.");
                 }
             }
         });
@@ -190,13 +194,15 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Object selected = mappingHintsList.getSelectedValue();
-            if (selected != null) {
-                final NodeMappingEntry nodeMappingEntry = (NodeMappingEntry) selected;
+            final Object[] selectedValues = mappingHintsList.getSelectedValues();
+            if (selectedValues != null && selectedValues.length > 0) {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {
-                        createModel.addMapping(nodeMappingEntry.getNodeMapping());
+                        for (Object selectedValue : selectedValues) {
+                            NodeMappingEntry nodeMappingEntry = (NodeMappingEntry) selectedValue;
+                            createModel.addMapping(nodeMappingEntry.getNodeMapping());
+                        }
                     }
                 });
             }

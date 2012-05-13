@@ -85,7 +85,7 @@ public class NodeMapping {
 
     @Override
     public int hashCode() {
-        return inputPath.hashCode();
+        return inputPath.hashCode() + outputPath.hashCode();
     }
 
     public String getDocumentation() {

@@ -219,7 +219,9 @@ public class CreateModel {
 
     private void fireStateChanged() {
         CreateTransition transition = getTransition();
-        for (Listener listener : listeners) listener.transition(this, transition);
+        if (transition != null) {
+            for (Listener listener : listeners) listener.transition(this, transition);
+        }
         this.state = getState();
     }
 
@@ -229,7 +231,7 @@ public class CreateModel {
             case NOTHING:
                 switch (newState) {
                     case NOTHING:
-                        break; // never
+                        return null;
                     case SOURCE_ONLY:
                         return NOTHING_TO_SOURCE;
                     case TARGET_ONLY:
