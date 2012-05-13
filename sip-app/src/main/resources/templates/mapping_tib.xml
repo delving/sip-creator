@@ -13,7 +13,7 @@
         <node-mapping outputPath="/tib:record/dc:description" inputPath="/input/description"/>
         <node-mapping outputPath="/tib:record/tib:creatorDeathYear" inputPath="/input/creator_date_of_death"/>
         <node-mapping outputPath="/tib:record/tib:objectNumber" inputPath="/input/object_number"/>
-        <node-mapping outputPath="/tib:record/tib:objectSoort" inputPath="/input/object_name"/>   I
+        <node-mapping outputPath="/tib:record/tib:objectSoort" inputPath="/input/object_name"/>
         <node-mapping outputPath="/tib:record/tib:productionStart" inputPath="/input/production_date_start"/>
         <node-mapping outputPath="/tib:record/tib:thumbLarge" inputPath="/input/reproduction_identifier_URL"/>
         <node-mapping outputPath="/tib:record/dc:identifier" inputPath="/input/object_number"/>
