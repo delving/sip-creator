@@ -9,25 +9,25 @@
     </functions>
 
     <node-mappings>
-        <node-mapping outputPath="/tib:record/tib:material" inputPath="/input/material"/>
-        <node-mapping outputPath="/tib:record/dc:description" inputPath="/input/description"/>
-        <node-mapping outputPath="/tib:record/tib:creatorDeathYear" inputPath="/input/creator_date_of_death"/>
-        <node-mapping outputPath="/tib:record/tib:objectNumber" inputPath="/input/object_number"/>
-        <node-mapping outputPath="/tib:record/tib:objectSoort" inputPath="/input/object_name"/>
-        <node-mapping outputPath="/tib:record/tib:productionStart" inputPath="/input/production_date_start"/>
-        <node-mapping outputPath="/tib:record/tib:thumbLarge" inputPath="/input/reproduction_identifier_URL"/>
-        <node-mapping outputPath="/tib:record/dc:identifier" inputPath="/input/object_number"/>
-        <node-mapping outputPath="/tib:record/europeana:uri" inputPath="/input/object_number"/>
-        <node-mapping outputPath="/tib:record/tib:productionEnd" inputPath="/input/production_date_end"/>
-        <node-mapping outputPath="/tib:record/delving:deepZoomUrl" inputPath="/input/reproduction_identifier_URL"/>
-        <node-mapping outputPath="/tib:record/tib:creatorBirthYear" inputPath="/input/creator_date_of_birth"/>
-        <node-mapping outputPath="/tib:record/europeana:isShownAt" inputPath="/input/object_number"/>
-        <node-mapping outputPath="/tib:record/tib:thumbSmall" inputPath="/input/reproduction_identifier_URL"/>
-        <node-mapping inputPath="/input/title" outputPath="/tib:record/dc:title"/>
-        <node-mapping inputPath="/input/creator" outputPath="/tib:record/dc:creator"/>
         <node-mapping inputPath="/input/content.subject" outputPath="/tib:record/dc:subject"/>
-        <node-mapping inputPath="/input/label.text" outputPath="/tib:record/dc:description"/>
+        <node-mapping inputPath="/input/creator" outputPath="/tib:record/dc:creator"/>
+        <node-mapping inputPath="/input/creator.date_of_birth" outputPath="/tib:record/tib:creatorBirthYear"/>
+        <node-mapping inputPath="/input/creator.date_of_death" outputPath="/tib:record/tib:creatorDeathYear"/>
+        <node-mapping inputPath="/input/description" outputPath="/tib:record/dc:description"/>
         <node-mapping inputPath="/input/institution.name" outputPath="/tib:record/dcterms:rightsHolder"/>
+        <node-mapping inputPath="/input/label.text" outputPath="/tib:record/dc:description"/>
+        <node-mapping inputPath="/input/material" outputPath="/tib:record/tib:material"/>
+        <node-mapping inputPath="/input/object_name" outputPath="/tib:record/tib:objectSoort"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/tib:record/dc:identifier"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/tib:record/europeana:isShownAt"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/tib:record/europeana:uri"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/tib:record/tib:objectNumber"/>
+        <node-mapping inputPath="/input/production_date_end" outputPath="/tib:record/tib:productionEnd"/>
+        <node-mapping inputPath="/input/production_date_start" outputPath="/tib:record/tib:productionStart"/>
+        <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/tib:record/delving:deepZoomUrl"/>
+        <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/tib:record/tib:thumbLarge"/>
+        <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/tib:record/tib:thumbSmall"/>
+        <node-mapping inputPath="/input/title" outputPath="/tib:record/dc:title"/>
     </node-mappings>
 
 </rec-mapping>
