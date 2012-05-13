@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<rec-mapping prefix="aff">
+<rec-mapping prefix="tib">
 
     <!--Copying node mappings to this list will make them appear as candidate mappings when-->
     <!--the prefix corresponds to the target format and the inputPath matches one of the-->
@@ -9,7 +9,27 @@
     </functions>
 
     <node-mappings>
-
+        <node-mapping outputPath="/tib:record/tib:material" inputPath="/input/material"/>
+        <node-mapping outputPath="/tib:record/dc:description" inputPath="/input/description"/>
+        <node-mapping outputPath="/tib:record/tib:creatorDeathYear" inputPath="/input/creator_date_of_death"/>
+        <node-mapping outputPath="/tib:record/tib:objectNumber" inputPath="/input/object_number"/>
+        <node-mapping outputPath="/tib:record/tib:objectSoort" inputPath="/input/object_name"/>   I
+        <node-mapping outputPath="/tib:record/tib:productionStart" inputPath="/input/production_date_start"/>
+        <node-mapping outputPath="/tib:record/tib:thumbLarge" inputPath="/input/reproduction_identifier_URL"/>
+        <node-mapping outputPath="/tib:record/dc:identifier" inputPath="/input/object_number"/>
+        <node-mapping outputPath="/tib:record/europeana:uri" inputPath="/input/object_number"/>
+        <node-mapping outputPath="/tib:record/dc:title" inputPath="/input/title"/>
+        <node-mapping outputPath="/tib:record/tib:productionEnd" inputPath="/input/production_date_end"/>
+        <node-mapping outputPath="/tib:record/delving:deepZoomUrl" inputPath="/input/reproduction_identifier_URL"/>
+        <node-mapping outputPath="/tib:record/tib:creatorBirthYear" inputPath="/input/creator_date_of_birth"/>
+        <node-mapping outputPath="/tib:record/europeana:isShownAt" inputPath="/input/object_number"/>
+        <node-mapping outputPath="/tib:record/tib:thumbSmall" inputPath="/input/reproduction_identifier_URL"/>
+        <node-mapping outputPath="/tib:record/dc:creator" inputPath="/input/creator"/>
+        <node-mapping inputPath="/input/title" outputPath="/tib:record/dc:title"/>
+        <node-mapping inputPath="/input/creator" outputPath="/tib:record/dc:creator"/>
+        <node-mapping inputPath="/input/content.subject" outputPath="/tib:record/dc:subject"/>
+        <node-mapping inputPath="/input/label.text" outputPath="/tib:record/dc:description"/>
+        <node-mapping inputPath="/input/institution.name" outputPath="/tib:record/dcterms:rightsHolder"/>
     </node-mappings>
 
 </rec-mapping>
