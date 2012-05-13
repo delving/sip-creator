@@ -1,0 +1,88 @@
+<rec-mapping prefix="tib">
+  <facts>
+    <entry>
+      <string>orgId</string>
+      <string>thuisinbrabant</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>ton-smits-huis</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Ton Smits Huis</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Ton Smits Huis</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Erfgoed Brabant</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string>TEXT</string>
+    </entry>
+    <entry>
+      <string>country</string>
+      <string>netherlands</string>
+    </entry>
+  </facts>
+  <functions/>
+  <node-mappings>
+    <node-mapping inputPath="/constant" outputPath="/tib:record/tib:citName">
+      <groovy-code>
+        <string>&apos;ccBrabant_TSH&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/object_number" outputPath="/tib:record/tib:citOldId">
+      <groovy-code>
+        <string>&quot;ccBrabant_TSH_${_objectnumber}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/reproduction.reference" outputPath="/tib:record/tib:thumbLarge"/>
+    <node-mapping inputPath="/input/reproduction.reference" outputPath="/tib:record/tib:thumbSmall"/>
+    <node-mapping inputPath="/facts/name" outputPath="/tib:record/tib:collection"/>
+    <node-mapping inputPath="/input/creator.role" outputPath="/tib:record/tib:creatorRole"/>
+    <node-mapping inputPath="/input/dimension.type" outputPath="/tib:record/tib:dimension">
+      <siblings>
+        <path>/input/dimension.unit</path>
+        <path>/input/dimension.value</path>
+      </siblings>
+    </node-mapping>
+    <node-mapping inputPath="/input/object_number" outputPath="/tib:record/tib:objectNumber"/>
+    <node-mapping inputPath="/input/object_name/@value" outputPath="/tib:record/tib:objectSoort"/>
+    <node-mapping inputPath="/input/material/text" outputPath="/tib:record/tib:material"/>
+    <node-mapping inputPath="/input/production.place" outputPath="/tib:record/tib:place"/>
+    <node-mapping inputPath="/input/technique/text" outputPath="/tib:record/tib:technique"/>
+    <node-mapping inputPath="/input/title" outputPath="/tib:record/dc:title"/>
+    <node-mapping inputPath="/input/creator" outputPath="/tib:record/dc:creator"/>
+    <node-mapping inputPath="/input/label.text" outputPath="/tib:record/dc:description"/>
+    <node-mapping inputPath="/input/object_number" outputPath="/tib:record/dc:identifier"/>
+    <node-mapping inputPath="/input/rights.notes" outputPath="/tib:record/dc:rights"/>
+    <node-mapping inputPath="/input/institution.name" outputPath="/tib:record/dcterms:rightsHolder"/>
+    <node-mapping inputPath="/input/reproduction.reference" outputPath="/tib:record/europeana:isShownBy"/>
+    <node-mapping inputPath="/facts/rights" outputPath="/tib:record/europeana:rights"/>
+    <node-mapping inputPath="/input/priref" outputPath="/tib:record/europeana:isShownAt"/>
+    <node-mapping inputPath="/input/reproduction.reference" outputPath="/tib:record/europeana:object"/>
+    <node-mapping inputPath="/facts/provider" outputPath="/tib:record/europeana:provider"/>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/tib:record/europeana:dataProvider"/>
+    <node-mapping inputPath="/facts/type" outputPath="/tib:record/europeana:type"/>
+    <node-mapping inputPath="/input/priref" outputPath="/tib:record/europeana:uri"/>
+    <node-mapping inputPath="/facts/language" outputPath="/tib:record/europeana:language"/>
+    <node-mapping inputPath="/facts/country" outputPath="/tib:record/europeana:country"/>
+    <node-mapping inputPath="/facts/spec" outputPath="/tib:record/europeana:collectionName"/>
+    <node-mapping inputPath="/facts/name" outputPath="/tib:record/europeana:collectionTitle"/>
+    <node-mapping inputPath="/input/reproduction.reference" outputPath="/tib:record/delving:thumbnail"/>
+    <node-mapping inputPath="/input/reproduction.reference" outputPath="/tib:record/delving:deepZoomUrl"/>
+  </node-mappings>
+</rec-mapping>

@@ -58,7 +58,7 @@ public class NodeMappingListModel extends AbstractListModel {
             }
         };
         list.setCellRenderer(new NodeMappingEntry.CellRenderer());
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         return list;
     }
 

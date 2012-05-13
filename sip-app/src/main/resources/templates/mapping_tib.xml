@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<rec-mapping prefix="aff">
+<rec-mapping prefix="tib">
 
     <!--Copying node mappings to this list will make them appear as candidate mappings when-->
     <!--the prefix corresponds to the target format and the inputPath matches one of the-->
@@ -9,7 +9,25 @@
     </functions>
 
     <node-mappings>
-
+        <node-mapping inputPath="/input/content.subject" outputPath="/tib:record/dc:subject"/>
+        <node-mapping inputPath="/input/creator" outputPath="/tib:record/dc:creator"/>
+        <node-mapping inputPath="/input/creator.date_of_birth" outputPath="/tib:record/tib:creatorBirthYear"/>
+        <node-mapping inputPath="/input/creator.date_of_death" outputPath="/tib:record/tib:creatorDeathYear"/>
+        <node-mapping inputPath="/input/description" outputPath="/tib:record/dc:description"/>
+        <node-mapping inputPath="/input/institution.name" outputPath="/tib:record/dcterms:rightsHolder"/>
+        <node-mapping inputPath="/input/label.text" outputPath="/tib:record/dc:description"/>
+        <node-mapping inputPath="/input/material" outputPath="/tib:record/tib:material"/>
+        <node-mapping inputPath="/input/object_name" outputPath="/tib:record/tib:objectSoort"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/tib:record/dc:identifier"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/tib:record/europeana:isShownAt"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/tib:record/europeana:uri"/>
+        <node-mapping inputPath="/input/object_number" outputPath="/tib:record/tib:objectNumber"/>
+        <node-mapping inputPath="/input/production_date_end" outputPath="/tib:record/tib:productionEnd"/>
+        <node-mapping inputPath="/input/production_date_start" outputPath="/tib:record/tib:productionStart"/>
+        <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/tib:record/delving:deepZoomUrl"/>
+        <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/tib:record/tib:thumbLarge"/>
+        <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/tib:record/tib:thumbSmall"/>
+        <node-mapping inputPath="/input/title" outputPath="/tib:record/dc:title"/>
     </node-mappings>
 
 </rec-mapping>
