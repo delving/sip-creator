@@ -76,23 +76,29 @@ public class TestMappingEngine {
                 "icn", "http://www.icn.nl/schemas/icn/"
         ));
         MappingResult result = mappingEngine.execute(input("icn"));
+        System.out.println(XmlSerializer.toXml(result.root()));
+        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
+            System.out.println(entry.getKey() + " -> "+entry.getValue());
+        }
         Source source = new DOMSource(result.root());
         validator("icn").validate(source);
     }
 
     @Test
-    public void indexDocumentFromFlat() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"), namespaces(
+    public void validateTIBNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        MappingEngine mappingEngine = new MappingEngine(mapping("tib"), classLoader(), new MockRecDefModel("tib"), namespaces(
                 "dc", "http://purl.org/dc/elements/1.1/",
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/",
-                "icn", "http://www.icn.nl/schemas/icn/"
+                "tib", "http://thuisinbrabant.nl"
         ));
-        MappingResult result = mappingEngine.execute(input("icn"));
+        MappingResult result = mappingEngine.execute(input("tib"));
         System.out.println(XmlSerializer.toXml(result.root()));
-        Map<String,List<String>> allFields = result.fields();
-        System.out.println(allFields);
-        Assert.assertFalse(allFields.isEmpty());
+        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
+            System.out.println(entry.getKey() + " -> "+entry.getValue());
+        }
+        Source source = new DOMSource(result.root());
+        validator("tib").validate(source);
     }
 
     @Test
