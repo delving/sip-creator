@@ -18,13 +18,11 @@
         <node-mapping outputPath="/tib:record/tib:thumbLarge" inputPath="/input/reproduction_identifier_URL"/>
         <node-mapping outputPath="/tib:record/dc:identifier" inputPath="/input/object_number"/>
         <node-mapping outputPath="/tib:record/europeana:uri" inputPath="/input/object_number"/>
-        <node-mapping outputPath="/tib:record/dc:title" inputPath="/input/title"/>
         <node-mapping outputPath="/tib:record/tib:productionEnd" inputPath="/input/production_date_end"/>
         <node-mapping outputPath="/tib:record/delving:deepZoomUrl" inputPath="/input/reproduction_identifier_URL"/>
         <node-mapping outputPath="/tib:record/tib:creatorBirthYear" inputPath="/input/creator_date_of_birth"/>
         <node-mapping outputPath="/tib:record/europeana:isShownAt" inputPath="/input/object_number"/>
         <node-mapping outputPath="/tib:record/tib:thumbSmall" inputPath="/input/reproduction_identifier_URL"/>
-        <node-mapping outputPath="/tib:record/dc:creator" inputPath="/input/creator"/>
         <node-mapping inputPath="/input/title" outputPath="/tib:record/dc:title"/>
         <node-mapping inputPath="/input/creator" outputPath="/tib:record/dc:creator"/>
         <node-mapping inputPath="/input/content.subject" outputPath="/tib:record/dc:subject"/>

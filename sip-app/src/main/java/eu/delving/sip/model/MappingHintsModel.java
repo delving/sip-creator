@@ -63,13 +63,14 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
 
     private void fetchMappingHints(String metadataPrefix, RecDefModel recDefModel) {
         mappingHints = null;
-        URL resource = getClass().getResource("/templates/" + Storage.FileType.MAPPING.getName(metadataPrefix));
+        String resourceName = "/templates/" + Storage.FileType.MAPPING.getName(metadataPrefix);
+        URL resource = getClass().getResource(resourceName);
         if (resource == null) return;
         try {
             mappingHints = RecMapping.read(resource.openStream(), recDefModel);
         }
         catch (Exception e) {
-            // tolerated
+            sipModel.getFeedback().alert("Unable to read mapping hints file: "+resourceName, e);
         }
     }
 
