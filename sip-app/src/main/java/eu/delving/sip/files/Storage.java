@@ -95,6 +95,7 @@ public interface Storage {
 
     String HARVEST_TAG = "delving-harvest";
     String ENVELOPE_TAG = "delving-sip-source";
+    String OUTPUT_TAG = "delving-output";
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";
     String UNIQUE_ATTR = "id";
@@ -103,6 +104,7 @@ public interface Storage {
     String RECORD_COUNT = "recordCount";
     String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
     String MAX_UNIQUE_VALUE_LENGTH = "maxUniqueValueLength";
+    String UNIQUE_VALUE_CONVERTER = "uniqueValueConverter";
     String HARVEST_URL = "harvestUrl";
     String HARVEST_PREFIX = "harvestPrefix";
     String HARVEST_SPEC = "harvestSpec";

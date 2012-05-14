@@ -81,12 +81,14 @@ public class TestSourceConverter {
     private static Path ROOT = Path.create("/the-root/sub-root/we-are-in-record");
     private static Path UNIQ = Path.create("/the-root/sub-root/we-are-in-record/a:unique");
     private static Map<String,String> namespaces = new TreeMap<String, String>();
+    private static final String UNIQUE_CONVERTER = ".(.*):::before:$1:after";
+
     static {
         namespaces.put("a", "http://a");
         namespaces.put("b", "http://b");
         namespaces.put("c", "http://c");
     }
-    private SourceConverter converter = new SourceConverter(ROOT, 2, UNIQ, 100, namespaces);
+    private SourceConverter converter = new SourceConverter(ROOT, 2, UNIQ, 100, UNIQUE_CONVERTER, namespaces);
 
     @Test
     public void runThrough() throws IOException, XMLStreamException, UniquenessException {
@@ -102,7 +104,7 @@ public class TestSourceConverter {
         String[] expect = {
                 "<?xml version='1.0' encoding='UTF-8'?>",
                 "<delving-sip-source xmlns:a=\"http://a\" xmlns:b=\"http://b\" xmlns:c=\"http://c\">",
-                "<input id=\"03030030\">",
+                "<input id=\"before:3030030:after\">",
                 "<a:boo>scary</a:boo>",
                 "<a:wrapper>",
                 "<a:middle>",
@@ -112,7 +114,7 @@ public class TestSourceConverter {
                 "<a:unique>03030030</a:unique>",
                 "<b:shh silent=\"very\">quiet</b:shh>",
                 "</input>",
-                "<input id=\"0404040404\">",
+                "<input id=\"before:404040404:after\">",
                 "<a:boo>very scary</a:boo>",
                 "<b:shh>deathly quiet</b:shh>",
                 "<a:unique>0404040404</a:unique>",

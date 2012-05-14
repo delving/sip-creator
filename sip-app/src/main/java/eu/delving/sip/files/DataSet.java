@@ -108,6 +108,8 @@ public interface DataSet {
 
     void importedToSource(ProgressListener progressListener) throws StorageException;
 
+    void deleteSource() throws StorageException;
+
     List<File> getUploadFiles() throws StorageException;
 
     void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws IOException, StorageException;

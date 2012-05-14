@@ -41,8 +41,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.BitSet;
 
 /**
@@ -52,7 +51,7 @@ import java.util.BitSet;
  */
 
 public class FileProcessor implements Runnable {
-
+    public static final String OUTPUT_FILE_PREF = "outputFile";
     private static final Logger LOG = Logger.getLogger(FileProcessor.class);
     private SipModel sipModel;
     private GroovyCodeResource groovyCodeResource;
@@ -62,6 +61,8 @@ public class FileProcessor implements Runnable {
     private boolean allowInvalid;
     private int validCount, invalidCount;
     private Stats stats = new Stats();
+    private File outputDirectory;
+    private XmlOutput xmlOutput;
 
     public interface Listener {
         void mappingFailed(MappingException exception);
@@ -74,12 +75,14 @@ public class FileProcessor implements Runnable {
     public FileProcessor(
             SipModel sipModel,
             boolean allowInvalidRecords,
+            File outputDirectory,
             GroovyCodeResource groovyCodeResource,
             ProgressListener progressListener,
             Listener listener
     ) {
         this.sipModel = sipModel;
         this.allowInvalid = allowInvalidRecords;
+        this.outputDirectory = outputDirectory;
         this.groovyCodeResource = groovyCodeResource;
         this.progressListener = progressListener;
         this.listener = listener;
@@ -88,7 +91,7 @@ public class FileProcessor implements Runnable {
     public void run() {
         if (sipModel.getDataSetModel().isEmpty()) throw new RuntimeException("No data set selected");
         BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
-        PrintWriter out = null;
+        PrintWriter reportWriter = null;
         try {
             RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping == null) return;
@@ -104,9 +107,15 @@ public class FileProcessor implements Runnable {
                     sipModel.getStatsModel().getRecordCount()
             );
             progressListener.prepareFor(sipModel.getStatsModel().getRecordCount());
-            out = sipModel.getDataSetModel().getDataSet().openReportWriter(recMapping);
+            reportWriter = sipModel.getDataSetModel().getDataSet().openReportWriter(recMapping);
             int count = 0;
             try {
+                if (outputDirectory != null) {
+                    String fileName = String.format("%s-%s.xml", sipModel.getDataSetModel().getDataSet().getSpec(), recMapping.getPrefix());
+                    File outputFile = new File(outputDirectory, fileName);
+                    OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
+                    xmlOutput = new XmlOutput(outputStream, recMapping.getRecDefTree().getRecDef().getNamespacesMap());
+                }
                 MetadataRecord record;
                 while ((record = parser.nextRecord()) != null && !aborted) {
                     if (!progressListener.setProgress(count++)) abort();
@@ -118,19 +127,20 @@ public class FileProcessor implements Runnable {
                         recordStatistics((Element) outputNode, Path.create());
                         validCount++;
                         valid.set(record.getRecordNumber());
+                        if (xmlOutput != null) xmlOutput.write(outputNode);
                     }
                     catch (MappingException e) {
-                        out.println("Mapping exception!");
-                        out.println(XmlSerializer.toXml(e.getMetadataRecord().getRootNode()));
-                        e.printStackTrace(out);
-                        out.println("========");
+                        reportWriter.println("Mapping exception!");
+                        reportWriter.println(XmlNodePrinter.toXml(e.getMetadataRecord().getRootNode()));
+                        e.printStackTrace(reportWriter);
+                        reportWriter.println("========");
                         abort();
                         listener.mappingFailed(e);
                     }
                     catch (SAXException e) {
                         invalidCount++;
-                        out.println(XmlSerializer.toXml(outputNode));
-                        out.println("=========");
+                        reportWriter.println(XmlSerializer.toXml(outputNode));
+                        reportWriter.println("=========");
                         if (!allowInvalid) {
                             abort();
                             listener.outputInvalid(record.getRecordNumber(), outputNode, e.getMessage());
@@ -138,28 +148,29 @@ public class FileProcessor implements Runnable {
                     }
                     catch (AssertionError e) {
                         invalidCount++;
-                        out.println("Discarded explicitly:");
-                        out.println(XmlSerializer.toXml(record.getRootNode()));
-                        out.println("=========");
+                        reportWriter.println("Discarded explicitly:");
+                        reportWriter.println(XmlNodePrinter.toXml(record.getRootNode()));
+                        reportWriter.println("=========");
                     }
                     catch (Exception e) {
                         abort();
                         sipModel.getFeedback().alert("Problem writing output", e);
-                        out.println("Unexpected exception!");
-                        e.printStackTrace(out);
+                        reportWriter.println("Unexpected exception!");
+                        e.printStackTrace(reportWriter);
                     }
                 }
-                out.println();
+                reportWriter.println();
                 if (aborted) {
-                    out.println("Validation was aborted!");
+                    reportWriter.println("Validation was aborted!");
                 }
                 else {
-                    out.println("Validation was completed:");
-                    out.println("Total Valid Records: " + validCount);
-                    out.println("Total Invalid Records: " + invalidCount);
-                    out.println("Total Records: " + (validCount + invalidCount));
-                    out.close();
+                    reportWriter.println("Validation was completed:");
+                    reportWriter.println("Total Valid Records: " + validCount);
+                    reportWriter.println("Total Invalid Records: " + invalidCount);
+                    reportWriter.println("Total Records: " + (validCount + invalidCount));
+                    reportWriter.close();
                 }
+                if (xmlOutput != null) xmlOutput.finish();
             }
             catch (IOException e) {
                 abort();
@@ -181,7 +192,7 @@ public class FileProcessor implements Runnable {
             LOG.info("Validation problem", e);
         }
         finally {
-            IOUtils.closeQuietly(out);
+            IOUtils.closeQuietly(reportWriter);
             if (aborted) {
                 sipModel.getFeedback().say("Validation canceled");
                 listener.finished(null, null, 0);

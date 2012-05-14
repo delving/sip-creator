@@ -553,8 +553,16 @@ public class StorageImpl implements Storage {
                 int recordCount = getRecordCount(hints);
                 Path uniqueElement = getUniqueElement(hints);
                 int maxUniqueValueLength = getMaxUniqueValueLength(hints);
+                String uniqueValueConverter = getUniqueValueConverter(hints);
                 Stats stats = getStats(false, null);
-                SourceConverter converter = new SourceConverter(recordRoot, recordCount, uniqueElement, maxUniqueValueLength, stats.namespaces);
+                SourceConverter converter = new SourceConverter(
+                        recordRoot,
+                        recordCount,
+                        uniqueElement,
+                        maxUniqueValueLength,
+                        uniqueValueConverter,
+                        stats.namespaces
+                );
                 converter.setProgressListener(progressListener);
                 Hasher hasher = new Hasher();
                 DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, FileType.SOURCE.getName())));
@@ -573,6 +581,11 @@ public class StorageImpl implements Storage {
                 delete(source);
                 throw new StorageException("Unable to convert source: " + e.getMessage(), e);
             }
+        }
+
+        @Override
+        public void deleteSource() throws StorageException {
+            for (File file : findSourceFiles(here)) delete(file);
         }
 
         @Override
