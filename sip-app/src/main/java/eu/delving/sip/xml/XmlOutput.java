@@ -1,0 +1,131 @@
+/*
+ * Copyright 2011, 2012 Delving BV
+ *
+ * Licensed under the EUPL, Version 1.0 or? as soon they
+ * will be approved by the European Commission - subsequent
+ * versions of the EUPL (the "Licence");
+ * you may not use this work except in compliance with the
+ * Licence.
+ * You may obtain a copy of the Licence at:
+ *
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in
+ * writing, software distributed under the Licence is
+ * distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied.
+ * See the Licence for the specific language governing
+ * permissions and limitations under the Licence.
+ */
+
+package eu.delving.sip.xml;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Namespace;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static eu.delving.sip.files.Storage.OUTPUT_TAG;
+
+/**
+ * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
+ * the recordRootPath
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
+ */
+
+public class XmlOutput {
+    private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+    private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+    private OutputStream outputStream;
+    private XMLEventWriter out;
+
+    public XmlOutput(OutputStream outputStream, Map<String, String> namespaces) throws UnsupportedEncodingException, XMLStreamException {
+        this.outputStream = outputStream;
+        out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+        out.add(eventFactory.createStartDocument());
+        out.add(eventFactory.createCharacters("\n"));
+        List<Namespace> namespaceList = new ArrayList<Namespace>();
+        for (Map.Entry<String, String> entry : namespaces.entrySet()) {
+            namespaceList.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
+        }
+        out.add(eventFactory.createStartElement("", "", OUTPUT_TAG, null, namespaceList.iterator()));
+    }
+
+    public void write(Node node) throws XMLStreamException {
+        writeElement((Element) node, 1);
+    }
+
+    public void finish() throws XMLStreamException, IOException {
+        out.add(eventFactory.createCharacters("\n"));
+        out.add(eventFactory.createEndElement("", "", OUTPUT_TAG));
+        out.add(eventFactory.createCharacters("\n"));
+        out.add(eventFactory.createEndDocument());
+        out.flush();
+        outputStream.close();
+    }
+
+    private void writeElement(Element element, int depth) throws XMLStreamException {
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        NamedNodeMap namedNodeMap = element.getAttributes();
+        for (int walk = 0; walk < namedNodeMap.getLength(); walk++) {
+            Node node = namedNodeMap.item(walk);
+            attributes.add(eventFactory.createAttribute(node.getPrefix(), node.getNamespaceURI(), node.getLocalName(), node.getNodeValue()));
+        }
+        out.add(eventFactory.createCharacters("\n"));
+        indent(depth);
+        out.add(eventFactory.createStartElement(element.getPrefix(), element.getNamespaceURI(), element.getLocalName(), attributes.iterator(), null));
+        NodeList kids = element.getChildNodes();
+        boolean textKids = false;
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            String text = kid.getTextContent().trim();
+            switch (kid.getNodeType()) {
+                case Node.TEXT_NODE:
+                    if (text.isEmpty()) break;
+                    out.add(eventFactory.createCharacters(text));
+                    textKids = true;
+                    break;
+                case Node.CDATA_SECTION_NODE:
+                    if (text.isEmpty()) break;
+                    out.add(eventFactory.createCData(text));
+                    textKids = true;
+                    break;
+                case Node.ATTRIBUTE_NODE:
+                    // handled in create start element
+                    break;
+                case Node.ELEMENT_NODE:
+                    writeElement((Element) kid, depth + 1);
+                    break;
+                default:
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
+
+            }
+        }
+        if (!textKids) {
+            out.add(eventFactory.createCharacters("\n"));
+            indent(depth);
+        }
+        out.add(eventFactory.createEndElement(element.getPrefix(), element.getNamespaceURI(), element.getLocalName()));
+    }
+
+    private void indent(int depth) throws XMLStreamException {
+        for (int walk = 0; walk < depth; walk++) out.add(eventFactory.createCharacters("   "));
+    }
+
+}

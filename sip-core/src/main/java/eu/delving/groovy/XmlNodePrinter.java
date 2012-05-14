@@ -27,6 +27,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,13 @@ public class XmlNodePrinter {
     private String quote;
     private boolean namespaceAware = true;
     private boolean showNamespaceUri = false;
+
+    public static String toXml(GroovyNode node) {
+        StringWriter writer = new StringWriter();
+        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
+        xmlNodePrinter.print(node);
+        return writer.toString();
+    }
 
     public XmlNodePrinter(Writer out) {
         this(out, "  ");
