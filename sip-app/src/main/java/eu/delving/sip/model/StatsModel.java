@@ -40,6 +40,7 @@ import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static eu.delving.sip.files.Storage.MAX_UNIQUE_VALUE_LENGTH;
+import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
 
 /**
  * An observable hole to put the things related to analysis: statistics, analysis tree, some list models
@@ -123,6 +124,14 @@ public class StatsModel {
     public int getMaxUniqueValueLength() {
         String max = hintsModel.get(MAX_UNIQUE_VALUE_LENGTH);
         return max == null ? Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH : Integer.parseInt(max);
+    }
+
+    public void setUniqueValueConverter(String converter) {
+        hintsModel.set(Storage.UNIQUE_VALUE_CONVERTER, converter);
+    }
+
+    public String getUniqueValueConverter() {
+        return hintsModel.get(UNIQUE_VALUE_CONVERTER);
     }
 
     public SourceTreeNode getSourceTree() {

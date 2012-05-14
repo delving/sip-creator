@@ -21,7 +21,10 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.sip.base.Exec;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 
 import javax.swing.*;
@@ -42,6 +45,7 @@ public class ExpertMenu extends JMenu {
         this.sipModel = sipModel;
         this.desktop = desktop;
         add(new MaxUniqueValueLengthAction());
+        add(new UniqueConverterAction());
     }
 
     private class MaxUniqueValueLengthAction extends AbstractAction {
@@ -66,6 +70,40 @@ public class ExpertMenu extends JMenu {
                 catch (NumberFormatException e) {
                     sipModel.getFeedback().alert("Not a number: " + answer);
                 }
+            }
+        }
+    }
+
+    private class UniqueConverterAction extends AbstractAction {
+
+        private UniqueConverterAction() {
+            super("Set Converter for the Unique value");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            String answer = JOptionPane.showInputDialog(
+                    desktop,
+                    String.format(
+                            "Enter a regular expression (executed by String.replaceFirst) in the form of 'from%sto'",
+                            SourceConverter.CONVERTER_DELIMITER
+                    ),
+                    sipModel.getStatsModel().getUniqueValueConverter()
+            );
+            if (answer != null) {
+                answer = answer.trim();
+                sipModel.getStatsModel().setUniqueValueConverter(answer);
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            sipModel.getDataSetModel().getDataSet().deleteSource();
+                        }
+                        catch (StorageException e) {
+                            sipModel.getFeedback().alert("Unable to delete source", e);
+                        }
+                    }
+                });
             }
         }
     }

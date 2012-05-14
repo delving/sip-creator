@@ -103,6 +103,7 @@ public interface Storage {
     String RECORD_COUNT = "recordCount";
     String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
     String MAX_UNIQUE_VALUE_LENGTH = "maxUniqueValueLength";
+    String UNIQUE_VALUE_CONVERTER = "uniqueValueConverter";
     String HARVEST_URL = "harvestUrl";
     String HARVEST_PREFIX = "harvestPrefix";
     String HARVEST_SPEC = "harvestSpec";
