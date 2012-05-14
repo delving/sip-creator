@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
 import static eu.delving.sip.files.Storage.RECORD_TAG;
@@ -54,6 +55,7 @@ import static eu.delving.sip.files.Storage.RECORD_TAG;
  */
 
 public class SourceConverter {
+    public static final String CONVERTER_DELIMITER = ":::";
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
@@ -69,13 +71,23 @@ public class SourceConverter {
     private List<String> lines = new ArrayList<String>();
     private boolean finished = false;
     private final Uniqueness uniqueness;
+    private Pattern uniqueConverterPattern;
+    private String uniqueConverterReplacement;
 
-    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath, int maxUniqueValueLength, Map<String, String> namespaces) {
+    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath, int maxUniqueValueLength, String uniqueConverter, Map<String, String> namespaces) {
         this.recordRootPath = recordRootPath;
         this.totalRecords = totalRecords;
         this.uniqueElementPath = uniqueElementPath;
         this.namespaces = namespaces;
         this.uniqueness = new Uniqueness(maxUniqueValueLength);
+        if (uniqueConverter != null) {
+            String delimiter = ":::";
+            int divider = uniqueConverter.indexOf(delimiter);
+            if (divider > 0) {
+                uniqueConverterPattern = Pattern.compile(uniqueConverter.substring(0, divider));
+                uniqueConverterReplacement = uniqueConverter.substring(divider + delimiter.length());
+            }
+        }
     }
 
     public void setProgressListener(ProgressListener progressListener) {
@@ -176,7 +188,7 @@ public class SourceConverter {
     }
 
     private void outputRecord(XMLEventWriter out) throws XMLStreamException {
-        Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, unique);
+        Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, getUniqueValue());
         unique = null;
         List<Attribute> attrs = new ArrayList<Attribute>();
         attrs.add(id);
@@ -185,6 +197,11 @@ public class SourceConverter {
         out.add(eventFactory.createEndElement("", "", RECORD_TAG));
         out.add(eventFactory.createCharacters("\n"));
         clearEvents();
+    }
+
+    private String getUniqueValue() {
+        String trimmed = unique.trim();
+        return uniqueConverterPattern != null ? uniqueConverterPattern.matcher(trimmed).replaceFirst(uniqueConverterReplacement) : trimmed;
     }
 
     private void handleStartElement(Path path, boolean followsStart) {

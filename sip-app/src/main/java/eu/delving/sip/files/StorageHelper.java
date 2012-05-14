@@ -88,6 +88,10 @@ public class StorageHelper {
         return max == null ? Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH : Integer.parseInt(max);
     }
 
+    static String getUniqueValueConverter(Map<String, String> hints) {
+        return hints.get(UNIQUE_VALUE_CONVERTER);
+    }
+
     static Map<String, String> readFacts(File file) throws IOException {
         Map<String, String> facts = new TreeMap<String, String>();
         if (file.exists()) {
@@ -221,7 +225,7 @@ public class StorageHelper {
 
     static File findLatestFile(File dir, FileType fileType, String prefix) {
         File latestFile = null;
-        for (File file : findLatestFiles(dir, fileType)) {
+        for (File file : findLatestPrefixFiles(dir, fileType)) {
             String filePrefix = extractName(file, fileType);
             if (filePrefix.equals(prefix)) latestFile = file;
         }
@@ -236,7 +240,12 @@ public class StorageHelper {
         return sorted;
     }
 
-    static Collection<File> findLatestFiles(File dir, Storage.FileType fileType) {
+    static Collection<File> findSourceFiles(File dir) {
+        File[] files = dir.listFiles(new NameFileFilter(SOURCE.getName()));
+        return Arrays.asList(files);
+    }
+
+    static Collection<File> findLatestPrefixFiles(File dir, Storage.FileType fileType) {
         File[] files = dir.listFiles(new PrefixFileFilter(fileType));
         Map<String, List<File>> map = new TreeMap<String, List<File>>();
         for (File file : files) {

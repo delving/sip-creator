@@ -26,7 +26,6 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.TreeMap;
@@ -79,12 +78,5 @@ public class XmlSerializer {
             Node sub = list.item(walk);
             gatherNamespaces(sub, namespaces);
         }
-    }
-    
-    public static String toXml(GroovyNode node) {
-        StringWriter writer = new StringWriter();
-        XmlNodePrinter xmlNodePrinter = new XmlNodePrinter(new PrintWriter(writer));
-        xmlNodePrinter.print(node);
-        return writer.toString();
     }
 }

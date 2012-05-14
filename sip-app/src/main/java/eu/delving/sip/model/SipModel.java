@@ -21,10 +21,7 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingException;
-import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.XmlSerializer;
+import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.NodeTransferHandler;
@@ -429,15 +426,22 @@ public class SipModel {
                     dataSetModel.getDataSet().getSpec(),
                     allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
             ));
+            File outputDirectory = null;
+            String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
+            if (!directoryString.isEmpty()) {
+                outputDirectory = new File(directoryString);
+                if (!outputDirectory.exists()) outputDirectory = null;
+            }
             Exec.work(new FileProcessor(
                     this,
                     allowInvalidRecords,
+                    outputDirectory,
                     groovyCodeResource,
                     progressListener,
                     new FileProcessor.Listener() {
                         @Override
                         public void mappingFailed(final MappingException exception) {
-                            String xml = XmlSerializer.toXml(exception.getMetadataRecord().getRootNode());
+                            String xml = XmlNodePrinter.toXml(exception.getMetadataRecord().getRootNode());
                             validationListener.failed(exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
                         }
 

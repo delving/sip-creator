@@ -52,7 +52,12 @@ public class FactModel {
     }
 
     public void set(String name, String value) {
-        facts.put(name, value);
+        if (value.isEmpty()) {
+            facts.remove(name);
+        }
+        else {
+            facts.put(name, value);
+        }
         fireFactUpdated(name);
     }
 

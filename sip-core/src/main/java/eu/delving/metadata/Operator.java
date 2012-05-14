@@ -31,7 +31,9 @@ public enum Operator {
     ALL("All Entries", "*"),
     FIRST("First Entry", "**"),
     COMMA_DELIM("Comma-Delimited", "* ', ' *"),
-    SPACE_DELIM("Space-Delimited", "* ' ' *");
+    SEMI_DELIM("Semicolon-Delimited", "* '; ' *"),
+    SPACE_DELIM("Space-Delimited", "* ' ' *"),
+    AS_ARRAY("As-Array", ">>");
 
     private final String display;
     private final String opchar;
