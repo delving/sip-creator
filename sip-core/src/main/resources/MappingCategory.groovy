@@ -184,6 +184,13 @@ public class MappingCategory {
         return null
     }
 
+    // call closure once with all of them
+    static Object rightShift(List a, Closure closure) {  // operator >>
+        a = unwrap(a)
+        closure.call(a);
+        return null
+    }
+
     static String sanitize(GroovyNode node) {
         return sanitize(node.toString())
     }
