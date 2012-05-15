@@ -302,7 +302,11 @@ public class FieldMappingFrame extends FrameBase {
 
         public void refresh() {
             MappingModel mappingModel = sipModel.getMappingModel();
-            setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getFunctions() : null);
+            List<MappingFunction> mappingFunctions = new ArrayList<MappingFunction>();
+            List<MappingFunction> fromRecDef = mappingModel.getRecMapping().getRecDefTree().getRecDef().functions;
+            if (fromRecDef != null) mappingFunctions.addAll(fromRecDef);
+            if (mappingModel.hasRecMapping()) mappingFunctions.addAll(mappingModel.getRecMapping().getFunctions());
+            setList(mappingFunctions);
         }
 
         private void setList(Collection<MappingFunction> functions) {
@@ -311,7 +315,7 @@ public class FieldMappingFrame extends FrameBase {
                 this.functions.clear();
                 fireIntervalRemoved(this, 0, size);
             }
-            if (functions != null) this.functions.addAll(functions);
+            this.functions.addAll(functions);
             if (!this.functions.isEmpty()) fireIntervalAdded(this, 0, getSize());
         }
 
