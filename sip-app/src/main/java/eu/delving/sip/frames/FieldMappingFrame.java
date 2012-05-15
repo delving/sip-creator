@@ -303,9 +303,11 @@ public class FieldMappingFrame extends FrameBase {
         public void refresh() {
             MappingModel mappingModel = sipModel.getMappingModel();
             List<MappingFunction> mappingFunctions = new ArrayList<MappingFunction>();
-            List<MappingFunction> fromRecDef = mappingModel.getRecMapping().getRecDefTree().getRecDef().functions;
-            if (fromRecDef != null) mappingFunctions.addAll(fromRecDef);
-            if (mappingModel.hasRecMapping()) mappingFunctions.addAll(mappingModel.getRecMapping().getFunctions());
+            if (mappingModel.hasRecMapping()) {
+                List<MappingFunction> fromRecDef = mappingModel.getRecMapping().getRecDefTree().getRecDef().functions;
+                if (fromRecDef != null) mappingFunctions.addAll(fromRecDef);
+                mappingFunctions.addAll(mappingModel.getRecMapping().getFunctions());
+            }
             setList(mappingFunctions);
         }
 
