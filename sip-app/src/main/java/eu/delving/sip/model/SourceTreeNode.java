@@ -181,7 +181,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public boolean couldBeUniqueElement() {
-        if (valueStats == null || valueStats.unique != null || !valueStats.unique) return false;
+        if (valueStats == null || valueStats.unique == null || !valueStats.unique) return false;
         SourceTreeNode walk = parent;
         while (walk != null) { // ancestor must be record root
             if (walk.isRecordRoot()) return true;
