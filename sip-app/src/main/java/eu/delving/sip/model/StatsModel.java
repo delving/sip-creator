@@ -66,17 +66,23 @@ public class StatsModel {
         if (stats != null) {
             sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
             if (stats.sourceFormat) {
-                recordRoot = Storage.RECORD_ROOT;
-                uniqueElement = Storage.UNIQUE_ELEMENT;
+                setSourceTree(sourceTree, Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
+                if (sipModel.getMappingModel().hasRecMapping()) {
+                    for (NodeMapping nodeMapping : sipModel.getMappingModel().getRecMapping().getNodeMappings()) {
+                        findNodesForInputPaths(nodeMapping);
+                    }
+                }
             }
             else {
-                recordRoot = getRecordRoot();
-                uniqueElement = getUniqueElement();
+                setSourceTree(sourceTree, getRecordRoot(), getUniqueElement());
             }
         }
         else {
-            sourceTree = SourceTreeNode.create("Analysis not yet performed");
+            setSourceTree(SourceTreeNode.create("Analysis not yet performed"), null, null);
         }
+    }
+
+    private void setSourceTree(SourceTreeNode sourceTreeRoot, Path recordRoot, Path uniqueElement) {
         sourceTree.setFilterModel(sourceTreeModel);
         sourceTreeModel.setRoot(sourceTree);
         root = sourceTree;
@@ -145,7 +151,7 @@ public class StatsModel {
     public SortedSet<SourceTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
         SortedSet<SourceTreeNode> nodes = new TreeSet<SourceTreeNode>();
         if (!(sourceTreeModel.getRoot() instanceof SourceTreeNode)) {
-            nodeMapping.clearStatsTreeNodes();
+            nodeMapping.clearSourceTreeNodes();
         }
         else if (!nodeMapping.hasSourceTreeNodes()) {
             for (Path path : nodeMapping.getInputPaths()) {
@@ -153,7 +159,7 @@ public class StatsModel {
                 if (treePath != null) nodes.add((SourceTreeNode) treePath.getLastPathComponent());
             }
             if (nodes.isEmpty()) {
-                nodeMapping.clearStatsTreeNodes();
+                nodeMapping.clearSourceTreeNodes();
             }
             else {
                 SourceTreeNode.setStatsTreeNodes(nodes, nodeMapping);

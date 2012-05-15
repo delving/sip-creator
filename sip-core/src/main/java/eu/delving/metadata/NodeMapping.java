@@ -102,7 +102,7 @@ public class NodeMapping {
         return operator == null ? Operator.ALL : operator;
     }
 
-    public void clearStatsTreeNodes() {
+    public void clearSourceTreeNodes() {
         sourceTreeNodes = null;
     }
 

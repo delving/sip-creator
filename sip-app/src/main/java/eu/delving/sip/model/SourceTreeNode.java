@@ -54,7 +54,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private boolean recordRoot, uniqueElement;
     private Stats.ValueStats valueStats;
     private String htmlToolTip, htmlDetails;
-    private List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
+    private Set<NodeMapping> nodeMappings = new HashSet<NodeMapping>();
 
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
@@ -126,7 +126,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         return valueStats;
     }
 
-    public List<NodeMapping> getNodeMappings() {
+    public Set<NodeMapping> getNodeMappings() {
         return nodeMappings;
     }
 
