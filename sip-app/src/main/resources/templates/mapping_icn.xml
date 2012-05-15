@@ -25,6 +25,20 @@
     </functions>
 
     <node-mappings>
+        <node-mapping inputPath="/input/dc:title" outputPath="/icn:record/dc:title"/>
+        <node-mapping inputPath="/input/dc:creator" outputPath="/icn:record/dc:creator"/>
+        <node-mapping inputPath="/input/dc:subject" outputPath="/icn:record/dc:subject"/>
+        <node-mapping inputPath="/input/dc:description" outputPath="/icn:record/dc:description"/>
+        <node-mapping inputPath="/input/dc:publisher" outputPath="/icn:record/dc:publisher"/>
+        <node-mapping inputPath="/input/dc:contributor" outputPath="/icn:record/dc:contributor"/>
+        <node-mapping inputPath="/input/dc:date" outputPath="/icn:record/dc:date"/>
+        <node-mapping inputPath="/input/dc:type" outputPath="/icn:record/dc:type"/>
+        <node-mapping inputPath="/input/dc:format" outputPath="/icn:record/dc:format"/>
+        <node-mapping inputPath="/input/dc:identifier" outputPath="/icn:record/dc:identifier"/>
+        <node-mapping inputPath="/input/dc:language" outputPath="/icn:record/dc:language"/>
+        <node-mapping inputPath="/input/dc:relation" outputPath="/icn:record/dc:relation"/>
+        <node-mapping inputPath="/input/dc:coverage" outputPath="/icn:record/dc:coverage"/>
+        <node-mapping inputPath="/input/dc:rights" outputPath="/icn:record/dc:rights"/>
     </node-mappings>
 
 </rec-mapping>
