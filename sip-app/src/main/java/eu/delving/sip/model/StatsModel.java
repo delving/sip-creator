@@ -52,8 +52,7 @@ public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
     private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
-    private SourceTreeNode root;
-    private FilterTreeModel sourceTreeModel = new FilterTreeModel(root = sourceTree);
+    private FilterTreeModel sourceTreeModel = new FilterTreeModel(sourceTree);
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -61,8 +60,6 @@ public class StatsModel {
     }
 
     public void setStatistics(Stats stats) {
-        Path recordRoot = null;
-        Path uniqueElement = null;
         if (stats != null) {
             sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
             if (stats.sourceFormat) {
@@ -83,9 +80,8 @@ public class StatsModel {
     }
 
     private void setSourceTree(SourceTreeNode sourceTreeRoot, Path recordRoot, Path uniqueElement) {
-        sourceTree.setFilterModel(sourceTreeModel);
-        sourceTreeModel.setRoot(sourceTree);
-        root = sourceTree;
+        this.sourceTree = sourceTreeRoot;
+        sourceTreeModel.setRoot(sourceTreeRoot);
         setDelimiters(recordRoot, uniqueElement);
     }
 
@@ -98,7 +94,7 @@ public class StatsModel {
     }
 
     public void setRecordRoot(Path recordRoot) {
-        int recordCount = root.setRecordRoot(recordRoot);
+        int recordCount = sourceTree.setRecordRoot(recordRoot);
         hintsModel.set(Storage.RECORD_ROOT_PATH, recordRoot.toString());
         hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         fireRecordRootSet();
@@ -114,7 +110,7 @@ public class StatsModel {
     }
 
     public void setUniqueElement(Path uniqueElement) {
-        root.setUniqueElement(uniqueElement);
+        sourceTree.setUniqueElement(uniqueElement);
         hintsModel.set(Storage.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
         fireUniqueElementSet();
     }
@@ -173,12 +169,10 @@ public class StatsModel {
 
     private void setDelimiters(Path recordRoot, Path uniqueElement) {
         if (recordRoot != null) {
-            int recordCount = root.setRecordRoot(recordRoot);
+            int recordCount = sourceTree.setRecordRoot(recordRoot);
             hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         }
-        if (uniqueElement != null) {
-            root.setUniqueElement(uniqueElement);
-        }
+        if (uniqueElement != null) sourceTree.setUniqueElement(uniqueElement);
     }
 
     private TreePath findNodeForInputPath(Path path, SourceTreeNode node) {
