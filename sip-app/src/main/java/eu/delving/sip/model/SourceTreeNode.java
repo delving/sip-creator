@@ -265,11 +265,9 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     public static void setStatsTreeNodes(final SortedSet<SourceTreeNode> nodes, final NodeMapping nodeMapping) {
         List<Path> inputPaths = new ArrayList<Path>();
-        for (SourceTreeNode node : nodes) {
-            inputPaths.add(node.getPath(false));
-            node.addMappedIn(nodeMapping);
-        }
+        for (SourceTreeNode node : nodes) inputPaths.add(node.getPath(false));
         nodeMapping.setStatsTreeNodes(nodes, inputPaths);
+        for (SourceTreeNode node : nodes) node.addMappedIn(nodeMapping);
     }
 
     public static void removeStatsTreeNodes(final NodeMapping nodeMapping) {
