@@ -59,6 +59,7 @@ public class DictionaryPanel extends JPanel {
     public static final String ASSIGN_SELECTED = "Assign Selected";
     public static final String ASSIGN_ALL = "Assign All";
     public static final String NO_DICTIONARY = "No dictionary for this mapping";
+    private SipModel sipModel;
     private CreateModel createModel;
     private JCheckBox showAssigned = new JCheckBox("Show Assigned");
     private JLabel statusLabel = new JLabel(NO_DICTIONARY, JLabel.CENTER);
@@ -77,6 +78,7 @@ public class DictionaryPanel extends JPanel {
 
     public DictionaryPanel(SipModel sipModel) {
         super(new BorderLayout(5, 5));
+        this.sipModel = sipModel;
         this.createModel = sipModel.getCreateModel();
         this.timer.setRepeats(false);
         valueList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -386,13 +388,11 @@ public class DictionaryPanel extends JPanel {
         public void actionPerformed(ActionEvent actionEvent) {
             int nonempty = countNonemptyDictionaryEntries(createModel.getNodeMapping());
             if (nonempty > 0) {
-                int response = JOptionPane.showConfirmDialog(
-                        SwingUtilities.getWindowAncestor(DictionaryPanel.this),
-                        String.format("Are you sure that you want to discard the %d entries set?", nonempty),
+                boolean confirm =  sipModel.getFeedback().confirm(
                         "Delete Dictionary",
-                        JOptionPane.OK_CANCEL_OPTION
-                );
-                if (response != JOptionPane.OK_OPTION) return;
+                        String.format("Are you sure that you want to discard the %d entries set?", nonempty)
+                ) ;
+                if (!confirm) return;
             }
             Exec.work(new Runnable() {
                 @Override

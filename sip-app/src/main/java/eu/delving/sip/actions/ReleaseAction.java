@@ -59,18 +59,14 @@ public class ReleaseAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         final DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-        int answer = JOptionPane.showConfirmDialog(
-                parent,
+        boolean unlock = sipModel.getFeedback().confirm(
+                "Release",
                 String.format("<html>Are you sure that you want to delete your local copy of<br>" +
                         "this dataset %s, and unlock it so that someone else can access it?",
                         dataSet.getSpec()
-                ),
-                "Release",
-                JOptionPane.OK_CANCEL_OPTION
+                )
         );
-        if (answer == JOptionPane.OK_OPTION) {
-            unlockDataSet(dataSet);
-        }
+        if (unlock) unlockDataSet(dataSet);
     }
 
     private void unlockDataSet(final DataSet dataSet) {

@@ -76,7 +76,7 @@ public class UploadAction extends AbstractAction {
             reportFilePopup.upload.requestFocusInWindow();
         }
         else {
-            JOptionPane.showMessageDialog(parent, "Upload not permitted until prefixes validated. Still invalid: " + invalidPrefixes);
+            sipModel.getFeedback().alert("Upload not permitted until prefixes validated. Still invalid: " + invalidPrefixes);
         }
     }
 
@@ -174,7 +174,7 @@ public class UploadAction extends AbstractAction {
         public void actionPerformed(ActionEvent actionEvent) {
             if (busyUploading) return;
             if (sipModel.getDataSetModel().isEmpty()) {
-                JOptionPane.showInternalMessageDialog(parent, "Data set and mapping must be selected");
+                sipModel.getFeedback().alert("Data set and mapping must be selected");
                 return;
             }
             try {
@@ -208,11 +208,11 @@ public class UploadAction extends AbstractAction {
                     @Override
                     public void finished(final boolean success) {
                         busyUploading = false;
+                        sipModel.getFeedback().alert(success ? "Upload complete" : "Upload failed");
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {
                                 disappear();
-                                JOptionPane.showMessageDialog(parent, success ? "Upload complete" : "Upload failed");
                             }
                         });
                     }

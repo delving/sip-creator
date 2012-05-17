@@ -59,8 +59,7 @@ public class ExpertMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            String answer = JOptionPane.showInputDialog(
-                    desktop,
+            String answer = sipModel.getFeedback().ask(
                     "Enter the maximum length for unique element value",
                     String.valueOf(Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH)
             );
@@ -85,8 +84,7 @@ public class ExpertMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            String answer = JOptionPane.showInputDialog(
-                    desktop,
+            String answer = sipModel.getFeedback().ask(
                     String.format(
                             "Enter a regular expression (executed by String.replaceFirst) in the form of 'from%sto'",
                             SourceConverter.CONVERTER_DELIMITER
@@ -119,8 +117,7 @@ public class ExpertMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            String answer = JOptionPane.showInputDialog(
-                    desktop,
+            String answer = sipModel.getFeedback().ask(
                     "Enter the directory where output is to be stored",
                     sipModel.getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "")
             );

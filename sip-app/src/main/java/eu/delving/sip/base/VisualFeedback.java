@@ -134,7 +134,22 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public String ask(String question) {
-        return JOptionPane.showInputDialog(desktop, question, "CONSTANT");
+        return JOptionPane.showInputDialog(desktop, question, "");
+    }
+
+    @Override
+    public String ask(String question, String defaultValue) {
+        return JOptionPane.showInputDialog(desktop, question, defaultValue);
+    }
+
+    @Override
+    public boolean confirm(String title, String message) {
+        return JOptionPane.YES_OPTION == JOptionPane.showInternalConfirmDialog(desktop, message, title, JOptionPane.YES_NO_OPTION);
+    }
+
+    @Override
+    public boolean form(String title, Object... components) {
+        return JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktop, components, title, JOptionPane.OK_CANCEL_OPTION);
     }
 
     private void addToList(final String message) {

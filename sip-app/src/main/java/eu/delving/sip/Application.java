@@ -203,13 +203,11 @@ public class Application {
     private boolean quit() {
         launcher.instances.remove(this.instance);
         if (harvestPool.getSize() > 0) {
-            if (JOptionPane.YES_OPTION !=
-                    JOptionPane.showConfirmDialog(null,
-                            String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize()),
-                            "Active harvests",
-                            JOptionPane.YES_NO_OPTION)) {
-                return false;
-            }
+            boolean exitAnyway = feedback.confirm(
+                    "Active harvests",
+                    String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize())
+            );
+            if (exitAnyway) return false;
         }
         if (!launcher.instances.isEmpty()) return false;
         System.exit(0);

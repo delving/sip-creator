@@ -384,8 +384,8 @@ public class FieldMappingFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            int answer = JOptionPane.showConfirmDialog(FieldMappingFrame.this, "Discard edited code and revert to the original?", "", JOptionPane.OK_CANCEL_OPTION);
-            if (answer == JOptionPane.OK_OPTION) {
+            boolean discard = sipModel.getFeedback().confirm("Discard", "Discard edited code and revert to the original?");
+            if (discard) {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {

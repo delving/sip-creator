@@ -65,13 +65,11 @@ public class RevertMappingMenu extends JMenu implements MappingSaveTimer.ListRec
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            int answer = JOptionPane.showConfirmDialog(
-                    SwingUtilities.getRootPane(RevertMappingMenu.this),
-                    String.format("Are you sure you want to revert to %s", lastModifiedString()),
+            boolean revert = sipModel.getFeedback().confirm(
                     "Revert",
-                    JOptionPane.OK_CANCEL_OPTION
+                    String.format("Are you sure you want to revert to %s", lastModifiedString())
             );
-            if (answer == JOptionPane.OK_OPTION) {
+            if (revert) {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {

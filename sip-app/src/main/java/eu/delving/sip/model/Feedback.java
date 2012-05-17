@@ -40,4 +40,10 @@ public interface Feedback {
     ProgressListener progressListener(String title);
 
     String ask(String question);
+
+    String ask(String question, String defaultValue);
+
+    boolean confirm(String title, String message);
+
+    boolean form(String title, Object ... components);
 }
