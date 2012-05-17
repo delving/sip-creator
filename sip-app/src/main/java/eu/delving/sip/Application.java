@@ -31,7 +31,6 @@ import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
-import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
@@ -48,6 +47,8 @@ import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static eu.delving.sip.files.DataSetState.NO_DATA;
 
@@ -73,8 +74,12 @@ public class Application {
     private StatusPanel statusPanel;
     private HelpPanel helpPanel;
     private Timer resizeTimer;
+    private Launcher launcher;
+    private String instance;
 
-    private Application(final File storageDirectory) throws StorageException {
+    private Application(final File storageDirectory, Launcher launcher, String instance) throws StorageException {
+        this.launcher = launcher;
+        this.launcher.instances.add(this.instance = instance);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -104,7 +109,7 @@ public class Application {
         feedback = new VisualFeedback(desktop);
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         Storage storage = new StorageImpl(storageDirectory, cultureHubClient.getHttpClient());
-        sipModel = new SipModel(storage, groovyCodeResource, feedback);
+        sipModel = new SipModel(storage, groovyCodeResource, feedback, instance);
         statusPanel = new StatusPanel(sipModel);
         harvestPool = new HarvestPool(sipModel);
         harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
@@ -148,15 +153,7 @@ public class Application {
                 quit();
             }
         });
-        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
-            @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                if (sipModel.getDataSetModel().isEmpty()) {
-                }
-                else {
-                }
-            }
-        });
+        home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
@@ -204,6 +201,7 @@ public class Application {
     }
 
     private boolean quit() {
+        launcher.instances.remove(this.instance);
         if (harvestPool.getSize() > 0) {
             if (JOptionPane.YES_OPTION !=
                     JOptionPane.showConfirmDialog(null,
@@ -213,6 +211,7 @@ public class Application {
                 return false;
             }
         }
+        if (!launcher.instances.isEmpty()) return false;
         System.exit(0);
         return true;
     }
@@ -281,6 +280,7 @@ public class Application {
 
     private JMenu createFileMenu() {
         JMenu menu = new JMenu("File");
+        menu.add(launcher);
         menu.add(downloadAction);
         menu.add(importAction);
         menu.add(validateAction);
@@ -442,20 +442,38 @@ public class Application {
         }
     }
 
-    public static void main(String[] args) throws StorageException {
-        final File storageDirectory = StorageFinder.getStorageDirectory(args);
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    Application application = new Application(storageDirectory);
-                    application.home.setVisible(true);
-                    application.allFrames.restore();
-                }
-                catch (StorageException e) {
-                    JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
-                    e.printStackTrace();
-                }
+    private static class Launcher extends AbstractAction implements Runnable {
+        private String[] args;
+        private Set<String> instances = new TreeSet<String>();
+
+        private Launcher(String[] args) {
+            super("New Application Instance");
+            this.args = args;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Exec.swingAny(this);
+        }
+
+        @Override
+        public void run() {
+            final File storageDirectory = StorageFinder.getStorageDirectory(args);
+            try {
+                int instance = 1;
+                while (instances.contains(String.valueOf(instance))) instance++;
+                Application application = new Application(storageDirectory, this, String.valueOf(instance));
+                application.home.setVisible(true);
+                application.allFrames.restore();
             }
-        });
+            catch (StorageException e) {
+                JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args) throws StorageException {
+        EventQueue.invokeLater(new Launcher(args));
     }
 }
