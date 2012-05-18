@@ -207,7 +207,7 @@ public class SourceConverter {
     }
 
     private String getUniqueValue() {
-        String trimmed = unique.trim();
+        String trimmed = unique.trim().replaceAll(":", "-");
         String modified = converterPattern != null ? converterPattern.matcher(trimmed).replaceFirst(converterReplacement) : trimmed;
         if (modified.length() > maxUniqueValueLength) throw new IllegalArgumentException("Unique value too large: "+unique);
         return TO_UNDERSCORE.matcher(modified).replaceAll("_");

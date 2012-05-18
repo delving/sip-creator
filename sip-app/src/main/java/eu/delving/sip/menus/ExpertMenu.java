@@ -86,7 +86,9 @@ public class ExpertMenu extends JMenu {
         public void actionPerformed(ActionEvent event) {
             String answer = sipModel.getFeedback().ask(
                     String.format(
-                            "Enter a regular expression (executed by String.replaceFirst) in the form of 'from%sto'",
+                            "Enter a regular expression (executed by String.replaceFirst) in the form of 'from%sto'. \n" +
+                                    "At identifier conversion time all ':' are converted to '-', so keep that in mind \n" +
+                                    "while writing regular expressions.'",
                             SourceConverter.CONVERTER_DELIMITER
                     ),
                     sipModel.getStatsModel().getUniqueValueConverter()
