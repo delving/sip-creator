@@ -72,6 +72,10 @@
         <elem tag="icn:purchasePrice"/>
         <elem tag="icn:acquiredWithHelpFrom"/>
         <elem tag="icn:physicalState"/>
+        <elem tag="icn:musipCollectionUri"/>
+        <elem tag="icn:musipCollectionDisplayName" hidden="true"/>
+        <elem tag="icn:musipMuseumUri"/>
+        <elem tag="icn:musipMuseumDisplayName" hidden="true"/>
 
         <elem tag="dc:title" />                    <!-- ESE 3.4 -->
         <elem tag="dc:creator" />                <!-- ESE 3.4 -->

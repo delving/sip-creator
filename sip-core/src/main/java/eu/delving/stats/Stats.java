@@ -236,6 +236,10 @@ public class Stats {
             }
             if (wordCounts != null) wordCounts.finish(total);
         }
+
+        public boolean isUnique() {
+            return unique != null && unique;
+        }
     }
 
     @XStreamAlias("random-sample")

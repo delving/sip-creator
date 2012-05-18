@@ -58,7 +58,7 @@ public class SipModel {
     private static final Logger LOG = Logger.getLogger(SipModel.class);
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
-    private Preferences preferences = Preferences.userNodeForPackage(getClass());
+    private Preferences preferences;
     private Feedback feedback;
     private FunctionCompileModel functionCompileModel;
     private MappingCompileModel recordCompileModel;
@@ -94,7 +94,8 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback) throws StorageException {
+    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, String instance) throws StorageException {
+        this.preferences  = Preferences.userNodeForPackage(getClass()).node(instance);
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
@@ -394,7 +395,7 @@ public class SipModel {
                 @Override
                 public void run() {
                     try {
-                        dataSetModel.getDataSet().importedToSource(progressListener);
+                        dataSetModel.getDataSet().importedToSource(feedback, progressListener);
                         Exec.swing(new Runnable() {
                             @Override
                             public void run() {

@@ -98,7 +98,7 @@ public class MetadataRecordFactory {
                         if (node == null) throw new RuntimeException("Node cannot be null");
                         String valueString = value.toString().trim();
                         value.setLength(0);
-                        if (valueString.length() > 0) node.setValue(valueString);
+                        if (valueString.length() > 0) node.setNodeValue(valueString);
                         node = node.parent();
                         break;
                     case XMLEvent.END_DOCUMENT: {

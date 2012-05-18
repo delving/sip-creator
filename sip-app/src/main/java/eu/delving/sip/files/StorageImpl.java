@@ -23,6 +23,7 @@ package eu.delving.sip.files;
 
 import eu.delving.metadata.*;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.model.Feedback;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
@@ -540,7 +541,7 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public void importedToSource(ProgressListener progressListener) throws StorageException {
+        public void importedToSource(Feedback feedback, ProgressListener progressListener) throws StorageException {
             if (!isRecentlyImported()) {
                 throw new StorageException("Import to source would be redundant, since source is newer");
             }
@@ -556,6 +557,7 @@ public class StorageImpl implements Storage {
                 String uniqueValueConverter = getUniqueValueConverter(hints);
                 Stats stats = getStats(false, null);
                 SourceConverter converter = new SourceConverter(
+                        feedback,
                         recordRoot,
                         recordCount,
                         uniqueElement,

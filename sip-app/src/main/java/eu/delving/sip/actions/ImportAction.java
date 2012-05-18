@@ -130,19 +130,17 @@ public class ImportAction extends AbstractAction {
     public boolean selectInputFile(File file) {
         if (!file.exists() || sipModel.getDataSetModel().isEmpty()) return false;
         String spec = sipModel.getDataSetModel().getDataSet().getSpec();
-        int doImport = JOptionPane.showConfirmDialog(
-                parent,
+        boolean doImport = sipModel.getFeedback().confirm(
+                "Verify your choice",
                 String.format(
                         "<html>Import this file<br><br>" +
                                 "<pre><strong>%s</strong></pre><br>" +
                                 "into data set '<strong>%s</strong>'?<br>",
                         file.getAbsolutePath(),
                         spec // todo: could snag description and things from facts, if they were hardcoded
-                ),
-                "Verify your choice",
-                JOptionPane.YES_NO_OPTION
+                )
         );
-        if (doImport == JOptionPane.YES_OPTION) {
+        if (doImport) {
             setEnabled(false);
             ProgressListener listener = sipModel.getFeedback().progressListener("Importing");
             listener.setProgressMessage(String.format("Storing data for %s", spec));
@@ -192,8 +190,7 @@ public class ImportAction extends AbstractAction {
             JTextField harvestUrl = new JTextField(null == url ? "" : url, 45);
             JTextField harvestPrefix = new JTextField(null == prefix ? "" : prefix);
             JTextField harvestSpec = new JTextField(null == spec ? "" : spec);
-            Object[] fields = new Object[]{"Server", harvestUrl, "Prefix", harvestPrefix, "Spec", harvestSpec};
-            if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(parent, fields, "OAI-PMH server details", JOptionPane.OK_CANCEL_OPTION)) {
+            if (!sipModel.getFeedback().form("OAI-PMH server details", "Server", harvestUrl, "Prefix", harvestPrefix, "Spec", harvestSpec)) {
                 return;
             }
             if (!StringUtils.isEmpty(harvestUrl.getText())) {

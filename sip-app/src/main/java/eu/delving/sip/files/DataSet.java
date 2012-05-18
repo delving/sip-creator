@@ -25,6 +25,7 @@ import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.model.Feedback;
 import eu.delving.stats.Stats;
 
 import javax.xml.validation.Validator;
@@ -106,7 +107,7 @@ public interface DataSet {
 
     void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException;
 
-    void importedToSource(ProgressListener progressListener) throws StorageException;
+    void importedToSource(Feedback feedback, ProgressListener progressListener) throws StorageException;
 
     void deleteSource() throws StorageException;
 

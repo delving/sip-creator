@@ -94,7 +94,7 @@ public class AllFrames {
         };
         try {
             File file = frameArrangementsFile();
-            if (!file.exists()) createDefaultFrameArrangements(file);
+            createDefaultFrameArrangements(file);
             try {
                 addFrameArrangements(new FileInputStream(file));
             }

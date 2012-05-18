@@ -350,15 +350,15 @@ public class FunctionFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            final String name = JOptionPane.showInputDialog(FunctionFrame.this, "Please enter the function name");
+            final String name = sipModel.getFeedback().ask("Please enter the function name");
             if (name != null) {
                 if (!FUNCTION_NAME.matcher(name).matches()) {
-                    JOptionPane.showMessageDialog(FunctionFrame.this, "Sorry, the name must be of the form 'aaaaa' or 'aaaaAaaa'");
+                    sipModel.getFeedback().alert("Sorry, the name must be of the form 'aaaaa' or 'aaaaAaaa'");
                     return;
                 }
                 final RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
                 if (recMapping.hasFunction(name)) {
-                    JOptionPane.showMessageDialog(FunctionFrame.this, "Sorry, but this function name already exists");
+                    sipModel.getFeedback().alert("Sorry, but this function name already exists");
                     return;
                 }
                 Exec.work(new Runnable() {

@@ -26,7 +26,7 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
-import eu.delving.stats.Uniqueness;
+import eu.delving.sip.model.Feedback;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -38,10 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
@@ -56,6 +53,8 @@ import static eu.delving.sip.files.Storage.RECORD_TAG;
 
 public class SourceConverter {
     public static final String CONVERTER_DELIMITER = ":::";
+    private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
+    private Feedback feedback;
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
@@ -70,22 +69,25 @@ public class SourceConverter {
     private List<XMLEvent> eventBuffer = new ArrayList<XMLEvent>();
     private List<String> lines = new ArrayList<String>();
     private boolean finished = false;
-    private final Uniqueness uniqueness;
-    private Pattern uniqueConverterPattern;
-    private String uniqueConverterReplacement;
+    private Set<String> uniqueness = new HashSet<String>();
+    private Pattern converterPattern;
+    private String converterReplacement;
+    private int uniqueRepeatCount;
+    private int maxUniqueValueLength;
 
-    public SourceConverter(Path recordRootPath, int totalRecords, Path uniqueElementPath, int maxUniqueValueLength, String uniqueConverter, Map<String, String> namespaces) {
+    public SourceConverter(Feedback feedback, Path recordRootPath, int totalRecords, Path uniqueElementPath, int maxUniqueValueLength, String uniqueConverter, Map<String, String> namespaces) {
+        this.feedback = feedback;
         this.recordRootPath = recordRootPath;
         this.totalRecords = totalRecords;
         this.uniqueElementPath = uniqueElementPath;
+        this.maxUniqueValueLength = maxUniqueValueLength;
         this.namespaces = namespaces;
-        this.uniqueness = new Uniqueness(maxUniqueValueLength);
         if (uniqueConverter != null) {
             String delimiter = ":::";
             int divider = uniqueConverter.indexOf(delimiter);
             if (divider > 0) {
-                uniqueConverterPattern = Pattern.compile(uniqueConverter.substring(0, divider));
-                uniqueConverterReplacement = uniqueConverter.substring(divider + delimiter.length());
+                converterPattern = Pattern.compile(uniqueConverter.substring(0, divider));
+                converterReplacement = uniqueConverter.substring(divider + delimiter.length());
             }
         }
     }
@@ -94,7 +96,7 @@ public class SourceConverter {
         this.progressListener = progressListener;
     }
 
-    public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException, UniquenessException {
+    public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
         Path path = Path.create();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
@@ -134,10 +136,7 @@ public class SourceConverter {
                             }
                             else {
                                 if (!uniqueElementPath.peek().isAttribute() && path.equals(uniqueElementPath)) {
-                                    unique = StringUtils.join(lines, ' ');
-                                    if (!uniqueness.isStillUnique(unique)) {
-                                        throw new UniquenessException(uniqueElementPath, recordCount);
-                                    }
+                                    unique = StringUtils.join(lines,"");
                                 }
                                 switch (lines.size()) {
                                     case 0:
@@ -182,26 +181,36 @@ public class SourceConverter {
         }
         finally {
             if (progressListener != null) progressListener.finished(finished);
+            if (feedback != null) feedback.say(String.format("Uniqueness violations : " + uniqueRepeatCount));
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         }
     }
 
     private void outputRecord(XMLEventWriter out) throws XMLStreamException {
-        Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, getUniqueValue());
-        unique = null;
-        List<Attribute> attrs = new ArrayList<Attribute>();
-        attrs.add(id);
-        out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
-        for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
-        out.add(eventFactory.createEndElement("", "", RECORD_TAG));
-        out.add(eventFactory.createCharacters("\n"));
+        String uniqueValue = getUniqueValue();
+        if (uniqueness.contains(uniqueValue)) {
+            uniqueRepeatCount++;
+        }
+        else {
+            uniqueness.add(uniqueValue);
+            Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
+            unique = null;
+            List<Attribute> attrs = new ArrayList<Attribute>();
+            attrs.add(id);
+            out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
+            for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
+            out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+            out.add(eventFactory.createCharacters("\n"));
+        }
         clearEvents();
     }
 
     private String getUniqueValue() {
-        String trimmed = unique.trim();
-        return uniqueConverterPattern != null ? uniqueConverterPattern.matcher(trimmed).replaceFirst(uniqueConverterReplacement) : trimmed;
+        String trimmed = unique.trim().replaceAll(":", "-");
+        String modified = converterPattern != null ? converterPattern.matcher(trimmed).replaceFirst(converterReplacement) : trimmed;
+        if (modified.length() > maxUniqueValueLength) throw new IllegalArgumentException("Unique value too large: "+unique);
+        return TO_UNDERSCORE.matcher(modified).replaceAll("_");
     }
 
     private void handleStartElement(Path path, boolean followsStart) {

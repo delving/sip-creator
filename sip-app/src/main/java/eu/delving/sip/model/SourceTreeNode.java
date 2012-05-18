@@ -54,7 +54,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private boolean recordRoot, uniqueElement;
     private Stats.ValueStats valueStats;
     private String htmlToolTip, htmlDetails;
-    private List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
+    private Set<NodeMapping> nodeMappings = new HashSet<NodeMapping>();
 
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
@@ -126,7 +126,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         return valueStats;
     }
 
-    public List<NodeMapping> getNodeMappings() {
+    public Set<NodeMapping> getNodeMappings() {
         return nodeMappings;
     }
 
@@ -181,7 +181,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public boolean couldBeUniqueElement() {
-        if (valueStats == null || !valueStats.unique) return false;
+        if (valueStats == null || !valueStats.hasValues()) return false;
         SourceTreeNode walk = parent;
         while (walk != null) { // ancestor must be record root
             if (walk.isRecordRoot()) return true;
@@ -265,11 +265,9 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     public static void setStatsTreeNodes(final SortedSet<SourceTreeNode> nodes, final NodeMapping nodeMapping) {
         List<Path> inputPaths = new ArrayList<Path>();
-        for (SourceTreeNode node : nodes) {
-            inputPaths.add(node.getPath(false));
-            node.addMappedIn(nodeMapping);
-        }
+        for (SourceTreeNode node : nodes) inputPaths.add(node.getPath(false));
         nodeMapping.setStatsTreeNodes(nodes, inputPaths);
+        for (SourceTreeNode node : nodes) node.addMappedIn(nodeMapping);
     }
 
     public static void removeStatsTreeNodes(final NodeMapping nodeMapping) {
