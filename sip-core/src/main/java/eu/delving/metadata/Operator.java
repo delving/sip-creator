@@ -36,15 +36,15 @@ public enum Operator {
     AS_ARRAY("As-Array", ">>");
 
     private final String display;
-    private final String opchar;
+    private final String codeString;
 
-    private Operator(String display, String opchar) {
+    private Operator(String display, String codeString) {
         this.display = display;
-        this.opchar = opchar;
+        this.codeString = codeString;
     }
 
-    public String getChar() {
-        return opchar;
+    public String getCodeString() {
+        return codeString;
     }
 
     @Override

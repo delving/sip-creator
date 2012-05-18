@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<rec-mapping prefix="aff">
+<rec-mapping prefix="icn">
 
     <!--Copying node mappings to this list will make them appear as candidate mappings when-->
     <!--the prefix corresponds to the target format and the inputPath matches one of the-->
@@ -25,20 +25,20 @@
     </functions>
 
     <node-mappings>
-        <node-mapping inputPath="/facts/language" outputPath="/aff:record/aff:thing/@aff:lang"/>
-        <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:uri"/>
-        <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:displayIdentification"/>
-        <node-mapping inputPath="/input/title" outputPath="/aff:record/aff:thing/aff:displayTitle"/>
-        <node-mapping inputPath="/input/description" outputPath="/aff:record/aff:thing/aff:displayDescription" operator="COMMA_DELIM"/>
-        <node-mapping inputPath="/input/inscription.content" outputPath="/aff:record/aff:thing/aff:displayInscription" operator="COMMA_DELIM"/>
-        <node-mapping inputPath="/input/production.date.start" outputPath="/aff:record/aff:thing/aff:displayYear" operator="FIRST"/>
-        <node-mapping inputPath="/facts/rights" outputPath="/aff:record/aff:thing/aff:displayRights"/>
-        <node-mapping inputPath="/input/production.date.start" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E12.Production]/aff:displayDate" operator="FIRST"/>
-        <node-mapping inputPath="/input/production.period" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E12.Production]/aff:displayPeriod" operator="COMMA_DELIM"/>
-        <node-mapping inputPath="/input/production.place" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E12.Production]/aff:eventPlace/aff:displayPlace"/>
-        <node-mapping inputPath="/input/acquisition.date" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E8.Acquisition]/aff:displayDate"/>
-        <node-mapping inputPath="/input/acquisition.method" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E8.Acquisition]/aff:displayMethod"/>
-        <node-mapping inputPath="/input/acquisition.place" outputPath="/aff:record/aff:events/aff:event[http://www.cidoc-crm.org/rdfs/E8.Acquisition]/aff:eventPlace/aff:displayPlace"/>
+        <node-mapping inputPath="/input/dc:title" outputPath="/icn:record/dc:title"/>
+        <node-mapping inputPath="/input/dc:creator" outputPath="/icn:record/dc:creator"/>
+        <node-mapping inputPath="/input/dc:subject" outputPath="/icn:record/dc:subject"/>
+        <node-mapping inputPath="/input/dc:description" outputPath="/icn:record/dc:description"/>
+        <node-mapping inputPath="/input/dc:publisher" outputPath="/icn:record/dc:publisher"/>
+        <node-mapping inputPath="/input/dc:contributor" outputPath="/icn:record/dc:contributor"/>
+        <node-mapping inputPath="/input/dc:date" outputPath="/icn:record/dc:date"/>
+        <node-mapping inputPath="/input/dc:type" outputPath="/icn:record/dc:type"/>
+        <node-mapping inputPath="/input/dc:format" outputPath="/icn:record/dc:format"/>
+        <node-mapping inputPath="/input/dc:identifier" outputPath="/icn:record/dc:identifier"/>
+        <node-mapping inputPath="/input/dc:language" outputPath="/icn:record/dc:language"/>
+        <node-mapping inputPath="/input/dc:relation" outputPath="/icn:record/dc:relation"/>
+        <node-mapping inputPath="/input/dc:coverage" outputPath="/icn:record/dc:coverage"/>
+        <node-mapping inputPath="/input/dc:rights" outputPath="/icn:record/dc:rights"/>
     </node-mappings>
 
 </rec-mapping>

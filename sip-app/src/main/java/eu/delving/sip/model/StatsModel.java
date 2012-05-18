@@ -52,8 +52,7 @@ public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
     private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
-    private SourceTreeNode root;
-    private FilterTreeModel sourceTreeModel = new FilterTreeModel(root = sourceTree);
+    private FilterTreeModel sourceTreeModel = new FilterTreeModel(sourceTree);
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -61,25 +60,28 @@ public class StatsModel {
     }
 
     public void setStatistics(Stats stats) {
-        Path recordRoot = null;
-        Path uniqueElement = null;
         if (stats != null) {
             sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
             if (stats.sourceFormat) {
-                recordRoot = Storage.RECORD_ROOT;
-                uniqueElement = Storage.UNIQUE_ELEMENT;
+                setSourceTree(sourceTree, Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
+                if (sipModel.getMappingModel().hasRecMapping()) {
+                    for (NodeMapping nodeMapping : sipModel.getMappingModel().getRecMapping().getNodeMappings()) {
+                        findNodesForInputPaths(nodeMapping);
+                    }
+                }
             }
             else {
-                recordRoot = getRecordRoot();
-                uniqueElement = getUniqueElement();
+                setSourceTree(sourceTree, getRecordRoot(), getUniqueElement());
             }
         }
         else {
-            sourceTree = SourceTreeNode.create("Analysis not yet performed");
+            setSourceTree(SourceTreeNode.create("Analysis not yet performed"), null, null);
         }
-        sourceTree.setFilterModel(sourceTreeModel);
-        sourceTreeModel.setRoot(sourceTree);
-        root = sourceTree;
+    }
+
+    private void setSourceTree(SourceTreeNode sourceTreeRoot, Path recordRoot, Path uniqueElement) {
+        this.sourceTree = sourceTreeRoot;
+        sourceTreeModel.setRoot(sourceTreeRoot);
         setDelimiters(recordRoot, uniqueElement);
     }
 
@@ -92,7 +94,7 @@ public class StatsModel {
     }
 
     public void setRecordRoot(Path recordRoot) {
-        int recordCount = root.setRecordRoot(recordRoot);
+        int recordCount = sourceTree.setRecordRoot(recordRoot);
         hintsModel.set(Storage.RECORD_ROOT_PATH, recordRoot.toString());
         hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         fireRecordRootSet();
@@ -108,7 +110,7 @@ public class StatsModel {
     }
 
     public void setUniqueElement(Path uniqueElement) {
-        root.setUniqueElement(uniqueElement);
+        sourceTree.setUniqueElement(uniqueElement);
         hintsModel.set(Storage.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
         fireUniqueElementSet();
     }
@@ -145,7 +147,7 @@ public class StatsModel {
     public SortedSet<SourceTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
         SortedSet<SourceTreeNode> nodes = new TreeSet<SourceTreeNode>();
         if (!(sourceTreeModel.getRoot() instanceof SourceTreeNode)) {
-            nodeMapping.clearStatsTreeNodes();
+            nodeMapping.clearSourceTreeNodes();
         }
         else if (!nodeMapping.hasSourceTreeNodes()) {
             for (Path path : nodeMapping.getInputPaths()) {
@@ -153,7 +155,7 @@ public class StatsModel {
                 if (treePath != null) nodes.add((SourceTreeNode) treePath.getLastPathComponent());
             }
             if (nodes.isEmpty()) {
-                nodeMapping.clearStatsTreeNodes();
+                nodeMapping.clearSourceTreeNodes();
             }
             else {
                 SourceTreeNode.setStatsTreeNodes(nodes, nodeMapping);
@@ -167,12 +169,10 @@ public class StatsModel {
 
     private void setDelimiters(Path recordRoot, Path uniqueElement) {
         if (recordRoot != null) {
-            int recordCount = root.setRecordRoot(recordRoot);
+            int recordCount = sourceTree.setRecordRoot(recordRoot);
             hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         }
-        if (uniqueElement != null) {
-            root.setUniqueElement(uniqueElement);
-        }
+        if (uniqueElement != null) sourceTree.setUniqueElement(uniqueElement);
     }
 
     private TreePath findNodeForInputPath(Path path, SourceTreeNode node) {

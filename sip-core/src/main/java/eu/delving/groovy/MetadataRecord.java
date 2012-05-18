@@ -60,8 +60,8 @@ public class MetadataRecord {
     }
 
     private boolean checkFor(GroovyNode groovyNode, Pattern pattern) {
-        if (groovyNode.value() instanceof List) {
-            List list = (List) groovyNode.value();
+        if (groovyNode.getNodeValue() instanceof List) {
+            List list = (List) groovyNode.getNodeValue();
             for (Object member : list) {
                 GroovyNode childNode = (GroovyNode) member;
                 if (checkFor(childNode, pattern)) return true;

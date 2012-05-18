@@ -224,7 +224,7 @@ public class CreateFrame extends FrameBase {
             Exec.work(new Runnable() {
                 @Override
                 public void run() {
-                    createModel.createMapping();
+                    if (createModel.canCreate()) createModel.createMapping();
                 }
             });
         }

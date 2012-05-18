@@ -163,9 +163,9 @@ public class InputFrame extends FrameBase {
             for (Map.Entry<String,String> entry : node.attributes().entrySet()) {
                 children.add(new GroovyTreeNode(this, entry.getKey(), entry.getValue()));
             }
-            if (node.value() instanceof List) {
-                string = node.name();
-                toolTip = String.format("Size: %d", ((List) node.value()).size());
+            if (node.getNodeValue() instanceof List) {
+                string = node.getNodeName();
+                toolTip = String.format("Size: %d", ((List) node.getNodeValue()).size());
             }
             else {
                 String value = node.text();
@@ -177,16 +177,16 @@ public class InputFrame extends FrameBase {
                     if (value.length() >= MAX_LENGTH) {
                         value = value.substring(0, MAX_LENGTH);
                     }
-                    string = String.format("<html><b>%s</b> = %s ...</html>", node.name(), value);
+                    string = String.format("<html><b>%s</b> = %s ...</html>", node.getNodeName(), value);
                     toolTip = node.text();
                 }
                 else {
-                    string = String.format("<html><b>%s</b> = %s</html>", node.name(), value);
+                    string = String.format("<html><b>%s</b> = %s</html>", node.getNodeName(), value);
                     toolTip = value;
                 }
             }
-            if (this.node.value() instanceof List) {
-                for (Object sub : ((List) this.node.value())) {
+            if (this.node.getNodeValue() instanceof List) {
+                for (Object sub : ((List) this.node.getNodeValue())) {
                     GroovyNode subnode = (GroovyNode) sub;
                     children.add(new GroovyTreeNode(this, subnode));
                 }
@@ -266,7 +266,7 @@ public class InputFrame extends FrameBase {
             if (attrKey != null && gtn.attrKey == null) return -1;
             if (attrKey == null && gtn.attrKey != null) return 1;
             if (attrKey != null && gtn.attrKey != null) return attrKey.compareTo(gtn.attrKey);
-            return node.name().compareTo(gtn.node.name());
+            return node.getNodeName().compareTo(gtn.node.getNodeName());
         }
     }
 

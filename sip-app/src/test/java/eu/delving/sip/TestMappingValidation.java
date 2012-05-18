@@ -150,7 +150,7 @@ public class TestMappingValidation {
         assertEquals(DELIMITED, state());
 
         assertFalse(dataSet().getLatestStats().sourceFormat);
-        dataSet().importedToSource(null);
+        dataSet().importedToSource(null, null);
         assertEquals(8, mock.fileCount());
         assertEquals(SOURCED, state());
 

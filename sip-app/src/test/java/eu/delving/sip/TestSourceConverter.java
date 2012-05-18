@@ -23,7 +23,6 @@ package eu.delving.sip;
 
 import eu.delving.metadata.Path;
 import eu.delving.sip.xml.SourceConverter;
-import eu.delving.sip.xml.UniquenessException;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -80,7 +79,7 @@ public class TestSourceConverter {
     };
     private static Path ROOT = Path.create("/the-root/sub-root/we-are-in-record");
     private static Path UNIQ = Path.create("/the-root/sub-root/we-are-in-record/a:unique");
-    private static Map<String,String> namespaces = new TreeMap<String, String>();
+    private static Map<String, String> namespaces = new TreeMap<String, String>();
     private static final String UNIQUE_CONVERTER = ".(.*):::before:$1:after";
 
     static {
@@ -88,10 +87,11 @@ public class TestSourceConverter {
         namespaces.put("b", "http://b");
         namespaces.put("c", "http://c");
     }
-    private SourceConverter converter = new SourceConverter(ROOT, 2, UNIQ, 100, UNIQUE_CONVERTER, namespaces);
+
+    private SourceConverter converter = new SourceConverter(null, ROOT, 2, UNIQ, 100, UNIQUE_CONVERTER, namespaces);
 
     @Test
-    public void runThrough() throws IOException, XMLStreamException, UniquenessException {
+    public void runThrough() throws IOException, XMLStreamException {
         String inputString = StringUtils.join(INPUT, "\n");
         InputStream in = new ByteArrayInputStream(inputString.getBytes("UTF-8"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -104,7 +104,7 @@ public class TestSourceConverter {
         String[] expect = {
                 "<?xml version='1.0' encoding='UTF-8'?>",
                 "<delving-sip-source xmlns:a=\"http://a\" xmlns:b=\"http://b\" xmlns:c=\"http://c\">",
-                "<input id=\"before:3030030:after\">",
+                "<input id=\"before_3030030_after\">",
                 "<a:boo>scary</a:boo>",
                 "<a:wrapper>",
                 "<a:middle>",
@@ -114,7 +114,7 @@ public class TestSourceConverter {
                 "<a:unique>03030030</a:unique>",
                 "<b:shh silent=\"very\">quiet</b:shh>",
                 "</input>",
-                "<input id=\"before:404040404:after\">",
+                "<input id=\"before_404040404_after\">",
                 "<a:boo>very scary</a:boo>",
                 "<b:shh>deathly quiet</b:shh>",
                 "<a:unique>0404040404</a:unique>",
@@ -124,7 +124,7 @@ public class TestSourceConverter {
                 "</input>",
                 "</delving-sip-source>",
         };
-        Assert.assertEquals("Unexpected output", StringUtils.join(expect,'\n'), StringUtils.join(lines,'\n'));
+        Assert.assertEquals("Unexpected output", StringUtils.join(expect, '\n'), StringUtils.join(lines, '\n'));
     }
 
     @Test
@@ -144,11 +144,7 @@ public class TestSourceConverter {
                 "</the-root>";
         InputStream in = new ByteArrayInputStream(input.getBytes("UTF-8"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            converter.parse(in, out);
-        }
-        catch (UniquenessException e) {
-            System.out.printf("%s%n", e.getMessage());
-        }
+        converter.parse(in, out);
+        Assert.assertEquals("Too many lines!", 6, new String(out.toByteArray()).split("\n").length);
     }
 }

@@ -302,7 +302,13 @@ public class FieldMappingFrame extends FrameBase {
 
         public void refresh() {
             MappingModel mappingModel = sipModel.getMappingModel();
-            setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getFunctions() : null);
+            List<MappingFunction> mappingFunctions = new ArrayList<MappingFunction>();
+            if (mappingModel.hasRecMapping()) {
+                List<MappingFunction> fromRecDef = mappingModel.getRecMapping().getRecDefTree().getRecDef().functions;
+                if (fromRecDef != null) mappingFunctions.addAll(fromRecDef);
+                mappingFunctions.addAll(mappingModel.getRecMapping().getFunctions());
+            }
+            setList(mappingFunctions);
         }
 
         private void setList(Collection<MappingFunction> functions) {
@@ -311,7 +317,7 @@ public class FieldMappingFrame extends FrameBase {
                 this.functions.clear();
                 fireIntervalRemoved(this, 0, size);
             }
-            if (functions != null) this.functions.addAll(functions);
+            this.functions.addAll(functions);
             if (!this.functions.isEmpty()) fireIntervalAdded(this, 0, getSize());
         }
 
@@ -378,8 +384,8 @@ public class FieldMappingFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            int answer = JOptionPane.showConfirmDialog(FieldMappingFrame.this, "Discard edited code and revert to the original?", "", JOptionPane.OK_CANCEL_OPTION);
-            if (answer == JOptionPane.OK_OPTION) {
+            boolean discard = sipModel.getFeedback().confirm("Discard", "Discard edited code and revert to the original?");
+            if (discard) {
                 Exec.work(new Runnable() {
                     @Override
                     public void run() {

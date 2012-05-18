@@ -307,9 +307,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 }
                 else {
                     codeOut.line_(
-                            "%s * { %s -> // R1b",
-                            toMapExpression(nodeMapping),
-                            nodeMapping.getMapName()
+                            "%s %s { %s -> // R1b",
+                            toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), nodeMapping.getMapName()
                     );
                     groovyParams.push(nodeMapping.getMapName());
                 }
@@ -334,7 +333,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 else {
                     codeOut.line_(
                             "%s %s { %s -> // R6b",
-                            toLoopRef(path), operator.getChar(), param
+                            toLoopRef(path), operator.getCodeString(), param
                     );
                     groovyParams.push(param);
                 }
@@ -394,7 +393,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (nodeMapping.hasMap()) {
             codeOut.line_(
                     "%s %s { %s -> // R10",
-                    toMapExpression(nodeMapping), nodeMapping.getOperator().getChar(), nodeMapping.getMapName()
+                    toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), nodeMapping.getMapName()
             );
             startBuilderCall(codeOut, "R11", groovyParams, editPath);
             codeOut.start(nodeMapping);

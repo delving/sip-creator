@@ -119,6 +119,6 @@ public class GroovyCodeResource {
 
         GroovySystem.setKeepJavaMetaClasses(false);
         for (Iterator it = GroovySystem.getMetaClassRegistry().iterator(); it.hasNext(); ) it.remove();
-//        groovyClassLoader.clearCache();
+        groovyClassLoader.clearCache();
     }
 }

@@ -42,7 +42,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
-import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
 /**
  * The structure of the input data, tree, variables and statistics.
@@ -61,7 +60,6 @@ public class SourceFrame extends FrameBase {
     private JPanel filterPanel = new JPanel(new BorderLayout(10, 10));
     private JTextField filterField = new JTextField();
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
-    private StatsFrame statsFrame;
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -102,7 +100,7 @@ public class SourceFrame extends FrameBase {
 
     private void reactToState(DataSetState state) {
         if (!state.atLeast(DataSetState.ANALYZED_IMPORT)) sipModel.getStatsModel().setStatistics(null);
-        boolean newDelimited = state.atLeast(ANALYZED_SOURCE);
+        boolean newDelimited = state.atLeast(DataSetState.SOURCED);
         if (newDelimited != delimited) {
             delimited = newDelimited;
             getContentPane().removeAll();
@@ -116,11 +114,6 @@ public class SourceFrame extends FrameBase {
         content.add(filterPanel, BorderLayout.NORTH);
         content.add(treePanel, BorderLayout.CENTER);
         if (!delimited) content.add(selectButtonPanel, BorderLayout.SOUTH);
-    }
-
-    private void onDoubleClick() {
-        statsFrame.setPlacement(getPlacement());
-        statsFrame.openFrame();
     }
 
     private void wireUp() {
@@ -227,12 +220,12 @@ public class SourceFrame extends FrameBase {
                 });
             }
         });
-        sourceTree.addMouseListener(new MouseInputAdapter() {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 2) onDoubleClick();
-            }
-        });
+//        sourceTree.addMouseListener(new MouseInputAdapter() {
+//            @Override
+//            public void mousePressed(MouseEvent mouseEvent) {
+//                if (mouseEvent.getClickCount() == 2) onDoubleClick();
+//            }
+//        });
         recordRootButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -249,6 +242,12 @@ public class SourceFrame extends FrameBase {
             public void actionPerformed(ActionEvent e) {
                 TreePath path = sourceTree.getSelectionPath();
                 SourceTreeNode node = (SourceTreeNode) path.getLastPathComponent();
+                if (!node.getStats().isUnique()) {
+                    if (!sipModel.getFeedback().confirm(
+                            "Unique Element",
+                            "This element is not verified to be unique. Multiples will be discarded"
+                    )) return;
+                }
                 sipModel.getStatsModel().setUniqueElement(node.getPath(true));
             }
         });
@@ -258,55 +257,4 @@ public class SourceFrame extends FrameBase {
         SourceTreeNode root = (SourceTreeNode) sourceTree.getModel().getRoot();
         root.showPath(sourceTree, node.getPath(true));
     }
-
-//    private static class HistogramModel extends AbstractListModel {
-//        private java.util.List<Stats.Counter> list = new ArrayList<Stats.Counter>();
-//
-//        public void setHistogram(Stats.Histogram histogram) {
-//            int size = getSize();
-//            list.clear();
-//            fireIntervalRemoved(this, 0, size);
-//            if (histogram != null) {
-//                list.addAll(histogram.counterMap.values());
-//                Collections.sort(list);
-//                fireIntervalAdded(this, 0, getSize());
-//            }
-//        }
-//
-//        @Override
-//        public int getSize() {
-//            return list.size();
-//        }
-//
-//        @Override
-//        public Object getElementAt(int i) {
-//            Stats.Counter counter = list.get(i);
-//            return String.format("   %d (%s) : '%s'", counter.count, counter.percentage, counter.value);
-//        }
-//    }
-//
-//    private class RandomSampleModel extends AbstractListModel {
-//
-//        private java.util.List<String> list = new ArrayList<String>();
-//
-//        public void setSample(Stats.Sample sample) {
-//            int size = getSize();
-//            list.clear();
-//            fireIntervalRemoved(this, 0, size);
-//            if (sample != null) {
-//                list.addAll(sample.values);
-//                fireIntervalAdded(this, 0, getSize());
-//            }
-//        }
-//
-//        @Override
-//        public int getSize() {
-//            return list.size();
-//        }
-//
-//        @Override
-//        public Object getElementAt(int i) {
-//            return "   " + list.get(i);
-//        }
-//    }
 }

@@ -109,7 +109,7 @@ public class CreateModel {
         TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
         RecDefTreeNode recDefTreeNode = (RecDefTreeNode) treePath.getLastPathComponent();
         nodeMapping.recDefNode = recDefTreeNode.getRecDefNode();
-        SourceTreeNode.setStatsTreeNodes(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping), nodeMapping);
+        sipModel.getStatsModel().findNodesForInputPaths(nodeMapping);
         recDefTreeNode.addNodeMapping(nodeMapping);
         setNodeMappingInternal(nodeMapping);
         adjustHighlights();
