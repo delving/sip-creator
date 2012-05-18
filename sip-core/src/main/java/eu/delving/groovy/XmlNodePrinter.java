@@ -156,7 +156,7 @@ public class XmlNodePrinter {
         /*
          * Handle normal element like <html> ... </html>.
          */
-        Object value = node.value();
+        Object value = node.getNodeValue();
         if (value instanceof List) {
             printName(node, ctx, true, false);
             printLineEnd();
@@ -217,7 +217,7 @@ public class XmlNodePrinter {
         if (node == null) {
             throw new NullPointerException("GroovyNode must not be null.");
         }
-        Object name = node.name();
+        Object name = node.getNodeName();
         if (name == null) {
             throw new NullPointerException("Name must not be null.");
         }
@@ -243,7 +243,7 @@ public class XmlNodePrinter {
     protected void printNamespace(Object object, NamespaceContext ctx) {
         if (namespaceAware) {
             if (object instanceof GroovyNode) {
-                printNamespace(((GroovyNode) object).name(), ctx);
+                printNamespace(((GroovyNode) object).getNodeName(), ctx);
             }
             else if (object instanceof QName) {
                 QName qname = (QName) object;
@@ -308,7 +308,7 @@ public class XmlNodePrinter {
             return qname.getQualifiedName();
         }
         else if (object instanceof GroovyNode) {
-            Object name = ((GroovyNode) object).name();
+            Object name = ((GroovyNode) object).getNodeName();
             return getName(name);
         }
         return object.toString();

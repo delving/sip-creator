@@ -121,7 +121,7 @@ public class MetadataParser {
                     if (node != null) {
                         String valueString = value.toString().trim();
                         value.setLength(0);
-                        if (!valueString.isEmpty()) node.setValue(valueString);
+                        if (!valueString.isEmpty()) node.setNodeValue(valueString);
                         if (path.equals(Storage.RECORD_ROOT)) {
                             if (node.parent() != null) throw new RuntimeException("Expected to be at root node");
                             metadataRecord = factory.fromGroovyNode(node, recordIndex++, recordCount);

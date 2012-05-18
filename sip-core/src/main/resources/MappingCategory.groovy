@@ -90,6 +90,7 @@ public class MappingCategory {
     static Object or(List a, List b) { // operator |
         a = unwrap(a)
         b = unwrap(b)
+        System.out.println("OR: "+a+" - "+b)
         TupleList list = new TupleList()
         Iterator aa = a.iterator()
         Iterator bb = b.iterator()
@@ -98,15 +99,15 @@ public class MappingCategory {
                 def ma = aa.next()
                 GroovyNode mb = (GroovyNode)bb.next()
                 if (ma instanceof Map) {
-                    ma[mb.name()] = mb
+                    ma[mb.getNodeName()] = mb
                     list.add(ma);
                 }
                 else {
                     GroovyNode na = (GroovyNode) ma
                     GroovyNode nb = (GroovyNode) mb
                     Map map = new TupleMap()
-                    map[na.name()] = na
-                    map[nb.name()] = nb
+                    map[na.getNodeName()] = na
+                    map[nb.getNodeName()] = nb
                     list.add(map)
                 }
             }
@@ -118,7 +119,7 @@ public class MappingCategory {
                 else {
                     GroovyNode na = (GroovyNode) ma;
                     Map map = new TupleMap()
-                    map[na.name()] = na
+                    map[na.getNodeName()] = na
                     list.add(map)
                 }
             }
@@ -126,7 +127,7 @@ public class MappingCategory {
                 def mb = bb.next()
                 GroovyNode nb = (GroovyNode) mb;
                 Map map = new TupleMap()
-                map[nb.name()] = nb
+                map[nb.getNodeName()] = nb
                 list.add(map)
             }
         }
@@ -170,7 +171,7 @@ public class MappingCategory {
             if (walk.hasNext()) out.append(delimiter)
         }
         if (node == null) return []
-        node.setValue(out.toString())
+        node.setNodeValue(out.toString())
         return [node]
     }
 
