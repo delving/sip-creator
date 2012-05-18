@@ -131,14 +131,14 @@ public class ImportAction extends AbstractAction {
         if (!file.exists() || sipModel.getDataSetModel().isEmpty()) return false;
         String spec = sipModel.getDataSetModel().getDataSet().getSpec();
         boolean doImport = sipModel.getFeedback().confirm(
+                "Verify your choice",
                 String.format(
                         "<html>Import this file<br><br>" +
                                 "<pre><strong>%s</strong></pre><br>" +
                                 "into data set '<strong>%s</strong>'?<br>",
                         file.getAbsolutePath(),
                         spec // todo: could snag description and things from facts, if they were hardcoded
-                ),
-                "Verify your choice"
+                )
         );
         if (doImport) {
             setEnabled(false);
