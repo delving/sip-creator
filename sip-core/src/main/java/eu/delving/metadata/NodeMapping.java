@@ -298,7 +298,7 @@ public class NodeMapping {
                 if (needLoop) {
                     codeOut.line_(
                             "%s %s { %s -> // N0a",
-                            toMapExpression(this), getOperator().getChar(), getMapName()
+                            toMapExpression(this), getOperator().getCodeString(), getMapName()
                     );
                 }
             }
@@ -308,7 +308,7 @@ public class NodeMapping {
                 if (needLoop) {
                     codeOut.line_(
                             "%s %s { %s -> // N0b",
-                            toLoopRef(path), getOperator().getChar(), param
+                            toLoopRef(path), getOperator().getCodeString(), param
                     );
                 }
             }

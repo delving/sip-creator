@@ -90,7 +90,6 @@ public class MappingCategory {
     static Object or(List a, List b) { // operator |
         a = unwrap(a)
         b = unwrap(b)
-        System.out.println("OR: "+a+" - "+b)
         TupleList list = new TupleList()
         Iterator aa = a.iterator()
         Iterator bb = b.iterator()
