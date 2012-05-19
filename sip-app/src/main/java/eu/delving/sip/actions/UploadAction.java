@@ -76,7 +76,12 @@ public class UploadAction extends AbstractAction {
             reportFilePopup.upload.requestFocusInWindow();
         }
         else {
-            sipModel.getFeedback().alert("Upload not permitted until prefixes validated. Still invalid: " + invalidPrefixes);
+            Exec.work(new Runnable() {
+                @Override
+                public void run() {
+                    sipModel.getFeedback().alert("Upload not permitted until all mappings are validated. Still invalid: " + invalidPrefixes);
+                }
+            });
         }
     }
 
