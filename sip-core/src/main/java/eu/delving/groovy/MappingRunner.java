@@ -88,7 +88,7 @@ public class MappingRunner {
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException, AssertionError {
-        if ((counter % 1000) == 0) groovyCodeResource.flush();
+        if ((counter % 100) == 0) groovyCodeResource.flush();
         if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
         counter += 1;
         try {
