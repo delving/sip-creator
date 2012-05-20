@@ -74,22 +74,41 @@
             <xs:element name="creatorRole" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="technique" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="material" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="location" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="country" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="province" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="municipality" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="place" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="location" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="locationType" minOccurs="0" maxOccurs="unbounded"/>
+
+            <xs:element name="collection" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="collectionPart" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="acquisitionMeans" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="collectionType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="acquisitionMeans" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="acquisitionYear" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="purchasePrice" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="acquiredWithHelpFrom" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="physicalState" minOccurs="0" maxOccurs="unbounded"/>
 
+            <xs:element name="musipCollectionUri" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="musipCollectionDisplayName" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="musipMuseumUri" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="musipMuseumDisplayName" minOccurs="0" maxOccurs="unbounded"/>
+
             <xs:group minOccurs="0" maxOccurs="unbounded" ref="icn:dcGroup" />
             <xs:group minOccurs="0" maxOccurs="unbounded" ref="icn:dctermsGroup" />
 
-            <xs:element ref="europeana:isShownBy" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="europeana:rights" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="europeana:isShownAt" minOccurs="0" maxOccurs="1"/>
+            <xs:choice>
+                <xs:sequence>
+                    <xs:element ref="isShownAt" minOccurs="0" maxOccurs="1"></xs:element>
+                    <xs:element ref="isShownBy" minOccurs="1" maxOccurs="1"></xs:element>
+                </xs:sequence>
+                <xs:sequence>
+                    <xs:element ref="isShownAt" minOccurs="1" maxOccurs="1"></xs:element>
+                    <xs:element ref="isShownBy" minOccurs="0" maxOccurs="1"></xs:element>
+                </xs:sequence>
+            </xs:choice>
             <xs:element ref="europeana:unstored" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="europeana:object" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="europeana:provider" minOccurs="0" maxOccurs="1"/>

@@ -54,6 +54,15 @@
                 <string>&quot;${spec}/${it}&quot;</string>
             </groovy-code>
         </mapping-function>
+        <mapping-function name="lowercase">
+            <sample-input>
+                <string>Bla bla</string>
+                <string>BLA bla bla</string>
+            </sample-input>
+            <groovy-code>
+                <string>&quot;${it.toString().toLowerCase()}&quot;</string>
+            </groovy-code>
+        </mapping-function>
     </functions>
 
 
@@ -61,13 +70,19 @@
         <elem tag="icn:creatorYearOfBirth"/>
         <elem tag="icn:creatorYearOfDeath"/>
         <elem tag="icn:creatorRole"/>
-        <elem tag="icn:technique"/>
-        <elem tag="icn:material"/>
-        <elem tag="icn:location"/>
+        <elem tag="icn:technique" function="lowercase"/>
+        <elem tag="icn:material" function="lowercase"/>
+        <elem tag="icn:country" />
         <elem tag="icn:province"/>
+        <elem tag="icn:municipality"/>
+        <elem tag="icn:place"/>
+        <elem tag="icn:location" />
+        <elem tag="icn:locationType" />
+
+        <elem tag="icn:collection"/>
         <elem tag="icn:collectionPart"/>
-        <elem tag="icn:acquisitionMeans"/>
         <elem tag="icn:collectionType"/>
+        <elem tag="icn:acquisitionMeans"/>
         <elem tag="icn:acquisitionYear"/>
         <elem tag="icn:purchasePrice"/>
         <elem tag="icn:acquiredWithHelpFrom"/>
@@ -76,6 +91,45 @@
         <elem tag="icn:musipCollectionDisplayName" hidden="true"/>
         <elem tag="icn:musipMuseumUri"/>
         <elem tag="icn:musipMuseumDisplayName" hidden="true"/>
+
+        <!--Information used ONH-->
+        <elem tag="icn:doId" fieldType="string"/>
+        <elem tag="icn:doName" />
+        <elem tag="icn:doUri" fieldType="string"/>
+        <elem tag="icn:doType" fieldType="string"/> <!--afbeeldingen, videos, audio, documenten-->
+        <elem tag="icn:theme" fieldType="string"/>
+        <elem tag="icn:dateId" fieldType="string" hidden="true"/>
+        <elem tag="icn:dateName" />
+        <elem tag="icn:dateType" />
+        <elem tag="icn:dateYear" />
+        <elem tag="icn:dateMonth" />
+        <elem tag="icn:dateDay" />
+        <elem tag="icn:dateIso" fieldType="date"/>
+        <elem tag="icn:periodId" fieldType="string" hidden="true"/>
+        <elem tag="icn:periodName"/>
+        <elem tag="icn:periodType"/>
+        <elem tag="icn:periodRange"/>
+        <elem tag="icn:periodStartIso" fieldType="date"/>
+        <elem tag="icn:periodStartYear" />
+        <elem tag="icn:periodStartMonth" />
+        <elem tag="icn:periodStartDay" />
+        <elem tag="icn:periodEndIso" fieldType="date"/>
+        <elem tag="icn:periodEndYear" />
+        <elem tag="icn:periodEndMonth" />
+        <elem tag="icn:periodEndDay" />
+        <elem tag="delving:locationId" />
+        <elem tag="delving:locationName" />
+        <elem tag="delving:locationLat" />
+        <elem tag="delving:locationLong" />
+        <elem tag="delving:locationGeoHash" fieldType="location"/>
+
+        <!--custom-->
+        <elem tag="created" hidden="true" />
+        <elem tag="modified" hidden="true" />
+        <elem tag="parTitle" hidden="true" />
+        <elem tag="parDescription" hidden="true" />
+        <elem tag="partnerId" hidden="true" />
+
 
         <elem tag="dc:title" />                    <!-- ESE 3.4 -->
         <elem tag="dc:creator" />                <!-- ESE 3.4 -->
@@ -117,8 +171,8 @@
         <elem tag="dcterms:rightsHolder"/>                             <!-- NOT part of ESE 3.4 -->
 
 
-        <elem tag="europeana:isShownBy" fieldType="link"/>                              <!-- ESE 3.4 -->
         <elem tag="europeana:rights"/>                                 <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownBy" fieldType="link"/>                              <!-- ESE 3.4 -->
         <elem tag="europeana:isShownAt" fieldType="link" operator="FIRST"/>  <!-- ESE 3.4 -->
         <elem tag="europeana:unstored"/>                               <!-- ESE 3.4 -->
         <elem tag="europeana:object" fieldType="link"/>        <!-- ESE 3.4 -->
