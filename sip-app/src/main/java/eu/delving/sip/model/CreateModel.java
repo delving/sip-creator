@@ -328,6 +328,7 @@ public class CreateModel {
                 break;
         }
         throw new IllegalStateException("No transition available from " + state + " to " + newState);
+        // todo: java.lang.IllegalStateException: No transition available from COMPLETE to TARGET_ONLY
     }
 
     private CreateState getState() {

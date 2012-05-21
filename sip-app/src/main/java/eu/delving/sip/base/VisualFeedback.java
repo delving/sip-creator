@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static javax.swing.JOptionPane.*;
+
 /**
  * Give the user feedback in different ways
  *
@@ -134,27 +136,22 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public String ask(String question) {
-        return JOptionPane.showInputDialog(desktop, question, "");
+        return askQuestion(desktop, question, null);
     }
 
     @Override
     public String ask(String question, String defaultValue) {
-        return JOptionPane.showInputDialog(desktop, question, defaultValue);
+        return askQuestion(desktop, question, defaultValue);
     }
 
     @Override
     public boolean confirm(String title, String message) {
-        return JOptionPane.YES_OPTION == JOptionPane.showInternalConfirmDialog(desktop, message, title, JOptionPane.YES_NO_OPTION);
+        return askOption(desktop, message, title, YES_NO_OPTION, QUESTION_MESSAGE);
     }
 
     @Override
     public boolean form(String title, Object... components) {
-        return JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktop, components, title, JOptionPane.OK_CANCEL_OPTION);
-    }
-
-    private void addToList(final String message) {
-        listModel.add(String.format("%s - %s", TIMESTAMP_FORMAT.format(new Date()), message));
-        list.ensureIndexIsVisible(listModel.getSize() - 1);
+        return askOption(desktop, components, title, OK_CANCEL_OPTION, QUESTION_MESSAGE);
     }
 
     private void inYourFace(String message, String extra) {
@@ -162,7 +159,77 @@ public class VisualFeedback implements Feedback {
         extra = sanitizeHtml(extra);
         String html = String.format("<html><h3>%s</h3>", message);
         if (extra != null) html = html + String.format("<p>%s</p>", extra);
-        JOptionPane.showMessageDialog(null, html);
+        askOption(desktop, html, "Message", DEFAULT_OPTION, INFORMATION_MESSAGE);
+    }
+
+    public static String askQuestion(JDesktopPane desktop, String question, Object initialSelectionValue) {
+        final JOptionPane pane = new JOptionPane(question, QUESTION_MESSAGE, OK_CANCEL_OPTION, null, null, null);
+        pane.putClientProperty(new Object(), Boolean.TRUE);
+        pane.setWantsInput(true);
+        pane.setInitialSelectionValue(initialSelectionValue);
+        JDialog frame = pane.createDialog(desktop, "Question");
+        pane.selectInitialValue();
+        frame.setVisible(true);
+        acquireFocus();
+        Object value = pane.getInputValue();
+        return value == UNINITIALIZED_VALUE ? null : (String) value;
+    }
+
+    public static boolean askOption(
+            JDesktopPane desktop,
+            Object message, String title,
+            int optionType, int messageType
+    ) {
+        JOptionPane pane = new JOptionPane(message, messageType, optionType, null, null, null);
+        pane.putClientProperty(new Object(), Boolean.TRUE);
+        JDialog frame = pane.createDialog(desktop, title);
+        pane.selectInitialValue();
+        frame.setVisible(true);
+        acquireFocus();
+        Object selectedValue = pane.getValue();
+        return selectedValue != null && selectedValue instanceof Integer && (Integer) selectedValue == YES_OPTION;
+    }
+
+    private static void acquireFocus() {
+        Component fo = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if (fo != null && fo.isShowing()) fo.requestFocus();
+    }
+
+//    private static void startLWModal(JInternalFrame frame) {
+//        try {
+//            Object obj = AccessController.doPrivileged(new ModalPrivilegedAction(Container.class, "startLWModal"));
+//            if (obj != null) ((Method) obj).invoke(frame, (Object[]) null);
+//        }
+//        catch (Exception ex) {
+//            // ignore
+//        }
+//    }
+//
+//    private static class ModalPrivilegedAction implements PrivilegedAction {
+//        private Class clazz;
+//        private String methodName;
+//
+//        public ModalPrivilegedAction(Class clazz, String methodName) {
+//            this.clazz = clazz;
+//            this.methodName = methodName;
+//        }
+//
+//        public Object run() {
+//            Method method = null;
+//            try {
+//                method = clazz.getDeclaredMethod(methodName, (Class[]) null);
+//            }
+//            catch (NoSuchMethodException ex) {
+//                // ignore
+//            }
+//            if (method != null) method.setAccessible(true);
+//            return method;
+//        }
+//    }
+
+    private void addToList(final String message) {
+        listModel.add(String.format("%s - %s", TIMESTAMP_FORMAT.format(new Date()), message));
+        list.ensureIndexIsVisible(listModel.getSize() - 1);
     }
 
     private static String sanitizeHtml(String string) {
