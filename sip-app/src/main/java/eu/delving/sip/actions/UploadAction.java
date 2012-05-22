@@ -103,15 +103,13 @@ public class UploadAction extends AbstractAction {
         public void run() {
             try {
                 final List<String> freshInvalidPrefixes = sipModel.getDataSetModel().getInvalidPrefixes();
-                if (invalidPrefixes.isEmpty()) {
-                    Exec.swing(new Runnable() {
-                        @Override
-                        public void run() {
-                            invalidPrefixes = freshInvalidPrefixes;
-                            realUploadAction.setEnabled(invalidPrefixes.isEmpty());
-                        }
-                    });
-                }
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        invalidPrefixes = freshInvalidPrefixes;
+                        realUploadAction.setEnabled(invalidPrefixes.isEmpty());
+                    }
+                });
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to fetch invalid prefixes", e);
