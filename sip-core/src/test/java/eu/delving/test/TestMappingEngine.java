@@ -55,14 +55,16 @@ import java.util.TreeMap;
 
 public class TestMappingEngine {
 
+    private XmlSerializer serializer = new XmlSerializer();
+
     @Test
     public void validateTreeNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         MappingEngine mappingEngine = new MappingEngine(mapping("lido"), classLoader(), new MockRecDefModel("lido"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
-        System.out.println(mappingEngine);
+//        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("lido"));
-        System.out.println(XmlSerializer.toXml(result.root()));
+//        System.out.println(serializer.toXml(result.root()));
         Source source = new DOMSource(result.root());
         validator("lido").validate(source);
     }
@@ -76,10 +78,10 @@ public class TestMappingEngine {
                 "icn", "http://www.icn.nl/schemas/icn/"
         ));
         MappingResult result = mappingEngine.execute(input("icn"));
-        System.out.println(XmlSerializer.toXml(result.root()));
-        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
-            System.out.println(entry.getKey() + " -> "+entry.getValue());
-        }
+//        System.out.println(serializer.toXml(result.root()));
+//        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
+//            System.out.println(entry.getKey() + " -> "+entry.getValue());
+//        }
         Source source = new DOMSource(result.root());
         validator("icn").validate(source);
     }
@@ -93,10 +95,10 @@ public class TestMappingEngine {
                 "tib", "http://thuisinbrabant.nl"
         ));
         MappingResult result = mappingEngine.execute(input("tib"));
-        System.out.println(XmlSerializer.toXml(result.root()));
-        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
-            System.out.println(entry.getKey() + " -> "+entry.getValue());
-        }
+        System.out.println(serializer.toXml(result.root()));
+//        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
+//            System.out.println(entry.getKey() + " -> "+entry.getValue());
+//        }
         Source source = new DOMSource(result.root());
         validator("tib").validate(source);
     }
@@ -106,9 +108,9 @@ public class TestMappingEngine {
         MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
-        System.out.println(mappingEngine);
+//        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("aff"));
-        System.out.println(XmlSerializer.toXml(result.root()));
+//        System.out.println(serializer.toXml(result.root()));
     }
 
     @Test
@@ -116,11 +118,11 @@ public class TestMappingEngine {
         MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
                 "lido", "http://www.lido-schema.org"
         ));
-        System.out.println(mappingEngine);
+//        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("aff"));
-        System.out.println(XmlSerializer.toXml(result.root()));
+//        System.out.println(serializer.toXml(result.root()));
         Map<String,List<String>> allFields = result.fields();
-        System.out.println(allFields);
+//        System.out.println(allFields);
         Assert.assertFalse(allFields.isEmpty());
     }
 

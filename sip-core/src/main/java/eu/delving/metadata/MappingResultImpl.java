@@ -22,6 +22,8 @@
 package eu.delving.metadata;
 
 import eu.delving.MappingResult;
+import eu.delving.groovy.XmlSerializer;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -38,6 +40,8 @@ import java.util.TreeMap;
  */
 
 public class MappingResultImpl implements MappingResult {
+    private Logger logger = Logger.getLogger(getClass());
+    private XmlSerializer serializer = new XmlSerializer();
     private Map<String, List<String>> allFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> systemFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> searchFields = new TreeMap<String, List<String>>();
@@ -89,9 +93,12 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    throw new RuntimeException("Attributes not implemented");
+                    logger.warn("Attribute appeared as child of the root node: " + serializer.toXml(node));
+                    break;
                 case Node.TEXT_NODE:
-                    throw new RuntimeException("Text Nodes not implemented");
+                case Node.CDATA_SECTION_NODE:
+                    logger.warn("Text node appeared as child of the root node: " + serializer.toXml(node));
+                    break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
                     String value = getTextFromChildren(kid);
@@ -99,7 +106,7 @@ public class MappingResultImpl implements MappingResult {
                     handleMarkedField(recDefNode, value);
                     break;
                 default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + serializer.toXml(node));
             }
         }
     }
@@ -110,9 +117,12 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    throw new RuntimeException("Attributes not implemented");
+                    logger.warn("Attribute node appeared while resolving AFF: " + serializer.toXml(node));
+                    break;
                 case Node.TEXT_NODE:
-                    throw new RuntimeException("Text Nodes not implemented");
+                case Node.CDATA_SECTION_NODE:
+                    logger.warn("Text node appeared while resolving AFF: " + serializer.toXml(node));
+                    break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
                     if (recDefNode.isLeafElem()) {
@@ -125,7 +135,7 @@ public class MappingResultImpl implements MappingResult {
                     }
                     break;
                 default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + serializer.toXml(node));
             }
         }
     }
@@ -179,7 +189,7 @@ public class MappingResultImpl implements MappingResult {
     private String getTextFromChildren(Node parent) {
         StringBuilder text = new StringBuilder();
         NodeList kids = parent.getChildNodes();
-        for (int walk=0; walk<kids.getLength(); walk++) {
+        for (int walk = 0; walk < kids.getLength(); walk++) {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.TEXT_NODE:

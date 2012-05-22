@@ -113,7 +113,7 @@ public class TestCodeGeneration {
         printWithLineNumbers(mappingRunner.getCode());
         Node node = mappingRunner.runMapping(createInputRecord());
 
-        String xml = XmlSerializer.toXml(node);
+        String xml = new XmlSerializer().toXml(node);
         System.out.println(xml);
         Assert.assertEquals(EXPECT, xml);
     }
@@ -151,7 +151,7 @@ public class TestCodeGeneration {
     }
 
     private static final String EXPECT =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<?xml version='1.0' encoding='UTF-8'?>\n" +
                     "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"backward\">\n" +
                     "    <lido:descriptiveMetadata>\n" +
                     "        <lido:objectClassificationWrap>\n" +

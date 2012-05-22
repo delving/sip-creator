@@ -54,8 +54,8 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
  */
 
 public class SipModel {
-
     private static final Logger LOG = Logger.getLogger(SipModel.class);
+    private XmlSerializer serializer = new XmlSerializer();
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences;
@@ -448,7 +448,7 @@ public class SipModel {
 
                         @Override
                         public void outputInvalid(int recordNumber, Node outputNode, String message) {
-                            String xml = XmlSerializer.toXml(outputNode);
+                            String xml = serializer.toXml(outputNode);
                             validationListener.failed(recordNumber, xml, message);
                         }
 
