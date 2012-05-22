@@ -22,8 +22,6 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.XmlNodePrinter;
-import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
@@ -163,15 +161,15 @@ public class TestMappingValidation {
         assertEquals(ANALYZED_SOURCE, state());
 
         mock.createMapping();
-        System.out.println(mock.mapping());
-        System.out.println();
+//        System.out.println(mock.mapping());
+//        System.out.println();
 
         MetadataParser parser = mock.parser();
         MetadataRecord record = parser.nextRecord();
-        System.out.println(XmlNodePrinter.toXml(record.getRootNode()));
+//        System.out.println(XmlNodePrinter.toXml(record.getRootNode()));
 
         Node node = mock.runMapping(record);
-        System.out.println(XmlSerializer.toXml(node));
+//        System.out.println(new XmlSerializer().toXml(node));
 
         Source source = new DOMSource(node);
         try {

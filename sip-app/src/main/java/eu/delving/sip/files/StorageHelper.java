@@ -171,7 +171,7 @@ public class StorageHelper {
             return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
         }
         else {
-            return findOrCreate(dir, RESULT_STATS.getName(prefix), new PrefixFileFilter(RESULT_STATS), RESULT_STATS);
+            return findOrCreate(dir, RESULT_STATS, prefix);
         }
     }
 
@@ -185,6 +185,13 @@ public class StorageHelper {
         if (fileType.getName() == null) throw new RuntimeException("Expected name");
         File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName()), fileType);
         if (file == null) file = new File(directory, fileType.getName());
+        return file;
+    }
+
+    static File findOrCreate(File directory, Storage.FileType fileType, String prefix) {
+        if (fileType.getName(prefix) == null) throw new RuntimeException("Expected name");
+        File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName(prefix)), fileType);
+        if (file == null) file = new File(directory, fileType.getName(prefix));
         return file;
     }
 
@@ -214,7 +221,7 @@ public class StorageHelper {
 
     static File findLatestHashed(File dir, FileType fileType, String prefix) throws StorageException {
         File latestFile = findLatestFile(dir, fileType, prefix);
-        if (!latestFile.exists()) throw new StorageException("Missing mapping file for "+prefix);
+        if (!latestFile.exists()) throw new StorageException("Missing file "+latestFile.getAbsolutePath());
         try {
             return Hasher.ensureFileHashed(latestFile);
         }
