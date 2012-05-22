@@ -221,8 +221,13 @@ public class UploadAction extends AbstractAction {
                     }
                 });
             }
-            catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to complete uploading", e);
+            catch (final StorageException e) {
+                Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getFeedback().alert("Unable to complete uploading", e);
+                    }
+                });
                 busyUploading = false;
             }
         }
