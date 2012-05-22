@@ -46,7 +46,7 @@ public class XmlSerializer {
         Element element = (Element) node;
         for (Map.Entry<String,String> entry : namespaces.entrySet()) {
             if (entry.getValue().equals(element.getNamespaceURI())) continue;
-            String xmlns = String.format("xmlns:%s", entry.getKey());
+            String xmlns = entry.getKey().isEmpty() ? "xmlns" : String.format("xmlns:%s", entry.getKey());
             if (element.getAttributeNode(xmlns) == null) element.setAttributeNS("http://www.w3.org/2000/xmlns/", xmlns, entry.getValue());
         }
         if (domImplementation.hasFeature("LS", "3.0") && domImplementation.hasFeature("Core", "2.0")) {
