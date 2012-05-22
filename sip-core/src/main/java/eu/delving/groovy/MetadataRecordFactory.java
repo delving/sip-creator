@@ -121,7 +121,12 @@ public class MetadataRecordFactory {
         StringBuilder out = new StringBuilder("<?xml version=\"1.0\"?>\n");
         out.append("<record");
         for (Map.Entry<String, String> namespace : namespaces.entrySet()) {
-            out.append(String.format(" xmlns:%s=\"%s\"", namespace.getKey(), namespace.getValue()));
+            if (namespace.getKey().isEmpty()) {
+                out.append(String.format(" xmlns=\"%s\"", namespace.getValue()));
+            }
+            else {
+                out.append(String.format(" xmlns:%s=\"%s\"", namespace.getKey(), namespace.getValue()));
+            }
         }
         out.append(">");
         out.append(xmlRecord);

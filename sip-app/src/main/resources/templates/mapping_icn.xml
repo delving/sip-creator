@@ -39,6 +39,31 @@
         <node-mapping inputPath="/input/dc:relation" outputPath="/icn:record/dc:relation"/>
         <node-mapping inputPath="/input/dc:coverage" outputPath="/icn:record/dc:coverage"/>
         <node-mapping inputPath="/input/dc:rights" outputPath="/icn:record/dc:rights"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:title" outputPath="/icn:record/dc:title"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:creator" outputPath="/icn:record/dc:creator"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:description" outputPath="/icn:record/dc:description"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:date" outputPath="/icn:record/dc:date"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:type" outputPath="/icn:record/dc:type"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:identifier" outputPath="/icn:record/dc:identifier"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/ese:isShownBy" outputPath="/icn:record/europeana:isShownBy"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/ese:isShownAt" outputPath="/icn:record/europeana:isShownAt">
+            <groovy-code>
+                <string>_eseisShownAt.text()</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:title" outputPath="/icn:record/dc:title"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:creator" outputPath="/icn:record/dc:creator"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:subject" outputPath="/icn:record/dc:subject"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:description" outputPath="/icn:record/dc:description"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:publisher" outputPath="/icn:record/dc:publisher"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:date" outputPath="/icn:record/dc:date"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:format" outputPath="/icn:record/dc:format"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:identifier" outputPath="/icn:record/dc:identifier"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:coverage" outputPath="/icn:record/dc:coverage"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:rights" outputPath="/icn:record/dc:rights"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/ese:isShownBy" outputPath="/icn:record/europeana:object"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/ese:dataProvider" outputPath="/icn:record/europeana:provider" operator="FIRST"/>
+        <node-mapping inputPath="/facts/dataProvider" outputPath="/icn:record/europeana:dataProvider"/>
     </node-mappings>
 
 </rec-mapping>

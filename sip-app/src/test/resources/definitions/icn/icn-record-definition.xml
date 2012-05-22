@@ -9,73 +9,119 @@
         <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
     </namespaces>
 
-    <functions>
-        <mapping-function name="cleanAdlibImageReference">
-            <sample-input>
-                <string>..\..\..\Images PH\OKS 1989-001 [01].JPG</string>
-                <string>../../../Images PH/OKS 1989-001 [01].JPG</string>
-            </sample-input>
-            <groovy-code>
-                <string>it.replaceAll(&apos;; &apos;, &apos;_&apos;).replaceAll(&apos;JPG&apos;, &apos;jpg&apos;).replaceAll(&quot;.*?[\\\\|//]&quot;, &quot;&quot;).replaceAll(&quot; &quot;, &quot;%20&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)</string>
-            </groovy-code>
-        </mapping-function>
-        <mapping-function name="deepZoomUrl">
-            <sample-input>
-                <string>D:/Documents/Schilderij/010.jpg</string>
-            </sample-input>
-            <groovy-code>
-                <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg&apos;,&apos;tif.dzi&apos;)</string>
-                <string>&quot;http://dimcon.delving.org/iip/deepzoom/mnt/dimcon/tiles/${orgId}/${spec}/${image}&quot;</string>
-            </groovy-code>
-        </mapping-function>
-        <mapping-function name="reverseNames">
-            <sample-input>
-                <string>Sjoerd Siebinga</string>
-                <string>Siebinga, Sjoerd</string>
-                <string>Siebinga, Sjoerd Michiel</string>
-            </sample-input>
-            <groovy-code>
-                <string>parts = it.toString().split(&quot;,&quot;)</string>
-                <string>if (parts.length &gt; 1) {</string>
-                <string>&quot;${parts[1].trim()} ${parts[0]}&quot;</string>
-                <string>}</string>
-                <string>else {</string>
-                <string>&quot;${it}&quot;</string>
-                <string>}</string>
-            </groovy-code>
-        </mapping-function>
-        <mapping-function name="toLocalId">
-            <sample-input>
-                <string>1231231</string>
-                <string>232455</string>
-                <string>12345</string>
-            </sample-input>
-            <groovy-code>
-                <string>&quot;${spec}/${it}&quot;</string>
-            </groovy-code>
-        </mapping-function>
-    </functions>
+    <attrs>
+        <attr tag="conceptType"/>
+        <attr tag="schema"/>
+        <attr tag="schemaUri"/>
+        <attr tag="type" hidden="true"/>
+        <attr tag="key" hidden="true"/>
+        <attr tag="localId"/>
+        <attr tag="lang"/>
+        <attr tag="MIME"/>
+        <attr tag="rightsUri"/>
+        <attr tag="roleInEventUri"/>
+        <attr tag="associationUri"/>
+        <attr tag="isoDate"/>
+    </attrs>
 
+    <elems>
+        <elem tag="date" elems="earliestDate, latestDate"/>
+        <elem tag="earliestDate" attrs="isoDate" />
+        <elem tag="latestDate" attrs="isoDate"/>
+    </elems>
 
     <root tag="record">
-        <elem tag="icn:creatorYearOfBirth"/>
-        <elem tag="icn:creatorYearOfDeath"/>
-        <elem tag="icn:creatorRole"/>
-        <elem tag="icn:technique"/>
-        <elem tag="icn:material"/>
-        <elem tag="icn:location"/>
-        <elem tag="icn:province"/>
+        <!--<elem tag="icn:creatorYearOfBirth"/>-->
+        <!--<elem tag="icn:creatorYearOfDeath"/>-->
+        <!--<elem tag="icn:creatorRole"/>-->
+        <!--<elem tag="icn:technique" function="lowercase"/>-->
+        <!--<elem tag="icn:material" function="lowercase"/>-->
+        <!--<elem tag="icn:country" />-->
+
+
+        <!--ADD TO ADMIN for dataprovider-->
+        <elem tag="icn:dataProviderUri"/>
+        <!--<elem tag="icn:municipality"/>-->
+        <!--<elem tag="icn:place"/>-->
+        <!--<elem tag="icn:location" />-->
+        <!--<elem tag="icn:locationType" />-->
+
+        <elem tag="icn:collection"/>
         <elem tag="icn:collectionPart"/>
-        <elem tag="icn:acquisitionMeans"/>
         <elem tag="icn:collectionType"/>
+        <elem tag="icn:acquisitionMeans"/>
         <elem tag="icn:acquisitionYear"/>
         <elem tag="icn:purchasePrice"/>
         <elem tag="icn:acquiredWithHelpFrom"/>
         <elem tag="icn:physicalState"/>
         <elem tag="icn:musipCollectionUri"/>
-        <elem tag="icn:musipCollectionDisplayName" hidden="true"/>
+        <elem tag="icn:musipDisplayCollection" hidden="true"/>
         <elem tag="icn:musipMuseumUri"/>
-        <elem tag="icn:musipMuseumDisplayName" hidden="true"/>
+        <elem tag="icn:musipDisplayMuseum" hidden="true"/>
+        <elem tag="icn:theme" fieldType="string"/>
+
+
+        <elem tag="concepts" singular="true" unmappable="true">
+            <elem tag="concept" attrs="type, key">
+                <elem tag="displayConcept" attrs="conceptType, localId, lang, schema, schemaUri" function="lowercase"/>
+            </elem>
+        </elem>
+
+        <elem tag="resources" singular="true" unmappable="true">
+            <elem tag="resource" attrs="type, key, localId, lang, MIME, rightsUri">
+                <elem tag="resourceUrl"/>
+                <elem tag="displayDescription"/>
+                <elem tag="displayRights"/>
+            </elem>
+        </elem>
+
+        <!--Information used ONH-->
+
+
+        <elem tag="events" singular="true" unmappable="true">
+            <elem tag="event" elems="date" attrs="type, key, lang, schema, schemaUri">
+                <elem tag="displayDate" attrs="isoDate"/>
+                <elem tag="displayEvent"/>
+                <elem tag="displayPeriod"/>
+                <elem tag="displayMethod"/>
+                <elem tag="displayDescription"/>
+
+                <elem tag="eventActor" attrs="type, key, roleInEventUri, localId, schema, schemaUri">
+                    <elem tag="displayRoleInEvent"/>
+                    <elem tag="displayActor"/>
+                    <elem tag="displayNationality"/>
+                    <elem tag="displayDescription"/>
+
+                    <elem tag="relatedEvent" attrs="type, key">
+                        <elem tag="displayDate" attrs="isoDate"/>
+                        <elem tag="displayEvent"/>
+                        <elem tag="displayDescription"/>
+
+                        <elem tag="relatedEventPlace" attrs="type, key, localId, schema, schemaUri" unmappable="true">
+                            <elem tag="displayPlace"/>
+                            <elem tag="lat"/>
+                            <elem tag="long"/>
+                            <elem tag="locationGeoHash" hidden="true"/>
+                        </elem>
+                    </elem>
+                </elem>
+
+                <elem tag="eventPlace" attrs="type, key, roleInEventUri, localId, schema, schemaUri">
+                    <elem tag="displayRoleInEvent"/>
+                    <elem tag="displayPlace"/>
+                    <elem tag="displayDescription"/>
+                    <elem tag="lat"/>
+                    <elem tag="long"/>
+                    <elem tag="locationGeoHash"  hidden="true"/>
+                </elem>
+
+                <elem tag="eventSubject" attrs="type, key, associationUri, localId, schema, schemaUri">
+                    <elem tag="displayAssociation"/>
+                    <elem tag="displayDate"/>
+                    <elem tag="displaySubject"/>
+                </elem>
+            </elem>
+        </elem>
 
         <elem tag="dc:title" />                    <!-- ESE 3.4 -->
         <elem tag="dc:creator" />                <!-- ESE 3.4 -->
@@ -117,8 +163,8 @@
         <elem tag="dcterms:rightsHolder"/>                             <!-- NOT part of ESE 3.4 -->
 
 
-        <elem tag="europeana:isShownBy" fieldType="link"/>                              <!-- ESE 3.4 -->
         <elem tag="europeana:rights"/>                                 <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownBy" fieldType="link"/>                              <!-- ESE 3.4 -->
         <elem tag="europeana:isShownAt" fieldType="link" operator="FIRST"/>  <!-- ESE 3.4 -->
         <elem tag="europeana:unstored"/>                               <!-- ESE 3.4 -->
         <elem tag="europeana:object" fieldType="link"/>        <!-- ESE 3.4 -->
@@ -136,23 +182,140 @@
 
         <!-- original delving namespace -->
         <elem tag="delving:year"/>
-        <elem tag="delving:thumbnail" fieldType="link"/>
-        <elem tag="delving:deepZoomUrl" fieldType="link"/>
-        <elem tag="delving:fullTextObjectUrl" fieldType="link"/>
-        <elem tag="delving:fullText"/>
+        <!--<elem tag="delving:thumbnail" fieldType="link"/>-->
+        <!--<elem tag="delving:deepZoomUrl" fieldType="link"/>-->
+        <!--<elem tag="delving:fullTextObjectUrl" fieldType="link"/>-->
+        <!--<elem tag="delving:fullText"/>-->
 
     </root>
+
+
+    <opts>
+          <!--<opt-list path="/record/events/event" key="@key" value="@type" schema="@schema" schemaUri="@schemaUri" displayName="Events">-->
+              <!--<opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production" value="Production"/>-->
+              <!--<opt hidden="true" key="cc_association" schema="culturecloud" schemaUri="" value="Association"/>-->
+          <!--</opt-list>-->
+
+          <opt-list path="/record/concepts/concept" key="@key" value="@type" displayName="Concepts">
+              <opt hidden="true" key="cc_obj_name" schema="cultureclud" schemaUri="http://id.culturecloud.eu/concepts/#objectName" value="Object name"/>
+              <opt hidden="true" key="cc_classification" schema="cultureclud" schemaUri="http://id.culturecloud.eu/concepts/#classification" value="Classification"/>
+              <opt hidden="true" key="crm_p129b" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/P129B.is_subject_of" value="Subject"/>
+              <opt hidden="true" key="crm_e57" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E57.Material" value="Material"/>
+              <opt hidden="true" key="crm_p32f" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/P32F_used_general_technique" value="Technique"/>
+              <opt hidden="true" key="cc_motif" schema="culturecloud" schemaUri="http://id.culturecloud.eu/concepts/#motif" value="Motif"/>
+          </opt-list>
+
+        <!--afbeeldingen, videos, audio, documenten-->
+        <opt-list path="/record/resources/resource" key="@key" value="@type" displayName="Resources">
+            <opt key="thumbnail" schema="culturecloud" schemaUri="http://id.culturecloud.eu/concepts/#thumbnail" value="Thumbnail"/>
+            <opt key="fullImage" schema="culturecloud" schemaUri="http://id.culturecloud.eu/concepts/#fullImage" value="Full image"/>
+            <opt key="landingPage" schema="culturecloud" schemaUri="http://id.culturecloud.eu/concepts/#landingPage" value="Landing page"/>
+            <opt hidden="true" key="deepZoomImage" schema="culturecloud" schemaUri="http://id.culturecloud.eu/concepts/#deepZoom" value="Deep zoom image"/>
+            <opt hidden="true" key="documentFile" schema="culturecloud" schemaUri="http://id.culturecloud.eu/concepts/#document" value="Document file"/>
+            <opt hidden="true" key="videoFile" schema="culturecloud" schemaUri="http://id.culturecloud.eu/concepts/#video" value="Video file"/>
+            <opt hidden="true" key="audioFile" schema="culturecloud" schemaUri="http://id.culturecloud.eu/concepts/#audio" value="Audio file"/>
+        </opt-list>
+
+        <opt-list path="/record/events/event" key="@key" value="@type" schema="@schema" schemaUri="@schemaUri" displayName="Events">
+            <opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production" value="Production"/>
+            <opt hidden="true" key="cc_association" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Association" value="Association"/>
+            <opt hidden="true" key="crm_e65" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E65.Creation" value="Creation"/>
+            <opt hidden="true" key="crm_e8" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E8.Acquisition" value="Acquisition"/>
+            <!--<opt hidden="true" key="crm_e16" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E16.Measurement" value="Measurement"/>-->
+            <!--<opt hidden="true" key="crm_e67" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E67.Birth" value="Birth"/>-->
+            <!--<opt hidden="true" key="crm_e69" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E69.Death" value="Death"/>-->
+            <!--<opt hidden="true" key="crm_e6" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E6.Destruction" value="Destruction"/>-->
+            <!--<opt hidden="true" key="crm_e9" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E9.Move" value="Move"/>-->
+            <!--<opt hidden="true" key="crm_e10" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E10.Transfer_of_Custody" value="TransferOfCustody"/>-->
+            <!--<opt hidden="true" key="crm_e14" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E14.Condition_Assessment" value="ConditionAssessment"/>-->
+            <!--<opt hidden="true" key="crm_e66" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E66.Formation" value="Formation"/>-->
+            <!--<opt hidden="true" key="crm_e85" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E85.Joining" value="Joining"/>-->
+            <!--<opt hidden="true" key="crm_e86" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E86.Leaving" value="Leaving"/>-->
+            <!--<opt hidden="true" key="frbr_f30" schema="cidoc-crm" schemaUri="http://www.??????????/rdfs/F30.Publication_Event" value="PublicationEvent"/>-->
+            <!--&lt;!&ndash; FRBRoo namespace in mid June 2012&ndash;&gt;-->
+            <!--<opt hidden="true" key="frbr_f31" schema="cidoc-crm" schemaUri="http://www.??????????.org/rdfs/F31.Performance" value="Performance"/>-->
+            <!--&lt;!&ndash; FRBRoo namespace in mid June 2012&ndash;&gt;-->
+            <!--<opt hidden="true" key="cc_collecting" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Collecting" value="Collecting"/>-->
+            <!--<opt hidden="true" key="cc_commissioning" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Commissioning" value="Commissioning"/>-->
+            <!--<opt hidden="true" key="cc_designing" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Designing" value="Designing"/>-->
+            <!--<opt hidden="true" key="cc_excavation" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Excavation" value="Excavation"/>-->
+            <!--<opt hidden="true" key="cc_exhibition" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Exhibition" value="Exhibition"/>-->
+            <!--<opt hidden="true" key="cc_finding" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Finding" value="Finding"/>-->
+            <!--<opt hidden="true" key="cc_loss" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Loss" value="Loss"/>-->
+            <!--<opt hidden="true" key="cc_use" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Use" value="Use"/>-->
+            <!--<opt hidden="true" key="cc_meeting" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#meeting" value="Meeting"/>-->
+        </opt-list>
+
+
+      </opts>
+
+    <functions>
+            <mapping-function name="cleanAdlibImageReference">
+                <sample-input>
+                    <string>..\..\..\Images PH\OKS 1989-001 [01].JPG</string>
+                    <string>../../../Images PH/OKS 1989-001 [01].JPG</string>
+                </sample-input>
+                <groovy-code>
+                    <string>it.replaceAll(&apos;; &apos;, &apos;_&apos;).replaceAll(&apos;JPG&apos;, &apos;jpg&apos;).replaceAll(&quot;.*?[\\\\|//]&quot;, &quot;&quot;).replaceAll(&quot; &quot;, &quot;%20&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)</string>
+                </groovy-code>
+            </mapping-function>
+            <mapping-function name="deepZoomUrl">
+                <sample-input>
+                    <string>D:/Documents/Schilderij/010.jpg</string>
+                </sample-input>
+                <groovy-code>
+                    <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg&apos;,&apos;tif.dzi&apos;)</string>
+                    <string>&quot;http://dimcon.delving.org/iip/deepzoom/mnt/dimcon/tiles/${orgId}/${spec}/${image}&quot;</string>
+                </groovy-code>
+            </mapping-function>
+            <mapping-function name="reverseNames">
+                <sample-input>
+                    <string>Sjoerd Siebinga</string>
+                    <string>Siebinga, Sjoerd</string>
+                    <string>Siebinga, Sjoerd Michiel</string>
+                </sample-input>
+                <groovy-code>
+                    <string>parts = it.toString().split(&quot;,&quot;)</string>
+                    <string>if (parts.length &gt; 1) {</string>
+                    <string>&quot;${parts[1].trim()} ${parts[0]}&quot;</string>
+                    <string>}</string>
+                    <string>else {</string>
+                    <string>&quot;${it}&quot;</string>
+                    <string>}</string>
+                </groovy-code>
+            </mapping-function>
+            <mapping-function name="toLocalId">
+                <sample-input>
+                    <string>1231231</string>
+                    <string>232455</string>
+                    <string>12345</string>
+                </sample-input>
+                <groovy-code>
+                    <string>&quot;${spec}/${it}&quot;</string>
+                </groovy-code>
+            </mapping-function>
+            <mapping-function name="lowercase">
+                <sample-input>
+                    <string>Bla bla</string>
+                    <string>BLA bla bla</string>
+                </sample-input>
+                <groovy-code>
+                    <string>&quot;${it.toString().toLowerCase()}&quot;</string>
+                </groovy-code>
+            </mapping-function>
+        </functions>
+
 
     <field-markers>
         <field-marker name="CREATOR" path="/record/dc:creator"/>
         <field-marker name="TITLE" path="/record/dc:title"/>
         <field-marker name="DESCRIPTION" path="/record/dc:description"/>
         <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
-        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
-        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
-        <field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>
+        <!--<field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>-->
+        <!--<field-marker name="THUMBNAIL" path="/record/europeana:object"/>-->
+        <!--<field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>-->
 
-        <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
+        <!--<field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>-->
         <field-marker type="search" name="SNIPPET" path="/record/dc:subject"/>
         <field-marker type="search" name="SNIPPET" path="/record/dcterms:alternative"/>
         <field-marker type="search" name="SNIPPET" path="/record/europeana:collectionTitle"/>

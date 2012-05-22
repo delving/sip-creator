@@ -110,6 +110,7 @@ public class SourceConverter {
                         out.add(eventFactory.createCharacters("\n"));
                         List<Namespace> nslist = new ArrayList<Namespace>();
                         for (Map.Entry<String, String> entry : namespaces.entrySet()) {
+                            if (entry.getValue().trim().isEmpty()) continue;
                             nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
                         }
                         out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
@@ -136,7 +137,7 @@ public class SourceConverter {
                             }
                             else {
                                 if (!uniqueElementPath.peek().isAttribute() && path.equals(uniqueElementPath)) {
-                                    unique = StringUtils.join(lines,"");
+                                    unique = StringUtils.join(lines, "");
                                 }
                                 switch (lines.size()) {
                                     case 0:
@@ -189,19 +190,21 @@ public class SourceConverter {
 
     private void outputRecord(XMLEventWriter out) throws XMLStreamException {
         String uniqueValue = getUniqueValue();
-        if (uniqueness.contains(uniqueValue)) {
-            uniqueRepeatCount++;
-        }
-        else {
-            uniqueness.add(uniqueValue);
-            Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
-            unique = null;
-            List<Attribute> attrs = new ArrayList<Attribute>();
-            attrs.add(id);
-            out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
-            for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
-            out.add(eventFactory.createEndElement("", "", RECORD_TAG));
-            out.add(eventFactory.createCharacters("\n"));
+        if (!uniqueValue.isEmpty()) {
+            if (uniqueness.contains(uniqueValue)) {
+                uniqueRepeatCount++;
+            }
+            else {
+                uniqueness.add(uniqueValue);
+                Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
+                unique = null;
+                List<Attribute> attrs = new ArrayList<Attribute>();
+                attrs.add(id);
+                out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
+                for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
+                out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                out.add(eventFactory.createCharacters("\n"));
+            }
         }
         clearEvents();
     }
@@ -209,7 +212,9 @@ public class SourceConverter {
     private String getUniqueValue() {
         String trimmed = unique.trim().replaceAll(":", "-");
         String modified = converterPattern != null ? converterPattern.matcher(trimmed).replaceFirst(converterReplacement) : trimmed;
-        if (modified.length() > maxUniqueValueLength) throw new IllegalArgumentException("Unique value too large: "+unique);
+        if (modified.length() > maxUniqueValueLength) {
+            throw new IllegalArgumentException("Unique value too large: " + unique);
+        }
         return TO_UNDERSCORE.matcher(modified).replaceAll("_");
     }
 
