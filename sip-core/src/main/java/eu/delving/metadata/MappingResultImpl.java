@@ -41,6 +41,7 @@ import java.util.TreeMap;
 
 public class MappingResultImpl implements MappingResult {
     private Logger logger = Logger.getLogger(getClass());
+    private XmlSerializer serializer = new XmlSerializer();
     private Map<String, List<String>> allFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> systemFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> searchFields = new TreeMap<String, List<String>>();
@@ -92,11 +93,11 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    logger.warn("Attribute appeared as child of the root node: " + XmlSerializer.toXml(node));
+                    logger.warn("Attribute appeared as child of the root node: " + serializer.toXml(node));
                     break;
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    logger.warn("Text node appeared as child of the root node: " + XmlSerializer.toXml(node));
+                    logger.warn("Text node appeared as child of the root node: " + serializer.toXml(node));
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
@@ -105,7 +106,7 @@ public class MappingResultImpl implements MappingResult {
                     handleMarkedField(recDefNode, value);
                     break;
                 default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType()+"\n"+XmlSerializer.toXml(node));
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + serializer.toXml(node));
             }
         }
     }
@@ -116,11 +117,11 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    logger.warn("Attribute node appeared while resolving AFF: " + XmlSerializer.toXml(node));
+                    logger.warn("Attribute node appeared while resolving AFF: " + serializer.toXml(node));
                     break;
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    logger.warn("Text node appeared while resolving AFF: " + XmlSerializer.toXml(node));
+                    logger.warn("Text node appeared while resolving AFF: " + serializer.toXml(node));
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
@@ -134,7 +135,7 @@ public class MappingResultImpl implements MappingResult {
                     }
                     break;
                 default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType()+"\n"+XmlSerializer.toXml(node));
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + serializer.toXml(node));
             }
         }
     }

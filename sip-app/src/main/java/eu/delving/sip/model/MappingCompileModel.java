@@ -57,6 +57,7 @@ import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
 public class MappingCompileModel {
     public final static int RUN_DELAY = 100;
     public final static int COMPILE_DELAY = 500;
+    private XmlSerializer serializer = new XmlSerializer();
     private RecMapping recMapping;
     private NodeMapping nodeMapping;
     private MetadataRecord metadataRecord;
@@ -278,7 +279,7 @@ public class MappingCompileModel {
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
                     if (node == null) return;
-                    String output = XmlSerializer.toXml(node);
+                    String output = serializer.toXml(node);
                     if (validator != null) {
                         ForgivingErrorHandler handler = new ForgivingErrorHandler();
                         validator.setErrorHandler(handler);

@@ -53,6 +53,7 @@ import java.util.BitSet;
 public class FileProcessor implements Runnable {
     public static final String OUTPUT_FILE_PREF = "outputFile";
     private static final Logger LOG = Logger.getLogger(FileProcessor.class);
+    private XmlSerializer serializer = new XmlSerializer();
     private SipModel sipModel;
     private GroovyCodeResource groovyCodeResource;
     private ProgressListener progressListener;
@@ -139,7 +140,7 @@ public class FileProcessor implements Runnable {
                     }
                     catch (SAXException e) {
                         invalidCount++;
-                        reportWriter.println(XmlSerializer.toXml(outputNode));
+                        reportWriter.println(serializer.toXml(outputNode));
                         reportWriter.println("=========");
                         if (!allowInvalid) {
                             abort();
