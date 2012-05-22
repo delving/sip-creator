@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="ese">
+
+    <!--Copying node mappings to this list will make them appear as candidate mappings when-->
+    <!--the prefix corresponds to the target format and the inputPath matches one of the-->
+    <!--input paths in the source analysis.-->
+    <functions>
+    </functions>
+
+    <node-mappings>
+        <node-mapping inputPath="/input/dc:title" outputPath="/europeana:record/dc:title"/>
+        <node-mapping inputPath="/input/dc:creator" outputPath="/europeana:record/dc:creator"/>
+        <node-mapping inputPath="/input/dc:subject" outputPath="/europeana:record/dc:subject"/>
+        <node-mapping inputPath="/input/dc:description" outputPath="/europeana:record/dc:description"/>
+        <node-mapping inputPath="/input/dc:publisher" outputPath="/europeana:record/dc:publisher"/>
+        <node-mapping inputPath="/input/dc:contributor" outputPath="/europeana:record/dc:contributor"/>
+        <node-mapping inputPath="/input/dc:date" outputPath="/europeana:record/dc:date"/>
+        <node-mapping inputPath="/input/dc:type" outputPath="/europeana:record/dc:type"/>
+        <node-mapping inputPath="/input/dc:format" outputPath="/europeana:record/dc:format"/>
+        <node-mapping inputPath="/input/dc:identifier" outputPath="/europeana:record/dc:identifier"/>
+        <node-mapping inputPath="/input/dc:language" outputPath="/europeana:record/dc:language"/>
+        <node-mapping inputPath="/input/dc:relation" outputPath="/europeana:record/dc:relation"/>
+        <node-mapping inputPath="/input/dc:coverage" outputPath="/europeana:record/dc:coverage"/>
+        <node-mapping inputPath="/input/dc:rights" outputPath="/europeana:record/dc:rights"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:title" outputPath="/europeana:record/dc:title"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:creator" outputPath="/europeana:record/dc:creator"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:description" outputPath="/europeana:record/dc:description"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:date" outputPath="/europeana:record/dc:date"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:type" outputPath="/europeana:record/dc:type"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/dc:identifier" outputPath="/europeana:record/dc:identifier"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/ese:isShownBy" outputPath="/europeana:record/europeana:isShownBy"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/ese:isShownAt" outputPath="/europeana:record/europeana:isShownAt">
+            <groovy-code>
+                <string>_eseisShownAt.text()</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/ese:isShownBy" outputPath="/europeana:record/europeana:object"/>
+        <node-mapping inputPath="/input/oai:metadata/ese:record/ese:dataProvider" outputPath="/europeana:record/europeana:provider" operator="FIRST"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:coverage" outputPath="/europeana:record/dc:title"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:creator" outputPath="/europeana:record/dc:creator"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:description" outputPath="/europeana:record/dc:description"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:date" outputPath="/europeana:record/dc:date"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:identifier" outputPath="/europeana:record/dc:identifier"/>
+        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:rights" outputPath="/europeana:record/dc:rights"/>
+        <node-mapping inputPath="/input/header/identifier" outputPath="/europeana:record/europeana:uri"/>
+    </node-mappings>
+
+</rec-mapping>

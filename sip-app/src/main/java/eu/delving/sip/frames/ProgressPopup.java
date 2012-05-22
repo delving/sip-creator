@@ -22,6 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressListener;
 
 import javax.swing.*;
@@ -31,51 +32,44 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static eu.delving.sip.base.FrameBase.Which.PROGRESS;
+
 /**
  * Provide a popped-up progress bar
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class ProgressPopup implements ProgressListener {
+public class ProgressPopup extends FrameBase implements ProgressListener {
     private BoundedRangeModel boundedRangeModel = new DefaultBoundedRangeModel();
     private JProgressBar progressBar = new JProgressBar(boundedRangeModel);
     private JLabel messageLabel = new JLabel("<html>Progress</html>");
     private String progressMessage, indeterminateMessage;
-    private JDialog dialog;
     private long lastProgress;
     private volatile boolean cancel;
     private List<End> ends = new ArrayList<End>();
     private Timer showTimer = new Timer(200, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (!cancel) dialog.setVisible(true);
+            if (!cancel) openFrame();
         }
     });
 
-    public ProgressPopup(Component parent, String title) {
+    public ProgressPopup(JDesktopPane desktop, String title) {
+        super(PROGRESS, desktop, null, title, true);
         this.showTimer.setRepeats(false);
-        this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), title, Dialog.ModalityType.APPLICATION_MODAL);
-        JButton cancelButton = new JButton("Cancel");
-        JPanel bp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bp.add(cancelButton);
-        cancelButton.addActionListener(new ActionListener() {
+        final Dimension all = desktop.getSize();
+        setPlacement(new Placement() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                cancel = true;
-                showTimer.stop();
-                dialog.setVisible(false);
+            public Point getLocation() {
+                return new Point(all.width/8, 200);
+            }
+
+            @Override
+            public Dimension getSize() {
+                return new Dimension(all.width*6/8, 250);
             }
         });
-        JPanel p = new JPanel(new GridLayout(0, 1));
-        p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        p.add(messageLabel);
-        p.add(progressBar);
-        p.add(bp);
-        this.dialog.getContentPane().add(p);
-        Dimension all = parent.getSize();
-        this.dialog.setLocation(all.width / 4, 100);
-        this.dialog.setSize(all.width / 2, 150);
     }
 
     @Override
@@ -140,7 +134,7 @@ public class ProgressPopup implements ProgressListener {
             public void run() {
                 cancel = true;
                 showTimer.stop();
-                if (dialog.isVisible()) dialog.setVisible(false);
+                closeFrame();
                 for (End end : ends) end.finished(ProgressPopup.this, success);
             }
         });
@@ -149,5 +143,26 @@ public class ProgressPopup implements ProgressListener {
     @Override
     public void onFinished(End end) {
         this.ends.add(end);
+    }
+
+    @Override
+    protected void buildContent(Container content) {
+        JButton cancelButton = new JButton("Cancel");
+        JPanel bp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bp.add(cancelButton);
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                cancel = true;
+                showTimer.stop();
+                setVisible(false);
+            }
+        });
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        p.add(messageLabel);
+        p.add(progressBar);
+        p.add(bp);
+        content.add(p);
     }
 }
