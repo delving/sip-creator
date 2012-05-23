@@ -318,7 +318,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
             }
         }
         else { // path should never be empty
-            Operator operator = (path.size() == 2) ? nodeMapping.getOperator() : Operator.ALL;
+            Operator operator = nodeMapping.getOperator();
+            if (path.size() > 2 && operator != Operator.FIRST) operator = Operator.ALL;
             String param = toLoopGroovyParam(path);
             if (groovyParams.contains(param)) {
                 toNodeMappingLoop(codeOut, false, nodeMapping, path.withRootRemoved(), groovyParams, editPath);

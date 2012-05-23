@@ -24,7 +24,6 @@ package eu.delving.test;
 import eu.delving.MappingEngine;
 import eu.delving.MappingResult;
 import eu.delving.groovy.MappingException;
-import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
@@ -55,8 +54,6 @@ import java.util.TreeMap;
 
 public class TestMappingEngine {
 
-    private XmlSerializer serializer = new XmlSerializer();
-
     @Test
     public void validateTreeNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         MappingEngine mappingEngine = new MappingEngine(mapping("lido"), classLoader(), new MockRecDefModel("lido"), namespaces(
@@ -64,7 +61,7 @@ public class TestMappingEngine {
         ));
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("lido"));
-//        System.out.println(serializer.toXml(result.root()));
+//        System.out.println(result);
         Source source = new DOMSource(result.root());
         validator("lido").validate(source);
     }
@@ -78,7 +75,7 @@ public class TestMappingEngine {
                 "icn", "http://www.icn.nl/schemas/icn/"
         ));
         MappingResult result = mappingEngine.execute(input("icn"));
-//        System.out.println(serializer.toXml(result.root()));
+        System.out.println(result);
 //        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
 //            System.out.println(entry.getKey() + " -> "+entry.getValue());
 //        }
@@ -95,7 +92,7 @@ public class TestMappingEngine {
                 "tib", "http://thuisinbrabant.nl"
         ));
         MappingResult result = mappingEngine.execute(input("tib"));
-        System.out.println(serializer.toXml(result.root()));
+        System.out.println(result);
 //        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
 //            System.out.println(entry.getKey() + " -> "+entry.getValue());
 //        }
