@@ -98,11 +98,10 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    logger.warn("Attribute appeared as child of the root node: " + this);
+                    logger.warn("Attribute appeared as child of the root node: " + kid.getNodeName());
                     break;
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    logger.warn("Text node appeared as child of the root node: " + this);
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
@@ -111,7 +110,7 @@ public class MappingResultImpl implements MappingResult {
                     handleMarkedField(recDefNode, value);
                     break;
                 default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + this);
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
             }
         }
     }
@@ -122,11 +121,10 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    logger.warn("Attribute node appeared while resolving AFF: " + this);
+                    logger.warn("Attribute node appeared while resolving AFF: " + kid.getNodeName());
                     break;
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    logger.warn("Text node appeared while resolving AFF: " + this);
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
@@ -140,7 +138,7 @@ public class MappingResultImpl implements MappingResult {
                     }
                     break;
                 default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + this);
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
             }
         }
     }
