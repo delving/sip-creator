@@ -39,6 +39,7 @@ import java.util.Map;
  */
 
 public class MappingEngine {
+    private XmlSerializer serializer = new XmlSerializer();
     private MetadataRecordFactory metadataRecordFactory;
     private MappingRunner mappingRunner;
 
@@ -51,7 +52,7 @@ public class MappingEngine {
 
     public MappingResult execute(String recordXML) throws XMLStreamException, MappingException {
         MetadataRecord metadataRecord = metadataRecordFactory.fromXml(recordXML);
-        return new MappingResultImpl(mappingRunner.runMapping(metadataRecord), mappingRunner.getRecDefTree()).resolve();
+        return new MappingResultImpl(serializer, mappingRunner.runMapping(metadataRecord), mappingRunner.getRecDefTree()).resolve();
     }
 
     public String toString() {

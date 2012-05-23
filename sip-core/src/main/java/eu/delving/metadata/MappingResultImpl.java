@@ -41,14 +41,15 @@ import java.util.TreeMap;
 
 public class MappingResultImpl implements MappingResult {
     private Logger logger = Logger.getLogger(getClass());
-    private XmlSerializer serializer = new XmlSerializer();
+    private XmlSerializer serializer;
     private Map<String, List<String>> allFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> systemFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> searchFields = new TreeMap<String, List<String>>();
     private Node node;
     private RecDefTree recDefTree;
 
-    public MappingResultImpl(Node node, RecDefTree recDefTree) {
+    public MappingResultImpl(XmlSerializer serializer, Node node, RecDefTree recDefTree) {
+        this.serializer = serializer;
         this.node = node;
         this.recDefTree = recDefTree;
     }
@@ -83,6 +84,10 @@ public class MappingResultImpl implements MappingResult {
         return this;
     }
 
+    public String toString() {
+        return serializer.toXml(node);
+    }
+
     private void resolveAFFRecord() {
         resolveAFFRecord((Element) node);
     }
@@ -93,11 +98,11 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    logger.warn("Attribute appeared as child of the root node: " + serializer.toXml(node));
+                    logger.warn("Attribute appeared as child of the root node: " + this);
                     break;
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    logger.warn("Text node appeared as child of the root node: " + serializer.toXml(node));
+                    logger.warn("Text node appeared as child of the root node: " + this);
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
@@ -106,7 +111,7 @@ public class MappingResultImpl implements MappingResult {
                     handleMarkedField(recDefNode, value);
                     break;
                 default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + serializer.toXml(node));
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + this);
             }
         }
     }
@@ -117,11 +122,11 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    logger.warn("Attribute node appeared while resolving AFF: " + serializer.toXml(node));
+                    logger.warn("Attribute node appeared while resolving AFF: " + this);
                     break;
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    logger.warn("Text node appeared while resolving AFF: " + serializer.toXml(node));
+                    logger.warn("Text node appeared while resolving AFF: " + this);
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
@@ -135,7 +140,7 @@ public class MappingResultImpl implements MappingResult {
                     }
                     break;
                 default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + serializer.toXml(node));
+                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType() + "\n" + this);
             }
         }
     }
@@ -199,28 +204,5 @@ public class MappingResultImpl implements MappingResult {
             }
         }
         return text.toString();
-    }
-
-    private void dump(Node node, int level) {
-        NodeList childNodes = node.getChildNodes();
-        for (int walk = 0; walk < childNodes.getLength(); walk++) {
-            Node child = childNodes.item(walk);
-            String type = "?";
-            switch (child.getNodeType()) {
-                case Node.ATTRIBUTE_NODE:
-                    type = "attr";
-                    break;
-                case Node.ELEMENT_NODE:
-                    type = "elem";
-                    break;
-                case Node.TEXT_NODE:
-                    type = "text";
-                    break;
-            }
-            for (int count = 0; count < level; count++) System.out.print('\t');
-            String string = String.format("%d: %s: %s = %s", level, type, child.getNodeName(), child.getNodeValue());
-            System.out.println(string);
-            dump(child, level + 1);
-        }
     }
 }
