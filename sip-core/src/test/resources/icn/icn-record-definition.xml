@@ -9,6 +9,54 @@
         <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
     </namespaces>
 
+    <functions>
+        <mapping-function name="cleanAdlibImageReference">
+            <sample-input>
+                <string>..\..\..\Images PH\OKS 1989-001 [01].JPG</string>
+                <string>../../../Images PH/OKS 1989-001 [01].JPG</string>
+            </sample-input>
+            <groovy-code>
+                <string>it.replaceAll(&apos;; &apos;, &apos;_&apos;).replaceAll(&apos;JPG&apos;, &apos;jpg&apos;).replaceAll(&quot;.*?[\\\\|//]&quot;, &quot;&quot;).replaceAll(&quot; &quot;, &quot;%20&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="deepZoomUrl">
+            <sample-input>
+                <string>D:/Documents/Schilderij/010.jpg</string>
+            </sample-input>
+            <groovy-code>
+                <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg&apos;,&apos;tif.dzi&apos;)</string>
+                <string>&quot;http://dimcon.delving.org/iip/deepzoom/mnt/dimcon/tiles/${orgId}/${spec}/${image}&quot;</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="reverseNames">
+            <sample-input>
+                <string>Sjoerd Siebinga</string>
+                <string>Siebinga, Sjoerd</string>
+                <string>Siebinga, Sjoerd Michiel</string>
+            </sample-input>
+            <groovy-code>
+                <string>parts = it.toString().split(&quot;,&quot;)</string>
+                <string>if (parts.length &gt; 1) {</string>
+                <string>&quot;${parts[1].trim()} ${parts[0]}&quot;</string>
+                <string>}</string>
+                <string>else {</string>
+                <string>&quot;${it}&quot;</string>
+                <string>}</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="toLocalId">
+            <sample-input>
+                <string>1231231</string>
+                <string>232455</string>
+                <string>12345</string>
+            </sample-input>
+            <groovy-code>
+                <string>&quot;${spec}/${it}&quot;</string>
+            </groovy-code>
+        </mapping-function>
+    </functions>
+
+
     <root tag="record">
         <elem tag="icn:creatorYearOfBirth"/>
         <elem tag="icn:creatorYearOfDeath"/>
@@ -24,11 +72,15 @@
         <elem tag="icn:purchasePrice"/>
         <elem tag="icn:acquiredWithHelpFrom"/>
         <elem tag="icn:physicalState"/>
+        <elem tag="icn:musipCollectionUri"/>
+        <elem tag="icn:musipCollectionDisplayName" hidden="true"/>
+        <elem tag="icn:musipMuseumUri"/>
+        <elem tag="icn:musipMuseumDisplayName" hidden="true"/>
 
-        <elem tag="dc:title" summaryField="TITLE"/>                    <!-- ESE 3.4 -->
-        <elem tag="dc:creator" summaryField="CREATOR"/>                <!-- ESE 3.4 -->
+        <elem tag="dc:title" />                    <!-- ESE 3.4 -->
+        <elem tag="dc:creator" />                <!-- ESE 3.4 -->
         <elem tag="dc:subject"/>                                       <!-- ESE 3.4 -->
-        <elem tag="dc:description" summaryField="DESCRIPTION"/>        <!-- ESE 3.4 -->
+        <elem tag="dc:description" />        <!-- ESE 3.4 -->
         <elem tag="dc:publisher"/>                                     <!-- ESE 3.4 -->
         <elem tag="dc:contributor"/>                                   <!-- ESE 3.4 -->
         <elem tag="dc:date"/>                                          <!-- ESE 3.4 -->
@@ -65,17 +117,17 @@
         <elem tag="dcterms:rightsHolder"/>                             <!-- NOT part of ESE 3.4 -->
 
 
-        <elem tag="europeana:isShownBy"/>                              <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownBy" fieldType="link"/>                              <!-- ESE 3.4 -->
         <elem tag="europeana:rights"/>                                 <!-- ESE 3.4 -->
-        <elem tag="europeana:isShownAt" summaryField="LANDING_PAGE"/>  <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt" fieldType="link" operator="FIRST"/>  <!-- ESE 3.4 -->
         <elem tag="europeana:unstored"/>                               <!-- ESE 3.4 -->
-        <elem tag="europeana:object" summaryField="THUMBNAIL"/>        <!-- ESE 3.4 -->
-        <elem tag="europeana:provider" summaryField="PROVIDER"/>       <!-- ESE 3.4 -->
-        <elem tag="europeana:dataProvider" summaryField="OWNER"/>      <!-- ESE 3.4 -->
+        <elem tag="europeana:object" fieldType="link"/>        <!-- ESE 3.4 -->
+        <elem tag="europeana:provider" />       <!-- ESE 3.4 -->
+        <elem tag="europeana:dataProvider" />      <!-- ESE 3.4 -->
         <elem tag="europeana:type"/>                                   <!-- ESE 3.4 -->
 
         <!-- moved from europeana to delving -->
-        <elem tag="europeana:uri"/>                                    <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
+        <elem tag="europeana:uri" function="toLocalId" operator="FIRST"/>                                    <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
         <elem tag="europeana:language"/>                               <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:country"/>                                <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
         <elem tag="europeana:collectionName"/>                         <!-- NOT part of ESE 3.4 -->
@@ -84,18 +136,14 @@
 
         <!-- original delving namespace -->
         <elem tag="delving:year"/>
-        <elem tag="delving:thumbnail"/>
-        <elem tag="delving:deepZoomUrl"/>
-        <elem tag="delving:fullTextObjectUrl"/>
+        <elem tag="delving:thumbnail" fieldType="link"/>
+        <elem tag="delving:deepZoomUrl" fieldType="link"/>
+        <elem tag="delving:fullTextObjectUrl" fieldType="link"/>
         <elem tag="delving:fullText"/>
 
     </root>
 
-    <opts>
-    </opts>
-
     <field-markers>
-
         <field-marker name="CREATOR" path="/record/dc:creator"/>
         <field-marker name="TITLE" path="/record/dc:title"/>
         <field-marker name="DESCRIPTION" path="/record/dc:description"/>
@@ -117,7 +165,6 @@
         <field-marker type="fact" name="provider" path="/record/europeana:provider"/>
         <field-marker type="fact" name="rights" path="/record/europeana:rights"/>
         <field-marker type="fact" name="type" path="/record/europeana:type"/>
-        
     </field-markers>
 
     <docs>
@@ -130,5 +177,3 @@
     </docs>
 
 </record-definition>
-
-
