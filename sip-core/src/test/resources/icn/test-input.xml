@@ -1,22 +1,22 @@
-<header>
-    <identifier>http://www.rnaproject.org/data/ce4889b0-450d-470e-8da5-61d875316c40</identifier>
-    <datestamp>2010-10-27T17:00:23Z</datestamp>
-    <setSpec>57</setSpec>
-</header>
-<oai:metadata xmlns:oai="http://www.openarchives.org/OAI/2.0/">
-<ese:record xmlns:ese="http://www.europeana.eu/schemas/ese" xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <dc:title xml:lang="nl">_Vuursteenpistool vervaardigd door
-        Theodorus Coop te Utrecht, circa 1675-1680 (1 van een
-        koppel)</dc:title>
-    <dc:creator>Coop, Theodorus-[3D]</dc:creator>
-    <dc:date>1675/1680</dc:date>
-    <dc:type>creatie event</dc:type>
-    <dc:subject>vuurwapens</dc:subject>
-    <dc:subject>vuursteenpistool</dc:subject>
-    <dc:identifier>019206-1</dc:identifier>
-    <ese:provider>Legermuseum / Dutch Army Museum</ese:provider>
-    <ese:type>IMAGE</ese:type>
-    <ese:isShownAt>http://lm.rnaviewer.net/nl/item?uri=http://www.rnaproject.org/data/f6dc4db1-b378-4327-a159-98b1d1fb122b</ese:isShownAt>
-    <ese:isShownBy>http://www.collectie.legermuseum.nl/asp/page.asp?alias=strategion&amp;view=strategion&amp;page_alias=imageview&amp;image=http://afbeeldingen.collectie.legermuseum.nl/wwwopac.exe?thumbnail=\\buffel\images$\\PM\images\D012\019206.jpg</ese:isShownBy>
-</ese:record>
-</oai:metadata>
+<header xmlns:rnax="http://www.rnaproject.org/data/rnax/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ese="http://www.europeana.eu/schemas/ese/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rna="http://www.rnaproject.org/data/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.openarchives.org/OAI/2.0/">
+        <identifier>http://www.rnaproject.org/data/ce4889b0-450d-470e-8da5-61d875316c40</identifier>
+        <datestamp>2010-10-27T17:00:23Z</datestamp>
+        <setSpec>57</setSpec>
+      </header>
+
+      
+<oai:metadata xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd" xmlns:rnax="http://www.rnaproject.org/data/rnax/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ese="http://www.europeana.eu/schemas/ese/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rna="http://www.rnaproject.org/data/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.openarchives.org/OAI/2.0/">
+        <ese:record>
+          <dc:title xml:lang="nl">_Vuursteenpistool vervaardigd door Theodorus Coop te Utrecht, circa 1675-1680 (1 van een koppel)</dc:title>
+          <dc:creator>Coop, Theodorus-[3D]</dc:creator>
+          <dc:date>1675/1680</dc:date>
+          <dc:type>creatie event</dc:type>
+          <dc:subject>vuurwapens</dc:subject>
+          <dc:subject>vuursteenpistool</dc:subject>
+          <dc:identifier>019206-1</dc:identifier>
+          <ese:provider>Legermuseum / Dutch Army Museum</ese:provider>
+          <ese:type>IMAGE</ese:type>
+          <ese:isShownAt>http://lm.rnaviewer.net/nl/item?uri=http://www.rnaproject.org/data/f6dc4db1-b378-4327-a159-98b1d1fb122b</ese:isShownAt>
+          <ese:isShownBy>http://www.collectie.legermuseum.nl/asp/page.asp?alias=strategion&amp;view=strategion&amp;page_alias=imageview&amp;image=http://afbeeldingen.collectie.legermuseum.nl/wwwopac.exe?thumbnail=\\buffel\images$\\PM\images\D012\019206.jpg</ese:isShownBy>
+        </ese:record>
+      </oai:metadata>

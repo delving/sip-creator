@@ -15,6 +15,7 @@
     <xs:import namespace="http://purl.org/dc/terms/" schemaLocation="http://schemas.delving.eu/dcterms-local.xsd"/>
     <xs:import namespace="http://www.europeana.eu/schemas/ese/" schemaLocation="http://schemas.delving.eu/ese-local.xsd"/>
 
+    <xs:element name="thumbnail" type="xs:anyURI"/>
 
     <xs:group name="dcGroup">
         <xs:choice >
@@ -74,7 +75,7 @@
             <xs:element name="technique" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="material" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="location" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="province" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="province" minOccurs="1" maxOccurs="1"/>
             <xs:element name="collectionPart" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="acquisitionMeans" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="collectionType" minOccurs="0" maxOccurs="unbounded"/>
@@ -95,11 +96,11 @@
             <xs:element ref="europeana:dataProvider" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="europeana:type" minOccurs="0" maxOccurs="1"/>
 
-            <xs:element ref="europeana:uri" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="europeana:uri" minOccurs="1" maxOccurs="1"/>
             <xs:element ref="europeana:language" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="europeana:country" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:collectionName" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="europeana:collectionTitle" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="europeana:collectionName" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="europeana:collectionTitle" minOccurs="1" maxOccurs="1"/>
             <xs:element ref="europeana:source" minOccurs="0" maxOccurs="unbounded"/>
 
             <xs:element ref="delving:year" minOccurs="0" maxOccurs="unbounded"/>
@@ -107,8 +108,6 @@
             <xs:element ref="delving:deepZoomUrl" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:fullTextObjectUrl" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="delving:fullText" minOccurs="0" maxOccurs="unbounded"/>
-
-
 
         </xs:sequence>
     </xs:complexType>
