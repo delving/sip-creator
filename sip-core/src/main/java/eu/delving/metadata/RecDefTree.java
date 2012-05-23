@@ -88,10 +88,18 @@ public class RecDefTree implements RecDefNodeListener {
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
         codeOut.line("// Functions from Mapping:");
-        for (MappingFunction function : mappingFunctions) function.toCode(codeOut);
+        Set<String> names = new TreeSet<String>();
+        for (MappingFunction function : mappingFunctions) {
+            function.toCode(codeOut);
+            names.add(function.name);
+        }
         if (recDef.functions != null) {
             codeOut.line("// Functions from Record Definition:");
-            for (MappingFunction function : recDef.functions) function.toCode(codeOut);
+            for (MappingFunction function : recDef.functions) {
+                if (names.contains(function.name)) continue;
+                function.toCode(codeOut);
+                names.add(function.name);
+            }
         }
         codeOut.line("// Dictionaries:");
         for (NodeMapping nodeMapping : getNodeMappings()) StringUtil.toDictionaryCode(nodeMapping,codeOut);
