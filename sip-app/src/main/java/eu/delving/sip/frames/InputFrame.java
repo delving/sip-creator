@@ -33,9 +33,13 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -93,6 +97,8 @@ public class InputFrame extends FrameBase {
         };
         recordTree.setToolTipText("Input Record");
         recordTree.setCellRenderer(new Renderer());
+        recordTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        recordTree.setTransferHandler(new TreeTransferHandler());
         filterField.addActionListener(rewind);
     }
 
@@ -105,7 +111,7 @@ public class InputFrame extends FrameBase {
     private JPanel createRecordButtonPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Filter"));
-        JPanel bp = new JPanel(new GridLayout(1,0));
+        JPanel bp = new JPanel(new GridLayout(1, 0));
         bp.add(new JButton(rewind));
         bp.add(new JButton(play));
         p.add(bp, BorderLayout.EAST);
@@ -143,7 +149,7 @@ public class InputFrame extends FrameBase {
         private Vector<GroovyTreeNode> children = new Vector<GroovyTreeNode>();
         private String string;
         private String toolTip;
-        
+
         private GroovyTreeNode(MetadataRecord metadataRecord) {
             this(null, metadataRecord.getRootNode());
             this.metadataRecord = metadataRecord;
@@ -160,7 +166,7 @@ public class InputFrame extends FrameBase {
         private GroovyTreeNode(GroovyTreeNode parent, GroovyNode node) {
             this.parent = parent;
             this.node = node;
-            for (Map.Entry<String,String> entry : node.attributes().entrySet()) {
+            for (Map.Entry<String, String> entry : node.attributes().entrySet()) {
                 children.add(new GroovyTreeNode(this, entry.getKey(), entry.getValue()));
             }
             if (node.getNodeValue() instanceof List) {
@@ -241,7 +247,7 @@ public class InputFrame extends FrameBase {
                     public void actionPerformed(ActionEvent e) {
                         recordTree.expandPath(getTreePath());
                         for (TreeNode sub : children) {
-                            ((GroovyTreeNode)sub).expand();
+                            ((GroovyTreeNode) sub).expand();
                         }
                     }
                 });
@@ -295,6 +301,7 @@ public class InputFrame extends FrameBase {
     }
 
     private RewindAction rewind = new RewindAction();
+
     private class RewindAction extends AbstractAction {
         private RewindAction() {
             putValue(Action.SMALL_ICON, SwingHelper.REWIND_ICON);
@@ -306,8 +313,9 @@ public class InputFrame extends FrameBase {
             play.actionPerformed(actionEvent);
         }
     }
-    
+
     private PlayAction play = new PlayAction();
+
     private class PlayAction extends AbstractAction {
         private PlayAction() {
             putValue(Action.SMALL_ICON, SwingHelper.PLAY_ICON);
@@ -323,7 +331,7 @@ public class InputFrame extends FrameBase {
 
     private SipModel.ScanPredicate createPredicate() {
         final String filterString = filterField.getText().trim();
-        switch ((Filter)filterBox.getSelectedItem()) {
+        switch ((Filter) filterBox.getSelectedItem()) {
             case REGEX:
                 return new SipModel.ScanPredicate() {
                     @Override
@@ -347,16 +355,56 @@ public class InputFrame extends FrameBase {
                     modulo = 1;
                 }
                 if (modulo <= 0) modulo = 1;
-                final int recordNumberModulo = modulo; 
+                final int recordNumberModulo = modulo;
                 return new SipModel.ScanPredicate() {
                     @Override
                     public boolean accept(MetadataRecord record) {
                         return recordNumberModulo == 1 || record.getRecordNumber() % recordNumberModulo == 0;
                     }
                 };
-            default :
+            default:
                 throw new RuntimeException();
         }
     }
-    
+
+    private static class TreeTransferHandler extends TransferHandler {
+
+        protected Transferable createTransferable(JComponent c) {
+            JTree tree = (JTree) c;
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths == null || paths.length != 1) return null;
+            TreePath path = tree.getSelectionPath();
+            GroovyTreeNode groovyTreeNode = (GroovyTreeNode) path.getLastPathComponent();
+            return new StringTransferable((String) (groovyTreeNode.node.getNodeValue()));
+        }
+
+        public int getSourceActions(JComponent c) {
+            return COPY;
+        }
+    }
+
+    private static class StringTransferable implements Transferable {
+        private String string;
+
+        private static final DataFlavor[] flavors = {DataFlavor.stringFlavor};
+
+        private StringTransferable(String string) {
+            this.string = string;
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            return flavors;
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            return flavor.equals(flavors[0]);
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            return string;
+        }
+    }
 }
