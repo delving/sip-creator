@@ -22,20 +22,17 @@
 package eu.delving.sip.xml;
 
 import eu.delving.groovy.*;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecMapping;
-import eu.delving.metadata.Tag;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.StatsModel;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
@@ -55,13 +52,16 @@ public class FileProcessor implements Runnable {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class);
     private XmlSerializer serializer = new XmlSerializer();
     private SipModel sipModel;
+    private Validator validator;
+    private BitSet valid;
+    private PrintWriter reportWriter;
     private GroovyCodeResource groovyCodeResource;
     private ProgressListener progressListener;
     private Listener listener;
     private volatile boolean aborted = false;
     private boolean allowInvalid;
     private int validCount, invalidCount;
-    private Stats stats = new Stats();
+    private Stats stats;
     private File outputDirectory;
     private XmlOutput xmlOutput;
 
@@ -91,118 +91,148 @@ public class FileProcessor implements Runnable {
 
     public void run() {
         if (sipModel.getDataSetModel().isEmpty()) throw new RuntimeException("No data set selected");
-        BitSet valid = new BitSet(sipModel.getStatsModel().getRecordCount());
-        PrintWriter reportWriter = null;
+        valid = new BitSet(recordCount());
+        stats = createStats();
+        MappingRunner mappingRunner;
+        MetadataParser parser;
         try {
-            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
-            if (recMapping == null) return;
-            stats.setRecordRoot(recMapping.getRecDefTree().getRoot().getPath());
-            stats.prefix = recMapping.getPrefix();
-            stats.name = sipModel.getDataSetFacts().get("name");
-            stats.maxUniqueValueLength = sipModel.getStatsModel().getMaxUniqueValueLength();
-            Validator validator = sipModel.getDataSetModel().newValidator();
-            validator.setErrorHandler(null);
-            MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
-            MetadataParser parser = new MetadataParser(
-                    sipModel.getDataSetModel().getDataSet().openSourceInputStream(),
-                    sipModel.getStatsModel().getRecordCount()
-            );
-            progressListener.prepareFor(sipModel.getStatsModel().getRecordCount());
-            reportWriter = sipModel.getDataSetModel().getDataSet().openReportWriter(recMapping);
-            int count = 0;
-            try {
-                if (outputDirectory != null) {
-                    String fileName = String.format("%s-%s.xml", sipModel.getDataSetModel().getDataSet().getSpec(), recMapping.getPrefix());
-                    File outputFile = new File(outputDirectory, fileName);
-                    OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
-                    xmlOutput = new XmlOutput(outputStream, recMapping.getRecDefTree().getRecDef().getNamespacesMap());
-                }
-                MetadataRecord record;
-                while ((record = parser.nextRecord()) != null && !aborted) {
-                    if (!progressListener.setProgress(count++)) abort();
-                    Node outputNode = null;
-                    try {
-                        outputNode = mappingRunner.runMapping(record);
-                        Source source = new DOMSource(outputNode);
-                        validator.validate(source);
-                        recordStatistics((Element) outputNode, Path.create());
-                        validCount++;
-                        valid.set(record.getRecordNumber());
-                        if (xmlOutput != null) xmlOutput.write(outputNode);
-                    }
-                    catch (MappingException e) {
-                        reportWriter.println("Mapping exception!");
-                        reportWriter.println(XmlNodePrinter.toXml(e.getMetadataRecord().getRootNode()));
-                        e.printStackTrace(reportWriter);
-                        reportWriter.println("========");
-                        abort();
-                        listener.mappingFailed(e);
-                    }
-                    catch (SAXException e) {
-                        invalidCount++;
-                        reportWriter.println(serializer.toXml(outputNode));
-                        reportWriter.println("=========");
-                        if (!allowInvalid) {
-                            abort();
-                            listener.outputInvalid(record.getRecordNumber(), outputNode, e.getMessage());
-                        }
-                    }
-                    catch (AssertionError e) {
-                        invalidCount++;
-                        reportWriter.println("Discarded explicitly:");
-                        reportWriter.println(XmlNodePrinter.toXml(record.getRootNode()));
-                        reportWriter.println("=========");
-                    }
-                    catch (Exception e) {
-                        abort();
-                        sipModel.getFeedback().alert("Problem writing output", e);
-                        reportWriter.println("Unexpected exception!");
-                        e.printStackTrace(reportWriter);
-                    }
-                }
-                reportWriter.println();
-                if (aborted) {
-                    reportWriter.println("Validation was aborted!");
-                }
-                else {
-                    reportWriter.println("Validation was completed:");
-                    reportWriter.println("Total Valid Records: " + validCount);
-                    reportWriter.println("Total Invalid Records: " + invalidCount);
-                    reportWriter.println("Total Records: " + (validCount + invalidCount));
-                    reportWriter.close();
-                }
-                if (xmlOutput != null) xmlOutput.finish();
-            }
-            catch (IOException e) {
-                abort();
-                sipModel.getFeedback().alert("Unable to write discarded record", e);
-            }
+            validator = createValidator();
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping(), null);
+            parser = new MetadataParser(dataSet().openSourceInputStream(), recordCount());
+            reportWriter = dataSet().openReportWriter(recMapping());
+            if (outputDirectory != null) xmlOutput = createXmlOutput();
         }
-        catch (XMLStreamException e) {
-            throw new RuntimeException("XML Problem", e);
+        catch (Exception e) {
+            sipModel.getFeedback().alert("Initialization of file processor failed", e);
+            return;
         }
-        catch (StorageException e) {
-            throw new RuntimeException("Storage Problem", e);
+        try {
+            progressListener.prepareFor(recordCount());
+            while (!aborted) {
+                MetadataRecord record = parser.nextRecord();
+                if (record == null) break;
+                if (!progressListener.setProgress(record.getRecordNumber())) abort();
+                int recordNumber = record.getRecordNumber();
+                try {
+                    Node node = mappingRunner.runMapping(record);
+                    validateRecord(recordNumber, node);
+                    if (xmlOutput != null) xmlOutput.write(node);
+                }
+                catch (AssertionError e) {
+                    invalidCount++;
+                    reportWriter.println("Discarded explicitly:");
+                    reportWriter.println(XmlNodePrinter.toXml(record.getRootNode()));
+                    reportWriter.println("=========");
+                }
+                catch (MappingException e) {
+                    reportWriter.println("Mapping exception!");
+                    reportWriter.println(XmlNodePrinter.toXml(e.getMetadataRecord().getRootNode()));
+                    e.printStackTrace(reportWriter);
+                    reportWriter.println("========");
+                    abort();
+                    listener.mappingFailed(e);
+                }
+            }
         }
         catch (MetadataParser.AbortException e) {
+            sipModel.getFeedback().say("File processing aborted");
             aborted = true;
-            LOG.info("Validation aborted by user");
         }
-        catch (MetadataException e) {
-            aborted = true;
-            LOG.info("Validation problem", e);
+        catch (Exception e) {
+            sipModel.getFeedback().alert("File processing problem", e);
         }
         finally {
+            finishReport();
+            if (xmlOutput != null) xmlOutput.finish();
             IOUtils.closeQuietly(reportWriter);
             if (aborted) {
-                sipModel.getFeedback().say("Validation canceled");
                 listener.finished(null, null, 0);
             }
             else {
                 sipModel.getFeedback().say("Finished validating");
-                listener.finished(aborted ? null : stats, aborted ? null : valid, sipModel.getStatsModel().getRecordCount());
+                listener.finished(aborted ? null : stats, aborted ? null : valid, recordCount());
             }
             if (!aborted) progressListener.finished(true);
+        }
+    }
+
+    private void finishReport() {
+        reportWriter.println();
+        if (aborted) {
+            reportWriter.println("Validation was aborted!");
+        }
+        else {
+            reportWriter.println("Validation was completed:");
+            reportWriter.println("Total Valid Records: " + validCount);
+            reportWriter.println("Total Invalid Records: " + invalidCount);
+            reportWriter.println("Total Records: " + (validCount + invalidCount));
+        }
+        reportWriter.close();
+    }
+
+    private XmlOutput createXmlOutput() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
+        String fileName = String.format("%s-%s.xml", dataSet().getSpec(), recMapping().getPrefix());
+        File outputFile = new File(outputDirectory, fileName);
+        OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
+        return new XmlOutput(outputStream, recDef().getNamespacesMap());
+    }
+
+    private DataSet dataSet() {
+        return sipModel.getDataSetModel().getDataSet();
+    }
+
+    private RecDef recDef() {
+        return recDefTree().getRecDef();
+    }
+
+    private RecDefTree recDefTree() {
+        return recMapping().getRecDefTree();
+    }
+
+    private RecMapping recMapping() {
+        if (!sipModel.getMappingModel().hasRecMapping()) throw new IllegalStateException("Must have record mapping");
+        return sipModel.getMappingModel().getRecMapping();
+    }
+
+    private int recordCount() {
+        return statsModel().getRecordCount();
+    }
+
+    private StatsModel statsModel() {
+        return sipModel.getStatsModel();
+    }
+
+    private Validator createValidator() throws MetadataException {
+        Validator validator = sipModel.getDataSetModel().newValidator();
+        validator.setErrorHandler(null);
+        return validator;
+    }
+
+    private Stats createStats() {
+        Stats stats = new Stats();
+        stats.setRecordRoot(recDefTree().getRoot().getPath());
+        stats.prefix = recMapping().getPrefix();
+        stats.name = sipModel.getDataSetFacts().get("name");
+        stats.maxUniqueValueLength = statsModel().getMaxUniqueValueLength();
+        return stats;
+    }
+
+    private void validateRecord(int recordNumber, Node node) {
+        try {
+            Source source = new DOMSource(node);
+            validator.validate(source);
+            validCount++;
+            valid.set(recordNumber);
+            recordStatistics((Element) node, Path.create());
+        }
+        catch (Exception e) {
+            invalidCount++;
+            reportWriter.println(serializer.toXml(node));
+            reportWriter.println("=========");
+            if (!allowInvalid) {
+                abort();
+                listener.outputInvalid(recordNumber, node, e.getMessage());
+            }
         }
     }
 
@@ -222,7 +252,7 @@ public class FileProcessor implements Runnable {
                 case Node.TEXT_NODE:
                     break;
                 case Node.ELEMENT_NODE:
-                    recordStatistics((Element)kid, path);
+                    recordStatistics((Element) kid, path);
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
