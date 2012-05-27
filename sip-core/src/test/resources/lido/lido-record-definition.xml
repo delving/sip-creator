@@ -97,15 +97,15 @@
 
         <!-- places: super-elements: eventPlace; subjectPlace OBS!! CHECK NESTED PARTOFPLACES-->
         <elem tag="displayPlace" attrs="xml:lang, encodinganalog, label"/>
-        <elem tag="place" elems="placeID, namePlaceSet, gml, partOfPlace, placeClassification" singular="true"/>
+        <elem tag="place" elems="placeID, namePlaceSet, partOfPlace, placeClassification" singular="true"/>
         <elem tag="placeID" attrs="pref, type, source, encodinganalog, label"/>
         <elem tag="namePlaceSet" elems="appellationValue, sourceAppellation"/>
-        <elem tag="gml" elems="gml:point, gml:LineString, gml:Polygon, " attrs="xml:lang"/>
-        <elem tag="gml:point" singular="true"/>
-        <elem tag="gml:LineString" singular="true"/>
-        <elem tag="gml:Polygon" singular="true"/>
+        <!--<elem tag="gml" elems="gml:point, gml:LineString, gml:Polygon, " attrs="xml:lang"/>-->
+        <!--<elem tag="gml:point" singular="true"/>-->
+        <!--<elem tag="gml:LineString" singular="true"/>-->
+        <!--<elem tag="gml:Polygon" singular="true"/>-->
         <!-- OBS Part of place should have elem="partofplace .-->
-        <elem tag="partOfPlace" elems="placeID, namePlaceSet, gml, placeClassification" attrs="politicalEntity, geographicalEntity"/>
+        <elem tag="partOfPlace" elems="placeID, namePlaceSet, placeClassification" attrs="politicalEntity, geographicalEntity"/>
         <elem tag="placeClassification" elems="conceptID, term" attrs="type"/>
 
         <!-- objects: super-elements: relatedWork; subjectObject; thingPresent -->
@@ -161,7 +161,7 @@
                     <elem tag="repositorySet" attrs="type, sortorder">
                         <elem tag="repositoryName" elems="legalBodyID, legalBodyName, legalBodyWeblink" singular="true"/>
                         <elem tag="workID" attrs="type, sortorder, encodinganalog, label"/>
-                        <elem tag="repositoryLocation" elems="placeID, namePlaceSet, gml, partOfPlace, placeClassification" attrs="politicalEntity, geographicalEntity" singular="true"/>
+                        <elem tag="repositoryLocation" elems="placeID, namePlaceSet, partOfPlace, placeClassification" attrs="politicalEntity, geographicalEntity" singular="true"/>
                     </elem>
                 </elem>
 
