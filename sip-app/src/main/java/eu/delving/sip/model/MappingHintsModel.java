@@ -79,13 +79,22 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
         Set<Path> sourcePaths = new HashSet<Path>();
         sourceTree.getPaths(sourcePaths);
         if (sipModel.getMappingModel().hasRecMapping()) {
-            List<NodeMapping> nodeMappingList = sipModel.getMappingModel().getRecMapping().getRecDefTree().getNodeMappings();
+            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
+            List<NodeMapping> nodeMappingList = recMapping.getRecDefTree().getNodeMappings();
             Set<NodeMapping> existingMappings = new HashSet<NodeMapping>(nodeMappingList);
             if (mappingHints != null) {
                 for (NodeMapping mapping : mappingHints.getNodeMappings()) {
                     if (sourcePaths.contains(mapping.inputPath) && !existingMappings.contains(mapping)) {
                         mappingHintList.add(mapping);
                     }
+                }
+            }
+            for (Path sourcePath : sourcePaths) {
+                RecDefNode node = recMapping.getRecDefTree().getFirstRecDefNode(sourcePath.peek());
+                if (node != null) {
+                    NodeMapping mapping = new NodeMapping().setInputPath(sourcePath).setOutputPath(node.getPath());
+                    mapping.recDefNode = node;
+                    if (!existingMappings.contains(mapping)) mappingHintList.add(mapping);
                 }
             }
         }

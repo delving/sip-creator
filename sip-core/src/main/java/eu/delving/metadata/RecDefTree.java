@@ -73,6 +73,10 @@ public class RecDefTree implements RecDefNodeListener {
         return root.getNode(path);
     }
 
+    public RecDefNode getFirstRecDefNode(Tag tag) {
+        return root.getFirstNode(tag);
+    }
+
     public List<NodeMapping> getNodeMappings() {
         List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
         root.collectNodeMappings(nodeMappings);

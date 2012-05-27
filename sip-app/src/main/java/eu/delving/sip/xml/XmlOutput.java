@@ -32,7 +32,6 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -50,14 +49,13 @@ import static eu.delving.sip.files.Storage.OUTPUT_TAG;
  */
 
 public class XmlOutput {
-    private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
     private OutputStream outputStream;
     private XMLEventWriter out;
 
     public XmlOutput(OutputStream outputStream, Map<String, String> namespaces) throws UnsupportedEncodingException, XMLStreamException {
         this.outputStream = outputStream;
-        out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+        out = XMLOutputFactory.newInstance().createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         out.add(eventFactory.createStartDocument());
         out.add(eventFactory.createCharacters("\n"));
         List<Namespace> namespaceList = new ArrayList<Namespace>();
@@ -67,17 +65,27 @@ public class XmlOutput {
         out.add(eventFactory.createStartElement("", "", OUTPUT_TAG, null, namespaceList.iterator()));
     }
 
-    public void write(Node node) throws XMLStreamException {
-        writeElement((Element) node, 1);
+    public void write(Node node) {
+        try {
+            writeElement((Element) node, 1);
+        }
+        catch (XMLStreamException e) {
+            throw new RuntimeException("Trouble writing node to output", e);
+        }
     }
 
-    public void finish() throws XMLStreamException, IOException {
-        out.add(eventFactory.createCharacters("\n"));
-        out.add(eventFactory.createEndElement("", "", OUTPUT_TAG));
-        out.add(eventFactory.createCharacters("\n"));
-        out.add(eventFactory.createEndDocument());
-        out.flush();
-        outputStream.close();
+    public void finish() {
+        try {
+            out.add(eventFactory.createCharacters("\n"));
+            out.add(eventFactory.createEndElement("", "", OUTPUT_TAG));
+            out.add(eventFactory.createCharacters("\n"));
+            out.add(eventFactory.createEndDocument());
+            out.flush();
+            outputStream.close();
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Trouble closing xml output", e);
+        }
     }
 
     private void writeElement(Element element, int depth) throws XMLStreamException {

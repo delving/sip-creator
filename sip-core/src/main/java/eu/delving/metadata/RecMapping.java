@@ -151,6 +151,7 @@ public class RecMapping {
                 if (recDefNode != null) {
                     NodeMapping nodeMapping = new NodeMapping().setInputPath(Path.create().child(Tag.create("facts")).child(Tag.create(marker.name)));
                     recDefNode.addNodeMapping(nodeMapping);
+                    nodeMappings.add(nodeMapping);
                 }
             }
         }
