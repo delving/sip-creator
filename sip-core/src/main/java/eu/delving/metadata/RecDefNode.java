@@ -182,6 +182,15 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return null;
     }
 
+    public RecDefNode getFirstNode(Tag soughtTag) {
+        if (getTag().equals(soughtTag)) return this;
+        for (RecDefNode sub : children) {
+            RecDefNode found = sub.getFirstNode(soughtTag);
+            if (found != null) return found;
+        }
+        return null;
+    }
+
     public boolean hasDescendentNodeMappings() {
         if (!nodeMappings.isEmpty()) return true;
         for (RecDefNode sub : children) if (sub.hasDescendentNodeMappings()) return true;
