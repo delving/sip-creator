@@ -457,6 +457,7 @@ public class Application {
         @Override
         public void run() {
             final File storageDirectory = StorageFinder.getStorageDirectory(args);
+            if (storageDirectory == null) return;
             try {
                 int instance = 1;
                 while (instances.contains(String.valueOf(instance))) instance++;
