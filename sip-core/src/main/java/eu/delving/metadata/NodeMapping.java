@@ -269,9 +269,12 @@ public class NodeMapping {
     private void toInnerLoop(CodeOut codeOut, Path path, Stack<String> groovyParams) {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
-            if (dictionary != null) {
-                String field = "??"; // todo: how do we know which field?
-                codeOut.line("lookup%s_%s(%s)", recDefNode.getOptList().dictionary, field, toLeafGroovyParam(path));
+            OptBox dictionaryOptBox = recDefNode.getDictionaryOptBox();
+            if (dictionaryOptBox != null) {
+                codeOut.line(
+                        "lookup%s_%s(%s)", // todo: comes out as lookupTURD_root
+                        dictionaryOptBox.getDictionaryName(), dictionaryOptBox.getFieldName(), toLeafGroovyParam(path)
+                );
             }
             else if (hasMap()) {
                 codeOut.line(getMapUsage());

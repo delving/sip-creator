@@ -36,10 +36,9 @@ import java.util.*;
 public class StringUtil {
 
     public static void toDictionaryCode(NodeMapping nodeMapping, CodeOut codeOut) {
-        if (nodeMapping.dictionary == null) return;
-        OptList optList = nodeMapping.recDefNode.getOptList();
-        String name = optList.dictionary;
-        codeOut.line_(String.format("def Dictionary%s = [", name));
+        OptBox optBox = nodeMapping.recDefNode.getDictionaryOptBox();
+        if (optBox == null || optBox.isChild()) return;
+        codeOut.line_(String.format("def Dictionary%s = [", optBox.getDictionaryName()));
         Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
         while (walk.hasNext()) {
             Map.Entry<String, String> entry = walk.next();
@@ -50,15 +49,17 @@ public class StringUtil {
             ));
         }
         codeOut._line("]");
-        for (String field : OptList.FIELDS) toLookupClosure(codeOut, name, field);
+        for (OptRole field : OptRole.getFields()) toLookupClosure(codeOut, optBox.getDictionaryName(), field.getFieldName());
     }
 
     private static void toLookupClosure(CodeOut codeOut, String name, String field) {
-        codeOut.line_("def lookup%s_%s = { key ->", name, field);
-        codeOut.line_("   if (!key) return ''");
-        codeOut.line( "   String optKey = Dictionary%s[key.sanitize()]", name);
-        codeOut.line_("   if (!optKey) return ''");
-        codeOut.line( "   _optLookup['%s'][optKey].%s", name, field);
+        codeOut.line_("def lookup%s_%s = { value ->", name, field);
+        codeOut.line("   if (!value) return ''");
+        codeOut.line("   String optKey = Dictionary%s[value.sanitize()]", name);
+        codeOut.line("   if (!optKey) return ''");
+        codeOut.line("   Object opt = _optLookup['%s'][optKey]", name);
+        codeOut.line("   if (!opt) return ''");
+        codeOut.line("   opt.%s", field);
         codeOut._line("}");
     }
 

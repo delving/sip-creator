@@ -32,51 +32,74 @@ import static eu.delving.metadata.OptRole.*;
 
 class OptBox {
     final OptRole role;
+    final OptList optList;
     final OptList.Opt opt;
 
     public static OptBox asRoot(OptList.Opt opt) {
-        return new OptBox(ROOT, opt);
+        return new OptBox(ROOT, null, opt);
     }
 
-    private OptBox(OptRole role, OptList.Opt opt) {
+    public static OptBox asRoot(OptList optList) {
+        return new OptBox(ROOT, optList, null);
+    }
+
+    private OptBox(OptRole role, OptList optList, OptList.Opt opt) {
         this.role = role;
+        this.optList = optList;
         this.opt = opt;
     }
 
     OptBox inRoleFor(Tag tag) {
         if (role == CHILD) {
-            OptList p = opt.parent;
-            if (p.key != null && p.key.equals(tag)) return new OptBox(KEY, opt);
-            if (p.value != null && p.value.equals(tag)) return new OptBox(VALUE, opt);
-            if (p.schema != null && p.schema.equals(tag)) return new OptBox(SCHEMA, opt);
-            if (p.schemaUri != null && p.schemaUri.equals(tag)) return new OptBox(SCHEMA_URI, opt);
+            OptList list = optList != null ? optList : opt.parent;
+            if (list.key != null && list.key.equals(tag)) return new OptBox(KEY, optList, opt);
+            if (list.value != null && list.value.equals(tag)) return new OptBox(VALUE, optList, opt);
+            if (list.schema != null && list.schema.equals(tag)) return new OptBox(SCHEMA, optList, opt);
+            if (list.schemaUri != null && list.schemaUri.equals(tag)) return new OptBox(SCHEMA_URI, optList, opt);
         }
         return null;
     }
 
     OptBox createChild() {
         if (role != ROOT) throw new RuntimeException();
-        return new OptBox(CHILD, opt);
+        return new OptBox(CHILD, optList, opt);
+    }
+
+    public boolean isDictionary() {
+        return optList != null;
     }
 
     public boolean isChild() {
         return role != ROOT;
     }
 
+    public String getDictionaryName() {
+        return optList.dictionary;
+    }
+
+    public String getFieldName() {
+        return role.getFieldName();
+    }
+
     public String toString() {
-        switch (role) {
-            case ROOT:
-                return opt.value;
-            case KEY:
-                return opt.key;
-            case VALUE:
-                return opt.value;
-            case SCHEMA:
-                return opt.schema;
-            case SCHEMA_URI:
-                return opt.schemaUri;
-            default:
-                return "OPT";
+        if (opt != null) {
+            switch (role) {
+                case ROOT:
+                    return opt.value;
+                case KEY:
+                    return opt.key;
+                case VALUE:
+                    return opt.value;
+                case SCHEMA:
+                    return opt.schema;
+                case SCHEMA_URI:
+                    return opt.schemaUri;
+                default:
+                    return "OPT";
+            }
+        }
+        else {
+            return String.format("Dictionary %s", optList.dictionary);
         }
     }
 }

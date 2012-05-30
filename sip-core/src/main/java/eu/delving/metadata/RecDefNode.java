@@ -88,7 +88,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             for (RecDef.Elem sub : elem.elemList) {
                 if (sub.optList != null) {
                     if (sub.optList.dictionary != null) {
-                        children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, null)); // ignore dictionaries for this
+                        children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, OptBox.asRoot(sub.optList)));
                     }
                     else {
                         for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option (introducing the OptBox instances)
@@ -106,6 +106,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 elem.nodeMapping.outputPath = getPath();
             }
         }
+    }
+
+    public OptBox getDictionaryOptBox() {
+        return optBox != null && optBox.isDictionary() ? optBox : null;
     }
 
     public boolean isHiddenOpt(OptList.Opt shown) {
@@ -439,7 +443,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     private boolean isRootOpt() {
-        return elem != null && optBox != null && optBox.role == OptRole.ROOT;
+        return elem != null && optBox != null && optBox.role == OptRole.ROOT && !optBox.isDictionary();
     }
 
     private boolean isChildOpt() {
@@ -455,7 +459,18 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 if (!sub.isAttr()) continue;
                 if (sub.isChildOpt()) {
                     if (comma) codeOut.line(",");
-                    codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
+                    OptBox dictionaryOptBox = sub.getDictionaryOptBox();
+                    if (dictionaryOptBox != null) {
+                        codeOut.line(
+                                "%s : '' // lookup%s_%s(%s) // %sd", // todo: comes back as lookupTURD_value(_lidolido), but _lidolido doesn't exist
+                                sub.getTag().toBuilderCall(),
+                                dictionaryOptBox.getDictionaryName(), dictionaryOptBox.getFieldName(),
+                                toLeafGroovyParam(getPath()), comment
+                        );
+                    }
+                    else {
+                        codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
+                    }
                     comma = true;
                 }
                 else {

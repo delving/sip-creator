@@ -97,10 +97,10 @@ public class TestCodeGeneration {
         NodeMapping mapping = actorNode.addNodeMapping(mapping("/input/leadup/record/list/member/name"));
         mapping.setGroovyCode(
                 "if (_name.contains(' ')) {\n" +
-                        "return _name.split(' ');\n" +
-                        "} else {\n" +
-                        "return _name.text();\n" +
-                        "}",
+                "   return _name.split(' ');\n" +
+                "} else {\n" +
+                "   return _name.text();\n" +
+                "}",
                 recMapping
         );
 

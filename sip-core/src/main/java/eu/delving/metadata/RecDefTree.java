@@ -83,11 +83,11 @@ public class RecDefTree implements RecDefNodeListener {
         return nodeMappings;
     }
 
-    public void toCode(CodeOut codeOut, Set<MappingFunction> mappingFunctions, Map<String,String> facts, EditPath editPath) {
+    public void toCode(CodeOut codeOut, Set<MappingFunction> mappingFunctions, Map<String, String> facts, EditPath editPath) {
         codeOut.line("// SIP-Creator Generated Mapping Code");
         codeOut.line("// ----------------------------------");
         codeOut.line("// Facts:");
-        for (Map.Entry<String,String> entry : facts.entrySet()) {
+        for (Map.Entry<String, String> entry : facts.entrySet()) {
             codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
@@ -106,7 +106,7 @@ public class RecDefTree implements RecDefNodeListener {
             }
         }
         codeOut.line("// Dictionaries:");
-        for (NodeMapping nodeMapping : getNodeMappings()) StringUtil.toDictionaryCode(nodeMapping,codeOut);
+        for (NodeMapping nodeMapping : getNodeMappings()) StringUtil.toDictionaryCode(nodeMapping, codeOut);
         codeOut.line("// DSL Category wraps Builder call:");
         codeOut.line("org.w3c.dom.Node outputNode");
         codeOut.line_("use (MappingCategory) {");

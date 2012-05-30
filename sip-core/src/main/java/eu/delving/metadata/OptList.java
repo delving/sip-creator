@@ -40,8 +40,6 @@ import java.util.TreeMap;
 @XStreamAlias("opt-list")
 public class OptList {
 
-    public static final String [] FIELDS = { "key", "value", "schema", "schemaUri" };
-
     @XStreamAsAttribute
     public String displayName;
 

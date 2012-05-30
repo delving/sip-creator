@@ -125,10 +125,6 @@ public class RecDef {
         throw new RuntimeException(String.format("No elem [%s]", tag));
     }
 
-    public void print(StringBuilder out) {
-        root.print(out, 0);
-    }
-
     public String toString() {
         List<Path> paths = new ArrayList<Path>();
         Path path = Path.create();
@@ -376,67 +372,6 @@ public class RecDef {
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
-        }
-
-        public void print(StringBuilder out, int level) {
-            if (doc != null) {
-                indent(out, level).append("/*\n");
-                indent(out, level + 1).append(String.format("\"%s\"\n", doc.path));
-                for (String line : doc.lines) {
-                    indent(out, level + 1).append(line).append('\n');
-                }
-                indent(out, level).append("*/\n");
-            }
-            if (optList != null) {
-                indent(out, level).append("// ");
-                for (OptList.Opt opt : optList.opts) out.append(String.format("%s=%s, ", opt.key, opt.value));
-                out.append("\n");
-            }
-            indent(out, level).append("lido.");
-            out.append(tag);
-            if (!attrList.isEmpty()) {
-                out.append("(");
-                Iterator<Attr> walk = attrList.iterator();
-                while (walk.hasNext()) {
-                    Attr def = walk.next();
-                    out.append(def.tag);
-                    out.append(": \"attrval\"");
-                    if (walk.hasNext()) out.append(", ");
-                }
-                if (elemList.isEmpty()) {
-                    out.append(", \"elemval\")");
-                }
-                else {
-                    out.append(")");
-                }
-            }
-            if (elemList.isEmpty()) {
-                if (required || singular) {
-                    out.append(" // ");
-                    if (required) out.append("required ");
-                    if (singular) out.append("singular ");
-                }
-                out.append("\n");
-            }
-            else {
-                if (required || singular) {
-                    out.append(" {");
-                    out.append(" // ");
-                    if (required) out.append("required ");
-                    if (singular) out.append("singular ");
-                    out.append("\n");
-                }
-                else {
-                    out.append(" {\n");
-                }
-                for (Elem def : elemList) def.print(out, level + 1);
-                indent(out, level).append("}\n");
-            }
-        }
-
-        private StringBuilder indent(StringBuilder out, int level) {
-            for (int count = 0; count < level; count++) out.append(INDENT);
-            return out;
         }
     }
 

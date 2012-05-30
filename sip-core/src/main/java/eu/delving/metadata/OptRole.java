@@ -40,11 +40,15 @@ public enum OptRole {
     private final String fieldName;
 
     private OptRole() {
-        String caps = WordUtils.capitalizeFully(toString(), new char[]{'_'}).replaceAll("_","");
-        this.fieldName = Character.toLowerCase(caps.charAt(0))+caps.substring(1);
+        String caps = WordUtils.capitalizeFully(toString(), new char[]{'_'}).replaceAll("_", "");
+        this.fieldName = Character.toLowerCase(caps.charAt(0)) + caps.substring(1);
     }
 
     public String getFieldName() {
         return fieldName;
+    }
+
+    public static OptRole[] getFields() {
+        return new OptRole[]{KEY, VALUE, SCHEMA, SCHEMA_URI};
     }
 }
