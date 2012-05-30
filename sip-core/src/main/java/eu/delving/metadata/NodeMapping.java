@@ -270,7 +270,8 @@ public class NodeMapping {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
             if (dictionary != null) {
-                codeOut.line("from%s(%s)", toDictionaryName(this), toLeafGroovyParam(path));
+                String field = "??"; // todo: how do we know which field?
+                codeOut.line("lookup%s_%s(%s)", recDefNode.getOptList().dictionary, field, toLeafGroovyParam(path));
             }
             else if (hasMap()) {
                 codeOut.line(getMapUsage());

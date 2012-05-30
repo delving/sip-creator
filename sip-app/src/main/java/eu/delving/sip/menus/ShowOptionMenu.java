@@ -58,7 +58,7 @@ public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
                     List<OptList> optLists = mappingModel.getRecMapping().getRecDefTree().getRecDef().opts;
                     if (optLists != null) {
                         for (OptList list : optLists) {
-                            if (list.dictionary) continue;
+                            if (list.dictionary != null) continue;
                             JMenu listMenu = new JMenu(list.displayName);
                             for (OptList.Opt opt : list.opts) listMenu.add(new OptAction(opt));
                             add(listMenu);

@@ -100,6 +100,9 @@ public class RecDef {
 
     public List<Doc> docs;
 
+    @XStreamOmitField
+    public Map<String, Map<String, OptList.Opt>> optLookup = new TreeMap<String, Map<String, OptList.Opt>>();
+
     public Map<String, String> getNamespacesMap() {
         Map<String, String> ns = new HashMap<String, String>();
         if (namespaces != null) for (Namespace namespace : namespaces) ns.put(namespace.prefix, namespace.uri);

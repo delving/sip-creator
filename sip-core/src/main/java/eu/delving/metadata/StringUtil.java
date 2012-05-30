@@ -35,16 +35,11 @@ import java.util.*;
 
 public class StringUtil {
 
-    private static final Hasher HASHER = new Hasher();
-
-    public static String toDictionaryName(NodeMapping nodeMapping) {
-        return "Dictionary" + HASHER.getHashString(nodeMapping.outputPath.toString()).substring(16);
-    }
-
     public static void toDictionaryCode(NodeMapping nodeMapping, CodeOut codeOut) {
         if (nodeMapping.dictionary == null) return;
-        String name = toDictionaryName(nodeMapping);
-        codeOut.line_(String.format("def %s = [", name));
+        OptList optList = nodeMapping.recDefNode.getOptList();
+        String name = optList.dictionary;
+        codeOut.line_(String.format("def Dictionary%s = [", name));
         Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
         while (walk.hasNext()) {
             Map.Entry<String, String> entry = walk.next();
@@ -55,18 +50,15 @@ public class StringUtil {
             ));
         }
         codeOut._line("]");
-        codeOut.line_("def from%s = { value ->", name);
-        codeOut.line_("if (value) {");
-        codeOut.line("def v = %s[value.sanitize()];", name);
-        codeOut.line_("if (v) {");
-        codeOut.line_("if (v.endsWith(':')) {");
-        codeOut.line("return \"${v} ${value}\"");
-        codeOut._line("} else {").in();
-        codeOut.line("return v");
-        codeOut._line("}");
-        codeOut._line("}");
-        codeOut._line("}");
-        codeOut.line("return ''");
+        for (String field : OptList.FIELDS) toLookupClosure(codeOut, name, field);
+    }
+
+    private static void toLookupClosure(CodeOut codeOut, String name, String field) {
+        codeOut.line_("def lookup%s_%s = { key ->", name, field);
+        codeOut.line_("   if (!key) return ''");
+        codeOut.line( "   String optKey = Dictionary%s[key.sanitize()]", name);
+        codeOut.line_("   if (!optKey) return ''");
+        codeOut.line( "   _optLookup['%s'][optKey].%s", name, field);
         codeOut._line("}");
     }
 

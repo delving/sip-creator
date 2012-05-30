@@ -28,6 +28,8 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
 * Part of the record definition
@@ -38,11 +40,13 @@ import java.util.List;
 @XStreamAlias("opt-list")
 public class OptList {
 
+    public static final String [] FIELDS = { "key", "value", "schema", "schemaUri" };
+
     @XStreamAsAttribute
     public String displayName;
 
     @XStreamAsAttribute
-    public boolean dictionary;
+    public String dictionary;
 
     @XStreamAsAttribute
     public Path path;
@@ -73,6 +77,11 @@ public class OptList {
         schemaUri = resolveTag(schemaUri, recDef);
         RecDef.Elem elem = recDef.findElem(path);
         elem.optList = this;
+        if (dictionary != null) {
+            Map<String,Opt> lookup = new TreeMap<String, Opt>();
+            for (Opt opt : opts) lookup.put(opt.value, opt);
+            recDef.optLookup.put(dictionary, lookup);
+        }
     }
 
     private static Tag resolveTag(Tag tag, RecDef recDef) {
@@ -110,7 +119,7 @@ public class OptList {
         public OptList parent;
 
         public String toString() {
-            return String.format("%s: %s", key, value);
+            return value;
         }
     }
 }

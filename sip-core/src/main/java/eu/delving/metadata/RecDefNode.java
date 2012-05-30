@@ -87,7 +87,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             }
             for (RecDef.Elem sub : elem.elemList) {
                 if (sub.optList != null) {
-                    if (sub.optList.dictionary) {
+                    if (sub.optList.dictionary != null) {
                         children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, null)); // ignore dictionaries for this
                     }
                     else {
