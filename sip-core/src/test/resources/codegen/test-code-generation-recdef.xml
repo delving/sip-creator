@@ -255,11 +255,18 @@
 
     <opts>
 
-        <opt-list dictionary="TURD" path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term" key="@addedSearchTerm" value="@label" displayName="Fake">
+        <opt-list dictionary="TURD" path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term" key="@addedSearchTerm" displayName="Fake">
             <opt key="man" value="Clay Man"/>
             <opt key="horse" value="Clay Horse"/>
             <opt key="savior" value="Jesus!"/>
         </opt-list>
 
+        <opt-list dictionary="CLUMP" path="/lido/administrativeMetadata/recordWrap/recordID" key="@type" displayName="MoreFake">
+            <opt key="rv" value="reverse reverse"/>
+            <opt key="fw" value="forward forward"/>
+            <opt key="pause" value="Pause Pause!"/>
+        </opt-list>
+
+        /lido/administrativeMetadata/recordWrap/recordID/@type
     </opts>
 </record-definition>

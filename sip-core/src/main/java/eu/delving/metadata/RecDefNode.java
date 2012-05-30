@@ -461,12 +461,15 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     if (comma) codeOut.line(",");
                     OptBox dictionaryOptBox = sub.getDictionaryOptBox();
                     if (dictionaryOptBox != null) {
-                        codeOut.line(
-                                "%s : '' // lookup%s_%s(%s) // %sd", // todo: comes back as lookupTURD_value(_lidolido), but _lidolido doesn't exist
-                                sub.getTag().toBuilderCall(),
-                                dictionaryOptBox.getDictionaryName(), dictionaryOptBox.getFieldName(),
-                                toLeafGroovyParam(getPath()), comment
-                        );
+                        if (nodeMappings.size() == 1) {
+                            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
+                            codeOut.line_("%s : {", sub.getTag().toBuilderCall());
+                            nodeMapping.toDictionaryCode(codeOut, groovyParams, editPath, sub.optBox.role);
+                            codeOut._line("}");
+                        }
+                        else {
+                            codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
+                        }
                     }
                     else {
                         codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);

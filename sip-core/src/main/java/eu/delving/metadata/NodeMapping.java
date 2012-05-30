@@ -226,6 +226,10 @@ public class NodeMapping {
         toUserCode(codeOut, groovyParams, editPath);
     }
 
+    public void toDictionaryCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath, OptRole optRole) {
+        toInnerLoop(codeOut, getLocalPath(), groovyParams, optRole);
+    }
+
     public boolean isUserCodeEditable() {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
@@ -245,7 +249,7 @@ public class NodeMapping {
         return !walk.hasNext();
     }
 
-    private void toUserCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+    public void toUserCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (editPath != null) {
             if (!editPath.isGeneratedCode()) {
                 String editedCode = editPath.getEditedCode(recDefNode.getPath());
@@ -263,17 +267,18 @@ public class NodeMapping {
             indentCode(groovyCode, codeOut);
             return;
         }
-        toInnerLoop(codeOut, getLocalPath(), groovyParams);
+        toInnerLoop(codeOut, getLocalPath(), groovyParams, OptRole.ROOT);
     }
 
-    private void toInnerLoop(CodeOut codeOut, Path path, Stack<String> groovyParams) {
+    private void toInnerLoop(CodeOut codeOut, Path path, Stack<String> groovyParams, OptRole optRole) {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
             OptBox dictionaryOptBox = recDefNode.getDictionaryOptBox();
+            optRole = optRole == OptRole.ROOT ? OptRole.VALUE : optRole;
             if (dictionaryOptBox != null) {
                 codeOut.line(
-                        "lookup%s_%s(%s)", // todo: comes out as lookupTURD_root
-                        dictionaryOptBox.getDictionaryName(), dictionaryOptBox.getFieldName(), toLeafGroovyParam(path)
+                        "lookup%s_%s(%s)",
+                        dictionaryOptBox.getDictionaryName(), optRole.getFieldName(), toLeafGroovyParam(path)
                 );
             }
             else if (hasMap()) {
@@ -293,7 +298,7 @@ public class NodeMapping {
             }
         }
         else if (recDefNode.isLeafElem()) {
-            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams);
+            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams, optRole);
         }
         else {
             boolean needLoop;
@@ -316,7 +321,7 @@ public class NodeMapping {
                     );
                 }
             }
-            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams);
+            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams, optRole);
             if (needLoop) codeOut._line("} // N0");
         }
     }

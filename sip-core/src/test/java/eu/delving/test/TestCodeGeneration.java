@@ -88,10 +88,11 @@ public class TestCodeGeneration {
         NodeMapping attr2attr = prefNode.addNodeMapping(mapping("/input/leadup/record/list/member/@index"));
         System.out.println("attr=" + attr2attr);
 
-        RecDefNode optionsNode = node("/lido/administrativeMetadata/recordWrap/recordID/@type");
+        RecDefNode optionsNode = node("/lido/administrativeMetadata/recordWrap/recordID");
         NodeMapping dictionaryMapping = optionsNode.addNodeMapping(mapping("/input/leadup/@orderofsort"));
         dictionaryMapping.dictionary = new TreeMap<String, String>();
-        dictionaryMapping.dictionary.put("backward", "reverse reverse");
+        dictionaryMapping.dictionary.put("thisaway", "reverse reverse");
+        dictionaryMapping.dictionary.put("thataway", "forward forward");
 
         RecDefNode actorNode = node("/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectActor/displayActor");
         NodeMapping mapping = actorNode.addNodeMapping(mapping("/input/leadup/record/list/member/name"));
@@ -129,7 +130,7 @@ public class TestCodeGeneration {
         GroovyNode input, leadup, record, list, member1, member2, fromOne, fromTwo;
         input = n(null, "input");
         leadup = n(input, "leadup");
-        leadup.attributes().put("orderofsort", "backward");
+        leadup.attributes().put("orderofsort", "thisaway");
         record = n(leadup, "record");
         list = n(record, "list");
         member1 = n(list, "member");
@@ -152,7 +153,7 @@ public class TestCodeGeneration {
 
     private static final String EXPECT =
             "<?xml version='1.0' encoding='UTF-8'?>\n" +
-                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"backward\">\n" +
+                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"thisaway\">\n" +
                     "    <lido:descriptiveMetadata>\n" +
                     "        <lido:objectClassificationWrap>\n" +
                     "            <lido:classificationWrap>\n" +
@@ -167,7 +168,7 @@ public class TestCodeGeneration {
                     "                <lido:subjectSet lido:sortorder=\"23\">\n" +
                     "                    <lido:subject>\n" +
                     "                        <lido:subjectConcept>\n" +
-                    "                            <lido:term lido:pref=\"23\">Clay Man</lido:term>\n" +
+                    "                            <lido:term lido:addedSearchTerm=\"man\" lido:pref=\"23\">Clay Man</lido:term>\n" +
                     "                        </lido:subjectConcept>\n" +
                     "                        <lido:subjectActor>\n" +
                     "                            <lido:displayActor>Gumby</lido:displayActor>\n" +
@@ -178,7 +179,7 @@ public class TestCodeGeneration {
                     "                <lido:subjectSet lido:sortorder=\"45\">\n" +
                     "                    <lido:subject>\n" +
                     "                        <lido:subjectConcept>\n" +
-                    "                            <lido:term lido:pref=\"45\">Clay Horse</lido:term>\n" +
+                    "                            <lido:term lido:addedSearchTerm=\"horse\" lido:pref=\"45\">Clay Horse</lido:term>\n" +
                     "                        </lido:subjectConcept>\n" +
                     "                        <lido:subjectActor>\n" +
                     "                            <lido:displayActor><![CDATA[<]]>O'Po<![CDATA[k]]>ey<![CDATA[>]]></lido:displayActor>\n" +
@@ -191,7 +192,7 @@ public class TestCodeGeneration {
                     "    </lido:descriptiveMetadata>\n" +
                     "    <lido:administrativeMetadata>\n" +
                     "        <lido:recordWrap>\n" +
-                    "            <lido:recordID lido:type=\"reverse reverse\"/>\n" +
+                    "            <lido:recordID lido:type=\"rv\">reverse reverse</lido:recordID>\n" +
                     "        </lido:recordWrap>\n" +
                     "    </lido:administrativeMetadata>\n" +
                     "</lido:lido>\n";
