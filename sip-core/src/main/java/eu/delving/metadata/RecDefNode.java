@@ -92,7 +92,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     }
                     else {
                         for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option (introducing the OptBox instances)
-                            children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, new OptBox(OptRole.ROOT, subOpt)));
+                            children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, OptBox.asRoot(subOpt)));
                         }
                     }
                 }
@@ -491,52 +491,4 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return name;
     }
 
-    private enum OptRole {ROOT, CHILD, KEY, VALUE, SCHEMA, SCHEMA_URI}
-
-    private static class OptBox {
-        final OptRole role;
-        final OptList.Opt opt;
-
-        OptBox(OptRole role, OptList.Opt opt) {
-            this.role = role;
-            this.opt = opt;
-        }
-
-        OptBox inRoleFor(Tag tag) {
-            if (role == OptRole.CHILD) {
-                if (opt.parent.key != null && opt.parent.key.equals(tag)) return new OptBox(OptRole.KEY, opt);
-                if (opt.parent.value != null && opt.parent.value.equals(tag)) return new OptBox(OptRole.VALUE, opt);
-                if (opt.parent.schema != null && opt.parent.schema.equals(tag)) return new OptBox(OptRole.SCHEMA, opt);
-                if (opt.parent.schemaUri != null && opt.parent.schemaUri.equals(tag))
-                    return new OptBox(OptRole.SCHEMA_URI, opt);
-            }
-            return null;
-        }
-
-        OptBox createChild() {
-            if (role != OptRole.ROOT) throw new RuntimeException();
-            return new OptBox(OptRole.CHILD, opt);
-        }
-
-        public boolean isChild() {
-            return role != OptRole.ROOT;
-        }
-
-        public String toString() {
-            switch (role) {
-                case ROOT:
-                    return opt.value;
-                case KEY:
-                    return opt.key;
-                case VALUE:
-                    return opt.value;
-                case SCHEMA:
-                    return opt.schema;
-                case SCHEMA_URI:
-                    return opt.schemaUri;
-                default:
-                    return "OPT";
-            }
-        }
-    }
 }
