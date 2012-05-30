@@ -110,7 +110,7 @@ public class SourceConverter {
                         out.add(eventFactory.createCharacters("\n"));
                         List<Namespace> nslist = new ArrayList<Namespace>();
                         for (Map.Entry<String, String> entry : namespaces.entrySet()) {
-                            if (entry.getValue().trim().isEmpty()) continue;
+                            if (entry.getKey().isEmpty() || entry.getValue().trim().isEmpty()) continue;
                             nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
                         }
                         out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
