@@ -42,7 +42,7 @@ public class StorageFinder {
     private static final Pattern HPU_HUMAN = Pattern.compile("([A-Za-z0-9.-]+):([0-9]+)/([A-Za-z0-9]+)");
     private static final Pattern HPU_DIRECTORY = Pattern.compile("([A-Za-z0-9_-]+)__([0-9]+)___([A-Za-z0-9]+)");
 
-    public static File getStorageDirectory(String [] args) {
+    public static File getStorageDirectory(String[] args) {
         if (!WORKSPACE_DIR.exists()) {
             if (!WORKSPACE_DIR.mkdirs()) {
                 throw new RuntimeException(String.format("Unable to create %s", WORKSPACE_DIR.getAbsolutePath()));
@@ -104,7 +104,7 @@ public class StorageFinder {
         String directoryName = String.format("%s__%s___%s", mungedHost, port, user);
         File directory = new File(WORKSPACE_DIR, directoryName);
         if (!directory.exists() && !directory.mkdirs()) {
-            throw new RuntimeException("Unable to create "+directory.getAbsolutePath());
+            throw new RuntimeException("Unable to create " + directory.getAbsolutePath());
         }
         return directory;
     }
@@ -115,11 +115,11 @@ public class StorageFinder {
             return createDirectory(matcher.group(1), matcher.group(2), matcher.group(3));
         }
         else {
-            throw new RuntimeException("Expected host:port/user but got "+hostPortUser);
+            throw new RuntimeException("Expected host:port/user but got " + hostPortUser);
         }
     }
 
-    private static File createHostPortDirectory(String [] args) {
+    private static File createHostPortDirectory(String[] args) {
         if (args.length > 0) {
             String user = args[0];
             URL codebase = getCodebase();
@@ -145,18 +145,13 @@ public class StorageFinder {
     }
 
     private static File chooseDirectory(File[] directories) {
-        String [] endpoints = new String[directories.length];
-        for (int walk=0; walk<directories.length; walk++) endpoints[walk] = getHostPortUser(directories[walk]);
+        String[] endpoints = new String[directories.length];
+        for (int walk = 0; walk < directories.length; walk++) endpoints[walk] = getHostPortUser(directories[walk]);
         JComboBox box = new JComboBox(endpoints);
         int okCancel = JOptionPane.showConfirmDialog(null, box, "Choose server", JOptionPane.OK_CANCEL_OPTION);
-        if (okCancel == JOptionPane.CANCEL_OPTION) {
-            System.exit(0);
-            return null;
-        }
-        else {
-            String hostPort = (String)box.getSelectedItem();
-            return createDirectory(hostPort);
-        }
+        if (okCancel == JOptionPane.CANCEL_OPTION) return null;
+        String hostPort = (String) box.getSelectedItem();
+        return createDirectory(hostPort);
     }
 
     public static URL getCodebase() {
