@@ -74,7 +74,7 @@ public class MappingRunner {
         recMapping.toCode(codeOut, editPath);
         code = codeOut.toString();
         script = groovyCodeResource.createMappingScript(code);
-        for (Map.Entry<String,String> entry : recMapping.getFacts().entrySet()) {
+        for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());
         }
     }
@@ -102,7 +102,7 @@ public class MappingRunner {
             return stripEmptyElements(script.run());
         }
         catch (MissingPropertyException e) {
-            throw new MappingException(metadataRecord, "Missing Property " + e.getProperty(), e);
+            throw new MappingException(metadataRecord, "Missing Property " + e.getProperty() + "\n" + code, e);
         }
         catch (MultipleCompilationErrorsException e) {
             StringBuilder out = new StringBuilder();

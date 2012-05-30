@@ -54,7 +54,14 @@
         <string>&quot;http://id.princesshof.nl/thing/${cleanUri(_objectnumber)}&quot;</string>
       </groovy-code>
     </node-mapping>
-    <node-mapping inputPath="/constant" outputPath="/aff:record/aff:thing/aff:category"/>
+    <node-mapping inputPath="/input/catty" outputPath="/aff:record/aff:thing/aff:category">
+        <dictionary>
+            <entry>
+                <string>Whatever</string>
+                <string>Thing</string>
+            </entry>
+        </dictionary>
+    </node-mapping>
     <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:displayIdentification"/>
     <node-mapping inputPath="/input/title" outputPath="/aff:record/aff:thing/aff:displayTitle"/>
     <node-mapping inputPath="/input/description" outputPath="/aff:record/aff:thing/aff:displayDescription" operator="COMMA_DELIM"/>

@@ -36,6 +36,7 @@ import java.util.*;
 public class StringUtil {
 
     public static void toDictionaryCode(NodeMapping nodeMapping, CodeOut codeOut) {
+        if (!nodeMapping.hasDictionary()) return;
         OptBox optBox = nodeMapping.recDefNode.getDictionaryOptBox();
         if (optBox == null || optBox.isChild()) return;
         codeOut.line_(String.format("def Dictionary%s = [", optBox.getDictionaryName()));

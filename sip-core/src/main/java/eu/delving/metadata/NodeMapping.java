@@ -123,6 +123,10 @@ public class NodeMapping {
         return walk.hasNext() ? walk.next() : null;
     }
 
+    public boolean hasDictionary() {
+        return dictionary != null;
+    }
+
     public SortedSet getSourceTreeNodes() {
         return sourceTreeNodes;
     }
@@ -381,5 +385,6 @@ public class NodeMapping {
     private EditPath getGeneratorEditPath() {
         return new EditPath(this);
     }
+
 }
 
