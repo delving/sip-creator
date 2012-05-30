@@ -174,7 +174,7 @@ public class MappingResultImpl implements MappingResult {
     }
 
     private RecDefNode getRecDefNode(Element element) {
-        Path path = Path.create().child(Tag.element(recDefTree.getRecDef().prefix, "record", null));
+        Path path = Path.create().child(recDefTree.getRecDef().root.tag);
         List<Element> elements = new ArrayList<Element>();
         while (element.getParentNode() != null) {
             elements.add(0, element);
