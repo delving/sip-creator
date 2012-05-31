@@ -47,6 +47,7 @@ public class TestSourceConverter {
             "<the-root",
             " xmlns:a=\"http://a\"",
             " xmlns:b=\"http://b\"",
+            " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", // will be stripped
             ">",
             "<sub-root xmlns:c=\"http://c\">", // repeated
             "<we-are-in-record>",
@@ -56,7 +57,8 @@ public class TestSourceConverter {
             "<a:inside>yolk</a:inside>",
             "</a:middle>",
             "</a:wrapper>",
-            "<a:unique>03030030</a:unique>",
+            "<a:unique " + // the rest will be stripped
+                    "xsi:schemaLocation=\"http://www.blabla.org/ http://www.blabla.org/boobies.xsd\">03030030</a:unique>",
             "<b:shh silent=\"very\">quiet</b:shh>",
             "</we-are-in-record>",
             "               <we-are-in-record xmlns:c=\"http://c\">           ",
