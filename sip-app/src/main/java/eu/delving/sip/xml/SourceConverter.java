@@ -53,6 +53,7 @@ import static eu.delving.sip.files.Storage.RECORD_TAG;
 
 public class SourceConverter {
     public static final String CONVERTER_DELIMITER = ":::";
+    private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
     private Feedback feedback;
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
@@ -83,11 +84,10 @@ public class SourceConverter {
         this.maxUniqueValueLength = maxUniqueValueLength;
         this.namespaces = namespaces;
         if (uniqueConverter != null) {
-            String delimiter = ":::";
-            int divider = uniqueConverter.indexOf(delimiter);
+            int divider = uniqueConverter.indexOf(CONVERTER_DELIMITER);
             if (divider > 0) {
                 converterPattern = Pattern.compile(uniqueConverter.substring(0, divider));
-                converterReplacement = uniqueConverter.substring(divider + delimiter.length());
+                converterReplacement = uniqueConverter.substring(divider + CONVERTER_DELIMITER.length());
             }
         }
     }
@@ -111,6 +111,7 @@ public class SourceConverter {
                         List<Namespace> nslist = new ArrayList<Namespace>();
                         for (Map.Entry<String, String> entry : namespaces.entrySet()) {
                             if (entry.getKey().isEmpty() || entry.getValue().trim().isEmpty()) continue;
+                            if (XSI_SCHEMA.equals(entry.getValue())) continue;
                             nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
                         }
                         out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
@@ -222,12 +223,23 @@ public class SourceConverter {
         if (recordEvents) {
             if (followsStart) eventBuffer.add(eventFactory.createCharacters("\n"));
             if (uniqueElementPath.peek().isAttribute()) handleAttributes(path, start);
-            eventBuffer.add(eventFactory.createStartElement(start.getName(), start.getAttributes(), null)); // remove namespaces
+            eventBuffer.add(eventFactory.createStartElement(start.getName(), filteredAttributes(), null)); // remove namespaces
         }
         else if (path.equals(recordRootPath)) {
             recordEvents = true;
             if (uniqueElementPath.peek().isAttribute()) handleAttributes(path, start);
         }
+    }
+
+    private Iterator<Attribute> filteredAttributes() {
+        Iterator aw = start.getAttributes();
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        while (aw.hasNext()) {
+            Attribute attribute = (Attribute) aw.next();
+            if (XSI_SCHEMA.equals(attribute.getName().getNamespaceURI())) continue;
+            attributes.add(attribute);
+        }
+        return attributes.iterator();
     }
 
     private void handleAttributes(Path path, StartElement start) {
