@@ -200,9 +200,7 @@ public class Stats {
             wordCounts.recordValue(String.valueOf(wordCount));
             if (!histogramExploded) {
                 if (values == null) values = new Histogram();
-                if (!values.recordValue(value)) {
-                    histogramExploded = true;
-                }
+                if (!values.recordValue(value)) histogramExploded = true;
                 if (values.trimmed) histogramExploded = true;
             }
             if (unique == null || unique) {
@@ -227,7 +225,7 @@ public class Stats {
 
         public void finish() {
             if (values != null) {
-                if (values.counterMap.size() == 1 || unique != null && unique) {
+                if (unique != null && unique) {
                     values = null;
                 }
                 else {
