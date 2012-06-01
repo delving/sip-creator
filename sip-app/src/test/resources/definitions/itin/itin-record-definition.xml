@@ -65,6 +65,9 @@
         </mapping-function>
     </functions>
 
+    <attrs>
+        <attr tag="type"/>
+    </attrs>
 
     <root tag="record">
 
@@ -136,11 +139,11 @@
         <elem tag="pvbLink_path"/>
 
         <!--Contenttype info-->
-        <elem tag="field_organization_type"/>
-        <elem tag="field_reference_type"/>
-        <elem tag="field_event_type"/>
-        <elem tag="field_accommodation_type"/>
-        <elem tag="field_place_type"/>
+        <elem tag="field_organization_type" attrs="type"/>
+        <elem tag="field_reference_type" attrs="type"/>
+        <elem tag="field_event_type" attrs="type"/>
+        <elem tag="field_accommodation_type" attrs="type"/>
+        <elem tag="field_place_type" attrs="type"/>
 
 
         <!--ICN fields -->
@@ -293,7 +296,7 @@
             <opt hidden="true" key="history_period" value="Historical period"/>
         </opt-list>
 
-        <opt-list path="/record/field_organization_type" key="@type" value="@label" dictionary="true" displayName="Organisation Type">
+        <opt-list path="/record/field_organization_type" key="@type" dictionary="ORG" displayName="Organisation Type">
             <opt key="onbekend" value="Onbekend / n.v.t."/>
             <opt key="onderwijsinstelling" value="Onderwijsinstelling"/>
             <opt key="overheidsinstelling" value="Overheidsinstelling"/>
@@ -304,7 +307,7 @@
             <opt key="weborganisaties" value="Weborganisaties"/>
         </opt-list>
 
-        <opt-list path="/record/field_reference_type" key="@type" value="@label" dictionary="true" displayName="Reference Type">
+        <opt-list path="/record/field_reference_type" key="@type" dictionary="REF" displayName="Reference Type">
             <opt key="boek" value="Boek"/>
             <opt key="tijdschrift" value="Tijdschrift"/>
             <opt key="krant" value="Krant"/>
@@ -314,20 +317,20 @@
             <opt key="overig" value="Overig"/>
         </opt-list>
 
-        <opt-list path="/record/field_place_type" key="@type" value="@label" dictionary="true" displayName="Place Type">
+        <opt-list path="/record/field_place_type" key="@type" dictionary="PLACE" displayName="Place Type">
             <opt key="café" value="café"/>
             <opt key="hotel" value="hotel"/>
             <opt key="restaurant" value="restaurant"/>
             <opt key="overig" value="overig"/>
         </opt-list>
 
-        <opt-list path="/record/field_accommodation_type" key="@type" value="@label" dictionary="true" displayName="Accommodation Type">
+        <opt-list path="/record/field_accommodation_type" key="@type" dictionary="ACCOM" displayName="Accommodation Type">
             <opt key="hotel" value="hotel"/>
             <opt key="restaurant" value="restaurant"/>
             <opt key="overig" value="overig"/>
         </opt-list>
 
-        <opt-list path="/record/field_event_type" key="@type" value="@label" dictionary="true" displayName="EventType">
+        <opt-list path="/record/field_event_type" key="@type" dictionary="EVENT" displayName="EventType">
             <opt key="andere_tocht" value="Andere tocht"/>
             <opt key="concert" value="Concert"/>
             <opt key="festival" value="Festival"/>
