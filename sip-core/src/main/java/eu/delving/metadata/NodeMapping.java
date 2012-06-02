@@ -230,12 +230,12 @@ public class NodeMapping {
         toUserCode(codeOut, groovyParams, editPath);
     }
 
-    public void toDictionaryCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath, OptRole optRole) {
+    public void toDictionaryCode(CodeOut codeOut, Stack<String> groovyParams, OptRole optRole) {
         toInnerLoop(codeOut, getLocalPath(), groovyParams, optRole);
     }
 
     public boolean isUserCodeEditable() {
-        return recDefNode.isAttr() || recDefNode.isLeafElem();
+        return (recDefNode.isAttr() || recDefNode.isLeafElem()) && !hasDictionary();
     }
 
     private boolean isSimilar(String codeString, Iterator<String> walk) {

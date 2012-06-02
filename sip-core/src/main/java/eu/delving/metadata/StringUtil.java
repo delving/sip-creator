@@ -57,7 +57,7 @@ public class StringUtil {
         codeOut.line_("def lookup%s_%s = { value ->", name, field);
         codeOut.line("   if (!value) return ''");
         codeOut.line("   String optKey = Dictionary%s[value.sanitize()]", name);
-        codeOut.line("   if (!optKey) return ''");
+        codeOut.line("   if (!optKey) optKey = value");
         codeOut.line("   Object opt = _optLookup['%s'][optKey]", name);
         codeOut.line("   if (!opt) return ''");
         codeOut.line("   opt.%s", field);

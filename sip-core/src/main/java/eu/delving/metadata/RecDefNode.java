@@ -464,10 +464,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
                         if (nodeMappings.size() == 1) {
                             NodeMapping nodeMapping = nodeMappings.values().iterator().next();
                             codeOut.line_("%s : {", sub.getTag().toBuilderCall());
-                            nodeMapping.toDictionaryCode(codeOut, groovyParams, editPath, sub.optBox.role);
+                            nodeMapping.toDictionaryCode(codeOut, groovyParams, sub.optBox.role);
                             codeOut._line("}");
                         }
-                        else {
+                        else { // this is actually a kind of error:
                             codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
                         }
                     }
