@@ -125,6 +125,7 @@
         <elem tag="cfield_lat"/>
         <elem tag="cfield_long"/>
         <elem tag="cfield_latLong"/>
+        <elem tag="cfield_itin_place"/>
 
         <!--Event-->
         <elem tag="field_date"/>
@@ -191,7 +192,6 @@
         <elem tag="field_organization_type"/>
         <elem tag="field_event_type"/>
         <elem tag="field_reference_type"/>
-        <elem tag="field_event_type"/>
         <elem tag="field_accommodation_type"/>
         <elem tag="field_place_type"/>
 

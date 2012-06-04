@@ -122,6 +122,7 @@
             <xs:element name="cfield_lat" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="cfield_long" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="cfield_latLong" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_itin_place" minOccurs="0" maxOccurs="unbounded"/>
 
             <!--Event-->
             <xs:element name="field_date" minOccurs="0" maxOccurs="unbounded"/>
@@ -170,7 +171,6 @@
             <xs:element name="field_facilities_wheelchair" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_wifi" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_facilities_other" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="field_history" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_use" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_amazon" minOccurs="0" maxOccurs="unbounded"/>
 
@@ -186,7 +186,6 @@
 
             <!--Contenttype info-->
             <xs:element name="field_organization_type" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="field_event_type" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_reference_type" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_event_type" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_accommodation_type" minOccurs="0" maxOccurs="unbounded"/>
