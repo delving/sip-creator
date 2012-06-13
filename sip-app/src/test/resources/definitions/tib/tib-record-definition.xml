@@ -86,7 +86,7 @@
         </mapping-function>
     </functions>
 
-    <root tag="record">
+    <root tag="tib:record">
 
         <!-- tib -->
         <elem tag="tib:citName"/>
@@ -107,11 +107,11 @@
         <elem tag="tib:objectSoort" function="lowercase"/>
         <elem tag="tib:material" function="lowercase"/>
         <elem tag="tib:place"/>
-        <elem tag="tib:technique" function="lowercase"/>
-        <elem tag="tib:color" function="lowercase"/>
-        <elem tag="tib:design" function="lowercase"/>
-        <elem tag="tib:exhibition" function="string"/>
-        <elem tag="tib:subjectDepicted" function="string"/>
+        <elem tag="tib:technique" function="lowercase" fieldType="string"/>
+        <elem tag="tib:color" function="lowercase" fieldType="string"/>
+        <elem tag="tib:design" function="lowercase" fieldType="string"/>
+        <elem tag="tib:exhibition" function="lowercase" fieldType="string"/>
+        <elem tag="tib:subjectDepicted" function="lowercase" fieldType="string"/>
         <elem tag="tib:date"/>
         <elem tag="tib:collectionPart"/>
         <elem tag="tib:person"/>
