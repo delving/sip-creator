@@ -24,7 +24,7 @@
                 <string>D:/Documents/Schilderij/010.jpg</string>
             </sample-input>
             <groovy-code>
-                <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg&apos;,&apos;tif.dzi&apos;)</string>
+                <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg|tif|TIF&apos;,&apos;tif.dzi&apos;)</string>
                 <string>&quot;http://thuisinbrabant.delving.org/iip/deepzoom/mnt/tib/tiles/${orgId}/${spec}/${image}&quot;</string>
             </groovy-code>
         </mapping-function>
@@ -41,7 +41,7 @@
                 <string>D:/Documents/Schilderij/010.jpg</string>
             </sample-input>
             <groovy-code>
-                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg&apos;, &apos;&apos;)}/500&quot;</string>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/500&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="lowercase">
@@ -71,7 +71,7 @@
         </mapping-function>
         <mapping-function name="smallThumbnail">
             <groovy-code>
-                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg&apos;, &apos;&apos;)}/180&quot;</string>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/180&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="toLocalId">
@@ -108,6 +108,10 @@
         <elem tag="tib:material" function="lowercase"/>
         <elem tag="tib:place"/>
         <elem tag="tib:technique" function="lowercase"/>
+        <elem tag="tib:color" function="lowercase"/>
+        <elem tag="tib:design" function="lowercase"/>
+        <elem tag="tib:exhibition" function="string"/>
+        <elem tag="tib:subjectDepicted" function="string"/>
         <elem tag="tib:date"/>
         <elem tag="tib:collectionPart"/>
         <elem tag="tib:person"/>
