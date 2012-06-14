@@ -169,7 +169,7 @@
         <elem tag="europeana:isShownBy" function="largeThumbnail" fieldType="link" operator="FIRST"/>                              <!-- ESE 3.4 -->
         <elem tag="europeana:rights" fieldType="link"/>                                 <!-- ESE 3.4 -->
         <elem tag="europeana:isShownAt" function="isShownAt" fieldType="link" operator="FIRST"/>                              <!-- ESE 3.4 -->
-        <elem tag="europeana:unstored"/>                               <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored" fieldType="unstored"/>                               <!-- ESE 3.4 -->
         <elem tag="europeana:object" function="smallThumbnail" fieldType="link" operator="FIRST"/>                                  <!-- ESE 3.4 -->
         <elem tag="europeana:provider" fieldType="string"/>                               <!-- ESE 3.4 -->
         <elem tag="europeana:dataProvider" fieldType="string"/>                           <!-- ESE 3.4 -->
