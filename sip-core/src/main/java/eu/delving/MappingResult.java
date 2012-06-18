@@ -25,6 +25,7 @@ import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This is how mapping results are given back from the MappingEngine
@@ -41,4 +42,14 @@ public interface MappingResult {
     Map<String, List<String>> systemFields();
 
     Map<String, List<String>> searchFields();
+
+    Set<String> missingSystemFields();
+
+    void checkMissingFields() throws MissingFieldsException;
+
+    public static class MissingFieldsException extends Exception {
+        public MissingFieldsException(String message) {
+            super(message);
+        }
+    }
 }
