@@ -196,6 +196,7 @@
         <field-marker name="CREATOR" path="/record/dc:creator"/>
         <field-marker name="TITLE" path="/record/dc:title"/>
         <field-marker name="DESCRIPTION" path="/record/dc:description"/>
+        <field-marker name="PROVIDER" path="/record/europeana:provider"/>
         <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
         <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
         <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
