@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.Storage;
 
 import javax.swing.tree.TreePath;
@@ -166,7 +167,7 @@ public class CreateModel {
     }
 
     private void adjustHighlights() {
-        Exec.swing(new Runnable() {
+        Exec.soon(new Swing() {
             @Override
             public void run() {
                 sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();

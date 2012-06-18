@@ -354,7 +354,7 @@ public class Application {
 
         @Override
         public void dataSetCreated(final DataSet dataSet) {
-            Exec.swing(new Runnable() {
+            Exec.soon(new Swing() {
                 @Override
                 public void run() {
                     dataSetMenu.refreshAndChoose(dataSet);

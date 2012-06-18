@@ -23,10 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.*;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -80,12 +77,7 @@ public class InputFrame extends FrameBase {
         sipModel.addParseListener(new SipModel.ParseListener() {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {
-                if (metadataRecord == null) {
-                    Exec.swing(new RecordSetter(null));
-                }
-                else {
-                    Exec.swing(new RecordSetter(metadataRecord));
-                }
+                Exec.soon(new RecordSetter(metadataRecord));
             }
         });
         recordTree = new JTree(EMPTY_MODEL) {
@@ -120,7 +112,7 @@ public class InputFrame extends FrameBase {
         return p;
     }
 
-    private class RecordSetter implements Runnable {
+    private class RecordSetter implements Swing {
         private MetadataRecord metadataRecord;
 
         private RecordSetter(MetadataRecord metadataRecord) {

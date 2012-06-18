@@ -21,10 +21,7 @@
 
 package eu.delving.sip.actions;
 
-import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.*;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
@@ -103,7 +100,7 @@ public class UploadAction extends AbstractAction {
         public void run() {
             try {
                 final List<String> freshInvalidPrefixes = sipModel.getDataSetModel().getInvalidPrefixes();
-                Exec.swing(new Runnable() {
+                Exec.soon(new Swing() {
                     @Override
                     public void run() {
                         invalidPrefixes = freshInvalidPrefixes;
@@ -212,7 +209,7 @@ public class UploadAction extends AbstractAction {
                     public void finished(final boolean success) {
                         busyUploading = false;
                         sipModel.getFeedback().alert(success ? "Upload complete" : "Upload failed");
-                        Exec.swing(new Runnable() {
+                        Exec.soon(new Swing() {
                             @Override
                             public void run() {
                                 disappear();

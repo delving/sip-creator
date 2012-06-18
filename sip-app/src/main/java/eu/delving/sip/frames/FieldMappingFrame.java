@@ -22,10 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.CompileState;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.URLLauncher;
+import eu.delving.sip.base.*;
 import eu.delving.sip.model.*;
 
 import javax.swing.*;
@@ -217,7 +214,7 @@ public class FieldMappingFrame extends FrameBase {
                     final NodeMapping nodeMapping = createModel.getNodeMapping();
                     contextVarModel.setList(nodeMapping);
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                    Exec.swing(new Runnable() {
+                    Exec.soon(new Swing() {
                         @Override
                         public void run() {
                             setEditable(codeArea, nodeMapping.isUserCodeEditable());
@@ -230,7 +227,7 @@ public class FieldMappingFrame extends FrameBase {
                 else {
                     contextVarModel.setList(null);
                     sipModel.getFieldCompileModel().setNodeMapping(null);
-                    Exec.swing(new Runnable() {
+                    Exec.soon(new Swing() {
                         @Override
                         public void run() {
                             setEditable(codeArea, false);
@@ -245,7 +242,7 @@ public class FieldMappingFrame extends FrameBase {
         sipModel.getFieldCompileModel().addListener(new MappingCompileModel.Listener() {
             @Override
             public void stateChanged(final CompileState state) {
-                Exec.swing(new Runnable() {
+                Exec.soon(new Swing() {
                     @Override
                     public void run() {
                         if (state == CompileState.ORIGINAL) {

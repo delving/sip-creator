@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
@@ -139,7 +140,7 @@ public class DataSetModel implements RecDefModel {
             final DataSetState freshState = getDataSetState();
             if (freshState != currentState) {
                 currentState = freshState;
-                Exec.swing(new Runnable() {
+                Exec.soon(new Swing() {
                     @Override
                     public void run() {
                         for (Listener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);

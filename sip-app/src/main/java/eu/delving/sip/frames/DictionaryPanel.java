@@ -23,6 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.CreateTransition;
@@ -265,7 +266,7 @@ public class DictionaryPanel extends JPanel {
             @Override
             public void transition(final CreateModel createModel, CreateTransition transition) {
                 if (!transition.nodeMappingChanged) return;
-                Exec.swing(new Runnable() {
+                Exec.soon(new Swing() {
                     @Override
                     public void run() {
                         boolean isDictionary = createModel.hasNodeMapping() && createModel.getNodeMapping().dictionary != null;

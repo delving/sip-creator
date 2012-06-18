@@ -23,6 +23,7 @@ package eu.delving.sip.menus;
 
 import eu.delving.metadata.OptList;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingModel;
 
 import javax.swing.*;
@@ -49,7 +50,7 @@ public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
 
     @Override
     public void recMappingSet(final MappingModel mappingModel) {
-        Exec.swing(new Runnable() {
+        Exec.soon(new Swing() {
             @Override
             public void run() {
                 removeAll();

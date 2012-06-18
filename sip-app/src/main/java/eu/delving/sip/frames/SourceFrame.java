@@ -25,6 +25,7 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.*;
@@ -123,7 +124,7 @@ public class SourceFrame extends FrameBase {
                 switch (transition) {
                     case COMPLETE_TO_COMPLETE:
                     case NOTHING_TO_COMPLETE:
-                        Exec.swing(new Runnable() {
+                        Exec.soon(new Swing() {
                             @Override
                             public void run() {
                                 sourceTree.clearSelection();

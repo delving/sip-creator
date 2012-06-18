@@ -28,6 +28,7 @@ import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -116,12 +117,12 @@ public class MappingCompileModel {
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
-        Exec.swing(new DocumentSetter(docDocument, "", true));
-        Exec.swing(new DocumentSetter(codeDocument, "", true));
-        Exec.swing(new DocumentSetter(outputDocument, "", true));
+        Exec.soon(new DocumentSetter(docDocument, "", true));
+        Exec.soon(new DocumentSetter(codeDocument, "", true));
+        Exec.soon(new DocumentSetter(outputDocument, "", true));
         if ((this.nodeMapping = nodeMapping) != null) {
-            Exec.swing(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
-            Exec.swing(new Runnable() {
+            Exec.soon(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
+            Exec.soon(new Swing() {
                 @Override
                 public void run() {
                     String code = getCode(getEditPath(false));
@@ -211,7 +212,7 @@ public class MappingCompileModel {
                 triggerRun();
             }
             else {
-                Exec.swing(new DocumentSetter(outputDocument, "", false));
+                Exec.soon(new DocumentSetter(outputDocument, "", false));
             }
         }
     }
@@ -323,7 +324,7 @@ public class MappingCompileModel {
 
         private void compilationComplete(String result, String error) {
             if (error != null) result = String.format("## VALIDATION ERROR! ##\n%s\n\n## OUTPUT ##\n%s", error, result);
-            Exec.swing(new DocumentSetter(outputDocument, result, false));
+            Exec.soon(new DocumentSetter(outputDocument, result, false));
         }
 
         public String toString() {
@@ -331,7 +332,7 @@ public class MappingCompileModel {
         }
     }
 
-    private class DocumentSetter implements Runnable {
+    private class DocumentSetter implements Swing {
 
         private Document document;
         private String content;

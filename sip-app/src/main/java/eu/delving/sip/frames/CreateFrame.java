@@ -23,6 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
@@ -125,7 +126,7 @@ public class CreateFrame extends FrameBase {
             public void transition(CreateModel createModel, final CreateTransition transition) {
                 final SortedSet<SourceTreeNode> sourceTreeNodes = createModel.getSourceTreeNodes();
                 final RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
-                Exec.swing(new Runnable() {
+                Exec.soon(new Swing() {
                     @Override
                     public void run() {
                         if (transition.sourceChanged) {

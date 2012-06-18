@@ -26,6 +26,7 @@ import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
@@ -272,7 +273,7 @@ public class SipModel {
                     dataSetModel.getMappingModel().setFacts(facts);
                     recordCompileModel.setValidator(dataSetModel.newValidator());
                     feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), dataSetModel.getPrefix()));
-                    Exec.swing(new Runnable() {
+                    Exec.soon(new Swing() {
                         @Override
                         public void run() {
                             dataSetFacts.set(facts);
@@ -338,7 +339,7 @@ public class SipModel {
                     analyzing = false;
                     try {
                         dataSetModel.getDataSet().setStats(stats, stats.sourceFormat, null);
-                        Exec.swing(new Runnable() {
+                        Exec.soon(new Swing() {
                             @Override
                             public void run() {
                                 statsModel.setStatistics(stats);
@@ -396,7 +397,7 @@ public class SipModel {
                 public void run() {
                     try {
                         dataSetModel.getDataSet().importedToSource(feedback, progressListener);
-                        Exec.swing(new Runnable() {
+                        Exec.soon(new Swing() {
                             @Override
                             public void run() {
                                 seekFirstRecord();

@@ -26,6 +26,7 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.StringUtil;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
@@ -100,9 +101,9 @@ public class FunctionCompileModel {
     public void setFunction(MappingFunction mappingFunction) {
         this.mappingFunction = mappingFunction;
         functionRunner = null;
-        Exec.swing(new DocumentSetter(inputDocument, getSampleInput(), true));
-        Exec.swing(new DocumentSetter(docDocument, getDocInput(), true));
-        Exec.swing(new DocumentSetter(codeDocument, getOriginalCode(), true));
+        Exec.soon(new DocumentSetter(inputDocument, getSampleInput(), true));
+        Exec.soon(new DocumentSetter(docDocument, getDocInput(), true));
+        Exec.soon(new DocumentSetter(codeDocument, getOriginalCode(), true));
         notifyStateChange(CompileState.SAVED);
         trigger(COMPILE_DELAY);
     }
@@ -178,7 +179,7 @@ public class FunctionCompileModel {
                         problems = true;
                     }
                 }
-                Exec.swing(new DocumentSetter(outputDocument, outputLines));
+                Exec.soon(new DocumentSetter(outputDocument, outputLines));
                 if (problems) {
                     notifyStateChange(CompileState.ERROR);
                 }
@@ -209,7 +210,7 @@ public class FunctionCompileModel {
         }
 
         private void compilationComplete(final String result) {
-            Exec.swing(new DocumentSetter(outputDocument, result, false));
+            Exec.soon(new DocumentSetter(outputDocument, result, false));
         }
 
         public String toString() {
@@ -287,7 +288,7 @@ public class FunctionCompileModel {
         }
     }
 
-    private class DocumentSetter implements Runnable {
+    private class DocumentSetter implements Swing {
 
         private Document document;
         private String content;

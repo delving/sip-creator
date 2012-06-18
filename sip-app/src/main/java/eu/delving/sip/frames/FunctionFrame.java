@@ -25,6 +25,7 @@ import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
@@ -212,7 +213,7 @@ public class FunctionFrame extends FrameBase {
             @Override
             public void recMappingSet(final MappingModel mappingModel) {
                 fetchFunctionList();
-                Exec.swing(new Runnable() {
+                Exec.soon(new Swing() {
                     @Override
                     public void run() {
                         if (mappingModel.hasRecMapping()) {
@@ -232,7 +233,7 @@ public class FunctionFrame extends FrameBase {
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void functionChanged(final MappingModel mappingModel, final MappingFunction function) {
-                Exec.swing(new Runnable() {
+                Exec.soon(new Swing() {
                     @Override
                     public void run() {
                         if (mappingModel.hasRecMapping()) {
@@ -268,7 +269,7 @@ public class FunctionFrame extends FrameBase {
             final MappingFunction.FunctionList functionList = MappingFunction.read(functionFile.openStream());
             SortedSet<MappingFunction> hintFunctions = sipModel.getMappingHintsModel().getFunctions();
             if (hintFunctions != null) functionList.functions.addAll(hintFunctions);
-            Exec.swing(new Runnable() {
+            Exec.soon(new Swing() {
                 @Override
                 public void run() {
                     libraryListModel.setList(functionList.functions);
@@ -330,7 +331,7 @@ public class FunctionFrame extends FrameBase {
                 @Override
                 public void run() {
                     sipModel.getFunctionCompileModel().setFunction(function);
-                    Exec.swing(new Runnable() {
+                    Exec.soon(new Swing() {
                         @Override
                         public void run() {
                             undoManager.discardAllEdits();
@@ -494,7 +495,7 @@ public class FunctionFrame extends FrameBase {
         @Override
         public void stateChanged(final CompileState state) {
             final boolean lib = this.library;
-            Exec.swing(new Runnable() {
+            Exec.soon(new Swing() {
                 @Override
                 public void run() {
                     if (state == CompileState.ORIGINAL) undoManager.discardAllEdits();

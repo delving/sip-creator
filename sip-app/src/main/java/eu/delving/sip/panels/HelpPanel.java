@@ -22,6 +22,7 @@
 package eu.delving.sip.panels;
 
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
@@ -71,7 +72,7 @@ public class HelpPanel extends HtmlPanel {
                 int end = fullPage.indexOf(END_MARKER);
                 if (end > start) {
                     final String ourPage = fullPage.substring(start + START_MARKER.length(), end).trim();
-                    Exec.swing(new Runnable() {
+                    Exec.soon(new Swing() {
                         @Override
                         public void run() {
                             setHtml("<html>" + ourPage);
@@ -90,7 +91,7 @@ public class HelpPanel extends HtmlPanel {
                     sipModel.getFeedback().say("Unable to fetch help page from workspace");
                 }
                 else {
-                    Exec.swing(new Runnable() {
+                    Exec.soon(new Swing() {
                         @Override
                         public void run() {
                             setHtml("<html>" + page);

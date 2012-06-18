@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
@@ -84,7 +85,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
                     sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping, freeze);
                 }
                 if (freeze) {
-                    if (listReceiver != null) Exec.swing(new Runnable() {
+                    if (listReceiver != null) Exec.soon(new Swing() {
                         @Override
                         public void run() {
                             try {

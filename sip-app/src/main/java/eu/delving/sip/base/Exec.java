@@ -35,9 +35,9 @@ import java.util.concurrent.Executors;
 public class Exec {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public static void swing(Runnable runnable) {
+    public static void soon(Swing swing) {
         checkWork();
-        SwingUtilities.invokeLater(runnable);
+        SwingUtilities.invokeLater(swing);
     }
 
     public static void swingLater(Runnable runnable) {
