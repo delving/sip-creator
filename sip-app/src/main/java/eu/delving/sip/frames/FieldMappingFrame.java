@@ -93,13 +93,8 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private void handleEnablement() {
-        Exec.swingLater(new Runnable() {
-            @Override
-            public void run() {
-                UNDO_ACTION.setEnabled(undoManager.canUndo());
-                REDO_ACTION.setEnabled(undoManager.canRedo());
-            }
-        });
+        UNDO_ACTION.setEnabled(undoManager.canUndo());
+        REDO_ACTION.setEnabled(undoManager.canRedo());
     }
 
     @Override

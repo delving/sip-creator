@@ -94,7 +94,7 @@ public class DataSetMenu extends JMenu {
                             });
                         }
                     });
-                    if (item.isPreferred()) Exec.swingLater(new Runnable() {
+                    if (item.isPreferred()) SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             item.doClick();

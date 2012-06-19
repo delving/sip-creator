@@ -167,12 +167,7 @@ public class AllFrames {
     }
 
     public void restore() {
-        Exec.swingLater(new Runnable() {
-            @Override
-            public void run() {
-                selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
-            }
-        });
+        selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
     }
 
     public JMenu getFrameMenu() {

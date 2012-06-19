@@ -40,11 +40,6 @@ public class Exec {
         SwingUtilities.invokeLater(swing);
     }
 
-    public static void swingLater(Runnable runnable) {
-        checkSwing();
-        SwingUtilities.invokeLater(runnable);
-    }
-
     public static void swingAny(Runnable runnable) {
         SwingUtilities.invokeLater(runnable);
     }

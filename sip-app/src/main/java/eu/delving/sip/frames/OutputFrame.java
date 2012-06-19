@@ -21,7 +21,6 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
@@ -70,15 +69,10 @@ public class OutputFrame extends FrameBase {
                 try {
                     String first = documentEvent.getDocument().getText(0, 1);
                     final boolean error = first.startsWith("#");
-                    Exec.swingLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            setError(area, error);
-                            area.setBackground(error ? new Color(1.0f, 0.9f, 0.9f) : Color.WHITE);
-                            area.setLineWrap(error);
-                            area.setCaretPosition(0);
-                        }
-                    });
+                    setError(area, error);
+                    area.setBackground(error ? new Color(1.0f, 0.9f, 0.9f) : Color.WHITE);
+                    area.setLineWrap(error);
+                    area.setCaretPosition(0);
                 }
                 catch (BadLocationException e) {
                     // who cares

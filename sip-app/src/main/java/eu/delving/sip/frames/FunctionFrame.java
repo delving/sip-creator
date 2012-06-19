@@ -282,13 +282,8 @@ public class FunctionFrame extends FrameBase {
     }
 
     private void handleEnablement() {
-        Exec.swingLater(new Runnable() {
-            @Override
-            public void run() {
-                UNDO_ACTION.setEnabled(undoManager.canUndo());
-                REDO_ACTION.setEnabled(undoManager.canRedo());
-            }
-        });
+        UNDO_ACTION.setEnabled(undoManager.canUndo());
+        REDO_ACTION.setEnabled(undoManager.canRedo());
     }
 
     private class FunctionSelection implements ListSelectionListener {
@@ -310,13 +305,8 @@ public class FunctionFrame extends FrameBase {
                 functionList.clearSelection();
                 final int index = functionModel.indexOf(function.name);
                 if (index >= 0) {
-                    Exec.swingLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            functionList.setSelectedIndex(index);
-                            libraryList.clearSelection();
-                        }
-                    });
+                    functionList.setSelectedIndex(index);
+                    libraryList.clearSelection();
                 }
             }
             else {
