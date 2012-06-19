@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
  */
 
 public class Exec {
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
 
     public static void run(Swing swing) {
         SwingUtilities.invokeLater(swing);

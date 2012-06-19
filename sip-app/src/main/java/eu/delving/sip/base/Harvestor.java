@@ -58,7 +58,7 @@ import static org.apache.http.HttpStatus.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class Harvestor implements Runnable {
+public class Harvestor implements Work {
     private static final int CONNECTION_TIMEOUT = 1000 * 60 * 5;
     private static final int TALK_DELAY = 1000 * 15;
     private static final Path RECORD_ROOT = Path.create("/OAI-PMH/ListRecords/record");
