@@ -61,6 +61,7 @@ public class OutputFrame extends FrameBase {
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
         final JTextArea area = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        area.setLineWrap(true);
         area.setFont(MONOSPACED);
         area.setWrapStyleWord(true);
         area.getDocument().addDocumentListener(new DocumentListener() {
@@ -70,8 +71,6 @@ public class OutputFrame extends FrameBase {
                     String first = documentEvent.getDocument().getText(0, 1);
                     final boolean error = first.startsWith("#");
                     setError(area, error);
-                    area.setBackground(error ? new Color(1.0f, 0.9f, 0.9f) : Color.WHITE);
-                    area.setLineWrap(error);
                     area.setCaretPosition(0);
                 }
                 catch (BadLocationException e) {
