@@ -67,7 +67,7 @@ public class SwingHelper {
     }
 
     public static void setError(JTextComponent component, boolean error) {
-        component.setBackground(error ? ERROR_BG : UNEDITABLE_BG);
+        component.setBackground(error ? ERROR_BG : NORMAL_BG);
     }
 
     public static void setDelimitedColor(JComponent component, boolean selected) {
