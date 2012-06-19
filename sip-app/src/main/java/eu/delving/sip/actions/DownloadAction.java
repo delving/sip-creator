@@ -148,7 +148,7 @@ public class DownloadAction extends AbstractAction {
         cultureHubClient.fetchDataSetList(new CultureHubClient.ListReceiveListener() {
             @Override
             public void listReceived(final List<CultureHubClient.DataSetEntry> entries) {
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
                         if (entries == null || entries.isEmpty()) {
@@ -166,7 +166,7 @@ public class DownloadAction extends AbstractAction {
             public void failed(Exception e) {
                 LOG.warn("Fetching list failed", e);
                 sipModel.getFeedback().alert("Failed to receive data set list");
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
                         downloadDialog.setVisible(false);

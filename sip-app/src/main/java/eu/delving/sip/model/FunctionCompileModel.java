@@ -27,6 +27,7 @@ import eu.delving.metadata.StringUtil;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
@@ -101,9 +102,9 @@ public class FunctionCompileModel {
     public void setFunction(MappingFunction mappingFunction) {
         this.mappingFunction = mappingFunction;
         functionRunner = null;
-        Exec.soon(new DocumentSetter(inputDocument, getSampleInput(), true));
-        Exec.soon(new DocumentSetter(docDocument, getDocInput(), true));
-        Exec.soon(new DocumentSetter(codeDocument, getOriginalCode(), true));
+        Exec.run(new DocumentSetter(inputDocument, getSampleInput(), true));
+        Exec.run(new DocumentSetter(docDocument, getDocInput(), true));
+        Exec.run(new DocumentSetter(codeDocument, getOriginalCode(), true));
         notifyStateChange(CompileState.SAVED);
         trigger(COMPILE_DELAY);
     }
@@ -159,7 +160,7 @@ public class FunctionCompileModel {
         return toLines(StringUtil.documentToString(document));
     }
 
-    private class RunJob implements Runnable {
+    private class RunJob implements Work {
 
         @Override
         public void run() {
@@ -179,7 +180,7 @@ public class FunctionCompileModel {
                         problems = true;
                     }
                 }
-                Exec.soon(new DocumentSetter(outputDocument, outputLines));
+                Exec.run(new DocumentSetter(outputDocument, outputLines));
                 if (problems) {
                     notifyStateChange(CompileState.ERROR);
                 }
@@ -210,7 +211,7 @@ public class FunctionCompileModel {
         }
 
         private void compilationComplete(final String result) {
-            Exec.soon(new DocumentSetter(outputDocument, result, false));
+            Exec.run(new DocumentSetter(outputDocument, result, false));
         }
 
         public String toString() {
@@ -332,7 +333,7 @@ public class FunctionCompileModel {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (busy) return;
-            Exec.work(new RunJob());
+            Exec.run(new RunJob());
         }
 
         public void triggerSoon(int millis) {
@@ -341,7 +342,7 @@ public class FunctionCompileModel {
         }
     }
     
-    private abstract class DocChangeListener implements DocumentListener, Runnable {
+    private abstract class DocChangeListener implements DocumentListener, Work {
 
         @Override
         public void insertUpdate(DocumentEvent documentEvent) {
@@ -359,7 +360,7 @@ public class FunctionCompileModel {
         }
 
         private void go() {
-            if (!ignoreDocChanges) Exec.work(this);
+            if (!ignoreDocChanges) Exec.run(this);
         }
     }
 

@@ -154,13 +154,13 @@ public class Application {
             }
         });
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 statusPanel.setState(state);
                 switch (state) {
                     case ABSENT:
-                        Exec.work(new Runnable() {
+                        Exec.run(new Work() {
                             @Override
                             public void run() {
                                 sipModel.getMappingModel().setRecMapping(null);
@@ -287,7 +287,7 @@ public class Application {
         return menu;
     }
 
-    private class InputAnalyzer implements Runnable {
+    private class InputAnalyzer implements Swing {
         @Override
         public void run() {
             final ProgressListener progress = sipModel.getFeedback().progressListener("Analyzing");
@@ -312,7 +312,7 @@ public class Application {
         }
     }
 
-    private class ConvertPerformer implements Runnable {
+    private class ConvertPerformer implements Swing {
         @Override
         public void run() {
             ProgressListener listener = sipModel.getFeedback().progressListener("Converting");
@@ -354,7 +354,7 @@ public class Application {
 
         @Override
         public void dataSetCreated(final DataSet dataSet) {
-            Exec.soon(new Swing() {
+            Exec.run(new Swing() {
                 @Override
                 public void run() {
                     dataSetMenu.refreshAndChoose(dataSet);
@@ -440,7 +440,7 @@ public class Application {
         }
     }
 
-    private static class Launcher extends AbstractAction implements Runnable {
+    private static class Launcher extends AbstractAction implements Swing {
         private String[] args;
         private Set<String> instances = new TreeSet<String>();
 
@@ -451,7 +451,7 @@ public class Application {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Exec.swingAny(this);
+            Exec.run(this);
         }
 
         @Override

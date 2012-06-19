@@ -48,9 +48,9 @@ public class ValidateAction extends AbstractAction {
     private JDesktopPane parent;
     private InvestigateRecordAction investigateRecordAction = new InvestigateRecordAction();
     private AllowInvalidRecordsAction allowInvalidRecordsAction = new AllowInvalidRecordsAction();
-    private Runnable investigate;
+    private Swing investigate;
 
-    public ValidateAction(JDesktopPane parent, SipModel sipModel, Runnable investigate) {
+    public ValidateAction(JDesktopPane parent, SipModel sipModel, Swing investigate) {
         super("<html><b>Map and validate all records</b>");
         this.parent = parent;
         this.sipModel = sipModel;
@@ -61,7 +61,7 @@ public class ValidateAction extends AbstractAction {
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
         );
-        this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+        this.sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 enableAccordingTo(state);
@@ -119,7 +119,7 @@ public class ValidateAction extends AbstractAction {
                 new SipModel.ValidationListener() {
                     @Override
                     public void failed(final int recordNumber, final String record, String message) {
-                        Exec.soon(new Swing() {
+                        Exec.run(new Swing() {
                             @Override
                             public void run() {
                                 investigateRecordAction.setRecordNumber(recordNumber);

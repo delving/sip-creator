@@ -35,18 +35,17 @@ import java.util.concurrent.Executors;
 public class Exec {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public static void soon(Swing swing) {
-        checkWork();
+    public static void run(Swing swing) {
         SwingUtilities.invokeLater(swing);
     }
 
-    public static void swingAny(Runnable runnable) {
-        SwingUtilities.invokeLater(runnable);
+    public static void run(Work work) {
+        executor.execute(work);
     }
 
-    public static void swingWait(Runnable runnable) {
+    public static void runWait(Swing swing) {
         try {
-            SwingUtilities.invokeAndWait(runnable);
+            SwingUtilities.invokeAndWait(swing);
         }
         catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -56,20 +55,7 @@ public class Exec {
         }
     }
 
-    public static void work(Runnable runnable) {
-        checkSwing();
-        executor.execute(runnable);
-    }
-
-    public static void workLater(Runnable runnable) {
-        executor.execute(runnable);
-    }
-
     public static void checkSwing() {
         if (!SwingUtilities.isEventDispatchThread()) throw new RuntimeException("Must be Swing thread");
-    }
-
-    public static void checkWork() {
-        if (SwingUtilities.isEventDispatchThread()) throw new RuntimeException("Must be Worker thread");
     }
 }

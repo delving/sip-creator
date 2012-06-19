@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
@@ -127,7 +128,7 @@ public class DataSetModel implements RecDefModel {
         return !isEmpty() && dataSet.deleteValidation(getPrefix());
     }
 
-    private class StateCheckTimer implements Runnable, ActionListener {
+    private class StateCheckTimer implements Work, ActionListener {
         private Timer timer = new Timer(1000, this);
 
         private StateCheckTimer() {
@@ -140,10 +141,10 @@ public class DataSetModel implements RecDefModel {
             final DataSetState freshState = getDataSetState();
             if (freshState != currentState) {
                 currentState = freshState;
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
-                        for (Listener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);
+                        for (SwingListener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);
                     }
                 });
             }
@@ -151,17 +152,17 @@ public class DataSetModel implements RecDefModel {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(this);
+            Exec.run(this);
         }
     }
 
-    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+    private List<SwingListener> listeners = new CopyOnWriteArrayList<SwingListener>();
 
-    public void addListener(Listener listener) {
+    public void addListener(SwingListener listener) {
         listeners.add(listener);
     }
 
-    public interface Listener {
+    public interface SwingListener {
 
         void stateChanged(DataSetModel model, DataSetState state);
 

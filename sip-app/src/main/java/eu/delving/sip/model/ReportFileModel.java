@@ -58,7 +58,7 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.S
         int size = getSize();
         if (size > 0) {
             lines = null;
-            Exec.soon(new Swing() {
+            Exec.run(new Swing() {
                 @Override
                 public void run() {
                     fireIntervalRemoved(this, 0, getSize());
@@ -69,7 +69,7 @@ public class ReportFileModel extends AbstractListModel implements MappingModel.S
             if (recMapping != null) {
                 final List<String> freshLines = sipModel.getDataSetModel().getDataSet().getReport(recMapping);
                 if (freshLines != null) {
-                    Exec.soon(new Swing() {
+                    Exec.run(new Swing() {
                         @Override
                         public void run() {
                             lines = freshLines;

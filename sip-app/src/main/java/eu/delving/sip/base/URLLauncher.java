@@ -79,7 +79,7 @@ public class URLLauncher implements CaretListener {
                     outputArea.select(min, max);
                 }
                 else {
-                    Exec.work(new Runnable() {
+                    Exec.run(new Work() {
                         @Override
                         public void run() {
                             feedback.alert(String.format("Not a valid URL: \"%s\"", url));
@@ -112,7 +112,7 @@ public class URLLauncher implements CaretListener {
             return bs.showDocument(url);
         }
         catch (UnavailableServiceException ue) {
-            Exec.work(new Runnable() {
+            Exec.run(new Work() {
                 @Override
                 public void run() {
                     feedback.alert(String.format("Sorry, need Web Start to launch \"%s\"", urlString));

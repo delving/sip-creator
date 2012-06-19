@@ -22,10 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.*;
 import eu.delving.sip.menus.RevertMappingMenu;
 import eu.delving.sip.model.*;
 
@@ -57,7 +54,7 @@ public class RecMappingFrame extends FrameBase {
                 switch (transition) {
                     case COMPLETE_TO_ARMED_SOURCE:
                     case COMPLETE_TO_ARMED_TARGET:
-                        Exec.soon(new Swing() {
+                        Exec.run(new Swing() {
                             @Override
                             public void run() {
                                 nodeMappingList.clearSelection();
@@ -90,7 +87,7 @@ public class RecMappingFrame extends FrameBase {
             if (event.getValueIsAdjusting()) return;
             final NodeMappingEntry selected = (NodeMappingEntry) nodeMappingList.getSelectedValue();
             if (selected != null) {
-                Exec.work(new Runnable() {
+                Exec.run(new Work() {
                     @Override
                     public void run() {
                         sipModel.getCreateModel().setNodeMapping(selected.getNodeMapping());
@@ -100,7 +97,7 @@ public class RecMappingFrame extends FrameBase {
         }
     }
 
-    private class RemoveNodeMappingAction extends AbstractAction implements Runnable {
+    private class RemoveNodeMappingAction extends AbstractAction implements Work {
 
         private RemoveNodeMappingAction() {
             super("Remove selected mapping");
@@ -108,7 +105,7 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(this);
+            Exec.run(this);
         }
 
         @Override

@@ -22,10 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.*;
 import eu.delving.sip.menus.ShowOptionMenu;
 import eu.delving.sip.model.*;
 
@@ -67,7 +64,7 @@ public class TargetFrame extends FrameBase {
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                Exec.soon(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
+                Exec.run(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
             }
         });
         createRecDefTree(sipModel);
@@ -117,7 +114,7 @@ public class TargetFrame extends FrameBase {
                 switch (transition) {
                     case COMPLETE_TO_COMPLETE:
                     case NOTHING_TO_COMPLETE:
-                        Exec.soon(new Swing() {
+                        Exec.run(new Swing() {
                             @Override
                             public void run() {
                                 recDefTree.clearSelection();
@@ -163,7 +160,7 @@ public class TargetFrame extends FrameBase {
         });
     }
 
-    private class RecDefSelection implements TreeSelectionListener, Runnable {
+    private class RecDefSelection implements TreeSelectionListener, Work {
 
         private Object nodeObject;
 
@@ -171,7 +168,7 @@ public class TargetFrame extends FrameBase {
         public void valueChanged(TreeSelectionEvent event) {
             TreePath path = recDefTree.getSelectionPath();
             nodeObject = path != null ? path.getLastPathComponent() : null;
-            Exec.work(this);
+            Exec.run(this);
         }
 
         @Override

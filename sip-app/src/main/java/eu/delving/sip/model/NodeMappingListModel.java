@@ -81,7 +81,6 @@ public class NodeMappingListModel extends AbstractListModel {
     }
 
     public void clearHighlighted() {
-        Exec.checkSwing();
         for (NodeMappingEntry entry : entries) entry.clearHighlighted();
     }
 
@@ -98,7 +97,7 @@ public class NodeMappingListModel extends AbstractListModel {
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping, NodeMappingChange change) {
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
                         fireContentsChanged(indexOf(nodeMapping));
@@ -108,7 +107,7 @@ public class NodeMappingListModel extends AbstractListModel {
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
                         entries.add(new NodeMappingEntry(NodeMappingListModel.this, nodeMapping));
@@ -120,7 +119,7 @@ public class NodeMappingListModel extends AbstractListModel {
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
                         int index = indexOf(nodeMapping);
@@ -136,7 +135,7 @@ public class NodeMappingListModel extends AbstractListModel {
         return new MappingModel.SetListener() {
             @Override
             public void recMappingSet(final MappingModel mappingModel) {
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
                         setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getNodeMappings() : null);

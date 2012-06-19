@@ -50,7 +50,7 @@ public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
 
     @Override
     public void recMappingSet(final MappingModel mappingModel) {
-        Exec.soon(new Swing() {
+        Exec.run(new Swing() {
             @Override
             public void run() {
                 removeAll();

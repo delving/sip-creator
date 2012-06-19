@@ -22,7 +22,6 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
@@ -135,7 +134,7 @@ public class StatsFrame extends FrameBase {
     }
 
     private void wireUp() {
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 DataSet dataSet = model.getDataSet();
@@ -192,7 +191,6 @@ public class StatsFrame extends FrameBase {
         }
 
         private void setStats(Stats stats) {
-            Exec.checkSwing();
             if (stats == null) {
                 chartHelper = null;
                 treeModel.setRoot(StatsNode.create("Empty"));

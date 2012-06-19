@@ -23,10 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.NodeTransferHandler;
-import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.*;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
@@ -258,7 +255,7 @@ public class SipModel {
     }
 
     public void setDataSet(final DataSet dataSet, final String requestedPrefix, final DataSetCompletion completion) {
-        Exec.work(new Runnable() {
+        Exec.run(new Work() {
             @Override
             public void run() {
                 try {
@@ -273,13 +270,13 @@ public class SipModel {
                     dataSetModel.getMappingModel().setFacts(facts);
                     recordCompileModel.setValidator(dataSetModel.newValidator());
                     feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), dataSetModel.getPrefix()));
-                    Exec.soon(new Swing() {
+                    Exec.run(new Swing() {
                         @Override
                         public void run() {
                             dataSetFacts.set(facts);
                             statsModel.set(hints);
                             statsModel.setStatistics(stats);
-                            Exec.work(new Runnable() {
+                            Exec.run(new Work() {
                                 @Override
                                 public void run() {
                                     mappingHintsModel.setSourceTree(statsModel.getSourceTree());
@@ -310,7 +307,7 @@ public class SipModel {
             importing = true;
             clearValidations();
             feedback.say("Importing metadata from " + file.getAbsolutePath());
-            Exec.work(new Runnable() {
+            Exec.run(new Work() {
                 @Override
                 public void run() {
                     try {
@@ -333,13 +330,13 @@ public class SipModel {
         else {
             analyzing = true;
             feedback.say("Analyzing data from " + dataSetModel.getDataSet().getSpec());
-            Exec.work(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
+            Exec.run(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
                 @Override
                 public void success(final Stats stats) {
                     analyzing = false;
                     try {
                         dataSetModel.getDataSet().setStats(stats, stats.sourceFormat, null);
-                        Exec.soon(new Swing() {
+                        Exec.run(new Swing() {
                             @Override
                             public void run() {
                                 statsModel.setStatistics(stats);
@@ -392,12 +389,12 @@ public class SipModel {
         else {
             converting = true;
             feedback.say("Converting to source for " + dataSetModel.getDataSet().getSpec());
-            Exec.work(new Runnable() {
+            Exec.run(new Work() {
                 @Override
                 public void run() {
                     try {
                         dataSetModel.getDataSet().importedToSource(feedback, progressListener);
-                        Exec.soon(new Swing() {
+                        Exec.run(new Swing() {
                             @Override
                             public void run() {
                                 seekFirstRecord();
@@ -434,7 +431,7 @@ public class SipModel {
                 outputDirectory = new File(directoryString);
                 if (!outputDirectory.exists()) outputDirectory = null;
             }
-            Exec.work(new FileProcessor(
+            Exec.run(new FileProcessor(
                     this,
                     allowInvalidRecords,
                     outputDirectory,
@@ -473,7 +470,7 @@ public class SipModel {
     }
 
     public void seekReset() {
-        Exec.work(new Runnable() {
+        Exec.run(new Work() {
             @Override
             public void run() {
                 if (metadataParser != null) {
@@ -501,12 +498,12 @@ public class SipModel {
     }
 
     public void seekRecord(ScanPredicate scanPredicate, ProgressListener progressListener) {
-        Exec.work(new RecordScanner(scanPredicate, progressListener));
+        Exec.run(new RecordScanner(scanPredicate, progressListener));
     }
 
     // === privates
 
-    private class RecordScanner implements Runnable {
+    private class RecordScanner implements Work {
         private ScanPredicate scanPredicate;
         private ProgressListener progressListener;
 

@@ -77,7 +77,7 @@ public class InputFrame extends FrameBase {
         sipModel.addParseListener(new SipModel.ParseListener() {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {
-                Exec.soon(new RecordSetter(metadataRecord));
+                Exec.run(new RecordSetter(metadataRecord));
             }
         });
         recordTree = new JTree(EMPTY_MODEL) {

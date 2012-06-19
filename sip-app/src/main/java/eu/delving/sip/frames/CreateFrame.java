@@ -21,10 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.*;
 import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
 
@@ -126,7 +123,7 @@ public class CreateFrame extends FrameBase {
             public void transition(CreateModel createModel, final CreateTransition transition) {
                 final SortedSet<SourceTreeNode> sourceTreeNodes = createModel.getSourceTreeNodes();
                 final RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
                         if (transition.sourceChanged) {
@@ -197,7 +194,7 @@ public class CreateFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             final Object[] selectedValues = mappingHintsList.getSelectedValues();
             if (selectedValues != null && selectedValues.length > 0) {
-                Exec.work(new Runnable() {
+                Exec.run(new Work() {
                     @Override
                     public void run() {
                         for (Object selectedValue : selectedValues) {
@@ -222,7 +219,7 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(new Runnable() {
+            Exec.run(new Work() {
                 @Override
                 public void run() {
                     if (createModel.canCreate()) createModel.createMapping();

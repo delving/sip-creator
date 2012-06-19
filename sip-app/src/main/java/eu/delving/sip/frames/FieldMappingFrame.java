@@ -191,7 +191,7 @@ public class FieldMappingFrame extends FrameBase {
                 if (operatorBoxSetting) return;
                 final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
                 if (nodeMapping != null) {
-                    Exec.work(new Runnable() {
+                    Exec.run(new Work() {
                         @Override
                         public void run() {
                             nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
@@ -209,7 +209,7 @@ public class FieldMappingFrame extends FrameBase {
                     final NodeMapping nodeMapping = createModel.getNodeMapping();
                     contextVarModel.setList(nodeMapping);
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                    Exec.soon(new Swing() {
+                    Exec.run(new Swing() {
                         @Override
                         public void run() {
                             setEditable(codeArea, nodeMapping.isUserCodeEditable());
@@ -222,7 +222,7 @@ public class FieldMappingFrame extends FrameBase {
                 else {
                     contextVarModel.setList(null);
                     sipModel.getFieldCompileModel().setNodeMapping(null);
-                    Exec.soon(new Swing() {
+                    Exec.run(new Swing() {
                         @Override
                         public void run() {
                             setEditable(codeArea, false);
@@ -237,7 +237,7 @@ public class FieldMappingFrame extends FrameBase {
         sipModel.getFieldCompileModel().addListener(new MappingCompileModel.Listener() {
             @Override
             public void stateChanged(final CompileState state) {
-                Exec.soon(new Swing() {
+                Exec.run(new Swing() {
                     @Override
                     public void run() {
                         if (state == CompileState.ORIGINAL) {
@@ -378,7 +378,7 @@ public class FieldMappingFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             boolean discard = sipModel.getFeedback().confirm("Discard", "Discard edited code and revert to the original?");
             if (discard) {
-                Exec.work(new Runnable() {
+                Exec.run(new Work() {
                     @Override
                     public void run() {
                         if (sipModel.getCreateModel().hasNodeMapping()) {

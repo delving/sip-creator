@@ -59,7 +59,7 @@ public abstract class FrameBase extends JInternalFrame {
     private Timer positionTimer;
     private AllFrames.XArrangement arrangement;
     private List<AdjustAction> adjustActions = new ArrayList<AdjustAction>();
-    private Runnable arrange;
+    private Swing arrange;
     private String title;
 
     public enum Which {
@@ -143,7 +143,7 @@ public abstract class FrameBase extends JInternalFrame {
         );
     }
 
-    public void setArrangementSource(AllFrames.XArrangement arrangement, Runnable arrange) {
+    public void setArrangementSource(AllFrames.XArrangement arrangement, Swing arrange) {
         this.arrangement = arrangement;
         this.arrange = arrange;
     }
@@ -383,8 +383,7 @@ public abstract class FrameBase extends JInternalFrame {
     protected void childClosing() {
         getGlassPane().setVisible(false);
         if (focusOwner != null) {
-            java.awt.EventQueue.invokeLater(new Runnable() {
-
+            Exec.run(new Swing() {
                 public void run() {
                     try {
                         moveToFront();

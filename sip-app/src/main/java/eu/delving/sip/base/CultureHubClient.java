@@ -148,7 +148,7 @@ public class CultureHubClient {
     }
 
     public void fetchDataSetList(ListReceiveListener listReceiveListener) {
-        Exec.work(new ListFetcher(1, listReceiveListener));
+        Exec.run(new ListFetcher(1, listReceiveListener));
     }
 
     public interface UnlockListener {
@@ -156,11 +156,11 @@ public class CultureHubClient {
     }
 
     public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
-        Exec.work(new Unlocker(1, dataSet, unlockListener));
+        Exec.run(new Unlocker(1, dataSet, unlockListener));
     }
 
     public void downloadDataSet(DataSet dataSet, ProgressListener progressListener) {
-        Exec.work(new DataSetDownloader(1, dataSet, progressListener));
+        Exec.run(new DataSetDownloader(1, dataSet, progressListener));
     }
 
     public interface UploadListener {
@@ -174,10 +174,10 @@ public class CultureHubClient {
     }
 
     public void uploadFiles(DataSet dataSet, UploadListener uploadListener) throws StorageException {
-        Exec.work(new FileUploader(1, dataSet, uploadListener));
+        Exec.run(new FileUploader(1, dataSet, uploadListener));
     }
 
-    private abstract class Attempt implements Runnable {
+    private abstract class Attempt implements Work {
         protected int attempt;
 
         protected Attempt(int attempt) {
@@ -188,11 +188,11 @@ public class CultureHubClient {
             return attempt <= 3;
         }
 
-        protected boolean reactToUnauthorized(Runnable retry) {
+        protected boolean reactToUnauthorized(Work retry) {
             if (shouldRetry()) {
                 context.getFeedback().alert("Authorization failed, retrying...");
                 context.invalidateTokens();
-                Exec.workLater(retry);
+                Exec.run(retry);
                 return true;
             }
             else {

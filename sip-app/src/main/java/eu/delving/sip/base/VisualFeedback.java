@@ -86,7 +86,7 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void say(final String message) {
-        Exec.swingAny(new Runnable() {
+        Exec.run(new Swing() {
             @Override
             public void run() {
                 addToList(message);
@@ -99,7 +99,7 @@ public class VisualFeedback implements Feedback {
     public void alert(final String message) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message);
-        Exec.swingWait(new Runnable() {
+        Exec.runWait(new Swing() {
             @Override
             public void run() {
                 addToList(message);
@@ -112,7 +112,7 @@ public class VisualFeedback implements Feedback {
     public void alert(final String message, final Exception exception) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message, exception);
-        Exec.swingWait(new Runnable() {
+        Exec.runWait(new Swing() {
             @Override
             public void run() {
                 addToList(message);

@@ -99,7 +99,7 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
                 }
             }
         }
-        Exec.soon(new Swing() {
+        Exec.run(new Swing() {
             @Override
             public void run() {
                 nodeMappingListModel.setList(mappingHintList);

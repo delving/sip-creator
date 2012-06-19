@@ -24,6 +24,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
@@ -95,7 +96,7 @@ public class MappingCodeFrame extends FrameBase {
     }
 
     void refresh() {
-        Exec.swingAny(new CodeUpdater());
+        Exec.run(new CodeUpdater());
     }
 
     @Override
@@ -103,7 +104,7 @@ public class MappingCodeFrame extends FrameBase {
         content.add(scrollVH(codeArea));
     }
 
-    private class CodeUpdater implements Runnable {
+    private class CodeUpdater implements Swing {
 
         @Override
         public void run() {

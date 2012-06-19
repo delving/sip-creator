@@ -27,6 +27,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
@@ -130,8 +132,8 @@ public class AllFrames {
         }
     }
 
-    public Runnable prepareForNothing() {
-        return new Runnable() {
+    public Swing prepareForNothing() {
+        return new Swing() {
             @Override
             public void run() {
                 selectNewView("");
@@ -139,8 +141,8 @@ public class AllFrames {
         };
     }
 
-    public Runnable prepareForMapping(final JComponent component) {
-        return new Runnable() {
+    public Swing prepareForMapping(final JComponent component) {
+        return new Swing() {
             @Override
             public void run() {
                 selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Quick Mapping");
@@ -148,8 +150,8 @@ public class AllFrames {
         };
     }
 
-    public Runnable prepareForInvestigation(final JComponent component) {
-        return new Runnable() {
+    public Swing prepareForInvestigation(final JComponent component) {
+        return new Swing() {
             @Override
             public void run() {
                 selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Big Picture");
@@ -157,8 +159,8 @@ public class AllFrames {
         };
     }
 
-    public Runnable prepareForDelimiting() {
-        return new Runnable() {
+    public Swing prepareForDelimiting() {
+        return new Swing() {
             @Override
             public void run() {
                 selectNewView("First Contact");
@@ -308,7 +310,7 @@ public class AllFrames {
         }
     }
 
-    private class Arrangement extends AbstractAction implements Runnable {
+    private class Arrangement extends AbstractAction implements Swing {
         List<Block> blocks = new ArrayList<Block>();
         public XArrangement source;
         private ViewIcon small, large;
@@ -352,7 +354,7 @@ public class AllFrames {
             actionPerformed(null);
             small.refresh();
             large.refresh();
-            Exec.work(new Runnable() {
+            Exec.run(new Work() {
                 @Override
                 public void run() {
                     XStream stream = new XStream();

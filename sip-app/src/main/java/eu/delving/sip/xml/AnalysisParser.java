@@ -23,6 +23,7 @@ package eu.delving.sip.xml;
 
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
@@ -45,7 +46,7 @@ import java.io.InputStream;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 
-public class AnalysisParser implements Runnable {
+public class AnalysisParser implements Work {
     public static final int ELEMENT_STEP = 10000;
     private Stats stats = new Stats();
     private Listener listener;

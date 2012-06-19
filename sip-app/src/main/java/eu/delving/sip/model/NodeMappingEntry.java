@@ -22,7 +22,6 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.SwingHelper;
 
 import javax.swing.*;
@@ -61,12 +60,10 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
     }
 
     public void fireChanged() {
-        Exec.checkSwing();
         listModel.fireContentsChanged(index);
     }
 
     public void clearHighlighted() {
-        Exec.checkSwing();
         if (highlighted) {
             highlighted = false;
             fireChanged();
@@ -74,7 +71,6 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
     }
 
     public void setHighlighted() {
-        Exec.checkSwing();
         if (!highlighted) {
             highlighted = true;
             fireChanged();

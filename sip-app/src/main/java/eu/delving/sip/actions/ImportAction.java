@@ -75,7 +75,7 @@ public class ImportAction extends AbstractAction {
         setEnabled(false);
         prepareDialog();
         prepareChooser(sipModel);
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 setEnabled(state != ABSENT);

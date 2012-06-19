@@ -59,7 +59,6 @@ public class CreateModel {
     }
 
     public void setSource(SortedSet<SourceTreeNode> sourceTreeNodes) {
-        Exec.checkWork();
         setter = SOURCE;
         setSourceInternal(sourceTreeNodes);
         setNodeMappingInternal(findExistingMapping());
@@ -68,7 +67,6 @@ public class CreateModel {
     }
 
     public void setTarget(RecDefTreeNode recDefTreeNode) {
-        Exec.checkWork();
         setter = TARGET;
         setTargetInternal(recDefTreeNode);
         setNodeMappingInternal(findExistingMapping());
@@ -77,7 +75,6 @@ public class CreateModel {
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
-        Exec.checkWork();
         setter = NODE_MAPPING;
         setNodeMappingInternal(nodeMapping);
         if (nodeMapping != null) {
@@ -90,7 +87,6 @@ public class CreateModel {
     }
 
     public void createMapping() {
-        Exec.checkWork();
         if (!canCreate()) throw new RuntimeException("Should have checked");
         NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
         created.recDefNode = recDefTreeNode.getRecDefNode();
@@ -106,7 +102,6 @@ public class CreateModel {
     }
 
     public void addMapping(NodeMapping nodeMapping) {
-        Exec.checkWork();
         TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
         RecDefTreeNode recDefTreeNode = (RecDefTreeNode) treePath.getLastPathComponent();
         nodeMapping.recDefNode = recDefTreeNode.getRecDefNode();
@@ -146,12 +141,10 @@ public class CreateModel {
     }
 
     private void setNodeMappingInternal(NodeMapping nodeMapping) {
-        Exec.checkWork();
         this.nodeMapping = nodeMapping;
     }
 
     private NodeMapping findExistingMapping() {
-        Exec.checkWork();
         if (sourceTreeNodes == null || recDefTreeNode == null) return null;
         nextNodeMapping:
         for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
@@ -167,7 +160,7 @@ public class CreateModel {
     }
 
     private void adjustHighlights() {
-        Exec.soon(new Swing() {
+        Exec.run(new Swing() {
             @Override
             public void run() {
                 sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();

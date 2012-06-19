@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
@@ -39,7 +40,7 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class MappingSaveTimer implements MappingModel.ChangeListener, MappingModel.SetListener, ActionListener, Runnable {
+public class MappingSaveTimer implements MappingModel.ChangeListener, MappingModel.SetListener, ActionListener, Work {
     private long nextFreeze;
     private SipModel sipModel;
     private Timer triggerTimer = new Timer(200, this);
@@ -68,7 +69,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Exec.work(this);
+        Exec.run(this);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
                     sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping, freeze);
                 }
                 if (freeze) {
-                    if (listReceiver != null) Exec.soon(new Swing() {
+                    if (listReceiver != null) Exec.run(new Swing() {
                         @Override
                         public void run() {
                             try {

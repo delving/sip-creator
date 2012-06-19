@@ -22,6 +22,7 @@
 package eu.delving.sip.menus;
 
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
@@ -96,7 +97,7 @@ public class ExpertMenu extends JMenu {
             if (answer != null) {
                 answer = answer.trim();
                 sipModel.getStatsModel().setUniqueValueConverter(answer);
-                Exec.work(new Runnable() {
+                Exec.run(new Work() {
                     @Override
                     public void run() {
                         try {

@@ -25,6 +25,7 @@ import eu.delving.MappingResult;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.StatsModel;
@@ -48,7 +49,7 @@ import java.util.BitSet;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class FileProcessor implements Runnable {
+public class FileProcessor implements Work {
     public static final String OUTPUT_FILE_PREF = "outputFile";
     private static final Logger LOG = Logger.getLogger(FileProcessor.class);
     private XmlSerializer serializer = new XmlSerializer();

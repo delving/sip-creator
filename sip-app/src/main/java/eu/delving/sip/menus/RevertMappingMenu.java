@@ -23,6 +23,7 @@ package eu.delving.sip.menus;
 
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.MappingSaveTimer;
 import eu.delving.sip.model.SipModel;
@@ -70,7 +71,7 @@ public class RevertMappingMenu extends JMenu implements MappingSaveTimer.ListRec
                     String.format("Are you sure you want to revert to %s", lastModifiedString())
             );
             if (revert) {
-                Exec.work(new Runnable() {
+                Exec.run(new Work() {
                     @Override
                     public void run() {
                         try {
