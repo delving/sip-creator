@@ -41,12 +41,11 @@ import java.io.File;
 
 public class ExpertMenu extends JMenu {
     private SipModel sipModel;
-    private JDesktopPane desktop;
 
-    public ExpertMenu(final SipModel sipModel, JDesktopPane desktop) {
+    public ExpertMenu(final SipModel sipModel, Action newInstanceAction) {
         super("Expert");
         this.sipModel = sipModel;
-        this.desktop = desktop;
+        add(newInstanceAction);
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
         add(new WriteOutputAction());

@@ -250,7 +250,7 @@ public class Application {
         bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
-        bar.add(new ExpertMenu(sipModel, desktop));
+        bar.add(new ExpertMenu(sipModel, launcher));
         bar.add(createHelpMenu());
         return bar;
     }
@@ -278,7 +278,6 @@ public class Application {
 
     private JMenu createFileMenu() {
         JMenu menu = new JMenu("File");
-        menu.add(launcher);
         menu.add(downloadAction);
         menu.add(importAction);
         menu.add(validateAction);
