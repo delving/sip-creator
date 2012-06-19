@@ -84,11 +84,11 @@ public class MappingResultImpl implements MappingResult {
         if (missing.isEmpty()) return;
         Map<String, Path> missingMap = new TreeMap<String, Path>();
         for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
-            if (fieldMarker.name == null) continue;
+            if (fieldMarker.name == null || fieldMarker.type != null) continue;
             if (missing.contains(fieldMarker.name)) missingMap.put(fieldMarker.name, fieldMarker.path);
         }
         StringBuilder out = new StringBuilder("Required fields missing: ");
-        for (Map.Entry<String ,Path> entry : missingMap.entrySet()) {
+        for (Map.Entry<String, Path> entry : missingMap.entrySet()) {
             out.append(String.format("%s (%s) ", entry.getKey(), entry.getValue()));
         }
         throw new MissingFieldsException(out.toString());
@@ -164,8 +164,7 @@ public class MappingResultImpl implements MappingResult {
     }
 
     private void handleMarkedField(RecDefNode recDefNode, String value) {
-        RecDef.FieldMarker fieldMarker = recDefNode.getFieldMarker();
-        if (fieldMarker != null) {
+        for (RecDef.FieldMarker fieldMarker : recDefNode.getFieldMarkers()) {
             if (fieldMarker.type == null) {
                 putSystem(fieldMarker.name, value);
             }
@@ -224,7 +223,7 @@ public class MappingResultImpl implements MappingResult {
         return text.toString();
     }
 
-    private static final String [] REQUIRED_SYSTEM_FIELDS = {
+    private static final String[] REQUIRED_SYSTEM_FIELDS = {
             "TITLE",
             "DESCRIPTION",
             "PROVIDER",

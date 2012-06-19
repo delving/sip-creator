@@ -181,7 +181,7 @@ public class RecDef {
             path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
             RecDefNode node = recDefTree.getRecDefNode(path);
             if (node == null) throw new RuntimeException("Cannot find path " + path);
-            node.setFieldMarker(this);
+            node.addFieldMarker(this);
         }
     }
 
