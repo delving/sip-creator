@@ -1,492 +1,442 @@
 <?xml version="1.0"?>
-<record-definition prefix="itin" flat="false">
-
-    <!--<version>1.0</version>-->
+<record-definition prefix="itin" flat="true">
 
     <namespaces>
+        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/"
+                   schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
+        <namespace prefix="dcterms" uri="http://purl.org/dc/terms/"
+                   schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
+        <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/"
+                   schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
+        <namespace prefix="icn" uri="http://www.icn.nl/schemas/icn/" schema="ICN-V1.0.xsd"/>
+        <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
         <namespace prefix="itin" uri="http://schemas.delving.eu/itin/"
                    schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
     </namespaces>
 
-    <attrs>
-
-        <attr tag="type" hidden="true"/>
-        <attr tag="label" hidden="true"/>
-
-        <attr tag="sourceId"/>
-        <attr tag="type"/>
-
-        <attr tag="organizationType">
-            <options> <!--todo: must become an opt-list-->
-                <string>Onbekend / n.v.t.</string>
-                <string>Onderwijsinstelling</string>
-                <string>Overheidsinstelling</string>
-                <string>Overig</string>
-                <string>Toeristisch commercieel</string>
-                <string>Toeristisch publiek</string>
-                <string>Vereniging</string>
-                <string>Weborganisaties</string>
-            </options>
-        </attr>
-
-        <attr tag="referenceType">
-            <options>
-                <string>Boek</string>
-                <string>Tijdschrift</string>
-                <string>Krant</string>
-                <string>Wetenschappelijk tijdschrift</string>
-                <string>Bron</string>
-                <string>Link</string>
-                <string>Overig</string>
-            </options>
-        </attr>
-
-        <attr tag="eventType">
-            <options>
-                <string>Andere tocht</string>
-                <string>Concert</string>
-                <string>Festival</string>
-                <string>Fietstocht</string>
-                <string>Lezing</string>
-                <string>Markt</string>
-                <string>Overig</string>
-                <string>Re-enactment</string>
-                <string>Rondleiding</string>
-                <string>Tentoonstelling</string>
-                <string>Theater</string>
-                <string>Wandeltocht</string>
-            </options>
-        </attr>
-
-        <attr tag="accommodationType">
-            <options> <!--todo: must become an opt-list-->
-                <string>café</string>
-                <string>hotel</string>
-                <string>restaurant</string>
-                <string>overig</string>
-            </options>
-        </attr>
-
-        <attr tag="placeType">
-            <options> <!--todo: must become an opt-list-->
-                <string></string>
-                <string>hotel</string>
-                <string>restaurant</string>
-                <string>overig</string>
-            </options>
-        </attr>
-
-        <!--Participant-->
-        <attr tag="extra"/>
-        <attr tag="firstName"/>
-        <attr tag="lastName"/>
-        <attr tag="position"/>
-
-        <!-- Link -->
-        <attr tag="name"/>
-        <attr tag="entitytype"/>
-        <attr tag="bundle"/>
-        <attr tag="id"/>
-        <attr tag="linkType"/>
-        <attr tag="pathalias"/>
-        <attr tag="path"/>
-
-    </attrs>
-
-    <elems>
-
-        <elem tag="itinNode" elems="title, language, taglines, summary, body, media, path"/>
-
-        <elem tag="title"/>
-        <elem tag="language"/>
-        <elem tag="taglines"/>
-        <elem tag="summary"/>
-        <elem tag="body"/>
-        <elem tag="media"/>
-        <elem tag="path"/>
-
-        <elem tag="open" elems="open_days, open_description"/>
-        <elem tag="open_days"/>
-        <elem tag="open_description"/>
-
-
-        <elem tag="taxonomy" elems="category, subject, tags, sections"/>
-        <elem tag="subject"/>
-        <elem tag="tags"/>
-        <elem tag="sections"/>
-        <elem tag="category"/>
-
-        <!-- Location, address, contact gis -->
-        <elem tag="location" elems="name, address, urls, gis"/>
-
-        <elem tag="address" elems="country, province, region, city, postcode, streetAddress, phone, email, url, gis"/>
-
-        <elem tag="contact" attrs="type" elems="position, name, city, postcode, streetAddress, phone, email, url, gis"/>
-
-        <elem tag="urls" elems="url"/>
-
-
-        <elem tag="country"/>
-        <elem tag="province"/>
-        <elem tag="region"/>
-        <elem tag="city"/>
-        <elem tag="postcode"/>
-        <elem tag="streetAddress"/>
-
-        <elem tag="position"/>
-        <elem tag="place"/>
-        <elem tag="phone"/>
-        <elem tag="email"/>
-        <elem tag="url"/>
-
-        <elem tag="name"/>
-
-        <elem tag="environment"/>
-        <elem tag="telecoms"/>
-        <elem tag="access"/>
-
-        <elem tag="gis" elems="geonamesUri, geonamesId, place, long, lat"/>
-        <elem tag="geonamesUri"/>
-        <elem tag="geonamesId"/>
-        <elem tag="place"/>
-        <elem tag="long"/>
-        <elem tag="lat"/>
-
-
-        <!-- Date-->
-        <elem tag="calendar" elems="startDate, startTime, endDate, endTime, year"/>
-        <elem tag="startDate"/>
-        <elem tag="startTime"/>
-        <elem tag="endDate"/>
-        <elem tag="endTime"/>
-        <elem tag="year"/>
-
-        <!--Link-->
-        <elem tag="links" elems="link"/>
-        <elem tag="link" attrs="name, type, entitytype, bundle, id, linkType, pathalias, path"/>
-
-    </elems>
+    <functions>
+        <mapping-function name="cleanAdlibImageReference">
+            <sample-input>
+                <string>..\..\..\Images PH\OKS 1989-001 [01].JPG</string>
+                <string>../../../Images PH/OKS 1989-001 [01].JPG</string>
+            </sample-input>
+            <groovy-code>
+                <string>it.replaceAll(&apos;; &apos;, &apos;_&apos;).replaceAll(&apos;JPG&apos;, &apos;jpg&apos;).replaceAll(&quot;.*?[\\\\|//]&quot;,
+                    &quot;&quot;).replaceAll(&quot; &quot;, &quot;%20&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;,
+                    &quot;%5D&quot;)
+                </string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="deepZoomUrl">
+            <sample-input>
+                <string>D:/Documents/Schilderij/010.jpg</string>
+            </sample-input>
+            <groovy-code>
+                <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg&apos;,&apos;tif.dzi&apos;)</string>
+                <string>
+                    &quot;http://dimcon.delving.org/iip/deepzoom/mnt/dimcon/tiles/${orgId}/${spec}/${image}&quot;</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="reverseNames">
+            <sample-input>
+                <string>Sjoerd Siebinga</string>
+                <string>Siebinga, Sjoerd</string>
+                <string>Siebinga, Sjoerd Michiel</string>
+            </sample-input>
+            <groovy-code>
+                <string>parts = it.toString().split(&quot;,&quot;)</string>
+                <string>if (parts.length &gt; 1) {</string>
+                <string>&quot;${parts[1].trim()} ${parts[0]}&quot;</string>
+                <string>}</string>
+                <string>else {</string>
+                <string>&quot;${it}&quot;</string>
+                <string>}</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="toLocalId">
+            <sample-input>
+                <string>1231231</string>
+                <string>232455</string>
+                <string>12345</string>
+            </sample-input>
+            <groovy-code>
+                <string>&quot;${spec}/${it}&quot;</string>
+            </groovy-code>
+        </mapping-function>
+    </functions>
 
 
     <root tag="record">
 
-        <elem tag="recordType" attrs="type, label, sourceId"/>
+        <!--Itin custom namespaces extended by contentType-->
 
-        <elem tag="admin" singular="true" unmapable="true">
-            <elem tag="displayDataProvider"/>
-            <elem tag="displayDataProviderCountry"/>
-            <elem tag="displayProvider"/>
-        </elem>
+        <elem tag="cfield_record_type"/>
 
-        <elem tag="organization" attrs="sourceId, organizationType" elems="itinNode, open, address, contact, taxonomy">
+        <!--Basic DataBlock that is shared between all content types -->
+        <elem tag="title"/>
+        <elem tag="language"/>
+        <elem tag="field_taglines"/>
+        <elem tag="field_summary"/>
+        <elem tag="field_body"/>
+        <elem tag="field_history"/>
+        <elem tag="field_sources"/>
+        <elem tag="field_media"/>
+        <elem tag="field_path"/>
+        <elem tag="cfield_name"/>
 
-        </elem>
+        <!--Taxonomy-->
+        <elem tag="field_Subject"/>
+        <elem tag="field_Tags"/>
+        <elem tag="field_Sections"/>
+        <elem tag="cfield_Category"/>
 
+        <!--Location block -->
+        <elem tag="cfield_loc_country"/>
+        <elem tag="cfield_loc_province"/>
+        <elem tag="cfield_loc_region"/>
+        <elem tag="cfield_loc_city"/>
+        <elem tag="cfield_loc_postcode"/>
+        <elem tag="cfield_loc_streetAddress"/>
 
-        <elem tag="history_person" elems="itinNode, taxonomy">
+        <elem tag="cfield_position"/>
+        <elem tag="cfield_place"/>
+        <elem tag="field_phone"/>
+        <elem tag="field_email"/>
+        <elem tag="field_url"/>
+        <elem tag="field_days_open"/>
+        <elem tag="field_open_description"/>
+        <elem tag="field_public_transport"/>
+        <elem tag="field_public_access"/>
 
-            <elem tag="life">
-                <elem tag="dates"/>
-                <!-- birth, death dates-->
-                <elem tag="life"/>
-                <!-- birth, death year-->
-                <elem tag="date_circa"/>
-                <elem tag="birth_place"/>
-                <elem tag="death_place"/>
-                <elem tag="residence"/>
-            </elem>
-            <elem tag="nickname"/>
-            <elem tag="function"/>
-            <elem tag="gender"/>
-            <elem tag="person_category"/>
+        <elem tag="loc_name"/>
 
-        </elem>
-
-        <elem tag="reference" attrs="referenceType" elems="media, path">
-
-            <elem tag="language"/>
-            <elem tag="title"/>
-            <elem tag="source"/>
-            <elem tag="author"/>
-            <elem tag="pub_location"/>
-            <elem tag="pub_year"/>
-            <elem tag="book">
-                <elem tag="publisher"/>
-            </elem>
-            <elem tag="magazine"/>
-            <!-- group -->
-            <elem tag="book_magazine">
-                <elem tag="isbn"/>
-                <elem tag="issn"/>
-                <elem tag="magazine_name"/>
-                <elem tag="magazine_issue"/>
-            </elem>
-            <elem tag="pages"/>
-            <elem tag="page_numbers"/>
-            <elem tag="website">
-                <elem tag="organisation_name"/>
-                <elem tag="url"/>
-            </elem>
-            <elem tag="related_pvb"/>
-            <elem tag="related_history_person"/>
-        </elem>
-
-        <elem tag="event" attrs="sourceId, eventType" elems="calendar, contact, location, links, itinNode">
+        <elem tag="loc_environment"/>
+        <elem tag="loc_telecoms"/>
+        <elem tag="loc_access"/>
 
 
-            <elem tag="categories">
-                <elem tag="category" attrs="type"/>
-            </elem>
+        <elem tag="loc_geonamesUri"/>
+        <elem tag="loc_geonamesId"/>
+        <elem tag="cfield_zooverPLaceId"/>
+        <elem tag="cfield_zooverRegionId"/>
+        <elem tag="cfield_zooverProvinceId"/>
+        <elem tag="cfield_zooverCountryId"/>
+        <elem tag="loc_place"/>
+        <elem tag="cfield_lat"/>
+        <elem tag="cfield_long"/>
+        <elem tag="cfield_latLong"/>
+        <elem tag="cfield_itin_place"/>
 
-            <elem tag="eventDetail" elems="urls">
-                <elem tag="title"/>
-                <elem tag="shortDescription"/>
-                <elem tag="longDescription"/>
-                <elem tag="notes"/>
-                <elem tag="media">
-                    <elem tag="file" attrs="type">
-                        <elem tag="description"/>
-                        <elem tag="hlink"/>
-                        <elem tag="title"/>
-                    </elem>
-                </elem>
-            </elem>
+        <!--Event-->
+        <elem tag="field_date"/>
+        <elem tag="field_date_year"/>
+        <elem tag="field_date_circa"/>
+        <elem tag="field_contact"/>
 
-            <elem tag="participants">
-                <elem tag="participant" attrs="extra, firstName, lastName, position"/>
-            </elem>
-            <elem tag="organiser" elems="name, address"/>
-            <elem tag="status"/>
-            <elem tag="websiteUrl"/>
-        </elem>
+        <!--Places-->
+        <elem tag="field_wapen"/>
+        <elem tag="field_wapen_toelichting"/>
 
-        <elem tag="pvb" elems="taxonomy, media, path, links">
+        <!--Calendar-->
+        <elem tag="cal_startDate"/>
+        <elem tag="cal_startTime"/>
+        <elem tag="cal_endDate"/>
+        <elem tag="cal_endTime"/>
+        <elem tag="cal_year"/>
 
-            <elem tag="language"/>
-            <elem tag="title"/>
-            <elem tag="description" elems="taglines, summary, body">
-                <elem tag="year"/>
-                <elem tag="date"/>
-                <elem tag="date_year"/>
-                <elem tag="date_circa"/>
-                <elem tag="importance"/>
-                <elem tag="poi_type"/>
-            </elem>
-            <elem tag="additional"/>
-            <elem tag="poi_subtype"/>
-            <elem tag="factual_info">
-                <elem tag="poi_friends"/>
-                <elem tag="poi_friends_of"/>
-                <elem tag="poi_society_info"/>
-                <elem tag="poi_society"/>
-            </elem>
-            <elem tag="use"/>
-            <elem tag="suggestions"/>
-            <elem tag="info">
-                <elem tag="directions"/>
-                <elem tag="public_transportation"/>
-                <elem tag="phone"/>
-                <elem tag="url"/>
-                <elem tag="email"/>
-                <elem tag="twitter"/>
-                <elem tag="facebook"/>
-                <elem tag="hyves"/>
-            </elem>
-            <elem tag="surroundings">
-                <elem tag="surroundings"/>
-            </elem>
-            <elem tag="visitor_info">
-                <elem tag="public_access"/>
-                <elem tag="days_open"/>
-                <elem tag="visitor_info"/>
-                <elem tag="fee"/>
-                <elem tag="fees"/>
-                <elem tag="cjp"/>
-                <elem tag="children_friendly"/>
-                <elem tag="facilities">
-                    <elem tag="facilities_shop"/>
-                    <elem tag="facilities_horeca"/>
-                    <elem tag="facilities_toilet"/>
-                    <elem tag="facilities_parking"/>
-                    <elem tag="facilities_wheelchair"/>
-                    <elem tag="wifi"/>
-                    <elem tag="efacilities_other"/>
-                </elem>
-            </elem>
-            <elem tag="history">
-                <elem tag="history"/>
-                <elem tag="use"/>
-            </elem>
-            <elem tag="amazon"/>
-            <elem tag="ref_collection"/>
-            <elem tag="sources"/>
-            <elem tag="attachments"/>
-        </elem>
+        <!--Persoon-->
+        <elem tag="field_nickname"/>
+        <elem tag="field_life_dates"/>
+        <elem tag="field_life"/>
+        <elem tag="field_birth_place"/>
+        <elem tag="field_death_place"/>
+        <elem tag="field_residence"/>
+        <elem tag="field_function"/>
+        <elem tag="field_gender"/>
 
-        <elem tag="place" attrs="sourceId, placeType" elems="itinNode, location, taxonomy">
+        <!-- POI -->
+        <elem tag="field_year"/>
+        <elem tag="field_importance"/>
+        <elem tag="field_poi_friends_of"/>
+        <elem tag="field_poi_society"/>
+        <elem tag="field_directions"/>
+        <elem tag="field_hyves"/>
+        <elem tag="field_facebook"/>
+        <elem tag="field_twitter"/>
+        <elem tag="field_visitor_info"/>
+        <elem tag="field_fees"/>
+        <elem tag="field_children_friendly"/>
+        <elem tag="field_cjp"/>
+        <elem tag="field_facilities_shop"/>
+        <elem tag="field_facilities_horeca"/>
+        <elem tag="field_facilities_toilet"/>
+        <elem tag="field_facilities_parking"/>
+        <elem tag="field_facilities_wheelchair"/>
+        <elem tag="field_wifi"/>
+        <elem tag="field_facilities_other"/>
+        <elem tag="field_history"/>
+        <elem tag="field_use"/>
+        <elem tag="field_amazon"/>
 
-            <elem tag="wapen">
-                <elem tag="wapen"/>
-                <elem tag="wapen_toelichting"/>
-            </elem>
-        </elem>
+        <!--pvb links-->
+        <elem tag="pvbLink_name"/>
+        <elem tag="pvbLink_type"/>
+        <elem tag="pvbLink_entityType"/>
+        <elem tag="pvbLink_bundle"/>
+        <elem tag="pvbLink_id"/>
+        <elem tag="pvbLink_linkType"/>
+        <elem tag="pvbLink_pathalias"/>
+        <elem tag="pvbLink_path"/>
+
+        <!--Contenttype info-->
+        <elem tag="field_organization_type"/>
+        <elem tag="field_event_type"/>
+        <elem tag="field_reference_type"/>
+        <elem tag="field_accommodation_type"/>
+        <elem tag="field_place_type"/>
 
 
-        <elem tag="accommodation" attrs="sourceId, accommodationType" elems="itinNode, open, contact, taxonomy, links">
+        <!--ICN fields -->
 
-            <elem tag="classification"/>
-            <elem tag="public_transport"/>
-            <elem tag="sources"/>
-            <elem tag="amazon"/>
+        <!--<elem tag="icn:creatorYearOfBirth"/>-->
+        <!--<elem tag="icn:creatorYearOfDeath"/>-->
+        <!--<elem tag="icn:creatorRole"/>-->
+        <!--<elem tag="icn:technique"/>-->
+        <!--<elem tag="icn:material"/>-->
+        <!--<elem tag="icn:location"/>-->
+        <!--<elem tag="icn:province"/>-->
+        <!--<elem tag="icn:collectionPart"/>-->
+        <!--<elem tag="icn:acquisitionMeans"/>-->
+        <!--<elem tag="icn:collectionType"/>-->
+        <!--<elem tag="icn:acquisitionYear"/>-->
+        <!--<elem tag="icn:purchasePrice"/>-->
+        <!--<elem tag="icn:acquiredWithHelpFrom"/>-->
+        <!--<elem tag="icn:physicalState"/>-->
+        <!--<elem tag="icn:musipCollectionUri"/>-->
+        <!--<elem tag="icn:musipCollectionDisplayName" hidden="true"/>-->
+        <!--<elem tag="icn:musipMuseumUri"/>-->
+        <!--<elem tag="icn:musipMuseumDisplayName" hidden="true"/>-->
 
-        </elem>
+        <elem tag="dc:title"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:creator"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:subject"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:description"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:publisher"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:contributor"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:date"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:type"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:format"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:identifier"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:source"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:language"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:relation"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:coverage"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dc:rights"/>
+        <!-- ESE 3.4 -->
 
-        <elem tag="history_period" elems="itinNode, taxonomy">
-
-            <elem tag="experience"/>
-            <elem tag="sources"/>
-            <elem tag="period_date"/>
-        </elem>
-
-
-        <!--<elem tag="object" elems="path">-->
-
-        <!--<elem tag="language"/>-->
-        <!--<elem tag="title"/>-->
-        <!--<elem tag="taglines"/>-->
-        <!--<elem tag="summary"/>-->
-        <!--<elem tag="body"/>-->
-        <!--<elem tag="organisation"/>-->
-        <!--<elem tag="identifier"/>-->
-        <!--<elem tag="dc_publisher"/>-->
-        <!--<elem tag="object_type"/>-->
-        <!--<elem tag="scene"/>-->
-        <!--<elem tag="onderwerp">-->
-        <!--<elem tag="ref_pvb"/>-->
-        <!--<elem tag="ref_persons"/>-->
-        <!--<elem tag="history_events"/>-->
-        <!--<elem tag="media_subject"/>-->
-        <!--</elem>-->
-        <!--<elem tag="metadata">-->
-        <!--<elem tag="creator"/>-->
-        <!--<elem tag="creation_date"/>-->
-        <!--<elem tag="material"/>-->
-        <!--<elem tag="size"/>-->
-        <!--</elem>-->
-        <!--<elem tag="remarks"/>-->
-        <!--<elem tag="copyright"/>-->
-        <!--<elem tag="sources"/>-->
-        <!--</elem>-->
-
-        <!--<elem tag="history_event" elems="taxonomy, media, path">-->
-
-        <!--<elem tag="language"/>-->
-        <!--<elem tag="title"/>-->
-        <!--<elem tag="taglines"/>-->
-        <!--<elem tag="summary"/>-->
-        <!--<elem tag="body"/>-->
-        <!--<elem tag="history_date"/>-->
-        <!--<elem tag="date"/>-->
-        <!--<elem tag="date_year"/>-->
-        <!--<elem tag="date_circa"/>-->
-        <!--<elem tag="url"/>-->
-        <!--<elem tag="contact"/>-->
-        <!--<elem tag="sources"/>-->
-        <!--<elem tag="ref_other"/>-->
-
-        <!--</elem>-->
-
-
-        <!--<elem tag="pvb_story" elems="taxonomy, media, path">-->
-
-        <!--<elem tag="language"/>-->
-        <!--<elem tag="title"/>-->
-        <!--<elem tag="taglines"/>-->
-        <!--<elem tag="summary"/>-->
-        <!--<elem tag="body"/>-->
-        <!--<elem tag="story_type"/>-->
-        <!--<elem tag="story_year"/>-->
-        <!--<elem tag="date"/>-->
-        <!--<elem tag="date_year"/>-->
-        <!--<elem tag="date_circa"/>-->
-        <!--<elem tag="ref_pvb"/>-->
-
-        <!--<elem tag="experience">-->
-        <!--<elem tag="exp_why"/>-->
-        <!--<elem tag="experience"/>-->
-        <!--</elem>-->
-        <!--<elem tag="sources"/>-->
-        <!--<elem tag="attachments"/>-->
-        <!--</elem>-->
-
-
-        <!--<elem tag="page">-->
-
-        <!--<elem tag="language"/>-->
-        <!--<elem tag="title"/>-->
-        <!--<elem tag="taglines"/>-->
-        <!--<elem tag="summary"/>-->
-        <!--<elem tag="body"/>-->
-        <!--<elem tag="media"/>-->
-        <!--<elem tag="path"/>-->
-
-        <!--</elem>-->
+        <elem tag="dcterms:created"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:extent"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasFormat"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasPart"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasVersion"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isFormatOf"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isPartOf"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isReferencedBy"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isReplacedBy"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isRequiredBy"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:isVersionOf"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:issued"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:medium"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:references"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:replaces"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:requires"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:tableOfContents"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:alternative"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:spatial"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:temporal"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:provenance"/>
+        <!-- ESE 3.4 -->
+        <elem tag="dcterms:rightsHolder"/>
+        <!-- NOT part of ESE 3.4 -->
 
 
-        <!--<elem tag="author" elems="taxonomy, media, path">-->
+        <elem tag="europeana:isShownBy" fieldType="link"/>
+        <!-- ESE 3.4 -->
+        <elem tag="europeana:rights"/>
+        <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt" fieldType="link" operator="FIRST"/>
+        <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored"/>
+        <!-- ESE 3.4 -->
+        <elem tag="europeana:object" fieldType="link"/>
+        <!-- ESE 3.4 -->
+        <elem tag="europeana:provider"/>
+        <!-- ESE 3.4 -->
+        <elem tag="europeana:dataProvider"/>
+        <!-- ESE 3.4 -->
+        <elem tag="europeana:type"/>
+        <!-- ESE 3.4 -->
 
-        <!--<elem tag="language"/>-->
-        <!--<elem tag="title"/>-->
-        <!--<elem tag="taglines"/>-->
-        <!--<elem tag="summary"/>-->
-        <!--<elem tag="body"/>-->
-        <!--<elem tag="phone"/>-->
-        <!--<elem tag="email"/>-->
-        <!--<elem tag="twitter"/>-->
-        <!--<elem tag="facebook"/>-->
-        <!--<elem tag="hyves"/>-->
-        <!--<elem tag="linkedin"/>-->
-        <!--<elem tag="url"/>-->
+        <!-- moved from europeana to delving -->
+        <elem tag="europeana:uri" function="toLocalId" operator="FIRST"/>
+        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
+        <elem tag="europeana:language"/>
+        <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
+        <elem tag="europeana:country"/>
+        <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
+        <elem tag="europeana:collectionName"/>
+        <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:collectionTitle"/>
+        <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:source"/>
+        <!-- NOT part of ESE 3.4 -->
 
-        <!--</elem>-->
-
-
-        <!--<elem tag="route" elems="taxonomy, media, path">-->
-
-        <!--<elem tag="language"/>-->
-        <!--<elem tag="title"/>-->
-        <!--<elem tag="taglines"/>-->
-        <!--<elem tag="summary"/>-->
-        <!--<elem tag="body"/>-->
-        <!--<elem tag="routeyou_id"/>-->
-        <!--<elem tag="route_type"/>-->
-        <!--<elem tag="related_pvb"/>-->
-
-        <!--</elem>-->
+        <!-- original delving namespace -->
+        <elem tag="delving:year"/>
+        <elem tag="delving:thumbnail" fieldType="link"/>
+        <elem tag="delving:deepZoomUrl" fieldType="link"/>
+        <elem tag="delving:fullTextObjectUrl" fieldType="link"/>
+        <elem tag="delving:fullText"/>
 
     </root>
 
-
     <opts>
-        <opt-list path="/record/recordType" key="@type" value="@label">
+        <!--<opt-list path="/record/cfield_record_type" hidden="true" key="@type" value="@label" displayName="Record Type">-->
+            <!--<opt hidden="true" key="organization" value="Organization"/>-->
+            <!--<opt hidden="true" key="history_person" value="Historical person"/>-->
+            <!--<opt hidden="true" key="reference" value="Bibliography"/>-->
+            <!--<opt hidden="true" key="event" value="Event"/>-->
+            <!--<opt hidden="true" key="pvb" value="Place of interest"/>-->
+            <!--<opt hidden="true" key="place" value="Place"/>-->
+            <!--<opt hidden="true" key="accommodation" value="Accommodation"/>-->
+            <!--<opt hidden="true" key="history_period" value="Historical period"/>-->
+        <!--</opt-list>-->
 
-            <opt hidden="true" key="organization" value="Organization"/>
-            <opt hidden="true" key="history_person" value="Historical person"/>
-            <opt hidden="true" key="reference" value="Bibliography"/>
-            <opt hidden="true" key="event" value="Event"/>
-            <opt hidden="true" key="pvb" value="Place of interest"/>
-            <opt hidden="true" key="place" value="Place"/>
-            <opt hidden="true" key="accommodation" value="Accommodation"/>
-            <opt hidden="true" key="history_period" value="Historical period"/>
+        <!--<opt-list path="/record/field_organization_type" key="@type" value="@label" dictionary="true" displayName="Organisation Type">-->
+            <!--<opt key="onbekend" value="Onbekend / n.v.t."/>-->
+            <!--<opt key="onderwijsinstelling" value="Onderwijsinstelling"/>-->
+            <!--<opt key="overheidsinstelling" value="Overheidsinstelling"/>-->
+            <!--<opt key="overig" value="Overig"/>-->
+            <!--<opt key="toeristisch commercieel" value="Toeristisch commercieel"/>-->
+            <!--<opt key="toeristisch publiek" value="Toeristisch publiek"/>-->
+            <!--<opt key="vereniging" value="Vereniging"/>-->
+            <!--<opt key="weborganisaties" value="Weborganisaties"/>-->
+        <!--</opt-list>-->
 
-        </opt-list>
+        <!--<opt-list path="/record/field_reference_type" key="@type" value="@label" dictionary="true" displayName="Reference Type">-->
+            <!--<opt key="boek" value="Boek"/>-->
+            <!--<opt key="tijdschrift" value="Tijdschrift"/>-->
+            <!--<opt key="krant" value="Krant"/>-->
+            <!--<opt key="wetenschappelijk_tijdschrift" value="Wetenschappelijk tijdschrift"/>-->
+            <!--<opt key="bron" value="Bron"/>-->
+            <!--<opt key="link" value="Link"/>-->
+            <!--<opt key="overig" value="Overig"/>-->
+        <!--</opt-list>-->
+
+        <!--<opt-list path="/record/field_place_type" key="@type" value="@label" dictionary="true" displayName="Place Type">-->
+            <!--<opt key="café" value="café"/>-->
+            <!--<opt key="hotel" value="hotel"/>-->
+            <!--<opt key="restaurant" value="restaurant"/>-->
+            <!--<opt key="overig" value="overig"/>-->
+        <!--</opt-list>-->
+
+        <!--<opt-list path="/record/field_accommodation_type" key="@type" value="@label" dictionary="true" displayName="Accommodation Type">-->
+            <!--<opt key="hotel" value="hotel"/>-->
+            <!--<opt key="restaurant" value="restaurant"/>-->
+            <!--<opt key="overig" value="overig"/>-->
+        <!--</opt-list>-->
+
+        <!--<opt-list path="/record/field_event_type" key="@type" value="@label" dictionary="true" displayName="EventType">-->
+            <!--<opt key="andere_tocht" value="Andere tocht"/>-->
+            <!--<opt key="concert" value="Concert"/>-->
+            <!--<opt key="festival" value="Festival"/>-->
+            <!--<opt key="fietstocht" value="Fietstocht"/>-->
+            <!--<opt key="lezing" value="Lezing"/>-->
+            <!--<opt key="markt" value="Markt"/>-->
+            <!--<opt key="overig" value="Overig"/>-->
+            <!--<opt key="re-enactment" value="Re-enactment"/>-->
+            <!--<opt key="rondleiding" value="Rondleiding"/>-->
+            <!--<opt key="tentoonstelling" value="Tentoonstelling"/>-->
+            <!--<opt key="theater" value="Theater"/>-->
+            <!--<opt key="wandeltocht" value="Wandeltocht"/>-->
+        <!--</opt-list>-->
     </opts>
 
 
+
+
     <field-markers>
-        <field-marker type="fact" path="/record/admin/displayDataProvider" name="dataProvider"/>
-        <field-marker type="fact" path="/record/admin/displayDataProviderCountry" name="country"/>
-        <field-marker type="fact" path="/record/admin/displayProvider" name="provider"/>
+        <field-marker name="CREATOR" path="/record/dc:creator"/>
+        <field-marker name="TITLE" path="/record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/record/dc:description"/>
+        <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
+        <field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>
+
+        <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dc:subject"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dcterms:alternative"/>
+        <field-marker type="search" name="SNIPPET" path="/record/europeana:collectionTitle"/>
+
+        <field-marker type="fact" name="spec" path="/record/europeana:collectionName"/>
+        <field-marker type="fact" name="name" path="/record/europeana:collectionTitle"/>
+        <field-marker type="fact" name="country" path="/record/europeana:country"/>
+        <field-marker type="fact" name="dataProvider" path="/record/europeana:dataProvider"/>
+        <field-marker type="fact" name="language" path="/record/europeana:language"/>
+        <field-marker type="fact" name="provider" path="/record/europeana:provider"/>
+        <field-marker type="fact" name="rights" path="/record/europeana:rights"/>
+        <field-marker type="fact" name="type" path="/record/europeana:type"/>
     </field-markers>
 
+    <docs>
+        <doc path="/record/dc:contributor">
+            <string name="Dublin Core definition">An entity responsible for making contributions to the content of the
+                resource. Examples of a Contributor include a person, an organization or a service. Typically, the name
+                of a Contributor should be used to indicate the entity.
+            </string>
+            <string name="Europeana definition">An entity responsible for making contributions to the resource</string>
+            <string name="Europeana note">The name of contributors to the original analog or born digital object. This
+                could be a person, an organisation or a service.
+            </string>
+        </doc>
+        <!-- ... -->
+    </docs>
+
 </record-definition>
+
+
