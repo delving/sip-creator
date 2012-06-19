@@ -21,6 +21,7 @@
 
 package eu.delving.sip.xml;
 
+import eu.delving.MappingResult;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.ProgressListener;
@@ -221,6 +222,8 @@ public class FileProcessor implements Runnable {
         try {
             Source source = new DOMSource(node);
             validator.validate(source);
+            MappingResult result = new MappingResultImpl(serializer, node, recDefTree()).resolve();
+            result.checkMissingFields();
             validCount++;
             valid.set(recordNumber);
             recordStatistics((Element) node, Path.create());
@@ -279,4 +282,5 @@ public class FileProcessor implements Runnable {
         aborted = true;
         progressListener.finished(false);
     }
+
 }
