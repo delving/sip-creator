@@ -65,9 +65,6 @@
         </mapping-function>
     </functions>
 
-    <attrs>
-        <attr tag="type"/>
-    </attrs>
 
     <root tag="record">
 
@@ -81,6 +78,8 @@
         <elem tag="field_taglines"/>
         <elem tag="field_summary"/>
         <elem tag="field_body"/>
+        <elem tag="field_history"/>
+        <elem tag="field_sources"/>
         <elem tag="field_media"/>
         <elem tag="field_path"/>
         <elem tag="cfield_name"/>
@@ -106,6 +105,8 @@
         <elem tag="field_url"/>
         <elem tag="field_days_open"/>
         <elem tag="field_open_description"/>
+        <elem tag="field_public_transport"/>
+        <elem tag="field_public_access"/>
 
         <elem tag="loc_name"/>
 
@@ -116,10 +117,25 @@
 
         <elem tag="loc_geonamesUri"/>
         <elem tag="loc_geonamesId"/>
+        <elem tag="cfield_zooverPLaceId"/>
+        <elem tag="cfield_zooverRegionId"/>
+        <elem tag="cfield_zooverProvinceId"/>
+        <elem tag="cfield_zooverCountryId"/>
         <elem tag="loc_place"/>
-        <elem tag="loc_long"/>
-        <elem tag="loc_lat"/>
-        <elem tag="loc_latLong"/>
+        <elem tag="cfield_lat"/>
+        <elem tag="cfield_long"/>
+        <elem tag="cfield_latLong"/>
+        <elem tag="cfield_itin_place"/>
+
+        <!--Event-->
+        <elem tag="field_date"/>
+        <elem tag="field_date_year"/>
+        <elem tag="field_date_circa"/>
+        <elem tag="field_contact"/>
+
+        <!--Places-->
+        <elem tag="field_wapen"/>
+        <elem tag="field_wapen_toelichting"/>
 
         <!--Calendar-->
         <elem tag="cal_startDate"/>
@@ -127,6 +143,40 @@
         <elem tag="cal_endDate"/>
         <elem tag="cal_endTime"/>
         <elem tag="cal_year"/>
+
+        <!--Persoon-->
+        <elem tag="field_nickname"/>
+        <elem tag="field_life_dates"/>
+        <elem tag="field_life"/>
+        <elem tag="field_birth_place"/>
+        <elem tag="field_death_place"/>
+        <elem tag="field_residence"/>
+        <elem tag="field_function"/>
+        <elem tag="field_gender"/>
+
+        <!-- POI -->
+        <elem tag="field_year"/>
+        <elem tag="field_importance"/>
+        <elem tag="field_poi_friends_of"/>
+        <elem tag="field_poi_society"/>
+        <elem tag="field_directions"/>
+        <elem tag="field_hyves"/>
+        <elem tag="field_facebook"/>
+        <elem tag="field_twitter"/>
+        <elem tag="field_visitor_info"/>
+        <elem tag="field_fees"/>
+        <elem tag="field_children_friendly"/>
+        <elem tag="field_cjp"/>
+        <elem tag="field_facilities_shop"/>
+        <elem tag="field_facilities_horeca"/>
+        <elem tag="field_facilities_toilet"/>
+        <elem tag="field_facilities_parking"/>
+        <elem tag="field_facilities_wheelchair"/>
+        <elem tag="field_wifi"/>
+        <elem tag="field_facilities_other"/>
+        <elem tag="field_history"/>
+        <elem tag="field_use"/>
+        <elem tag="field_amazon"/>
 
         <!--pvb links-->
         <elem tag="pvbLink_name"/>
@@ -139,11 +189,11 @@
         <elem tag="pvbLink_path"/>
 
         <!--Contenttype info-->
-        <elem tag="field_organization_type" attrs="type"/>
-        <elem tag="field_reference_type" attrs="type"/>
-        <elem tag="field_event_type" attrs="type"/>
-        <elem tag="field_accommodation_type" attrs="type"/>
-        <elem tag="field_place_type" attrs="type"/>
+        <elem tag="field_organization_type"/>
+        <elem tag="field_event_type"/>
+        <elem tag="field_reference_type"/>
+        <elem tag="field_accommodation_type"/>
+        <elem tag="field_place_type"/>
 
 
         <!--ICN fields -->
@@ -285,65 +335,65 @@
     </root>
 
     <opts>
-        <opt-list path="/record/cfield_record_type" hidden="true" key="@type" value="@label" displayName="Record Type">
-            <opt hidden="true" key="organization" value="Organization"/>
-            <opt hidden="true" key="history_person" value="Historical person"/>
-            <opt hidden="true" key="reference" value="Bibliography"/>
-            <opt hidden="true" key="event" value="Event"/>
-            <opt hidden="true" key="pvb" value="Place of interest"/>
-            <opt hidden="true" key="place" value="Place"/>
-            <opt hidden="true" key="accommodation" value="Accommodation"/>
-            <opt hidden="true" key="history_period" value="Historical period"/>
-        </opt-list>
+        <!--<opt-list path="/record/cfield_record_type" hidden="true" key="@type" value="@label" displayName="Record Type">-->
+            <!--<opt hidden="true" key="organization" value="Organization"/>-->
+            <!--<opt hidden="true" key="history_person" value="Historical person"/>-->
+            <!--<opt hidden="true" key="reference" value="Bibliography"/>-->
+            <!--<opt hidden="true" key="event" value="Event"/>-->
+            <!--<opt hidden="true" key="pvb" value="Place of interest"/>-->
+            <!--<opt hidden="true" key="place" value="Place"/>-->
+            <!--<opt hidden="true" key="accommodation" value="Accommodation"/>-->
+            <!--<opt hidden="true" key="history_period" value="Historical period"/>-->
+        <!--</opt-list>-->
 
-        <opt-list path="/record/field_organization_type" key="@type" dictionary="ORG" displayName="Organisation Type">
-            <opt key="onbekend" value="Onbekend / n.v.t."/>
-            <opt key="onderwijsinstelling" value="Onderwijsinstelling"/>
-            <opt key="overheidsinstelling" value="Overheidsinstelling"/>
-            <opt key="overig" value="Overig"/>
-            <opt key="toeristisch commercieel" value="Toeristisch commercieel"/>
-            <opt key="toeristisch publiek" value="Toeristisch publiek"/>
-            <opt key="vereniging" value="Vereniging"/>
-            <opt key="weborganisaties" value="Weborganisaties"/>
-        </opt-list>
+        <!--<opt-list path="/record/field_organization_type" key="@type" value="@label" dictionary="true" displayName="Organisation Type">-->
+            <!--<opt key="onbekend" value="Onbekend / n.v.t."/>-->
+            <!--<opt key="onderwijsinstelling" value="Onderwijsinstelling"/>-->
+            <!--<opt key="overheidsinstelling" value="Overheidsinstelling"/>-->
+            <!--<opt key="overig" value="Overig"/>-->
+            <!--<opt key="toeristisch commercieel" value="Toeristisch commercieel"/>-->
+            <!--<opt key="toeristisch publiek" value="Toeristisch publiek"/>-->
+            <!--<opt key="vereniging" value="Vereniging"/>-->
+            <!--<opt key="weborganisaties" value="Weborganisaties"/>-->
+        <!--</opt-list>-->
 
-        <opt-list path="/record/field_reference_type" key="@type" dictionary="REF" displayName="Reference Type">
-            <opt key="boek" value="Boek"/>
-            <opt key="tijdschrift" value="Tijdschrift"/>
-            <opt key="krant" value="Krant"/>
-            <opt key="wetenschappelijk_tijdschrift" value="Wetenschappelijk tijdschrift"/>
-            <opt key="bron" value="Bron"/>
-            <opt key="link" value="Link"/>
-            <opt key="overig" value="Overig"/>
-        </opt-list>
+        <!--<opt-list path="/record/field_reference_type" key="@type" value="@label" dictionary="true" displayName="Reference Type">-->
+            <!--<opt key="boek" value="Boek"/>-->
+            <!--<opt key="tijdschrift" value="Tijdschrift"/>-->
+            <!--<opt key="krant" value="Krant"/>-->
+            <!--<opt key="wetenschappelijk_tijdschrift" value="Wetenschappelijk tijdschrift"/>-->
+            <!--<opt key="bron" value="Bron"/>-->
+            <!--<opt key="link" value="Link"/>-->
+            <!--<opt key="overig" value="Overig"/>-->
+        <!--</opt-list>-->
 
-        <opt-list path="/record/field_place_type" key="@type" dictionary="PLACE" displayName="Place Type">
-            <opt key="café" value="café"/>
-            <opt key="hotel" value="hotel"/>
-            <opt key="restaurant" value="restaurant"/>
-            <opt key="overig" value="overig"/>
-        </opt-list>
+        <!--<opt-list path="/record/field_place_type" key="@type" value="@label" dictionary="true" displayName="Place Type">-->
+            <!--<opt key="café" value="café"/>-->
+            <!--<opt key="hotel" value="hotel"/>-->
+            <!--<opt key="restaurant" value="restaurant"/>-->
+            <!--<opt key="overig" value="overig"/>-->
+        <!--</opt-list>-->
 
-        <opt-list path="/record/field_accommodation_type" key="@type" dictionary="ACCOM" displayName="Accommodation Type">
-            <opt key="hotel" value="hotel"/>
-            <opt key="restaurant" value="restaurant"/>
-            <opt key="overig" value="overig"/>
-        </opt-list>
+        <!--<opt-list path="/record/field_accommodation_type" key="@type" value="@label" dictionary="true" displayName="Accommodation Type">-->
+            <!--<opt key="hotel" value="hotel"/>-->
+            <!--<opt key="restaurant" value="restaurant"/>-->
+            <!--<opt key="overig" value="overig"/>-->
+        <!--</opt-list>-->
 
-        <opt-list path="/record/field_event_type" key="@type" dictionary="EVENT" displayName="EventType">
-            <opt key="andere_tocht" value="Andere tocht"/>
-            <opt key="concert" value="Concert"/>
-            <opt key="festival" value="Festival"/>
-            <opt key="fietstocht" value="Fietstocht"/>
-            <opt key="lezing" value="Lezing"/>
-            <opt key="markt" value="Markt"/>
-            <opt key="overig" value="Overig"/>
-            <opt key="re-enactment" value="Re-enactment"/>
-            <opt key="rondleiding" value="Rondleiding"/>
-            <opt key="tentoonstelling" value="Tentoonstelling"/>
-            <opt key="theater" value="Theater"/>
-            <opt key="wandeltocht" value="Wandeltocht"/>
-        </opt-list>
+        <!--<opt-list path="/record/field_event_type" key="@type" value="@label" dictionary="true" displayName="EventType">-->
+            <!--<opt key="andere_tocht" value="Andere tocht"/>-->
+            <!--<opt key="concert" value="Concert"/>-->
+            <!--<opt key="festival" value="Festival"/>-->
+            <!--<opt key="fietstocht" value="Fietstocht"/>-->
+            <!--<opt key="lezing" value="Lezing"/>-->
+            <!--<opt key="markt" value="Markt"/>-->
+            <!--<opt key="overig" value="Overig"/>-->
+            <!--<opt key="re-enactment" value="Re-enactment"/>-->
+            <!--<opt key="rondleiding" value="Rondleiding"/>-->
+            <!--<opt key="tentoonstelling" value="Tentoonstelling"/>-->
+            <!--<opt key="theater" value="Theater"/>-->
+            <!--<opt key="wandeltocht" value="Wandeltocht"/>-->
+        <!--</opt-list>-->
     </opts>
 
 

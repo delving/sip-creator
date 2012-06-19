@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:icn="http://www.icn.nl/schemas/icn/"
            xmlns:delving="http://schemas.delving.eu/"
            xmlns:dc="http://purl.org/dc/elements/1.1/"
            xmlns:dcterms="http://purl.org/dc/terms/"
@@ -71,24 +70,126 @@
     <xs:complexType name="recordType">
         <xs:sequence>
 
+            <!-- Basis datablock -->
             <xs:element name="cfield_record_type" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="title" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="language" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_taglines" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_summary" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_body" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_history" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_sources" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_media" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_path" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="cfield_name" minOccurs="0" maxOccurs="unbounded"/>
 
+            <!--Taxonomy-->
+            <xs:element name="field_Subject" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_Tags" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_Sections" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_Category" minOccurs="0" maxOccurs="unbounded"/>
 
+            <!--Location block -->
+            <xs:element name="cfield_loc_country" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="cfield_loc_province" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_loc_region" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="cfield_loc_city" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="cfield_loc_postcode" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="cfield_loc_streetAddress" minOccurs="0" maxOccurs="unbounded"/>
+
             <xs:element name="cfield_position" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_place" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_phone" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_email" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_url" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_days_open" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="field_open_description" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_public_transport" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_public_access" minOccurs="0" maxOccurs="unbounded"/>
 
+            <xs:element name="loc_name" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="loc_environment" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="loc_telecoms" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="loc_access" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="loc_geonamesUri" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="loc_geonamesId" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_zooverPLaceId" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_zooverRegionId" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_zooverProvinceId" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_zooverCountryId" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="loc_place" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_lat" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_long" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_latLong" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cfield_itin_place" minOccurs="0" maxOccurs="unbounded"/>
+
+            <!--Event-->
+            <xs:element name="field_date" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_date_year" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_date_circa" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_contact" minOccurs="0" maxOccurs="unbounded"/>
+
+            <!--Places-->
+            <xs:element name="field_wapen" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_wapen_toelichting" minOccurs="0" maxOccurs="unbounded"/>
+
+            <!--Calendar-->
+            <xs:element name="cal_startDate" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cal_startTime" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cal_endDate" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cal_endTime" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cal_year" minOccurs="0" maxOccurs="unbounded"/>
+
+            <!--Persoon-->
+            <xs:element name="field_nickname" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_life_dates" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_life" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_birth_place" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_death_place" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_residence" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_function" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_gender" minOccurs="0" maxOccurs="unbounded"/>
+
+            <!-- POI -->
+            <xs:element name="field_year" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_importance" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_poi_friends_of" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_poi_society" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_directions" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_hyves" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_facebook" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_twitter" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_visitor_info" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_fees" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_children_friendly" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_cjp" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_facilities_shop" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_facilities_horeca" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_facilities_toilet" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_facilities_parking" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_facilities_wheelchair" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_wifi" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_facilities_other" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_use" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_amazon" minOccurs="0" maxOccurs="unbounded"/>
+
+            <!--pvb links-->
+            <xs:element name="pvbLink_name" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pvbLink_type" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pvbLink_entityType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pvbLink_bundle" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pvbLink_id" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pvbLink_linkType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pvbLink_pathalias" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pvbLink_path" minOccurs="0" maxOccurs="unbounded"/>
+
+            <!--Contenttype info-->
             <xs:element name="field_organization_type" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_reference_type" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_event_type" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_accommodation_type" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field_place_type" minOccurs="0" maxOccurs="unbounded"/>
+
 
             <xs:group minOccurs="0" maxOccurs="unbounded" ref="itin:dcGroup" />
             <xs:group minOccurs="0" maxOccurs="unbounded" ref="itin:dctermsGroup" />
