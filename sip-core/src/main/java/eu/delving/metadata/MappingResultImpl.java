@@ -228,7 +228,6 @@ public class MappingResultImpl implements MappingResult {
             "DESCRIPTION",
             "PROVIDER",
             "OWNER",
-            "THUMBNAIL",
             "LANDING_PAGE"
     };
 }
