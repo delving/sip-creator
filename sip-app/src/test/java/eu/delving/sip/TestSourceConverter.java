@@ -51,7 +51,7 @@ public class TestSourceConverter {
             ">",
             "<sub-root xmlns:c=\"http://c\">", // repeated
             "<we-are-in-record>",
-            "<a:boo>scary</a:boo>",
+            "<a:boo>&amp;three > two &gt; 1</a:boo>",
             "<a:wrapper>",
             "<a:middle>",
             "<a:inside>yolk</a:inside>",
@@ -107,7 +107,7 @@ public class TestSourceConverter {
                 "<?xml version='1.0' encoding='UTF-8'?>",
                 "<delving-sip-source xmlns:a=\"http://a\" xmlns:b=\"http://b\" xmlns:c=\"http://c\">",
                 "<input id=\"before_3030030_after\">",
-                "<a:boo>scary</a:boo>",
+                "<a:boo>&amp;three > two > 1</a:boo>",
                 "<a:wrapper>",
                 "<a:middle>",
                 "<a:inside>yolk</a:inside>",
