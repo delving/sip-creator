@@ -28,10 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The result of the mapping engine
@@ -72,6 +69,29 @@ public class MappingResultImpl implements MappingResult {
     @Override
     public Map<String, List<String>> searchFields() {
         return searchFields;
+    }
+
+    @Override
+    public Set<String> missingSystemFields() {
+        Set<String> missing = new TreeSet<String>(Arrays.asList(REQUIRED_SYSTEM_FIELDS));
+        missing.removeAll(systemFields.keySet());
+        return missing;
+    }
+
+    @Override
+    public void checkMissingFields() throws MissingFieldsException {
+        Set<String> missing = missingSystemFields();
+        if (missing.isEmpty()) return;
+        Map<String, Path> missingMap = new TreeMap<String, Path>();
+        for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
+            if (fieldMarker.name == null) continue;
+            if (missing.contains(fieldMarker.name)) missingMap.put(fieldMarker.name, fieldMarker.path);
+        }
+        StringBuilder out = new StringBuilder("Required fields missing: ");
+        for (Map.Entry<String ,Path> entry : missingMap.entrySet()) {
+            out.append(String.format("%s (%s) ", entry.getKey(), entry.getValue()));
+        }
+        throw new MissingFieldsException(out.toString());
     }
 
     public MappingResult resolve() {
@@ -203,4 +223,13 @@ public class MappingResultImpl implements MappingResult {
         }
         return text.toString();
     }
+
+    private static final String [] REQUIRED_SYSTEM_FIELDS = {
+            "TITLE",
+            "DESCRIPTION",
+            "PROVIDER",
+            "OWNER",
+            "THUMBNAIL",
+            "LANDING_PAGE"
+    };
 }

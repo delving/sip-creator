@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.MappingResult;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
@@ -285,10 +286,15 @@ public class MappingCompileModel {
                         validator.setErrorHandler(handler);
                         try {
                             validator.validate(new DOMSource(node));
+                            MappingResult result = new MappingResultImpl(serializer, node, recMapping.getRecDefTree()).resolve();
+                            result.checkMissingFields();
                             compilationComplete(output, handler.getError());
                         }
                         catch (SAXException e) {
                             compilationComplete(output, handler.getError());
+                        }
+                        catch (MappingResult.MissingFieldsException e) {
+                            compilationComplete(output, e.getMessage());
                         }
                         finally {
                             handler.reset();
