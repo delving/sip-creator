@@ -5,6 +5,7 @@
            targetNamespace="http://schemas.delving.eu/aff/"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+
     <xs:element name="record" type="aff:recordType"/>
 
     <xs:attribute name="localId" type="xs:string"/>

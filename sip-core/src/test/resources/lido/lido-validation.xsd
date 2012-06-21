@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:lido="http://www.lido-schema.org"
+<xsd:schema xmlns:gml="http://www.opengis.net/gml" xmlns:lido="http://www.lido-schema.org"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
             targetNamespace="http://www.lido-schema.org" elementFormDefault="qualified"
             attributeFormDefault="qualified">
@@ -654,11 +654,11 @@
 			<xsd:documentation>Definition: Specifies the GML instantiation for georeferences.</xsd:documentation>
 			<xsd:documentation>Notes: For documentation on GML refer to http://www.opengis.net/gml/. </xsd:documentation>
 		</xsd:annotation>
-		<!--<xsd:sequence>-->
-			<!--<xsd:element ref="gml:Point" minOccurs="0" maxOccurs="unbounded"/>-->
-			<!--<xsd:element ref="gml:LineString" minOccurs="0" maxOccurs="unbounded"/>-->
-			<!--<xsd:element ref="gml:Polygon" minOccurs="0" maxOccurs="unbounded"/>-->
-		<!--</xsd:sequence>-->
+		<xsd:sequence>
+			<xsd:element ref="gml:Point" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="gml:LineString" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="gml:Polygon" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="identifierComplexType">
 		<xsd:annotation>
