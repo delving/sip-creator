@@ -180,10 +180,10 @@
 
         <opt-list path="/record/findingAid/c" key="@key" value="@type" displayName="FindingAid">
             <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fonds" value="root">
-                <opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">
-                    <opt value="A"/>
-                    <opt value="B"/>
-                </opt-list>
+                <dict-opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">
+                    <dict-opt value="A"/>
+                    <dict-opt value="B"/>
+                </dict-opt-list>
             </opt>
         </opt-list>
 
@@ -204,24 +204,24 @@
         <opt-list path="/record/events/event" key="@key" value="@type" schema="@schema" schemaUri="@schemaUri" displayName="Events">
             <opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production" value="Production">
 
-                <!--<opt-list dictionary="ActorRoleInEvent"-->
-                          <!--valuePath="/record/events/event/eventActor/displayRoleInEvent"-->
-                          <!--keyPath="/record/events/event/eventActor/@roleInEventUri"-->
-                          <!--displayName="ActorRoleInEvent">-->
-                    <!--<opt key="a" value="Photographer"/>-->
-                    <!--<opt key="b" value="Creator"/>-->
-                    <!--<opt key="c" value="Factory"/>-->
-                    <!--<opt key="d" value="Company owner"/>-->
-                    <!--<opt key="e" value="Producer"/>-->
-                <!--</opt-list>-->
+                <dict-opt-list dictionary="ActorRoleInEvent"
+                          valuePath="/record/events/event/eventActor/displayRoleInEvent"
+                          keyPath="/record/events/event/eventActor/@roleInEventUri"
+                          displayName="ActorRoleInEvent">
+                    <dict-opt key="a" value="Photographer"/>
+                    <dict-opt key="b" value="Creator"/>
+                    <dict-opt key="c" value="Factory"/>
+                    <dict-opt key="d" value="Company owner"/>
+                    <dict-opt key="e" value="Producer"/>
+                </dict-opt-list>
 
-                <!--<opt-list dictionary="PlaceRoleInEvent"-->
-                          <!--valuePath="/record/events/event/eventPlace/displayRoleInEvent"-->
-                          <!--keyPath="/record/events/event/eventPlace/@roleInEventUri"-->
-                          <!--displayName="PlaceRoleInEvent">-->
-                    <!--<opt key="a" value="Production place"/>-->
-                    <!--<opt key="b" value="What the fuck, need to check up this!"/>-->
-                <!--</opt-list>-->
+                <dict-opt-list dictionary="PlaceRoleInEvent"
+                          valuePath="/record/events/event/eventPlace/displayRoleInEvent"
+                          keyPath="/record/events/event/eventPlace/@roleInEventUri"
+                          displayName="PlaceRoleInEvent">
+                    <dict-opt key="a" value="Production place"/>
+                    <dict-opt key="b" value="What the fuck, need to check up this!"/>
+                </dict-opt-list>
 
             </opt>
             <opt hidden="true" key="crm_e65" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E65.Creation" value="Creation"/>
