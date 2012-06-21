@@ -202,6 +202,10 @@
         <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
         <field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>
 
+        <!-- todo: these should have paths, currently they are checked for presence but not resolved-->
+        <field-marker name="SPEC"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
+
         <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
         <field-marker type="search" name="SNIPPET" path="/record/dc:subject"/>
         <field-marker type="search" name="SNIPPET" path="/record/dcterms:alternative"/>
