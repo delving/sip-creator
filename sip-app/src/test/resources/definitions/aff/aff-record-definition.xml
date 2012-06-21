@@ -9,7 +9,8 @@
                    schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
     </namespaces>
 
-       <attrs>
+
+    <attrs>
         <attr tag="id"/>
         <attr tag="localId"/>
         <attr tag="level"/>
