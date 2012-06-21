@@ -112,7 +112,7 @@ public class MappingResultImpl implements MappingResult {
     }
 
     private void addIfMissing(SystemField systemField, Set<String> keys, Set<String> missing) {
-        if (keys.contains(systemField.toString())) missing.add(systemField.toString());
+        if (!keys.contains(systemField.toString())) missing.add(systemField.toString());
     }
 
     private void resolveAFFRecord() {
