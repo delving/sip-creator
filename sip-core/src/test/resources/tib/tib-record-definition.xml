@@ -24,8 +24,8 @@
                 <string>D:/Documents/Schilderij/010.jpg</string>
             </sample-input>
             <groovy-code>
-                <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg&apos;,&apos;tif.dzi&apos;)</string>
-                <string>&quot;http://thuisinbrabant.delving.org/iip/deepzoom/mnt/tib/tiles/${orgId}/${spec}/${image}&quot;</string>
+                <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg|tif|TIF&apos;,&apos;tif.dzi&apos;)</string>
+                <string>&quot;http://thuisinbrabant.delving.org/iip/deepzoom/mnt/tib/tiles/thuisinbrabant/${spec}/${image}&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="isShownAt">
@@ -41,7 +41,7 @@
                 <string>D:/Documents/Schilderij/010.jpg</string>
             </sample-input>
             <groovy-code>
-                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg&apos;, &apos;&apos;)}/500&quot;</string>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/thuisinbrabant/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/500&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="lowercase">
@@ -71,7 +71,7 @@
         </mapping-function>
         <mapping-function name="smallThumbnail">
             <groovy-code>
-                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg&apos;, &apos;&apos;)}/180&quot;</string>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/thuisinbrabant/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/180&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="toLocalId">
@@ -86,7 +86,7 @@
         </mapping-function>
     </functions>
 
-    <root tag="record">
+    <root tag="tib:record">
 
         <!-- tib -->
         <elem tag="tib:citName"/>
@@ -95,7 +95,7 @@
         <elem tag="tib:thumbSmall" fieldType="link" function="smallThumbnail"/>
         <elem tag="tib:collection"/>
         <elem tag="tib:creatorRole" function="lowercase"/>
-        <elem tag="tib:productionPeriod"/>
+        <elem tag="tib:productionPeriod" fieldType="string"/>
         <elem tag="tib:productionStart"/>
         <elem tag="tib:productionEnd"/>
         <elem tag="tib:creatorBirthYear"/>
@@ -107,7 +107,11 @@
         <elem tag="tib:objectSoort" function="lowercase"/>
         <elem tag="tib:material" function="lowercase"/>
         <elem tag="tib:place"/>
-        <elem tag="tib:technique" function="lowercase"/>
+        <elem tag="tib:technique" function="lowercase" fieldType="string"/>
+        <elem tag="tib:color" function="lowercase" fieldType="string"/>
+        <elem tag="tib:design" function="lowercase" fieldType="string"/>
+        <elem tag="tib:exhibition" function="lowercase" fieldType="string"/>
+        <elem tag="tib:subjectDepicted" function="lowercase" fieldType="string"/>
         <elem tag="tib:date"/>
         <elem tag="tib:collectionPart"/>
         <elem tag="tib:person"/>
@@ -165,7 +169,7 @@
         <elem tag="europeana:isShownBy" function="largeThumbnail" fieldType="link" operator="FIRST"/>                              <!-- ESE 3.4 -->
         <elem tag="europeana:rights" fieldType="link"/>                                 <!-- ESE 3.4 -->
         <elem tag="europeana:isShownAt" function="isShownAt" fieldType="link" operator="FIRST"/>                              <!-- ESE 3.4 -->
-        <elem tag="europeana:unstored"/>                               <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored" fieldType="unstored"/>                               <!-- ESE 3.4 -->
         <elem tag="europeana:object" function="smallThumbnail" fieldType="link" operator="FIRST"/>                                  <!-- ESE 3.4 -->
         <elem tag="europeana:provider" fieldType="string"/>                               <!-- ESE 3.4 -->
         <elem tag="europeana:dataProvider" fieldType="string"/>                           <!-- ESE 3.4 -->
@@ -192,10 +196,15 @@
         <field-marker name="CREATOR" path="/record/dc:creator"/>
         <field-marker name="TITLE" path="/record/dc:title"/>
         <field-marker name="DESCRIPTION" path="/record/dc:description"/>
+        <field-marker name="PROVIDER" path="/record/europeana:provider"/>
         <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
         <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
         <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
         <field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>
+
+        <!-- todo: these should have paths, currently they are checked for presence but not resolved-->
+        <field-marker name="SPEC"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
 
         <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
         <field-marker type="search" name="SNIPPET" path="/record/dc:subject"/>

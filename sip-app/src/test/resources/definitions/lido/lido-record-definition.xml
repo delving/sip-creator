@@ -255,6 +255,19 @@
 
     </root>
 
+    <field-markers>
+        <!-- todo: these should have paths, currently they are checked for presence but not resolved-->
+        <field-marker name="CREATOR"/>
+        <field-marker name="TITLE"/>
+        <field-marker name="DESCRIPTION"/>
+        <field-marker name="OWNER"/>
+        <field-marker name="PROVIDER"/>
+        <field-marker name="LANDING_PAGE"/>
+        <field-marker name="THUMBNAIL"/>
+        <field-marker name="THUMBNAIL"/>
+        <field-marker name="SPEC"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
+    </field-markers>
 
     <opts>
         <!--<option-list path="/lido/administrativeMetadata/recordWrap">-->
