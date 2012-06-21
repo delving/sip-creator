@@ -9,7 +9,8 @@
                    schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
     </namespaces>
 
-       <attrs>
+
+    <attrs>
         <attr tag="id"/>
         <attr tag="localId"/>
         <attr tag="level"/>
@@ -253,9 +254,9 @@
     </opts>
 
     <field-markers>
-        <field-marker type="fact" path="/record/admin/displayDataProvider" name="dataProvider"/>
-        <field-marker type="fact" path="/record/admin/displayDataProviderCountry" name="country"/>
-        <field-marker type="fact" path="/record/admin/displayProvider" name="provider"/>
+        <field-marker name="dataProvider" type="fact" path="/record/admin/displayDataProvider"/>
+        <field-marker name="country" type="fact" path="/record/admin/displayDataProviderCountry"/>
+        <field-marker name="provider" type="fact" path="/record/admin/displayProvider"/>
 
         <field-marker name="CREATOR" path="/record/events/event[crm_e12]/eventActor/displayActor"/>
         <field-marker name="TITLE" path="/record/thing/displayTitle"/>
@@ -264,7 +265,13 @@
         <field-marker name="LANDING_PAGE" path="/record/resources/resource[http://id.culturecloud.eu/concepts/#landingPage]/resourceUrl"/>
         <field-marker name="THUMBNAIL" path="/record/resources/resource[http://id.culturecloud.eu/concepts/#thumbnail]/resourceUrl"/>
 
-        <field-marker type="search" name="SNIPPET" path="/record/thing/displayDescription"/>
+        <!-- todo: these should have paths, because currently their presence is checked but they are not resolved-->
+        <field-marker name="SPEC"/>
+        <field-marker name="PROVIDER"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
+        <field-marker name="THUMBNAIL"/>
+
+        <field-marker name="SNIPPET" type="search" path="/record/thing/displayDescription"/>
     </field-markers>
 
     <docs>

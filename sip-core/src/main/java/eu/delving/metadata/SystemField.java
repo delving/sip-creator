@@ -19,34 +19,32 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving;
-
-import org.w3c.dom.Node;
-
-import java.util.List;
-import java.util.Map;
+package eu.delving.metadata;
 
 /**
- * This is how mapping results are given back from the MappingEngine
+ * The fields that the hub system knows about.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface MappingResult {
+public enum SystemField {
+    TITLE("delving_title"),
+    DESCRIPTION("delving_description"),
+    PROVIDER("delving_provider"),
+    OWNER("delving_owner"),
+    CREATOR("delving_creator"),
+    THUMBNAIL("delving_thumbnail"),
+    LANDING_PAGE("delving_landingPage"),
+    DEEP_ZOOM_URL("delving_deepZoomUrl"),
+    SPEC("delving_spec");
 
-    Node root();
+    private final String tag;
 
-    Map<String, List<String>> fields();
+    private SystemField(String tag) {
+        this.tag = tag;
+    }
 
-    Map<String, List<String>> systemFields();
-
-    Map<String, List<String>> searchFields();
-
-    void checkMissingFields() throws MissingFieldsException;
-
-    public static class MissingFieldsException extends Exception {
-        public MissingFieldsException(String message) {
-            super(message);
-        }
+    public String getTag() {
+        return tag;
     }
 }
