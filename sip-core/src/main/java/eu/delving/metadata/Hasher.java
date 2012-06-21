@@ -72,12 +72,8 @@ public class Hasher {
             Hasher hasher = new Hasher();
             hasher.update(file);
             File hashedFile = new File(file.getParentFile(), hasher.prefixFileName(file.getName()));
-            if (hashedFile.exists()) {
-                FileUtils.deleteQuietly(file);
-            }
-            else {
-                FileUtils.moveFile(file, hashedFile);
-            }
+            if (hashedFile.exists()) FileUtils.deleteQuietly(hashedFile);
+            FileUtils.moveFile(file, hashedFile);
             return hashedFile;
         }
     }

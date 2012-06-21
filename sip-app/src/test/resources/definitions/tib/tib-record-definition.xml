@@ -25,7 +25,7 @@
             </sample-input>
             <groovy-code>
                 <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg|tif|TIF&apos;,&apos;tif.dzi&apos;)</string>
-                <string>&quot;http://thuisinbrabant.delving.org/iip/deepzoom/mnt/tib/tiles/${orgId}/${spec}/${image}&quot;</string>
+                <string>&quot;http://thuisinbrabant.delving.org/iip/deepzoom/mnt/tib/tiles/thuisinbrabant/${spec}/${image}&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="isShownAt">
@@ -41,7 +41,7 @@
                 <string>D:/Documents/Schilderij/010.jpg</string>
             </sample-input>
             <groovy-code>
-                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/500&quot;</string>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/thuisinbrabant/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/500&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="lowercase">
@@ -71,7 +71,7 @@
         </mapping-function>
         <mapping-function name="smallThumbnail">
             <groovy-code>
-                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/${orgId}/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/180&quot;</string>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/thuisinbrabant/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/180&quot;</string>
             </groovy-code>
         </mapping-function>
         <mapping-function name="toLocalId">
@@ -95,7 +95,7 @@
         <elem tag="tib:thumbSmall" fieldType="link" function="smallThumbnail"/>
         <elem tag="tib:collection"/>
         <elem tag="tib:creatorRole" function="lowercase"/>
-        <elem tag="tib:productionPeriod"/>
+        <elem tag="tib:productionPeriod" fieldType="string"/>
         <elem tag="tib:productionStart"/>
         <elem tag="tib:productionEnd"/>
         <elem tag="tib:creatorBirthYear"/>
@@ -201,6 +201,10 @@
         <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
         <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
         <field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>
+
+        <!-- todo: these should have paths, currently they are checked for presence but not resolved-->
+        <field-marker name="SPEC"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
 
         <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
         <field-marker type="search" name="SNIPPET" path="/record/dc:subject"/>

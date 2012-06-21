@@ -147,6 +147,13 @@ public class RecDefTree implements RecDefNodeListener {
     }
 
     private void resolve() {
-        if (recDef.fieldMarkers != null) for (RecDef.FieldMarker marker : recDef.fieldMarkers) marker.resolve(this);
+        if (recDef.fieldMarkers == null) throw new IllegalStateException("Record definition must have field markers");
+        EnumSet<SystemField> missing = EnumSet.allOf(SystemField.class);
+        for (RecDef.FieldMarker marker : recDef.fieldMarkers) {
+            if (marker.name != null && marker.type == null) missing.remove(SystemField.valueOf(marker.name));
+            if (marker.path == null) continue;
+            marker.resolve(this);
+        }
+        if (!missing.isEmpty()) throw new IllegalStateException("Record definition missing system fields: "+missing);
     }
 }

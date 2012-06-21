@@ -30,6 +30,8 @@ import org.w3c.dom.NodeList;
 
 import java.util.*;
 
+import static eu.delving.metadata.SystemField.*;
+
 /**
  * The result of the mapping engine
  *
@@ -72,16 +74,17 @@ public class MappingResultImpl implements MappingResult {
     }
 
     @Override
-    public Set<String> missingSystemFields() {
-        Set<String> missing = new TreeSet<String>(Arrays.asList(REQUIRED_SYSTEM_FIELDS));
-        missing.removeAll(systemFields.keySet());
-        return missing;
-    }
-
-    @Override
     public void checkMissingFields() throws MissingFieldsException {
-        Set<String> missing = missingSystemFields();
+        Set<String> missing = new TreeSet<String>();
+        Set<String> keys = systemFields.keySet();
+        addIfMissing(TITLE, keys, missing);
+        addIfMissing(OWNER, keys, missing);
+        addIfMissing(LANDING_PAGE, keys, missing);
+        addIfMissing(THUMBNAIL, keys, missing);
         if (missing.isEmpty()) return;
+        if (missing.size() == 1 && (missing.contains(LANDING_PAGE.toString()) || missing.contains(THUMBNAIL.toString()))) {
+            return; // ok, only need one of these two
+        }
         Map<String, Path> missingMap = new TreeMap<String, Path>();
         for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
             if (fieldMarker.name == null || fieldMarker.type != null) continue;
@@ -106,6 +109,10 @@ public class MappingResultImpl implements MappingResult {
 
     public String toString() {
         return serializer.toXml(node);
+    }
+
+    private void addIfMissing(SystemField systemField, Set<String> keys, Set<String> missing) {
+        if (keys.contains(systemField.toString())) missing.add(systemField.toString());
     }
 
     private void resolveAFFRecord() {
@@ -223,13 +230,4 @@ public class MappingResultImpl implements MappingResult {
         }
         return text.toString();
     }
-
-    private static final String[] REQUIRED_SYSTEM_FIELDS = {
-            "TITLE",
-            "DESCRIPTION",
-            "PROVIDER",
-            "OWNER",
-            "THUMBNAIL",
-            "LANDING_PAGE"
-    };
 }
