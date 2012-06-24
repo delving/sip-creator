@@ -134,14 +134,27 @@ public class MappingCategory {
     }
 
     // run a closure on each member of the list
-    static Boolean multiply(List a, Closure closure) { // operator *
+    static List multiply(List a, Closure closure) { // operator *
         a = unwrap(a)
-        Boolean called = false;
+        List output = new ArrayList();
         for (Object child : a) {
-            closure.call(child)
-            called = true;
+            Object returnValue = closure.call(child)
+            if (returnValue) {
+                if (returnValue instanceof Object[]) {
+                    output.addAll(returnValue)
+                }
+                else if (returnValue instanceof List) {
+                    output.addAll(returnValue)
+                }
+                else if (returnValue instanceof String) {
+                    output.add(returnValue)
+                }
+                else if (!(returnValue instanceof org.w3c.dom.Node)) {
+                    output.add(returnValue.toString())
+                }
+            }
         }
-        return called
+        return output
     }
 
     // run the closure once for the concatenated values
@@ -162,20 +175,20 @@ public class MappingCategory {
     }
 
     // call closure for the first if there is one
-    static Boolean power(List a, Closure closure) {  // operator **
+    static Object power(List a, Closure closure) {  // operator **
         a = unwrap(a)
         for (Object child : a) {
             closure.call(child)
-            return true;
+            break
         }
-        return false;
+        return null
     }
 
     // call closure once with all of them
-    static Boolean rightShift(List a, Closure closure) {  // operator >>
+    static Object rightShift(List a, Closure closure) {  // operator >>
         a = unwrap(a)
         closure.call(a);
-        return true;
+        return null
     }
 
     static String sanitize(GroovyNode node) {

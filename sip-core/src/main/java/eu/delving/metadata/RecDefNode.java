@@ -406,7 +406,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     private void toBranchCode(boolean virtual, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        startBuilderCall(codeOut, true, "R8", groovyParams, editPath);
+        startBuilderCall(codeOut, false, "R8", groovyParams, editPath);
         for (RecDefNode sub : children) {
             if (sub.isAttr()) continue;
             if (sub.isChildOpt()) {
@@ -473,8 +473,9 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (hasActiveAttributes()) {
             Tag tag = getTag();
             codeOut.line_(
-                    "%s ( %s // %s%s",
-                    tag.toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : "", comment, isRootOpt() ? "(opt)" : "");
+                    "%s ( // %s%s",
+                    tag.toBuilderCall(), comment, isRootOpt() ? "(opt)" : ""
+            );
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
@@ -495,12 +496,16 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     }
                 }
             }
-            codeOut._line(") {").in();
+            codeOut._line(
+                    ") { %s",
+                    absentFalse ? ABSENT_IS_FALSE : ""
+            ).in();
         }
         else {
             codeOut.line_(
                     "%s { %s // %s%s",
-                    getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : "", comment, isRootOpt() ? "(opt)" : "");
+                    getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : "", comment, isRootOpt() ? "(opt)" : ""
+            );
         }
     }
 
