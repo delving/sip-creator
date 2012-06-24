@@ -168,15 +168,15 @@
             <!--<opt key="pause" value="Pause Pause!"/>-->
         <!--</opt-list>-->
 
-        <opt-list dictionary="CAT" path="/record/thing/category"
-                  key="@key"
-                  schemaUri="@schemaUri"
-                  displayName="Category">
-            <opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>
-            <opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>
-            <opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>
-            <opt key="crm_e31" scehamUri="http://www.cidoc-crm.org/rdfs/E31.Document" value="Document"/>
-        </opt-list>
+        <!--<opt-list dictionary="CAT" path="/record/thing/category"-->
+                  <!--key="@key"-->
+                  <!--schemaUri="@schemaUri"-->
+                  <!--displayName="Category">-->
+            <!--<opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>-->
+            <!--<opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>-->
+            <!--<opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>-->
+            <!--<opt key="crm_e31" scehamUri="http://www.cidoc-crm.org/rdfs/E31.Document" value="Document"/>-->
+        <!--</opt-list>-->
 
         <opt-list path="/record/findingAid/c" key="@key" value="@type" displayName="FindingAid">
             <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fonds" value="root">
