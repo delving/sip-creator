@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Handle some common string manipulations.
@@ -36,6 +37,7 @@ import java.util.*;
 public class StringUtil {
 
     private static final Hasher HASHER = new Hasher();
+    private static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
 
     public static String toDictionaryName(NodeMapping nodeMapping) {
         return "Dictionary" + HASHER.getHashString(nodeMapping.outputPath.toString()).substring(16);
@@ -162,6 +164,24 @@ public class StringUtil {
         return indent;
     }
 
+    public static List<String> getIfAbsentCode(List<String> groovyCode) {
+        List<String> code = null;
+        if (groovyCode != null) {
+            int braceLevel = 0;
+            for (String line : groovyCode) {
+                if (code != null) {
+                    braceLevel += StringUtil.braceCount(line);
+                    if (braceLevel <= 0) break;
+                    code.add(line);
+                }
+                else if (IF_ABSENT_PATTERN.matcher(line).matches()) {
+                    code = new ArrayList<String>();
+                    braceLevel++;
+                }
+            }
+        }
+        return code;
+    }
 
     private static final String PLAIN_ASCII =
             "AaEeIiOoUu"    // grave
@@ -208,4 +228,14 @@ public class StringUtil {
                 .replaceAll(" +", " ");
     }
 
+    public static int braceCount(String line) {
+        int count = 0;
+        for (int walk=0; walk<line.length(); walk++) {
+            switch(line.charAt(walk)) {
+                case '{': count++; break;
+                case '}': count--; break;
+            }
+        }
+        return count;
+    }
 }

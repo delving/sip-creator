@@ -43,6 +43,7 @@ import static eu.delving.metadata.StringUtil.*;
  */
 
 public class RecDefNode implements Comparable<RecDefNode> {
+    public static final String ABSENT_IS_FALSE = "_absent_ = false";
     private RecDefNode parent;
     private Path path;
     private RecDef.Elem elem;
@@ -273,23 +274,45 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 toBranchCode(false, codeOut, groovyParams, editPath);
             }
             else if (hasActiveAttributes()) {
-                startBuilderCall(codeOut, "R0", groovyParams, editPath);
+                startBuilderCall(codeOut, false, "R0", groovyParams, editPath);
                 codeOut.line("// no node mappings");
                 codeOut._line("} // R0");
             }
         }
         else if (editPath != null) {
             NodeMapping nodeMapping = editPath.getNodeMapping();
+            codeOut.line("_absent_ = true");
             codeOut.start(nodeMapping);
             toNodeMappingLoop(codeOut, false, nodeMapping, nodeMapping.getLocalPath(), groovyParams, editPath);
             codeOut.end(nodeMapping);
+            addIfAbsentCode(codeOut, nodeMapping, groovyParams, editPath);
         }
         else {
             for (NodeMapping nodeMapping : nodeMappings.values()) {
+                codeOut.line("_absent_ = true");
                 codeOut.start(nodeMapping);
                 toNodeMappingLoop(codeOut, false, nodeMapping, nodeMapping.getLocalPath(), groovyParams, editPath);
                 codeOut.end(nodeMapping);
+                addIfAbsentCode(codeOut, nodeMapping, groovyParams, editPath);
             }
+        }
+    }
+
+    private void addIfAbsentCode(CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams, EditPath editPath) {
+        List<String> groovyCode = nodeMapping.groovyCode;
+        if (editPath != null) {
+            if (!editPath.isGeneratedCode()) {
+                String editedCode = editPath.getEditedCode(getPath());
+                if (editedCode != null) groovyCode = StringUtil.stringToLines(editedCode);
+            }
+        }
+        List<String> ifAbsentCode = StringUtil.getIfAbsentCode(groovyCode);
+        if (ifAbsentCode != null) {
+            codeOut.line_("if (_absent_) {");
+            startBuilderCall(codeOut, false, "R0a", groovyParams, editPath);
+            indentCode(ifAbsentCode, codeOut);
+            codeOut._line("} // R0a");
+            codeOut._line("}");
         }
     }
 
@@ -356,14 +379,14 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     private void toMapNodeMapping(CodeOut codeOut, boolean virtual, NodeMapping nodeMapping, Stack<String> groovyParams, EditPath editPath) {
         if (isLeafElem()) {
-            startBuilderCall(codeOut, "R3", groovyParams, editPath);
+            startBuilderCall(codeOut, true, "R3", groovyParams, editPath);
             codeOut.start(nodeMapping);
             nodeMapping.toLeafElementCode(codeOut, groovyParams, editPath);
             codeOut.end(nodeMapping);
             codeOut._line("} // R3");
         }
         else {
-            startBuilderCall(codeOut, "R4", groovyParams, editPath);
+            startBuilderCall(codeOut, true, "R4", groovyParams, editPath);
             codeOut.start(nodeMapping);
             for (RecDefNode sub : children) {
                 if (sub.isAttr()) continue;
@@ -383,7 +406,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     private void toBranchCode(boolean virtual, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        startBuilderCall(codeOut, "R8", groovyParams, editPath);
+        startBuilderCall(codeOut, true, "R8", groovyParams, editPath);
         for (RecDefNode sub : children) {
             if (sub.isAttr()) continue;
             if (sub.isChildOpt()) {
@@ -405,7 +428,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     "%s %s { %s -> // R10",
                     toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), nodeMapping.getMapName()
             );
-            startBuilderCall(codeOut, "R11", groovyParams, editPath);
+            startBuilderCall(codeOut, true, "R11", groovyParams, editPath);
             codeOut.start(nodeMapping);
             nodeMapping.toLeafElementCode(codeOut, groovyParams, editPath);
             codeOut.end(nodeMapping);
@@ -413,7 +436,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             codeOut._line("} // R10");
         }
         else {
-            startBuilderCall(codeOut, "R12", groovyParams, editPath);
+            startBuilderCall(codeOut, true, "R12", groovyParams, editPath);
             codeOut.start(nodeMapping);
             nodeMapping.toLeafElementCode(codeOut, groovyParams, editPath);
             codeOut.end(nodeMapping);
@@ -446,10 +469,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return optBox != null && optBox.role != OptRole.ROOT;
     }
 
-    private void startBuilderCall(CodeOut codeOut, String comment, Stack<String> groovyParams, EditPath editPath) {
+    private void startBuilderCall(CodeOut codeOut, boolean absentFalse, String comment, Stack<String> groovyParams, EditPath editPath) {
         if (hasActiveAttributes()) {
             Tag tag = getTag();
-            codeOut.line_("%s ( // %s%s", tag.toBuilderCall(), comment, isRootOpt() ? "(opt)" : "");
+            codeOut.line_(
+                    "%s ( %s // %s%s",
+                    tag.toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : "", comment, isRootOpt() ? "(opt)" : "");
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
@@ -473,7 +498,9 @@ public class RecDefNode implements Comparable<RecDefNode> {
             codeOut._line(") {").in();
         }
         else {
-            codeOut.line_("%s { // %s%s", getTag().toBuilderCall(), comment, isRootOpt() ? "(opt)" : "");
+            codeOut.line_(
+                    "%s { %s // %s%s",
+                    getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : "", comment, isRootOpt() ? "(opt)" : "");
         }
     }
 
