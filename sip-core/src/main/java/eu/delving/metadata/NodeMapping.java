@@ -226,6 +226,7 @@ public class NodeMapping {
         toUserCode(codeOut, groovyParams, editPath);
     }
 
+
     public boolean isUserCodeEditable() {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
