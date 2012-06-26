@@ -21,18 +21,17 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.*;
+import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
-import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-import static eu.delving.metadata.NodeMappingChange.DOCUMENTATION;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
@@ -44,40 +43,17 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 public class MappingCodeFrame extends FrameBase {
     private static int MARG = 30;
-    private JTextArea codeArea = new JTextArea();
+    public static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 10);
+    private JTextArea recordArea = new JTextArea();
+    private JTextArea fieldArea = new JTextArea();
 
     public MappingCodeFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.CODE, desktop, sipModel, "Mapping Code", false);
-        codeArea.setFont(new Font("Monospaced", Font.BOLD, 10));
-        codeArea.setEditable(false);
-        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
-            @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                refresh();
-            }
-        });
-        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
-            @Override
-            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-                refresh();
-            }
-
-            @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
-                if (change != DOCUMENTATION) refresh();
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                refresh();
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                refresh();
-            }
-
-        });
+        fieldArea.setFont(MONOSPACED);
+        recordArea.setFont(MONOSPACED);
+        Ear ear = new Ear();
+        sipModel.getFieldCompileModel().addListener(ear);
+        sipModel.getRecordCompileModel().addListener(ear);
         setPlacement(new Placement() {
             @Override
             public Point getLocation() {
@@ -95,32 +71,55 @@ public class MappingCodeFrame extends FrameBase {
         );
     }
 
-    void refresh() {
-        Exec.run(new CodeUpdater());
-    }
-
     @Override
     protected void buildContent(Container content) {
-        content.add(scrollVH(codeArea));
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Whole Record", scrollVH(recordArea));
+        tabs.addTab("Current Mapping", scrollVH(fieldArea));
+        content.add(tabs);
     }
 
-    private class CodeUpdater implements Swing {
+    private class Ear implements MappingCompileModel.Listener {
+        @Override
+        public void stateChanged(CompileState state) {
+            // nothing
+        }
+
+        @Override
+        public void codeCompiled(MappingCompileModel.Type type, String code) {
+            switch (type) {
+                case RECORD:
+                    Exec.run(new CodeUpdater(code, recordArea));
+                    break;
+                case FIELD:
+                    Exec.run(new CodeUpdater(code, fieldArea));
+                    break;
+            }
+        }
+    }
+
+    private static class CodeUpdater implements Swing {
+        private String code;
+        private JTextArea textArea;
+
+        private CodeUpdater(String code, JTextArea textArea) {
+            this.code = code;
+            this.textArea = textArea;
+        }
 
         @Override
         public void run() {
-            RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
-            if (recMapping != null) {
-                String code = recMapping.toCode();
+            if (code != null) {
                 StringBuilder numbered = new StringBuilder();
                 int index = 0;
                 for (String line : code.split("\n")) {
                     numbered.append(String.format("%3d: ", ++index));
                     numbered.append(line).append('\n');
                 }
-                codeArea.setText(numbered.toString());
+                textArea.setText(numbered.toString());
             }
             else {
-                codeArea.setText("// No code");
+                textArea.setText("// No code");
             }
         }
     }

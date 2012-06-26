@@ -275,7 +275,7 @@ public class MappingCompileModel {
                 if (mappingRunner == null) {
                     feedback.say("Compiling " + type);
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath);
-//                    if (type == Type.FIELD) System.out.println(mappingRunner.getCode()); // todo: remove
+                    notifyCodeCompiled(mappingRunner.getCode());
                 }
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
@@ -470,8 +470,13 @@ public class MappingCompileModel {
         for (Listener listener : listeners) listener.stateChanged(state);
     }
 
+    private void notifyCodeCompiled(String code) {
+        for (Listener listener : listeners) listener.codeCompiled(type, code);
+    }
+
     public interface Listener {
         void stateChanged(CompileState state);
+        void codeCompiled(Type type, String code);
     }
 
     public void addListener(Listener listener) {

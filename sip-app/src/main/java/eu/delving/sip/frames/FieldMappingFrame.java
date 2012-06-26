@@ -248,6 +248,11 @@ public class FieldMappingFrame extends FrameBase {
                     }
                 });
             }
+
+            @Override
+            public void codeCompiled(MappingCompileModel.Type type, String code) {
+                // nothing
+            }
         });
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
