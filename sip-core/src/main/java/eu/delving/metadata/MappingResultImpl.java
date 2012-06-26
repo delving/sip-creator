@@ -79,6 +79,7 @@ public class MappingResultImpl implements MappingResult {
         Set<String> keys = systemFields.keySet();
         addIfMissing(TITLE, keys, missing);
         addIfMissing(OWNER, keys, missing);
+        addIfMissing(PROVIDER, keys, missing);
         addIfMissing(LANDING_PAGE, keys, missing);
         addIfMissing(THUMBNAIL, keys, missing);
         if (missing.isEmpty()) return;
