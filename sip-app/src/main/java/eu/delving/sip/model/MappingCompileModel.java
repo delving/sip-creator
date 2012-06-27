@@ -22,10 +22,7 @@
 package eu.delving.sip.model;
 
 import eu.delving.MappingResult;
-import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingRunner;
-import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.XmlSerializer;
+import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
@@ -275,7 +272,7 @@ public class MappingCompileModel {
                 if (mappingRunner == null) {
                     feedback.say("Compiling " + type);
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath);
-//                    if (type == Type.FIELD) System.out.println(mappingRunner.getCode()); // todo: remove
+                    notifyCodeCompiled(mappingRunner.getCode());
                 }
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
@@ -305,8 +302,8 @@ public class MappingCompileModel {
                     }
                     setMappingCode();
                 }
-                catch (AssertionError e) {
-                    compilationComplete("Discarded explicitly with 'assert'", e.getMessage());
+                catch (DiscardRecordException e) {
+                    compilationComplete("Discarded explicitly", e.getMessage());
                     setMappingCode();
                 }
             }
@@ -471,8 +468,13 @@ public class MappingCompileModel {
         for (Listener listener : listeners) listener.stateChanged(state);
     }
 
+    private void notifyCodeCompiled(String code) {
+        for (Listener listener : listeners) listener.codeCompiled(type, code);
+    }
+
     public interface Listener {
         void stateChanged(CompileState state);
+        void codeCompiled(Type type, String code);
     }
 
     public void addListener(Listener listener) {

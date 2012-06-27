@@ -86,6 +86,11 @@ public class RecDefTree implements RecDefNodeListener {
     public void toCode(CodeOut codeOut, Set<MappingFunction> mappingFunctions, Map<String,String> facts, EditPath editPath) {
         codeOut.line("// SIP-Creator Generated Mapping Code");
         codeOut.line("// ----------------------------------");
+        codeOut.line("// Discarding:");
+        codeOut.line("import eu.delving.groovy.DiscardRecordException");
+        codeOut.line("def discard = { reason -> throw new DiscardRecordException(reason.toString()) }");
+        codeOut.line("def discardIf = { thing, reason ->  if (thing) throw new DiscardRecordException(reason.toString()) }");
+        codeOut.line("def discardIfNot = { thing, reason ->  if (!thing) throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("// Facts:");
         for (Map.Entry<String,String> entry : facts.entrySet()) {
             codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
