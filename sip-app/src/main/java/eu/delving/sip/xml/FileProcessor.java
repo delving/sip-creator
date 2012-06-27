@@ -120,7 +120,7 @@ public class FileProcessor implements Work {
                     validateRecord(recordNumber, node);
                     if (xmlOutput != null) xmlOutput.write(node);
                 }
-                catch (AssertionError e) {
+                catch (DiscardRecordException e) {
                     invalidCount++;
                     reportWriter.println("Discarded explicitly:");
                     reportWriter.println(XmlNodePrinter.toXml(record.getRootNode()));

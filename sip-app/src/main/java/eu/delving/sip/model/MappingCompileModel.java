@@ -22,10 +22,7 @@
 package eu.delving.sip.model;
 
 import eu.delving.MappingResult;
-import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingRunner;
-import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.XmlSerializer;
+import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Exec;
@@ -305,8 +302,8 @@ public class MappingCompileModel {
                     }
                     setMappingCode();
                 }
-                catch (AssertionError e) {
-                    compilationComplete("Discarded explicitly with 'assert'", e.getMessage());
+                catch (DiscardRecordException e) {
+                    compilationComplete("Discarded explicitly", e.getMessage());
                     setMappingCode();
                 }
             }

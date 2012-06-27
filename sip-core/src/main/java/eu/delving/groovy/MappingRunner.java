@@ -87,7 +87,7 @@ public class MappingRunner {
         return code;
     }
 
-    public Node runMapping(MetadataRecord metadataRecord) throws MappingException, AssertionError {
+    public Node runMapping(MetadataRecord metadataRecord) throws MappingException  {
         if ((counter % 100) == 0) groovyCodeResource.flush();
         if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
         counter += 1;
@@ -100,6 +100,9 @@ public class MappingRunner {
             binding.setVariable("_facts", wrap(factsNode));
             script.setBinding(binding);
             return stripEmptyElements(script.run());
+        }
+        catch (DiscardRecordException e) {
+            throw e;
         }
         catch (MissingPropertyException e) {
             throw new MappingException(metadataRecord, "Missing Property " + e.getProperty() + "\n" + code, e);
