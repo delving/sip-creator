@@ -23,7 +23,6 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.Storage;
 
@@ -160,7 +159,7 @@ public class CreateModel {
     }
 
     private void adjustHighlights() {
-        Exec.run(new Swing() {
+        sipModel.exec(new Swing() {
             @Override
             public void run() {
                 sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();

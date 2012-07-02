@@ -51,6 +51,8 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.apache.http.HttpStatus.*;
 
@@ -148,7 +150,7 @@ public class CultureHubClient {
     }
 
     public void fetchDataSetList(ListReceiveListener listReceiveListener) {
-        Exec.run(new ListFetcher(1, listReceiveListener));
+        exec(new ListFetcher(1, listReceiveListener));
     }
 
     public interface UnlockListener {
@@ -156,11 +158,11 @@ public class CultureHubClient {
     }
 
     public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
-        Exec.run(new Unlocker(1, dataSet, unlockListener));
+        exec(new Unlocker(1, dataSet, unlockListener));
     }
 
     public void downloadDataSet(DataSet dataSet, ProgressListener progressListener) {
-        Exec.run(new DataSetDownloader(1, dataSet, progressListener));
+        exec(new DataSetDownloader(1, dataSet, progressListener));
     }
 
     public interface UploadListener {
@@ -174,7 +176,7 @@ public class CultureHubClient {
     }
 
     public void uploadFiles(DataSet dataSet, UploadListener uploadListener) throws StorageException {
-        Exec.run(new FileUploader(1, dataSet, uploadListener));
+        exec(new FileUploader(1, dataSet, uploadListener));
     }
 
     private abstract class Attempt implements Work {
@@ -192,7 +194,7 @@ public class CultureHubClient {
             if (shouldRetry()) {
                 context.getFeedback().alert("Authorization failed, retrying...");
                 context.invalidateTokens();
-                Exec.run(retry);
+                exec(retry);
                 return true;
             }
             else {
@@ -685,5 +687,11 @@ public class CultureHubClient {
         public String username;
         public String fullname;
         public String email;
+    }
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    public void exec(Work work) {
+        executor.execute(work);
     }
 }

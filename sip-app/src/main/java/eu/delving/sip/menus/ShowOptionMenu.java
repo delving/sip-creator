@@ -22,9 +22,9 @@
 package eu.delving.sip.menus;
 
 import eu.delving.metadata.OptList;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -38,19 +38,21 @@ import java.util.List;
 
 public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
     private Listener listener;
+    private SipModel sipModel;
 
     public interface Listener {
         void optSelected(OptList.Opt opt);
     }
 
-    public ShowOptionMenu(Listener listener) {
+    public ShowOptionMenu(SipModel sipModel, Listener listener) {
         super("Options");
+        this.sipModel = sipModel;
         this.listener = listener;
     }
 
     @Override
     public void recMappingSet(final MappingModel mappingModel) {
-        Exec.run(new Swing() {
+        sipModel.exec(new Swing() {
             @Override
             public void run() {
                 removeAll();

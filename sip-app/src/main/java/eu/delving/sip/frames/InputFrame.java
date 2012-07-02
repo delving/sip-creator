@@ -23,7 +23,10 @@ package eu.delving.sip.frames;
 
 import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -72,12 +75,12 @@ public class InputFrame extends FrameBase {
         }
     }
 
-    public InputFrame(JDesktopPane desktop, SipModel sipModel) {
+    public InputFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(Which.INPUT, desktop, sipModel, "Input", false);
         sipModel.addParseListener(new SipModel.ParseListener() {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {
-                Exec.run(new RecordSetter(metadataRecord));
+                exec(new RecordSetter(metadataRecord));
             }
         });
         recordTree = new JTree(EMPTY_MODEL) {

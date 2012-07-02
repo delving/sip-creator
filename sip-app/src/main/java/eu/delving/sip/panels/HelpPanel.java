@@ -21,7 +21,6 @@
 
 package eu.delving.sip.panels;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
@@ -54,7 +53,7 @@ public class HelpPanel extends HtmlPanel {
         super("Help");
         this.sipModel = sipModel;
         this.httpClient = httpClient;
-        Exec.run(new PageFetcher());
+        sipModel.exec(new PageFetcher());
         int width = getFontMetrics(getFont()).stringWidth("this string determines the width of the help panel, yeah");
         setPreferredSize(new Dimension(width, 400));
         setMinimumSize(getPreferredSize());
@@ -73,7 +72,7 @@ public class HelpPanel extends HtmlPanel {
                 int end = fullPage.indexOf(END_MARKER);
                 if (end > start) {
                     final String ourPage = fullPage.substring(start + START_MARKER.length(), end).trim();
-                    Exec.run(new Swing() {
+                    sipModel.exec(new Swing() {
                         @Override
                         public void run() {
                             setHtml("<html>" + ourPage);
@@ -92,7 +91,7 @@ public class HelpPanel extends HtmlPanel {
                     sipModel.getFeedback().say("Unable to fetch help page from workspace");
                 }
                 else {
-                    Exec.run(new Swing() {
+                    sipModel.exec(new Swing() {
                         @Override
                         public void run() {
                             setHtml("<html>" + page);

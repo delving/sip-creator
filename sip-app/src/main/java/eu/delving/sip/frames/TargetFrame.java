@@ -22,7 +22,10 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.ShowOptionMenu;
 import eu.delving.sip.model.*;
 
@@ -59,12 +62,12 @@ public class TargetFrame extends FrameBase {
         }
     });
 
-    public TargetFrame(JDesktopPane desktop, SipModel sipModel) {
+    public TargetFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(Which.TARGET, desktop, sipModel, "Target", false);
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
-                Exec.run(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
+                exec(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
             }
         });
         createRecDefTree(sipModel);
@@ -72,7 +75,7 @@ public class TargetFrame extends FrameBase {
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
         treePanel.add(SwingHelper.scrollVH("Record Definition", recDefTree));
-        ShowOptionMenu showOptionMenu = new ShowOptionMenu(new ShowOptionMenu.Listener() {
+        ShowOptionMenu showOptionMenu = new ShowOptionMenu(sipModel, new ShowOptionMenu.Listener() {
             @Override
             public void optSelected(OptList.Opt opt) {
                 RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
@@ -114,7 +117,7 @@ public class TargetFrame extends FrameBase {
                 switch (transition) {
                     case COMPLETE_TO_COMPLETE:
                     case NOTHING_TO_COMPLETE:
-                        Exec.run(new Swing() {
+                        exec(new Swing() {
                             @Override
                             public void run() {
                                 recDefTree.clearSelection();
@@ -168,7 +171,7 @@ public class TargetFrame extends FrameBase {
         public void valueChanged(TreeSelectionEvent event) {
             TreePath path = recDefTree.getSelectionPath();
             nodeObject = path != null ? path.getLastPathComponent() : null;
-            Exec.run(this);
+            exec(this);
         }
 
         @Override

@@ -45,9 +45,12 @@ public class MappingModel implements RecDefNodeListener {
     private RecDefTreeNode recDefTreeRoot;
     private NodeMappingListModel nodeMappingListModel = new NodeMappingListModel();
 
-    public MappingModel() {
-        addSetListener(nodeMappingListModel.createSetEar());
-        addChangeListener(nodeMappingListModel.createMappingChangeEar());
+    MappingModel() {
+    }
+
+    public MappingModel(SipModel sipModel) {
+        addSetListener(nodeMappingListModel.createSetEar(sipModel));
+        addChangeListener(nodeMappingListModel.createMappingChangeEar(sipModel));
     }
 
     public void setRecMapping(RecMapping recMapping) {

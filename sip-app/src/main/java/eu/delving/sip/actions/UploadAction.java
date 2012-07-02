@@ -73,7 +73,7 @@ public class UploadAction extends AbstractAction {
             reportFilePopup.upload.requestFocusInWindow();
         }
         else {
-            Exec.run(new Work() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     sipModel.getFeedback().alert("Upload not permitted until all mappings are validated. Still invalid: " + invalidPrefixes);
@@ -100,7 +100,7 @@ public class UploadAction extends AbstractAction {
         public void run() {
             try {
                 final List<String> freshInvalidPrefixes = sipModel.getDataSetModel().getInvalidPrefixes();
-                Exec.run(new Swing() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         invalidPrefixes = freshInvalidPrefixes;
@@ -118,7 +118,7 @@ public class UploadAction extends AbstractAction {
         @Override
         public void stateChanged(DataSetModel model, DataSetState state) {
             if (realUploadAction.isEnabled()) realUploadAction.setEnabled(false);
-            if (state.atLeast(DataSetState.VALIDATED)) Exec.run(new InvalidPrefixesFetcher());
+            if (state.atLeast(DataSetState.VALIDATED)) sipModel.exec(new InvalidPrefixesFetcher());
         }
     }
 
@@ -209,7 +209,7 @@ public class UploadAction extends AbstractAction {
                     public void finished(final boolean success) {
                         busyUploading = false;
                         sipModel.getFeedback().alert(success ? "Upload complete" : "Upload failed");
-                        Exec.run(new Swing() {
+                        sipModel.exec(new Swing() {
                             @Override
                             public void run() {
                                 disappear();
@@ -219,7 +219,7 @@ public class UploadAction extends AbstractAction {
                 });
             }
             catch (final StorageException e) {
-                Exec.run(new Work() {
+                sipModel.exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getFeedback().alert("Unable to complete uploading", e);

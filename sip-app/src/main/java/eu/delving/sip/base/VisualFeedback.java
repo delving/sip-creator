@@ -59,6 +59,7 @@ public class VisualFeedback implements Feedback {
     private LogFrame logFrame;
     private JDesktopPane desktop;
     private ProgressPopup progressPopup;
+    private SipModel sipModel;
 
     public VisualFeedback(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -66,6 +67,7 @@ public class VisualFeedback implements Feedback {
     }
 
     public void setSipModel(SipModel sipModel) {
+        this.sipModel = sipModel;
         this.logFrame = new LogFrame(desktop, sipModel);
         toggle.addItemListener(new ItemListener() {
             @Override
@@ -86,7 +88,7 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void say(final String message) {
-        Exec.run(new Swing() {
+        sipModel.exec(new Swing() {
             @Override
             public void run() {
                 addToList(message);
@@ -99,7 +101,7 @@ public class VisualFeedback implements Feedback {
     public void alert(final String message) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message);
-        Exec.runWait(new Swing() {
+        sipModel.execWait(new Swing() {
             @Override
             public void run() {
                 addToList(message);
@@ -112,7 +114,7 @@ public class VisualFeedback implements Feedback {
     public void alert(final String message, final Exception exception) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message, exception);
-        Exec.runWait(new Swing() {
+        sipModel.execWait(new Swing() {
             @Override
             public void run() {
                 addToList(message);

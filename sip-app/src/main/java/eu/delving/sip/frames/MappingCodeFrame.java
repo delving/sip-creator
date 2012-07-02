@@ -22,7 +22,6 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.CompileState;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingCompileModel;
@@ -89,10 +88,10 @@ public class MappingCodeFrame extends FrameBase {
         public void codeCompiled(MappingCompileModel.Type type, String code) {
             switch (type) {
                 case RECORD:
-                    Exec.run(new CodeUpdater(code, recordArea));
+                    exec(new CodeUpdater(code, recordArea));
                     break;
                 case FIELD:
-                    Exec.run(new CodeUpdater(code, fieldArea));
+                    exec(new CodeUpdater(code, fieldArea));
                     break;
             }
         }

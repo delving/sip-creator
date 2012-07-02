@@ -23,7 +23,6 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -52,11 +51,12 @@ import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
 public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
-    private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
+    private SourceTreeNode sourceTree;
     private FilterTreeModel sourceTreeModel = new FilterTreeModel(sourceTree);
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
+        this.sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
         hintsModel.addListener(new HintSaveTimer());
     }
 
@@ -223,7 +223,7 @@ public class StatsModel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Exec.run(this);
+            sipModel.exec(this);
         }
 
         @Override

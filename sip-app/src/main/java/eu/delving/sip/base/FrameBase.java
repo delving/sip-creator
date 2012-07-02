@@ -383,7 +383,7 @@ public abstract class FrameBase extends JInternalFrame {
     protected void childClosing() {
         getGlassPane().setVisible(false);
         if (focusOwner != null) {
-            Exec.run(new Swing() {
+            sipModel.exec(new Swing() {
                 public void run() {
                     try {
                         moveToFront();
@@ -516,4 +516,14 @@ public abstract class FrameBase extends JInternalFrame {
         }
         return frame;
     }
+
+    public void exec(Swing swing) {
+        sipModel.exec(swing);
+    }
+
+    public void exec(Work work) {
+        sipModel.exec(work);
+    }
+
+
 }

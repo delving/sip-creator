@@ -22,7 +22,10 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.RevertMappingMenu;
 import eu.delving.sip.model.*;
 
@@ -54,7 +57,7 @@ public class RecMappingFrame extends FrameBase {
                 switch (transition) {
                     case COMPLETE_TO_ARMED_SOURCE:
                     case COMPLETE_TO_ARMED_TARGET:
-                        Exec.run(new Swing() {
+                        exec(new Swing() {
                             @Override
                             public void run() {
                                 nodeMappingList.clearSelection();
@@ -87,7 +90,7 @@ public class RecMappingFrame extends FrameBase {
             if (event.getValueIsAdjusting()) return;
             final NodeMappingEntry selected = (NodeMappingEntry) nodeMappingList.getSelectedValue();
             if (selected != null) {
-                Exec.run(new Work() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getCreateModel().setNodeMapping(selected.getNodeMapping());
@@ -105,7 +108,7 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.run(this);
+            exec(this);
         }
 
         @Override

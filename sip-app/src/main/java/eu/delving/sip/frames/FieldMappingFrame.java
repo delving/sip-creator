@@ -82,7 +82,7 @@ public class FieldMappingFrame extends FrameBase {
         outputArea.setWrapStyleWord(true);
         attachAction(UNDO_ACTION);
         attachAction(REDO_ACTION);
-        new URLLauncher(outputArea, sipModel.getFeedback());
+        new URLLauncher(sipModel, outputArea, sipModel.getFeedback());
         wireUp();
         handleEnablement();
     }
@@ -191,7 +191,7 @@ public class FieldMappingFrame extends FrameBase {
                 if (operatorBoxSetting) return;
                 final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
                 if (nodeMapping != null) {
-                    Exec.run(new Work() {
+                    exec(new Work() {
                         @Override
                         public void run() {
                             nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
@@ -209,7 +209,7 @@ public class FieldMappingFrame extends FrameBase {
                     final NodeMapping nodeMapping = createModel.getNodeMapping();
                     contextVarModel.setList(nodeMapping);
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                    Exec.run(new Swing() {
+                    exec(new Swing() {
                         @Override
                         public void run() {
                             setEditable(codeArea, nodeMapping.isUserCodeEditable());
@@ -222,7 +222,7 @@ public class FieldMappingFrame extends FrameBase {
                 else {
                     contextVarModel.setList(null);
                     sipModel.getFieldCompileModel().setNodeMapping(null);
-                    Exec.run(new Swing() {
+                    exec(new Swing() {
                         @Override
                         public void run() {
                             setEditable(codeArea, false);
@@ -237,7 +237,7 @@ public class FieldMappingFrame extends FrameBase {
         sipModel.getFieldCompileModel().addListener(new MappingCompileModel.Listener() {
             @Override
             public void stateChanged(final CompileState state) {
-                Exec.run(new Swing() {
+                exec(new Swing() {
                     @Override
                     public void run() {
                         if (state == CompileState.ORIGINAL) {
@@ -383,7 +383,7 @@ public class FieldMappingFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             boolean discard = sipModel.getFeedback().confirm("Discard", "Discard edited code and revert to the original?");
             if (discard) {
-                Exec.run(new Work() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         if (sipModel.getCreateModel().hasNodeMapping()) {

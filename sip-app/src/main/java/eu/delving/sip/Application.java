@@ -160,7 +160,7 @@ public class Application {
                 statusPanel.setState(state);
                 switch (state) {
                     case ABSENT:
-                        Exec.run(new Work() {
+                        sipModel.exec(new Work() {
                             @Override
                             public void run() {
                                 sipModel.getMappingModel().setRecMapping(null);
@@ -353,7 +353,7 @@ public class Application {
 
         @Override
         public void dataSetCreated(final DataSet dataSet) {
-            Exec.run(new Swing() {
+            sipModel.exec(new Swing() {
                 @Override
                 public void run() {
                     dataSetMenu.refreshAndChoose(dataSet);
@@ -450,7 +450,7 @@ public class Application {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Exec.run(this);
+            new Thread(this).start(); // todo: this whole launcher should change
         }
 
         @Override

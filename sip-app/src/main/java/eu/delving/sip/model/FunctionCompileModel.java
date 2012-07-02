@@ -26,7 +26,6 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.StringUtil;
 import eu.delving.sip.base.CompileState;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import groovy.lang.Binding;
@@ -61,7 +60,7 @@ import java.util.regex.Pattern;
 public class FunctionCompileModel {
     public final static int RUN_DELAY = 100;
     public final static int COMPILE_DELAY = 500;
-    private MappingModel mappingModel;
+    private SipModel sipModel;
     private Document inputDocument = new PlainDocument();
     private Document codeDocument = new PlainDocument();
     private Document docDocument = new PlainDocument();
@@ -74,8 +73,8 @@ public class FunctionCompileModel {
     private MappingFunction mappingFunction;
     private boolean ignoreDocChanges;
 
-    public FunctionCompileModel(MappingModel mappingModel, Feedback feedback, GroovyCodeResource groovyCodeResource) {
-        this.mappingModel = mappingModel;
+    public FunctionCompileModel(SipModel sipModel, Feedback feedback, GroovyCodeResource groovyCodeResource) {
+        this.sipModel = sipModel;
         this.feedback = feedback;
         this.groovyCodeResource = groovyCodeResource;
         this.inputDocument.addDocumentListener(new DocChangeListener() {
@@ -103,9 +102,9 @@ public class FunctionCompileModel {
     public void setFunction(MappingFunction mappingFunction) {
         this.mappingFunction = mappingFunction;
         functionRunner = null;
-        Exec.run(new DocumentSetter(inputDocument, getSampleInput(), true));
-        Exec.run(new DocumentSetter(docDocument, getDocInput(), true));
-        Exec.run(new DocumentSetter(codeDocument, getOriginalCode(), true));
+        sipModel.exec(new DocumentSetter(inputDocument, getSampleInput(), true));
+        sipModel.exec(new DocumentSetter(docDocument, getDocInput(), true));
+        sipModel.exec(new DocumentSetter(codeDocument, getOriginalCode(), true));
         notifyStateChange(CompileState.SAVED);
         trigger(COMPILE_DELAY);
     }
@@ -181,7 +180,7 @@ public class FunctionCompileModel {
                         problems = true;
                     }
                 }
-                Exec.run(new DocumentSetter(outputDocument, outputLines));
+                sipModel.exec(new DocumentSetter(outputDocument, outputLines));
                 if (problems) {
                     notifyStateChange(CompileState.ERROR);
                 }
@@ -189,7 +188,7 @@ public class FunctionCompileModel {
                     mappingFunction.setSampleInput(StringUtil.documentToString(inputDocument));
                     mappingFunction.setDocumentation(StringUtil.documentToString(docDocument));
                     mappingFunction.setGroovyCode(StringUtil.documentToString(codeDocument));
-                    mappingModel.notifyFunctionChanged(mappingFunction);
+                    sipModel.getMappingModel().notifyFunctionChanged(mappingFunction);
                     notifyStateChange(mappingFunction.groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);
                 }
             }
@@ -212,7 +211,7 @@ public class FunctionCompileModel {
         }
 
         private void compilationComplete(final String result) {
-            Exec.run(new DocumentSetter(outputDocument, result, false));
+            sipModel.exec(new DocumentSetter(outputDocument, result, false));
         }
 
         public String toString() {
@@ -224,7 +223,7 @@ public class FunctionCompileModel {
         private Script script;
 
         public FunctionRunner() {
-            this.script = groovyCodeResource.createFunctionScript(mappingFunction, mappingModel.getRecMapping().getFacts(), StringUtil.documentToString(codeDocument));
+            this.script = groovyCodeResource.createFunctionScript(mappingFunction, sipModel.getMappingModel().getRecMapping().getFacts(), StringUtil.documentToString(codeDocument));
         }
 
         public Object runFunction(Object argument) throws Problem {
@@ -334,7 +333,7 @@ public class FunctionCompileModel {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (busy) return;
-            Exec.run(new RunJob());
+            sipModel.exec(new RunJob());
         }
 
         public void triggerSoon(int millis) {
@@ -361,7 +360,7 @@ public class FunctionCompileModel {
         }
 
         private void go() {
-            if (!ignoreDocChanges) Exec.run(this);
+            if (!ignoreDocChanges) sipModel.exec(this);
         }
     }
 

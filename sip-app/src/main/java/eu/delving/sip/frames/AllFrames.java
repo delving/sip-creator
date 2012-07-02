@@ -25,7 +25,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -354,7 +353,7 @@ public class AllFrames {
             actionPerformed(null);
             small.refresh();
             large.refresh();
-            Exec.run(new Work() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     XStream stream = new XStream();

@@ -22,7 +22,6 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
@@ -267,7 +266,7 @@ public class DictionaryPanel extends JPanel {
             @Override
             public void transition(final CreateModel createModel, CreateTransition transition) {
                 if (!transition.nodeMappingChanged) return;
-                Exec.run(new Swing() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         boolean isDictionary = createModel.hasNodeMapping() && createModel.getNodeMapping().dictionary != null;
@@ -322,7 +321,7 @@ public class DictionaryPanel extends JPanel {
                 }
                 patternField.setText("");
                 patternField.requestFocus();
-                Exec.run(new Work() {
+                sipModel.exec(new Work() {
                     @Override
                     public void run() {
                         if (createModel.hasNodeMapping()) createModel.getNodeMapping().notifyChanged(DICTIONARY);
@@ -376,7 +375,7 @@ public class DictionaryPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.run(new Work() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     if (isDictionaryPossible(createModel.getNodeMapping()))
@@ -397,7 +396,7 @@ public class DictionaryPanel extends JPanel {
                 ) ;
                 if (!confirm) return;
             }
-            Exec.run(new Work() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     removeDictionary(createModel.getNodeMapping());

@@ -22,7 +22,10 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.CompileState;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
@@ -210,7 +213,7 @@ public class FunctionFrame extends FrameBase {
             @Override
             public void recMappingSet(final MappingModel mappingModel) {
                 fetchFunctionList();
-                Exec.run(new Swing() {
+                exec(new Swing() {
                     @Override
                     public void run() {
                         if (mappingModel.hasRecMapping()) {
@@ -230,7 +233,7 @@ public class FunctionFrame extends FrameBase {
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void functionChanged(final MappingModel mappingModel, final MappingFunction function) {
-                Exec.run(new Swing() {
+                exec(new Swing() {
                     @Override
                     public void run() {
                         if (mappingModel.hasRecMapping()) {
@@ -266,7 +269,7 @@ public class FunctionFrame extends FrameBase {
             final MappingFunction.FunctionList functionList = MappingFunction.read(functionFile.openStream());
             SortedSet<MappingFunction> hintFunctions = sipModel.getMappingHintsModel().getFunctions();
             if (hintFunctions != null) functionList.functions.addAll(hintFunctions);
-            Exec.run(new Swing() {
+            exec(new Swing() {
                 @Override
                 public void run() {
                     libraryListModel.setList(functionList.functions);
@@ -314,11 +317,11 @@ public class FunctionFrame extends FrameBase {
             setEditable(docArea, !library);
             setEditable(inputArea, !library);
             setEditable(outputArea, !library);
-            Exec.run(new Work() {
+            exec(new Work() {
                 @Override
                 public void run() {
                     sipModel.getFunctionCompileModel().setFunction(function);
-                    Exec.run(new Swing() {
+                    exec(new Swing() {
                         @Override
                         public void run() {
                             undoManager.discardAllEdits();
@@ -349,7 +352,7 @@ public class FunctionFrame extends FrameBase {
                     sipModel.getFeedback().alert("Sorry, but this function name already exists");
                     return;
                 }
-                Exec.run(new Work() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         MappingFunction mappingFunction = recMapping.createFunction(name);
@@ -369,7 +372,7 @@ public class FunctionFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             final MappingFunction selected = (MappingFunction) functionList.getSelectedValue();
             if (selected != null) {
-                Exec.run(new Work() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getMappingModel().getRecMapping().removeFunction(selected);
@@ -389,7 +392,7 @@ public class FunctionFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             final MappingFunction selected = (MappingFunction) libraryList.getSelectedValue();
             if (selected != null) {
-                Exec.run(new Work() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getMappingModel().getRecMapping().addFunction(selected);
@@ -482,7 +485,7 @@ public class FunctionFrame extends FrameBase {
         @Override
         public void stateChanged(final CompileState state) {
             final boolean lib = this.library;
-            Exec.run(new Swing() {
+            exec(new Swing() {
                 @Override
                 public void run() {
                     if (state == CompileState.ORIGINAL) undoManager.discardAllEdits();

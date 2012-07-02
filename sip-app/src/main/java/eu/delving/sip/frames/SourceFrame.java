@@ -23,7 +23,6 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -125,7 +124,7 @@ public class SourceFrame extends FrameBase {
                 switch (transition) {
                     case COMPLETE_TO_COMPLETE:
                     case NOTHING_TO_COMPLETE:
-                        Exec.run(new Swing() {
+                        exec(new Swing() {
                             @Override
                             public void run() {
                                 sourceTree.clearSelection();
@@ -214,7 +213,7 @@ public class SourceFrame extends FrameBase {
                         }
                     }
                 }
-                if (!nodeList.isEmpty()) Exec.run(new Work() {
+                if (!nodeList.isEmpty()) exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getCreateModel().setSource(nodeList);

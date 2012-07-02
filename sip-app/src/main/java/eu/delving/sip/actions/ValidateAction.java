@@ -21,7 +21,6 @@
 
 package eu.delving.sip.actions;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
@@ -119,7 +118,7 @@ public class ValidateAction extends AbstractAction {
                 new SipModel.ValidationListener() {
                     @Override
                     public void failed(final int recordNumber, final String record, String message) {
-                        Exec.run(new Swing() {
+                        sipModel.exec(new Swing() {
                             @Override
                             public void run() {
                                 investigateRecordAction.setRecordNumber(recordNumber);

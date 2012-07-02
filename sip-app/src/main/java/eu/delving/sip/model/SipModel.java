@@ -23,7 +23,10 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.NodeTransferHandler;
+import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
@@ -37,10 +40,13 @@ import org.w3c.dom.Node;
 
 import javax.swing.*;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
 
 import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
@@ -53,6 +59,7 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
 public class SipModel {
     private static final Logger LOG = Logger.getLogger(SipModel.class);
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
     private XmlSerializer serializer = new XmlSerializer();
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
@@ -98,9 +105,9 @@ public class SipModel {
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
         MappingModel mappingModel = dataSetModel.getMappingModel();
-        functionCompileModel = new FunctionCompileModel(mappingModel, feedback, groovyCodeResource);
-        recordCompileModel = new MappingCompileModel(MappingCompileModel.Type.RECORD, feedback, groovyCodeResource);
-        fieldCompileModel = new MappingCompileModel(MappingCompileModel.Type.FIELD, feedback, groovyCodeResource);
+        functionCompileModel = new FunctionCompileModel(this, feedback, groovyCodeResource);
+        recordCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.RECORD, feedback, groovyCodeResource);
+        fieldCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.FIELD, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel.getParseEar());
         parseListeners.add(fieldCompileModel.getParseEar());
         mappingHintsModel = new MappingHintsModel(this);
@@ -255,7 +262,7 @@ public class SipModel {
     }
 
     public void setDataSet(final DataSet dataSet, final String requestedPrefix, final DataSetCompletion completion) {
-        Exec.run(new Work() {
+        exec(new Work() {
             @Override
             public void run() {
                 try {
@@ -270,13 +277,13 @@ public class SipModel {
                     dataSetModel.getMappingModel().setFacts(facts);
                     recordCompileModel.setValidator(dataSetModel.newValidator());
                     feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), dataSetModel.getPrefix()));
-                    Exec.run(new Swing() {
+                    exec(new Swing() {
                         @Override
                         public void run() {
                             dataSetFacts.set(facts);
                             statsModel.set(hints);
                             statsModel.setStatistics(stats);
-                            Exec.run(new Work() {
+                            exec(new Work() {
                                 @Override
                                 public void run() {
                                     mappingHintsModel.setSourceTree(statsModel.getSourceTree());
@@ -307,7 +314,7 @@ public class SipModel {
             importing = true;
             clearValidations();
             feedback.say("Importing metadata from " + file.getAbsolutePath());
-            Exec.run(new Work() {
+            exec(new Work() {
                 @Override
                 public void run() {
                     try {
@@ -330,13 +337,13 @@ public class SipModel {
         else {
             analyzing = true;
             feedback.say("Analyzing data from " + dataSetModel.getDataSet().getSpec());
-            Exec.run(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
+            exec(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
                 @Override
                 public void success(final Stats stats) {
                     analyzing = false;
                     try {
                         dataSetModel.getDataSet().setStats(stats, stats.sourceFormat, null);
-                        Exec.run(new Swing() {
+                        exec(new Swing() {
                             @Override
                             public void run() {
                                 statsModel.setStatistics(stats);
@@ -389,12 +396,12 @@ public class SipModel {
         else {
             converting = true;
             feedback.say("Converting to source for " + dataSetModel.getDataSet().getSpec());
-            Exec.run(new Work() {
+            exec(new Work() {
                 @Override
                 public void run() {
                     try {
                         dataSetModel.getDataSet().importedToSource(feedback, progressListener);
-                        Exec.run(new Swing() {
+                        exec(new Swing() {
                             @Override
                             public void run() {
                                 seekFirstRecord();
@@ -431,7 +438,7 @@ public class SipModel {
                 outputDirectory = new File(directoryString);
                 if (!outputDirectory.exists()) outputDirectory = null;
             }
-            Exec.run(new FileProcessor(
+            exec(new FileProcessor(
                     this,
                     allowInvalidRecords,
                     outputDirectory,
@@ -470,7 +477,7 @@ public class SipModel {
     }
 
     public void seekReset() {
-        Exec.run(new Work() {
+        exec(new Work() {
             @Override
             public void run() {
                 if (metadataParser != null) {
@@ -498,7 +505,7 @@ public class SipModel {
     }
 
     public void seekRecord(ScanPredicate scanPredicate, ProgressListener progressListener) {
-        Exec.run(new RecordScanner(scanPredicate, progressListener));
+        exec(new RecordScanner(scanPredicate, progressListener));
     }
 
     // === privates
@@ -551,4 +558,29 @@ public class SipModel {
     private MappingModel mappingModel() {
         return dataSetModel.getMappingModel();
     }
+
+    public void exec(Swing swing) {
+        SwingUtilities.invokeLater(swing);
+    }
+
+    public void exec(Work work) {
+        executor.execute(work);
+    }
+
+    public void execWait(Swing swing) {
+        try {
+            SwingUtilities.invokeAndWait(swing);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void checkSwing() {
+        if (!SwingUtilities.isEventDispatchThread()) throw new RuntimeException("Must be Swing thread");
+    }
+
 }

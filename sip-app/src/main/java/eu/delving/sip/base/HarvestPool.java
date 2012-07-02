@@ -81,7 +81,7 @@ public class HarvestPool extends AbstractListModel {
 
         });
         tasks.add(harvestor);
-        Exec.run(harvestor);
+        sipModel.exec(harvestor);
         fireIntervalAdded(this, 0, tasks.size());
     }
 

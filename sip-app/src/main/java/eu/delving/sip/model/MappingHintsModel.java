@@ -22,7 +22,6 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.Storage;
 
@@ -99,7 +98,7 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
                 }
             }
         }
-        Exec.run(new Swing() {
+        sipModel.exec(new Swing() {
             @Override
             public void run() {
                 nodeMappingListModel.setList(mappingHintList);

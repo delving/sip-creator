@@ -21,7 +21,10 @@
 
 package eu.delving.sip.actions;
 
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
@@ -148,7 +151,7 @@ public class DownloadAction extends AbstractAction {
         cultureHubClient.fetchDataSetList(new CultureHubClient.ListReceiveListener() {
             @Override
             public void listReceived(final List<CultureHubClient.DataSetEntry> entries) {
-                Exec.run(new Swing() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         if (entries == null || entries.isEmpty()) {
@@ -166,7 +169,7 @@ public class DownloadAction extends AbstractAction {
             public void failed(Exception e) {
                 LOG.warn("Fetching list failed", e);
                 sipModel.getFeedback().alert("Failed to receive data set list");
-                Exec.run(new Swing() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         downloadDialog.setVisible(false);

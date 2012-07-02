@@ -21,7 +21,6 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -96,7 +95,7 @@ public class DataSetMenu extends JMenu {
                             });
                         }
                     });
-                    if (item.isPreferred()) Exec.run(new Swing() {
+                    if (item.isPreferred()) sipModel.exec(new Swing() {
                         @Override
                         public void run() {
                             item.doClick();
@@ -111,7 +110,7 @@ public class DataSetMenu extends JMenu {
             }
         }
         catch (final StorageException e) {
-            Exec.run(new Work() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     sipModel.getFeedback().alert("Problem loading data set list", e);

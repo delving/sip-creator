@@ -21,7 +21,6 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
@@ -85,7 +84,7 @@ public class ProgressPopup extends FrameBase implements ProgressListener {
 
     @Override
     public void setProgressString(final String message) {
-        Exec.run(new Swing() {
+        exec(new Swing() {
             @Override
             public void run() {
                 if (!progressBar.isStringPainted()) progressBar.setStringPainted(true);
@@ -96,7 +95,7 @@ public class ProgressPopup extends FrameBase implements ProgressListener {
 
     @Override
     public void prepareFor(final int total) {
-        Exec.run(new Swing() {
+        exec(new Swing() {
             @Override
             public void run() {
                 if (total < 0) {
@@ -117,7 +116,7 @@ public class ProgressPopup extends FrameBase implements ProgressListener {
     @Override
     public boolean setProgress(final int progress) {
         if (System.currentTimeMillis() > lastProgress + PATIENCE) { // not too many events
-            Exec.run(new Swing() {
+            exec(new Swing() {
                 @Override
                 public void run() {
                     boundedRangeModel.setValue(progress);
@@ -130,7 +129,7 @@ public class ProgressPopup extends FrameBase implements ProgressListener {
 
     @Override
     public void finished(final boolean success) {
-        Exec.run(new Swing() {
+        exec(new Swing() {
             @Override
             public void run() {
                 cancel = true;

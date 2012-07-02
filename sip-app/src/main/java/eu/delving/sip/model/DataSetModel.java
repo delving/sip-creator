@@ -22,7 +22,6 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -48,10 +47,14 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
     private DataSetState currentState = ABSENT;
-    private MappingModel mappingModel = new MappingModel();
+    private MappingModel mappingModel;
 
     public DataSetModel() {
-        new StateCheckTimer();
+        this.mappingModel = new MappingModel();
+    }
+
+    public DataSetModel(SipModel sipModel) {
+        new StateCheckTimer(sipModel);
     }
 
     public MappingModel getMappingModel() {
@@ -129,9 +132,11 @@ public class DataSetModel implements RecDefModel {
     }
 
     private class StateCheckTimer implements Work, ActionListener {
+        private SipModel sipModel;
         private Timer timer = new Timer(1000, this);
 
-        private StateCheckTimer() {
+        private StateCheckTimer(SipModel sipModel) {
+            this.sipModel = sipModel;
             timer.setRepeats(true);
             timer.start();
         }
@@ -141,7 +146,7 @@ public class DataSetModel implements RecDefModel {
             final DataSetState freshState = getDataSetState();
             if (freshState != currentState) {
                 currentState = freshState;
-                Exec.run(new Swing() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         for (SwingListener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);
@@ -152,7 +157,7 @@ public class DataSetModel implements RecDefModel {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.run(this);
+            sipModel.exec(this);
         }
     }
 
