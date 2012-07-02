@@ -74,12 +74,10 @@ public class Application {
     private StatusPanel statusPanel;
     private HelpPanel helpPanel;
     private Timer resizeTimer;
-    private Launcher launcher;
     private String instance;
 
-    private Application(final File storageDirectory, Launcher launcher, String instance) throws StorageException {
-        this.launcher = launcher;
-        this.launcher.instances.add(this.instance = instance);
+    private Application(final File storageDirectory, String instance) throws StorageException {
+        instances.add(this.instance = instance);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -201,7 +199,7 @@ public class Application {
     }
 
     private boolean quit() {
-        launcher.instances.remove(this.instance);
+        instances.remove(this.instance);
         if (harvestPool.getSize() > 0) {
             boolean exitAnyway = feedback.confirm(
                     "Active harvests",
@@ -209,7 +207,7 @@ public class Application {
             );
             if (exitAnyway) return false;
         }
-        if (!launcher.instances.isEmpty()) return false;
+        if (!instances.isEmpty()) return false;
         System.exit(0);
         return true;
     }
@@ -278,7 +276,6 @@ public class Application {
 
     private JMenu createFileMenu() {
         JMenu menu = new JMenu("File");
-        menu.add(launcher);
         menu.add(downloadAction);
         menu.add(importAction);
         menu.add(validateAction);
@@ -440,39 +437,60 @@ public class Application {
         }
     }
 
-    private static class Launcher extends AbstractAction implements Runnable {
-        private String[] args;
-        private Set<String> instances = new TreeSet<String>();
+//    private static class Launcher extends AbstractAction implements Runnable {
+//        private String[] args;
+//        private Set<String> instances = new TreeSet<String>();
+//
+//        private Launcher(String[] args) {
+//            super("New Application Instance");
+//            this.args = args;
+//        }
+//
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            Exec.swingAny(this);
+//        }
+//
+//        @Override
+//        public void run() {
+//            final File storageDirectory = StorageFinder.getStorageDirectory(args);
+//            if (storageDirectory == null) return;
+//            try {
+//                int instance = 1;
+//                while (instances.contains(String.valueOf(instance))) instance++;
+//                Application application = new Application(storageDirectory, this, String.valueOf(instance));
+//                application.home.setVisible(true);
+//                application.allFrames.restore();
+//            }
+//            catch (StorageException e) {
+//                JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
-        private Launcher(String[] args) {
-            super("New Application Instance");
-            this.args = args;
-        }
+    // todo: this is for later.  just one instance now
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Exec.swingAny(this);
-        }
+    private static Set<String> instances = new TreeSet<String>();
 
-        @Override
-        public void run() {
-            final File storageDirectory = StorageFinder.getStorageDirectory(args);
-            if (storageDirectory == null) return;
-            try {
-                int instance = 1;
-                while (instances.contains(String.valueOf(instance))) instance++;
-                Application application = new Application(storageDirectory, this, String.valueOf(instance));
-                application.home.setVisible(true);
-                application.allFrames.restore();
+    public static void main(final String[] args) throws StorageException {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final File storageDirectory = StorageFinder.getStorageDirectory(args);
+                if (storageDirectory == null) return;
+                try {
+                    int instance = 1;
+                    while (instances.contains(String.valueOf(instance))) instance++;
+                    Application application = new Application(storageDirectory, String.valueOf(instance));
+                    application.home.setVisible(true);
+                    application.allFrames.restore();
+                }
+                catch (StorageException e) {
+                    JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
+                    e.printStackTrace();
+                }
             }
-            catch (StorageException e) {
-                JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void main(String[] args) throws StorageException {
-        EventQueue.invokeLater(new Launcher(args));
+        });
     }
 }
