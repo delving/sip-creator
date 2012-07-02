@@ -40,7 +40,6 @@ import org.w3c.dom.Node;
 
 import javax.swing.*;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -565,22 +564,6 @@ public class SipModel {
 
     public void exec(Work work) {
         executor.execute(work);
-    }
-
-    public void execWait(Swing swing) {
-        try {
-            SwingUtilities.invokeAndWait(swing);
-        }
-        catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void checkSwing() {
-        if (!SwingUtilities.isEventDispatchThread()) throw new RuntimeException("Must be Swing thread");
     }
 
 }

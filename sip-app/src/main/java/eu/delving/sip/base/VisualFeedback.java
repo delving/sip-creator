@@ -32,6 +32,7 @@ import javax.swing.event.InternalFrameEvent;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class VisualFeedback implements Feedback {
     public void alert(final String message) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message);
-        sipModel.execWait(new Swing() {
+        execWait(new Runnable() {
             @Override
             public void run() {
                 addToList(message);
@@ -114,7 +115,7 @@ public class VisualFeedback implements Feedback {
     public void alert(final String message, final Exception exception) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message, exception);
-        sipModel.execWait(new Swing() {
+        execWait(new Runnable() {
             @Override
             public void run() {
                 addToList(message);
@@ -315,6 +316,18 @@ public class VisualFeedback implements Feedback {
         @Override
         public Object getElementAt(int i) {
             return lines.get(i);
+        }
+    }
+
+    private void execWait(Runnable runnable) {
+        try {
+            SwingUtilities.invokeAndWait(runnable);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
     }
 }
