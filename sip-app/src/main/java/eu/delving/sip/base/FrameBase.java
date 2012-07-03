@@ -106,7 +106,7 @@ public abstract class FrameBase extends JInternalFrame {
         this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title);
-        for (int pos = 0; pos<4; pos++) {
+        for (int pos = 0; pos < 4; pos++) {
             adjustActions.add(new AdjustAction(pos, 1));
             adjustActions.add(new AdjustAction(pos, -1));
         }
@@ -173,6 +173,19 @@ public abstract class FrameBase extends JInternalFrame {
 
     public Which getWhich() {
         return which;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        setComponentsEnabled(this, enabled);
+    }
+
+    private void setComponentsEnabled(Container c, boolean enabled) {
+        for (Component comp : c.getComponents()) {
+            if (comp instanceof java.awt.Container) setComponentsEnabled((java.awt.Container) comp, enabled);
+            comp.setEnabled(enabled);
+        }
     }
 
     // override this
@@ -477,27 +490,27 @@ public abstract class FrameBase extends JInternalFrame {
             this.position = position;
             this.direction = direction;
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             AllFrames.XFrame frame = frame();
             if (frame == null) return;
             StringBuilder out = new StringBuilder();
-            for (int walk=0; walk<4; walk++) {
+            for (int walk = 0; walk < 4; walk++) {
                 char ch = frame.where.charAt(walk);
                 if (position == walk) {
-                    switch(ch) {
+                    switch (ch) {
                         case '0':
-                            out.append((direction < 0 && position <= 1) ? ch : (char)(ch + direction));
+                            out.append((direction < 0 && position <= 1) ? ch : (char) (ch + direction));
                             break;
                         case '1':
-                            out.append((direction < 0 && position > 1) ? ch : (char)(ch + direction));
+                            out.append((direction < 0 && position > 1) ? ch : (char) (ch + direction));
                             break;
                         case '9':
-                            out.append((direction > 0) ? ch : (char)(ch + direction));
+                            out.append((direction > 0) ? ch : (char) (ch + direction));
                             break;
-                        default :
-                            out.append((char)(ch + direction));
+                        default:
+                            out.append((char) (ch + direction));
                     }
                 }
                 else {
