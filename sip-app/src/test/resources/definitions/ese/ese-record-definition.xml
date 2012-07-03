@@ -67,12 +67,12 @@
         <field-marker name="TITLE" path="/europeana:record/dc:title"/>
         <field-marker name="DESCRIPTION" path="/europeana:record/dc:description"/>
         <field-marker name="OWNER" path="/europeana:record/europeana:dataProvider"/>
+        <field-marker name="PROVIDER" path="/europeana:record/europeana:provider"/>
         <field-marker name="LANDING_PAGE" path="/europeana:record/europeana:isShownAt"/>
         <field-marker name="THUMBNAIL" path="/europeana:record/europeana:object"/>
 
         <!-- todo: these should have paths, currently they are checked for presence but not resolved-->
         <field-marker name="SPEC"/>
-        <field-marker name="PROVIDER"/>
         <field-marker name="DEEP_ZOOM_URL"/>
 
         <field-marker type="fact" name="dataProvider" path="/europeana:record/europeana:dataProvider"/>
@@ -82,5 +82,6 @@
     </field-markers>
 
 </record-definition>
+
 
 

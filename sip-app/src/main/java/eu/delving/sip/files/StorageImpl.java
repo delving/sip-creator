@@ -637,7 +637,10 @@ public class StorageImpl implements Storage {
                                 }
                                 hasher.update(buffer, bytesRead);
                             }
-                            if (progressListener != null) progressListener.finished(!cancelled);
+                            if (progressListener != null) {
+                                progressListener.finished(!cancelled);
+                                progressListener = null;
+                            }
                         }
                         finally {
                             IOUtils.closeQuietly(outputStream);
