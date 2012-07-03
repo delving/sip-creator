@@ -120,7 +120,7 @@ public class RecDefTree implements RecDefNodeListener {
         codeOut.line("_uniqueIdentifier = _input._id[0].toString()");
         codeOut.line("outputNode = output.");
         if (root.hasDescendentNodeMappings()) {
-            root.toElementCode(codeOut, false, new Stack<String>(), editPath);
+            root.toElementCode(codeOut, new Stack<String>(), editPath);
         }
         else {
             codeOut.line("'no' { 'mapping' }");
