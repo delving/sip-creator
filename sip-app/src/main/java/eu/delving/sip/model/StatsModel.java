@@ -228,6 +228,7 @@ public class StatsModel {
         @Override
         public void run() {
             try {
+                if (sipModel.getDataSetModel().isEmpty()) return;
                 sipModel.getDataSetModel().getDataSet().setHints(hintsModel.getFacts());
             }
             catch (StorageException e) {

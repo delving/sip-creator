@@ -100,6 +100,7 @@ public class ExpertMenu extends JMenu {
                     @Override
                     public void run() {
                         try {
+                            if (sipModel.getDataSetModel().isEmpty()) return;
                             sipModel.getDataSetModel().getDataSet().deleteSource();
                         }
                         catch (StorageException e) {
