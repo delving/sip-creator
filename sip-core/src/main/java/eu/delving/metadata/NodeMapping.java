@@ -98,7 +98,7 @@ public class NodeMapping {
     }
 
     public Operator getOperator() {
-        if (recDefNode.hasOperator()) return recDefNode.getOperator();
+        if (recDefNode.hasOperator() && operator == null) return recDefNode.getOperator();
         return operator == null ? Operator.ALL : operator;
     }
 
