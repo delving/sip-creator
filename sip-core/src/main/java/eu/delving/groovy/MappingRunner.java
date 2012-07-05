@@ -116,6 +116,9 @@ public class MappingRunner {
             }
             throw new MappingException(metadataRecord, out.toString(), e);
         }
+        catch (AssertionError e) {
+            throw new MappingException(metadataRecord, "The keyword 'assert' should not be used", e);
+        }
         catch (Exception e) {
             String codeLines = fetchCodeLines(e);
             if (codeLines != null) {
