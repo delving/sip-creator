@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Exec;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 
 import javax.swing.tree.TreePath;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static eu.delving.sip.files.DataSetState.ABSENT;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 import static eu.delving.sip.model.CreateModel.Setter.*;
 import static eu.delving.sip.model.CreateState.*;
@@ -53,8 +55,19 @@ public class CreateModel {
 
     public enum Setter {NONE, SOURCE, TARGET, NODE_MAPPING}
 
-    public CreateModel(SipModel sipModel) {
+    public CreateModel(final SipModel sipModel) {
         this.sipModel = sipModel;
+        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+            @Override
+            public void stateChanged(DataSetModel model, DataSetState state) {
+                if (state == ABSENT) Exec.work(new Runnable() {
+                    @Override
+                    public void run() {
+                        sipModel.getCreateModel().setNodeMapping(null);
+                    }
+                });
+            }
+        });
     }
 
     public void setSource(SortedSet<SourceTreeNode> sourceTreeNodes) {
@@ -83,6 +96,10 @@ public class CreateModel {
             setSourceInternal(sipModel.getStatsModel().findNodesForInputPaths(nodeMapping));
             TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
             setTargetInternal((RecDefTreeNode) treePath.getLastPathComponent());
+        }
+        else {
+            setSourceInternal(null);
+            setTargetInternal(null);
         }
         adjustHighlights();
         fireStateChanged();
@@ -231,7 +248,7 @@ public class CreateModel {
             case NOTHING:
                 switch (newState) {
                     case NOTHING:
-                        return null;
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         return NOTHING_TO_SOURCE;
                     case TARGET_ONLY:
@@ -245,7 +262,7 @@ public class CreateModel {
             case SOURCE_ONLY:
                 switch (newState) {
                     case NOTHING:
-                        return SOURCE_TO_NOTHING;
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         return SOURCE_TO_SOURCE;
                     case TARGET_ONLY:
@@ -259,7 +276,7 @@ public class CreateModel {
             case TARGET_ONLY:
                 switch (newState) {
                     case NOTHING:
-                        return TARGET_TO_NOTHING;
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         break; // never
                     case TARGET_ONLY:
@@ -273,7 +290,7 @@ public class CreateModel {
             case SOURCE_AND_TARGET:
                 switch (newState) {
                     case NOTHING:
-                        break; // never
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         return ARMED_TO_SOURCE;
                     case TARGET_ONLY:
@@ -306,7 +323,7 @@ public class CreateModel {
             case COMPLETE:
                 switch (newState) {
                     case NOTHING:
-                        break; // never
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         break; // never
                     case TARGET_ONLY:

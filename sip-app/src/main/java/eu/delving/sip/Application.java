@@ -161,7 +161,6 @@ public class Application {
                         Exec.work(new Runnable() {
                             @Override
                             public void run() {
-                                sipModel.getMappingModel().setRecMapping(null);
                                 sipModel.getDataSetFacts().set(null);
                                 sipModel.getStatsModel().setStatistics(null);
                             }
