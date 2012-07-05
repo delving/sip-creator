@@ -146,10 +146,8 @@ public class StatsModel {
 
     public SortedSet<SourceTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
         SortedSet<SourceTreeNode> nodes = new TreeSet<SourceTreeNode>();
-        if (!(sourceTreeModel.getRoot() instanceof SourceTreeNode)) {
-            nodeMapping.clearSourceTreeNodes();
-        }
-        else if (!nodeMapping.hasSourceTreeNodes()) {
+        nodeMapping.clearSourceTreeNodes();
+        if (sourceTreeModel.getRoot() instanceof SourceTreeNode) {
             for (Path path : nodeMapping.getInputPaths()) {
                 TreePath treePath = findNodeForInputPath(path, (SourceTreeNode) sourceTreeModel.getRoot());
                 if (treePath != null) nodes.add((SourceTreeNode) treePath.getLastPathComponent());
@@ -160,9 +158,6 @@ public class StatsModel {
             else {
                 SourceTreeNode.setStatsTreeNodes(nodes, nodeMapping);
             }
-        }
-        else {
-            for (Object node : nodeMapping.getSourceTreeNodes()) nodes.add((SourceTreeNode) node);
         }
         return nodes.isEmpty() ? null : nodes;
     }
