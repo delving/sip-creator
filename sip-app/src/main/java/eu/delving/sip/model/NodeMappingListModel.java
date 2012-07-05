@@ -87,6 +87,10 @@ public class NodeMappingListModel extends AbstractListModel {
     public MappingModel.ChangeListener createMappingChangeEar(final SipModel sipModel) {
         return new MappingModel.ChangeListener() {
             @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+            }
+
+            @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             }
 

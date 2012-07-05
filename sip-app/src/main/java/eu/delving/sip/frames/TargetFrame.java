@@ -63,8 +63,8 @@ public class TargetFrame extends FrameBase {
         }
     });
 
-    public TargetFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.TARGET, desktop, sipModel, "Target", false);
+    public TargetFrame(JDesktopPane desktop, SipModel sipModel) {
+        super(Which.TARGET, desktop, sipModel, "Target");
         createRecDefTree(sipModel);
         timer.setRepeats(false);
         recDefTree.setDropMode(DropMode.ON);
@@ -207,6 +207,11 @@ public class TargetFrame extends FrameBase {
         recDefTree.setDropMode(DropMode.ON);
         recDefTree.setTransferHandler(sipModel.getNodeTransferHandler());
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             }

@@ -112,7 +112,7 @@ public class ValidateAction extends AbstractAction {
             }
         });
         setEnabled(false);
-        sipModel.validateFile(
+        sipModel.processFile(
                 allowInvalidRecords,
                 progressListener,
                 new SipModel.ValidationListener() {

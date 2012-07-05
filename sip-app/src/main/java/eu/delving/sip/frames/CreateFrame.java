@@ -21,6 +21,10 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
@@ -57,7 +61,7 @@ public class CreateFrame extends FrameBase {
     private CopyMappingAction copyMappingAction;
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CREATE, desktop, sipModel, "Create", false);
+        super(Which.CREATE, desktop, sipModel, "Create");
         createModel = sipModel.getCreateModel();
         mappingHintsList = sipModel.getMappingHintsModel().getNodeMappingListModel().createJList();
         createMappingAction = new CreateMappingAction();
@@ -104,6 +108,28 @@ public class CreateFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
         mappingHintsList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {

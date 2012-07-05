@@ -43,7 +43,7 @@ public class OutputFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
 
     public OutputFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.OUTPUT, desktop, sipModel, "Output", false);
+        super(Which.OUTPUT, desktop, sipModel, "Output");
         sipModel.getRecordCompileModel().setEnabled(false);
     }
 

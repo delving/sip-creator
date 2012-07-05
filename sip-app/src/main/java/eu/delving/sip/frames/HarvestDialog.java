@@ -44,7 +44,7 @@ public class HarvestDialog extends FrameBase {
     private HarvestPool harvestPool;
 
     public HarvestDialog(JComponent parent, SipModel sipModel, HarvestPool harvestPool) {
-        super(Which.HARVEST, parent, sipModel, "Active harvests", false);
+        super(Which.HARVEST, parent, sipModel, "Active harvests");
         this.harvestPool = harvestPool;
     }
 

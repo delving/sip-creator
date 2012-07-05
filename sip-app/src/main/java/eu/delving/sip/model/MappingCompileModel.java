@@ -225,6 +225,10 @@ public class MappingCompileModel {
         }
 
         @Override
+        public void lockChanged(MappingModel mappingModel, boolean locked) {
+        }
+
+        @Override
         public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             triggerCompile();
         }
@@ -318,7 +322,7 @@ public class MappingCompileModel {
         }
 
         private void setMappingCode() {
-            if (nodeMapping != null && nodeMapping.isUserCodeEditable()) {
+            if (nodeMapping != null && nodeMapping.isUserCodeEditable() && !recMapping.isLocked()) {
                 String editedCode = StringUtil.documentToString(codeDocument);
                 nodeMapping.setGroovyCode(editedCode, recMapping);
                 notifyStateChange(nodeMapping.groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);

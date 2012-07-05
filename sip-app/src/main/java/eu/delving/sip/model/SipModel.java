@@ -77,7 +77,7 @@ public class SipModel {
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
     private NodeTransferHandler nodeTransferHandler = new NodeTransferHandler(this);
     private MappingSaveTimer mappingSaveTimer = new MappingSaveTimer(this);
-    private volatile boolean converting, validating, analyzing, importing;
+    private volatile boolean converting, processing, analyzing, importing;
 
     public interface AnalysisListener {
         boolean analysisProgress(long elementCount);
@@ -119,6 +119,10 @@ public class SipModel {
         mappingModel.addSetListener(mappingSaveTimer);
         mappingModel.addChangeListener(mappingSaveTimer);
         mappingModel.addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+            }
+
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
                 clearValidation();
@@ -419,14 +423,14 @@ public class SipModel {
         }
     }
 
-    public void validateFile(boolean allowInvalidRecords, final ProgressListener progressListener, final ValidationListener validationListener) {
-        if (validating) {
-            feedback.say("Busy validating");
+    public void processFile(boolean allowInvalidRecords, final ProgressListener progressListener, final ValidationListener validationListener) {
+        if (processing) {
+            feedback.say("Busy processing");
         }
         else {
-            validating = true;
+            processing = true;
             feedback.say(String.format(
-                    "Validating mapping %s for data set %s, %s",
+                    "Processing mapping %s for data set %s, %s",
                     mappingModel().getRecMapping().getPrefix(),
                     dataSetModel.getDataSet().getSpec(),
                     allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
@@ -467,8 +471,9 @@ public class SipModel {
                                 feedback.alert("Unable to store validation results", e);
                             }
                             reportFileModel.kick();
-                            feedback.say("Validation complete, report available");
-                            validating = false;
+                            feedback.say("Processing complete, report and statistics available");
+                            mappingModel().setLocked(stats != null);
+                            processing = false;
                         }
                     }
             ));

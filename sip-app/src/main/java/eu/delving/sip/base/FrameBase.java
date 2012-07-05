@@ -87,7 +87,11 @@ public abstract class FrameBase extends JInternalFrame {
         Dimension getSize();
     }
 
-    public FrameBase(Which which, final JComponent parent, SipModel sipModel, String title, boolean modal) {
+    public FrameBase(Which which, final JComponent parent, SipModel sipModel, String title) {
+        this(which, parent, sipModel, title, false);
+    }
+
+    protected FrameBase(Which which, final JComponent parent, SipModel sipModel, String title, boolean modal) {
         super(
                 title,
                 true, // resizable
@@ -120,8 +124,8 @@ public abstract class FrameBase extends JInternalFrame {
                 }
         );
         positionTimer.setRepeats(false);
-        setGlassPane(new ModalityInternalGlassPane(this));
-        addFrameListener();
+        setGlassPane(new InternalGlassPane(this));
+//        addFrameListener();
         addFrameVetoListener();
         if (modal) {
             setFocusTraversalKeysEnabled(false);
@@ -175,17 +179,8 @@ public abstract class FrameBase extends JInternalFrame {
         return which;
     }
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        setComponentsEnabled(this, enabled);
-    }
-
-    private void setComponentsEnabled(Container c, boolean enabled) {
-        for (Component comp : c.getComponents()) {
-            if (comp instanceof java.awt.Container) setComponentsEnabled((java.awt.Container) comp, enabled);
-            comp.setEnabled(enabled);
-        }
+    public void setFrameLocked(boolean locked) {
+        getGlassPane().setVisible(locked);
     }
 
     // override this
@@ -432,20 +427,96 @@ public abstract class FrameBase extends JInternalFrame {
      * on associated modal frame. Also if modal frame has no children make
      * class pane invisible
      */
-    class ModalityInternalGlassPane extends JComponent {
+    class InternalGlassPane extends JComponent {
+        private boolean consuming;
 
-        private FrameBase modalFrame;
+        public InternalGlassPane(final FrameBase frame) {
+            setToolTipText(
+                    "<html><b>Mapping is locked<b><br>" +
+                    "<p>You can unlock it in the Unlock menu</p>"
+            );
+            setFocusable(true);
+            addComponentListener(new ComponentListener() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                }
 
-        public ModalityInternalGlassPane(FrameBase frame) {
-            modalFrame = frame;
+                @Override
+                public void componentMoved(ComponentEvent e) {
+                }
+
+                @Override
+                public void componentShown(ComponentEvent e) {
+                    consuming = true;
+                    requestFocus();
+                }
+
+                @Override
+                public void componentHidden(ComponentEvent e) {
+                    consuming = false;
+                }
+            });
+            addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    consume(e);
+                }
+            });
+            addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    consume(e);
+                }
+            });
+            addMouseMotionListener(new MouseMotionListener() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    consume(e);
+                }
+            });
             addMouseListener(new MouseAdapter() {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (!modalFrame.isSelected()) {
+                    if (!frame.isSelected()) {
                         try {
-                            modalFrame.setSelected(true);
-                            if (!modalFrame.hasChildFrame()) {
+                            frame.setSelected(true);
+                            if (!frame.hasChildFrame()) {
                                 setVisible(false);
                             }
                         }
@@ -457,9 +528,18 @@ public abstract class FrameBase extends JInternalFrame {
             });
         }
 
+        private void consume(KeyEvent e) {
+            if (consuming) e.consume();
+        }
+
+        private void consume(MouseEvent e) {
+            if (consuming) e.consume();
+        }
+
+
         @Override
-        public void paint(Graphics g) {
-            super.paint(g);
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
             g.setColor(new Color(255, 255, 255, 100));
             g.fillRect(0, 0, getWidth(), getHeight());
         }

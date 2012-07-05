@@ -107,6 +107,10 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
     }
 
     @Override
+    public void lockChanged(MappingModel mappingModel, boolean locked) {
+    }
+
+    @Override
     public void functionChanged(MappingModel mappingModel, MappingFunction function) {
     }
 
