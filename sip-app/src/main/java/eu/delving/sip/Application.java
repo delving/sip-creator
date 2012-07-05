@@ -22,6 +22,10 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.actions.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
@@ -31,6 +35,7 @@ import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
@@ -62,6 +67,7 @@ public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
+    private UnlockMappingAction unlockMappingAction = new UnlockMappingAction();
     private Action downloadAction, importAction, uploadAction, deleteAction, validateAction;
     private JFrame home;
     private JDesktopPane desktop;
@@ -124,6 +130,33 @@ public class Application {
         allFrames = new AllFrames(desktop, sipModel);
         helpPanel = new HelpPanel(sipModel, cultureHubClient.getHttpClient());
         home.getContentPane().add(desktop, BorderLayout.CENTER);
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, final boolean locked) {
+                Exec.swing(new Runnable() {
+                    @Override
+                    public void run() {
+                        unlockMappingAction.setEnabled(locked);
+                    }
+                });
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new ImportAction(desktop, sipModel, harvestPool);
         validateAction = new ValidateAction(desktop, sipModel, allFrames.prepareForInvestigation(desktop));
@@ -243,6 +276,9 @@ public class Application {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
+        JMenu unlockMenu = new JMenu("Unlock");
+        unlockMenu.add(unlockMappingAction);
+        bar.add(unlockMenu);
         bar.add(createFileMenu());
         bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
@@ -317,6 +353,23 @@ public class Application {
                     sipModel.getDataSetModel().getDataSet().getSpec()
             ));
             sipModel.convertSource(listener);
+        }
+    }
+
+    private class UnlockMappingAction extends AbstractAction implements Runnable {
+
+        private UnlockMappingAction() {
+            super("Unlock mapping for further editing");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Exec.work(this);
+        }
+
+        @Override
+        public void run() {
+            sipModel.getMappingModel().setLocked(false);
         }
     }
 

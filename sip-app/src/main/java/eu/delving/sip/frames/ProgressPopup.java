@@ -56,7 +56,7 @@ public class ProgressPopup extends FrameBase implements ProgressListener {
     });
 
     public ProgressPopup(JDesktopPane desktop, String title) {
-        super(PROGRESS, desktop, null, title, true);
+        super(PROGRESS, desktop, null, title, true); // todo: this is the only modal frame
         this.showTimer.setRepeats(false);
         final Dimension all = desktop.getSize();
         setPlacement(new Placement() {

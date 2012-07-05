@@ -21,7 +21,10 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.SwingHelper;
@@ -44,9 +47,11 @@ import java.awt.event.ActionEvent;
 public class RecMappingFrame extends FrameBase {
     private RemoveNodeMappingAction removeAction = new RemoveNodeMappingAction();
     private JList nodeMappingList;
+    private RevertMappingMenu revertMappingMenu;
 
     public RecMappingFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings", false);
+        super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings");
+        revertMappingMenu = new RevertMappingMenu(sipModel);
         setJMenuBar(createMenuBar());
         nodeMappingList = sipModel.getMappingModel().getNodeMappingListModel().createJList();
         nodeMappingList.addListSelectionListener(new NodeMappingSelection());
@@ -66,11 +71,33 @@ public class RecMappingFrame extends FrameBase {
                 }
             }
         });
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                removeAction.setEnabled(!locked);
+                revertMappingMenu.setEnabled(!locked);
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
     }
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        RevertMappingMenu revertMappingMenu = new RevertMappingMenu(sipModel);
         sipModel.getMappingSaveTimer().setListReceiver(revertMappingMenu);
         bar.add(revertMappingMenu);
         return bar;

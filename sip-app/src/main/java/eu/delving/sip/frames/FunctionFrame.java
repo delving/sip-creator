@@ -74,7 +74,7 @@ public class FunctionFrame extends FrameBase {
     private UndoManager undoManager = new UndoManager();
 
     public FunctionFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.FUNCTIONS, desktop, sipModel, "Global Functions", false);
+        super(Which.FUNCTIONS, desktop, sipModel, "Global Functions");
         inputArea = new JTextArea(sipModel.getFunctionCompileModel().getInputDocument());
         inputArea.setFont(MONOSPACED);
         docArea = new JTextArea(sipModel.getFunctionCompileModel().getDocDocument());
@@ -215,11 +215,9 @@ public class FunctionFrame extends FrameBase {
                 Exec.swing(new Runnable() {
                     @Override
                     public void run() {
-                        if (mappingModel.hasRecMapping()) {
-                            functionModel.setList(mappingModel.getRecMapping().getFunctions());
-                        }
                         factsModel.clear();
                         if (mappingModel.hasRecMapping()) {
+                            functionModel.setList(mappingModel.getRecMapping().getFunctions());
                             for (String fact : mappingModel.getRecMapping().getFacts().keySet()) {
                                 factsModel.addElement(String.format("  %s  ", fact));
                             }
@@ -233,6 +231,11 @@ public class FunctionFrame extends FrameBase {
             }
         });
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
             @Override
             public void functionChanged(final MappingModel mappingModel, final MappingFunction function) {
                 Exec.swing(new Runnable() {

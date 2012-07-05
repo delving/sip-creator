@@ -71,7 +71,7 @@ public class FieldMappingFrame extends FrameBase {
     private UndoManager undoManager = new UndoManager();
 
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.FIELD_MAPPING, desktop, sipModel, "Field Mapping", false);
+        super(Which.FIELD_MAPPING, desktop, sipModel, "Field Mapping");
         dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);
@@ -269,6 +269,11 @@ public class FieldMappingFrame extends FrameBase {
             }
         });
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
                 functionModel.refresh();

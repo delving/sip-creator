@@ -47,7 +47,7 @@ public class MappingCodeFrame extends FrameBase {
     private JTextArea fieldArea = new JTextArea();
 
     public MappingCodeFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CODE, desktop, sipModel, "Mapping Code", false);
+        super(Which.CODE, desktop, sipModel, "Mapping Code");
         fieldArea.setFont(MONOSPACED);
         recordArea.setFont(MONOSPACED);
         Ear ear = new Ear();

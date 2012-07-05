@@ -52,6 +52,9 @@ public class RecMapping {
     @XStreamAsAttribute
     String prefix;
 
+    @XStreamAsAttribute
+    boolean locked;
+
     @XStreamAlias("facts")
     Map<String, String> facts = new HashMap<String, String>();
 
@@ -74,6 +77,14 @@ public class RecMapping {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     public boolean setFact(String fieldName, String value) {

@@ -110,6 +110,11 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     }
 
     @Override
+    public void lockChanged(MappingModel mappingModel, boolean locked) {
+        kick(false);
+    }
+
+    @Override
     public void functionChanged(MappingModel mappingModel, MappingFunction function) {
         kick(false);
     }

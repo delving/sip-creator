@@ -21,8 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.Path;
-import eu.delving.metadata.Tag;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.files.DataSetState;
@@ -72,7 +71,7 @@ public class SourceFrame extends FrameBase {
     });
 
     public SourceFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.SOURCE, desktop, sipModel, "Source", false);
+        super(Which.SOURCE, desktop, sipModel, "Source");
         sourceTree = new JTree(sipModel.getStatsModel().getSourceTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {
@@ -154,6 +153,28 @@ public class SourceFrame extends FrameBase {
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 timer.restart();
+            }
+        });
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {

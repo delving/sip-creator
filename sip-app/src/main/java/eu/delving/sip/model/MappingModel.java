@@ -62,6 +62,16 @@ public class MappingModel implements RecDefNodeListener {
         return recMapping.getPrefix();
     }
 
+    public boolean isLocked() {
+        return recMapping == null || recMapping.isLocked();
+    }
+
+    public void setLocked(boolean locked) {
+        if (!hasRecMapping() || locked == isLocked()) return;
+        recMapping.setLocked(locked);
+        notifyLockChanged(locked);
+    }
+
     public boolean hasRecMapping() {
         return recMapping != null;
     }
@@ -89,6 +99,10 @@ public class MappingModel implements RecDefNodeListener {
         recMapping.getFacts().putAll(map);
     }
 
+    public void notifyLockChanged(boolean locked) {
+        for (ChangeListener changeListener : changeListeners) changeListener.lockChanged(this, locked);
+    }
+
     public void notifyFunctionChanged(MappingFunction mappingFunction) {
         for (ChangeListener changeListener : changeListeners) changeListener.functionChanged(this, mappingFunction);
     }
@@ -101,14 +115,16 @@ public class MappingModel implements RecDefNodeListener {
 
     @Override
     public void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping) {
-        for (ChangeListener changeListener : changeListeners)
+        for (ChangeListener changeListener : changeListeners) {
             changeListener.nodeMappingAdded(this, recDefNode, nodeMapping);
+        }
     }
 
     @Override
     public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
-        for (ChangeListener changeListener : changeListeners)
+        for (ChangeListener changeListener : changeListeners) {
             changeListener.nodeMappingRemoved(this, recDefNode, nodeMapping);
+        }
     }
 
     // observable
@@ -118,6 +134,8 @@ public class MappingModel implements RecDefNodeListener {
     }
 
     public interface ChangeListener {
+
+        void lockChanged(MappingModel mappingModel, boolean locked);
 
         void functionChanged(MappingModel mappingModel, MappingFunction function);
 
@@ -152,5 +170,6 @@ public class MappingModel implements RecDefNodeListener {
 
     private void fireRecMappingSet() {
         for (SetListener listener : setListeners) listener.recMappingSet(this);
+        notifyLockChanged(isLocked());
     }
 }
