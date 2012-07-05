@@ -41,10 +41,9 @@ import java.io.File;
 public class ExpertMenu extends JMenu {
     private SipModel sipModel;
 
-    public ExpertMenu(final SipModel sipModel, Action newInstanceAction) {
+    public ExpertMenu(final SipModel sipModel) {
         super("Expert");
         this.sipModel = sipModel;
-        add(newInstanceAction);
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
         add(new WriteOutputAction());
@@ -99,6 +98,7 @@ public class ExpertMenu extends JMenu {
                     @Override
                     public void run() {
                         try {
+                            if (sipModel.getDataSetModel().isEmpty()) return;
                             sipModel.getDataSetModel().getDataSet().deleteSource();
                         }
                         catch (StorageException e) {

@@ -122,7 +122,7 @@ public class FileProcessor implements Work {
                 }
                 catch (DiscardRecordException e) {
                     invalidCount++;
-                    reportWriter.println("Discarded explicitly:");
+                    reportWriter.println("Discarded explicitly: "+e.getMessage());
                     reportWriter.println(XmlNodePrinter.toXml(record.getRootNode()));
                     reportWriter.println("=========");
                 }

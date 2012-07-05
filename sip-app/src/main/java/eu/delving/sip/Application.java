@@ -47,8 +47,6 @@ import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.Set;
-import java.util.TreeSet;
 
 import static eu.delving.sip.files.DataSetState.NO_DATA;
 
@@ -74,12 +72,9 @@ public class Application {
     private StatusPanel statusPanel;
     private HelpPanel helpPanel;
     private Timer resizeTimer;
-    private Launcher launcher;
     private String instance;
 
-    private Application(final File storageDirectory, Launcher launcher, String instance) throws StorageException {
-        this.launcher = launcher;
-        this.launcher.instances.add(this.instance = instance);
+    private Application(final File storageDirectory, String instance) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -163,7 +158,6 @@ public class Application {
                         sipModel.exec(new Work() {
                             @Override
                             public void run() {
-                                sipModel.getMappingModel().setRecMapping(null);
                                 sipModel.getDataSetFacts().set(null);
                                 sipModel.getStatsModel().setStatistics(null);
                             }
@@ -201,7 +195,6 @@ public class Application {
     }
 
     private boolean quit() {
-        launcher.instances.remove(this.instance);
         if (harvestPool.getSize() > 0) {
             boolean exitAnyway = feedback.confirm(
                     "Active harvests",
@@ -209,7 +202,6 @@ public class Application {
             );
             if (exitAnyway) return false;
         }
-        if (!launcher.instances.isEmpty()) return false;
         System.exit(0);
         return true;
     }
@@ -250,7 +242,7 @@ public class Application {
         bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
-        bar.add(new ExpertMenu(sipModel, launcher));
+        bar.add(new ExpertMenu(sipModel));
         bar.add(createHelpMenu());
         return bar;
     }
@@ -439,39 +431,35 @@ public class Application {
         }
     }
 
-    private static class Launcher extends AbstractAction implements Swing {
-        private String[] args;
-        private Set<String> instances = new TreeSet<String>();
+//    private static class Launcher extends AbstractAction implements Swing {
+//        private String[] args;
+//        private Set<String> instances = new TreeSet<String>();
+//
+//    // todo: this is for later.  just one instance now
+//
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            new Thread(this).start(); // todo: this whole launcher should change
+//        }
+//    }
 
-        private Launcher(String[] args) {
-            super("New Application Instance");
-            this.args = args;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            new Thread(this).start(); // todo: this whole launcher should change
-        }
-
-        @Override
-        public void run() {
-            final File storageDirectory = StorageFinder.getStorageDirectory(args);
-            if (storageDirectory == null) return;
-            try {
-                int instance = 1;
-                while (instances.contains(String.valueOf(instance))) instance++;
-                Application application = new Application(storageDirectory, this, String.valueOf(instance));
-                application.home.setVisible(true);
-                application.allFrames.restore();
+    public static void main(final String[] args) throws StorageException {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final File storageDirectory = StorageFinder.getStorageDirectory(args);
+                if (storageDirectory == null) return;
+                try {
+                    int instance = 1;
+                    Application application = new Application(storageDirectory, String.valueOf(instance));
+                    application.home.setVisible(true);
+                    application.allFrames.restore();
+                }
+                catch (StorageException e) {
+                    JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
+                    e.printStackTrace();
+                }
             }
-            catch (StorageException e) {
-                JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void main(String[] args) throws StorageException {
-        EventQueue.invokeLater(new Launcher(args));
+        });
     }
 }

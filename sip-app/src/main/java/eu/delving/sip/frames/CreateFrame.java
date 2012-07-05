@@ -154,13 +154,12 @@ public class CreateFrame extends FrameBase {
                         }
                         switch (transition) {
                             case NOTHING_TO_SOURCE:
-                            case SOURCE_TO_NOTHING:
                             case NOTHING_TO_TARGET:
-                            case TARGET_TO_NOTHING:
                             case ARMED_TO_TARGET:
                             case ARMED_TO_SOURCE:
                             case SOURCE_TO_SOURCE:
                             case TARGET_TO_TARGET:
+                            case ANYTHING_TO_NOTHING:
                                 createMappingAction.setIncomplete();
                                 break;
                             case SOURCE_TO_ARMED:

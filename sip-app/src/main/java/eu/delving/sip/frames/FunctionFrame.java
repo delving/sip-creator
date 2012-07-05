@@ -226,6 +226,9 @@ public class FunctionFrame extends FrameBase {
                             }
                             factsModel.addElement("  _uniqueIdentifier   ");
                         }
+                        codeArea.setText("");
+                        outputArea.setText("");
+                        inputArea.setText("");
                     }
                 });
             }

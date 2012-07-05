@@ -46,6 +46,7 @@ import java.awt.event.*;
  */
 
 public class TargetFrame extends FrameBase {
+    public static final FilterNode EMPTY_NODE = FilterNode.createMessageNode("No record definition");
     private JTree recDefTree;
     private JTextField filterField = new JTextField();
     private JPanel treePanel;
@@ -64,12 +65,6 @@ public class TargetFrame extends FrameBase {
 
     public TargetFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(Which.TARGET, desktop, sipModel, "Target", false);
-        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
-            @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                exec(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
-            }
-        });
         createRecDefTree(sipModel);
         timer.setRepeats(false);
         recDefTree.setDropMode(DropMode.ON);
@@ -111,6 +106,12 @@ public class TargetFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
+            @Override
+            public void recMappingSet(MappingModel mappingModel) {
+                exec(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
+            }
+        });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void transition(CreateModel createModel, CreateTransition transition) {
@@ -191,7 +192,7 @@ public class TargetFrame extends FrameBase {
     }
 
     private void createRecDefTree(SipModel sipModel) {
-        recDefTree = new JTree(new RecDefTreeModel(FilterNode.createMessageNode("Empty"))) {
+        recDefTree = new JTree(new RecDefTreeModel(EMPTY_NODE)) {
             @Override
             public String getToolTipText(MouseEvent evt) {
                 TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
@@ -263,10 +264,11 @@ public class TargetFrame extends FrameBase {
                 model.setAttributesHidden(hideAttributes.isSelected());
             }
             else {
-                recDefTree.setModel(new RecDefTreeModel(FilterNode.createMessageNode("No record definition")));
+                recDefTree.setModel(new RecDefTreeModel(EMPTY_NODE));
             }
             treePanel.removeAll();
             treePanel.add(SwingHelper.scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
+            treePanel.validate();
         }
     }
 
