@@ -81,6 +81,7 @@ public class Application {
     private HelpPanel helpPanel;
     private Timer resizeTimer;
     private String instance;
+    private ExpertMenu expertMenu;
 
     private Application(final File storageDirectory, String instance) throws StorageException {
         instances.add(this.instance = instance);
@@ -114,6 +115,7 @@ public class Application {
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         Storage storage = new StorageImpl(storageDirectory, cultureHubClient.getHttpClient());
         sipModel = new SipModel(storage, groovyCodeResource, feedback, instance);
+        expertMenu = new ExpertMenu(sipModel, desktop);
         statusPanel = new StatusPanel(sipModel);
         harvestPool = new HarvestPool(sipModel);
         harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
@@ -137,6 +139,7 @@ public class Application {
                     @Override
                     public void run() {
                         unlockMappingAction.setEnabled(locked);
+                        expertMenu.setEnabled(!locked);
                     }
                 });
             }
@@ -283,7 +286,7 @@ public class Application {
         bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
-        bar.add(new ExpertMenu(sipModel, desktop));
+        bar.add(expertMenu);
         bar.add(createHelpMenu());
         return bar;
     }
