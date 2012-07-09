@@ -135,7 +135,7 @@ public class HelpPanel extends HtmlPanel {
 
         @Override
         public Job getJob() {
-            return Job.HTTP_FETCH_HELP_TEXT;
+            return Job.FETCH_HELP_TEXT;
         }
     }
 

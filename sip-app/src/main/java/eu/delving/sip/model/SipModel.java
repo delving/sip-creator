@@ -44,8 +44,6 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
 
 import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
@@ -58,8 +56,8 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
 public class SipModel {
     private static final Logger LOG = Logger.getLogger(SipModel.class);
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
     private XmlSerializer serializer = new XmlSerializer();
+    private WorkModel workModel = new WorkModel();
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences;
@@ -203,6 +201,10 @@ public class SipModel {
 
     public void addParseListener(ParseListener parseListener) {
         parseListeners.add(parseListener);
+    }
+
+    public ListModel getJobListModel() {
+        return workModel.getListModel();
     }
 
     public Preferences getPreferences() {
@@ -603,7 +605,6 @@ public class SipModel {
     }
 
     public void exec(Work work) {
-        executor.execute(work);
+        workModel.exec(work);
     }
-
 }
