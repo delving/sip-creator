@@ -49,11 +49,12 @@ public class DataSetModel implements RecDefModel {
     private DataSetState currentState = ABSENT;
     private MappingModel mappingModel;
 
-    public DataSetModel() {
+    public DataSetModel() { // test only
         this.mappingModel = new MappingModel();
     }
 
     public DataSetModel(SipModel sipModel) {
+        this.mappingModel = new MappingModel(sipModel);
         new StateCheckTimer(sipModel);
     }
 

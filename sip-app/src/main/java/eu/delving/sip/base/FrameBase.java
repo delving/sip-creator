@@ -611,7 +611,7 @@ public abstract class FrameBase extends JInternalFrame {
     }
 
     public void exec(Swing swing) {
-        sipModel.exec(swing);
+        SwingUtilities.invokeLater(swing);
     }
 
     public void exec(Work work) {

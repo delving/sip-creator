@@ -70,14 +70,14 @@ public class SipModel {
     private MetadataParser metadataParser;
     private StatsModel statsModel;
     private MappingHintsModel mappingHintsModel;
+    private DataSetModel dataSetModel;
     private FactModel dataSetFacts = new FactModel();
-    private DataSetModel dataSetModel = new DataSetModel();
-    private CreateModel createModel = new CreateModel(this);
-    private ReportFileModel reportFileModel = new ReportFileModel(this);
-    private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
-    private NodeTransferHandler nodeTransferHandler = new NodeTransferHandler(this);
-    private MappingSaveTimer mappingSaveTimer = new MappingSaveTimer(this);
+    private CreateModel createModel;
+    private ReportFileModel reportFileModel;
+    private NodeTransferHandler nodeTransferHandler;
+    private MappingSaveTimer mappingSaveTimer;
     private volatile boolean converting, processing, analyzing, importing;
+    private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
 
     public interface AnalysisListener {
         boolean analysisProgress(long elementCount);
@@ -103,22 +103,27 @@ public class SipModel {
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
-        MappingModel mappingModel = dataSetModel.getMappingModel();
+        dataSetModel = new DataSetModel(this);
         functionCompileModel = new FunctionCompileModel(this, feedback, groovyCodeResource);
         recordCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.RECORD, feedback, groovyCodeResource);
         fieldCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.FIELD, feedback, groovyCodeResource);
         parseListeners.add(recordCompileModel.getParseEar());
         parseListeners.add(fieldCompileModel.getParseEar());
         mappingHintsModel = new MappingHintsModel(this);
-        mappingModel.addSetListener(reportFileModel);
-        mappingModel.addSetListener(recordCompileModel.getMappingModelSetListener());
-        mappingModel.addChangeListener(recordCompileModel.getMappingModelChangeListener());
-        mappingModel.addSetListener(fieldCompileModel.getMappingModelSetListener());
-        mappingModel.addChangeListener(fieldCompileModel.getMappingModelChangeListener());
-        mappingModel.addChangeListener(mappingHintsModel);
-        mappingModel.addSetListener(mappingSaveTimer);
-        mappingModel.addChangeListener(mappingSaveTimer);
-        mappingModel.addChangeListener(new MappingModel.ChangeListener() {
+        createModel = new CreateModel(this);
+        reportFileModel = new ReportFileModel(this);
+        nodeTransferHandler = new NodeTransferHandler(this);
+        mappingSaveTimer = new MappingSaveTimer(this);
+        MappingModel mm = dataSetModel.getMappingModel();
+        mm.addSetListener(reportFileModel);
+        mm.addSetListener(recordCompileModel.getMappingModelSetListener());
+        mm.addChangeListener(recordCompileModel.getMappingModelChangeListener());
+        mm.addSetListener(fieldCompileModel.getMappingModelSetListener());
+        mm.addChangeListener(fieldCompileModel.getMappingModelChangeListener());
+        mm.addChangeListener(mappingHintsModel);
+        mm.addSetListener(mappingSaveTimer);
+        mm.addChangeListener(mappingSaveTimer);
+        mm.addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void lockChanged(MappingModel mappingModel, boolean locked) {
             }

@@ -51,12 +51,11 @@ import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
 public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
-    private SourceTreeNode sourceTree;
+    private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
     private FilterTreeModel sourceTreeModel = new FilterTreeModel(sourceTree);
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
-        this.sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
         hintsModel.addListener(new HintSaveTimer());
     }
 

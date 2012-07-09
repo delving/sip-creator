@@ -89,7 +89,7 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void say(final String message) {
-        sipModel.exec(new Swing() {
+        SwingUtilities.invokeLater(new Swing() {
             @Override
             public void run() {
                 addToList(message);
