@@ -184,6 +184,11 @@ public class TargetFrame extends FrameBase {
                 sipModel.getCreateModel().setTarget(node);
             }
         }
+
+        @Override
+        public Job getJob() {
+            return Job.SELECT_REC_DEF_SET_TARGET;
+        }
     }
 
     private void showPath(RecDefTreeNode node) {

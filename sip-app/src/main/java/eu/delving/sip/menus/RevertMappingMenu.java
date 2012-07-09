@@ -81,6 +81,11 @@ public class RevertMappingMenu extends JMenu implements MappingSaveTimer.ListRec
                             sipModel.getFeedback().alert("Unable to revert mapping", e);
                         }
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.REVERT_MAPPING;
+                    }
                 });
             }
         }

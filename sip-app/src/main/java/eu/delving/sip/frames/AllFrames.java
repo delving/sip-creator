@@ -365,6 +365,11 @@ public class AllFrames {
                         // eat it.
                     }
                 }
+
+                @Override
+                public Job getJob() {
+                    return Job.READ_FRAME_ARRANGEMENTS;
+                }
             });
         }
     }

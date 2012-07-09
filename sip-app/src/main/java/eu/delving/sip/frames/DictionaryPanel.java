@@ -326,6 +326,11 @@ public class DictionaryPanel extends JPanel {
                     public void run() {
                         if (createModel.hasNodeMapping()) createModel.getNodeMapping().notifyChanged(DICTIONARY);
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.NOTIFY_DICTIONARY_CHANGED;
+                    }
                 });
                 timer.restart();
             }
@@ -381,6 +386,11 @@ public class DictionaryPanel extends JPanel {
                     if (isDictionaryPossible(createModel.getNodeMapping()))
                         refreshDictionary(createModel.getNodeMapping());
                 }
+
+                @Override
+                public Job getJob() {
+                    return Job.REFRESH_DICTIONARY;
+                }
             });
         }
     };
@@ -400,6 +410,11 @@ public class DictionaryPanel extends JPanel {
                 @Override
                 public void run() {
                     removeDictionary(createModel.getNodeMapping());
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.REMOVE_DICTIONARY;
                 }
             });
         }

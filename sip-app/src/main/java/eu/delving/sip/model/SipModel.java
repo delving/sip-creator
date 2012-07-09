@@ -269,7 +269,7 @@ public class SipModel {
         void complete(boolean success);
     }
 
-    public void setDataSet(final DataSet dataSet, final String requestedPrefix, final DataSetCompletion completion) {
+    public void setDataSetPrefix(final DataSet dataSet, final String requestedPrefix, final DataSetCompletion completion) {
         exec(new Work() {
             @Override
             public void run() {
@@ -299,6 +299,11 @@ public class SipModel {
                                         statsModel.findNodesForInputPaths(nodeMapping);
                                     }
                                 }
+
+                                @Override
+                                public Job getJob() {
+                                    return Job.SET_MAPPING_HINTS_FIND_NODES;
+                                }
                             });
                             seekFirstRecord();
                         }
@@ -310,6 +315,11 @@ public class SipModel {
                     feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);
                     dataSetModel.clearDataSet();
                 }
+            }
+
+            @Override
+            public Job getJob() {
+                return Job.SET_DATASET_PREFIX;
             }
         });
     }
@@ -333,6 +343,11 @@ public class SipModel {
                     catch (StorageException e) {
                         feedback.alert(String.format("Couldn't create Data Set from %s: %s", file.getAbsolutePath(), e.getMessage()), e);
                     }
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.IMPORT_SOURCE;
                 }
             });
         }
@@ -424,6 +439,11 @@ public class SipModel {
                         converting = false;
                     }
                 }
+
+                @Override
+                public Job getJob() {
+                    return Job.CONVERT_SOURCE;
+                }
             });
         }
     }
@@ -495,6 +515,11 @@ public class SipModel {
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                 }
             }
+
+            @Override
+            public Job getJob() {
+                return Job.SEEK_RESET;
+            }
         });
     }
 
@@ -561,6 +586,11 @@ public class SipModel {
                 feedback.alert("Unable to fetch the next record", e);
                 metadataParser = null;
             }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.SCAN_INPUT_RECORDS;
         }
     }
 

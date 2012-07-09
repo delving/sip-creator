@@ -197,6 +197,11 @@ public class Application {
                                 sipModel.getDataSetFacts().set(null);
                                 sipModel.getStatsModel().setStatistics(null);
                             }
+
+                            @Override
+                            public Job getJob() {
+                                return Job.CLEAR_FACTS_STATS;
+                            }
                         });
                         home.setTitle("Delving SIP Creator");
                         sipModel.seekReset();
@@ -368,6 +373,17 @@ public class Application {
         @Override
         public void run() {
             sipModel.getMappingModel().setLocked(false);
+            try {
+                sipModel.getDataSetModel().deleteValidation();
+            }
+            catch (StorageException e) {
+                feedback.alert("Unable to delete validation", e);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.UNLOCK_MAPPING;
         }
     }
 

@@ -160,6 +160,11 @@ public class DataSetModel implements RecDefModel {
         public void actionPerformed(ActionEvent actionEvent) {
             sipModel.exec(this);
         }
+
+        @Override
+        public Job getJob() {
+            return Job.CHECK_DATA_SET_STATE;
+        }
     }
 
     private List<SwingListener> listeners = new CopyOnWriteArrayList<SwingListener>();

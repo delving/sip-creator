@@ -230,6 +230,11 @@ public class CreateFrame extends FrameBase {
                             createModel.addMapping(nodeMappingEntry.getNodeMapping());
                         }
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.COPY_MAPPING_FROM_HINTS;
+                    }
                 });
             }
         }
@@ -251,6 +256,11 @@ public class CreateFrame extends FrameBase {
                 @Override
                 public void run() {
                     if (createModel.canCreate()) createModel.createMapping();
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.CREATE_MAPPING;
                 }
             });
         }

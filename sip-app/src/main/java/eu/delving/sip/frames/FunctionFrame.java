@@ -335,6 +335,11 @@ public class FunctionFrame extends FrameBase {
                         }
                     });
                 }
+
+                @Override
+                public Job getJob() {
+                    return Job.FUNCTION_SELECT;
+                }
             });
         }
     }
@@ -364,6 +369,11 @@ public class FunctionFrame extends FrameBase {
                         MappingFunction mappingFunction = recMapping.createFunction(name);
                         sipModel.getMappingModel().notifyFunctionChanged(mappingFunction);
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.NOTIFY_FUNCTION_CHANGED;
+                    }
                 });
             }
         }
@@ -384,6 +394,11 @@ public class FunctionFrame extends FrameBase {
                         sipModel.getMappingModel().getRecMapping().removeFunction(selected);
                         sipModel.getMappingModel().notifyFunctionChanged(selected);
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.FUNCTION_REMOVE;
+                    }
                 });
             }
         }
@@ -403,6 +418,11 @@ public class FunctionFrame extends FrameBase {
                     public void run() {
                         sipModel.getMappingModel().getRecMapping().addFunction(selected);
                         sipModel.getMappingModel().notifyFunctionChanged(selected);
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.FUNCTION_COPY_FROM_LIBRARY;
                     }
                 });
             }

@@ -261,6 +261,11 @@ public class CultureHubClient {
                 listReceiveListener.failed(e);
             }
         }
+
+        @Override
+        public Job getJob() {
+            return Job.HTTP_FETCH_DATASET_LIST;
+        }
     }
 
     private class Unlocker extends Attempt {
@@ -306,6 +311,11 @@ public class CultureHubClient {
                 context.getFeedback().alert(String.format("Error unlocking dataset server: %s", e.getMessage()));
                 unlockListener.unlockComplete(false);
             }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.HTTP_UNLOCK_DATA_SET;
         }
     }
 
@@ -371,6 +381,11 @@ public class CultureHubClient {
                 }
                 progressListener.finished(success);
             }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.HTTP_DOWNLOAD_DATASET;
         }
     }
 
@@ -454,6 +469,11 @@ public class CultureHubClient {
                 context.getFeedback().alert("Authorization system problem: " + e.getMessage());
                 uploadListener.finished(false);
             }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.HTTP_UPLOAD_FILES;
         }
     }
 

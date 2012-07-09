@@ -122,6 +122,11 @@ public class RecMappingFrame extends FrameBase {
                     public void run() {
                         sipModel.getCreateModel().setNodeMapping(selected.getNodeMapping());
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.SELECT_NODE_MAPPING;
+                    }
                 });
             }
         }
@@ -150,6 +155,11 @@ public class RecMappingFrame extends FrameBase {
                     sipModel.getCreateModel().setNodeMapping(null);
                 }
             }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.REMOVE_NODE_MAPPING;
         }
     }
 }

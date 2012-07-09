@@ -239,6 +239,11 @@ public class SourceFrame extends FrameBase {
                     public void run() {
                         sipModel.getCreateModel().setSource(nodeList);
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.SELECT_SOURCE_SET_SOURCE;
+                    }
                 });
             }
         });

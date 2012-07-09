@@ -105,6 +105,11 @@ public class ExpertMenu extends JMenu {
                             sipModel.getFeedback().alert("Unable to delete source", e);
                         }
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.DELETE_SOURCE_FOR_RECONVERT;
+                    }
                 });
             }
         }

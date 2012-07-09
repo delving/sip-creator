@@ -337,6 +337,11 @@ public class MappingCompileModel {
         public String toString() {
             return type.toString();
         }
+
+        @Override
+        public Job getJob() {
+            return Job.NODE_MAPPING_COMPILE_RUN;
+        }
     }
 
     private class DocumentSetter implements Swing {
@@ -397,6 +402,11 @@ public class MappingCompileModel {
     private abstract class DocChangeListener implements DocumentListener, Work {
 
         @Override
+        public Job getJob() {
+            return Job.MAPPING_DOCUMENT_CHANGED;
+        }
+
+        @Override
         public void insertUpdate(DocumentEvent documentEvent) {
             go();
         }
@@ -424,6 +434,11 @@ public class MappingCompileModel {
         }
 
         @Override
+        public Job getJob() {
+            return Job.MAPPING_DOCUMENT_CHANGED;
+        }
+
+        @Override
         public void run() {
             laterTimer.restart();
         }
@@ -434,6 +449,11 @@ public class MappingCompileModel {
                 @Override
                 public void run() {
                     later();
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.MAPPING_DOCUMENT_CHANGED;
                 }
             });
         }

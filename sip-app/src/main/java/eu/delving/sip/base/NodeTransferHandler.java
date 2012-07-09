@@ -95,6 +95,11 @@ public class NodeTransferHandler extends TransferHandler {
                         if (createModel.canCreate()) createModel.createMapping();
                     }
                 }
+
+                @Override
+                public Job getJob() {
+                    return Job.DROP_TRANSFER_HANDLER;
+                }
             });
             return true;
         }

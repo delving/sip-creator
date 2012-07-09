@@ -240,6 +240,11 @@ public class StatsModel {
         public void allFactsUpdated(Map<String, String> map) {
             timer.restart();
         }
+
+        @Override
+        public Job getJob() {
+            return Job.SAVE_HINTS;
+        }
     }
 
 

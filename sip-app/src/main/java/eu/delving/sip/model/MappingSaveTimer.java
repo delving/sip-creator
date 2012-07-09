@@ -46,6 +46,11 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     private ListReceiver listReceiver;
     private boolean freezeMode;
 
+    @Override
+    public Job getJob() {
+        return Job.SAVE_MAPPING;
+    }
+
     public interface ListReceiver {
         void mappingFileList(List<File> mappingFiles);
     }

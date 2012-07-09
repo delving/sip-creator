@@ -52,6 +52,11 @@ public class AnalysisParser implements Work {
     private Listener listener;
     private DataSetModel dataSetModel;
 
+    @Override
+    public Job getJob() {
+        return Job.PARSE_ANALYZE;
+    }
+
     public interface Listener {
 
         void success(Stats stats);

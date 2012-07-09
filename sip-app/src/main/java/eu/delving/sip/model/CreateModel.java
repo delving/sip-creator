@@ -66,6 +66,11 @@ public class CreateModel {
                     public void run() {
                         sipModel.getCreateModel().setNodeMapping(null);
                     }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.CLEAR_NODE_MAPPING;
+                    }
                 });
             }
         });

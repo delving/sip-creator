@@ -79,6 +79,11 @@ public class Harvestor implements Work {
     private String dataSetSpec;
     private File tempFile;
 
+    @Override
+    public Job getJob() {
+        return Job.HARVEST_OAI_PMH;
+    }
+
     /**
      * Subscribe to the progress of the harvestor.
      */

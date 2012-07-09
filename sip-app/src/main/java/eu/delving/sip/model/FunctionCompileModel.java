@@ -217,6 +217,11 @@ public class FunctionCompileModel {
         public String toString() {
             return "FunctionCompileModel";
         }
+
+        @Override
+        public Job getJob() {
+            return Job.FUNCTION_COMPILE_RUN;
+        }
     }
 
     private class FunctionRunner {
@@ -357,6 +362,11 @@ public class FunctionCompileModel {
         @Override
         public void changedUpdate(DocumentEvent documentEvent) {
             go();
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.FUNCTION_DOC_CHANGE_LISTENER;
         }
 
         private void go() {

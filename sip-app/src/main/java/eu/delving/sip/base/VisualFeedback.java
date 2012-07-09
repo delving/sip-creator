@@ -102,26 +102,38 @@ public class VisualFeedback implements Feedback {
     public void alert(final String message) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message);
-        execWait(new Runnable() {
-            @Override
-            public void run() {
-                addToList(message);
-                inYourFace(message, null);
-            }
-        });
+        if (SwingUtilities.isEventDispatchThread()) {
+            addToList(message);
+            inYourFace(message, null);
+        }
+        else {
+            execWait(new Runnable() {
+                @Override
+                public void run() {
+                    addToList(message);
+                    inYourFace(message, null);
+                }
+            });
+        }
     }
 
     @Override
     public void alert(final String message, final Exception exception) {
         if (progressPopup != null) progressPopup.finished(false);
         log.warn(message, exception);
-        execWait(new Runnable() {
-            @Override
-            public void run() {
-                addToList(message);
-                inYourFace(message, exception.getMessage());
-            }
-        });
+        if (SwingUtilities.isEventDispatchThread()) {
+            addToList(message);
+            inYourFace(message, exception.getMessage());
+        }
+        else {
+            execWait(new Runnable() {
+                @Override
+                public void run() {
+                    addToList(message);
+                    inYourFace(message, exception.getMessage());
+                }
+            });
+        }
     }
 
     @Override

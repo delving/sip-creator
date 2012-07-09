@@ -81,12 +81,7 @@ public class URLLauncher implements CaretListener {
                     outputArea.select(min, max);
                 }
                 else {
-                    sipModel.exec(new Work() {
-                        @Override
-                        public void run() {
-                            feedback.alert(String.format("Not a valid URL: \"%s\"", url));
-                        }
-                    });
+                    feedback.alert(String.format("Not a valid URL: \"%s\"", url));
                     outputArea.select(min, min);
                 }
             }
@@ -114,12 +109,7 @@ public class URLLauncher implements CaretListener {
             return bs.showDocument(url);
         }
         catch (UnavailableServiceException ue) {
-            sipModel.exec(new Work() {
-                @Override
-                public void run() {
-                    feedback.alert(String.format("Sorry, need Web Start to launch \"%s\"", urlString));
-                }
-            });
+            feedback.alert(String.format("Sorry, need Web Start to launch \"%s\"", urlString));
             return false;
         }
         catch (MalformedURLException e1) {

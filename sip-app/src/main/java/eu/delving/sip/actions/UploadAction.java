@@ -73,12 +73,7 @@ public class UploadAction extends AbstractAction {
             reportFilePopup.upload.requestFocusInWindow();
         }
         else {
-            sipModel.exec(new Work() {
-                @Override
-                public void run() {
-                    sipModel.getFeedback().alert("Upload not permitted until all mappings are validated. Still invalid: " + invalidPrefixes);
-                }
-            });
+            sipModel.getFeedback().alert("Upload not permitted until all mappings are validated. Still invalid: " + invalidPrefixes);
         }
     }
 
@@ -111,6 +106,11 @@ public class UploadAction extends AbstractAction {
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to fetch invalid prefixes", e);
             }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.FIND_INVALID_PREFIXES;
         }
     }
 
@@ -219,12 +219,7 @@ public class UploadAction extends AbstractAction {
                 });
             }
             catch (final StorageException e) {
-                sipModel.exec(new Work() {
-                    @Override
-                    public void run() {
-                        sipModel.getFeedback().alert("Unable to complete uploading", e);
-                    }
-                });
+                sipModel.getFeedback().alert("Unable to complete uploading", e);
                 busyUploading = false;
             }
         }

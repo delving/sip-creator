@@ -197,6 +197,11 @@ public class FieldMappingFrame extends FrameBase {
                             nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
                             nodeMapping.notifyChanged(OPERATOR);
                         }
+
+                        @Override
+                        public Job getJob() {
+                            return Job.SET_OPERATOR;
+                        }
                     });
                 }
             }
@@ -395,6 +400,11 @@ public class FieldMappingFrame extends FrameBase {
                             sipModel.getCreateModel().getNodeMapping().revertToGenerated();
                         }
                         sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.REVERT_NODE_MAPPING;
                     }
                 });
             }

@@ -67,6 +67,11 @@ public class FileProcessor implements Work {
     private File outputDirectory;
     private XmlOutput xmlOutput;
 
+    @Override
+    public Job getJob() {
+        return Job.PROCESS_FILE;
+    }
+
     public interface Listener {
         void mappingFailed(MappingException exception);
 
