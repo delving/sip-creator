@@ -70,6 +70,16 @@ public class WorkModel {
         return jobContexts.isEmpty();
     }
 
+    public boolean isDataSetBusy(String dataSetSpec) {
+        for (JobContext context : jobContexts) {
+            String dataSet = context.getDataSet();
+            if (dataSet == null) continue;
+            if (!(context.work() instanceof Work.LongTermWork)) continue;
+            if (dataSetSpec.equals(dataSet)) return true;
+        }
+        return false;
+    }
+
     public void exec(Work work) {
         switch (work.getJob().getKind()) {
             case SILENT:

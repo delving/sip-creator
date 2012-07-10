@@ -29,6 +29,7 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
 /**
  * The menu for choosing from local data sets.
@@ -40,10 +41,19 @@ public class DataSetMenu extends JMenu {
     private final String SELECTED_SPEC = "selectedSpec";
     private final String SELECTED_PREFIX = "selectedPrefix";
     private SipModel sipModel;
+    private ButtonGroup buttonGroup;
 
     public DataSetMenu(final SipModel sipModel) {
         super("Data Sets");
         this.sipModel = sipModel;
+        Timer disableTimer = new Timer(500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                disableBusy();
+            }
+        });
+        disableTimer.setRepeats(true);
+        disableTimer.start();
         refresh();
     }
 
@@ -55,6 +65,16 @@ public class DataSetMenu extends JMenu {
             clearPreference();
         }
         refresh();
+    }
+
+    public void disableBusy() {
+        if (buttonGroup == null) return;
+        Enumeration<AbstractButton> buttons = buttonGroup.getElements();
+        while (buttons.hasMoreElements()) {
+            AbstractButton button = buttons.nextElement();
+            DataSetItem dataSetItem = (DataSetItem) button;
+            dataSetItem.checkDataSetBusy();
+        }
     }
 
     private void clearPreference() {
@@ -70,8 +90,8 @@ public class DataSetMenu extends JMenu {
     }
 
     private void refresh() {
+        buttonGroup = new ButtonGroup();
         removeAll();
-        final ButtonGroup buttonGroup = new ButtonGroup();
         try {
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 for (String prefix : dataSet.getPrefixes()) {
@@ -117,6 +137,7 @@ public class DataSetMenu extends JMenu {
             super(String.format("%s - %s", dataSet.getSpec(), prefix));
             this.dataSet = dataSet;
             this.prefix = prefix;
+            checkDataSetBusy();
         }
 
         public DataSet getDataSet() {
@@ -125,6 +146,10 @@ public class DataSetMenu extends JMenu {
 
         public String getPrefix() {
             return prefix;
+        }
+
+        public void checkDataSetBusy() {
+            setEnabled(!sipModel.getWorkModel().isDataSetBusy(dataSet.getSpec()));
         }
 
         public boolean isPreferred() {

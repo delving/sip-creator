@@ -74,7 +74,6 @@ public class SipModel {
     private ReportFileModel reportFileModel;
     private NodeTransferHandler nodeTransferHandler;
     private MappingSaveTimer mappingSaveTimer;
-    private volatile boolean converting, processing, analyzing, importing;
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
 
     public interface ValidationListener {
@@ -346,14 +345,8 @@ public class SipModel {
     }
 
     public void importSource(final File file, Swing finished) {
-        if (importing) {
-            feedback.alert("Busy importing");
-        }
-        else {
-            importing = true;
-            clearValidations();
-            exec(new SourceImporter(file, dataSetModel.getDataSet(), finished));
-        }
+        clearValidations();
+        exec(new SourceImporter(file, dataSetModel.getDataSet(), finished));
     }
 
     private class SourceImporter implements Work.DataSetWork, Work.LongTermWork {
@@ -383,7 +376,6 @@ public class SipModel {
             try {
                 dataSet.externalToImported(file, progressListener);
                 Swing.Exec.later(finished);
-                importing = false;
             }
             catch (StorageException e) {
                 feedback.alert(String.format("Couldn't create Data Set from %s: %s", file.getAbsolutePath(), e.getMessage()), e);
@@ -398,58 +390,44 @@ public class SipModel {
     }
 
     public void analyzeFields() {
-        if (analyzing) {
-            feedback.alert("Busy analyzing");
-        }
-        else {
-            analyzing = true;
-            exec(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
-                @Override
-                public void success(final Stats stats) {
-                    analyzing = false;
-                    try {
-                        dataSetModel.getDataSet().setStats(stats, stats.sourceFormat, null);
-                        exec(new Swing() {
-                            @Override
-                            public void run() {
-                                statsModel.setStatistics(stats);
-                                if (stats.sourceFormat) {
-                                    seekFirstRecord();
-                                }
-                                else {
-                                    seekReset();
-                                }
+        exec(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
+            @Override
+            public void success(final Stats stats) {
+                try {
+                    dataSetModel.getDataSet().setStats(stats, stats.sourceFormat, null);
+                    exec(new Swing() {
+                        @Override
+                        public void run() {
+                            statsModel.setStatistics(stats);
+                            if (stats.sourceFormat) {
+                                seekFirstRecord();
                             }
-                        });
-                    }
-                    catch (StorageException e) {
-                        feedback.alert("Problem storing statistics", e);
-                    }
+                            else {
+                                seekReset();
+                            }
+                        }
+                    });
                 }
+                catch (StorageException e) {
+                    feedback.alert("Problem storing statistics", e);
+                }
+            }
 
-                @Override
-                public void failure(String message, Exception exception) {
-                    analyzing = false;
-                    if (message == null) {
-                        message = "Analysis failed";
-                    }
-                    if (exception != null) {
-                        feedback.alert(message, exception);
-                    }
+            @Override
+            public void failure(String message, Exception exception) {
+                if (message == null) {
+                    message = "Analysis failed";
                 }
-            }));
-        }
+                if (exception != null) {
+                    feedback.alert(message, exception);
+                }
+            }
+        }));
     }
 
     public void convertSource() {
         clearValidations();
-        if (converting) {
-            feedback.alert("Busy converting to source for " + dataSetModel.getDataSet().getSpec());
-        }
-        else {
-            converting = true;
-            exec(new ConversionRunner(dataSetModel.getDataSet()));
-        }
+        exec(new ConversionRunner(dataSetModel.getDataSet()));
     }
 
     private class ConversionRunner implements Work.DataSetWork, Work.LongTermWork {
@@ -484,9 +462,6 @@ public class SipModel {
             catch (StorageException e) {
                 feedback.alert("Conversion failed: " + e.getMessage(), e);
             }
-            finally {
-                converting = false;
-            }
         }
 
         @Override
@@ -500,60 +475,53 @@ public class SipModel {
     }
 
     public void processFile(boolean allowInvalidRecords, final ValidationListener validationListener, final Swing finished) {
-        if (processing) {
-            feedback.alert("Busy processing");
+        File outputDirectory = null;
+        String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
+        if (!directoryString.isEmpty()) {
+            outputDirectory = new File(directoryString);
+            if (!outputDirectory.exists()) outputDirectory = null;
         }
-        else {
-            processing = true;
-            File outputDirectory = null;
-            String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
-            if (!directoryString.isEmpty()) {
-                outputDirectory = new File(directoryString);
-                if (!outputDirectory.exists()) outputDirectory = null;
-            }
-            exec(new FileProcessor(
-                    this,
-                    statsModel.getMaxUniqueValueLength(),
-                    statsModel.getRecordCount(),
-                    allowInvalidRecords,
-                    outputDirectory,
-                    groovyCodeResource,
-                    new FileProcessor.Listener() {
-                        @Override
-                        public void mappingFailed(final MappingException exception) {
-                            String xml = XmlNodePrinter.toXml(exception.getMetadataRecord().getRootNode());
-                            validationListener.failed(exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
-                            finishedProcessing();
-                        }
-
-                        @Override
-                        public void outputInvalid(int recordNumber, Node outputNode, String message) {
-                            String xml = serializer.toXml(outputNode);
-                            validationListener.failed(recordNumber, xml, message);
-                            finishedProcessing();
-                        }
-
-                        @Override
-                        public void finished(final Stats stats, final BitSet valid, int recordCount) {
-                            finishedProcessing();
-                            try {
-                                DataSet dataSet = dataSetModel.getDataSet();
-                                dataSet.setStats(stats, false, mappingModel().getRecMapping().getPrefix());
-                                dataSet.setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
-                            }
-                            catch (StorageException e) {
-                                feedback.alert("Unable to store validation results", e);
-                            }
-                            reportFileModel.kick();
-                            processing = false;
-                        }
-
-                        private void finishedProcessing() {
-                            Swing.Exec.later(finished);
-                        }
+        exec(new FileProcessor(
+                this,
+                statsModel.getMaxUniqueValueLength(),
+                statsModel.getRecordCount(),
+                allowInvalidRecords,
+                outputDirectory,
+                groovyCodeResource,
+                new FileProcessor.Listener() {
+                    @Override
+                    public void mappingFailed(final MappingException exception) {
+                        String xml = XmlNodePrinter.toXml(exception.getMetadataRecord().getRootNode());
+                        validationListener.failed(exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
+                        finishedProcessing();
                     }
-            ));
-        }
+
+                    @Override
+                    public void outputInvalid(int recordNumber, Node outputNode, String message) {
+                        String xml = serializer.toXml(outputNode);
+                        validationListener.failed(recordNumber, xml, message);
+                        finishedProcessing();
+                    }
+
+                    @Override
+                    public void finished(final Stats stats, final BitSet valid, int recordCount) {
+                        finishedProcessing();
+                        try {
+                            DataSet dataSet = dataSetModel.getDataSet();
+                            dataSet.setStats(stats, false, mappingModel().getRecMapping().getPrefix());
+                            dataSet.setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
+                        }
+                        catch (StorageException e) {
+                            feedback.alert("Unable to store validation results", e);
+                        }
+                        reportFileModel.kick();
+                    }
+
+                    private void finishedProcessing() {
+                        Swing.Exec.later(finished);
+                    }
+                }
+        ));
     }
 
     public void seekReset() {

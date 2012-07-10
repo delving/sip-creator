@@ -209,7 +209,7 @@ public class CreateModel {
                         }
                         break;
                     case NODE_MAPPING:
-                        if (nodeMapping == null) return;
+                        if (nodeMapping == null || nodeMapping.getSourceTreeNodes() == null) return;
                         for (Object node : nodeMapping.getSourceTreeNodes()) ((SourceTreeNode) node).setHighlighted();
                         RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
                         RecDefTreeNode recDefTreeNode = root.getRecDefTreeNode(nodeMapping.recDefNode);
