@@ -27,11 +27,11 @@ import eu.delving.metadata.*;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.StatsModel;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,18 +42,20 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import java.io.*;
 import java.util.BitSet;
+import java.util.Map;
 
 /**
- * Take the input and config informationm and produce an output xml file
+ * Take the input and config information and produce an output xml file
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
     public static final String OUTPUT_FILE_PREF = "outputFile";
-    private static final Logger LOG = Logger.getLogger(FileProcessor.class);
     private XmlSerializer serializer = new XmlSerializer();
-    private SipModel sipModel;
+    private Feedback feedback;
+    private DataSet dataSet;
+    private RecMapping recMapping;
     private Validator validator;
     private BitSet valid;
     private PrintWriter reportWriter;
@@ -66,6 +68,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private Stats stats;
     private File outputDirectory;
     private XmlOutput xmlOutput;
+    private int maxUniqueValueLength;
+    private int recordCount;
 
     public interface Listener {
         void mappingFailed(MappingException exception);
@@ -77,24 +81,23 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     public FileProcessor(
             SipModel sipModel,
+            int maxUniqueValueLength,
+            int recordCount,
             boolean allowInvalidRecords,
             File outputDirectory,
             GroovyCodeResource groovyCodeResource,
             Listener listener
     ) {
-        this.sipModel = sipModel;
+        sipModel.getMappingModel().setLocked(true);
+        this.maxUniqueValueLength = maxUniqueValueLength;
+        this.recordCount = recordCount;
+        this.feedback = sipModel.getFeedback();
+        this.dataSet = sipModel.getDataSetModel().getDataSet();
+        this.recMapping = sipModel.getMappingModel().getRecMapping();
         this.allowInvalid = allowInvalidRecords;
         this.outputDirectory = outputDirectory;
         this.groovyCodeResource = groovyCodeResource;
         this.listener = listener;
-
-//        feedback.say(String.format(
-//                "Processing mapping %s for data set %s, %s",
-//                mappingModel().getRecMapping().getPrefix(),
-//                dataSetModel.getDataSet().getSpec(),
-//                allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
-//        ));
-
     }
 
     @Override
@@ -104,12 +107,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     @Override
     public String getPrefix() {
-        return sipModel.getMappingModel().getPrefix(); // todo: should be stored
+        return recMapping.getPrefix();
     }
 
     @Override
     public DataSet getDataSet() {
-        return sipModel.getDataSetModel().getDataSet(); // todo: should be stored;
+        return dataSet;
     }
 
     @Override
@@ -117,30 +120,29 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.progressListener = progressListener;
         progressListener.setProgressMessage(String.format(
                 "Mapping raw data of '%s' into '%s' format, validating and gathering statistics",
-                getDataSet().getSpec(), sipModel.getMappingModel().getRecMapping().getPrefix()
+                dataSet.getSpec(), getPrefix()
         ));
     }
 
     @Override
     public void run() {
-        if (sipModel.getDataSetModel().isEmpty()) throw new RuntimeException("No data set selected");
-        valid = new BitSet(recordCount());
+        valid = new BitSet(recordCount);
         stats = createStats();
         MappingRunner mappingRunner;
         MetadataParser parser;
         try {
             validator = createValidator();
-            mappingRunner = new MappingRunner(groovyCodeResource, recMapping(), null);
-            parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount());
-            reportWriter = getDataSet().openReportWriter(recMapping());
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
+            parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
+            reportWriter = getDataSet().openReportWriter(recMapping);
             if (outputDirectory != null) xmlOutput = createXmlOutput();
         }
         catch (Exception e) {
-            sipModel.getFeedback().alert("Initialization of file processor failed", e);
+            feedback.alert("Initialization of file processor failed", e);
             return;
         }
         try {
-            progressListener.prepareFor(recordCount());
+            progressListener.prepareFor(recordCount);
             while (!aborted) {
                 MetadataRecord record = parser.nextRecord();
                 if (record == null) break;
@@ -153,7 +155,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 }
                 catch (DiscardRecordException e) {
                     invalidCount++;
-                    reportWriter.println("Discarded explicitly: "+e.getMessage());
+                    reportWriter.println("Discarded explicitly: " + e.getMessage());
                     reportWriter.println(XmlNodePrinter.toXml(record.getRootNode()));
                     reportWriter.println("=========");
                 }
@@ -171,7 +173,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             aborted = true;
         }
         catch (Exception e) {
-            sipModel.getFeedback().alert("File processing problem", e);
+            feedback.alert("File processing problem", e);
         }
         finally {
             finishReport();
@@ -181,7 +183,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 listener.finished(null, null, 0);
             }
             else {
-                listener.finished(aborted ? null : stats, aborted ? null : valid, recordCount());
+                listener.finished(aborted ? null : stats, aborted ? null : valid, recordCount);
             }
             if (!aborted) progressListener.finished(true);
         }
@@ -202,7 +204,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     private XmlOutput createXmlOutput() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
-        String fileName = String.format("%s-%s.xml", getDataSet().getSpec(), recMapping().getPrefix());
+        String fileName = String.format("%s-%s.xml", getDataSet().getSpec(), recMapping.getPrefix());
         File outputFile = new File(outputDirectory, fileName);
         OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
         return new XmlOutput(outputStream, recDef().getNamespacesMap());
@@ -213,34 +215,27 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     private RecDefTree recDefTree() {
-        return recMapping().getRecDefTree();
-    }
-
-    private RecMapping recMapping() {
-        if (!sipModel.getMappingModel().hasRecMapping()) throw new IllegalStateException("Must have record mapping");
-        return sipModel.getMappingModel().getRecMapping();
-    }
-
-    private int recordCount() {
-        return statsModel().getRecordCount();
-    }
-
-    private StatsModel statsModel() {
-        return sipModel.getStatsModel();
+        return recMapping.getRecDefTree();
     }
 
     private Validator createValidator() throws MetadataException {
-        Validator validator = sipModel.getDataSetModel().newValidator();
-        validator.setErrorHandler(null);
-        return validator;
+        try {
+            Validator validator = dataSet.newValidator(getPrefix());
+            validator.setErrorHandler(null);
+            return validator;
+        }
+        catch (StorageException e) {
+            throw new MetadataException("Unable to get validator", e);
+        }
     }
 
     private Stats createStats() {
         Stats stats = new Stats();
         stats.setRecordRoot(recDefTree().getRoot().getPath());
-        stats.prefix = recMapping().getPrefix();
-        stats.name = sipModel.getDataSetFacts().get("name");
-        stats.maxUniqueValueLength = statsModel().getMaxUniqueValueLength();
+        stats.prefix = recMapping.getPrefix();
+        Map<String,String> facts = dataSet.getDataSetFacts();
+        stats.name = facts.get("name");
+        stats.maxUniqueValueLength = maxUniqueValueLength;
         return stats;
     }
 

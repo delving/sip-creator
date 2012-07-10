@@ -513,6 +513,8 @@ public class SipModel {
             }
             exec(new FileProcessor(
                     this,
+                    statsModel.getMaxUniqueValueLength(),
+                    statsModel.getRecordCount(),
                     allowInvalidRecords,
                     outputDirectory,
                     groovyCodeResource,
@@ -543,7 +545,6 @@ public class SipModel {
                                 feedback.alert("Unable to store validation results", e);
                             }
                             reportFileModel.kick();
-                            mappingModel().setLocked(stats != null);
                             processing = false;
                         }
 
