@@ -66,6 +66,10 @@ public class WorkModel {
         });
     }
 
+    public boolean isEmpty() {
+        return jobContexts.isEmpty();
+    }
+
     public void exec(Work work) {
         switch (work.getJob().getKind()) {
             case SILENT:

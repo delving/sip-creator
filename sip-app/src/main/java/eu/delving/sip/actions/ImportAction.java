@@ -21,7 +21,6 @@
 
 package eu.delving.sip.actions;
 
-import eu.delving.sip.base.HarvestPool;
 import eu.delving.sip.base.Harvestor;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
@@ -59,9 +58,8 @@ public class ImportAction extends AbstractAction {
     private ChooseFileAction chooseFileAction = new ChooseFileAction();
     private HarvestAction harvestAction = new HarvestAction();
     private JFileChooser chooser = new JFileChooser("XML Metadata Source File");
-    private HarvestPool harvestPool;
 
-    public ImportAction(JDesktopPane parent, SipModel sipModel, HarvestPool harvestPool) {
+    public ImportAction(JDesktopPane parent, SipModel sipModel) {
         super("Import new data into this data set");
         putValue(Action.SMALL_ICON, SwingHelper.IMPORT_ICON);
         putValue(
@@ -70,7 +68,6 @@ public class ImportAction extends AbstractAction {
         );
         this.parent = parent;
         this.sipModel = sipModel;
-        this.harvestPool = harvestPool;
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Input Source", Dialog.ModalityType.APPLICATION_MODAL);
         setEnabled(false);
         prepareDialog();
@@ -209,20 +206,7 @@ public class ImportAction extends AbstractAction {
         }
 
         private void performHarvest(final String harvestUrl, final String harvestPrefix, final String harvestSpec) {
-
-            harvestPool.submit(new Harvestor(sipModel.getDataSetModel().getDataSet(), new Harvestor.Context() {
-
-                @Override
-                public File outputFile() {
-                    try {
-                        return sipModel.getDataSetModel().getDataSet().importedOutput();
-                    }
-                    catch (StorageException e) {
-                        e.printStackTrace();
-                        sipModel.getFeedback().alert(e.getMessage());
-                    }
-                    return null;
-                }
+            sipModel.exec(new Harvestor(sipModel.getDataSetModel().getDataSet(), new Harvestor.Context() {
 
                 @Override
                 public String harvestUrl() {

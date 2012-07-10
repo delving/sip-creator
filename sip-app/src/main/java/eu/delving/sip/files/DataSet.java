@@ -73,7 +73,7 @@ public interface DataSet {
 
     void deleteAllValidations() throws StorageException;
 
-    File importedOutput() throws StorageException;
+    File importedOutput();
 
     InputStream openImportedInputStream() throws StorageException;
 

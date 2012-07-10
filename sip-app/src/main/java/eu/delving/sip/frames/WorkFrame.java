@@ -46,10 +46,10 @@ public class WorkFrame extends FrameBase {
 
     public WorkFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.WORK, desktop, sipModel, "Work");
-        this.miniList = new JList(sipModel.getJobListModel());
+        this.miniList = new JList(sipModel.getWorkModel().getListModel());
         this.miniList.setFont(TINY);
         this.miniList.setCellRenderer(new MiniCellRenderer());
-        this.fullList = new JList(sipModel.getJobListModel());
+        this.fullList = new JList(sipModel.getWorkModel().getListModel());
         this.fullList.setFont(MONOSPACED);
         this.fullList.setCellRenderer(new JobContextCellRenderer());
         getAction().putValue(

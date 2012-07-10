@@ -69,7 +69,6 @@ public class Application {
     private OAuthClient oauthClient;
     private AllFrames allFrames;
     private VisualFeedback feedback;
-    private HarvestPool harvestPool;
     private StatusPanel statusPanel;
     private HelpPanel helpPanel;
     private Timer resizeTimer;
@@ -109,7 +108,6 @@ public class Application {
         sipModel = new SipModel(storage, groovyCodeResource, feedback, instance);
         expertMenu = new ExpertMenu(sipModel);
         statusPanel = new StatusPanel(sipModel);
-        harvestPool = new HarvestPool(sipModel);
         home = new JFrame("Delving SIP Creator");
         home.addComponentListener(new ComponentAdapter() {
             @Override
@@ -150,7 +148,7 @@ public class Application {
             }
         });
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
-        importAction = new ImportAction(desktop, sipModel, harvestPool);
+        importAction = new ImportAction(desktop, sipModel);
         validateAction = new ValidateAction(desktop, sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
         deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
@@ -212,10 +210,10 @@ public class Application {
     }
 
     private boolean quit() {
-        if (harvestPool.getSize() > 0) {
+        if (!sipModel.getWorkModel().isEmpty()) {
             boolean exitAnyway = feedback.confirm(
-                    "Active harvests",
-                    String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize())
+                    "Busy",
+                    "There are jobs busy, are you sure you want to exit?"
             );
             if (exitAnyway) return false;
         }

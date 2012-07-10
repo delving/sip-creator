@@ -274,7 +274,7 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public File importedOutput() throws StorageException {
+        public File importedOutput() {
             return importedFile(here);
         }
 

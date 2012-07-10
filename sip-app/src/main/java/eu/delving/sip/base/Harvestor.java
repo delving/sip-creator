@@ -82,8 +82,6 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
 
     public interface Context {
 
-        File outputFile();
-
         String harvestUrl();
 
         String harvestPrefix();
@@ -308,7 +306,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
 
     private boolean prepareOutput() {
         try {
-            tempFile = File.createTempFile(context.outputFile().getName(), ".tmp");
+            tempFile = File.createTempFile("sip-creator-harvest", ".tmp");
             log.info(String.format("Opening temporary output file '%s'", tempFile));
             outputStream = new GZIPOutputStream(new FileOutputStream(tempFile));
             out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
@@ -344,9 +342,9 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
 //            listener.finished(true);
             return;
         }
-        String message = String.format("Copying temp file %s to %s", tempFile, context.outputFile());
+        File outputFile = dataSet.importedOutput();
+        String message = String.format("Moving temp file %s to %s", tempFile, outputFile);
         log.info(message);
-        File outputFile = context.outputFile();
         FileUtils.deleteQuietly(outputFile);
         FileUtils.moveFile(tempFile, outputFile);
 //        listener.finished(false);

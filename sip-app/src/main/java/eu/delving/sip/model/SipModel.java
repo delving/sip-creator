@@ -196,8 +196,8 @@ public class SipModel {
         parseListeners.add(parseListener);
     }
 
-    public ListModel getJobListModel() {
-        return workModel.getListModel();
+    public WorkModel getWorkModel() {
+        return workModel;
     }
 
     public Preferences getPreferences() {
