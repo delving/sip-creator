@@ -177,7 +177,6 @@ public class SipModel {
     private void clearValidation() {
         try {
             dataSetModel.deleteValidation();
-            feedback.say("Validation cleared for this mappings");
         }
         catch (StorageException e) {
             LOG.warn(String.format("Error while deleting validation file %s", e));
@@ -187,7 +186,6 @@ public class SipModel {
     private void clearValidations() {
         try {
             dataSetModel.getDataSet().deleteAllValidations();
-            feedback.say("Validation cleared for all mappings");
         }
         catch (StorageException e) {
             LOG.warn(String.format("Error while deleting validation files %s", e));
@@ -296,7 +294,6 @@ public class SipModel {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setTitle("Loading Dataset");
             progressListener.setIndeterminateMessage(String.format("Preparing dataset %s for mapping %s", dataSet.getSpec(), prefix));
         }
 
@@ -313,7 +310,6 @@ public class SipModel {
                 mappingHintsModel.initialize(prefixToUse, dataSetModel);
                 dataSetModel.getMappingModel().setFacts(facts);
                 recordCompileModel.setValidator(dataSetModel.newValidator());
-                feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), dataSetModel.getPrefix()));
                 exec(new Swing() {
                     @Override
                     public void run() {
@@ -351,12 +347,11 @@ public class SipModel {
 
     public void importSource(final File file, Swing finished) {
         if (importing) {
-            feedback.say("Busy importing");
+            feedback.alert("Busy importing");
         }
         else {
             importing = true;
             clearValidations();
-            feedback.say("Importing metadata from " + file.getAbsolutePath());
             exec(new SourceImporter(file, dataSetModel.getDataSet(), finished));
         }
     }
@@ -388,7 +383,6 @@ public class SipModel {
             try {
                 dataSet.externalToImported(file, progressListener);
                 Swing.Exec.later(finished);
-                feedback.say("Finished importing metadata");
                 importing = false;
             }
             catch (StorageException e) {
@@ -399,18 +393,16 @@ public class SipModel {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setTitle("Importing");
             progressListener.setProgressMessage(String.format("Storing data for %s", dataSet.getSpec()));
         }
     }
 
     public void analyzeFields() {
         if (analyzing) {
-            feedback.say("Busy analyzing");
+            feedback.alert("Busy analyzing");
         }
         else {
             analyzing = true;
-            feedback.say("Analyzing data from " + dataSetModel.getDataSet().getSpec());
             exec(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
                 @Override
                 public void success(final Stats stats) {
@@ -429,7 +421,6 @@ public class SipModel {
                                 }
                             }
                         });
-                        feedback.say("Import analyzed");
                     }
                     catch (StorageException e) {
                         feedback.alert("Problem storing statistics", e);
@@ -445,9 +436,6 @@ public class SipModel {
                     if (exception != null) {
                         feedback.alert(message, exception);
                     }
-                    else {
-                        feedback.say("Analysis aborted");
-                    }
                 }
             }));
         }
@@ -456,11 +444,10 @@ public class SipModel {
     public void convertSource() {
         clearValidations();
         if (converting) {
-            feedback.say("Busy converting to source for " + dataSetModel.getDataSet().getSpec());
+            feedback.alert("Busy converting to source for " + dataSetModel.getDataSet().getSpec());
         }
         else {
             converting = true;
-            feedback.say("Converting to source for " + dataSetModel.getDataSet().getSpec());
             exec(new ConversionRunner(dataSetModel.getDataSet()));
         }
     }
@@ -493,7 +480,6 @@ public class SipModel {
                         seekFirstRecord();
                     }
                 });
-                feedback.say("Source conversion complete");
             }
             catch (StorageException e) {
                 feedback.alert("Conversion failed: " + e.getMessage(), e);
@@ -506,9 +492,8 @@ public class SipModel {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setTitle("Converting");
             progressListener.setProgressMessage(String.format(
-                    "<html><h3>Converting source data of '%s' to standard form</h3>",
+                    "Converting source data of '%s' to standard form",
                     dataSet.getSpec()
             ));
         }
@@ -516,16 +501,10 @@ public class SipModel {
 
     public void processFile(boolean allowInvalidRecords, final ValidationListener validationListener, final Swing finished) {
         if (processing) {
-            feedback.say("Busy processing");
+            feedback.alert("Busy processing");
         }
         else {
             processing = true;
-            feedback.say(String.format(
-                    "Processing mapping %s for data set %s, %s",
-                    mappingModel().getRecMapping().getPrefix(),
-                    dataSetModel.getDataSet().getSpec(),
-                    allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
-            ));
             File outputDirectory = null;
             String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
             if (!directoryString.isEmpty()) {
@@ -564,7 +543,6 @@ public class SipModel {
                                 feedback.alert("Unable to store validation results", e);
                             }
                             reportFileModel.kick();
-                            feedback.say("Processing complete, report and statistics available");
                             mappingModel().setLocked(stats != null);
                             processing = false;
                         }
@@ -682,7 +660,6 @@ public class SipModel {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setTitle("Scanning");
             progressListener.setProgressMessage("Scanning input records");
         }
     }

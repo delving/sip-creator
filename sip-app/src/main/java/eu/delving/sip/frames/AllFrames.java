@@ -56,6 +56,7 @@ public class AllFrames {
     private FunctionFrame functionFrame;
     private MappingCodeFrame mappingCodeFrame;
     private StatsFrame statsFrame;
+    private WorkFrame workFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
@@ -74,6 +75,7 @@ public class AllFrames {
         functionFrame = new FunctionFrame(desktop, sipModel);
         mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
         statsFrame = new StatsFrame(desktop, sipModel);
+        workFrame = new WorkFrame(desktop, sipModel);
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
         FrameBase source = new SourceFrame(desktop, sipModel);
@@ -182,6 +184,7 @@ public class AllFrames {
         menu.add(statsFrame.getAction());
         menu.add(functionFrame.getAction());
         menu.add(mappingCodeFrame.getAction());
+        menu.add(workFrame.getAction());
         return menu;
     }
 
@@ -210,10 +213,12 @@ public class AllFrames {
     }
 
     public JPanel getBigWindowsPanel() {
-        JPanel p = new JPanel(new GridLayout(0, 1));
+        JPanel p = new JPanel(new GridLayout(1, 0));
+        p.setBorder(BorderFactory.createTitledBorder("Global Frames"));
         p.add(createHotkeyButton(statsFrame));
         p.add(createHotkeyButton(functionFrame));
         p.add(createHotkeyButton(mappingCodeFrame));
+        p.add(createHotkeyButton(workFrame));
         return p;
     }
 
@@ -248,7 +253,6 @@ public class AllFrames {
         for (Arrangement arrangement : arrangements) {
             if (arrangement.toString().equals(viewName)) {
                 arrangement.actionPerformed(null);
-                sipModel.getFeedback().say(String.format("Selecting view %s", arrangement));
                 return;
             }
         }

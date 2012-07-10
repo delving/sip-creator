@@ -30,7 +30,6 @@ import eu.delving.sip.actions.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
-import eu.delving.sip.frames.HarvestDialog;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
@@ -46,8 +45,6 @@ import org.apache.commons.lang.StringUtils;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -72,7 +69,6 @@ public class Application {
     private OAuthClient oauthClient;
     private AllFrames allFrames;
     private VisualFeedback feedback;
-    private HarvestDialog harvestDialog;
     private HarvestPool harvestPool;
     private StatusPanel statusPanel;
     private HelpPanel helpPanel;
@@ -114,9 +110,6 @@ public class Application {
         expertMenu = new ExpertMenu(sipModel);
         statusPanel = new StatusPanel(sipModel);
         harvestPool = new HarvestPool(sipModel);
-        harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
-        feedback.setSipModel(sipModel);
-        feedback.say("SIP-Creator started");
         home = new JFrame("Delving SIP Creator");
         home.addComponentListener(new ComponentAdapter() {
             @Override
@@ -216,22 +209,6 @@ public class Application {
                 }
             }
         });
-        harvestPool.addListDataListener(new ListDataListener() {
-            @Override
-            public void intervalAdded(ListDataEvent listDataEvent) {
-                refreshToggleButton();
-            }
-
-            @Override
-            public void intervalRemoved(ListDataEvent listDataEvent) {
-                refreshToggleButton();
-            }
-
-            @Override
-            public void contentsChanged(ListDataEvent listDataEvent) {
-                refreshToggleButton();
-            }
-        });
     }
 
     private boolean quit() {
@@ -247,12 +224,7 @@ public class Application {
     }
 
     private JPanel createStatePanel() {
-        refreshToggleButton();
-        JPanel right = new JPanel(new BorderLayout(6, 6));
-        right.add(allFrames.getBigWindowsPanel(), BorderLayout.WEST);
-        right.add(feedback.getToggle(), BorderLayout.CENTER);
-        right.add(new JButton(harvestDialog.getAction()), BorderLayout.EAST);
-        JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
+        JPanel p = new JPanel(new BorderLayout(10,10));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
@@ -266,14 +238,10 @@ public class Application {
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
         statusPanel.setReaction(DataSetState.VALIDATED, uploadAction);
-        p.add(statusPanel);
-        p.add(right);
+        p.add(statusPanel, BorderLayout.CENTER);
+        p.add(allFrames.getBigWindowsPanel(), BorderLayout.EAST);
         p.setPreferredSize(new Dimension(80, 80));
         return p;
-    }
-
-    private void refreshToggleButton() {
-        harvestDialog.getAction().putValue(Action.NAME, String.format("%d harvests", harvestPool.getSize()));
     }
 
     private JMenuBar createMenuBar() {

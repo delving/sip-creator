@@ -275,7 +275,6 @@ public class MappingCompileModel {
             compiling = true;
             try {
                 if (mappingRunner == null) {
-                    feedback.say("Compiling " + type);
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath);
                     notifyCodeCompiled(mappingRunner.getCode());
                 }

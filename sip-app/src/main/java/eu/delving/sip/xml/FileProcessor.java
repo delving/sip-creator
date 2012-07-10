@@ -87,6 +87,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.outputDirectory = outputDirectory;
         this.groovyCodeResource = groovyCodeResource;
         this.listener = listener;
+
+//        feedback.say(String.format(
+//                "Processing mapping %s for data set %s, %s",
+//                mappingModel().getRecMapping().getPrefix(),
+//                dataSetModel.getDataSet().getSpec(),
+//                allowInvalidRecords ? "allowing invalid records" : "expecting valid records"
+//        ));
+
     }
 
     @Override
@@ -107,9 +115,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     @Override
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
-        progressListener.setTitle("Validating and Analyzing");
         progressListener.setProgressMessage(String.format(
-                "<html><h3>Mapping raw data of '%s' into '%s' format, validating and gathering statistics</h3>",
+                "Mapping raw data of '%s' into '%s' format, validating and gathering statistics",
                 getDataSet().getSpec(), sipModel.getMappingModel().getRecMapping().getPrefix()
         ));
     }
@@ -161,7 +168,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
         }
         catch (MetadataParser.AbortException e) {
-            sipModel.getFeedback().say("File processing aborted");
             aborted = true;
         }
         catch (Exception e) {
@@ -175,7 +181,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 listener.finished(null, null, 0);
             }
             else {
-                sipModel.getFeedback().say("Finished validating");
                 listener.finished(aborted ? null : stats, aborted ? null : valid, recordCount());
             }
             if (!aborted) progressListener.finished(true);

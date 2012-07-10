@@ -29,8 +29,6 @@ package eu.delving.sip.model;
 
 public interface Feedback {
 
-    void say(String message);
-
     void alert(String message);
 
     void alert(String message, Exception exception);

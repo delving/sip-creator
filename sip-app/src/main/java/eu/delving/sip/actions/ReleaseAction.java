@@ -74,7 +74,6 @@ public class ReleaseAction extends AbstractAction {
             @Override
             public void unlockComplete(boolean successful) {
                 if (successful) {
-                    sipModel.getFeedback().say(String.format("Unlocked %s and removed it locally", dataSet));
                     try {
                         sipModel.exec(new Swing() {
                             @Override

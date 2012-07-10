@@ -29,8 +29,6 @@ package eu.delving.sip.base;
 
 public interface ProgressListener {
 
-    void setTitle(String title);
-
     void setProgressMessage(String message);
 
     void setIndeterminateMessage(String message);

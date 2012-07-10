@@ -117,7 +117,6 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     @Override
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
-        progressListener.setTitle("Harvesting");
         progressListener.setProgressMessage(String.format("Harvesting data for data set %s", dataSet.getSpec()));
     }
 

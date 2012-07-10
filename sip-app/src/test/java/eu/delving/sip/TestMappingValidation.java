@@ -220,11 +220,6 @@ public class TestMappingValidation {
     private ProgressListener progressListener() {
         return new ProgressListener() {
             @Override
-            public void setTitle(String title) {
-                System.out.println("title = "+title);
-            }
-
-            @Override
             public void setProgressMessage(String message) {
                 System.out.println("message = "+message);
             }

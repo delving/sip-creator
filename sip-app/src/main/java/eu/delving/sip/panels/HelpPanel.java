@@ -85,20 +85,13 @@ public class HelpPanel extends HtmlPanel {
                 }
             }
             catch (Exception e) {
-                sipModel.getFeedback().say("Unable to fetch help page via https");
                 final String page = getHelpHtml();
-                if (page == null) {
-                    sipModel.getFeedback().say("Unable to fetch help page from workspace");
-                }
-                else {
-                    sipModel.exec(new Swing() {
-                        @Override
-                        public void run() {
-                            setHtml("<html>" + page);
-                        }
-                    });
-                    sipModel.getFeedback().say("Fetched help page from workspace");
-                }
+                sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        setHtml(page == null ? "<html>Unable to fetch" : "<html>" + page);
+                    }
+                });
             }
         }
 

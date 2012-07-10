@@ -81,9 +81,8 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
     @Override
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
-        progressListener.setTitle("Analyzing");
         progressListener.setProgressMessage(String.format(
-                "<html><h3>Analyzing data of '%s'</h3>",
+                "Analyzing data of '%s'",
                 dataSetModel.getDataSet().getSpec()
         ));
     }

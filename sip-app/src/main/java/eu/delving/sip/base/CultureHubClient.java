@@ -122,7 +122,6 @@ public class CultureHubClient {
                 InetSocketAddress addr = (InetSocketAddress) proxy.address();
                 String host = addr.getHostName();
                 int port = addr.getPort();
-                context.getFeedback().say(String.format("An HTTP Proxy is detected. %s:%d", host, port));
                 HttpHost httpHost = new HttpHost(host, port);
                 ConnRouteParams.setDefaultProxy(httpParams, httpHost);
                 proxyDetected = true;
@@ -130,9 +129,6 @@ public class CultureHubClient {
         }
         catch (URISyntaxException e) {
             throw new RuntimeException("Bad address: " + context.getServerUrl(), e);
-        }
-        if (!proxyDetected) {
-            context.getFeedback().say("No HTTP Proxy detected");
         }
         httpClient = new DefaultHttpClient(httpParams);
     }
@@ -205,7 +201,6 @@ public class CultureHubClient {
             try {
                 String url = createListRequest();
                 log.info("requesting list: " + url);
-                say("Requesting data set list from culture hub");
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
@@ -215,7 +210,6 @@ public class CultureHubClient {
                     switch (code) {
                         case OK:
                             DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
-                            say("List received");
                             listReceiveListener.listReceived(dataSetList.list);
                             break;
                         case UNAUTHORIZED:
@@ -271,7 +265,6 @@ public class CultureHubClient {
         public void run() {
             try {
                 HttpGet get = createUnlockRequest(dataSet);
-                say("Unlocking data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 EntityUtils.consume(response.getEntity());
                 Code code = Code.from(response);
@@ -329,7 +322,6 @@ public class CultureHubClient {
             boolean success = false;
             try {
                 HttpGet get = createDownloadRequest(dataSet);
-                say("Downloading SIP for data set " + dataSet.getSpec());
                 progressListener.prepareFor(-1);
                 HttpResponse response = httpClient.execute(get);
                 HttpEntity entity = response.getEntity();
@@ -340,7 +332,6 @@ public class CultureHubClient {
                             dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
                             success = true;
                             context.dataSetCreated(dataSet);
-                            say(String.format("Local data set %s created in workspace", dataSet.getSpec()));
                             break;
                         case UNAUTHORIZED:
                             if (reactToUnauthorized(new DataSetDownloader(attempt + 1, dataSet, finished))) {
@@ -395,9 +386,8 @@ public class CultureHubClient {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setTitle("Download");
-            progressListener.setProgressMessage(String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", dataSet.getSpec()));
-            progressListener.setIndeterminateMessage(String.format("<html><h3>Culture hub is preparing '%s' for download.</h3>.", dataSet.getSpec()));
+            progressListener.setProgressMessage(String.format("Downloading the data of '%s' from the culture hub.", dataSet.getSpec()));
+            progressListener.setIndeterminateMessage(String.format("Culture hub is preparing '%s' for download.", dataSet.getSpec()));
         }
     }
 
@@ -494,13 +484,12 @@ public class CultureHubClient {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setTitle("Uploading");
             progressListener.setProgressMessage(String.format(
-                    "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
+                    "Uploading the data of '%s' to the culture hub",
                     dataSet.getSpec()
             ));
             progressListener.setIndeterminateMessage(String.format(
-                    "<html><h3>Culture hub is processing '%s' metadata</h3>",
+                    "Culture hub is processing '%s' metadata",
                     dataSet.getSpec()
             ));
         }
@@ -538,10 +527,6 @@ public class CultureHubClient {
         else {
             throw new RuntimeException("Cannot determine content type of " + file.getAbsolutePath());
         }
-    }
-
-    private void say(String message) {
-        context.getFeedback().say(message);
     }
 
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {

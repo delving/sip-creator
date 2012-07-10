@@ -146,7 +146,7 @@ public class WorkModel {
             if (!snapshot.isEmpty()) {
                 int size = getSize();
                 snapshot.clear();
-                fireIntervalRemoved(this, 0, size - 1);
+                fireIntervalRemoved(this, 0, size);
             }
             for (JobContext context : jobContexts) {
                 if (context.isDone()) {
@@ -158,12 +158,12 @@ public class WorkModel {
             }
             if (!snapshot.isEmpty()) {
                 Collections.sort(snapshot);
-                fireIntervalAdded(this, 0, snapshot.size() - 1);
+                fireIntervalAdded(this, 0, snapshot.size());
             }
         }
     }
 
-    private class JobContext implements Comparable<JobContext> {
+    public class JobContext implements Comparable<JobContext> {
         private Date start;
         private Future<?> future;
         private Queue<Work> queue = new ConcurrentLinkedQueue<Work>();
@@ -216,6 +216,10 @@ public class WorkModel {
             }
         }
 
+        public String getProgress() {
+            return progress == null ? null : progress.toString();
+        }
+
         public void add(Work work) {
             queue.add(work);
         }
@@ -229,7 +233,7 @@ public class WorkModel {
             this.future = executor.submit(work());
             this.start = new Date();
             if (work() instanceof Work.LongTermWork) {
-                ((Work.LongTermWork) work()).setProgressListener(progress = new SimpleProgress(this));
+                ((Work.LongTermWork) work()).setProgressListener(progress = new SimpleProgress());
             }
             else {
                 progress = null;
@@ -254,24 +258,14 @@ public class WorkModel {
 
         @Override
         public String toString() {
-            return getStart() + job().toString();
+            return (isEmpty() ? "empty" : job().toString()) + start.toString();
         }
     }
 
     private static class SimpleProgress implements ProgressListener {
-        private JobContext jobContext;
-        private String title, progressMessage, indeterminateMessage;
+        private String progressMessage, indeterminateMessage;
         private int current, maximum;
         private boolean finished, success;
-
-        private SimpleProgress(JobContext jobContext) {
-            this.jobContext = jobContext;
-        }
-
-        @Override
-        public void setTitle(String title) {
-            this.title = title;
-        }
 
         @Override
         public void setProgressMessage(String message) {
@@ -302,10 +296,14 @@ public class WorkModel {
 
         @Override
         public String toString() {
-            return String.format(
-                    "%s(%s): %s %d",
-                    jobContext.job().toString(), title, progressMessage, current
-            );
+            String message = progressMessage;
+            if (indeterminateMessage != null && current == 0) message = indeterminateMessage;
+            if (maximum == 0) {
+                return String.format("%d : %s", current, message);
+            }
+            else {
+                return String.format("%d/%d : %s", current, maximum, message);
+            }
         }
     }
 }
