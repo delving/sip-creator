@@ -33,6 +33,8 @@ import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -196,21 +198,45 @@ public class AllFrames {
         return menu;
     }
 
-    public JPanel getArrangementsPanel() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBorder(BorderFactory.createTitledBorder("Arrangements"));
-        for (Arrangement a : arrangements) {
+    public JPanel getSidePanel() {
+        JPanel arrangements = new JPanel();
+        arrangements.setLayout(new BoxLayout(arrangements, BoxLayout.Y_AXIS));
+        arrangements.setBorder(BorderFactory.createTitledBorder("Arrangements"));
+        for (Arrangement a : this.arrangements) {
             JButton b = new JButton(a);
             b.setHorizontalTextPosition(JButton.CENTER);
             b.setVerticalTextPosition(JButton.BOTTOM);
             b.setFont(new Font("Sans", Font.ITALIC, 10));
-            p.add(b);
-            p.add(Box.createVerticalStrut(5));
+            arrangements.add(b);
+            arrangements.add(Box.createVerticalStrut(5));
         }
-        p.add(Box.createVerticalGlue());
+        arrangements.add(Box.createVerticalGlue());
+        JPanel work = new JPanel(new BorderLayout());
+        work.add(miniScrollV("Work", workFrame.getMiniList()));
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(arrangements, BorderLayout.CENTER);
+        p.add(work, BorderLayout.SOUTH);
+        p.setPreferredSize(new Dimension(110, 400));
+        workFrame.getMiniList().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() || workFrame.getMiniList().isSelectionEmpty()) return;
+                workFrame.getAction().actionPerformed(null);
+            }
+        });
         return p;
     }
+
+    public static JComponent miniScrollV(String title, JComponent content) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder(title));
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        p.add(scroll);
+        return p;
+    }
+
 
     public JPanel getBigWindowsPanel() {
         JPanel p = new JPanel(new GridLayout(1, 0));
@@ -218,7 +244,6 @@ public class AllFrames {
         p.add(createHotkeyButton(statsFrame));
         p.add(createHotkeyButton(functionFrame));
         p.add(createHotkeyButton(mappingCodeFrame));
-        p.add(createHotkeyButton(workFrame));
         return p;
     }
 
@@ -382,7 +407,6 @@ public class AllFrames {
         public EditAction() {
             super("Edit Frame Arrangements");
         }
-
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {

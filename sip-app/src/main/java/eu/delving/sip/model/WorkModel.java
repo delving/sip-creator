@@ -216,8 +216,12 @@ public class WorkModel {
             }
         }
 
-        public String getProgress() {
-            return progress == null ? null : progress.toString();
+        public String getFullProgress() {
+            return progress == null ? null : progress.toFullString();
+        }
+
+        public String getMiniProgress() {
+            return progress == null ? " - " : progress.toString();
         }
 
         public void add(Work work) {
@@ -294,8 +298,7 @@ public class WorkModel {
             this.success = success;
         }
 
-        @Override
-        public String toString() {
+        public String toFullString() {
             String message = progressMessage;
             if (indeterminateMessage != null && current == 0) message = indeterminateMessage;
             if (maximum == 0) {
@@ -305,5 +308,16 @@ public class WorkModel {
                 return String.format("%d/%d : %s", current, maximum, message);
             }
         }
+
+        @Override
+        public String toString() {
+            if (maximum == 0) {
+                return String.format("%d", current);
+            }
+            else {
+                return String.format("%d/%d", current, maximum);
+            }
+        }
+
     }
 }

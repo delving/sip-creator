@@ -41,22 +41,30 @@ import java.text.SimpleDateFormat;
 public class WorkFrame extends FrameBase {
     private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("hh:mm:ss");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
-    private JList list;
+    private static final Font TINY = new Font("Serif", Font.PLAIN, 10);
+    private JList fullList, miniList;
 
     public WorkFrame(JDesktopPane desktop, SipModel sipModel) {
         super(Which.WORK, desktop, sipModel, "Work");
-        this.list = new JList(sipModel.getJobListModel());
-        this.list.setFont(MONOSPACED);
-        this.list.setCellRenderer(new JobContextCellRenderer());
+        this.miniList = new JList(sipModel.getJobListModel());
+        this.miniList.setFont(TINY);
+        this.miniList.setCellRenderer(new MiniCellRenderer());
+        this.fullList = new JList(sipModel.getJobListModel());
+        this.fullList.setFont(MONOSPACED);
+        this.fullList.setCellRenderer(new JobContextCellRenderer());
         getAction().putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
         );
     }
 
+    public JList getMiniList() {
+        return miniList;
+    }
+
     @Override
     protected void buildContent(Container content) {
-        content.add(SwingHelper.scrollV("Work happening in the background", list), BorderLayout.CENTER);
+        content.add(SwingHelper.scrollV("Work happening in the background", fullList), BorderLayout.CENTER);
     }
 
     private class JobContextCellRenderer extends DefaultListCellRenderer {
@@ -70,11 +78,22 @@ public class WorkFrame extends FrameBase {
             if (dataSetSpec != null) {
                 show += String.format(" (%s)", dataSetSpec);
             }
-            String progress = jobContext.getProgress();
+            String progress = jobContext.getFullProgress();
             if (progress != null) {
                 show += String.format(" - %s", progress);
             }
             return super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
+        }
+    }
+
+    private class MiniCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            WorkModel.JobContext jobContext = (WorkModel.JobContext) value;
+            String progress = jobContext.getMiniProgress();
+            Component component = super.getListCellRendererComponent(list, progress, index, isSelected, cellHasFocus);
+            component.setBackground(Color.GREEN);
+            return component;
         }
     }
 }

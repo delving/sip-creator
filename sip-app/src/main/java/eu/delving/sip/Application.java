@@ -155,7 +155,7 @@ public class Application {
         uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
         deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
-        home.getContentPane().add(allFrames.getArrangementsPanel(), BorderLayout.WEST);
+        home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         screen.height -= 30;
         home.setSize(screen);
