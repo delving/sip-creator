@@ -77,15 +77,10 @@ public class SipModel {
     private volatile boolean converting, processing, analyzing, importing;
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
 
-    public interface AnalysisListener {
-        boolean analysisProgress(long elementCount);
-
-        void analysisComplete();
-    }
-
     public interface ValidationListener {
 
         void failed(int recordNumber, String record, String message);
+
     }
 
     public interface ParseListener {
@@ -97,7 +92,7 @@ public class SipModel {
     }
 
     public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, String instance) throws StorageException {
-        this.preferences  = Preferences.userNodeForPackage(getClass()).node(instance);
+        this.preferences = Preferences.userNodeForPackage(getClass()).node(instance);
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
@@ -267,66 +262,94 @@ public class SipModel {
         return fieldCompileModel;
     }
 
-    public interface DataSetCompletion {
-        void complete(boolean success);
+    public void setDataSetPrefix(DataSet dataSet, String prefix, Swing success) {
+        exec(new DataSetPrefixLoader(dataSet, prefix, success));
     }
 
-    public void setDataSetPrefix(final DataSet dataSet, final String requestedPrefix, final DataSetCompletion completion) {
-        exec(new Work() {
-            @Override
-            public void run() {
-                try {
-                    final Stats stats = dataSet.getLatestStats();
-                    final Map<String, String> facts = dataSet.getDataSetFacts();
-                    final Map<String, String> hints = dataSet.getHints();
-                    final String prefix = requestedPrefix.isEmpty() ? dataSet.getLatestPrefix() : requestedPrefix;
-                    dataSetModel.setDataSet(dataSet, prefix);
-                    final RecMapping recMapping = dataSetModel.getRecMapping();
-                    dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-                    mappingHintsModel.initialize(requestedPrefix, dataSetModel);
-                    dataSetModel.getMappingModel().setFacts(facts);
-                    recordCompileModel.setValidator(dataSetModel.newValidator());
-                    feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), dataSetModel.getPrefix()));
-                    exec(new Swing() {
-                        @Override
-                        public void run() {
-                            dataSetFacts.set(facts);
-                            statsModel.set(hints);
-                            statsModel.setStatistics(stats);
-                            exec(new Work() {
-                                @Override
-                                public void run() {
-                                    mappingHintsModel.setSourceTree(statsModel.getSourceTree());
-                                    for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
-                                        statsModel.findNodesForInputPaths(nodeMapping);
-                                    }
-                                }
+    private class DataSetPrefixLoader implements Work.DataSetPrefixWork, Work.LongTermWork {
+        private DataSet dataSet;
+        private String prefix;
+        private ProgressListener progressListener;
+        private Swing success;
 
-                                @Override
-                                public Job getJob() {
-                                    return Job.SET_MAPPING_HINTS_FIND_NODES;
-                                }
-                            });
-                            seekFirstRecord();
-                        }
-                    });
-                    completion.complete(true);
-                }
-                catch (Exception e) {
-                    completion.complete(false);
-                    feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);
-                    dataSetModel.clearDataSet();
-                }
-            }
+        private DataSetPrefixLoader(DataSet dataSet, String prefix, Swing success) {
+            this.dataSet = dataSet;
+            this.prefix = prefix;
+            this.success = success;
+        }
 
-            @Override
-            public Job getJob() {
-                return Job.SET_DATASET_PREFIX;
+        @Override
+        public Job getJob() {
+            return Job.SET_DATASET_PREFIX;
+        }
+
+        @Override
+        public String getPrefix() {
+            return prefix;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setTitle("Loading Dataset");
+            progressListener.setIndeterminateMessage(String.format("Preparing dataset %s for mapping %s", dataSet.getSpec(), prefix));
+        }
+
+        @Override
+        public void run() {
+            try {
+                final Stats stats = dataSet.getLatestStats();
+                final Map<String, String> facts = dataSet.getDataSetFacts();
+                final Map<String, String> hints = dataSet.getHints();
+                final String prefixToUse = prefix.isEmpty() ? dataSet.getLatestPrefix() : prefix;
+                dataSetModel.setDataSet(dataSet, prefixToUse);
+                final RecMapping recMapping = dataSetModel.getRecMapping();
+                dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
+                mappingHintsModel.initialize(prefixToUse, dataSetModel);
+                dataSetModel.getMappingModel().setFacts(facts);
+                recordCompileModel.setValidator(dataSetModel.newValidator());
+                feedback.say(String.format("Loaded dataset '%s' and '%s' mapping", dataSet.getSpec(), dataSetModel.getPrefix()));
+                exec(new Swing() {
+                    @Override
+                    public void run() {
+                        dataSetFacts.set(facts);
+                        statsModel.set(hints);
+                        statsModel.setStatistics(stats);
+                        exec(new Work() {
+                            @Override
+                            public void run() {
+                                mappingHintsModel.setSourceTree(statsModel.getSourceTree());
+                                for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
+                                    statsModel.findNodesForInputPaths(nodeMapping);
+                                }
+                            }
+
+                            @Override
+                            public Job getJob() {
+                                return Job.SET_MAPPING_HINTS_FIND_NODES;
+                            }
+                        });
+                        seekFirstRecord();
+                    }
+                });
+                progressListener.finished(true);
+                Swing.Exec.later(success);
             }
-        });
+            catch (Exception e) {
+                progressListener.finished(false);
+                feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);
+                dataSetModel.clearDataSet();
+            }
+        }
+
     }
 
-    public void importSource(final File file, final ProgressListener progressListener) {
+    public void importSource(final File file, Swing finished) {
         if (importing) {
             feedback.say("Busy importing");
         }
@@ -334,28 +357,54 @@ public class SipModel {
             importing = true;
             clearValidations();
             feedback.say("Importing metadata from " + file.getAbsolutePath());
-            exec(new Work() {
-                @Override
-                public void run() {
-                    try {
-                        dataSetModel.getDataSet().externalToImported(file, progressListener);
-                        feedback.say("Finished importing metadata");
-                        importing = false;
-                    }
-                    catch (StorageException e) {
-                        feedback.alert(String.format("Couldn't create Data Set from %s: %s", file.getAbsolutePath(), e.getMessage()), e);
-                    }
-                }
-
-                @Override
-                public Job getJob() {
-                    return Job.IMPORT_SOURCE;
-                }
-            });
+            exec(new SourceImporter(file, dataSetModel.getDataSet(), finished));
         }
     }
 
-    public void analyzeFields(final AnalysisListener listener) {
+    private class SourceImporter implements Work.DataSetWork, Work.LongTermWork {
+        private File file;
+        private DataSet dataSet;
+        private ProgressListener progressListener;
+        private Swing finished;
+
+        private SourceImporter(File file, DataSet dataSet, Swing finished) {
+            this.file = file;
+            this.dataSet = dataSet;
+            this.finished = finished;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.IMPORT_SOURCE;
+        }
+
+        @Override
+        public void run() {
+            try {
+                dataSet.externalToImported(file, progressListener);
+                Swing.Exec.later(finished);
+                feedback.say("Finished importing metadata");
+                importing = false;
+            }
+            catch (StorageException e) {
+                feedback.alert(String.format("Couldn't create Data Set from %s: %s", file.getAbsolutePath(), e.getMessage()), e);
+            }
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setTitle("Importing");
+            progressListener.setProgressMessage(String.format("Storing data for %s", dataSet.getSpec()));
+        }
+    }
+
+    public void analyzeFields() {
         if (analyzing) {
             feedback.say("Busy analyzing");
         }
@@ -385,15 +434,11 @@ public class SipModel {
                     catch (StorageException e) {
                         feedback.alert("Problem storing statistics", e);
                     }
-                    finally {
-                        listener.analysisComplete();
-                    }
                 }
 
                 @Override
                 public void failure(String message, Exception exception) {
                     analyzing = false;
-                    listener.analysisComplete();
                     if (message == null) {
                         message = "Analysis failed";
                     }
@@ -404,16 +449,11 @@ public class SipModel {
                         feedback.say("Analysis aborted");
                     }
                 }
-
-                @Override
-                public boolean progress(long elementCount) {
-                    return listener.analysisProgress(elementCount);
-                }
             }));
         }
     }
 
-    public void convertSource(final ProgressListener progressListener) {
+    public void convertSource() {
         clearValidations();
         if (converting) {
             feedback.say("Busy converting to source for " + dataSetModel.getDataSet().getSpec());
@@ -421,36 +461,60 @@ public class SipModel {
         else {
             converting = true;
             feedback.say("Converting to source for " + dataSetModel.getDataSet().getSpec());
-            exec(new Work() {
-                @Override
-                public void run() {
-                    try {
-                        dataSetModel.getDataSet().importedToSource(feedback, progressListener);
-                        exec(new Swing() {
-                            @Override
-                            public void run() {
-                                seekFirstRecord();
-                            }
-                        });
-                        feedback.say("Source conversion complete");
-                    }
-                    catch (StorageException e) {
-                        feedback.alert("Conversion failed: " + e.getMessage(), e);
-                    }
-                    finally {
-                        converting = false;
-                    }
-                }
-
-                @Override
-                public Job getJob() {
-                    return Job.CONVERT_SOURCE;
-                }
-            });
+            exec(new ConversionRunner(dataSetModel.getDataSet()));
         }
     }
 
-    public void processFile(boolean allowInvalidRecords, final ProgressListener progressListener, final ValidationListener validationListener) {
+    private class ConversionRunner implements Work.DataSetWork, Work.LongTermWork {
+        private DataSet dataSet;
+        private ProgressListener progressListener;
+
+        private ConversionRunner(DataSet dataSet) {
+            this.dataSet = dataSet;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.CONVERT_SOURCE;
+        }
+
+        @Override
+        public void run() {
+            try {
+                dataSetModel.getDataSet().importedToSource(feedback, progressListener);
+                exec(new Swing() {
+                    @Override
+                    public void run() {
+                        seekFirstRecord();
+                    }
+                });
+                feedback.say("Source conversion complete");
+            }
+            catch (StorageException e) {
+                feedback.alert("Conversion failed: " + e.getMessage(), e);
+            }
+            finally {
+                converting = false;
+            }
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setTitle("Converting");
+            progressListener.setProgressMessage(String.format(
+                    "<html><h3>Converting source data of '%s' to standard form</h3>",
+                    dataSet.getSpec()
+            ));
+        }
+    }
+
+    public void processFile(boolean allowInvalidRecords, final ValidationListener validationListener, final Swing finished) {
         if (processing) {
             feedback.say("Busy processing");
         }
@@ -473,22 +537,24 @@ public class SipModel {
                     allowInvalidRecords,
                     outputDirectory,
                     groovyCodeResource,
-                    progressListener,
                     new FileProcessor.Listener() {
                         @Override
                         public void mappingFailed(final MappingException exception) {
                             String xml = XmlNodePrinter.toXml(exception.getMetadataRecord().getRootNode());
                             validationListener.failed(exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
+                            finishedProcessing();
                         }
 
                         @Override
                         public void outputInvalid(int recordNumber, Node outputNode, String message) {
                             String xml = serializer.toXml(outputNode);
                             validationListener.failed(recordNumber, xml, message);
+                            finishedProcessing();
                         }
 
                         @Override
                         public void finished(final Stats stats, final BitSet valid, int recordCount) {
+                            finishedProcessing();
                             try {
                                 DataSet dataSet = dataSetModel.getDataSet();
                                 dataSet.setStats(stats, false, mappingModel().getRecMapping().getPrefix());
@@ -502,13 +568,17 @@ public class SipModel {
                             mappingModel().setLocked(stats != null);
                             processing = false;
                         }
+
+                        private void finishedProcessing() {
+                            Swing.Exec.later(finished);
+                        }
                     }
             ));
         }
     }
 
     public void seekReset() {
-        exec(new Work() {
+        exec(new Work.DataSetWork() {
             @Override
             public void run() {
                 if (metadataParser != null) {
@@ -522,14 +592,19 @@ public class SipModel {
             public Job getJob() {
                 return Job.SEEK_RESET;
             }
+
+            @Override
+            public DataSet getDataSet() {
+                return dataSetModel.getDataSet();
+            }
         });
     }
 
     public void seekFirstRecord() {
-        seekRecordNumber(0, null);
+        seekRecordNumber(0);
     }
 
-    public void seekRecordNumber(final int recordNumber, ProgressListener progressListener) {
+    public void seekRecordNumber(final int recordNumber) {
         seekReset();
         ScanPredicate numberScan = new ScanPredicate() {
             @Override
@@ -537,22 +612,23 @@ public class SipModel {
                 return record.getRecordNumber() == recordNumber;
             }
         };
-        seekRecord(numberScan, progressListener);
+        seekRecord(numberScan, null);
     }
 
-    public void seekRecord(ScanPredicate scanPredicate, ProgressListener progressListener) {
-        exec(new RecordScanner(scanPredicate, progressListener));
+    public void seekRecord(ScanPredicate scanPredicate, Swing finished) {
+        exec(new RecordScanner(scanPredicate, finished));
     }
 
     // === privates
 
-    private class RecordScanner implements Work {
+    private class RecordScanner implements Work.DataSetWork, Work.LongTermWork {
         private ScanPredicate scanPredicate;
         private ProgressListener progressListener;
+        private Swing finished;
 
-        private RecordScanner(ScanPredicate scanPredicate, ProgressListener progressListener) {
+        private RecordScanner(ScanPredicate scanPredicate, Swing finished) {
             this.scanPredicate = scanPredicate;
-            this.progressListener = progressListener;
+            this.finished = finished;
         }
 
         @Override
@@ -588,11 +664,26 @@ public class SipModel {
                 feedback.alert("Unable to fetch the next record", e);
                 metadataParser = null;
             }
+            finally {
+                if (finished != null) Swing.Exec.later(finished);
+            }
         }
 
         @Override
         public Job getJob() {
             return Job.SCAN_INPUT_RECORDS;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSetModel.getDataSet(); // todo: should hold it, i suppose
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setTitle("Scanning");
+            progressListener.setProgressMessage("Scanning input records");
         }
     }
 
@@ -601,7 +692,7 @@ public class SipModel {
     }
 
     public void exec(Swing swing) {
-        SwingUtilities.invokeLater(swing);
+        Swing.Exec.later(swing);
     }
 
     public void exec(Work work) {

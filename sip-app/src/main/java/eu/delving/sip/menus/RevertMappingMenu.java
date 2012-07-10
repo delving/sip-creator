@@ -23,6 +23,7 @@ package eu.delving.sip.menus;
 
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.MappingSaveTimer;
 import eu.delving.sip.model.SipModel;
@@ -65,33 +66,56 @@ public class RevertMappingMenu extends JMenu implements MappingSaveTimer.ListRec
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            // todo: make sure there is a dataset and a prefix
             boolean revert = sipModel.getFeedback().confirm(
                     "Revert",
                     String.format("Are you sure you want to revert to %s", lastModifiedString())
             );
             if (revert) {
-                sipModel.exec(new Work() {
-                    @Override
-                    public void run() {
-                        try {
-                            RecMapping previousMapping = sipModel.getDataSetModel().getDataSet().revertRecMapping(file, sipModel.getDataSetModel());
-                            sipModel.getMappingModel().setRecMapping(previousMapping);
-                        }
-                        catch (StorageException e) {
-                            sipModel.getFeedback().alert("Unable to revert mapping", e);
-                        }
-                    }
-
-                    @Override
-                    public Job getJob() {
-                        return Job.REVERT_MAPPING;
-                    }
-                });
+                sipModel.exec(new MappingReverter(file, sipModel.getDataSetModel().getDataSet(), sipModel.getMappingModel().getPrefix()));
             }
         }
 
         private String lastModifiedString() {
             return DATE_FORMAT.format(new Date(file.lastModified()));
+        }
+    }
+
+    private class MappingReverter implements Work.DataSetPrefixWork {
+        private File file;
+        private DataSet dataSet;
+        private String prefix;
+
+        private MappingReverter(File file, DataSet dataSet, String prefix) {
+            this.file = file;
+            this.dataSet = dataSet;
+            this.prefix = prefix;
+        }
+
+        @Override
+        public void run() {
+            try {
+                RecMapping previousMapping = sipModel.getDataSetModel().getDataSet().revertRecMapping(file, sipModel.getDataSetModel());
+                sipModel.getMappingModel().setRecMapping(previousMapping);
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to revert mapping", e);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.REVERT_MAPPING;
+        }
+
+        @Override
+        public String getPrefix() {
+            return prefix;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
         }
     }
 }

@@ -1,5 +1,7 @@
 package eu.delving.sip.base;
 
+import eu.delving.sip.files.DataSet;
+
 import static eu.delving.sip.base.Work.Kind.*;
 
 /**
@@ -47,13 +49,14 @@ public interface Work extends Runnable {
 
         READ_FRAME_ARRANGEMENTS(SILENT),
 
-        CHECK_DATA_SET_STATE(DATA_SET_PREFIX),
         SET_DATASET_PREFIX(DATA_SET_PREFIX),
         SAVE_HINTS(DATA_SET_PREFIX),
         SAVE_MAPPING(DATA_SET_PREFIX),
         REVERT_MAPPING(DATA_SET_PREFIX),
+
         FIND_INVALID_PREFIXES(DATA_SET),
         DELETE_SOURCE_FOR_RECONVERT(DATA_SET),
+        CHECK_DATA_SET_STATE(DATA_SET),
         SEEK_RESET(DATA_SET),
 
         IMPORT_SOURCE(DATA_SET),
@@ -83,4 +86,16 @@ public interface Work extends Runnable {
     }
 
     Job getJob();
+
+    public interface DataSetWork extends Work {
+        DataSet getDataSet();
+    }
+
+    public interface DataSetPrefixWork extends DataSetWork {
+        String getPrefix();
+    }
+
+    public interface LongTermWork extends Work {
+        void setProgressListener(ProgressListener progressListener);
+    }
 }

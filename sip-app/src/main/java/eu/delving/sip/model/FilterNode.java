@@ -21,7 +21,8 @@
 
 package eu.delving.sip.model;
 
-import javax.swing.*;
+import eu.delving.sip.base.Swing;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -44,7 +45,7 @@ public abstract class FilterNode {
 
     public final void fireChanged() {
         if (filterModel == null) throw new RuntimeException("Tree model must be set");
-        SwingUtilities.invokeLater(new Runnable() {
+        Swing.Exec.later(new Swing() {
             @Override
             public void run() {
                 filterModel.refreshNode(FilterNode.this);

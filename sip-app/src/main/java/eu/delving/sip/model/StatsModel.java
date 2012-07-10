@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.stats.Stats;
@@ -208,7 +209,7 @@ public class StatsModel {
         void uniqueElementSet(Path uniqueElementPath);
     }
 
-    private class HintSaveTimer implements FactModel.Listener, ActionListener, Work {
+    private class HintSaveTimer implements FactModel.Listener, ActionListener, Work.DataSetWork {
         private Timer timer = new Timer(200, this);
 
         private HintSaveTimer() {
@@ -244,6 +245,12 @@ public class StatsModel {
         @Override
         public Job getJob() {
             return Job.SAVE_HINTS;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            if (sipModel.getDataSetModel().isEmpty()) return null;
+            return sipModel.getDataSetModel().getDataSet();
         }
     }
 

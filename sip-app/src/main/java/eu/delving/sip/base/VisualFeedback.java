@@ -21,7 +21,6 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.sip.frames.ProgressPopup;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 import org.apache.log4j.Logger;
@@ -59,8 +58,6 @@ public class VisualFeedback implements Feedback {
     private JList list = new JList(listModel);
     private LogFrame logFrame;
     private JDesktopPane desktop;
-    private ProgressPopup progressPopup;
-    private SipModel sipModel;
 
     public VisualFeedback(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -68,7 +65,6 @@ public class VisualFeedback implements Feedback {
     }
 
     public void setSipModel(SipModel sipModel) {
-        this.sipModel = sipModel;
         this.logFrame = new LogFrame(desktop, sipModel);
         toggle.addItemListener(new ItemListener() {
             @Override
@@ -89,7 +85,7 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void say(final String message) {
-        SwingUtilities.invokeLater(new Swing() {
+        Swing.Exec.later(new Swing() {
             @Override
             public void run() {
                 addToList(message);
@@ -100,7 +96,6 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void alert(final String message) {
-        if (progressPopup != null) progressPopup.finished(false);
         log.warn(message);
         if (SwingUtilities.isEventDispatchThread()) {
             addToList(message);
@@ -119,7 +114,6 @@ public class VisualFeedback implements Feedback {
 
     @Override
     public void alert(final String message, final Exception exception) {
-        if (progressPopup != null) progressPopup.finished(false);
         log.warn(message, exception);
         if (SwingUtilities.isEventDispatchThread()) {
             addToList(message);
@@ -136,18 +130,18 @@ public class VisualFeedback implements Feedback {
         }
     }
 
-    @Override
-    public ProgressListener progressListener(String title) {
-        if (progressPopup != null) progressPopup.finished(false); // destroy the previous one
-        progressPopup = new ProgressPopup(desktop, title);
-        progressPopup.onFinished(new ProgressListener.End() {
-            @Override
-            public void finished(ProgressListener progressListener, boolean success) {
-                if (progressPopup == progressListener) progressPopup = null; // only set to null if it's the current one
-            }
-        });
-        return progressPopup;
-    }
+//    @Override  todo: look this over
+//    public ProgressListener progressListener(String title) {
+//        if (progressPopup != null) progressPopup.finished(false); // destroy the previous one
+//        progressPopup = new ProgressPopup(desktop, title);
+//        progressPopup.onFinished(new ProgressListener.End() {
+//            @Override
+//            public void finished(ProgressListener progressListener, boolean success) {
+//                if (progressPopup == progressListener) progressPopup = null; // only set to null if it's the current one
+//            }
+//        });
+//        return progressPopup;
+//    }
 
     @Override
     public String ask(String question) {

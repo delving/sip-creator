@@ -49,7 +49,7 @@ import java.util.BitSet;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class FileProcessor implements Work {
+public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
     public static final String OUTPUT_FILE_PREF = "outputFile";
     private static final Logger LOG = Logger.getLogger(FileProcessor.class);
     private XmlSerializer serializer = new XmlSerializer();
@@ -67,11 +67,6 @@ public class FileProcessor implements Work {
     private File outputDirectory;
     private XmlOutput xmlOutput;
 
-    @Override
-    public Job getJob() {
-        return Job.PROCESS_FILE;
-    }
-
     public interface Listener {
         void mappingFailed(MappingException exception);
 
@@ -85,17 +80,41 @@ public class FileProcessor implements Work {
             boolean allowInvalidRecords,
             File outputDirectory,
             GroovyCodeResource groovyCodeResource,
-            ProgressListener progressListener,
             Listener listener
     ) {
         this.sipModel = sipModel;
         this.allowInvalid = allowInvalidRecords;
         this.outputDirectory = outputDirectory;
         this.groovyCodeResource = groovyCodeResource;
-        this.progressListener = progressListener;
         this.listener = listener;
     }
 
+    @Override
+    public Job getJob() {
+        return Job.PROCESS_FILE;
+    }
+
+    @Override
+    public String getPrefix() {
+        return sipModel.getMappingModel().getPrefix(); // todo: should be stored
+    }
+
+    @Override
+    public DataSet getDataSet() {
+        return sipModel.getDataSetModel().getDataSet(); // todo: should be stored;
+    }
+
+    @Override
+    public void setProgressListener(ProgressListener progressListener) {
+        this.progressListener = progressListener;
+        progressListener.setTitle("Validating and Analyzing");
+        progressListener.setProgressMessage(String.format(
+                "<html><h3>Mapping raw data of '%s' into '%s' format, validating and gathering statistics</h3>",
+                getDataSet().getSpec(), sipModel.getMappingModel().getRecMapping().getPrefix()
+        ));
+    }
+
+    @Override
     public void run() {
         if (sipModel.getDataSetModel().isEmpty()) throw new RuntimeException("No data set selected");
         valid = new BitSet(recordCount());
@@ -105,8 +124,8 @@ public class FileProcessor implements Work {
         try {
             validator = createValidator();
             mappingRunner = new MappingRunner(groovyCodeResource, recMapping(), null);
-            parser = new MetadataParser(dataSet().openSourceInputStream(), recordCount());
-            reportWriter = dataSet().openReportWriter(recMapping());
+            parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount());
+            reportWriter = getDataSet().openReportWriter(recMapping());
             if (outputDirectory != null) xmlOutput = createXmlOutput();
         }
         catch (Exception e) {
@@ -178,14 +197,10 @@ public class FileProcessor implements Work {
     }
 
     private XmlOutput createXmlOutput() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
-        String fileName = String.format("%s-%s.xml", dataSet().getSpec(), recMapping().getPrefix());
+        String fileName = String.format("%s-%s.xml", getDataSet().getSpec(), recMapping().getPrefix());
         File outputFile = new File(outputDirectory, fileName);
         OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
         return new XmlOutput(outputStream, recDef().getNamespacesMap());
-    }
-
-    private DataSet dataSet() {
-        return sipModel.getDataSetModel().getDataSet();
     }
 
     private RecDef recDef() {

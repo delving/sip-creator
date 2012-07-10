@@ -22,30 +22,22 @@
 package eu.delving.sip.base;
 
 /**
- * Ties a process to a ProgressMonitor
+ * Allows for progress reporting from a long term process to the work model
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
 public interface ProgressListener {
 
-    long PATIENCE = 250;
+    void setTitle(String title);
 
     void setProgressMessage(String message);
 
     void setIndeterminateMessage(String message);
-
-    void setProgressString(String message);
 
     void prepareFor(int total);
 
     boolean setProgress(int progress);
 
     void finished(boolean success);
-
-    void onFinished(End end);
-
-    public interface End {
-        void finished(ProgressListener progressListener, boolean success);
-    }
 }

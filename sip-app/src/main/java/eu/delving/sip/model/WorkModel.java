@@ -21,19 +21,16 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * A model of all the work that is being done in background threads at any time.
@@ -43,14 +40,30 @@ import java.util.concurrent.Future;
 
 public class WorkModel {
     private static final int REFRESH_RATE = 1000;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private List<JobContext> jobs = new CopyOnWriteArrayList<JobContext>();
-    private JobList jobList = new JobList();
+    private ExecutorService executor = Executors.newCachedThreadPool();
+    private List<JobContext> jobContexts = new CopyOnWriteArrayList<JobContext>();
+    private JobListModel jobListModel = new JobListModel();
 
     public WorkModel() {
-        Timer tick = new Timer(REFRESH_RATE, jobList);
+        Timer tick = new Timer(REFRESH_RATE, jobListModel);
         tick.setRepeats(true);
         tick.start();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(30);
+                        for (JobContext context : jobContexts) {
+                            if (context.isDone()) jobContexts.remove(context);
+                        }
+                    }
+                    catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     public void exec(Work work) {
@@ -58,23 +71,64 @@ public class WorkModel {
             case SILENT:
                 executor.execute(work);
                 break;
-            default:
-                executeInContext(work);
+            case NETWORK:
+                network(work);
                 break;
+            case NETWORK_DATA_SET:
+                dataSet(work);
+                break;
+            case DATA_SET:
+                dataSet(work);
+                break;
+            case DATA_SET_PREFIX:
+                dataSetPrefix(work);
+                break;
+            default:
+                throw new RuntimeException();
         }
     }
 
-    private void executeInContext(Work work) {
-        JobContext jobContext = new JobContext(work);
-        jobContext.setFuture(executor.submit(work, jobContext));
-        jobs.add(jobContext);
+    private void dataSetPrefix(Work work) {
+        dataSet(work); // for now
+    }
+
+    private void dataSet(Work work) {
+        Work.DataSetWork w = (Work.DataSetWork) work;
+        DataSet dataSet = w.getDataSet();
+        if (dataSet != null) {
+            for (JobContext context : jobContexts) {
+                String dataSetSpec = context.getDataSet();
+                if (dataSetSpec != null && dataSetSpec.equals(dataSet.getSpec())) {
+                    context.add(work);
+                    work = null;
+                    break;
+                }
+            }
+        }
+        justDoIt(work);
+    }
+
+    private void network(Work work) {
+        for (JobContext context : jobContexts) {
+            if (context.isNetwork()) {
+                context.add(work);
+                work = null;
+                break;
+            }
+        }
+        justDoIt(work);
+    }
+
+    private void justDoIt(Work work) {
+        if (work == null) return;
+        jobContexts.add(new JobContext(work));
     }
 
     public ListModel getListModel() {
-        return jobList;
+        return jobListModel;
     }
 
-    private class JobList extends AbstractListModel implements ActionListener {
+    private class JobListModel extends AbstractListModel implements ActionListener {
         private List<JobContext> snapshot = new ArrayList<JobContext>();
 
         @Override
@@ -94,34 +148,34 @@ public class WorkModel {
                 snapshot.clear();
                 fireIntervalRemoved(this, 0, size - 1);
             }
-            Iterator<JobContext> jobWalk = jobs.iterator();
-            while (jobWalk.hasNext()) {
-                JobContext context = jobWalk.next();
-                if (context.isDone()) jobWalk.remove();
-                snapshot.add(context);
+            for (JobContext context : jobContexts) {
+                if (context.isDone()) {
+                    jobContexts.remove(context);
+                }
+                else {
+                    snapshot.add(context);
+                }
             }
             if (!snapshot.isEmpty()) {
+                Collections.sort(snapshot);
                 fireIntervalAdded(this, 0, snapshot.size() - 1);
             }
         }
     }
 
-    private class JobContext {
-        private Work work;
+    private class JobContext implements Comparable<JobContext> {
         private Date start;
-        private Future<JobContext> future;
+        private Future<?> future;
+        private Queue<Work> queue = new ConcurrentLinkedQueue<Work>();
+        private SimpleProgress progress;
 
         public JobContext(Work work) {
-            this.work = work;
-            this.start = new Date();
-        }
-
-        public void setFuture(Future<JobContext> future) {
-            this.future = future;
+            this.queue.add(work);
+            launch();
         }
 
         public Work.Job getJob() {
-            return work.getJob();
+            return job();
         }
 
         public Date getStart() {
@@ -129,7 +183,129 @@ public class WorkModel {
         }
 
         public boolean isDone() {
-            return future.isDone();
+            if (isEmpty()) return true;
+            if (!future.isDone()) return false;
+//          todo:  future.isCancelled()
+            if (progress != null) progress.finished(true);
+            queue.remove();
+            if (isEmpty()) return true;
+            launch();
+            return false;
+        }
+
+        public String getDataSet() {
+            if (isEmpty()) return null;
+            switch (kind()) {
+                case NETWORK_DATA_SET:
+                case DATA_SET:
+                case DATA_SET_PREFIX:
+                    DataSet dataSet = ((Work.DataSetWork) work()).getDataSet();
+                    return dataSet == null ? null : dataSet.getSpec();
+                default:
+                    return null;
+            }
+        }
+
+        public boolean isNetwork() {
+            if (isEmpty()) return false;
+            switch (kind()) {
+                case NETWORK:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public void add(Work work) {
+            queue.add(work);
+        }
+
+        @Override
+        public int compareTo(JobContext o) {
+            return start.compareTo(o.start);
+        }
+
+        private void launch() {
+            this.future = executor.submit(work());
+            this.start = new Date();
+            if (work() instanceof Work.LongTermWork) {
+                ((Work.LongTermWork) work()).setProgressListener(progress = new SimpleProgress(this));
+            }
+            else {
+                progress = null;
+            }
+        }
+
+        private Work.Kind kind() {
+            return job().getKind();
+        }
+
+        private Work.Job job() {
+            return work().getJob();
+        }
+
+        private Work work() {
+            return queue.peek();
+        }
+
+        private boolean isEmpty() {
+            return queue.isEmpty();
+        }
+
+        @Override
+        public String toString() {
+            return getStart() + job().toString();
+        }
+    }
+
+    private static class SimpleProgress implements ProgressListener {
+        private JobContext jobContext;
+        private String title, progressMessage, indeterminateMessage;
+        private int current, maximum;
+        private boolean finished, success;
+
+        private SimpleProgress(JobContext jobContext) {
+            this.jobContext = jobContext;
+        }
+
+        @Override
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        @Override
+        public void setProgressMessage(String message) {
+            this.progressMessage = message;
+        }
+
+        @Override
+        public void setIndeterminateMessage(String message) {
+            this.indeterminateMessage = message;
+        }
+
+        @Override
+        public void prepareFor(int total) {
+            this.maximum = total;
+        }
+
+        @Override
+        public boolean setProgress(int progress) {
+            this.current = progress;
+            return true; // todo: false if you want to cancel
+        }
+
+        @Override
+        public void finished(boolean success) {
+            this.finished = true;
+            this.success = success;
+        }
+
+        @Override
+        public String toString() {
+            return String.format(
+                    "%s(%s): %s %d",
+                    jobContext.job().toString(), title, progressMessage, current
+            );
         }
     }
 }

@@ -47,39 +47,39 @@ public class HarvestPool extends AbstractListModel {
             LOG.info(String.format("Harvestor for %s is already running", harvestor.getDataSetSpec()));
             return;
         }
-        harvestor.setListener(new Harvestor.Listener() {
-
-            @Override
-            public void finished(boolean cancelled) {
-                tasks.remove(harvestor);
-                fireIntervalRemoved(this, 0, tasks.size());
-            }
-
-            @Override
-            public void progress(int count) {
-                fireContentsChanged(this, 0, tasks.size());
-            }
-
-            @Override
-            public void tellUser(String message) {
-                LOG.info(message);
-                sipModel.getFeedback().say(String.format("Harvestor '%s' %s", harvestor.getDataSetSpec(), message));
-            }
-
-            @Override
-            public void failed(String message, Exception exception) {
-                if (null == exception) {
-                    sipModel.getFeedback().alert(String.format("Harvestor '%s': %s", harvestor.getDataSetSpec(), message));
-                }
-                else {
-                    sipModel.getFeedback().alert(String.format("Harvestor '%s': %s", harvestor.getDataSetSpec(), message), exception);
-                }
-                LOG.error(exception);
-                tasks.remove(harvestor);
-                fireIntervalRemoved(this, 0, tasks.size());
-            }
-
-        });
+//        harvestor.setListener(new Harvestor.Listener() {
+//
+//            @Override
+//            public void finished(boolean cancelled) {
+//                tasks.remove(harvestor);
+//                fireIntervalRemoved(this, 0, tasks.size());
+//            }
+//
+//            @Override
+//            public void progress(int count) {
+//                fireContentsChanged(this, 0, tasks.size());
+//            }
+//
+//            @Override
+//            public void tellUser(String message) {
+//                LOG.info(message);
+//                sipModel.getFeedback().say(String.format("Harvestor '%s' %s", harvestor.getDataSetSpec(), message));
+//            }
+//
+//            @Override
+//            public void failed(String message, Exception exception) {
+//                if (null == exception) {
+//                    sipModel.getFeedback().alert(String.format("Harvestor '%s': %s", harvestor.getDataSetSpec(), message));
+//                }
+//                else {
+//                    sipModel.getFeedback().alert(String.format("Harvestor '%s': %s", harvestor.getDataSetSpec(), message), exception);
+//                }
+//                LOG.error(exception);
+//                tasks.remove(harvestor);
+//                fireIntervalRemoved(this, 0, tasks.size());
+//            }
+//
+//        });
         tasks.add(harvestor);
         sipModel.exec(harvestor);
         fireIntervalAdded(this, 0, tasks.size());

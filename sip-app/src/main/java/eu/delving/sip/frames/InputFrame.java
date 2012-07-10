@@ -24,7 +24,6 @@ package eu.delving.sip.frames;
 import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.SipModel;
@@ -318,9 +317,13 @@ public class InputFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            ProgressListener progress = sipModel.getFeedback().progressListener("Scanning");
-            progress.setProgressMessage(String.format("Scanning for %s: %s", filterBox.getSelectedItem(), filterField.getText().trim()));
-            sipModel.seekRecord(createPredicate(), progress);
+            setEnabled(false);
+            sipModel.seekRecord(createPredicate(), new Swing() {
+                @Override
+                public void run() {
+                    setEnabled(true);
+                }
+            });
         }
     }
 

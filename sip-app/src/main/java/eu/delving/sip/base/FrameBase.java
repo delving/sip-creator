@@ -87,15 +87,11 @@ public abstract class FrameBase extends JInternalFrame {
         Dimension getSize();
     }
 
-    public FrameBase(Which which, final JComponent parent, SipModel sipModel, String title) {
-        this(which, parent, sipModel, title, false);
-    }
-
-    protected FrameBase(Which which, final JComponent parent, SipModel sipModel, String title, boolean modal) {
+    protected FrameBase(Which which, final JComponent parent, SipModel sipModel, String title) {
         super(
                 title,
                 true, // resizable
-                !modal, // closeable
+                true, // closeable
                 true, // maximizable
                 false // iconifiable
         );
@@ -127,9 +123,6 @@ public abstract class FrameBase extends JInternalFrame {
         setGlassPane(new InternalGlassPane(this));
 //        addFrameListener();
         addFrameVetoListener();
-        if (modal) {
-            setFocusTraversalKeysEnabled(false);
-        }
         super.addPropertyChangeListener("closed", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
@@ -196,10 +189,6 @@ public abstract class FrameBase extends JInternalFrame {
 
     public void setPlacement(Placement placement) {
         this.placement = placement;
-    }
-
-    public Placement getPlacement() {
-        return placement;
     }
 
     protected abstract void buildContent(Container content);
@@ -611,7 +600,7 @@ public abstract class FrameBase extends JInternalFrame {
     }
 
     public void exec(Swing swing) {
-        SwingUtilities.invokeLater(swing);
+        Swing.Exec.later(swing);
     }
 
     public void exec(Work work) {

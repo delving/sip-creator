@@ -25,6 +25,7 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
@@ -181,7 +182,7 @@ public class TestMappingValidation {
     }
 
     private void performAnalysis() {
-        new AnalysisParser(mock.model(), 100, new AnalysisParser.Listener() {
+        AnalysisParser analysisParser = new AnalysisParser(mock.model(), 100, new AnalysisParser.Listener() {
             @Override
             public void success(Stats stats) {
                 try {
@@ -211,12 +212,44 @@ public class TestMappingValidation {
             public void failure(String message, Exception exception) {
                 throw new RuntimeException(message, exception);
             }
+        });
+        analysisParser.setProgressListener(progressListener());
+        analysisParser.run();
+    }
+
+    private ProgressListener progressListener() {
+        return new ProgressListener() {
+            @Override
+            public void setTitle(String title) {
+                System.out.println("title = "+title);
+            }
 
             @Override
-            public boolean progress(long elementCount) {
-                return true;
+            public void setProgressMessage(String message) {
+                System.out.println("message = "+message);
             }
-        }).run();
+
+            @Override
+            public void setIndeterminateMessage(String message) {
+                System.out.println("indeterminate = "+message);
+            }
+
+            @Override
+            public void prepareFor(int total) {
+                System.out.println("prepareFor = "+total);
+            }
+
+            @Override
+            public boolean setProgress(int progress) {
+                System.out.println("progress = "+progress);
+                return false;  // todo: implement
+            }
+
+            @Override
+            public void finished(boolean success) {
+                System.out.println("finished");
+            }
+        };
     }
 
     private DataSet dataSet() {
@@ -226,4 +259,5 @@ public class TestMappingValidation {
     private DataSetState state() {
         return mock.model().getDataSetState();
     }
+
 }

@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
@@ -39,7 +40,7 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class MappingSaveTimer implements MappingModel.ChangeListener, MappingModel.SetListener, ActionListener, Work {
+public class MappingSaveTimer implements MappingModel.ChangeListener, MappingModel.SetListener, ActionListener, Work.DataSetPrefixWork {
     private long nextFreeze;
     private SipModel sipModel;
     private Timer triggerTimer = new Timer(200, this);
@@ -49,6 +50,18 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     @Override
     public Job getJob() {
         return Job.SAVE_MAPPING;
+    }
+
+    @Override
+    public String getPrefix() {
+        if (!sipModel.getMappingModel().hasRecMapping()) return null;
+        return sipModel.getMappingModel().getPrefix();
+    }
+
+    @Override
+    public DataSet getDataSet() {
+        if (sipModel.getDataSetModel().isEmpty()) return null;
+        return sipModel.getDataSetModel().getDataSet();
     }
 
     public interface ListReceiver {

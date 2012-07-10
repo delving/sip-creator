@@ -132,7 +132,7 @@ public class DataSetModel implements RecDefModel {
         return !isEmpty() && dataSet.deleteValidation(getPrefix());
     }
 
-    private class StateCheckTimer implements Work, ActionListener {
+    private class StateCheckTimer implements Work, ActionListener, Work.DataSetWork {
         private SipModel sipModel;
         private Timer timer = new Timer(1000, this);
 
@@ -164,6 +164,12 @@ public class DataSetModel implements RecDefModel {
         @Override
         public Job getJob() {
             return Job.CHECK_DATA_SET_STATE;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            if (sipModel.getDataSetModel().isEmpty()) return null;
+            return sipModel.getDataSetModel().getDataSet();
         }
     }
 

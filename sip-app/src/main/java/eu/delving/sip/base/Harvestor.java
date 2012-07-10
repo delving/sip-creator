@@ -24,6 +24,7 @@ package eu.delving.sip.base;
 import com.ctc.wstx.stax.WstxInputFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.files.DataSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -58,7 +59,7 @@ import static org.apache.http.HttpStatus.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class Harvestor implements Work {
+public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     private static final int CONNECTION_TIMEOUT = 1000 * 60 * 5;
     private static final int TALK_DELAY = 1000 * 15;
     private static final Path RECORD_ROOT = Path.create("/OAI-PMH/ListRecords/record");
@@ -75,33 +76,9 @@ public class Harvestor implements Work {
     private Context context;
     private int recordCount;
     private boolean cancelled;
-    private Listener listener;
-    private String dataSetSpec;
+    private DataSet dataSet;
     private File tempFile;
-
-    @Override
-    public Job getJob() {
-        return Job.HARVEST_OAI_PMH;
-    }
-
-    /**
-     * Subscribe to the progress of the harvestor.
-     */
-    public interface Listener {
-
-        void finished(boolean cancelled);
-
-        void progress(int count);
-
-        void tellUser(String message);
-
-        void failed(String message, Exception exception);
-
-    }
-
-    public void setListener(Listener listener) {
-        this.listener = listener;
-    }
+    private ProgressListener progressListener;
 
     public interface Context {
 
@@ -114,8 +91,8 @@ public class Harvestor implements Work {
         String harvestSpec();
     }
 
-    public Harvestor(String dataSetSpec, Context context) {
-        this.dataSetSpec = dataSetSpec;
+    public Harvestor(DataSet dataSet, Context context) {
+        this.dataSet = dataSet;
         this.context = context;
         HttpParams timeoutParams = new BasicHttpParams();
         HttpConnectionParams.setSoTimeout(timeoutParams, CONNECTION_TIMEOUT);
@@ -128,24 +105,38 @@ public class Harvestor implements Work {
     }
 
     @Override
+    public Job getJob() {
+        return Job.HARVEST_OAI_PMH;
+    }
+
+    @Override
+    public DataSet getDataSet() {
+        return dataSet;
+    }
+
+    @Override
+    public void setProgressListener(ProgressListener progressListener) {
+        this.progressListener = progressListener;
+        progressListener.setTitle("Harvesting");
+        progressListener.setProgressMessage(String.format("Harvesting data for data set %s", dataSet.getSpec()));
+    }
+
+    @Override
     public void run() {
         if (!okURL(context.harvestUrl(), "Harvest Base URL")) return;
         if (!okValue(context.harvestPrefix(), "Harvest Metadata Prefix")) return;
         if (!prepareOutput()) return;
         try {
-            listener.tellUser("Starting harvest");
-            listener.progress(recordCount);
+            progressListener.setProgress(recordCount);
             HttpEntity fetchedRecords = fetchFirstEntity();
             String resumptionToken = saveRecords(fetchedRecords, out);
-            listener.tellUser(String.format("first resumption token \"%s\" received", resumptionToken));
             long time = System.currentTimeMillis();
             while (isValidResumptionToken(resumptionToken) && recordCount > 0 && !cancelled) {
                 EntityUtils.consume(fetchedRecords);
-                listener.progress(recordCount);
+                progressListener.setProgress(recordCount);
                 fetchedRecords = fetchNextEntity(resumptionToken);
                 resumptionToken = saveRecords(fetchedRecords, out);
                 if (System.currentTimeMillis() - time > TALK_DELAY) {
-                    listener.tellUser(String.format("So far %d records", recordCount));
                     time = System.currentTimeMillis();
                 }
                 if (!isValidResumptionToken(resumptionToken) && recordCount > 0) {
@@ -154,27 +145,24 @@ public class Harvestor implements Work {
             }
             if (recordCount > 0) {
                 finishOutput(cancelled);
-                listener.tellUser(cancelled ? "Cancelled!" : String.format("Harvest complete, %d records", recordCount));
+//                listener.tellUser(cancelled ? "Cancelled!" : String.format("Harvest complete, %d records", recordCount));
             }
             else {
                 outputStream.close();
                 if (!tempFile.delete()) {
-                    listener.tellUser("Unable to delete output file");
+//                    listener.tellUser("Unable to delete output file");
                 }
-                listener.finished(cancelled);
+//                listener.finished(cancelled);
             }
         }
         catch (UnknownHostException e) {
-            listener.failed(String.format("Error opening '%s' : %s", context.harvestUrl(), e.getMessage()), e);
+            log.error(String.format("Error opening '%s' : %s", context.harvestUrl(), e.getMessage()), e);
         }
         catch (IOException e) {
             log.error(String.format("Unable to complete harvest of %s because of a streaming problem", context.harvestUrl()), e);
-            listener.tellUser("Unable to complete harvest");
-            listener.failed("Streaming problem", e);
         }
         catch (XMLStreamException e) {
             log.error(String.format("Unable to complete harvest of %s because of an xml problem", context.harvestUrl()), e);
-            listener.failed("Invalid data received", e);
         }
     }
 
@@ -243,7 +231,7 @@ public class Harvestor implements Work {
                         tokenBuilder = null;
                     }
                     else if (path.equals(ERROR) && errorBuilder != null) {
-                        listener.failed(String.format("OAI-PMH Error: %s", errorBuilder), null);
+//                        listener.failed(String.format("OAI-PMH Error: %s", errorBuilder), null);
                     }
                     path = path.parent();
                     break;
@@ -330,21 +318,18 @@ public class Harvestor implements Work {
             return true;
         }
         catch (FileNotFoundException e) {
-            listener.tellUser("Unable to create file to receive harvested data");
-            listener.failed("Can't create temp file", e);
+            log.error("Unable to create file to receive harvested data", e);
             return false;
         }
         catch (XMLStreamException e) {
-            listener.tellUser("Unable to stream to file to receive harvested data");
-            listener.failed("XML Stream error", e);
+            log.error("Unable to stream to file to receive harvested data", e);
             return false;
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
         catch (IOException e) {
-            log.error(String.format("Error creating temp file '%s'%n", tempFile));
-            listener.failed("Error creating temp file", e);
+            log.error(String.format("Error creating temp file '%s'%n", tempFile), e);
             return false;
         }
     }
@@ -357,7 +342,7 @@ public class Harvestor implements Work {
         out.flush();
         outputStream.close();
         if (cancelled) {
-            listener.finished(true);
+//            listener.finished(true);
             return;
         }
         String message = String.format("Copying temp file %s to %s", tempFile, context.outputFile());
@@ -365,7 +350,7 @@ public class Harvestor implements Work {
         File outputFile = context.outputFile();
         FileUtils.deleteQuietly(outputFile);
         FileUtils.moveFile(tempFile, outputFile);
-        listener.finished(false);
+//        listener.finished(false);
     }
 
     private class NamespaceCollector {
@@ -410,7 +395,7 @@ public class Harvestor implements Work {
     private boolean okValue(String string, String description) {
         boolean ok = string != null && !string.trim().isEmpty();
         if (!ok) {
-            listener.tellUser("Missing value for " + description);
+//            listener.tellUser("Missing value for " + description);
         }
         return ok;
     }
@@ -424,18 +409,18 @@ public class Harvestor implements Work {
             return true;
         }
         catch (MalformedURLException e) {
-            listener.tellUser("Malformed URL: " + url);
+//            listener.tellUser("Malformed URL: " + url);
             return false;
         }
     }
 
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-        listener.progress(recordCount);
+        progressListener.setProgress(recordCount);
     }
 
     public String getDataSetSpec() {
-        return dataSetSpec;
+        return dataSet.getSpec();
     }
 
     @Override
@@ -443,16 +428,16 @@ public class Harvestor implements Work {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Harvestor harvestor = (Harvestor) o;
-        return dataSetSpec.equals(harvestor.dataSetSpec);
+        return dataSet.getSpec().equals(harvestor.dataSet.getSpec());
     }
 
     @Override
     public int hashCode() {
-        return dataSetSpec.hashCode();
+        return dataSet.getSpec().hashCode();
     }
 
     @Override
     public String toString() {
-        return String.format("%s %s - %s:%s (%d records)", cancelled ? "CANCELLED!" : "", dataSetSpec, context.harvestUrl(), context.harvestPrefix(), getRecordCount());
+        return String.format("%s %s - %s:%s (%d records)", cancelled ? "CANCELLED!" : "", dataSet.getSpec(), context.harvestUrl(), context.harvestPrefix(), getRecordCount());
     }
 }

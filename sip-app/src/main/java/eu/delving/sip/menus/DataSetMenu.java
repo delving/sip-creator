@@ -21,7 +21,6 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -82,14 +81,10 @@ public class DataSetMenu extends JMenu {
                     item.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
-                            final ProgressListener listener = sipModel.getFeedback().progressListener("Loading Dataset");
-                            listener.setIndeterminateMessage(String.format("Preparing dataset %s for mapping %s", item.getDataSet(), item.getPrefix()));
-                            listener.prepareFor(-1);
-                            sipModel.setDataSetPrefix(item.getDataSet(), item.getPrefix(), new SipModel.DataSetCompletion() {
+                            sipModel.setDataSetPrefix(item.getDataSet(), item.getPrefix(), new Swing() {
                                 @Override
-                                public void complete(final boolean success) {
-                                    listener.finished(success);
-                                    if (success) setPreference(item.getDataSet(), item.getPrefix());
+                                public void run() {
+                                    setPreference(item.getDataSet(), item.getPrefix());
                                 }
                             });
                         }

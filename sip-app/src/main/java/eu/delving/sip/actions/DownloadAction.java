@@ -22,7 +22,6 @@
 package eu.delving.sip.actions;
 
 import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
@@ -192,19 +191,15 @@ public class DownloadAction extends AbstractAction {
             if (entry == null) return;
             setEnabled(false);
             downloadDialog.setVisible(false);
-            ProgressListener listener = sipModel.getFeedback().progressListener("Download");
-            listener.setProgressMessage(String.format("<html><h3>Downloading the data of '%s' from the culture hub</h3>.", entry.getSpec()));
-            listener.setIndeterminateMessage(String.format("<html><h3>Culture hub is preparing '%s' for download.</h3>.", entry.getSpec()));
-            listener.onFinished(new ProgressListener.End() {
-                @Override
-                public void finished(ProgressListener progressListener, boolean success) {
-                    setEnabled(true);
-                    downloadDialog.setVisible(false);
-                }
-            });
             try {
                 DataSet dataSet = sipModel.getStorage().createDataSet(entry.getSpec(), entry.getOrganization());
-                cultureHubClient.downloadDataSet(dataSet, listener);
+                cultureHubClient.downloadDataSet(dataSet, new Swing() {
+                    @Override
+                    public void run() {
+                        setEnabled(true);
+                        downloadDialog.setVisible(false);
+                    }
+                });
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to create data set called " + entry.getSpec(), e);

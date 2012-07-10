@@ -22,6 +22,7 @@
 package eu.delving.sip.menus;
 
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
@@ -94,7 +95,7 @@ public class ExpertMenu extends JMenu {
             if (answer != null) {
                 answer = answer.trim();
                 sipModel.getStatsModel().setUniqueValueConverter(answer);
-                sipModel.exec(new Work() {
+                sipModel.exec(new Work.DataSetWork() {
                     @Override
                     public void run() {
                         try {
@@ -109,6 +110,11 @@ public class ExpertMenu extends JMenu {
                     @Override
                     public Job getJob() {
                         return Job.DELETE_SOURCE_FOR_RECONVERT;
+                    }
+
+                    @Override
+                    public DataSet getDataSet() {
+                        return sipModel.getDataSetModel().getDataSet();
                     }
                 });
             }

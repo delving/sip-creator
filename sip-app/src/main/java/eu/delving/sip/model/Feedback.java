@@ -21,8 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.sip.base.ProgressListener;
-
 /**
  * Handle exceptions that happen under the hood
  *
@@ -36,8 +34,6 @@ public interface Feedback {
     void alert(String message);
 
     void alert(String message, Exception exception);
-
-    ProgressListener progressListener(String title);
 
     String ask(String question);
 
