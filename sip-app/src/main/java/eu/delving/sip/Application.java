@@ -22,19 +22,22 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.actions.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
-import eu.delving.sip.frames.HarvestDialog;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
-import eu.delving.sip.xml.AnalysisParser;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.lang.StringUtils;
@@ -42,13 +45,9 @@ import org.apache.commons.lang.StringUtils;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.Set;
-import java.util.TreeSet;
 
 import static eu.delving.sip.files.DataSetState.NO_DATA;
 
@@ -62,6 +61,7 @@ public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
+    private UnlockMappingAction unlockMappingAction = new UnlockMappingAction();
     private Action downloadAction, importAction, uploadAction, deleteAction, validateAction;
     private JFrame home;
     private JDesktopPane desktop;
@@ -69,15 +69,13 @@ public class Application {
     private OAuthClient oauthClient;
     private AllFrames allFrames;
     private VisualFeedback feedback;
-    private HarvestDialog harvestDialog;
-    private HarvestPool harvestPool;
     private StatusPanel statusPanel;
     private HelpPanel helpPanel;
     private Timer resizeTimer;
     private String instance;
+    private ExpertMenu expertMenu;
 
     private Application(final File storageDirectory, String instance) throws StorageException {
-        instances.add(this.instance = instance);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -108,11 +106,8 @@ public class Application {
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         Storage storage = new StorageImpl(storageDirectory, cultureHubClient.getHttpClient());
         sipModel = new SipModel(storage, groovyCodeResource, feedback, instance);
+        expertMenu = new ExpertMenu(sipModel);
         statusPanel = new StatusPanel(sipModel);
-        harvestPool = new HarvestPool(sipModel);
-        harvestDialog = new HarvestDialog(desktop, sipModel, harvestPool);
-        feedback.setSipModel(sipModel);
-        feedback.say("SIP-Creator started");
         home = new JFrame("Delving SIP Creator");
         home.addComponentListener(new ComponentAdapter() {
             @Override
@@ -124,13 +119,41 @@ public class Application {
         allFrames = new AllFrames(desktop, sipModel);
         helpPanel = new HelpPanel(sipModel, cultureHubClient.getHttpClient());
         home.getContentPane().add(desktop, BorderLayout.CENTER);
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, final boolean locked) {
+                sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        unlockMappingAction.setEnabled(locked);
+                        expertMenu.setEnabled(!locked);
+                    }
+                });
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
-        importAction = new ImportAction(desktop, sipModel, harvestPool);
+        importAction = new ImportAction(desktop, sipModel);
         validateAction = new ValidateAction(desktop, sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
         deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
-        home.getContentPane().add(allFrames.getArrangementsPanel(), BorderLayout.WEST);
+        home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         screen.height -= 30;
         home.setSize(screen);
@@ -152,18 +175,22 @@ public class Application {
             }
         });
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 statusPanel.setState(state);
                 switch (state) {
                     case ABSENT:
-                        Exec.work(new Runnable() {
+                        sipModel.exec(new Work() {
                             @Override
                             public void run() {
-                                sipModel.getMappingModel().setRecMapping(null);
                                 sipModel.getDataSetFacts().set(null);
                                 sipModel.getStatsModel().setStatistics(null);
+                            }
+
+                            @Override
+                            public Job getJob() {
+                                return Job.CLEAR_FACTS_STATS;
                             }
                         });
                         home.setTitle("Delving SIP Creator");
@@ -180,45 +207,22 @@ public class Application {
                 }
             }
         });
-        harvestPool.addListDataListener(new ListDataListener() {
-            @Override
-            public void intervalAdded(ListDataEvent listDataEvent) {
-                refreshToggleButton();
-            }
-
-            @Override
-            public void intervalRemoved(ListDataEvent listDataEvent) {
-                refreshToggleButton();
-            }
-
-            @Override
-            public void contentsChanged(ListDataEvent listDataEvent) {
-                refreshToggleButton();
-            }
-        });
     }
 
     private boolean quit() {
-        instances.remove(this.instance);
-        if (harvestPool.getSize() > 0) {
+        if (!sipModel.getWorkModel().isEmpty()) {
             boolean exitAnyway = feedback.confirm(
-                    "Active harvests",
-                    String.format("There are %d active harvests, are you sure you want to exit?", harvestPool.getSize())
+                    "Busy",
+                    "There are jobs busy, are you sure you want to exit?"
             );
             if (exitAnyway) return false;
         }
-        if (!instances.isEmpty()) return false;
         System.exit(0);
         return true;
     }
 
     private JPanel createStatePanel() {
-        refreshToggleButton();
-        JPanel right = new JPanel(new BorderLayout(6, 6));
-        right.add(allFrames.getBigWindowsPanel(), BorderLayout.WEST);
-        right.add(feedback.getToggle(), BorderLayout.CENTER);
-        right.add(new JButton(harvestDialog.getAction()), BorderLayout.EAST);
-        JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
+        JPanel p = new JPanel(new BorderLayout(10,10));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
@@ -232,23 +236,22 @@ public class Application {
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
         statusPanel.setReaction(DataSetState.VALIDATED, uploadAction);
-        p.add(statusPanel);
-        p.add(right);
+        p.add(statusPanel, BorderLayout.CENTER);
+        p.add(allFrames.getBigWindowsPanel(), BorderLayout.EAST);
         p.setPreferredSize(new Dimension(80, 80));
         return p;
     }
 
-    private void refreshToggleButton() {
-        harvestDialog.getAction().putValue(Action.NAME, String.format("%d harvests", harvestPool.getSize()));
-    }
-
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
+        JMenu unlockMenu = new JMenu("Unlock");
+        unlockMenu.add(unlockMappingAction);
+        bar.add(unlockMenu);
         bar.add(createFileMenu());
         bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
-        bar.add(new ExpertMenu(sipModel, desktop));
+        bar.add(expertMenu);
         bar.add(createHelpMenu());
         return bar;
     }
@@ -284,40 +287,45 @@ public class Application {
         return menu;
     }
 
-    private class InputAnalyzer implements Runnable {
+    private class InputAnalyzer implements Swing {
         @Override
         public void run() {
-            final ProgressListener progress = sipModel.getFeedback().progressListener("Analyzing");
-            progress.setProgressMessage(String.format(
-                    "<html><h3>Analyzing data of '%s'</h3>",
-                    sipModel.getDataSetModel().getDataSet().getSpec()
-            ));
-            progress.prepareFor(100);
-            sipModel.analyzeFields(new SipModel.AnalysisListener() {
-                @Override
-                public boolean analysisProgress(final long elementCount) {
-                    int value = (int) (elementCount / AnalysisParser.ELEMENT_STEP);
-                    progress.setProgressString(String.format("%d elements", elementCount));
-                    return progress.setProgress(value % 100);
-                }
-
-                @Override
-                public void analysisComplete() {
-                    progress.finished(true);
-                }
-            });
+            sipModel.analyzeFields();
         }
     }
 
-    private class ConvertPerformer implements Runnable {
+    private class ConvertPerformer implements Swing {
         @Override
         public void run() {
-            ProgressListener listener = sipModel.getFeedback().progressListener("Converting");
-            listener.setProgressMessage(String.format(
-                    "<html><h3>Converting source data of '%s' to standard form</h3>",
-                    sipModel.getDataSetModel().getDataSet().getSpec()
-            ));
-            sipModel.convertSource(listener);
+            sipModel.convertSource();
+        }
+    }
+
+    private class UnlockMappingAction extends AbstractAction implements Work {
+
+        private UnlockMappingAction() {
+            super("Unlock mapping for further editing");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            sipModel.exec(this);
+        }
+
+        @Override
+        public void run() {
+            sipModel.getMappingModel().setLocked(false);
+            try {
+                sipModel.getDataSetModel().deleteValidation();
+            }
+            catch (StorageException e) {
+                feedback.alert("Unable to delete validation", e);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.UNLOCK_MAPPING;
         }
     }
 
@@ -351,7 +359,7 @@ public class Application {
 
         @Override
         public void dataSetCreated(final DataSet dataSet) {
-            Exec.swing(new Runnable() {
+            sipModel.exec(new Swing() {
                 @Override
                 public void run() {
                     dataSetMenu.refreshAndChoose(dataSet);
@@ -437,41 +445,17 @@ public class Application {
         }
     }
 
-//    private static class Launcher extends AbstractAction implements Runnable {
+//    private static class Launcher extends AbstractAction implements Swing {
 //        private String[] args;
 //        private Set<String> instances = new TreeSet<String>();
 //
-//        private Launcher(String[] args) {
-//            super("New Application Instance");
-//            this.args = args;
-//        }
+//    // todo: this is for later.  just one instance now
 //
 //        @Override
 //        public void actionPerformed(ActionEvent e) {
-//            Exec.swingAny(this);
-//        }
-//
-//        @Override
-//        public void run() {
-//            final File storageDirectory = StorageFinder.getStorageDirectory(args);
-//            if (storageDirectory == null) return;
-//            try {
-//                int instance = 1;
-//                while (instances.contains(String.valueOf(instance))) instance++;
-//                Application application = new Application(storageDirectory, this, String.valueOf(instance));
-//                application.home.setVisible(true);
-//                application.allFrames.restore();
-//            }
-//            catch (StorageException e) {
-//                JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
-//                e.printStackTrace();
-//            }
+//            new Thread(this).start(); // todo: this whole launcher should change
 //        }
 //    }
-
-    // todo: this is for later.  just one instance now
-
-    private static Set<String> instances = new TreeSet<String>();
 
     public static void main(final String[] args) throws StorageException {
         EventQueue.invokeLater(new Runnable() {
@@ -481,7 +465,6 @@ public class Application {
                 if (storageDirectory == null) return;
                 try {
                     int instance = 1;
-                    while (instances.contains(String.valueOf(instance))) instance++;
                     Application application = new Application(storageDirectory, String.valueOf(instance));
                     application.home.setVisible(true);
                     application.allFrames.restore();

@@ -22,9 +22,10 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.ShowOptionMenu;
 import eu.delving.sip.model.*;
 
@@ -45,6 +46,7 @@ import java.awt.event.*;
  */
 
 public class TargetFrame extends FrameBase {
+    public static final FilterNode EMPTY_NODE = FilterNode.createMessageNode("No record definition");
     private JTree recDefTree;
     private JTextField filterField = new JTextField();
     private JPanel treePanel;
@@ -62,19 +64,13 @@ public class TargetFrame extends FrameBase {
     });
 
     public TargetFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.TARGET, desktop, sipModel, "Target", false);
-        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
-            @Override
-            public void recMappingSet(MappingModel mappingModel) {
-                Exec.swing(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
-            }
-        });
+        super(Which.TARGET, desktop, sipModel, "Target");
         createRecDefTree(sipModel);
         timer.setRepeats(false);
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
         treePanel.add(SwingHelper.scrollVH("Record Definition", recDefTree));
-        ShowOptionMenu showOptionMenu = new ShowOptionMenu(new ShowOptionMenu.Listener() {
+        ShowOptionMenu showOptionMenu = new ShowOptionMenu(sipModel, new ShowOptionMenu.Listener() {
             @Override
             public void optSelected(OptList.Opt opt) {
                 RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
@@ -110,13 +106,19 @@ public class TargetFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
+            @Override
+            public void recMappingSet(MappingModel mappingModel) {
+                exec(new TreeUpdater(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getPrefix() : "?"));
+            }
+        });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void transition(CreateModel createModel, CreateTransition transition) {
                 switch (transition) {
                     case COMPLETE_TO_COMPLETE:
                     case NOTHING_TO_COMPLETE:
-                        Exec.swing(new Runnable() {
+                        exec(new Swing() {
                             @Override
                             public void run() {
                                 recDefTree.clearSelection();
@@ -162,7 +164,7 @@ public class TargetFrame extends FrameBase {
         });
     }
 
-    private class RecDefSelection implements TreeSelectionListener, Runnable {
+    private class RecDefSelection implements TreeSelectionListener, Work {
 
         private Object nodeObject;
 
@@ -170,7 +172,7 @@ public class TargetFrame extends FrameBase {
         public void valueChanged(TreeSelectionEvent event) {
             TreePath path = recDefTree.getSelectionPath();
             nodeObject = path != null ? path.getLastPathComponent() : null;
-            Exec.work(this);
+            exec(this);
         }
 
         @Override
@@ -182,6 +184,11 @@ public class TargetFrame extends FrameBase {
                 sipModel.getCreateModel().setTarget(node);
             }
         }
+
+        @Override
+        public Job getJob() {
+            return Job.SELECT_REC_DEF_SET_TARGET;
+        }
     }
 
     private void showPath(RecDefTreeNode node) {
@@ -190,7 +197,7 @@ public class TargetFrame extends FrameBase {
     }
 
     private void createRecDefTree(SipModel sipModel) {
-        recDefTree = new JTree(new RecDefTreeModel(FilterNode.createMessageNode("Empty"))) {
+        recDefTree = new JTree(new RecDefTreeModel(EMPTY_NODE)) {
             @Override
             public String getToolTipText(MouseEvent evt) {
                 TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
@@ -205,6 +212,11 @@ public class TargetFrame extends FrameBase {
         recDefTree.setDropMode(DropMode.ON);
         recDefTree.setTransferHandler(sipModel.getNodeTransferHandler());
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             }
@@ -246,7 +258,7 @@ public class TargetFrame extends FrameBase {
         }
     }
 
-    private class TreeUpdater implements Runnable {
+    private class TreeUpdater implements Swing {
         private String prefix;
 
         private TreeUpdater(String prefix) {
@@ -262,10 +274,11 @@ public class TargetFrame extends FrameBase {
                 model.setAttributesHidden(hideAttributes.isSelected());
             }
             else {
-                recDefTree.setModel(new RecDefTreeModel(FilterNode.createMessageNode("No record definition")));
+                recDefTree.setModel(new RecDefTreeModel(EMPTY_NODE));
             }
             treePanel.removeAll();
             treePanel.add(SwingHelper.scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
+            treePanel.validate();
         }
     }
 

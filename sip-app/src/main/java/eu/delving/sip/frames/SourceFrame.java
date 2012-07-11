@@ -21,10 +21,10 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.Path;
-import eu.delving.metadata.Tag;
-import eu.delving.sip.base.Exec;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.*;
@@ -72,7 +72,7 @@ public class SourceFrame extends FrameBase {
     });
 
     public SourceFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.SOURCE, desktop, sipModel, "Source", false);
+        super(Which.SOURCE, desktop, sipModel, "Source");
         sourceTree = new JTree(sipModel.getStatsModel().getSourceTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {
@@ -123,7 +123,7 @@ public class SourceFrame extends FrameBase {
                 switch (transition) {
                     case COMPLETE_TO_COMPLETE:
                     case NOTHING_TO_COMPLETE:
-                        Exec.swing(new Runnable() {
+                        exec(new Swing() {
                             @Override
                             public void run() {
                                 sourceTree.clearSelection();
@@ -156,7 +156,29 @@ public class SourceFrame extends FrameBase {
                 timer.restart();
             }
         });
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
+        sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 switch (state) {
@@ -212,10 +234,15 @@ public class SourceFrame extends FrameBase {
                         }
                     }
                 }
-                if (!nodeList.isEmpty()) Exec.work(new Runnable() {
+                if (!nodeList.isEmpty()) exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getCreateModel().setSource(nodeList);
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.SELECT_SOURCE_SET_SOURCE;
                     }
                 });
             }

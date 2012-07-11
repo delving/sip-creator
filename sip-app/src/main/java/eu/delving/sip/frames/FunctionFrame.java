@@ -23,8 +23,9 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.model.FunctionCompileModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
@@ -74,7 +75,7 @@ public class FunctionFrame extends FrameBase {
     private UndoManager undoManager = new UndoManager();
 
     public FunctionFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.FUNCTIONS, desktop, sipModel, "Global Functions", false);
+        super(Which.FUNCTIONS, desktop, sipModel, "Functions");
         inputArea = new JTextArea(sipModel.getFunctionCompileModel().getInputDocument());
         inputArea.setFont(MONOSPACED);
         docArea = new JTextArea(sipModel.getFunctionCompileModel().getDocDocument());
@@ -212,27 +213,33 @@ public class FunctionFrame extends FrameBase {
             @Override
             public void recMappingSet(final MappingModel mappingModel) {
                 fetchFunctionList();
-                Exec.swing(new Runnable() {
+                exec(new Swing() {
                     @Override
                     public void run() {
-                        if (mappingModel.hasRecMapping()) {
-                            functionModel.setList(mappingModel.getRecMapping().getFunctions());
-                        }
                         factsModel.clear();
                         if (mappingModel.hasRecMapping()) {
+                            functionModel.setList(mappingModel.getRecMapping().getFunctions());
                             for (String fact : mappingModel.getRecMapping().getFacts().keySet()) {
                                 factsModel.addElement(String.format("  %s  ", fact));
                             }
                             factsModel.addElement("  _uniqueIdentifier   ");
                         }
+                        codeArea.setText("");
+                        outputArea.setText("");
+                        inputArea.setText("");
                     }
                 });
             }
         });
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
+            @Override
             public void functionChanged(final MappingModel mappingModel, final MappingFunction function) {
-                Exec.swing(new Runnable() {
+                exec(new Swing() {
                     @Override
                     public void run() {
                         if (mappingModel.hasRecMapping()) {
@@ -268,7 +275,7 @@ public class FunctionFrame extends FrameBase {
             final MappingFunction.FunctionList functionList = MappingFunction.read(functionFile.openStream());
             SortedSet<MappingFunction> hintFunctions = sipModel.getMappingHintsModel().getFunctions();
             if (hintFunctions != null) functionList.functions.addAll(hintFunctions);
-            Exec.swing(new Runnable() {
+            exec(new Swing() {
                 @Override
                 public void run() {
                     libraryListModel.setList(functionList.functions);
@@ -281,13 +288,8 @@ public class FunctionFrame extends FrameBase {
     }
 
     private void handleEnablement() {
-        Exec.swingLater(new Runnable() {
-            @Override
-            public void run() {
-                UNDO_ACTION.setEnabled(undoManager.canUndo());
-                REDO_ACTION.setEnabled(undoManager.canRedo());
-            }
-        });
+        UNDO_ACTION.setEnabled(undoManager.canUndo());
+        REDO_ACTION.setEnabled(undoManager.canRedo());
     }
 
     private class FunctionSelection implements ListSelectionListener {
@@ -309,13 +311,8 @@ public class FunctionFrame extends FrameBase {
                 functionList.clearSelection();
                 final int index = functionModel.indexOf(function.name);
                 if (index >= 0) {
-                    Exec.swingLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            functionList.setSelectedIndex(index);
-                            libraryList.clearSelection();
-                        }
-                    });
+                    functionList.setSelectedIndex(index);
+                    libraryList.clearSelection();
                 }
             }
             else {
@@ -326,17 +323,22 @@ public class FunctionFrame extends FrameBase {
             setEditable(docArea, !library);
             setEditable(inputArea, !library);
             setEditable(outputArea, !library);
-            Exec.work(new Runnable() {
+            exec(new Work() {
                 @Override
                 public void run() {
                     sipModel.getFunctionCompileModel().setFunction(function);
-                    Exec.swing(new Runnable() {
+                    exec(new Swing() {
                         @Override
                         public void run() {
                             undoManager.discardAllEdits();
                             handleEnablement();
                         }
                     });
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.FUNCTION_SELECT;
                 }
             });
         }
@@ -361,11 +363,16 @@ public class FunctionFrame extends FrameBase {
                     sipModel.getFeedback().alert("Sorry, but this function name already exists");
                     return;
                 }
-                Exec.work(new Runnable() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         MappingFunction mappingFunction = recMapping.createFunction(name);
                         sipModel.getMappingModel().notifyFunctionChanged(mappingFunction);
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.NOTIFY_FUNCTION_CHANGED;
                     }
                 });
             }
@@ -381,11 +388,16 @@ public class FunctionFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             final MappingFunction selected = (MappingFunction) functionList.getSelectedValue();
             if (selected != null) {
-                Exec.work(new Runnable() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getMappingModel().getRecMapping().removeFunction(selected);
                         sipModel.getMappingModel().notifyFunctionChanged(selected);
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.FUNCTION_REMOVE;
                     }
                 });
             }
@@ -401,11 +413,16 @@ public class FunctionFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             final MappingFunction selected = (MappingFunction) libraryList.getSelectedValue();
             if (selected != null) {
-                Exec.work(new Runnable() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getMappingModel().getRecMapping().addFunction(selected);
                         sipModel.getMappingModel().notifyFunctionChanged(selected);
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.FUNCTION_COPY_FROM_LIBRARY;
                     }
                 });
             }
@@ -494,7 +511,7 @@ public class FunctionFrame extends FrameBase {
         @Override
         public void stateChanged(final CompileState state) {
             final boolean lib = this.library;
-            Exec.swing(new Runnable() {
+            exec(new Swing() {
                 @Override
                 public void run() {
                     if (state == CompileState.ORIGINAL) undoManager.discardAllEdits();

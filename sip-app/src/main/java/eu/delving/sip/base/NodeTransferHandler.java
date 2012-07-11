@@ -82,7 +82,7 @@ public class NodeTransferHandler extends TransferHandler {
         if (!canImport(info)) return false;
         try {
             final NodeListHolder nodeListHolder = (NodeListHolder) info.getTransferable().getTransferData(FLAVOR);
-            Exec.work(new Runnable() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     CreateModel createModel = sipModel.getCreateModel();
@@ -94,6 +94,11 @@ public class NodeTransferHandler extends TransferHandler {
                         createModel.setTarget(recDefTreeNode);
                         if (createModel.canCreate()) createModel.createMapping();
                     }
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.DROP_TRANSFER_HANDLER;
                 }
             });
             return true;

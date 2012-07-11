@@ -52,7 +52,8 @@ public class XmlSerializer {
     private List<String> indentStrings = new ArrayList<String>();
 
     public String toXml(Node node) {
-        if (node.getNodeType() != Node.ELEMENT_NODE) throw new IllegalArgumentException("toXml should only be called on an element");
+        if (node.getNodeType() != Node.ELEMENT_NODE)
+            throw new IllegalArgumentException("toXml should only be called on an element");
         try {
             Map<String, String> namespaces = new TreeMap<String, String>();
             gatherNamespaces(node, namespaces);
@@ -97,6 +98,7 @@ public class XmlSerializer {
     }
 
     private void nodeToXml(XMLEventWriter out, Node node, int level) throws XMLStreamException {
+        if (node.getLocalName() == null) return;
         List<Attribute> attributes = getAttributes(node);
         String indentString = indentString(level);
         out.add(eventFactory.createCharacters(indentString));

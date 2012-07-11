@@ -51,6 +51,8 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.apache.http.HttpStatus.*;
 
@@ -63,7 +65,6 @@ import static org.apache.http.HttpStatus.*;
 public class CultureHubClient {
     private static final int CONNECTION_TIMEOUT = 1000 * 60 * 30;
     private static final int BLOCK_SIZE = 4096;
-    private static final long MINIMUM_PROGRESS_SIZE = 1024 * 1024;
     private Logger log = Logger.getLogger(getClass());
     private Context context;
     private HttpClient httpClient;
@@ -121,7 +122,6 @@ public class CultureHubClient {
                 InetSocketAddress addr = (InetSocketAddress) proxy.address();
                 String host = addr.getHostName();
                 int port = addr.getPort();
-                context.getFeedback().say(String.format("An HTTP Proxy is detected. %s:%d", host, port));
                 HttpHost httpHost = new HttpHost(host, port);
                 ConnRouteParams.setDefaultProxy(httpParams, httpHost);
                 proxyDetected = true;
@@ -129,9 +129,6 @@ public class CultureHubClient {
         }
         catch (URISyntaxException e) {
             throw new RuntimeException("Bad address: " + context.getServerUrl(), e);
-        }
-        if (!proxyDetected) {
-            context.getFeedback().say("No HTTP Proxy detected");
         }
         httpClient = new DefaultHttpClient(httpParams);
     }
@@ -148,7 +145,7 @@ public class CultureHubClient {
     }
 
     public void fetchDataSetList(ListReceiveListener listReceiveListener) {
-        Exec.work(new ListFetcher(1, listReceiveListener));
+        exec(new ListFetcher(1, listReceiveListener));
     }
 
     public interface UnlockListener {
@@ -156,28 +153,18 @@ public class CultureHubClient {
     }
 
     public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
-        Exec.work(new Unlocker(1, dataSet, unlockListener));
+        exec(new Unlocker(1, dataSet, unlockListener));
     }
 
-    public void downloadDataSet(DataSet dataSet, ProgressListener progressListener) {
-        Exec.work(new DataSetDownloader(1, dataSet, progressListener));
+    public void downloadDataSet(DataSet dataSet, Swing finished) {
+        exec(new DataSetDownloader(1, dataSet, finished));
     }
 
-    public interface UploadListener {
-        void uploadRefused(File file);
-
-        void uploadStarted(File file);
-
-        ProgressListener getProgressListener();
-
-        void finished(boolean success);
+    public void uploadFiles(DataSet dataSet, Swing finished) throws StorageException {
+        exec(new FileUploader(1, dataSet, finished));
     }
 
-    public void uploadFiles(DataSet dataSet, UploadListener uploadListener) throws StorageException {
-        Exec.work(new FileUploader(1, dataSet, uploadListener));
-    }
-
-    private abstract class Attempt implements Runnable {
+    private abstract class Attempt implements Work {
         protected int attempt;
 
         protected Attempt(int attempt) {
@@ -188,11 +175,11 @@ public class CultureHubClient {
             return attempt <= 3;
         }
 
-        protected boolean reactToUnauthorized(Runnable retry) {
+        protected boolean reactToUnauthorized(Work retry) {
             if (shouldRetry()) {
                 context.getFeedback().alert("Authorization failed, retrying...");
                 context.invalidateTokens();
-                Exec.workLater(retry);
+                exec(retry);
                 return true;
             }
             else {
@@ -214,7 +201,6 @@ public class CultureHubClient {
             try {
                 String url = createListRequest();
                 log.info("requesting list: " + url);
-                say("Requesting data set list from culture hub");
                 HttpGet get = new HttpGet(url);
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
@@ -224,7 +210,6 @@ public class CultureHubClient {
                     switch (code) {
                         case OK:
                             DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
-                            say("List received");
                             listReceiveListener.listReceived(dataSetList.list);
                             break;
                         case UNAUTHORIZED:
@@ -259,9 +244,14 @@ public class CultureHubClient {
                 listReceiveListener.failed(e);
             }
         }
+
+        @Override
+        public Job getJob() {
+            return Job.FETCH_LIST;
+        }
     }
 
-    private class Unlocker extends Attempt {
+    private class Unlocker extends Attempt implements Work.DataSetWork {
         private DataSet dataSet;
         private UnlockListener unlockListener;
 
@@ -275,7 +265,6 @@ public class CultureHubClient {
         public void run() {
             try {
                 HttpGet get = createUnlockRequest(dataSet);
-                say("Unlocking data set " + dataSet.getSpec());
                 HttpResponse response = httpClient.execute(get);
                 EntityUtils.consume(response.getEntity());
                 Code code = Code.from(response);
@@ -305,16 +294,27 @@ public class CultureHubClient {
                 unlockListener.unlockComplete(false);
             }
         }
+
+        @Override
+        public Job getJob() {
+            return Job.UNLOCK;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
     }
 
-    private class DataSetDownloader extends Attempt {
+    private class DataSetDownloader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
         private DataSet dataSet;
         private ProgressListener progressListener;
+        private Swing finished;
 
-        private DataSetDownloader(int attempt, DataSet dataSet, ProgressListener progressListener) {
+        private DataSetDownloader(int attempt, DataSet dataSet, Swing finished) {
             super(attempt);
             this.dataSet = dataSet;
-            this.progressListener = progressListener;
+            this.finished = finished;
         }
 
         @Override
@@ -322,7 +322,6 @@ public class CultureHubClient {
             boolean success = false;
             try {
                 HttpGet get = createDownloadRequest(dataSet);
-                say("Downloading SIP for data set " + dataSet.getSpec());
                 progressListener.prepareFor(-1);
                 HttpResponse response = httpClient.execute(get);
                 HttpEntity entity = response.getEntity();
@@ -333,10 +332,12 @@ public class CultureHubClient {
                             dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
                             success = true;
                             context.dataSetCreated(dataSet);
-                            say(String.format("Local data set %s created in workspace", dataSet.getSpec()));
                             break;
                         case UNAUTHORIZED:
-                            if (!reactToUnauthorized(new DataSetDownloader(attempt + 1, dataSet, progressListener))) {
+                            if (reactToUnauthorized(new DataSetDownloader(attempt + 1, dataSet, finished))) {
+                                finished = null;
+                            }
+                            else {
                                 success = false;
                             }
                             break;
@@ -356,7 +357,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.warn("Unable to download data set", e);
-                context.getFeedback().alert("Unable to download data set"); // todo: tell them why
+                context.getFeedback().alert("Unable to download data set", e);
             }
             finally {
                 if (!success) {
@@ -368,20 +369,39 @@ public class CultureHubClient {
                     }
                 }
                 progressListener.finished(success);
+                if (finished != null) Swing.Exec.later(finished);
             }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.DOWNLOAD;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setProgressMessage(String.format("Downloading the data of '%s' from the culture hub.", dataSet.getSpec()));
+            progressListener.setIndeterminateMessage(String.format("Culture hub is preparing '%s' for download.", dataSet.getSpec()));
         }
     }
 
-    private class FileUploader extends Attempt {
+    private class FileUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
         private DataSet dataSet;
         private List<File> uploadFiles;
-        private UploadListener uploadListener;
+        private ProgressListener progressListener;
+        private Swing finished;
 
-        FileUploader(int attempt, DataSet dataSet, UploadListener uploadListener) throws StorageException {
+        FileUploader(int attempt, DataSet dataSet, Swing finished) throws StorageException {
             super(attempt);
             this.dataSet = dataSet;
             this.uploadFiles = dataSet.getUploadFiles();
-            this.uploadListener = uploadListener;
+            this.finished = finished;
         }
 
         @Override
@@ -399,15 +419,10 @@ public class CultureHubClient {
                             Iterator<File> walk = uploadFiles.iterator();
                             while (walk.hasNext()) {
                                 File file = walk.next();
-                                if (!requestedFiles.contains(file.getName())) {
-                                    log.info(String.format("Hub does not want %s", file.getName()));
-                                    uploadListener.uploadRefused(file);
-                                    walk.remove();
-                                }
+                                if (!requestedFiles.contains(file.getName())) walk.remove();
                             }
                             for (File file : uploadFiles) {
-                                ProgressListener progressListener = file.length() < MINIMUM_PROGRESS_SIZE ? null : uploadListener.getProgressListener();
-                                HttpPost upload = createUploadRequest(dataSet, file, uploadListener, progressListener);
+                                HttpPost upload = createUploadRequest(dataSet, file, progressListener);
                                 FileEntity fileEntity = (FileEntity) upload.getEntity();
                                 log.info("Uploading " + file);
                                 try {
@@ -417,7 +432,6 @@ public class CultureHubClient {
                                     if (code != Code.OK && !fileEntity.abort) {
                                         context.invalidateTokens();
                                         reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
-                                        uploadListener.finished(false);
                                         return;
                                     }
                                 }
@@ -427,7 +441,10 @@ public class CultureHubClient {
                             }
                             break;
                         case UNAUTHORIZED:
-                            if (!reactToUnauthorized(new FileUploader(attempt + 1, dataSet, uploadListener))) {
+                            if (reactToUnauthorized(new FileUploader(attempt + 1, dataSet, finished))) {
+                                finished = null;
+                            }
+                            else {
                                 context.getFeedback().alert("Unable to complete upload");
                             }
                             break;
@@ -441,17 +458,40 @@ public class CultureHubClient {
                 else {
                     throw new IOException("Empty entity");
                 }
-                uploadListener.finished(true);
             }
             catch (OAuthProblemException e) {
                 reportOAuthProblem(e);
-                uploadListener.finished(false);
             }
             catch (Exception e) {
                 log.error("Error while connecting", e);
                 context.getFeedback().alert("Authorization system problem: " + e.getMessage());
-                uploadListener.finished(false);
             }
+            finally {
+                if (finished != null) Swing.Exec.later(finished);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.UPLOAD;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setProgressMessage(String.format(
+                    "Uploading the data of '%s' to the culture hub",
+                    dataSet.getSpec()
+            ));
+            progressListener.setIndeterminateMessage(String.format(
+                    "Culture hub is processing '%s' metadata",
+                    dataSet.getSpec()
+            ));
         }
     }
 
@@ -489,21 +529,15 @@ public class CultureHubClient {
         }
     }
 
-    private void say(String message) {
-        context.getFeedback().say(message);
-    }
-
     private static class FileEntity extends AbstractHttpEntity implements Cloneable {
         private final File file;
-        private final UploadListener uploadListener;
         private final ProgressListener progressListener;
         private long bytesSent;
         private int blocksReported;
         private boolean abort = false;
 
-        public FileEntity(File file, UploadListener uploadListener, ProgressListener progressListener) {
+        public FileEntity(File file, ProgressListener progressListener) {
             this.file = file;
-            this.uploadListener = uploadListener;
             this.progressListener = progressListener;
             setContentType(deriveContentType(file));
         }
@@ -524,7 +558,6 @@ public class CultureHubClient {
 
         @Override
         public void writeTo(OutputStream outputStream) throws IOException {
-            uploadListener.uploadStarted(file);
             if (progressListener != null) progressListener.prepareFor((int) (getContentLength() / BLOCK_SIZE));
             InputStream inputStream = new FileInputStream(this.file);
             try {
@@ -598,13 +631,13 @@ public class CultureHubClient {
         return new StringEntity(fileList.toString());
     }
 
-    private HttpPost createUploadRequest(DataSet dataSet, File file, UploadListener uploadListener, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
+    private HttpPost createUploadRequest(DataSet dataSet, File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
         String url = String.format(
                 "%s/submit/%s/%s/%s?accessKey=%s",
                 context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), file.getName(), context.getAccessToken()
         );
         HttpPost upload = new HttpPost(url);
-        FileEntity fileEntity = new FileEntity(file, uploadListener, progressListener);
+        FileEntity fileEntity = new FileEntity(file, progressListener);
         upload.setEntity(fileEntity);
         return upload;
     }
@@ -685,5 +718,11 @@ public class CultureHubClient {
         public String username;
         public String fullname;
         public String email;
+    }
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    public void exec(Work work) {
+        executor.execute(work);
     }
 }

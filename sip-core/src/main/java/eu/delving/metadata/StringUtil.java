@@ -36,17 +36,13 @@ import java.util.regex.Pattern;
 
 public class StringUtil {
 
-    private static final Hasher HASHER = new Hasher();
     private static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
 
-    public static String toDictionaryName(NodeMapping nodeMapping) {
-        return "Dictionary" + HASHER.getHashString(nodeMapping.outputPath.toString()).substring(16);
-    }
-
     public static void toDictionaryCode(NodeMapping nodeMapping, CodeOut codeOut) {
-        if (nodeMapping.dictionary == null) return;
-        String name = toDictionaryName(nodeMapping);
-        codeOut.line_(String.format("def %s = [", name));
+        if (!nodeMapping.hasDictionary()) return;
+        OptBox optBox = nodeMapping.recDefNode.getDictionaryOptBox();
+        if (optBox == null || optBox.isChild()) return;
+        codeOut.line_(String.format("def Dictionary%s = [", optBox.getDictionaryName()));
         Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
         while (walk.hasNext()) {
             Map.Entry<String, String> entry = walk.next();
@@ -57,18 +53,17 @@ public class StringUtil {
             ));
         }
         codeOut._line("]");
-        codeOut.line_("def from%s = { value ->", name);
-        codeOut.line_("if (value) {");
-        codeOut.line("def v = %s[value.sanitize()];", name);
-        codeOut.line_("if (v) {");
-        codeOut.line_("if (v.endsWith(':')) {");
-        codeOut.line("return \"${v} ${value}\"");
-        codeOut._line("} else {").in();
-        codeOut.line("return v");
-        codeOut._line("}");
-        codeOut._line("}");
-        codeOut._line("}");
-        codeOut.line("return ''");
+        for (OptRole field : OptRole.getFields()) toLookupClosure(codeOut, optBox.getDictionaryName(), field.getFieldName());
+    }
+
+    private static void toLookupClosure(CodeOut codeOut, String name, String field) {
+        codeOut.line_("def lookup%s_%s = { value ->", name, field);
+        codeOut.line("   if (!value) return ''");
+        codeOut.line("   String optKey = Dictionary%s[value.sanitize()]", name);
+        codeOut.line("   if (!optKey) optKey = value");
+        codeOut.line("   Object opt = _optLookup['%s'][optKey]", name);
+        codeOut.line("   if (!opt) return ''");
+        codeOut.line("   opt.%s", field);
         codeOut._line("}");
     }
 

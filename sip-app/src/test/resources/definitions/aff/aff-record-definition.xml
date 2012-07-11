@@ -3,12 +3,10 @@
 
     <!--<version>1.0</version>-->
 
-
     <namespaces>
         <namespace prefix="aff" uri="http://schemas.delving.eu/aff/"
                    schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
     </namespaces>
-
 
     <attrs>
         <attr tag="id"/>
@@ -114,7 +112,7 @@
                 <elem tag="displayMethod"/>
                 <elem tag="displayDescription"/>
 
-                <elem tag="eventActor" attrs="type, key, roleInEventUri, localId, schema, schemaUri">
+                <elem tag="eventActor" attrs="type, key, localId, roleInEventUri, schema, schemaUri">
                     <elem tag="displayRoleInEvent"/>
                     <elem tag="displayActor"/>
                     <elem tag="displayNationality"/>
@@ -133,7 +131,7 @@
                     </elem>
                 </elem>
 
-                <elem tag="eventPlace" attrs="type, key, roleInEventUri, localId, schema, schemaUri">
+                <elem tag="eventPlace" attrs="type, key, localId, roleInEventUri, schema, schemaUri">
                     <elem tag="displayRoleInEvent"/>
                     <elem tag="displayPlace"/>
                     <elem tag="displayDescription"/>
@@ -161,19 +159,31 @@
 
     <opts>
 
-        <opt-list dictionary="true" path="/record/thing/category" key="@key" schemaUri="@schemaUri" displayName="Category">
-            <opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>
-            <opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>
-            <opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>
-            <opt key="crm_e31" scehamUri="http://www.cidoc-crm.org/rdfs/E31.Document" value="Document"/>
-        </opt-list>
+        <!--<opt-list dictionary="CLUMP"-->
+                  <!--path="/lido/administrativeMetadata/recordWrap/recordID"-->
+                  <!--key="@type"-->
+                  <!--displayName="MoreFake">-->
+            <!--<opt key="rv" value="reverse reverse"/>-->
+            <!--<opt key="fw" value="forward forward"/>-->
+            <!--<opt key="pause" value="Pause Pause!"/>-->
+        <!--</opt-list>-->
+
+        <!--<opt-list dictionary="CAT" path="/record/thing/category"-->
+                  <!--key="@key"-->
+                  <!--schemaUri="@schemaUri"-->
+                  <!--displayName="Category">-->
+            <!--<opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>-->
+            <!--<opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>-->
+            <!--<opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>-->
+            <!--<opt key="crm_e31" scehamUri="http://www.cidoc-crm.org/rdfs/E31.Document" value="Document"/>-->
+        <!--</opt-list>-->
 
         <opt-list path="/record/findingAid/c" key="@key" value="@type" displayName="FindingAid">
             <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fonds" value="root">
-                <opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">
-                    <opt value="A"/>
-                    <opt value="B"/>
-                </opt-list>
+                <dict-opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">
+                    <dict-opt value="A"/>
+                    <dict-opt value="B"/>
+                </dict-opt-list>
             </opt>
         </opt-list>
 
@@ -192,7 +202,28 @@
         </opt-list>
 
         <opt-list path="/record/events/event" key="@key" value="@type" schema="@schema" schemaUri="@schemaUri" displayName="Events">
-            <opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production" value="Production"/>
+            <opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production" value="Production">
+
+                <dict-opt-list dictionary="ActorRoleInEvent"
+                          valuePath="/record/events/event/eventActor/displayRoleInEvent"
+                          keyPath="/record/events/event/eventActor/@roleInEventUri"
+                          displayName="ActorRoleInEvent">
+                    <dict-opt key="a" value="Photographer"/>
+                    <dict-opt key="b" value="Creator"/>
+                    <dict-opt key="c" value="Factory"/>
+                    <dict-opt key="d" value="Company owner"/>
+                    <dict-opt key="e" value="Producer"/>
+                </dict-opt-list>
+
+                <dict-opt-list dictionary="PlaceRoleInEvent"
+                          valuePath="/record/events/event/eventPlace/displayRoleInEvent"
+                          keyPath="/record/events/event/eventPlace/@roleInEventUri"
+                          displayName="PlaceRoleInEvent">
+                    <dict-opt key="a" value="Production place"/>
+                    <dict-opt key="b" value="What the fuck, need to check up this!"/>
+                </dict-opt-list>
+
+            </opt>
             <opt hidden="true" key="crm_e65" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E65.Creation" value="Creation"/>
             <opt hidden="true" key="crm_e8" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E8.Acquisition" value="Acquisition"/>
             <opt hidden="true" key="crm_e16" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E16.Measurement" value="Measurement"/>

@@ -21,8 +21,7 @@
 
 package eu.delving.sip.actions;
 
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -47,20 +46,18 @@ public class ValidateAction extends AbstractAction {
     private JDesktopPane parent;
     private InvestigateRecordAction investigateRecordAction = new InvestigateRecordAction();
     private AllowInvalidRecordsAction allowInvalidRecordsAction = new AllowInvalidRecordsAction();
-    private Runnable investigate;
+    private Swing investigate;
 
-    public ValidateAction(JDesktopPane parent, SipModel sipModel, Runnable investigate) {
+    public ValidateAction(JDesktopPane parent, SipModel sipModel, Swing investigate) {
         super("<html><b>Map and validate all records</b>");
         this.parent = parent;
         this.sipModel = sipModel;
         this.investigate = investigate;
         setEnabled(false);
         putValue(Action.SMALL_ICON, SwingHelper.VALIDATE_ICON);
-        putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
-        this.sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+        KeyStroke keyStrokeV = KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        putValue(Action.ACCELERATOR_KEY, keyStrokeV);
+        this.sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 enableAccordingTo(state);
@@ -99,38 +96,29 @@ public class ValidateAction extends AbstractAction {
     }
 
     private void performValidation(boolean allowInvalidRecords) {
-        ProgressListener progressListener = sipModel.getFeedback().progressListener("Validating and Analyzing");
-        progressListener.setProgressMessage(String.format(
-                "<html><h3>Mapping raw data of '%s' into '%s' format, validating and gathering statistics</h3>",
-                sipModel.getDataSetModel().getDataSet().getSpec(),
-                sipModel.getMappingModel().getRecMapping().getPrefix()
-        ));
-        progressListener.onFinished(new ProgressListener.End() {
+        setEnabled(false);
+        SipModel.ValidationListener validationListener = new SipModel.ValidationListener() {
             @Override
-            public void finished(ProgressListener progressListener, boolean success) {
+            public void failed(final int recordNumber, final String record, String message) {
+                sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        investigateRecordAction.setRecordNumber(recordNumber);
+                        Dimension all = parent.getSize();
+                        Dimension d = dialog.getSize();
+                        dialog.setLocation((all.width - d.width) / 2, (all.height - d.height) / 2);
+                        dialog.setVisible(true);
+                    }
+                });
+            }
+        };
+        sipModel.processFile(allowInvalidRecords, validationListener, new Swing() {
+
+            @Override
+            public void run() {
                 setEnabled(true);
             }
         });
-        setEnabled(false);
-        sipModel.validateFile(
-                allowInvalidRecords,
-                progressListener,
-                new SipModel.ValidationListener() {
-                    @Override
-                    public void failed(final int recordNumber, final String record, String message) {
-                        Exec.swing(new Runnable() {
-                            @Override
-                            public void run() {
-                                investigateRecordAction.setRecordNumber(recordNumber);
-                                Dimension all = parent.getSize();
-                                Dimension d = dialog.getSize();
-                                dialog.setLocation((all.width - d.width) / 2, (all.height - d.height) / 2);
-                                dialog.setVisible(true);
-                            }
-                        });
-                    }
-                }
-        );
     }
 
     private class InvestigateRecordAction extends AbstractAction {
@@ -148,15 +136,7 @@ public class ValidateAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            ProgressListener progressListener = sipModel.getFeedback().progressListener("Scanning");
-            progressListener.setProgressMessage(String.format("<html><h3>Scanning for record %d</h3></html>", recordNumber));
-            progressListener.onFinished(new ProgressListener.End() {
-                @Override
-                public void finished(ProgressListener progressListener, boolean success) {
-                    dialog.setVisible(false);
-                }
-            });
-            sipModel.seekRecordNumber(recordNumber, progressListener);
+            sipModel.seekRecordNumber(recordNumber);
             investigate.run();
         }
     }

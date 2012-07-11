@@ -25,13 +25,16 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -55,6 +58,7 @@ public class AllFrames {
     private FunctionFrame functionFrame;
     private MappingCodeFrame mappingCodeFrame;
     private StatsFrame statsFrame;
+    private WorkFrame workFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
@@ -73,6 +77,7 @@ public class AllFrames {
         functionFrame = new FunctionFrame(desktop, sipModel);
         mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
         statsFrame = new StatsFrame(desktop, sipModel);
+        workFrame = new WorkFrame(desktop, sipModel);
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
         FrameBase source = new SourceFrame(desktop, sipModel);
@@ -130,8 +135,8 @@ public class AllFrames {
         }
     }
 
-    public Runnable prepareForNothing() {
-        return new Runnable() {
+    public Swing prepareForNothing() {
+        return new Swing() {
             @Override
             public void run() {
                 selectNewView("");
@@ -139,8 +144,8 @@ public class AllFrames {
         };
     }
 
-    public Runnable prepareForMapping(final JComponent component) {
-        return new Runnable() {
+    public Swing prepareForMapping(final JComponent component) {
+        return new Swing() {
             @Override
             public void run() {
                 selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Quick Mapping");
@@ -148,8 +153,8 @@ public class AllFrames {
         };
     }
 
-    public Runnable prepareForInvestigation(final JComponent component) {
-        return new Runnable() {
+    public Swing prepareForInvestigation(final JComponent component) {
+        return new Swing() {
             @Override
             public void run() {
                 selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Big Picture");
@@ -157,8 +162,8 @@ public class AllFrames {
         };
     }
 
-    public Runnable prepareForDelimiting() {
-        return new Runnable() {
+    public Swing prepareForDelimiting() {
+        return new Swing() {
             @Override
             public void run() {
                 selectNewView("First Contact");
@@ -167,12 +172,7 @@ public class AllFrames {
     }
 
     public void restore() {
-        Exec.swingLater(new Runnable() {
-            @Override
-            public void run() {
-                selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
-            }
-        });
+        selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
     }
 
     public JMenu getFrameMenu() {
@@ -186,6 +186,7 @@ public class AllFrames {
         menu.add(statsFrame.getAction());
         menu.add(functionFrame.getAction());
         menu.add(mappingCodeFrame.getAction());
+        menu.add(workFrame.getAction());
         return menu;
     }
 
@@ -197,24 +198,49 @@ public class AllFrames {
         return menu;
     }
 
-    public JPanel getArrangementsPanel() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBorder(BorderFactory.createTitledBorder("Arrangements"));
-        for (Arrangement a : arrangements) {
+    public JPanel getSidePanel() {
+        JPanel arrangements = new JPanel();
+        arrangements.setLayout(new BoxLayout(arrangements, BoxLayout.Y_AXIS));
+        arrangements.setBorder(BorderFactory.createTitledBorder("Arrangements"));
+        for (Arrangement a : this.arrangements) {
             JButton b = new JButton(a);
             b.setHorizontalTextPosition(JButton.CENTER);
             b.setVerticalTextPosition(JButton.BOTTOM);
             b.setFont(new Font("Sans", Font.ITALIC, 10));
-            p.add(b);
-            p.add(Box.createVerticalStrut(5));
+            arrangements.add(b);
+            arrangements.add(Box.createVerticalStrut(5));
         }
-        p.add(Box.createVerticalGlue());
+        arrangements.add(Box.createVerticalGlue());
+        JPanel work = new JPanel(new BorderLayout());
+        work.add(miniScrollV("Work", workFrame.getMiniList()));
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(arrangements, BorderLayout.CENTER);
+        p.add(work, BorderLayout.SOUTH);
+        p.setPreferredSize(new Dimension(110, 400));
+        workFrame.getMiniList().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() || workFrame.getMiniList().isSelectionEmpty()) return;
+                workFrame.getAction().actionPerformed(null);
+            }
+        });
         return p;
     }
 
+    public static JComponent miniScrollV(String title, JComponent content) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder(title));
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        p.add(scroll);
+        return p;
+    }
+
+
     public JPanel getBigWindowsPanel() {
-        JPanel p = new JPanel(new GridLayout(0, 1));
+        JPanel p = new JPanel(new GridLayout(1, 0));
+        p.setBorder(BorderFactory.createTitledBorder("Global Frames"));
         p.add(createHotkeyButton(statsFrame));
         p.add(createHotkeyButton(functionFrame));
         p.add(createHotkeyButton(mappingCodeFrame));
@@ -252,7 +278,6 @@ public class AllFrames {
         for (Arrangement arrangement : arrangements) {
             if (arrangement.toString().equals(viewName)) {
                 arrangement.actionPerformed(null);
-                sipModel.getFeedback().say(String.format("Selecting view %s", arrangement));
                 return;
             }
         }
@@ -313,7 +338,7 @@ public class AllFrames {
         }
     }
 
-    private class Arrangement extends AbstractAction implements Runnable {
+    private class Arrangement extends AbstractAction implements Swing {
         List<Block> blocks = new ArrayList<Block>();
         public XArrangement source;
         private ViewIcon small, large;
@@ -357,7 +382,7 @@ public class AllFrames {
             actionPerformed(null);
             small.refresh();
             large.refresh();
-            Exec.work(new Runnable() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     XStream stream = new XStream();
@@ -369,6 +394,11 @@ public class AllFrames {
                         // eat it.
                     }
                 }
+
+                @Override
+                public Job getJob() {
+                    return Job.READ_FRAME_ARRANGEMENTS;
+                }
             });
         }
     }
@@ -377,7 +407,6 @@ public class AllFrames {
         public EditAction() {
             super("Edit Frame Arrangements");
         }
-
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {

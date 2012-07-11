@@ -25,7 +25,7 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;
@@ -64,40 +64,39 @@ public class NodeMappingListModel extends AbstractListModel {
 
     @Override
     public int getSize() {
-        Exec.checkSwing();
         return entries.size();
     }
 
     @Override
     public Object getElementAt(int i) {
-        Exec.checkSwing();
         return entries.get(i);
     }
 
     public NodeMappingEntry getEntry(NodeMapping nodeMapping) {
-        Exec.checkSwing();
         return entries.get(indexOf(nodeMapping));
     }
 
     public void clearHighlighted() {
-        Exec.checkSwing();
         for (NodeMappingEntry entry : entries) entry.clearHighlighted();
     }
 
     public void fireContentsChanged(int index) {
-        Exec.checkSwing();
         fireContentsChanged(this, index, index);
     }
 
-    public MappingModel.ChangeListener createMappingChangeEar() {
+    public MappingModel.ChangeListener createMappingChangeEar(final SipModel sipModel) {
         return new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+            }
+
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
             }
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping, NodeMappingChange change) {
-                Exec.swing(new Runnable() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         fireContentsChanged(indexOf(nodeMapping));
@@ -107,7 +106,7 @@ public class NodeMappingListModel extends AbstractListModel {
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
-                Exec.swing(new Runnable() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         entries.add(new NodeMappingEntry(NodeMappingListModel.this, nodeMapping));
@@ -119,7 +118,7 @@ public class NodeMappingListModel extends AbstractListModel {
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping) {
-                Exec.swing(new Runnable() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         int index = indexOf(nodeMapping);
@@ -131,11 +130,11 @@ public class NodeMappingListModel extends AbstractListModel {
         };
     }
 
-    public MappingModel.SetListener createSetEar() {
+    public MappingModel.SetListener createSetEar(final SipModel sipModel) {
         return new MappingModel.SetListener() {
             @Override
             public void recMappingSet(final MappingModel mappingModel) {
-                Exec.swing(new Runnable() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getNodeMappings() : null);
@@ -146,7 +145,6 @@ public class NodeMappingListModel extends AbstractListModel {
     }
 
     public void setList(List<NodeMapping> freshList) {
-        Exec.checkSwing();
         if (!entries.isEmpty()) {
             final int size = getSize();
             entries.clear();
@@ -161,7 +159,6 @@ public class NodeMappingListModel extends AbstractListModel {
     }
 
     public int indexOf(NodeMapping nodeMapping) {
-        Exec.checkSwing();
         int index = 0;
         for (NodeMappingEntry entry : entries) {
             if (entry.getNodeMapping() == nodeMapping) return index;

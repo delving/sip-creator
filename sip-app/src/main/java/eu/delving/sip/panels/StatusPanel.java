@@ -21,6 +21,7 @@
 
 package eu.delving.sip.panels;
 
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
@@ -81,8 +82,8 @@ public class StatusPanel extends JPanel {
         for (StateAction action : actions) action.enableIf(state);
     }
 
-    public void setReaction(DataSetState state, Runnable work) {
-        for (StateAction stateAction : actions) if (stateAction.state == state) stateAction.setWork(work);
+    public void setReaction(DataSetState state, Swing swing) {
+        for (StateAction stateAction : actions) if (stateAction.state == state) stateAction.setWork(swing);
     }
 
     public void setReaction(DataSetState state, Action action) {
@@ -91,7 +92,7 @@ public class StatusPanel extends JPanel {
 
     private class StateAction extends AbstractAction {
         private DataSetState state;
-        private Runnable work;
+        private Swing swing;
         private Action action;
 
         private StateAction(DataSetState state) {
@@ -100,8 +101,8 @@ public class StatusPanel extends JPanel {
             setEnabled(false);
         }
 
-        public void setWork(Runnable work) {
-            this.work = work;
+        public void setWork(Swing swing) {
+            this.swing = swing;
         }
 
         public void setAction(Action action) {
@@ -119,12 +120,12 @@ public class StatusPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (work != null) work.run();
+            if (swing != null) swing.run();
             if (action != null) action.actionPerformed(null);
         }
     }
     
-    private class SourcedListener implements DataSetModel.Listener {
+    private class SourcedListener implements DataSetModel.SwingListener {
         private StateAction sourcedAction;
 
         private SourcedListener(StateAction action) {

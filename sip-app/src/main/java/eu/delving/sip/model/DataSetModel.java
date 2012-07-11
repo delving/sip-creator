@@ -22,7 +22,8 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
@@ -46,10 +47,15 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
 public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
     private DataSetState currentState = ABSENT;
-    private MappingModel mappingModel = new MappingModel();
+    private MappingModel mappingModel;
 
-    public DataSetModel() {
-        new StateCheckTimer();
+    public DataSetModel() { // test only
+        this.mappingModel = new MappingModel();
+    }
+
+    public DataSetModel(SipModel sipModel) {
+        this.mappingModel = new MappingModel(sipModel);
+        new StateCheckTimer(sipModel);
     }
 
     public MappingModel getMappingModel() {
@@ -126,10 +132,12 @@ public class DataSetModel implements RecDefModel {
         return !isEmpty() && dataSet.deleteValidation(getPrefix());
     }
 
-    private class StateCheckTimer implements Runnable, ActionListener {
+    private class StateCheckTimer implements Work, ActionListener, Work.DataSetWork {
+        private SipModel sipModel;
         private Timer timer = new Timer(1000, this);
 
-        private StateCheckTimer() {
+        private StateCheckTimer(SipModel sipModel) {
+            this.sipModel = sipModel;
             timer.setRepeats(true);
             timer.start();
         }
@@ -139,10 +147,10 @@ public class DataSetModel implements RecDefModel {
             final DataSetState freshState = getDataSetState();
             if (freshState != currentState) {
                 currentState = freshState;
-                Exec.swing(new Runnable() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
-                        for (Listener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);
+                        for (SwingListener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);
                     }
                 });
             }
@@ -150,17 +158,28 @@ public class DataSetModel implements RecDefModel {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(this);
+            sipModel.exec(this);
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.CHECK_STATE;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            if (sipModel.getDataSetModel().isEmpty()) return null;
+            return sipModel.getDataSetModel().getDataSet();
         }
     }
 
-    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+    private List<SwingListener> listeners = new CopyOnWriteArrayList<SwingListener>();
 
-    public void addListener(Listener listener) {
+    public void addListener(SwingListener listener) {
         listeners.add(listener);
     }
 
-    public interface Listener {
+    public interface SwingListener {
 
         void stateChanged(DataSetModel model, DataSetState state);
 

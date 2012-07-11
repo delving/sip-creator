@@ -23,6 +23,9 @@ package eu.delving.sip.xml;
 
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
@@ -45,25 +48,43 @@ import java.io.InputStream;
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 
-public class AnalysisParser implements Runnable {
+public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
     public static final int ELEMENT_STEP = 10000;
     private Stats stats = new Stats();
     private Listener listener;
     private DataSetModel dataSetModel;
+    private ProgressListener progressListener;
 
     public interface Listener {
 
         void success(Stats stats);
 
         void failure(String message, Exception exception);
-
-        boolean progress(long elementCount);
     }
 
     public AnalysisParser(DataSetModel dataSetModel, int maxUniqueValueLength, Listener listener) {
         this.dataSetModel = dataSetModel;
         this.listener = listener;
         stats.maxUniqueValueLength = maxUniqueValueLength;
+    }
+
+    @Override
+    public Job getJob() {
+        return Job.PARSE_ANALYZE;
+    }
+
+    @Override
+    public DataSet getDataSet() {
+        return dataSetModel.getDataSet();
+    }
+
+    @Override
+    public void setProgressListener(ProgressListener progressListener) {
+        this.progressListener = progressListener;
+        progressListener.setProgressMessage(String.format(
+                "Analyzing data of '%s'",
+                dataSetModel.getDataSet().getSpec()
+        ));
     }
 
     @Override
@@ -94,12 +115,12 @@ public class AnalysisParser implements Runnable {
                 stats.name = dataSetModel.getDataSet().getDataSetFacts().get("name");
                 XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
                 StringBuilder text = new StringBuilder();
-                long count = 0;
+                int count = 0;
                 while (running) {
                     switch (input.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             if (++count % ELEMENT_STEP == 0) {
-                                if (listener != null && !listener.progress(count)) running = false;
+                                if (listener != null && !progressListener.setProgress(count)) running = false;
                             }
                             for (int walk = 0; walk < input.getNamespaceCount(); walk++) {
                                 stats.recordNamespace(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
@@ -132,9 +153,11 @@ public class AnalysisParser implements Runnable {
             }
             if (running) {
                 stats.finish();
+                progressListener.finished(true);
                 listener.success(stats);
             }
             else {
+                progressListener.finished(false);
                 listener.failure(null, null);
             }
         }
@@ -152,6 +175,7 @@ public class AnalysisParser implements Runnable {
                     default:
                         throw new IllegalStateException("Unexpected state " + dataSetModel.getDataSetState(), e);
                 }
+                progressListener.finished(false);
                 listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
             }
             catch (StorageException se) {

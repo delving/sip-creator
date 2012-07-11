@@ -30,11 +30,9 @@ package eu.delving.sip.model;
 public enum CreateTransition {
 
     NOTHING_TO_SOURCE(true, false, false), // source set
-    SOURCE_TO_NOTHING(true, false, false), // source set
     SOURCE_TO_SOURCE(true, false, false), // source to something new
 
     NOTHING_TO_TARGET(false, true, false), // target set
-    TARGET_TO_NOTHING(false, true, false), // target set
     TARGET_TO_TARGET(false, true, false),
 
     ARMED_TO_TARGET(true, false, false), // source cleared
@@ -58,7 +56,8 @@ public enum CreateTransition {
     TARGET_TO_COMPLETE(true, false, true), // source and nodeMapping set
     SOURCE_TO_COMPLETE(false, true, true), // target and nodeMapping set
 
-    CREATE_COMPLETE(false, false, true); // only nodeMapping set
+    CREATE_COMPLETE(false, false, true), // only nodeMapping set
+    ANYTHING_TO_NOTHING(true, true, true);
 
     public final boolean sourceChanged, targetChanged, nodeMappingChanged;
 

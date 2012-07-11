@@ -21,10 +21,14 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
-import eu.delving.sip.base.Exec;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.RevertMappingMenu;
 import eu.delving.sip.model.*;
 
@@ -44,9 +48,11 @@ import java.awt.event.ActionEvent;
 public class RecMappingFrame extends FrameBase {
     private RemoveNodeMappingAction removeAction = new RemoveNodeMappingAction();
     private JList nodeMappingList;
+    private RevertMappingMenu revertMappingMenu;
 
     public RecMappingFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings", false);
+        super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings");
+        revertMappingMenu = new RevertMappingMenu(sipModel);
         setJMenuBar(createMenuBar());
         nodeMappingList = sipModel.getMappingModel().getNodeMappingListModel().createJList();
         nodeMappingList.addListSelectionListener(new NodeMappingSelection());
@@ -56,7 +62,7 @@ public class RecMappingFrame extends FrameBase {
                 switch (transition) {
                     case COMPLETE_TO_ARMED_SOURCE:
                     case COMPLETE_TO_ARMED_TARGET:
-                        Exec.swing(new Runnable() {
+                        exec(new Swing() {
                             @Override
                             public void run() {
                                 nodeMappingList.clearSelection();
@@ -66,11 +72,33 @@ public class RecMappingFrame extends FrameBase {
                 }
             }
         });
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                removeAction.setEnabled(!locked);
+                revertMappingMenu.setEnabled(!locked);
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
     }
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        RevertMappingMenu revertMappingMenu = new RevertMappingMenu(sipModel);
         sipModel.getMappingSaveTimer().setListReceiver(revertMappingMenu);
         bar.add(revertMappingMenu);
         return bar;
@@ -89,17 +117,22 @@ public class RecMappingFrame extends FrameBase {
             if (event.getValueIsAdjusting()) return;
             final NodeMappingEntry selected = (NodeMappingEntry) nodeMappingList.getSelectedValue();
             if (selected != null) {
-                Exec.work(new Runnable() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         sipModel.getCreateModel().setNodeMapping(selected.getNodeMapping());
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.SELECT_NODE_MAPPING;
                     }
                 });
             }
         }
     }
 
-    private class RemoveNodeMappingAction extends AbstractAction implements Runnable {
+    private class RemoveNodeMappingAction extends AbstractAction implements Work {
 
         private RemoveNodeMappingAction() {
             super("Remove selected mapping");
@@ -107,7 +140,7 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(this);
+            exec(this);
         }
 
         @Override
@@ -122,6 +155,11 @@ public class RecMappingFrame extends FrameBase {
                     sipModel.getCreateModel().setNodeMapping(null);
                 }
             }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.REMOVE_NODE_MAPPING;
         }
     }
 }

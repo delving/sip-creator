@@ -22,8 +22,8 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.CompileState;
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 
@@ -47,7 +47,7 @@ public class MappingCodeFrame extends FrameBase {
     private JTextArea fieldArea = new JTextArea();
 
     public MappingCodeFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CODE, desktop, sipModel, "Mapping Code", false);
+        super(Which.CODE, desktop, sipModel, "Code");
         fieldArea.setFont(MONOSPACED);
         recordArea.setFont(MONOSPACED);
         Ear ear = new Ear();
@@ -88,16 +88,16 @@ public class MappingCodeFrame extends FrameBase {
         public void codeCompiled(MappingCompileModel.Type type, String code) {
             switch (type) {
                 case RECORD:
-                    Exec.swing(new CodeUpdater(code, recordArea));
+                    exec(new CodeUpdater(code, recordArea));
                     break;
                 case FIELD:
-                    Exec.swing(new CodeUpdater(code, fieldArea));
+                    exec(new CodeUpdater(code, fieldArea));
                     break;
             }
         }
     }
 
-    private static class CodeUpdater implements Runnable {
+    private static class CodeUpdater implements Swing {
         private String code;
         private JTextArea textArea;
 

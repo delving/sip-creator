@@ -28,12 +28,14 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
-* Part of the record definition
-*
-* @author Gerald de Jong <gerald@delving.eu>
-*/
+ * Part of the record definition
+ *
+ * @author Gerald de Jong <gerald@delving.eu>
+ */
 
 @XStreamAlias("opt-list")
 public class OptList {
@@ -42,7 +44,7 @@ public class OptList {
     public String displayName;
 
     @XStreamAsAttribute
-    public boolean dictionary;
+    public String dictionary;
 
     @XStreamAsAttribute
     public Path path;
@@ -65,7 +67,8 @@ public class OptList {
     public void resolve(RecDef recDef) {
         for (Opt opt : opts) opt.parent = this;
         if (path == null) throw new RuntimeException("No path for OptList: " + opts);
-        if (path.peek().isAttribute()) throw new RuntimeException("An option list may not be connected to an attribute: " + path);
+        if (path.peek().isAttribute())
+            throw new RuntimeException("An option list may not be connected to an attribute: " + path);
         path = path.withDefaultPrefix(recDef.prefix);
         key = resolveTag(key, recDef);
         value = resolveTag(value, recDef);
@@ -73,6 +76,11 @@ public class OptList {
         schemaUri = resolveTag(schemaUri, recDef);
         RecDef.Elem elem = recDef.findElem(path);
         elem.optList = this;
+        if (dictionary != null) {
+            Map<String, Opt> lookup = new TreeMap<String, Opt>();
+            for (Opt opt : opts) lookup.put(opt.value, opt);
+            recDef.optLookup.put(dictionary, lookup);
+        }
     }
 
     private static Tag resolveTag(Tag tag, RecDef recDef) {
@@ -103,14 +111,60 @@ public class OptList {
         @XStreamAsAttribute
         public boolean hidden;
 
-        @XStreamAlias("opt-list")
-        public OptList optList;
+        @XStreamImplicit
+        public List<DictOptList> dictOptLists;
 
         @XStreamOmitField
         public OptList parent;
 
         public String toString() {
-            return String.format("%s: %s", key, value);
+            return value;
         }
     }
+
+    @XStreamAlias("dict-opt-list")
+    public static class DictOptList {
+        @XStreamAsAttribute
+        public String displayName;
+
+        @XStreamAsAttribute
+        public String dictionary;
+
+        @XStreamAsAttribute
+        public Path keyPath;
+
+        @XStreamAsAttribute
+        public Path valuePath;
+
+        @XStreamAsAttribute
+        public Tag key;
+
+        @XStreamAsAttribute
+        public Tag value;
+
+        @XStreamImplicit
+        public List<DictOpt> opts;
+
+        @XStreamOmitField
+        public Opt parent;
+    }
+
+    @XStreamAlias("dict-opt")
+    public static class DictOpt {
+
+        @XStreamAsAttribute
+        public String key;
+
+        @XStreamAsAttribute
+        public String value;
+
+        @XStreamOmitField
+        public DictOptList parent;
+
+        public String toString() {
+            return value;
+        }
+    }
+
+
 }

@@ -22,9 +22,10 @@
 package eu.delving.sip.actions;
 
 import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
@@ -35,7 +36,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,12 +76,7 @@ public class UploadAction extends AbstractAction {
             reportFilePopup.upload.requestFocusInWindow();
         }
         else {
-            Exec.work(new Runnable() {
-                @Override
-                public void run() {
-                    sipModel.getFeedback().alert("Upload not permitted until all mappings are validated. Still invalid: " + invalidPrefixes);
-                }
-            });
+            sipModel.getFeedback().alert("Upload not permitted until all mappings are validated. Still invalid: " + invalidPrefixes);
         }
     }
 
@@ -98,12 +93,18 @@ public class UploadAction extends AbstractAction {
         }
     }
 
-    private class InvalidPrefixesFetcher implements Runnable {
+    private class InvalidPrefixesFetcher implements Work.DataSetWork {
+        private DataSet dataSet;
+
+        private InvalidPrefixesFetcher(DataSet dataSet) {
+            this.dataSet = dataSet;
+        }
+
         @Override
         public void run() {
             try {
                 final List<String> freshInvalidPrefixes = sipModel.getDataSetModel().getInvalidPrefixes();
-                Exec.swing(new Runnable() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         invalidPrefixes = freshInvalidPrefixes;
@@ -115,13 +116,23 @@ public class UploadAction extends AbstractAction {
                 sipModel.getFeedback().alert("Unable to fetch invalid prefixes", e);
             }
         }
+
+        @Override
+        public Job getJob() {
+            return Job.FIND_INVALID_PREFIXES;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
     }
 
-    private class Enabler implements DataSetModel.Listener {
+    private class Enabler implements DataSetModel.SwingListener {
         @Override
         public void stateChanged(DataSetModel model, DataSetState state) {
             if (realUploadAction.isEnabled()) realUploadAction.setEnabled(false);
-            if (state.atLeast(DataSetState.VALIDATED)) Exec.work(new InvalidPrefixesFetcher());
+            if (state.atLeast(DataSetState.VALIDATED)) sipModel.exec(new InvalidPrefixesFetcher(sipModel.getDataSetModel().getDataSet()));
         }
     }
 
@@ -183,51 +194,16 @@ public class UploadAction extends AbstractAction {
             try {
                 busyUploading = true;
                 reportFilePopup.setVisible(false);
-                cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new CultureHubClient.UploadListener() {
+                cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new Swing() {
                     @Override
-                    public void uploadRefused(File file) {
-                        sipModel.getFeedback().say(String.format("Hub already has %s", file.getName()));
-                    }
-
-                    @Override
-                    public void uploadStarted(File file) {
-                        sipModel.getFeedback().say(String.format("Uploading %s...", file.getName()));
-                    }
-
-                    @Override
-                    public ProgressListener getProgressListener() {
-                        ProgressListener listener = sipModel.getFeedback().progressListener("Uploading");
-                        listener.setProgressMessage(String.format(
-                                "<html><h3>Uploading the data of '%s' to the culture hub</h3>",
-                                sipModel.getDataSetModel().getDataSet().getSpec()
-                        ));
-                        listener.setIndeterminateMessage(String.format(
-                                "<html><h3>Culture hub is processing '%s' metadata</h3>",
-                                sipModel.getDataSetModel().getDataSet().getSpec()
-                        ));
-                        return listener;
-                    }
-
-                    @Override
-                    public void finished(final boolean success) {
+                    public void run() {
                         busyUploading = false;
-                        sipModel.getFeedback().alert(success ? "Upload complete" : "Upload failed");
-                        Exec.swing(new Runnable() {
-                            @Override
-                            public void run() {
-                                disappear();
-                            }
-                        });
+                        disappear();
                     }
                 });
             }
             catch (final StorageException e) {
-                Exec.work(new Runnable() {
-                    @Override
-                    public void run() {
-                        sipModel.getFeedback().alert("Unable to complete uploading", e);
-                    }
-                });
+                sipModel.getFeedback().alert("Unable to complete uploading", e);
                 busyUploading = false;
             }
         }

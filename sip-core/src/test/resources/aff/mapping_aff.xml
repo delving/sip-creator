@@ -49,7 +49,15 @@
     <node-mapping inputPath="/facts/provider" outputPath="/aff:record/aff:admin/aff:displayProvider"/>
     <node-mapping inputPath="/facts/language" outputPath="/aff:record/aff:admin/aff:defaultLang"/>
     <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:uri"/>
-    <node-mapping inputPath="/constant" outputPath="/aff:record/aff:thing/aff:category"/>
+    <node-mapping inputPath="/input/catty" outputPath="/aff:record/aff:thing/aff:category">
+        <!--todo: here we need a dictionary-->
+        <dictionary>
+            <entry>
+                <string>Whatever</string>
+                <string>Thing</string>
+            </entry>
+        </dictionary>
+    </node-mapping>
     <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:displayIdentification"/>
     <node-mapping inputPath="/input/title" outputPath="/aff:record/aff:thing/aff:displayTitle"/>
     <node-mapping inputPath="/input/description" outputPath="/aff:record/aff:thing/aff:displayDescription" operator="COMMA_DELIM"/>

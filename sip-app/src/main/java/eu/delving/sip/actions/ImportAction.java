@@ -21,9 +21,8 @@
 
 package eu.delving.sip.actions;
 
-import eu.delving.sip.base.HarvestPool;
 import eu.delving.sip.base.Harvestor;
-import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
@@ -59,9 +58,8 @@ public class ImportAction extends AbstractAction {
     private ChooseFileAction chooseFileAction = new ChooseFileAction();
     private HarvestAction harvestAction = new HarvestAction();
     private JFileChooser chooser = new JFileChooser("XML Metadata Source File");
-    private HarvestPool harvestPool;
 
-    public ImportAction(JDesktopPane parent, SipModel sipModel, HarvestPool harvestPool) {
+    public ImportAction(JDesktopPane parent, SipModel sipModel) {
         super("Import new data into this data set");
         putValue(Action.SMALL_ICON, SwingHelper.IMPORT_ICON);
         putValue(
@@ -70,12 +68,11 @@ public class ImportAction extends AbstractAction {
         );
         this.parent = parent;
         this.sipModel = sipModel;
-        this.harvestPool = harvestPool;
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Input Source", Dialog.ModalityType.APPLICATION_MODAL);
         setEnabled(false);
         prepareDialog();
         prepareChooser(sipModel);
-        sipModel.getDataSetModel().addListener(new DataSetModel.Listener() {
+        sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
                 setEnabled(state != ABSENT);
@@ -142,15 +139,12 @@ public class ImportAction extends AbstractAction {
         );
         if (doImport) {
             setEnabled(false);
-            ProgressListener listener = sipModel.getFeedback().progressListener("Importing");
-            listener.setProgressMessage(String.format("Storing data for %s", spec));
-            listener.onFinished(new ProgressListener.End() {
+            sipModel.importSource(file, new Swing() {
                 @Override
-                public void finished(ProgressListener progressListener, boolean success) {
+                public void run() {
                     setEnabled(true);
                 }
             });
-            sipModel.importSource(file, listener);
             return true;
         }
         return false;
@@ -212,20 +206,7 @@ public class ImportAction extends AbstractAction {
         }
 
         private void performHarvest(final String harvestUrl, final String harvestPrefix, final String harvestSpec) {
-
-            harvestPool.submit(new Harvestor(sipModel.getDataSetModel().getDataSet().getSpec(), new Harvestor.Context() {
-
-                @Override
-                public File outputFile() {
-                    try {
-                        return sipModel.getDataSetModel().getDataSet().importedOutput();
-                    }
-                    catch (StorageException e) {
-                        e.printStackTrace();
-                        sipModel.getFeedback().alert(e.getMessage());
-                    }
-                    return null;
-                }
+            sipModel.exec(new Harvestor(sipModel.getDataSetModel().getDataSet(), new Harvestor.Context() {
 
                 @Override
                 public String harvestUrl() {

@@ -21,7 +21,7 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public abstract class FilterNode {
 
     public final void fireChanged() {
         if (filterModel == null) throw new RuntimeException("Tree model must be set");
-        Exec.swingAny(new Runnable() {
+        Swing.Exec.later(new Swing() {
             @Override
             public void run() {
                 filterModel.refreshNode(FilterNode.this);
