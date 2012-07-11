@@ -162,6 +162,7 @@ public class ReportFileModel {
 
         @Override
         public int getSize() {
+            if (lines == null) return 0;
             return lines.size();
         }
 
