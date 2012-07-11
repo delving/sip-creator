@@ -21,11 +21,13 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,64 +36,143 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class ReportFileModel extends AbstractListModel implements MappingModel.SetListener {
+public class ReportFileModel {
+    public static final String DIVIDER = "<>=====<>=====<>";
     private SipModel sipModel;
-    private List<String> lines;
-    private RecMapping recMapping;
+    private Listener listener;
+    private List<ProcessingReport> reports = new ArrayList<ProcessingReport>();
+
+    public interface Listener {
+        void reportsUpdated(ReportFileModel reportFileModel);
+    }
 
     public ReportFileModel(SipModel sipModel) {
         this.sipModel = sipModel;
     }
 
-    @Override
-    public int getSize() {
-        return lines == null ? 0 : lines.size();
+    public void setListener(Listener listener) {
+        this.listener = listener;
     }
 
-    @Override
-    public Object getElementAt(int i) {
-        return lines.get(i);
+    public List<ProcessingReport> getReports() {
+        return reports;
     }
 
     public void refresh() {
-        int size = getSize();
-        if (size > 0) {
-            lines = null;
+        if (sipModel.getDataSetModel().isEmpty()) return;
+        try {
+            DataSet dataSet = sipModel.getDataSetModel().getDataSet();
+            reports.clear();
+            for (String prefix : dataSet.getPrefixes()) {
+                ProcessingReport processingReport = new ProcessingReport(dataSet, prefix);
+                reports.add(processingReport);
+                sipModel.exec(processingReport);
+            }
             sipModel.exec(new Swing() {
                 @Override
                 public void run() {
-                    fireIntervalRemoved(this, 0, getSize());
+                    listener.reportsUpdated(ReportFileModel.this);
                 }
             });
-        }
-        try {
-            if (recMapping != null) {
-                final List<String> freshLines = sipModel.getDataSetModel().getDataSet().getReport(recMapping);
-                if (freshLines != null) {
-                    sipModel.exec(new Swing() {
-                        @Override
-                        public void run() {
-                            lines = freshLines;
-                            fireIntervalAdded(ReportFileModel.this, 0, getSize());
-                        }
-                    });
-
-                }
-            }
         }
         catch (StorageException e) {
             sipModel.getFeedback().alert("Validation Report", e);
         }
     }
 
-    public void kick() {
-        recMappingSet(sipModel.getMappingModel()); // to fire it off
+    public class ProcessingReport implements Work.DataSetPrefixWork {
+        private DataSet dataSet;
+        private String prefix;
+        private LinesModel invalidListModel = new LinesModel();
+        private LinesModel summaryListModel = new LinesModel();
+
+        public ProcessingReport(DataSet dataSet, String prefix) {
+            this.dataSet = dataSet;
+            this.prefix = prefix;
+        }
+
+        @Override
+        public String getPrefix() {
+            return prefix;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.LOAD_REPORT;
+        }
+
+        @Override
+        public void run() {
+            try {
+                List<String> invalid = new ArrayList<String>();
+                List<String> summary = new ArrayList<String>();
+                if (dataSet.isValidated(prefix)) {
+                    List<String> report = dataSet.getReport(prefix);
+                    if (report == null) {
+                        summary.add("Validated but no report found");
+                    }
+                    else {
+                        boolean seenDivider = false;
+                        for (String line : report) {
+                            if (line.equals(DIVIDER)) {
+                                seenDivider = true;
+                            }
+                            else if (seenDivider) {
+                                summary.add(line);
+                            }
+                            else {
+                                invalid.add(line);
+                            }
+                        }
+                    }
+                }
+                else {
+                    summary.add(String.format("Processing not yet performed for %s.",prefix.toUpperCase()));
+                }
+                invalidListModel.setLines(invalid);
+                sipModel.exec(invalidListModel);
+                summaryListModel.setLines(summary);
+                sipModel.exec(summaryListModel);
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert(String.format("Unable to load report for %s - %s", getDataSet().getSpec(), getPrefix()), e);
+            }
+        }
+
+        public ListModel getInvalid() {
+            return invalidListModel;
+        }
+
+        public ListModel getSummary() {
+            return summaryListModel;
+        }
     }
 
-    @Override
-    public void recMappingSet(MappingModel mappingModel) {
-        this.recMapping = mappingModel.getRecMapping();
-        refresh();
-    }
+    private static class LinesModel extends AbstractListModel implements Swing {
+        private List<String> lines;
 
+        public void setLines(List<String> lines) {
+            this.lines = lines;
+        }
+
+        @Override
+        public int getSize() {
+            return lines.size();
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+            return lines.get(index);
+        }
+
+        @Override
+        public void run() {
+            fireIntervalAdded(this, 0, getSize());
+        }
+    }
 }

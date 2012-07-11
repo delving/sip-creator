@@ -25,6 +25,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -59,6 +60,7 @@ public class AllFrames {
     private MappingCodeFrame mappingCodeFrame;
     private StatsFrame statsFrame;
     private WorkFrame workFrame;
+    private UploadFrame uploadFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private JDesktopPane desktop;
@@ -71,13 +73,14 @@ public class AllFrames {
         analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
-    public AllFrames(JDesktopPane desktop, final SipModel sipModel) {
+    public AllFrames(JDesktopPane desktop, final SipModel sipModel, final CultureHubClient cultureHubClient) {
         this.desktop = desktop;
         this.sipModel = sipModel;
         functionFrame = new FunctionFrame(desktop, sipModel);
         mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
         statsFrame = new StatsFrame(desktop, sipModel);
         workFrame = new WorkFrame(desktop, sipModel);
+        uploadFrame = new UploadFrame(desktop, sipModel, cultureHubClient);
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
         FrameBase source = new SourceFrame(desktop, sipModel);
@@ -171,6 +174,10 @@ public class AllFrames {
         };
     }
 
+    public Action getUploadAction() {
+        return uploadFrame.getUploadAction();
+    }
+
     public void restore() {
         selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
     }
@@ -187,6 +194,7 @@ public class AllFrames {
         menu.add(functionFrame.getAction());
         menu.add(mappingCodeFrame.getAction());
         menu.add(workFrame.getAction());
+        menu.add(uploadFrame.getAction());
         return menu;
     }
 

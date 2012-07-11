@@ -459,8 +459,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public PrintWriter openReportWriter(RecMapping recMapping) throws StorageException {
-            File file = new File(here, FileType.REPORT.getName(recMapping.getPrefix()));
+        public PrintWriter openReportWriter(String prefix) throws StorageException {
+            File file = new File(here, FileType.REPORT.getName(prefix));
             try {
                 return new PrintWriter(file);
             }
@@ -470,9 +470,9 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public List<String> getReport(RecMapping recMapping) throws StorageException {
+        public List<String> getReport(String prefix) throws StorageException {
             try {
-                File file = reportFile(here, recMapping);
+                File file = reportFile(here, prefix);
                 return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
             }
             catch (IOException e) {

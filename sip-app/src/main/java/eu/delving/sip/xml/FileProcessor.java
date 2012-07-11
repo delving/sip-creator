@@ -29,6 +29,7 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.IOUtils;
@@ -134,7 +135,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             validator = createValidator();
             mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
             parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
-            reportWriter = getDataSet().openReportWriter(recMapping);
+            reportWriter = getDataSet().openReportWriter(recMapping.getPrefix());
             if (outputDirectory != null) xmlOutput = createXmlOutput();
         }
         catch (Exception e) {
@@ -157,13 +158,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     invalidCount++;
                     reportWriter.println("Discarded explicitly: " + e.getMessage());
                     reportWriter.println(XmlNodePrinter.toXml(record.getRootNode()));
-                    reportWriter.println("=========");
                 }
                 catch (MappingException e) {
                     reportWriter.println("Mapping exception!");
                     reportWriter.println(XmlNodePrinter.toXml(e.getMetadataRecord().getRootNode()));
                     e.printStackTrace(reportWriter);
-                    reportWriter.println("========");
                     abort();
                     listener.mappingFailed(e);
                 }
@@ -190,7 +189,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     private void finishReport() {
-        reportWriter.println();
+        reportWriter.println(ReportFileModel.DIVIDER);
         if (aborted) {
             reportWriter.println("Validation was aborted!");
         }
@@ -252,7 +251,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         catch (Exception e) {
             invalidCount++;
             reportWriter.println(serializer.toXml(node));
-            reportWriter.println("=========");
+            reportWriter.println("===");
             if (!allowInvalid) {
                 abort();
                 listener.outputInvalid(recordNumber, node, e.getMessage());

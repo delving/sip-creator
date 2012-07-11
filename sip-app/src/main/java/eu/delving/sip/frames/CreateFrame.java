@@ -241,9 +241,9 @@ public class CreateFrame extends FrameBase {
     }
 
     private class CreateMappingAction extends AbstractAction {
-        private static final String CREATE = "<html><h3>Create this mapping</h3></html>";
-        private static final String EXISTS = "<html><h3>Mapping has been created</h3></html>";
-        private static final String SELECT = "<html><h3>Make selections first</h3></html>";
+        private static final String CREATE = "<html><b>Create this mapping</b></html>";
+        private static final String EXISTS = "<html><b>Mapping has been created</b></html>";
+        private static final String SELECT = "<html><b>Make selections first</b></html>";
 
         private CreateMappingAction() {
             super(SELECT);

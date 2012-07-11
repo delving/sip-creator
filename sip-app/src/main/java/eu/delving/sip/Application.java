@@ -26,7 +26,10 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
-import eu.delving.sip.actions.*;
+import eu.delving.sip.actions.DownloadAction;
+import eu.delving.sip.actions.ImportAction;
+import eu.delving.sip.actions.ReleaseAction;
+import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
@@ -61,8 +64,7 @@ public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
-    private UnlockMappingAction unlockMappingAction = new UnlockMappingAction();
-    private Action downloadAction, importAction, uploadAction, deleteAction, validateAction;
+    private Action downloadAction, importAction, uploadAction, releaseAction, validateAction;
     private JFrame home;
     private JDesktopPane desktop;
     private DataSetMenu dataSetMenu;
@@ -116,7 +118,7 @@ public class Application {
             }
         });
         desktop.setBackground(new Color(190, 190, 200));
-        allFrames = new AllFrames(desktop, sipModel);
+        allFrames = new AllFrames(desktop, sipModel, cultureHubClient);
         helpPanel = new HelpPanel(sipModel, cultureHubClient.getHttpClient());
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
@@ -125,7 +127,7 @@ public class Application {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
-                        unlockMappingAction.setEnabled(locked);
+                        dataSetMenu.getUnlockMappingAction().setEnabled(locked);
                         expertMenu.setEnabled(!locked);
                     }
                 });
@@ -150,8 +152,8 @@ public class Application {
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new ImportAction(desktop, sipModel);
         validateAction = new ValidateAction(desktop, sipModel, allFrames.prepareForInvestigation(desktop));
-        uploadAction = new UploadAction(desktop, sipModel, cultureHubClient);
-        deleteAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
+        uploadAction = allFrames.getUploadAction();
+        releaseAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -203,6 +205,7 @@ public class Application {
                                 "Delving SIP Creator - [%s -> %s]",
                                 dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
                         ));
+                        sipModel.getReportFileModel().refresh();
                         break;
                 }
             }
@@ -235,7 +238,7 @@ public class Application {
         statusPanel.setReaction(DataSetState.SOURCED, new InputAnalyzer());
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
-        statusPanel.setReaction(DataSetState.VALIDATED, uploadAction);
+        statusPanel.setReaction(DataSetState.VALIDATED, allFrames.getUploadAction());
         p.add(statusPanel, BorderLayout.CENTER);
         p.add(allFrames.getBigWindowsPanel(), BorderLayout.EAST);
         p.setPreferredSize(new Dimension(80, 80));
@@ -244,9 +247,6 @@ public class Application {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        JMenu unlockMenu = new JMenu("Unlock");
-        unlockMenu.add(unlockMappingAction);
-        bar.add(unlockMenu);
         bar.add(createFileMenu());
         bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
@@ -263,6 +263,7 @@ public class Application {
         item.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
+                helpPanel.initialize();
                 if (item.isSelected()) {
                     home.getContentPane().add(helpPanel, BorderLayout.EAST);
                 }
@@ -283,7 +284,7 @@ public class Application {
         menu.add(importAction);
         menu.add(validateAction);
         menu.add(uploadAction);
-        menu.add(deleteAction);
+        menu.add(releaseAction);
         return menu;
     }
 
@@ -298,34 +299,6 @@ public class Application {
         @Override
         public void run() {
             sipModel.convertSource();
-        }
-    }
-
-    private class UnlockMappingAction extends AbstractAction implements Work {
-
-        private UnlockMappingAction() {
-            super("Unlock mapping for further editing");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.exec(this);
-        }
-
-        @Override
-        public void run() {
-            sipModel.getMappingModel().setLocked(false);
-            try {
-                sipModel.getDataSetModel().deleteValidation();
-            }
-            catch (StorageException e) {
-                feedback.alert("Unable to delete validation", e);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.UNLOCK_MAPPING;
         }
     }
 

@@ -99,7 +99,7 @@ public class VisualFeedback implements Feedback {
     private void inYourFace(String message, String extra) {
         message = sanitizeHtml(message);
         extra = sanitizeHtml(extra);
-        String html = String.format("<html><h3>%s</h3>", message);
+        String html = String.format("<html><b>%s</b></html>", message);
         if (extra != null) html = html + String.format("<p>%s</p>", extra);
         askOption(desktop, html, "Message", DEFAULT_OPTION, INFORMATION_MESSAGE);
     }

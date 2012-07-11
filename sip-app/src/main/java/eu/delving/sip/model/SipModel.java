@@ -38,7 +38,6 @@ import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 
-import javax.swing.*;
 import java.io.File;
 import java.util.BitSet;
 import java.util.List;
@@ -107,7 +106,6 @@ public class SipModel {
         nodeTransferHandler = new NodeTransferHandler(this);
         mappingSaveTimer = new MappingSaveTimer(this);
         MappingModel mm = dataSetModel.getMappingModel();
-        mm.addSetListener(reportFileModel);
         mm.addSetListener(recordCompileModel.getMappingModelSetListener());
         mm.addChangeListener(recordCompileModel.getMappingModelChangeListener());
         mm.addSetListener(fieldCompileModel.getMappingModelSetListener());
@@ -239,7 +237,7 @@ public class SipModel {
         return statsModel;
     }
 
-    public ListModel getReportFileModel() {
+    public ReportFileModel getReportFileModel() {
         return reportFileModel;
     }
 
@@ -514,11 +512,11 @@ public class SipModel {
                         catch (StorageException e) {
                             feedback.alert("Unable to store validation results", e);
                         }
-                        reportFileModel.kick();
+                        reportFileModel.refresh();
                     }
 
                     private void finishedProcessing() {
-                        Swing.Exec.later(finished);
+                        exec(finished);
                     }
                 }
         ));
@@ -612,7 +610,7 @@ public class SipModel {
                 metadataParser = null;
             }
             finally {
-                if (finished != null) Swing.Exec.later(finished);
+                if (finished != null) exec(finished);
             }
         }
 
