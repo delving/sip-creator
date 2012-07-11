@@ -104,7 +104,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
 
     @Override
     public Job getJob() {
-        return Job.HARVEST_OAI_PMH;
+        return Job.HARVEST;
     }
 
     @Override

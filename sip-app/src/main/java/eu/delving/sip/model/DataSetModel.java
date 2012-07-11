@@ -163,7 +163,7 @@ public class DataSetModel implements RecDefModel {
 
         @Override
         public Job getJob() {
-            return Job.CHECK_DATA_SET_STATE;
+            return Job.CHECK_STATE;
         }
 
         @Override

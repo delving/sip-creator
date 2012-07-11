@@ -109,7 +109,7 @@ public class ExpertMenu extends JMenu {
 
                     @Override
                     public Job getJob() {
-                        return Job.DELETE_SOURCE_FOR_RECONVERT;
+                        return Job.DELETE_SOURCE;
                     }
 
                     @Override

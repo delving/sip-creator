@@ -27,6 +27,7 @@ import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -67,7 +68,6 @@ public class MappingCompileModel {
     private Type type;
     private Validator validator;
     private GroovyCodeResource groovyCodeResource;
-    private Feedback feedback;
     private boolean enabled;
     private volatile boolean compiling;
     private ParseEar parseEar = new ParseEar();
@@ -91,10 +91,9 @@ public class MappingCompileModel {
         }
     }
 
-    public MappingCompileModel(SipModel sipModel, Type type, Feedback feedback, GroovyCodeResource groovyCodeResource) {
+    public MappingCompileModel(SipModel sipModel, Type type, GroovyCodeResource groovyCodeResource) {
         this.sipModel = sipModel;
         this.type = type;
-        this.feedback = feedback;
         this.groovyCodeResource = groovyCodeResource;
         this.codeDocument.addDocumentListener(new DocChangeListener() {
             @Override
@@ -261,7 +260,7 @@ public class MappingCompileModel {
         }
     }
 
-    private class MappingJob implements Work {
+    private class MappingJob implements Work.DataSetPrefixWork {
 
         private EditPath editPath;
 
@@ -339,7 +338,17 @@ public class MappingCompileModel {
 
         @Override
         public Job getJob() {
-            return Job.NODE_MAPPING_COMPILE_RUN;
+            return Job.COMPILE_NODE_MAPPING;
+        }
+
+        @Override
+        public String getPrefix() {
+            return recMapping == null ? "" : recMapping.getPrefix();
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return sipModel.getDataSetModel().getDataSet();
         }
     }
 

@@ -102,7 +102,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     @Override
     public Job getJob() {
-        return Job.PROCESS_FILE;
+        return Job.PROCESS;
     }
 
     @Override

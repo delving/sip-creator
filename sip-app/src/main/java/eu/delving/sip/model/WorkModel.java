@@ -74,7 +74,7 @@ public class WorkModel {
         for (JobContext context : jobContexts) {
             String dataSet = context.getDataSet();
             if (dataSet == null) continue;
-            if (!(context.work() instanceof Work.LongTermWork)) continue;
+            if (!(context.getWork() instanceof Work.LongTermWork)) continue;
             if (dataSetSpec.equals(dataSet)) return true;
         }
         return false;
@@ -213,7 +213,7 @@ public class WorkModel {
                 case NETWORK_DATA_SET:
                 case DATA_SET:
                 case DATA_SET_PREFIX:
-                    DataSet dataSet = ((Work.DataSetWork) work()).getDataSet();
+                    DataSet dataSet = ((Work.DataSetWork) getWork()).getDataSet();
                     return dataSet == null ? null : dataSet.getSpec();
                 default:
                     return null;
@@ -235,7 +235,7 @@ public class WorkModel {
         }
 
         public String getMiniProgress() {
-            return progress == null ? " - " : progress.toString();
+            return progress == null ? null : progress.toString();
         }
 
         public void add(Work work) {
@@ -248,10 +248,10 @@ public class WorkModel {
         }
 
         private void launch() {
-            this.future = executor.submit(work());
+            this.future = executor.submit(getWork());
             this.start = new Date();
-            if (work() instanceof Work.LongTermWork) {
-                ((Work.LongTermWork) work()).setProgressListener(progress = new SimpleProgress());
+            if (getWork() instanceof Work.LongTermWork) {
+                ((Work.LongTermWork) getWork()).setProgressListener(progress = new SimpleProgress());
             }
             else {
                 progress = null;
@@ -263,10 +263,10 @@ public class WorkModel {
         }
 
         private Work.Job job() {
-            return work().getJob();
+            return getWork().getJob();
         }
 
-        private Work work() {
+        public Work getWork() {
             return queue.peek();
         }
 

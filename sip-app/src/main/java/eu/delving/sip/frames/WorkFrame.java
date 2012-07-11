@@ -23,8 +23,10 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.WorkModel;
+import org.apache.commons.lang.WordUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +43,7 @@ import java.text.SimpleDateFormat;
 public class WorkFrame extends FrameBase {
     private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("hh:mm:ss");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
-    private static final Font TINY = new Font("Serif", Font.PLAIN, 10);
+    private static final Font TINY = new Font("Serif", Font.PLAIN, 8);
     private JList fullList, miniList;
 
     public WorkFrame(JDesktopPane desktop, SipModel sipModel) {
@@ -91,8 +93,15 @@ public class WorkFrame extends FrameBase {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             WorkModel.JobContext jobContext = (WorkModel.JobContext) value;
             String progress = jobContext.getMiniProgress();
-            Component component = super.getListCellRendererComponent(list, progress, index, isSelected, cellHasFocus);
-            component.setBackground(Color.GREEN);
+            String jobName = jobContext.isDone() ? "done" : WordUtils.capitalizeFully(jobContext.getJob().toString(), new char[]{'_'});
+            String show = progress == null ? jobName : String.format("%s: %s", jobName, progress);
+            Component component = super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
+            if (jobContext.getWork() instanceof Work.LongTermWork) {
+                component.setBackground(SwingHelper.LONG_TERM_JOB_COLOR);
+            }
+            else {
+                component.setBackground(SwingHelper.NORMAL_JOB_COLOR);
+            }
             return component;
         }
     }

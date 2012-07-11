@@ -28,6 +28,7 @@ import eu.delving.metadata.StringUtil;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
@@ -160,7 +161,7 @@ public class FunctionCompileModel {
         return toLines(StringUtil.documentToString(document));
     }
 
-    private class RunJob implements Work {
+    private class RunJob implements Work.DataSetPrefixWork {
 
         @Override
         public void run() {
@@ -220,7 +221,17 @@ public class FunctionCompileModel {
 
         @Override
         public Job getJob() {
-            return Job.FUNCTION_COMPILE_RUN;
+            return Job.COMPILE_FUNCTION;
+        }
+
+        @Override
+        public String getPrefix() {
+            return sipModel.getMappingModel().getPrefix();
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return sipModel.getDataSetModel().getDataSet();
         }
     }
 

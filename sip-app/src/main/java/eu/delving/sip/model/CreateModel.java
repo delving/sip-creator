@@ -324,9 +324,9 @@ public class CreateModel {
                     case NOTHING:
                         return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
-                        break; // never
+                        return ARMED_TO_SOURCE;
                     case TARGET_ONLY:
-                        break; // never
+                        return ARMED_TO_TARGET;
                     case SOURCE_AND_TARGET:
                         switch (setter) {
                             case NONE:
@@ -344,7 +344,6 @@ public class CreateModel {
                 break;
         }
         throw new IllegalStateException("No transition available from " + state + " to " + newState);
-        // todo: java.lang.IllegalStateException: No transition available from COMPLETE to TARGET_ONLY
     }
 
     private CreateState getState() {

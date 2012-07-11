@@ -97,8 +97,8 @@ public class SipModel {
         this.feedback = feedback;
         dataSetModel = new DataSetModel(this);
         functionCompileModel = new FunctionCompileModel(this, feedback, groovyCodeResource);
-        recordCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.RECORD, feedback, groovyCodeResource);
-        fieldCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.FIELD, feedback, groovyCodeResource);
+        recordCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.RECORD, groovyCodeResource);
+        fieldCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.FIELD, groovyCodeResource);
         parseListeners.add(recordCompileModel.getParseEar());
         parseListeners.add(fieldCompileModel.getParseEar());
         mappingHintsModel = new MappingHintsModel(this);
@@ -277,7 +277,7 @@ public class SipModel {
 
         @Override
         public Job getJob() {
-            return Job.SET_DATASET_PREFIX;
+            return Job.SET_DATASET;
         }
 
         @Override
@@ -618,7 +618,7 @@ public class SipModel {
 
         @Override
         public Job getJob() {
-            return Job.SCAN_INPUT_RECORDS;
+            return Job.SCAN_RECORDS;
         }
 
         @Override

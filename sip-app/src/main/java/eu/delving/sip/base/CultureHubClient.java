@@ -247,7 +247,7 @@ public class CultureHubClient {
 
         @Override
         public Job getJob() {
-            return Job.FETCH_DATASET_LIST;
+            return Job.FETCH_LIST;
         }
     }
 
@@ -297,7 +297,7 @@ public class CultureHubClient {
 
         @Override
         public Job getJob() {
-            return Job.UNLOCK_DATA_SET;
+            return Job.UNLOCK;
         }
 
         @Override
@@ -375,7 +375,7 @@ public class CultureHubClient {
 
         @Override
         public Job getJob() {
-            return Job.DOWNLOAD_DATASET;
+            return Job.DOWNLOAD;
         }
 
         @Override
@@ -473,7 +473,7 @@ public class CultureHubClient {
 
         @Override
         public Job getJob() {
-            return Job.UPLOAD_FILES;
+            return Job.UPLOAD;
         }
 
         @Override
