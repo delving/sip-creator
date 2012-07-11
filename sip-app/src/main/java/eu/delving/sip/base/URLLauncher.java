@@ -22,6 +22,7 @@
 package eu.delving.sip.base;
 
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.model.SipModel;
 
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
@@ -39,11 +40,12 @@ import java.net.URL;
  */
 
 public class URLLauncher implements CaretListener {
-
+    private SipModel sipModel;
     private JTextArea outputArea;
     private Feedback feedback;
 
-    public URLLauncher(JTextArea outputArea, Feedback feedback) {
+    public URLLauncher(SipModel sipModel, JTextArea outputArea, Feedback feedback) {
+        this.sipModel = sipModel;
         this.outputArea = outputArea;
         this.feedback = feedback;
         outputArea.addCaretListener(this);
@@ -79,12 +81,7 @@ public class URLLauncher implements CaretListener {
                     outputArea.select(min, max);
                 }
                 else {
-                    Exec.work(new Runnable() {
-                        @Override
-                        public void run() {
-                            feedback.alert(String.format("Not a valid URL: \"%s\"", url));
-                        }
-                    });
+                    feedback.alert(String.format("Not a valid URL: \"%s\"", url));
                     outputArea.select(min, min);
                 }
             }
@@ -112,12 +109,7 @@ public class URLLauncher implements CaretListener {
             return bs.showDocument(url);
         }
         catch (UnavailableServiceException ue) {
-            Exec.work(new Runnable() {
-                @Override
-                public void run() {
-                    feedback.alert(String.format("Sorry, need Web Start to launch \"%s\"", urlString));
-                }
-            });
+            feedback.alert(String.format("Sorry, need Web Start to launch \"%s\"", urlString));
             return false;
         }
         catch (MalformedURLException e1) {

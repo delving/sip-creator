@@ -22,8 +22,9 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.NodeMapping;
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.model.CreateModel;
 import eu.delving.sip.model.CreateTransition;
 import eu.delving.sip.model.RecDefTreeNode;
@@ -265,7 +266,7 @@ public class DictionaryPanel extends JPanel {
             @Override
             public void transition(final CreateModel createModel, CreateTransition transition) {
                 if (!transition.nodeMappingChanged) return;
-                Exec.swing(new Runnable() {
+                sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         boolean isDictionary = createModel.hasNodeMapping() && createModel.getNodeMapping().dictionary != null;
@@ -320,10 +321,15 @@ public class DictionaryPanel extends JPanel {
                 }
                 patternField.setText("");
                 patternField.requestFocus();
-                Exec.work(new Runnable() {
+                sipModel.exec(new Work() {
                     @Override
                     public void run() {
                         if (createModel.hasNodeMapping()) createModel.getNodeMapping().notifyChanged(DICTIONARY);
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.NOTIFY_DICTIONARY_CHANGED;
                     }
                 });
                 timer.restart();
@@ -374,10 +380,16 @@ public class DictionaryPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(new Runnable() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
-                    if (isDictionaryPossible(createModel.getNodeMapping())) refreshDictionary(createModel.getNodeMapping());
+                    if (isDictionaryPossible(createModel.getNodeMapping()))
+                        refreshDictionary(createModel.getNodeMapping());
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.REFRESH_DICTIONARY;
                 }
             });
         }
@@ -394,10 +406,15 @@ public class DictionaryPanel extends JPanel {
                 ) ;
                 if (!confirm) return;
             }
-            Exec.work(new Runnable() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     removeDictionary(createModel.getNodeMapping());
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.REMOVE_DICTIONARY;
                 }
             });
         }

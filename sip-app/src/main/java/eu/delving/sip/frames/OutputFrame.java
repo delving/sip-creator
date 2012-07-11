@@ -21,7 +21,6 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.Exec;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
@@ -44,7 +43,7 @@ public class OutputFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
 
     public OutputFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.OUTPUT, desktop, sipModel, "Output", false);
+        super(Which.OUTPUT, desktop, sipModel, "Output");
         sipModel.getRecordCompileModel().setEnabled(false);
     }
 
@@ -62,6 +61,7 @@ public class OutputFrame extends FrameBase {
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
         final JTextArea area = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        area.setLineWrap(true);
         area.setFont(MONOSPACED);
         area.setWrapStyleWord(true);
         area.getDocument().addDocumentListener(new DocumentListener() {
@@ -70,15 +70,8 @@ public class OutputFrame extends FrameBase {
                 try {
                     String first = documentEvent.getDocument().getText(0, 1);
                     final boolean error = first.startsWith("#");
-                    Exec.swingLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            setError(area, error);
-                            area.setBackground(error ? new Color(1.0f, 0.9f, 0.9f) : Color.WHITE);
-                            area.setLineWrap(error);
-                            area.setCaretPosition(0);
-                        }
-                    });
+                    setError(area, error);
+                    area.setCaretPosition(0);
                 }
                 catch (BadLocationException e) {
                     // who cares

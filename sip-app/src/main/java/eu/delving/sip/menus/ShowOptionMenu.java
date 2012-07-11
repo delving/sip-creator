@@ -22,8 +22,9 @@
 package eu.delving.sip.menus;
 
 import eu.delving.metadata.OptList;
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -37,19 +38,21 @@ import java.util.List;
 
 public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
     private Listener listener;
+    private SipModel sipModel;
 
     public interface Listener {
         void optSelected(OptList.Opt opt);
     }
 
-    public ShowOptionMenu(Listener listener) {
+    public ShowOptionMenu(SipModel sipModel, Listener listener) {
         super("Options");
+        this.sipModel = sipModel;
         this.listener = listener;
     }
 
     @Override
     public void recMappingSet(final MappingModel mappingModel) {
-        Exec.swing(new Runnable() {
+        sipModel.exec(new Swing() {
             @Override
             public void run() {
                 removeAll();
@@ -58,7 +61,7 @@ public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
                     List<OptList> optLists = mappingModel.getRecMapping().getRecDefTree().getRecDef().opts;
                     if (optLists != null) {
                         for (OptList list : optLists) {
-                            if (list.dictionary) continue;
+                            if (list.dictionary != null) continue;
                             JMenu listMenu = new JMenu(list.displayName);
                             for (OptList.Opt opt : list.opts) listMenu.add(new OptAction(opt));
                             add(listMenu);

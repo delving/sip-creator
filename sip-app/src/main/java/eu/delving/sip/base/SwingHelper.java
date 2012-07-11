@@ -42,6 +42,8 @@ public class SwingHelper {
     private static Color DELIMITER_BG = new Color(255,255,200);
     public static Color MAPPED_COLOR = new Color(220,255,220);
     public static Color HILIGHTED_COLOR = new Color(255,205,205);
+    public static Color LONG_TERM_JOB_COLOR = new Color(255,205,205);
+    public static Color NORMAL_JOB_COLOR = new Color(220,255,220);
 
     public static final Icon VALUE_ELEMENT_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/value-element-icon.png"));
     public static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/composite-element-icon.png"));
@@ -67,7 +69,7 @@ public class SwingHelper {
     }
 
     public static void setError(JTextComponent component, boolean error) {
-        component.setBackground(error ? ERROR_BG : UNEDITABLE_BG);
+        component.setBackground(error ? ERROR_BG : NORMAL_BG);
     }
 
     public static void setDelimitedColor(JComponent component, boolean selected) {

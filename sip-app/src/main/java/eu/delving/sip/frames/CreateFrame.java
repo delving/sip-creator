@@ -21,9 +21,14 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.Exec;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.model.*;
 import eu.delving.sip.panels.HtmlPanel;
 
@@ -56,7 +61,7 @@ public class CreateFrame extends FrameBase {
     private CopyMappingAction copyMappingAction;
 
     public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CREATE, desktop, sipModel, "Create", false);
+        super(Which.CREATE, desktop, sipModel, "Create");
         createModel = sipModel.getCreateModel();
         mappingHintsList = sipModel.getMappingHintsModel().getNodeMappingListModel().createJList();
         createMappingAction = new CreateMappingAction();
@@ -103,6 +108,28 @@ public class CreateFrame extends FrameBase {
     }
 
     private void wireUp() {
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
+            @Override
+            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+            }
+
+            @Override
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            }
+
+            @Override
+            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+        });
         mappingHintsList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
@@ -125,7 +152,7 @@ public class CreateFrame extends FrameBase {
             public void transition(CreateModel createModel, final CreateTransition transition) {
                 final SortedSet<SourceTreeNode> sourceTreeNodes = createModel.getSourceTreeNodes();
                 final RecDefTreeNode recDefTreeNode = createModel.getRecDefTreeNode();
-                Exec.swing(new Runnable() {
+                exec(new Swing() {
                     @Override
                     public void run() {
                         if (transition.sourceChanged) {
@@ -153,13 +180,12 @@ public class CreateFrame extends FrameBase {
                         }
                         switch (transition) {
                             case NOTHING_TO_SOURCE:
-                            case SOURCE_TO_NOTHING:
                             case NOTHING_TO_TARGET:
-                            case TARGET_TO_NOTHING:
                             case ARMED_TO_TARGET:
                             case ARMED_TO_SOURCE:
                             case SOURCE_TO_SOURCE:
                             case TARGET_TO_TARGET:
+                            case ANYTHING_TO_NOTHING:
                                 createMappingAction.setIncomplete();
                                 break;
                             case SOURCE_TO_ARMED:
@@ -196,13 +222,18 @@ public class CreateFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             final Object[] selectedValues = mappingHintsList.getSelectedValues();
             if (selectedValues != null && selectedValues.length > 0) {
-                Exec.work(new Runnable() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         for (Object selectedValue : selectedValues) {
                             NodeMappingEntry nodeMappingEntry = (NodeMappingEntry) selectedValue;
                             createModel.addMapping(nodeMappingEntry.getNodeMapping());
                         }
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.COPY_MAPPING_FROM_HINTS;
                     }
                 });
             }
@@ -221,10 +252,15 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(new Runnable() {
+            exec(new Work() {
                 @Override
                 public void run() {
                     if (createModel.canCreate()) createModel.createMapping();
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.CREATE_MAPPING;
                 }
             });
         }

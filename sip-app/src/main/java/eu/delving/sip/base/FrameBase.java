@@ -59,7 +59,7 @@ public abstract class FrameBase extends JInternalFrame {
     private Timer positionTimer;
     private AllFrames.XArrangement arrangement;
     private List<AdjustAction> adjustActions = new ArrayList<AdjustAction>();
-    private Runnable arrange;
+    private Swing arrange;
     private String title;
 
     public enum Which {
@@ -72,7 +72,7 @@ public abstract class FrameBase extends JInternalFrame {
         FIELD_MAPPING,
         OUTPUT,
         CODE,
-        LOG,
+        WORK,
         HARVEST,
         MAPPING_HINTS,
         FUNCTIONS,
@@ -87,11 +87,11 @@ public abstract class FrameBase extends JInternalFrame {
         Dimension getSize();
     }
 
-    public FrameBase(Which which, final JComponent parent, SipModel sipModel, String title, boolean modal) {
+    protected FrameBase(Which which, final JComponent parent, SipModel sipModel, String title) {
         super(
                 title,
                 true, // resizable
-                !modal, // closeable
+                true, // closeable
                 true, // maximizable
                 false // iconifiable
         );
@@ -106,7 +106,7 @@ public abstract class FrameBase extends JInternalFrame {
         this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title);
-        for (int pos = 0; pos<4; pos++) {
+        for (int pos = 0; pos < 4; pos++) {
             adjustActions.add(new AdjustAction(pos, 1));
             adjustActions.add(new AdjustAction(pos, -1));
         }
@@ -120,12 +120,9 @@ public abstract class FrameBase extends JInternalFrame {
                 }
         );
         positionTimer.setRepeats(false);
-        setGlassPane(new ModalityInternalGlassPane(this));
-        addFrameListener();
+        setGlassPane(new InternalGlassPane(this));
+//        addFrameListener();
         addFrameVetoListener();
-        if (modal) {
-            setFocusTraversalKeysEnabled(false);
-        }
         super.addPropertyChangeListener("closed", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
@@ -143,7 +140,7 @@ public abstract class FrameBase extends JInternalFrame {
         );
     }
 
-    public void setArrangementSource(AllFrames.XArrangement arrangement, Runnable arrange) {
+    public void setArrangementSource(AllFrames.XArrangement arrangement, Swing arrange) {
         this.arrangement = arrangement;
         this.arrange = arrange;
     }
@@ -175,6 +172,10 @@ public abstract class FrameBase extends JInternalFrame {
         return which;
     }
 
+    public void setFrameLocked(boolean locked) {
+        getGlassPane().setVisible(locked);
+    }
+
     // override this
     protected void onOpen(boolean opened) {
     }
@@ -188,10 +189,6 @@ public abstract class FrameBase extends JInternalFrame {
 
     public void setPlacement(Placement placement) {
         this.placement = placement;
-    }
-
-    public Placement getPlacement() {
-        return placement;
     }
 
     protected abstract void buildContent(Container content);
@@ -383,8 +380,7 @@ public abstract class FrameBase extends JInternalFrame {
     protected void childClosing() {
         getGlassPane().setVisible(false);
         if (focusOwner != null) {
-            java.awt.EventQueue.invokeLater(new Runnable() {
-
+            sipModel.exec(new Swing() {
                 public void run() {
                     try {
                         moveToFront();
@@ -420,20 +416,96 @@ public abstract class FrameBase extends JInternalFrame {
      * on associated modal frame. Also if modal frame has no children make
      * class pane invisible
      */
-    class ModalityInternalGlassPane extends JComponent {
+    class InternalGlassPane extends JComponent {
+        private boolean consuming;
 
-        private FrameBase modalFrame;
+        public InternalGlassPane(final FrameBase frame) {
+            setToolTipText(
+                    "<html><b>Mapping is locked<b><br>" +
+                    "<p>You can unlock it in the Unlock menu</p>"
+            );
+            setFocusable(true);
+            addComponentListener(new ComponentListener() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                }
 
-        public ModalityInternalGlassPane(FrameBase frame) {
-            modalFrame = frame;
+                @Override
+                public void componentMoved(ComponentEvent e) {
+                }
+
+                @Override
+                public void componentShown(ComponentEvent e) {
+                    consuming = true;
+                    requestFocus();
+                }
+
+                @Override
+                public void componentHidden(ComponentEvent e) {
+                    consuming = false;
+                }
+            });
+            addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    consume(e);
+                }
+            });
+            addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    consume(e);
+                }
+            });
+            addMouseMotionListener(new MouseMotionListener() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    consume(e);
+                }
+
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    consume(e);
+                }
+            });
             addMouseListener(new MouseAdapter() {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (!modalFrame.isSelected()) {
+                    if (!frame.isSelected()) {
                         try {
-                            modalFrame.setSelected(true);
-                            if (!modalFrame.hasChildFrame()) {
+                            frame.setSelected(true);
+                            if (!frame.hasChildFrame()) {
                                 setVisible(false);
                             }
                         }
@@ -445,9 +517,18 @@ public abstract class FrameBase extends JInternalFrame {
             });
         }
 
+        private void consume(KeyEvent e) {
+            if (consuming) e.consume();
+        }
+
+        private void consume(MouseEvent e) {
+            if (consuming) e.consume();
+        }
+
+
         @Override
-        public void paint(Graphics g) {
-            super.paint(g);
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
             g.setColor(new Color(255, 255, 255, 100));
             g.fillRect(0, 0, getWidth(), getHeight());
         }
@@ -477,27 +558,27 @@ public abstract class FrameBase extends JInternalFrame {
             this.position = position;
             this.direction = direction;
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             AllFrames.XFrame frame = frame();
             if (frame == null) return;
             StringBuilder out = new StringBuilder();
-            for (int walk=0; walk<4; walk++) {
+            for (int walk = 0; walk < 4; walk++) {
                 char ch = frame.where.charAt(walk);
                 if (position == walk) {
-                    switch(ch) {
+                    switch (ch) {
                         case '0':
-                            out.append((direction < 0 && position <= 1) ? ch : (char)(ch + direction));
+                            out.append((direction < 0 && position <= 1) ? ch : (char) (ch + direction));
                             break;
                         case '1':
-                            out.append((direction < 0 && position > 1) ? ch : (char)(ch + direction));
+                            out.append((direction < 0 && position > 1) ? ch : (char) (ch + direction));
                             break;
                         case '9':
-                            out.append((direction > 0) ? ch : (char)(ch + direction));
+                            out.append((direction > 0) ? ch : (char) (ch + direction));
                             break;
-                        default :
-                            out.append((char)(ch + direction));
+                        default:
+                            out.append((char) (ch + direction));
                     }
                 }
                 else {
@@ -517,4 +598,14 @@ public abstract class FrameBase extends JInternalFrame {
         }
         return frame;
     }
+
+    public void exec(Swing swing) {
+        Swing.Exec.later(swing);
+    }
+
+    public void exec(Work work) {
+        sipModel.exec(work);
+    }
+
+
 }

@@ -98,7 +98,7 @@ public class NodeMapping {
     }
 
     public Operator getOperator() {
-        if (recDefNode.hasOperator()) return recDefNode.getOperator();
+        if (recDefNode.hasOperator() && operator == null) return recDefNode.getOperator();
         return operator == null ? Operator.ALL : operator;
     }
 
@@ -121,6 +121,10 @@ public class NodeMapping {
     public Object getSingleSourceTreeNode() {
         Iterator walk = sourceTreeNodes.iterator();
         return walk.hasNext() ? walk.next() : null;
+    }
+
+    public boolean hasDictionary() {
+        return dictionary != null;
     }
 
     public SortedSet getSourceTreeNodes() {
@@ -226,9 +230,12 @@ public class NodeMapping {
         toUserCode(codeOut, groovyParams, editPath);
     }
 
+    public void toDictionaryCode(CodeOut codeOut, Stack<String> groovyParams, OptRole optRole) {
+        toInnerLoop(codeOut, getLocalPath(), groovyParams, optRole);
+    }
 
     public boolean isUserCodeEditable() {
-        return recDefNode.isAttr() || recDefNode.isLeafElem();
+        return (recDefNode.isAttr() || recDefNode.isLeafElem()) && !hasDictionary();
     }
 
     private boolean isSimilar(String codeString, Iterator<String> walk) {
@@ -246,7 +253,7 @@ public class NodeMapping {
         return !walk.hasNext();
     }
 
-    private void toUserCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+    public void toUserCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
         if (editPath != null) {
             if (!editPath.isGeneratedCode()) {
                 String editedCode = editPath.getEditedCode(recDefNode.getPath());
@@ -264,14 +271,19 @@ public class NodeMapping {
             indentCode(groovyCode, codeOut);
             return;
         }
-        toInnerLoop(codeOut, getLocalPath(), groovyParams);
+        toInnerLoop(codeOut, getLocalPath(), groovyParams, OptRole.ROOT);
     }
 
-    private void toInnerLoop(CodeOut codeOut, Path path, Stack<String> groovyParams) {
+    private void toInnerLoop(CodeOut codeOut, Path path, Stack<String> groovyParams, OptRole optRole) {
         if (path.isEmpty()) throw new RuntimeException();
         if (path.size() == 1) {
-            if (dictionary != null) {
-                codeOut.line("from%s(%s)", toDictionaryName(this), toLeafGroovyParam(path));
+            OptBox dictionaryOptBox = recDefNode.getDictionaryOptBox();
+            optRole = optRole == OptRole.ROOT ? OptRole.VALUE : optRole;
+            if (dictionaryOptBox != null) {
+                codeOut.line(
+                        "lookup%s_%s(%s)",
+                        dictionaryOptBox.getDictionaryName(), optRole.getFieldName(), toLeafGroovyParam(path)
+                );
             }
             else if (hasMap()) {
                 codeOut.line(getMapUsage());
@@ -290,7 +302,7 @@ public class NodeMapping {
             }
         }
         else if (recDefNode.isLeafElem()) {
-            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams);
+            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams, optRole);
         }
         else {
             boolean needLoop;
@@ -313,7 +325,7 @@ public class NodeMapping {
                     );
                 }
             }
-            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams);
+            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams, optRole);
             if (needLoop) codeOut._line("} // N0");
         }
     }
@@ -373,5 +385,6 @@ public class NodeMapping {
     private EditPath getGeneratorEditPath() {
         return new EditPath(this);
     }
+
 }
 

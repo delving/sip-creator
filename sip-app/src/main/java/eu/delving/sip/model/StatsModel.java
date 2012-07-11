@@ -23,7 +23,8 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.stats.Stats;
@@ -146,10 +147,8 @@ public class StatsModel {
 
     public SortedSet<SourceTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
         SortedSet<SourceTreeNode> nodes = new TreeSet<SourceTreeNode>();
-        if (!(sourceTreeModel.getRoot() instanceof SourceTreeNode)) {
-            nodeMapping.clearSourceTreeNodes();
-        }
-        else if (!nodeMapping.hasSourceTreeNodes()) {
+        nodeMapping.clearSourceTreeNodes();
+        if (sourceTreeModel.getRoot() instanceof SourceTreeNode) {
             for (Path path : nodeMapping.getInputPaths()) {
                 TreePath treePath = findNodeForInputPath(path, (SourceTreeNode) sourceTreeModel.getRoot());
                 if (treePath != null) nodes.add((SourceTreeNode) treePath.getLastPathComponent());
@@ -160,9 +159,6 @@ public class StatsModel {
             else {
                 SourceTreeNode.setStatsTreeNodes(nodes, nodeMapping);
             }
-        }
-        else {
-            for (Object node : nodeMapping.getSourceTreeNodes()) nodes.add((SourceTreeNode) node);
         }
         return nodes.isEmpty() ? null : nodes;
     }
@@ -213,7 +209,7 @@ public class StatsModel {
         void uniqueElementSet(Path uniqueElementPath);
     }
 
-    private class HintSaveTimer implements FactModel.Listener, ActionListener, Runnable {
+    private class HintSaveTimer implements FactModel.Listener, ActionListener, Work.DataSetWork {
         private Timer timer = new Timer(200, this);
 
         private HintSaveTimer() {
@@ -222,12 +218,13 @@ public class StatsModel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Exec.work(this);
+            sipModel.exec(this);
         }
 
         @Override
         public void run() {
             try {
+                if (sipModel.getDataSetModel().isEmpty()) return;
                 sipModel.getDataSetModel().getDataSet().setHints(hintsModel.getFacts());
             }
             catch (StorageException e) {
@@ -243,6 +240,17 @@ public class StatsModel {
         @Override
         public void allFactsUpdated(Map<String, String> map) {
             timer.restart();
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.SAVE_HINTS;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            if (sipModel.getDataSetModel().isEmpty()) return null;
+            return sipModel.getDataSetModel().getDataSet();
         }
     }
 

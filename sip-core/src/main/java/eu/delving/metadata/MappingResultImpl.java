@@ -209,6 +209,7 @@ public class MappingResultImpl implements MappingResult {
         }
         for (Element el : elements) {
             String key = el.getAttribute("aff:key");
+            if (el.getLocalName() == null) break;
             path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), key));
         }
         RecDefNode recDefNode = recDefTree.getRecDefNode(path);

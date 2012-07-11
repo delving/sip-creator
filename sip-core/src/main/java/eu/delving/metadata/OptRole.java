@@ -19,23 +19,36 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.base;
+package eu.delving.metadata;
+
+import org.apache.commons.lang.WordUtils;
 
 /**
- * Allows for progress reporting from a long term process to the work model
+ * What roles can an opt play in the tree of RecDefNodes
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface ProgressListener {
+public enum OptRole {
+    ROOT,
+    CHILD,
+    KEY,
+    VALUE,
+    SCHEMA,
+    SCHEMA_URI;
 
-    void setProgressMessage(String message);
+    private final String fieldName;
 
-    void setIndeterminateMessage(String message);
+    private OptRole() {
+        String caps = WordUtils.capitalizeFully(toString(), new char[]{'_'}).replaceAll("_", "");
+        this.fieldName = Character.toLowerCase(caps.charAt(0)) + caps.substring(1);
+    }
 
-    void prepareFor(int total);
+    public String getFieldName() {
+        return fieldName;
+    }
 
-    boolean setProgress(int progress);
-
-    void finished(boolean success);
+    public static OptRole[] getFields() {
+        return new OptRole[]{KEY, VALUE, SCHEMA, SCHEMA_URI};
+    }
 }

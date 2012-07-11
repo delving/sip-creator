@@ -88,12 +88,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
             }
             for (RecDef.Elem sub : elem.elemList) {
                 if (sub.optList != null) {
-                    if (sub.optList.dictionary) {
-                        children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, null)); // ignore dictionaries for this
+                    if (sub.optList.dictionary != null) {
+                        children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, OptBox.asRoot(sub.optList)));
                     }
                     else {
                         for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option (introducing the OptBox instances)
-                            children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, new OptBox(OptRole.ROOT, subOpt)));
+                            children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, OptBox.asRoot(subOpt)));
                         }
                     }
                 }
@@ -107,6 +107,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 elem.nodeMapping.outputPath = getPath();
             }
         }
+    }
+
+    public OptBox getDictionaryOptBox() {
+        return optBox != null && optBox.isDictionary() ? optBox : null;
     }
 
     public boolean isHiddenOpt(OptList.Opt shown) {
@@ -446,7 +450,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     private boolean isRootOpt() {
-        return elem != null && optBox != null && optBox.role == OptRole.ROOT;
+        return elem != null && optBox != null && optBox.role == OptRole.ROOT && !optBox.isDictionary();
     }
 
     private boolean isChildOpt() {
@@ -465,7 +469,21 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 if (!sub.isAttr()) continue;
                 if (sub.isChildOpt()) {
                     if (comma) codeOut.line(",");
-                    codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
+                    OptBox dictionaryOptBox = sub.getDictionaryOptBox();
+                    if (dictionaryOptBox != null) {
+                        if (nodeMappings.size() == 1) {
+                            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
+                            codeOut.line_("%s : {", sub.getTag().toBuilderCall());
+                            nodeMapping.toDictionaryCode(codeOut, groovyParams, sub.optBox.role);
+                            codeOut._line("}");
+                        }
+                        else { // this is actually a kind of error:
+                            codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
+                        }
+                    }
+                    else {
+                        codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
+                    }
                     comma = true;
                 }
                 else {
@@ -507,52 +525,4 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return name;
     }
 
-    private enum OptRole {ROOT, CHILD, KEY, VALUE, SCHEMA, SCHEMA_URI}
-
-    private static class OptBox {
-        final OptRole role;
-        final OptList.Opt opt;
-
-        OptBox(OptRole role, OptList.Opt opt) {
-            this.role = role;
-            this.opt = opt;
-        }
-
-        OptBox inRoleFor(Tag tag) {
-            if (role == OptRole.CHILD) {
-                if (opt.parent.key != null && opt.parent.key.equals(tag)) return new OptBox(OptRole.KEY, opt);
-                if (opt.parent.value != null && opt.parent.value.equals(tag)) return new OptBox(OptRole.VALUE, opt);
-                if (opt.parent.schema != null && opt.parent.schema.equals(tag)) return new OptBox(OptRole.SCHEMA, opt);
-                if (opt.parent.schemaUri != null && opt.parent.schemaUri.equals(tag))
-                    return new OptBox(OptRole.SCHEMA_URI, opt);
-            }
-            return null;
-        }
-
-        OptBox createChild() {
-            if (role != OptRole.ROOT) throw new RuntimeException();
-            return new OptBox(OptRole.CHILD, opt);
-        }
-
-        public boolean isChild() {
-            return role != OptRole.ROOT;
-        }
-
-        public String toString() {
-            switch (role) {
-                case ROOT:
-                    return opt.value;
-                case KEY:
-                    return opt.key;
-                case VALUE:
-                    return opt.value;
-                case SCHEMA:
-                    return opt.schema;
-                case SCHEMA_URI:
-                    return opt.schemaUri;
-                default:
-                    return "OPT";
-            }
-        }
-    }
 }

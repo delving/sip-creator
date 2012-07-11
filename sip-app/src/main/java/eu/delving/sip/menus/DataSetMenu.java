@@ -21,8 +21,7 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
@@ -30,6 +29,7 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
 /**
  * The menu for choosing from local data sets.
@@ -41,10 +41,19 @@ public class DataSetMenu extends JMenu {
     private final String SELECTED_SPEC = "selectedSpec";
     private final String SELECTED_PREFIX = "selectedPrefix";
     private SipModel sipModel;
+    private ButtonGroup buttonGroup;
 
     public DataSetMenu(final SipModel sipModel) {
         super("Data Sets");
         this.sipModel = sipModel;
+        Timer disableTimer = new Timer(500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                disableBusy();
+            }
+        });
+        disableTimer.setRepeats(true);
+        disableTimer.start();
         refresh();
     }
 
@@ -56,6 +65,16 @@ public class DataSetMenu extends JMenu {
             clearPreference();
         }
         refresh();
+    }
+
+    public void disableBusy() {
+        if (buttonGroup == null) return;
+        Enumeration<AbstractButton> buttons = buttonGroup.getElements();
+        while (buttons.hasMoreElements()) {
+            AbstractButton button = buttons.nextElement();
+            DataSetItem dataSetItem = (DataSetItem) button;
+            dataSetItem.checkDataSetBusy();
+        }
     }
 
     private void clearPreference() {
@@ -71,8 +90,8 @@ public class DataSetMenu extends JMenu {
     }
 
     private void refresh() {
+        buttonGroup = new ButtonGroup();
         removeAll();
-        final ButtonGroup buttonGroup = new ButtonGroup();
         try {
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 for (String prefix : dataSet.getPrefixes()) {
@@ -82,19 +101,15 @@ public class DataSetMenu extends JMenu {
                     item.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
-                            final ProgressListener listener = sipModel.getFeedback().progressListener("Loading Dataset");
-                            listener.setIndeterminateMessage(String.format("Preparing dataset %s for mapping %s", item.getDataSet(), item.getPrefix()));
-                            listener.prepareFor(-1);
-                            sipModel.setDataSet(item.getDataSet(), item.getPrefix(), new SipModel.DataSetCompletion() {
+                            sipModel.setDataSetPrefix(item.getDataSet(), item.getPrefix(), new Swing() {
                                 @Override
-                                public void complete(final boolean success) {
-                                    listener.finished(success);
-                                    if (success) setPreference(item.getDataSet(), item.getPrefix());
+                                public void run() {
+                                    setPreference(item.getDataSet(), item.getPrefix());
                                 }
                             });
                         }
                     });
-                    if (item.isPreferred()) Exec.swingLater(new Runnable() {
+                    if (item.isPreferred()) sipModel.exec(new Swing() {
                         @Override
                         public void run() {
                             item.doClick();
@@ -109,12 +124,7 @@ public class DataSetMenu extends JMenu {
             }
         }
         catch (final StorageException e) {
-            Exec.work(new Runnable() {
-                @Override
-                public void run() {
-                    sipModel.getFeedback().alert("Problem loading data set list", e);
-                }
-            });
+            sipModel.getFeedback().alert("Problem loading data set list", e);
         }
     }
 
@@ -127,6 +137,7 @@ public class DataSetMenu extends JMenu {
             super(String.format("%s - %s", dataSet.getSpec(), prefix));
             this.dataSet = dataSet;
             this.prefix = prefix;
+            checkDataSetBusy();
         }
 
         public DataSet getDataSet() {
@@ -135,6 +146,10 @@ public class DataSetMenu extends JMenu {
 
         public String getPrefix() {
             return prefix;
+        }
+
+        public void checkDataSetBusy() {
+            setEnabled(!sipModel.getWorkModel().isDataSetBusy(dataSet.getSpec()));
         }
 
         public boolean isPreferred() {

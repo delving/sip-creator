@@ -1,6 +1,7 @@
 <recordList>
     <record>
         <priref>1</priref>
+        <catty>Whatever</catty>
         <edit.source>collect&gt;intern</edit.source>
         <edit.source>photo</edit.source>
         <edit.source>collect&gt;intern</edit.source>

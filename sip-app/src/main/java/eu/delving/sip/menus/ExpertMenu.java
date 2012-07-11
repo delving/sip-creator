@@ -21,7 +21,8 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
@@ -40,12 +41,10 @@ import java.io.File;
 
 public class ExpertMenu extends JMenu {
     private SipModel sipModel;
-    private JDesktopPane desktop;
 
-    public ExpertMenu(final SipModel sipModel, JDesktopPane desktop) {
+    public ExpertMenu(final SipModel sipModel) {
         super("Expert");
         this.sipModel = sipModel;
-        this.desktop = desktop;
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
         add(new WriteOutputAction());
@@ -96,15 +95,26 @@ public class ExpertMenu extends JMenu {
             if (answer != null) {
                 answer = answer.trim();
                 sipModel.getStatsModel().setUniqueValueConverter(answer);
-                Exec.work(new Runnable() {
+                sipModel.exec(new Work.DataSetWork() {
                     @Override
                     public void run() {
                         try {
+                            if (sipModel.getDataSetModel().isEmpty()) return;
                             sipModel.getDataSetModel().getDataSet().deleteSource();
                         }
                         catch (StorageException e) {
                             sipModel.getFeedback().alert("Unable to delete source", e);
                         }
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.DELETE_SOURCE;
+                    }
+
+                    @Override
+                    public DataSet getDataSet() {
+                        return sipModel.getDataSetModel().getDataSet();
                     }
                 });
             }

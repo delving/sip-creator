@@ -25,7 +25,9 @@ import eu.delving.MappingResult;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -66,13 +68,13 @@ public class MappingCompileModel {
     private Type type;
     private Validator validator;
     private GroovyCodeResource groovyCodeResource;
-    private Feedback feedback;
     private boolean enabled;
     private volatile boolean compiling;
     private ParseEar parseEar = new ParseEar();
     private boolean ignoreDocChanges;
     private MappingRunner mappingRunner;
     private MappingModelEar mappingModelEar = new MappingModelEar();
+    private SipModel sipModel;
 
     public enum Type {
         RECORD("record mapping"),
@@ -89,9 +91,9 @@ public class MappingCompileModel {
         }
     }
 
-    public MappingCompileModel(Type type, Feedback feedback, GroovyCodeResource groovyCodeResource) {
+    public MappingCompileModel(SipModel sipModel, Type type, GroovyCodeResource groovyCodeResource) {
+        this.sipModel = sipModel;
         this.type = type;
-        this.feedback = feedback;
         this.groovyCodeResource = groovyCodeResource;
         this.codeDocument.addDocumentListener(new DocChangeListener() {
             @Override
@@ -114,12 +116,12 @@ public class MappingCompileModel {
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
-        Exec.swing(new DocumentSetter(docDocument, "", true));
-        Exec.swing(new DocumentSetter(codeDocument, "", true));
-        Exec.swing(new DocumentSetter(outputDocument, "", true));
+        sipModel.exec(new DocumentSetter(docDocument, "", true));
+        sipModel.exec(new DocumentSetter(codeDocument, "", true));
+        sipModel.exec(new DocumentSetter(outputDocument, "", true));
         if ((this.nodeMapping = nodeMapping) != null) {
-            Exec.swing(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
-            Exec.swing(new Runnable() {
+            sipModel.exec(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
+            sipModel.exec(new Swing() {
                 @Override
                 public void run() {
                     String code = getCode(getEditPath(false));
@@ -176,7 +178,6 @@ public class MappingCompileModel {
     }
 
     private String getCode(EditPath editPath) {
-        Exec.checkSwing();
         switch (type) {
             case RECORD:
                 return recMapping == null ? "" : recMapping.toCode();
@@ -189,7 +190,6 @@ public class MappingCompileModel {
 
     private EditPath getEditPath(final boolean fromCodeDocument) {
         if (nodeMapping == null) return null;
-        Exec.checkSwing();
         String editedCode = null;
         if (fromCodeDocument) {
             editedCode = StringUtil.documentToString(codeDocument);
@@ -209,7 +209,7 @@ public class MappingCompileModel {
                 triggerRun();
             }
             else {
-                Exec.swing(new DocumentSetter(outputDocument, "", false));
+                sipModel.exec(new DocumentSetter(outputDocument, "", false));
             }
         }
     }
@@ -221,6 +221,10 @@ public class MappingCompileModel {
             recMapping = mappingModel.getRecMapping();
             setNodeMapping(null);
             triggerCompile();
+        }
+
+        @Override
+        public void lockChanged(MappingModel mappingModel, boolean locked) {
         }
 
         @Override
@@ -256,7 +260,7 @@ public class MappingCompileModel {
         }
     }
 
-    private class MappingJob implements Runnable {
+    private class MappingJob implements Work.DataSetPrefixWork {
 
         private EditPath editPath;
 
@@ -270,7 +274,6 @@ public class MappingCompileModel {
             compiling = true;
             try {
                 if (mappingRunner == null) {
-                    feedback.say("Compiling " + type);
                     mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath);
                     notifyCodeCompiled(mappingRunner.getCode());
                 }
@@ -317,7 +320,7 @@ public class MappingCompileModel {
         }
 
         private void setMappingCode() {
-            if (nodeMapping != null && nodeMapping.isUserCodeEditable()) {
+            if (nodeMapping != null && nodeMapping.isUserCodeEditable() && !recMapping.isLocked()) {
                 String editedCode = StringUtil.documentToString(codeDocument);
                 nodeMapping.setGroovyCode(editedCode, recMapping);
                 notifyStateChange(nodeMapping.groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);
@@ -326,15 +329,30 @@ public class MappingCompileModel {
 
         private void compilationComplete(String result, String error) {
             if (error != null) result = String.format("## VALIDATION ERROR! ##\n%s\n\n## OUTPUT ##\n%s", error, result);
-            Exec.swing(new DocumentSetter(outputDocument, result, false));
+            sipModel.exec(new DocumentSetter(outputDocument, result, false));
         }
 
         public String toString() {
             return type.toString();
         }
+
+        @Override
+        public Job getJob() {
+            return Job.COMPILE_NODE_MAPPING;
+        }
+
+        @Override
+        public String getPrefix() {
+            return recMapping == null ? "" : recMapping.getPrefix();
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return sipModel.getDataSetModel().getDataSet();
+        }
     }
 
-    private class DocumentSetter implements Runnable {
+    private class DocumentSetter implements Swing {
 
         private Document document;
         private String content;
@@ -348,7 +366,6 @@ public class MappingCompileModel {
 
         @Override
         public void run() {
-            Exec.checkSwing();
             ignoreDocChanges = ignore;
             int docLength = document.getLength();
             try {
@@ -381,7 +398,7 @@ public class MappingCompileModel {
                     throw new RuntimeException(e);
                 }
             }
-            Exec.work(new MappingJob(getEditPath(true)));
+            sipModel.exec(new MappingJob(getEditPath(true)));
         }
 
         public void triggerSoon(int delay) {
@@ -390,7 +407,12 @@ public class MappingCompileModel {
         }
     }
 
-    private abstract class DocChangeListener implements DocumentListener, Runnable {
+    private abstract class DocChangeListener implements DocumentListener, Work {
+
+        @Override
+        public Job getJob() {
+            return Job.MAPPING_DOCUMENT_CHANGED;
+        }
 
         @Override
         public void insertUpdate(DocumentEvent documentEvent) {
@@ -408,7 +430,7 @@ public class MappingCompileModel {
         }
 
         private void go() {
-            if (!ignoreDocChanges) Exec.work(this);
+            if (!ignoreDocChanges) sipModel.exec(this);
         }
     }
 
@@ -420,16 +442,26 @@ public class MappingCompileModel {
         }
 
         @Override
+        public Job getJob() {
+            return Job.MAPPING_DOCUMENT_CHANGED;
+        }
+
+        @Override
         public void run() {
             laterTimer.restart();
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Exec.work(new Runnable() {
+            sipModel.exec(new Work() {
                 @Override
                 public void run() {
                     later();
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.MAPPING_DOCUMENT_CHANGED;
                 }
             });
         }

@@ -74,7 +74,7 @@ public class MappingRunner {
         recMapping.toCode(codeOut, editPath);
         code = codeOut.toString();
         script = groovyCodeResource.createMappingScript(code);
-        for (Map.Entry<String,String> entry : recMapping.getFacts().entrySet()) {
+        for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());
         }
     }
@@ -94,6 +94,7 @@ public class MappingRunner {
         try {
             Binding binding = new Binding();
             DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getNamespaces());
+            binding.setVariable("_optLookup", recMapping.getRecDefTree().getRecDef().optLookup);
             binding.setVariable("output", builder);
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));
@@ -104,7 +105,7 @@ public class MappingRunner {
             throw e;
         }
         catch (MissingPropertyException e) {
-            throw new MappingException(metadataRecord, "Missing Property " + e.getProperty(), e);
+            throw new MappingException(metadataRecord, "Missing Property " + e.getProperty() + "\n" + code, e);
         }
         catch (MultipleCompilationErrorsException e) {
             StringBuilder out = new StringBuilder();
@@ -115,6 +116,9 @@ public class MappingRunner {
                 out.append(String.format("Problem: %s\n", se.getOriginalMessage()));
             }
             throw new MappingException(metadataRecord, out.toString(), e);
+        }
+        catch (AssertionError e) {
+            throw new MappingException(metadataRecord, "The keyword 'assert' should not be used", e);
         }
         catch (Exception e) {
             String codeLines = fetchCodeLines(e);

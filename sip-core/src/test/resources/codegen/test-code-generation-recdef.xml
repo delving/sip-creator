@@ -72,7 +72,7 @@
 
         <!-- event: super-elements: eventSet; relatedEvent; subjectEvent -->
         <elem tag="displayEvent" attrs="xml:lang, encodinganalog, label"/>
-        <elem tag="event" elems="eventID, eventType, roleInEvent, eventName, eventActor, culture, eventDate, periodName, eventPlace, eventMethod, eventMaterialsTech, thingPresent, relatedEventSet, eventDescriptionSet"  singular="true"/>
+        <elem tag="event" elems="eventID, eventType, roleInEvent, eventName, eventActor, culture, eventDate, periodName, eventPlace, eventMethod, eventMaterialsTech, thingPresent, relatedEventSet, eventDescriptionSet" singular="true"/>
         <elem tag="eventID" attrs="pref, type, source, encodinganalog, label"/>
         <elem tag="eventType" elems="conceptID, term" required="true" singular="true"/>
         <elem tag="roleInEvent" elems="conceptID, term"/>
@@ -125,10 +125,9 @@
     </elems>
 
     <root tag="lido" attrs="sortorder" required="true">
-
         <elem tag="lidoRecID" attrs="pref, type, source, encodinganalog, label" required="true"/>
         <elem tag="objectPublishedID" attrs="pref, type, source, encodinganalog, label"/>
-        <elem tag="category" elems="conceptID, term" singular="true"/>
+        <elem tag="category" elems="term, conceptID" singular="true"/>
 
         <elem tag="descriptiveMetadata" attrs="xml:lang" required="true">
 
@@ -137,7 +136,7 @@
                     <elem tag="objectWorkType" elems="conceptID, term" attrs="type, sortorder" required="true"/>
                 </elem>
                 <elem tag="classificationWrap" singular="true">
-                    <elem tag="classification" elems="conceptID, term" attrs="type, sortorder" />
+                    <elem tag="classification" elems="conceptID, term" attrs="type, sortorder"/>
                 </elem>
             </elem>
 
@@ -228,7 +227,7 @@
                 <elem tag="recordID" attrs="pref, type, source, encodinganalog, label" required="true"/>
                 <elem tag="recordType" elems="conceptID, term" required="true" singular="true"/>
                 <elem tag="recordSource" elems="legalBodyID, legalBodyName, legalBodyWeblink" attrs="type, sortorder"/>
-                <elem tag="recordRights" elems="rightsType, rightsDate, rightsHolder, creditLine" />
+                <elem tag="recordRights" elems="rightsType, rightsDate, rightsHolder, creditLine"/>
                 <elem tag="recordInfoSet" attrs="type">
                     <elem tag="recordInfoID" attrs="pref, type, source, encodinganalog, label"/>
                     <elem tag="recordInfoLink" attrs="pref, formatResource,xml:lang, encodinganalog, label"/>
@@ -240,7 +239,7 @@
                     <elem tag="resourceID" attrs="pref, type, source, encodinganalog, label" singular="true"/>
                     <elem tag="resourceRepresentation" attrs="type">
                         <elem tag="linkResource" attrs="codecResource" required="true" singular="true"/>
-                        <elem tag="resourceMeasurementsSet" elems="measurementType, measurementUnit, measurementValue" />
+                        <elem tag="resourceMeasurementsSet" elems="measurementType, measurementUnit, measurementValue"/>
                     </elem>
                     <elem tag="resourceType" elems="conceptID, term" singular="true"/>
                     <elem tag="resourceRelType" elems="conceptID, term" singular="true"/>
@@ -270,6 +269,19 @@
     </field-markers>
 
     <opts>
+
+        <opt-list dictionary="TURD" path="/lido/descriptiveMetadata/objectRelationWrap/subjectWrap/subjectSet/subject/subjectConcept/term" key="@addedSearchTerm" displayName="Fake">
+            <opt key="man" value="Clay Man"/>
+            <opt key="horse" value="Clay Horse"/>
+            <opt key="savior" value="Jesus!"/>
+        </opt-list>
+
+        <opt-list dictionary="CLUMP" path="/lido/administrativeMetadata/recordWrap/recordID" key="@type" displayName="MoreFake">
+            <opt key="rv" value="reverse reverse"/>
+            <opt key="fw" value="forward forward"/>
+            <opt key="pause" value="Pause Pause!"/>
+        </opt-list>
+
         <!--<option-list path="/lido/administrativeMetadata/recordWrap">-->
             <!--<opt key="1">Item</opt>-->
             <!--<opt key="2">Collection</opt>-->

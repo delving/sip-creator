@@ -22,10 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.*;
-import eu.delving.sip.base.CompileState;
-import eu.delving.sip.base.Exec;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.URLLauncher;
+import eu.delving.sip.base.*;
 import eu.delving.sip.model.*;
 
 import javax.swing.*;
@@ -71,7 +68,7 @@ public class FieldMappingFrame extends FrameBase {
     private UndoManager undoManager = new UndoManager();
 
     public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.FIELD_MAPPING, desktop, sipModel, "Field Mapping", false);
+        super(Which.FIELD_MAPPING, desktop, sipModel, "Field Mapping");
         dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);
@@ -85,7 +82,7 @@ public class FieldMappingFrame extends FrameBase {
         outputArea.setWrapStyleWord(true);
         attachAction(UNDO_ACTION);
         attachAction(REDO_ACTION);
-        new URLLauncher(outputArea, sipModel.getFeedback());
+        new URLLauncher(sipModel, outputArea, sipModel.getFeedback());
         wireUp();
         handleEnablement();
     }
@@ -96,13 +93,8 @@ public class FieldMappingFrame extends FrameBase {
     }
 
     private void handleEnablement() {
-        Exec.swingLater(new Runnable() {
-            @Override
-            public void run() {
-                UNDO_ACTION.setEnabled(undoManager.canUndo());
-                REDO_ACTION.setEnabled(undoManager.canRedo());
-            }
-        });
+        UNDO_ACTION.setEnabled(undoManager.canUndo());
+        REDO_ACTION.setEnabled(undoManager.canRedo());
     }
 
     @Override
@@ -199,11 +191,16 @@ public class FieldMappingFrame extends FrameBase {
                 if (operatorBoxSetting) return;
                 final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
                 if (nodeMapping != null) {
-                    Exec.work(new Runnable() {
+                    exec(new Work() {
                         @Override
                         public void run() {
                             nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
                             nodeMapping.notifyChanged(OPERATOR);
+                        }
+
+                        @Override
+                        public Job getJob() {
+                            return Job.SET_OPERATOR;
                         }
                     });
                 }
@@ -217,7 +214,7 @@ public class FieldMappingFrame extends FrameBase {
                     final NodeMapping nodeMapping = createModel.getNodeMapping();
                     contextVarModel.setList(nodeMapping);
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                    Exec.swing(new Runnable() {
+                    exec(new Swing() {
                         @Override
                         public void run() {
                             setEditable(codeArea, nodeMapping.isUserCodeEditable());
@@ -230,7 +227,7 @@ public class FieldMappingFrame extends FrameBase {
                 else {
                     contextVarModel.setList(null);
                     sipModel.getFieldCompileModel().setNodeMapping(null);
-                    Exec.swing(new Runnable() {
+                    exec(new Swing() {
                         @Override
                         public void run() {
                             setEditable(codeArea, false);
@@ -245,7 +242,7 @@ public class FieldMappingFrame extends FrameBase {
         sipModel.getFieldCompileModel().addListener(new MappingCompileModel.Listener() {
             @Override
             public void stateChanged(final CompileState state) {
-                Exec.swing(new Runnable() {
+                exec(new Swing() {
                     @Override
                     public void run() {
                         if (state == CompileState.ORIGINAL) {
@@ -269,6 +266,11 @@ public class FieldMappingFrame extends FrameBase {
             }
         });
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+            @Override
+            public void lockChanged(MappingModel mappingModel, boolean locked) {
+                setFrameLocked(locked);
+            }
+
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
                 functionModel.refresh();
@@ -391,13 +393,18 @@ public class FieldMappingFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             boolean discard = sipModel.getFeedback().confirm("Discard", "Discard edited code and revert to the original?");
             if (discard) {
-                Exec.work(new Runnable() {
+                exec(new Work() {
                     @Override
                     public void run() {
                         if (sipModel.getCreateModel().hasNodeMapping()) {
                             sipModel.getCreateModel().getNodeMapping().revertToGenerated();
                         }
                         sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.REVERT_NODE_MAPPING;
                     }
                 });
             }

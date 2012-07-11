@@ -45,11 +45,12 @@ public class TestSourceConverter {
     private static String[] INPUT = {
             "<?xml version=\"1.0\"?>",
             "<the-root",
+            " xmlns=\"http://rootns\"",
             " xmlns:a=\"http://a\"",
             " xmlns:b=\"http://b\"",
             " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", // will be stripped
             ">",
-            "<sub-root xmlns:c=\"http://c\">", // repeated
+            "<sub-root xmlns:c=\"http://c\" xmlns=\"rootns\">", // repeated, both of them
             "<we-are-in-record>",
             "<a:boo>&amp;three > two &gt; 1</a:boo>",
             "<a:wrapper>",
@@ -85,6 +86,7 @@ public class TestSourceConverter {
     private static final String UNIQUE_CONVERTER = ".(.*):::before:$1:after";
 
     static {
+        namespaces.put("", "http://rootns");
         namespaces.put("a", "http://a");
         namespaces.put("b", "http://b");
         namespaces.put("c", "http://c");

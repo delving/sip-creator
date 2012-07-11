@@ -23,7 +23,9 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 
 import javax.swing.tree.TreePath;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static eu.delving.sip.files.DataSetState.ABSENT;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 import static eu.delving.sip.model.CreateModel.Setter.*;
 import static eu.delving.sip.model.CreateState.*;
@@ -53,12 +56,27 @@ public class CreateModel {
 
     public enum Setter {NONE, SOURCE, TARGET, NODE_MAPPING}
 
-    public CreateModel(SipModel sipModel) {
+    public CreateModel(final SipModel sipModel) {
         this.sipModel = sipModel;
+        sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
+            @Override
+            public void stateChanged(DataSetModel model, DataSetState state) {
+                if (state == ABSENT) sipModel.exec(new Work() {
+                    @Override
+                    public void run() {
+                        sipModel.getCreateModel().setNodeMapping(null);
+                    }
+
+                    @Override
+                    public Job getJob() {
+                        return Job.CLEAR_NODE_MAPPING;
+                    }
+                });
+            }
+        });
     }
 
     public void setSource(SortedSet<SourceTreeNode> sourceTreeNodes) {
-        Exec.checkWork();
         setter = SOURCE;
         setSourceInternal(sourceTreeNodes);
         setNodeMappingInternal(findExistingMapping());
@@ -67,7 +85,6 @@ public class CreateModel {
     }
 
     public void setTarget(RecDefTreeNode recDefTreeNode) {
-        Exec.checkWork();
         setter = TARGET;
         setTargetInternal(recDefTreeNode);
         setNodeMappingInternal(findExistingMapping());
@@ -76,7 +93,6 @@ public class CreateModel {
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
-        Exec.checkWork();
         setter = NODE_MAPPING;
         setNodeMappingInternal(nodeMapping);
         if (nodeMapping != null) {
@@ -84,12 +100,15 @@ public class CreateModel {
             TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
             setTargetInternal((RecDefTreeNode) treePath.getLastPathComponent());
         }
+        else {
+            setSourceInternal(null);
+            setTargetInternal(null);
+        }
         adjustHighlights();
         fireStateChanged();
     }
 
     public void createMapping() {
-        Exec.checkWork();
         if (!canCreate()) throw new RuntimeException("Should have checked");
         NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
         created.recDefNode = recDefTreeNode.getRecDefNode();
@@ -105,7 +124,6 @@ public class CreateModel {
     }
 
     public void addMapping(NodeMapping nodeMapping) {
-        Exec.checkWork();
         TreePath treePath = sipModel.getMappingModel().getTreePath(nodeMapping.outputPath);
         RecDefTreeNode recDefTreeNode = (RecDefTreeNode) treePath.getLastPathComponent();
         nodeMapping.recDefNode = recDefTreeNode.getRecDefNode();
@@ -145,12 +163,10 @@ public class CreateModel {
     }
 
     private void setNodeMappingInternal(NodeMapping nodeMapping) {
-        Exec.checkWork();
         this.nodeMapping = nodeMapping;
     }
 
     private NodeMapping findExistingMapping() {
-        Exec.checkWork();
         if (sourceTreeNodes == null || recDefTreeNode == null) return null;
         nextNodeMapping:
         for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
@@ -166,7 +182,7 @@ public class CreateModel {
     }
 
     private void adjustHighlights() {
-        Exec.swing(new Runnable() {
+        sipModel.exec(new Swing() {
             @Override
             public void run() {
                 sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();
@@ -193,7 +209,7 @@ public class CreateModel {
                         }
                         break;
                     case NODE_MAPPING:
-                        if (nodeMapping == null) return;
+                        if (nodeMapping == null || nodeMapping.getSourceTreeNodes() == null) return;
                         for (Object node : nodeMapping.getSourceTreeNodes()) ((SourceTreeNode) node).setHighlighted();
                         RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
                         RecDefTreeNode recDefTreeNode = root.getRecDefTreeNode(nodeMapping.recDefNode);
@@ -231,7 +247,7 @@ public class CreateModel {
             case NOTHING:
                 switch (newState) {
                     case NOTHING:
-                        return null;
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         return NOTHING_TO_SOURCE;
                     case TARGET_ONLY:
@@ -245,7 +261,7 @@ public class CreateModel {
             case SOURCE_ONLY:
                 switch (newState) {
                     case NOTHING:
-                        return SOURCE_TO_NOTHING;
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         return SOURCE_TO_SOURCE;
                     case TARGET_ONLY:
@@ -259,7 +275,7 @@ public class CreateModel {
             case TARGET_ONLY:
                 switch (newState) {
                     case NOTHING:
-                        return TARGET_TO_NOTHING;
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         break; // never
                     case TARGET_ONLY:
@@ -273,7 +289,7 @@ public class CreateModel {
             case SOURCE_AND_TARGET:
                 switch (newState) {
                     case NOTHING:
-                        break; // never
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
                         return ARMED_TO_SOURCE;
                     case TARGET_ONLY:
@@ -306,11 +322,11 @@ public class CreateModel {
             case COMPLETE:
                 switch (newState) {
                     case NOTHING:
-                        break; // never
+                        return ANYTHING_TO_NOTHING;
                     case SOURCE_ONLY:
-                        break; // never
+                        return ARMED_TO_SOURCE;
                     case TARGET_ONLY:
-                        break; // never
+                        return ARMED_TO_TARGET;
                     case SOURCE_AND_TARGET:
                         switch (setter) {
                             case NONE:
@@ -328,7 +344,6 @@ public class CreateModel {
                 break;
         }
         throw new IllegalStateException("No transition available from " + state + " to " + newState);
-        // todo: java.lang.IllegalStateException: No transition available from COMPLETE to TARGET_ONLY
     }
 
     private CreateState getState() {

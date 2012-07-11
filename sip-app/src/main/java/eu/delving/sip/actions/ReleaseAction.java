@@ -22,7 +22,7 @@
 package eu.delving.sip.actions;
 
 import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.Exec;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -74,9 +74,8 @@ public class ReleaseAction extends AbstractAction {
             @Override
             public void unlockComplete(boolean successful) {
                 if (successful) {
-                    sipModel.getFeedback().say(String.format("Unlocked %s and removed it locally", dataSet));
                     try {
-                        Exec.swing(new Runnable() {
+                        sipModel.exec(new Swing() {
                             @Override
                             public void run() {
                                 sipModel.seekReset(); // release the file handle
