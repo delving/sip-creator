@@ -151,7 +151,8 @@ public class Application {
         });
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new ImportAction(desktop, sipModel);
-        validateAction = new ValidateAction(desktop, sipModel, allFrames.prepareForInvestigation(desktop));
+        dataSetMenu = new DataSetMenu(sipModel);
+        validateAction = new ValidateAction(desktop, sipModel, dataSetMenu, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
         releaseAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
@@ -162,7 +163,6 @@ public class Application {
         home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
         home.setIconImage(logo.getImage());
-        dataSetMenu = new DataSetMenu(sipModel);
         oauthClient = new OAuthClient(
                 cultureHubClient.getHttpClient(),
                 StorageFinder.getHostPort(storageDirectory),
@@ -197,7 +197,7 @@ public class Application {
                         });
                         home.setTitle("Delving SIP Creator");
                         sipModel.seekReset();
-                        dataSetMenu.refreshAndChoose(null);
+                        dataSetMenu.refreshAndChoose(null, null);
                         break;
                     default:
                         DataSetModel dataSetModel = sipModel.getDataSetModel();
@@ -335,7 +335,7 @@ public class Application {
             sipModel.exec(new Swing() {
                 @Override
                 public void run() {
-                    dataSetMenu.refreshAndChoose(dataSet);
+                    dataSetMenu.refreshAndChoose(dataSet, null);
                 }
             });
         }

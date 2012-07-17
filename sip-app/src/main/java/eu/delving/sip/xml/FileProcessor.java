@@ -73,11 +73,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private int recordCount;
 
     public interface Listener {
-        void mappingFailed(MappingException exception);
+        void mappingFailed(FileProcessor fileProcessor, MappingException exception);
 
-        void outputInvalid(int recordNumber, Node node, String message);
+        void outputInvalid(FileProcessor fileProcessor, int recordNumber, Node node, String message);
 
-        void finished(Stats stats, BitSet valid, int recordCount);
+        void finished(FileProcessor fileProcessor, Stats stats, BitSet valid, int recordCount);
     }
 
     public FileProcessor(
@@ -114,6 +114,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     @Override
     public DataSet getDataSet() {
         return dataSet;
+    }
+
+    public String getSpec() {
+        return dataSet.getSpec();
     }
 
     @Override
@@ -164,7 +168,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     reportWriter.println(XmlNodePrinter.toXml(e.getMetadataRecord().getRootNode()));
                     e.printStackTrace(reportWriter);
                     abort();
-                    listener.mappingFailed(e);
+                    listener.mappingFailed(this, e);
                 }
             }
         }
@@ -179,10 +183,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             if (xmlOutput != null) xmlOutput.finish();
             IOUtils.closeQuietly(reportWriter);
             if (aborted) {
-                listener.finished(null, null, 0);
+                listener.finished(this, null, null, 0);
             }
             else {
-                listener.finished(aborted ? null : stats, aborted ? null : valid, recordCount);
+                listener.finished(this, aborted ? null : stats, aborted ? null : valid, recordCount);
             }
             if (!aborted) progressListener.finished(true);
         }
@@ -254,7 +258,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             reportWriter.println("===");
             if (!allowInvalid) {
                 abort();
-                listener.outputInvalid(recordNumber, node, e.getMessage());
+                listener.outputInvalid(this, recordNumber, node, e.getMessage());
             }
         }
     }

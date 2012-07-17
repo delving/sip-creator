@@ -77,7 +77,7 @@ public class SipModel {
 
     public interface ValidationListener {
 
-        void failed(int recordNumber, String record, String message);
+        void failed(FileProcessor fileProcessor, int recordNumber, String record, String message);
 
     }
 
@@ -488,26 +488,25 @@ public class SipModel {
                 groovyCodeResource,
                 new FileProcessor.Listener() {
                     @Override
-                    public void mappingFailed(final MappingException exception) {
+                    public void mappingFailed(FileProcessor fileProcessor, final MappingException exception) {
                         String xml = XmlNodePrinter.toXml(exception.getMetadataRecord().getRootNode());
-                        validationListener.failed(exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
+                        validationListener.failed(fileProcessor, exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
                         finishedProcessing();
                     }
 
                     @Override
-                    public void outputInvalid(int recordNumber, Node outputNode, String message) {
+                    public void outputInvalid(FileProcessor fileProcessor, int recordNumber, Node outputNode, String message) {
                         String xml = serializer.toXml(outputNode);
-                        validationListener.failed(recordNumber, xml, message);
+                        validationListener.failed(fileProcessor, recordNumber, xml, message);
                         finishedProcessing();
                     }
 
                     @Override
-                    public void finished(final Stats stats, final BitSet valid, int recordCount) {
+                    public void finished(FileProcessor fileProcessor, final Stats stats, final BitSet valid, int recordCount) {
                         finishedProcessing();
                         try {
-                            DataSet dataSet = dataSetModel.getDataSet();
-                            dataSet.setStats(stats, false, mappingModel().getRecMapping().getPrefix());
-                            dataSet.setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
+                            fileProcessor.getDataSet().setStats(stats, false, fileProcessor.getPrefix());
+                            fileProcessor.getDataSet().setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
                         }
                         catch (StorageException e) {
                             feedback.alert("Unable to store validation results", e);

@@ -63,9 +63,9 @@ public class DataSetMenu extends JMenu {
         return unlockMappingAction;
     }
 
-    public void refreshAndChoose(DataSet dataSet) {
+    public void refreshAndChoose(DataSet dataSet, String prefix) {
         if (dataSet != null) {
-            setPreference(dataSet, null);
+            setPreference(dataSet, prefix);
         }
         else {
             clearPreference();
