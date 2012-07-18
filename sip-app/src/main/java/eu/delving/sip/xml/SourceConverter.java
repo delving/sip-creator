@@ -182,7 +182,6 @@ public class SourceConverter {
             }
         }
         finally {
-            if (progressListener != null) progressListener.finished(finished);
             if (feedback != null && uniqueRepeatCount > 0) feedback.alert(String.format("Uniqueness violations : " + uniqueRepeatCount));
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);

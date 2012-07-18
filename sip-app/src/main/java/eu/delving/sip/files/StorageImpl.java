@@ -517,11 +517,9 @@ public class StorageImpl implements Storage {
                     }
                     hasher.update(buffer, bytesRead);
                 }
-                if (progressListener != null) progressListener.finished(!cancelled);
                 delete(statsFile(here, false, null));
             }
             catch (Exception e) {
-                if (progressListener != null) progressListener.finished(false);
                 throw new StorageException("Unable to capture XML input into " + source.getAbsolutePath(), e);
             }
             finally {
@@ -637,10 +635,7 @@ public class StorageImpl implements Storage {
                                 }
                                 hasher.update(buffer, bytesRead);
                             }
-                            if (progressListener != null) {
-                                progressListener.finished(!cancelled);
-                                progressListener = null;
-                            }
+                            if (progressListener != null) progressListener = null;
                         }
                         finally {
                             IOUtils.closeQuietly(outputStream);
@@ -664,7 +659,6 @@ public class StorageImpl implements Storage {
                             IOUtils.closeQuietly(output);
                         }
                         if (progressListener != null && !progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
-                            progressListener.finished(false);
                             break;
                         }
                     }

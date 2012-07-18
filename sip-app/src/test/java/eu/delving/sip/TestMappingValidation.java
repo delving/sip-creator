@@ -239,11 +239,6 @@ public class TestMappingValidation {
                 System.out.println("progress = "+progress);
                 return false;  // todo: implement
             }
-
-            @Override
-            public void finished(boolean success) {
-                System.out.println("finished");
-            }
         };
     }
 

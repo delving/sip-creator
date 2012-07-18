@@ -21,7 +21,9 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.groovy.*;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
@@ -36,10 +38,8 @@ import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Node;
 
 import java.io.File;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -56,7 +56,7 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 public class SipModel {
     private static final Logger LOG = Logger.getLogger(SipModel.class);
     private XmlSerializer serializer = new XmlSerializer();
-    private WorkModel workModel = new WorkModel();
+    private WorkModel workModel;
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences;
@@ -75,12 +75,6 @@ public class SipModel {
     private MappingSaveTimer mappingSaveTimer;
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
 
-    public interface ValidationListener {
-
-        void failed(FileProcessor fileProcessor, int recordNumber, String record, String message);
-
-    }
-
     public interface ParseListener {
         void updatedRecord(MetadataRecord metadataRecord);
     }
@@ -94,6 +88,7 @@ public class SipModel {
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
+        this.workModel = new WorkModel(feedback);
         dataSetModel = new DataSetModel(this);
         functionCompileModel = new FunctionCompileModel(this, feedback, groovyCodeResource);
         recordCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.RECORD, groovyCodeResource);
@@ -330,11 +325,9 @@ public class SipModel {
                         seekFirstRecord();
                     }
                 });
-                progressListener.finished(true);
                 Swing.Exec.later(success);
             }
             catch (Exception e) {
-                progressListener.finished(false);
                 feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);
                 dataSetModel.clearDataSet();
             }
@@ -472,7 +465,7 @@ public class SipModel {
         }
     }
 
-    public void processFile(final ValidationListener validationListener, final Swing finished) {
+    public void processFile(FileProcessor.Listener listener) {
         File outputDirectory = null;
         String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
         if (!directoryString.isEmpty()) {
@@ -485,36 +478,7 @@ public class SipModel {
                 statsModel.getRecordCount(),
                 outputDirectory,
                 groovyCodeResource,
-                new FileProcessor.Listener() {
-                    @Override
-                    public void mappingFailed(FileProcessor fileProcessor, final MappingException exception) {
-                        String xml = XmlNodePrinter.toXml(exception.getMetadataRecord().getRootNode());
-                        validationListener.failed(fileProcessor, exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
-                        finishedProcessing();
-                    }
-
-                    @Override
-                    public void outputInvalid(FileProcessor fileProcessor, int recordNumber, Node outputNode, String message) {
-                        validationListener.failed(fileProcessor, recordNumber, serializer.toXml(outputNode), message);
-                    }
-
-                    @Override
-                    public void finished(FileProcessor fileProcessor, final Stats stats, final BitSet valid, int recordCount) {
-                        finishedProcessing();
-                        try {
-                            fileProcessor.getDataSet().setStats(stats, false, fileProcessor.getPrefix());
-                            fileProcessor.getDataSet().setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
-                        }
-                        catch (StorageException e) {
-                            feedback.alert("Unable to store validation results", e);
-                        }
-                        reportFileModel.refresh();
-                    }
-
-                    private void finishedProcessing() {
-                        exec(finished);
-                    }
-                }
+                listener
         ));
     }
 
@@ -592,7 +556,6 @@ public class SipModel {
                             for (ParseListener parseListener : parseListeners) {
                                 parseListener.updatedRecord(metadataRecord);
                             }
-                            if (progressListener != null) progressListener.finished(true);
                             break;
                         }
                     }

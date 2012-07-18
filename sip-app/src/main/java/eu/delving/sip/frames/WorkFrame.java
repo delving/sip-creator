@@ -29,6 +29,8 @@ import eu.delving.sip.model.WorkModel;
 import org.apache.commons.lang.WordUtils;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.text.DateFormat;
@@ -45,8 +47,9 @@ public class WorkFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
     private static final Font TINY = new Font("Serif", Font.PLAIN, 8);
     private JList fullList, miniList;
+    private WorkModel.JobContext selectedJobContext;
 
-    public WorkFrame(JDesktopPane desktop, SipModel sipModel) {
+    public WorkFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(Which.WORK, desktop, sipModel, "Work");
         this.miniList = new JList(sipModel.getWorkModel().getListModel());
         this.miniList.setFont(TINY);
@@ -54,6 +57,14 @@ public class WorkFrame extends FrameBase {
         this.fullList = new JList(sipModel.getWorkModel().getListModel());
         this.fullList.setFont(MONOSPACED);
         this.fullList.setCellRenderer(new JobContextCellRenderer());
+        this.fullList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.fullList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+                selectedJobContext = (WorkModel.JobContext) fullList.getSelectedValue();
+            }
+        });
         getAction().putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())

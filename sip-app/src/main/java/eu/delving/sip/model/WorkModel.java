@@ -43,8 +43,10 @@ public class WorkModel {
     private ExecutorService executor = Executors.newCachedThreadPool();
     private List<JobContext> jobContexts = new CopyOnWriteArrayList<JobContext>();
     private JobListModel jobListModel = new JobListModel();
+    private Feedback feedback;
 
-    public WorkModel() {
+    public WorkModel(Feedback feedback) {
+        this.feedback = feedback;
         Timer tick = new Timer(REFRESH_RATE, jobListModel);
         tick.setRepeats(true);
         tick.start();
@@ -200,7 +202,6 @@ public class WorkModel {
             if (isEmpty()) return true;
             if (!future.isDone()) return false;
 //          todo:  future.isCancelled()
-            if (progress != null) progress.finished(true);
             queue.remove();
             if (isEmpty()) return true;
             launch();
@@ -239,6 +240,12 @@ public class WorkModel {
         }
 
         public void add(Work work) {
+            if (work instanceof Work.LongTermWork) {
+                if (!isEmpty() && work.getClass() == getWork().getClass() && !isDone()) {
+                    feedback.alert(this + " busy");
+                    return;
+                }
+            }
             queue.add(work);
         }
 
@@ -276,14 +283,13 @@ public class WorkModel {
 
         @Override
         public String toString() {
-            return (isEmpty() ? "empty" : job().toString()) + start.toString();
+            return isEmpty() ? "empty" : job().toString();
         }
     }
 
     private static class SimpleProgress implements ProgressListener {
         private String progressMessage, indeterminateMessage;
         private int current, maximum;
-        private boolean finished, success;
 
         @Override
         public void setProgressMessage(String message) {
@@ -304,12 +310,6 @@ public class WorkModel {
         public boolean setProgress(int progress) {
             this.current = progress;
             return true; // todo: false if you want to cancel
-        }
-
-        @Override
-        public void finished(boolean success) {
-            this.finished = true;
-            this.success = success;
         }
 
         public String toFullString() {

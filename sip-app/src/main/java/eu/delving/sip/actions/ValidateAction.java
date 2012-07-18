@@ -23,7 +23,9 @@ package eu.delving.sip.actions;
 
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
@@ -70,38 +72,60 @@ public class ValidateAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         setEnabled(false);
-        SipModel.ValidationListener validationListener = new SipModel.ValidationListener() {
+        sipModel.processFile(new FileProcessor.Listener() {
             @Override
-            public void failed(final FileProcessor fileProcessor, final int recordNumber, final String record, String message) {
+            public void failed(final FileProcessor fileProcessor) {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         sipModel.getMappingModel().setLocked(false);
+                        setEnabled(true);
                         if (isNotCurrent(fileProcessor)) {
                             sipModel.setDataSetPrefix(fileProcessor.getDataSet(), fileProcessor.getPrefix(), new Swing() {
                                 @Override
                                 public void run() {
                                     dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
-                                    investigateRecord(recordNumber);
+                                    sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
+                                    investigate.run();
                                 }
                             });
                         }
                         else {
-                            investigateRecord(recordNumber);
+                            sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
+                            investigate.run();
                         }
                     }
                 });
             }
 
-            private void investigateRecord(int recordNumber) {
-                sipModel.seekRecordNumber(recordNumber);
-                investigate.run();
-            }
-        };
-        sipModel.processFile(validationListener, new Swing() {
             @Override
-            public void run() {
-                setEnabled(true);
+            public void aborted(FileProcessor fileProcessor) {
+                sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        sipModel.getMappingModel().setLocked(false);
+                        setEnabled(true);
+                    }
+                });
+            }
+
+            @Override
+            public void succeeded(FileProcessor processor) {
+                try {
+                    DataSet dataSet = processor.getDataSet();
+                    dataSet.setStats(processor.getStats(), false, processor.getPrefix());
+                    dataSet.setValidation(processor.getPrefix(), processor.getValid(), processor.getRecordCount());
+                }
+                catch (StorageException e) {
+                    sipModel.getFeedback().alert("Unable to store validation results", e);
+                }
+                sipModel.getReportFileModel().refresh();
+                sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        setEnabled(true);
+                    }
+                });
             }
         });
     }

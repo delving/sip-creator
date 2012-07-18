@@ -46,6 +46,8 @@ import java.io.*;
 import java.util.BitSet;
 import java.util.Map;
 
+import static eu.delving.groovy.XmlNodePrinter.toXml;
+
 /**
  * Take the input and config information and produce an output xml file
  *
@@ -58,27 +60,28 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private Feedback feedback;
     private DataSet dataSet;
     private RecMapping recMapping;
-    private Validator validator;
     private BitSet valid;
     private PrintWriter reportWriter;
     private GroovyCodeResource groovyCodeResource;
     private ProgressListener progressListener;
     private Listener listener;
-    private volatile boolean aborted = false;
+    private volatile boolean done = false;
     private boolean allowInvalid;
-    private int validCount, invalidCount;
+    private int validCount, invalidCount, recordCount, recordNumber;
     private Stats stats;
     private File outputDirectory;
     private XmlOutput xmlOutput;
     private int maxUniqueValueLength;
-    private int recordCount;
+    private String problemXML;
+    private String problemMessage;
 
     public interface Listener {
-        void mappingFailed(FileProcessor fileProcessor, MappingException exception);
 
-        void outputInvalid(FileProcessor fileProcessor, int recordNumber, Node node, String message);
+        void failed(FileProcessor fileProcessor);
 
-        void finished(FileProcessor fileProcessor, Stats stats, BitSet valid, int recordCount);
+        void aborted(FileProcessor fileProcessor);
+
+        void succeeded(FileProcessor fileProcessor);
     }
 
     public FileProcessor(
@@ -100,6 +103,34 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.listener = listener;
     }
 
+    public String getSpec() {
+        return dataSet.getSpec();
+    }
+
+    public BitSet getValid() {
+        return valid;
+    }
+
+    public Stats getStats() {
+        return stats;
+    }
+
+    public int getRecordNumber() {
+        return recordNumber;
+    }
+
+    public int getRecordCount() {
+        return recordCount;
+    }
+
+    public String getProblemXML() {
+        return problemXML;
+    }
+
+    public String getProblemMessage() {
+        return problemMessage;
+    }
+
     @Override
     public Job getJob() {
         return Job.PROCESS;
@@ -113,10 +144,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     @Override
     public DataSet getDataSet() {
         return dataSet;
-    }
-
-    public String getSpec() {
-        return dataSet.getSpec();
     }
 
     @Override
@@ -134,6 +161,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         stats = createStats();
         MappingRunner mappingRunner;
         MetadataParser parser;
+        Validator validator;
         try {
             validator = createValidator();
             mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
@@ -147,14 +175,48 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
         try {
             progressListener.prepareFor(recordCount);
-            while (!aborted) {
+            while (!done) {
                 MetadataRecord record = parser.nextRecord();
                 if (record == null) break;
-                if (!progressListener.setProgress(record.getRecordNumber())) abort();
-                int recordNumber = record.getRecordNumber();
+                if (!progressListener.setProgress(record.getRecordNumber())) {
+                    done = true;
+                    break;
+                }
+                this.recordNumber = record.getRecordNumber();
                 try {
                     Node node = mappingRunner.runMapping(record);
-                    validateRecord(recordNumber, node);
+                    try {
+                        Source source = new DOMSource(node);
+                        validator.validate(source);
+                        MappingResult result = new MappingResultImpl(serializer, node, recDefTree()).resolve();
+                        result.checkMissingFields();
+                        validCount++;
+                        valid.set(record.getRecordNumber());
+                        recordStatistics((Element) node, Path.create());
+                    }
+                    catch (Exception e) {
+                        invalidCount++;
+                        reportWriter.println(serializer.toXml(node));
+                        reportWriter.println("===");
+                        if (!allowInvalid) {
+                            switch (askHowToProceed(record.getRecordNumber())) {
+                                case ABORT:
+                                    done = true;
+                                    break;
+                                case CONTINUE:
+                                    break;
+                                case IGNORE:
+                                    allowInvalid = true;
+                                    break;
+                                case INVESTIGATE:
+                                    done = true;
+                                    problemXML = serializer.toXml(node);
+                                    problemMessage = e.getMessage();
+                                    listener.failed(this);
+                                    break;
+                            }
+                        }
+                    }
                     if (xmlOutput != null) xmlOutput.write(node);
                 }
                 catch (DiscardRecordException e) {
@@ -166,13 +228,16 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     reportWriter.println("Mapping exception!");
                     reportWriter.println(XmlNodePrinter.toXml(e.getMetadataRecord().getRootNode()));
                     e.printStackTrace(reportWriter);
-                    abort();
-                    listener.mappingFailed(this, e);
+                    done = true;
+                    problemXML = toXml(e.getMetadataRecord().getRootNode());
+                    problemMessage = e.getMessage();
+                    listener.failed(this);
+                    break;
                 }
             }
         }
         catch (MetadataParser.AbortException e) {
-            aborted = true;
+            done = true;
         }
         catch (Exception e) {
             feedback.alert("File processing problem", e);
@@ -181,19 +246,18 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             finishReport();
             if (xmlOutput != null) xmlOutput.finish();
             IOUtils.closeQuietly(reportWriter);
-            if (aborted) {
-                listener.finished(this, null, null, 0);
+            if (done) {
+                listener.aborted(this);
             }
             else {
-                listener.finished(this, aborted ? null : stats, aborted ? null : valid, recordCount);
+                listener.succeeded(this);
             }
-            if (!aborted) progressListener.finished(true);
         }
     }
 
     private void finishReport() {
         reportWriter.println(ReportFileModel.DIVIDER);
-        if (aborted) {
+        if (done) {
             reportWriter.println("Validation was aborted!");
         }
         else {
@@ -241,39 +305,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         return stats;
     }
 
-    private void validateRecord(int recordNumber, Node node) {
-        try {
-            Source source = new DOMSource(node);
-            validator.validate(source);
-            MappingResult result = new MappingResultImpl(serializer, node, recDefTree()).resolve();
-            result.checkMissingFields();
-            validCount++;
-            valid.set(recordNumber);
-            recordStatistics((Element) node, Path.create());
-        }
-        catch (Exception e) {
-            invalidCount++;
-            reportWriter.println(serializer.toXml(node));
-            reportWriter.println("===");
-            if (!allowInvalid) {
-                switch (askHowToProceed(recordNumber)) {
-                    case ABORT:
-                        abort();
-                        break;
-                    case CONTINUE:
-                        break;
-                    case IGNORE:
-                        allowInvalid = true;
-                        break;
-                    case INVESTIGATE:
-                        abort();
-                        listener.outputInvalid(this, recordNumber, node, e.getMessage());
-                        break;
-                }
-            }
-        }
-    }
-
     private void recordStatistics(Element element, Path path) {
         String prefix = element.getPrefix();
         String name = element.getLocalName();
@@ -313,11 +344,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         return text;
     }
 
-    private void abort() {
-        aborted = true;
-        progressListener.finished(false);
-    }
-
     private enum NextStep {
         ABORT,
         INVESTIGATE,
@@ -348,6 +374,4 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             return NextStep.ABORT;
         }
     }
-
-
 }
