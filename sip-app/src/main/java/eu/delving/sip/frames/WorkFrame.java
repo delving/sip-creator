@@ -47,7 +47,6 @@ public class WorkFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
     private static final Font TINY = new Font("Serif", Font.PLAIN, 8);
     private JList fullList, miniList;
-    private WorkModel.JobContext selectedJobContext;
 
     public WorkFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(Which.WORK, desktop, sipModel, "Work");
@@ -62,7 +61,16 @@ public class WorkFrame extends FrameBase {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
-                selectedJobContext = (WorkModel.JobContext) fullList.getSelectedValue();
+                WorkModel.JobContext context = (WorkModel.JobContext) fullList.getSelectedValue();
+                if (context != null && context.getProgressIndicator() != null) {
+                    String message = String.format(
+                            "<html>Do you want to cancel this job?<br>%s",
+                            toFullString(context)
+                    );
+                    if (sipModel.getFeedback().confirm("Cancel Job", message)) {
+                        context.getProgressIndicator().cancel();
+                    }
+                }
             }
         });
         getAction().putValue(
@@ -84,28 +92,33 @@ public class WorkFrame extends FrameBase {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             WorkModel.JobContext jobContext = (WorkModel.JobContext) value;
-            String date = TIMESTAMP_FORMAT.format(jobContext.getStart());
-            String job = jobContext.getJob().toString();
-            String dataSetSpec = jobContext.getDataSet();
-            String show = String.format("%s: %s", job, date);
-            if (dataSetSpec != null) {
-                show += String.format(" (%s)", dataSetSpec);
-            }
-            String progress = jobContext.getFullProgress();
-            if (progress != null) {
-                show += String.format(" - %s", progress);
-            }
+            String show = toFullString(jobContext);
             return super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
         }
+    }
+
+    private String toFullString(WorkModel.JobContext jobContext) {
+        String date = TIMESTAMP_FORMAT.format(jobContext.getStart());
+        String job = jobContext.getJob().toString();
+        String dataSetSpec = jobContext.getDataSet();
+        String show = String.format("%s: %s", job, date);
+        if (dataSetSpec != null) {
+            show += String.format(" (%s)", dataSetSpec);
+        }
+        WorkModel.ProgressIndicator progress = jobContext.getProgressIndicator();
+        if (progress != null) {
+            show += String.format(" - %s", progress.getString(true));
+        }
+        return show;
     }
 
     private class MiniCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             WorkModel.JobContext jobContext = (WorkModel.JobContext) value;
-            String progress = jobContext.getMiniProgress();
+            WorkModel.ProgressIndicator progress = jobContext.getProgressIndicator();
             String jobName = jobContext.isDone() ? "done" : WordUtils.capitalizeFully(jobContext.getJob().toString(), new char[]{'_'});
-            String show = progress == null ? jobName : String.format("%s: %s", jobName, progress);
+            String show = progress == null ? jobName : String.format("%s: %s", jobName, progress.getString(false));
             Component component = super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
             if (jobContext.getWork() instanceof Work.LongTermWork) {
                 component.setBackground(SwingHelper.LONG_TERM_JOB_COLOR);
