@@ -37,6 +37,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -84,7 +85,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             SipModel sipModel,
             int maxUniqueValueLength,
             int recordCount,
-            boolean allowInvalidRecords,
             File outputDirectory,
             GroovyCodeResource groovyCodeResource,
             Listener listener
@@ -95,7 +95,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.feedback = sipModel.getFeedback();
         this.dataSet = sipModel.getDataSetModel().getDataSet();
         this.recMapping = sipModel.getMappingModel().getRecMapping();
-        this.allowInvalid = allowInvalidRecords;
         this.outputDirectory = outputDirectory;
         this.groovyCodeResource = groovyCodeResource;
         this.listener = listener;
@@ -236,7 +235,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         Stats stats = new Stats();
         stats.setRecordRoot(recDefTree().getRoot().getPath());
         stats.prefix = recMapping.getPrefix();
-        Map<String,String> facts = dataSet.getDataSetFacts();
+        Map<String, String> facts = dataSet.getDataSetFacts();
         stats.name = facts.get("name");
         stats.maxUniqueValueLength = maxUniqueValueLength;
         return stats;
@@ -257,8 +256,20 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             reportWriter.println(serializer.toXml(node));
             reportWriter.println("===");
             if (!allowInvalid) {
-                abort();
-                listener.outputInvalid(this, recordNumber, node, e.getMessage());
+                switch (askHowToProceed(recordNumber)) {
+                    case ABORT:
+                        abort();
+                        break;
+                    case CONTINUE:
+                        break;
+                    case IGNORE:
+                        allowInvalid = true;
+                        break;
+                    case INVESTIGATE:
+                        abort();
+                        listener.outputInvalid(this, recordNumber, node, e.getMessage());
+                        break;
+                }
             }
         }
     }
@@ -306,5 +317,37 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         aborted = true;
         progressListener.finished(false);
     }
+
+    private enum NextStep {
+        ABORT,
+        INVESTIGATE,
+        CONTINUE,
+        IGNORE
+    }
+
+    private NextStep askHowToProceed(int recordNumber) {
+        JCheckBox investigate = new JCheckBox(String.format(
+                "<html><b>Investigate</b> - Stop and fix the %s mapping of data set %s, with invalid record %d in view",
+                getPrefix(), getSpec(), recordNumber
+        ));
+        JCheckBox ignore = new JCheckBox(
+                "<html><b>Ignore</b> - Accept this record as invalid and ignore subsequent invalid records"
+        );
+        if (feedback.form("Continue?", investigate, ignore)) {
+            if (investigate.isSelected()) {
+                return NextStep.INVESTIGATE;
+            }
+            else if (ignore.isSelected()) {
+                return NextStep.IGNORE;
+            }
+            else {
+                return NextStep.CONTINUE;
+            }
+        }
+        else {
+            return NextStep.ABORT;
+        }
+    }
+
 
 }

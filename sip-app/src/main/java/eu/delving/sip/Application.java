@@ -152,7 +152,7 @@ public class Application {
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new ImportAction(desktop, sipModel);
         dataSetMenu = new DataSetMenu(sipModel);
-        validateAction = new ValidateAction(desktop, sipModel, dataSetMenu, allFrames.prepareForInvestigation(desktop));
+        validateAction = new ValidateAction(sipModel, dataSetMenu, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
         releaseAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);

@@ -472,7 +472,7 @@ public class SipModel {
         }
     }
 
-    public void processFile(boolean allowInvalidRecords, final ValidationListener validationListener, final Swing finished) {
+    public void processFile(final ValidationListener validationListener, final Swing finished) {
         File outputDirectory = null;
         String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
         if (!directoryString.isEmpty()) {
@@ -483,7 +483,6 @@ public class SipModel {
                 this,
                 statsModel.getMaxUniqueValueLength(),
                 statsModel.getRecordCount(),
-                allowInvalidRecords,
                 outputDirectory,
                 groovyCodeResource,
                 new FileProcessor.Listener() {
@@ -496,9 +495,7 @@ public class SipModel {
 
                     @Override
                     public void outputInvalid(FileProcessor fileProcessor, int recordNumber, Node outputNode, String message) {
-                        String xml = serializer.toXml(outputNode);
-                        validationListener.failed(fileProcessor, recordNumber, xml, message);
-                        finishedProcessing();
+                        validationListener.failed(fileProcessor, recordNumber, serializer.toXml(outputNode), message);
                     }
 
                     @Override
