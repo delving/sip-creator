@@ -47,17 +47,23 @@ public class HelpPanel extends HtmlPanel {
     private static final Color TINT = new Color(0.95f, 0.95f, 1.0f);
     private SipModel sipModel;
     private HttpClient httpClient;
-    private boolean fetched;
+    private boolean fetchStarted;
 
-    public HelpPanel(SipModel sipModel, HttpClient httpClient) {
+    public HelpPanel(final SipModel sipModel, HttpClient httpClient) {
         super("Help");
         this.sipModel = sipModel;
         this.httpClient = httpClient;
-        sipModel.exec(new PageFetcher());
         int width = getFontMetrics(getFont()).stringWidth("this string determines the width of the help panel, yeah");
         setPreferredSize(new Dimension(width, 400));
         setMinimumSize(getPreferredSize());
         setBackground(TINT);
+    }
+
+    public void initialize() {
+        if (!fetchStarted) {
+            fetchStarted = true;
+            sipModel.exec(new PageFetcher());
+        }
     }
 
     private class PageFetcher implements Work {

@@ -153,11 +153,9 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
             }
             if (running) {
                 stats.finish();
-                progressListener.finished(true);
                 listener.success(stats);
             }
             else {
-                progressListener.finished(false);
                 listener.failure(null, null);
             }
         }
@@ -175,7 +173,6 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
                     default:
                         throw new IllegalStateException("Unexpected state " + dataSetModel.getDataSetState(), e);
                 }
-                progressListener.finished(false);
                 listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
             }
             catch (StorageException se) {

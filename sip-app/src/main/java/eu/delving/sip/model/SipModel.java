@@ -21,7 +21,9 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.groovy.*;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
@@ -36,11 +38,8 @@ import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Node;
 
-import javax.swing.*;
 import java.io.File;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -57,7 +56,7 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 public class SipModel {
     private static final Logger LOG = Logger.getLogger(SipModel.class);
     private XmlSerializer serializer = new XmlSerializer();
-    private WorkModel workModel = new WorkModel();
+    private WorkModel workModel;
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Preferences preferences;
@@ -76,12 +75,6 @@ public class SipModel {
     private MappingSaveTimer mappingSaveTimer;
     private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
 
-    public interface ValidationListener {
-
-        void failed(int recordNumber, String record, String message);
-
-    }
-
     public interface ParseListener {
         void updatedRecord(MetadataRecord metadataRecord);
     }
@@ -95,6 +88,7 @@ public class SipModel {
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
+        this.workModel = new WorkModel(feedback);
         dataSetModel = new DataSetModel(this);
         functionCompileModel = new FunctionCompileModel(this, feedback, groovyCodeResource);
         recordCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.RECORD, groovyCodeResource);
@@ -107,7 +101,6 @@ public class SipModel {
         nodeTransferHandler = new NodeTransferHandler(this);
         mappingSaveTimer = new MappingSaveTimer(this);
         MappingModel mm = dataSetModel.getMappingModel();
-        mm.addSetListener(reportFileModel);
         mm.addSetListener(recordCompileModel.getMappingModelSetListener());
         mm.addChangeListener(recordCompileModel.getMappingModelChangeListener());
         mm.addSetListener(fieldCompileModel.getMappingModelSetListener());
@@ -239,7 +232,7 @@ public class SipModel {
         return statsModel;
     }
 
-    public ListModel getReportFileModel() {
+    public ReportFileModel getReportFileModel() {
         return reportFileModel;
     }
 
@@ -332,11 +325,9 @@ public class SipModel {
                         seekFirstRecord();
                     }
                 });
-                progressListener.finished(true);
                 Swing.Exec.later(success);
             }
             catch (Exception e) {
-                progressListener.finished(false);
                 feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);
                 dataSetModel.clearDataSet();
             }
@@ -474,7 +465,7 @@ public class SipModel {
         }
     }
 
-    public void processFile(boolean allowInvalidRecords, final ValidationListener validationListener, final Swing finished) {
+    public void processFile(FileProcessor.Listener listener) {
         File outputDirectory = null;
         String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
         if (!directoryString.isEmpty()) {
@@ -485,42 +476,9 @@ public class SipModel {
                 this,
                 statsModel.getMaxUniqueValueLength(),
                 statsModel.getRecordCount(),
-                allowInvalidRecords,
                 outputDirectory,
                 groovyCodeResource,
-                new FileProcessor.Listener() {
-                    @Override
-                    public void mappingFailed(final MappingException exception) {
-                        String xml = XmlNodePrinter.toXml(exception.getMetadataRecord().getRootNode());
-                        validationListener.failed(exception.getMetadataRecord().getRecordNumber(), xml, exception.getMessage());
-                        finishedProcessing();
-                    }
-
-                    @Override
-                    public void outputInvalid(int recordNumber, Node outputNode, String message) {
-                        String xml = serializer.toXml(outputNode);
-                        validationListener.failed(recordNumber, xml, message);
-                        finishedProcessing();
-                    }
-
-                    @Override
-                    public void finished(final Stats stats, final BitSet valid, int recordCount) {
-                        finishedProcessing();
-                        try {
-                            DataSet dataSet = dataSetModel.getDataSet();
-                            dataSet.setStats(stats, false, mappingModel().getRecMapping().getPrefix());
-                            dataSet.setValidation(getMappingModel().getRecMapping().getPrefix(), valid, recordCount);
-                        }
-                        catch (StorageException e) {
-                            feedback.alert("Unable to store validation results", e);
-                        }
-                        reportFileModel.kick();
-                    }
-
-                    private void finishedProcessing() {
-                        Swing.Exec.later(finished);
-                    }
-                }
+                listener
         ));
     }
 
@@ -598,7 +556,6 @@ public class SipModel {
                             for (ParseListener parseListener : parseListeners) {
                                 parseListener.updatedRecord(metadataRecord);
                             }
-                            if (progressListener != null) progressListener.finished(true);
                             break;
                         }
                     }
@@ -612,7 +569,7 @@ public class SipModel {
                 metadataParser = null;
             }
             finally {
-                if (finished != null) Swing.Exec.later(finished);
+                if (finished != null) exec(finished);
             }
         }
 

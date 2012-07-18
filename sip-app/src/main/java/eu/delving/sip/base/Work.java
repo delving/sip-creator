@@ -65,6 +65,7 @@ public interface Work extends Runnable {
         CONVERT_SOURCE(DATA_SET),
         SCAN_RECORDS(DATA_SET),
         PROCESS(DATA_SET_PREFIX),
+        LOAD_REPORT(DATA_SET_PREFIX),
 
         FETCH_LIST(NETWORK),
         FETCH_HELP(NETWORK),

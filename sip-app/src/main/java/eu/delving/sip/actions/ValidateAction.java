@@ -23,14 +23,17 @@ package eu.delving.sip.actions;
 
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.StorageException;
+import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.xml.FileProcessor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import static eu.delving.sip.files.DataSetState.MAPPING;
@@ -42,16 +45,13 @@ import static eu.delving.sip.files.DataSetState.MAPPING;
  */
 public class ValidateAction extends AbstractAction {
     private SipModel sipModel;
-    private JDialog dialog;
-    private JDesktopPane parent;
-    private InvestigateRecordAction investigateRecordAction = new InvestigateRecordAction();
-    private AllowInvalidRecordsAction allowInvalidRecordsAction = new AllowInvalidRecordsAction();
     private Swing investigate;
+    private DataSetMenu dataSetMenu;
 
-    public ValidateAction(JDesktopPane parent, SipModel sipModel, Swing investigate) {
+    public ValidateAction(SipModel sipModel, DataSetMenu dataSetMenu, Swing investigate) {
         super("<html><b>Map and validate all records</b>");
-        this.parent = parent;
         this.sipModel = sipModel;
+        this.dataSetMenu = dataSetMenu;
         this.investigate = investigate;
         setEnabled(false);
         putValue(Action.SMALL_ICON, SwingHelper.VALIDATE_ICON);
@@ -63,94 +63,77 @@ public class ValidateAction extends AbstractAction {
                 enableAccordingTo(state);
             }
         });
-        this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Invalid Record", Dialog.ModalityType.APPLICATION_MODAL);
-        prepareDialog();
     }
 
     private void enableAccordingTo(DataSetState dataSetState) {
         setEnabled(dataSetState.atLeast(MAPPING));
     }
 
-    private void prepareDialog() {
-        JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                dialog.setVisible(false);
-            }
-        });
-        JPanel bp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bp.add(cancel);
-        JPanel p = new JPanel(new GridLayout(1, 0, 15, 15));
-        p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        p.add(new JButton(investigateRecordAction));
-        p.add(new JButton(allowInvalidRecordsAction));
-        dialog.getContentPane().add(p, BorderLayout.CENTER);
-        dialog.getContentPane().add(bp, BorderLayout.SOUTH);
-        dialog.pack();
-    }
-
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        performValidation(false);
-    }
-
-    private void performValidation(boolean allowInvalidRecords) {
         setEnabled(false);
-        SipModel.ValidationListener validationListener = new SipModel.ValidationListener() {
+        sipModel.processFile(new FileProcessor.Listener() {
             @Override
-            public void failed(final int recordNumber, final String record, String message) {
+            public void failed(final FileProcessor fileProcessor) {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
-                        investigateRecordAction.setRecordNumber(recordNumber);
-                        Dimension all = parent.getSize();
-                        Dimension d = dialog.getSize();
-                        dialog.setLocation((all.width - d.width) / 2, (all.height - d.height) / 2);
-                        dialog.setVisible(true);
+                        sipModel.getMappingModel().setLocked(false);
+                        setEnabled(true);
+                        if (isNotCurrent(fileProcessor)) {
+                            sipModel.setDataSetPrefix(fileProcessor.getDataSet(), fileProcessor.getPrefix(), new Swing() {
+                                @Override
+                                public void run() {
+                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
+                                    sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
+                                    investigate.run();
+                                }
+                            });
+                        }
+                        else {
+                            sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
+                            investigate.run();
+                        }
                     }
                 });
             }
-        };
-        sipModel.processFile(allowInvalidRecords, validationListener, new Swing() {
 
             @Override
-            public void run() {
-                setEnabled(true);
+            public void aborted(FileProcessor fileProcessor) {
+                sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        sipModel.getMappingModel().setLocked(false);
+                        setEnabled(true);
+                    }
+                });
+            }
+
+            @Override
+            public void succeeded(FileProcessor processor) {
+                try {
+                    DataSet dataSet = processor.getDataSet();
+                    dataSet.setStats(processor.getStats(), false, processor.getPrefix());
+                    dataSet.setValidation(processor.getPrefix(), processor.getValid(), processor.getRecordCount());
+                }
+                catch (StorageException e) {
+                    sipModel.getFeedback().alert("Unable to store validation results", e);
+                }
+                sipModel.getReportFileModel().refresh();
+                sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        setEnabled(true);
+                    }
+                });
             }
         });
     }
 
-    private class InvestigateRecordAction extends AbstractAction {
-
-        private int recordNumber;
-
-        private InvestigateRecordAction() {
-            super("<html><center><br><h2>Investigate</h2>Fix the mapping, with<br>the invalid record in view<br><br>");
-        }
-
-        private void setRecordNumber(int recordNumber) {
-            this.recordNumber = recordNumber;
-            putValue(Action.NAME, String.format("<html><center><br><h2>Investigate</h2>Fix the mapping, with<br>invalid record %d in view<br><br>", recordNumber));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.seekRecordNumber(recordNumber);
-            investigate.run();
-        }
+    private boolean isNotCurrent(FileProcessor fileProcessor) {
+        boolean dataSetNotCurrent = sipModel.getDataSetModel().isEmpty() || !sipModel.getDataSetModel().getDataSet().getSpec().equals(fileProcessor.getSpec());
+        boolean prefixNotCurrent = !(sipModel.getMappingModel().hasRecMapping() && sipModel.getMappingModel().getRecMapping().getPrefix().equals(fileProcessor.getPrefix()));
+        return dataSetNotCurrent || prefixNotCurrent;
     }
 
-    private class AllowInvalidRecordsAction extends AbstractAction {
-
-        private AllowInvalidRecordsAction() {
-            super("<html><center><br><h2>Accept - Redo</h2>Run the validation again<br>accepting invalid records<br><br>");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            dialog.setVisible(false);
-            performValidation(true);
-        }
-    }
 }

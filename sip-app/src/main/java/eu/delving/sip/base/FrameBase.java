@@ -73,10 +73,10 @@ public abstract class FrameBase extends JInternalFrame {
         OUTPUT,
         CODE,
         WORK,
+        UPLOAD,
         HARVEST,
         MAPPING_HINTS,
         FUNCTIONS,
-        PROGRESS,
         QUESTION,
         MESSAGE,
     }
@@ -422,7 +422,7 @@ public abstract class FrameBase extends JInternalFrame {
         public InternalGlassPane(final FrameBase frame) {
             setToolTipText(
                     "<html><b>Mapping is locked<b><br>" +
-                    "<p>You can unlock it in the Unlock menu</p>"
+                    "<p>You can unlock it from the Data Sets menu.</p>"
             );
             setFocusable(true);
             addComponentListener(new ComponentListener() {
