@@ -46,7 +46,8 @@ import static eu.delving.sip.files.Storage.RECORD_TAG;
 
 /**
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
- * the recordRootPath
+ * the recordRootPath.  There is a potential regex-based conversion of the ID values on the way.  The uniqueness
+ * of the ID is checked.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

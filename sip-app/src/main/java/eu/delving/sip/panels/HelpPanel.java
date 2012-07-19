@@ -35,7 +35,8 @@ import java.awt.*;
 import java.io.*;
 
 /**
- * Show help fetched from github
+ * Show help which is lazy-fetched from github, actually scraping the HTML contents of a wiki page by selecting
+ * stuff between a beginning and an ending marker.  A tiny bit of CSS styling here too.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

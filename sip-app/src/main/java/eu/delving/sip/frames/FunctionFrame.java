@@ -51,7 +51,9 @@ import java.util.regex.Pattern;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
- * This panel provides an interface for building and testing global functions
+ * This panel provides an interface for building global functions in the context of tests which demonstrate how
+ * input is turned into output using the function.  A list of library functions is gathered here as well, so that
+ * frequently used functions can be copied in and modified.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

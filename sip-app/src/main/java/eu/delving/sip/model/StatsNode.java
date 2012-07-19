@@ -37,7 +37,8 @@ import java.util.*;
 import java.util.List;
 
 /**
- * A node of a stats tree
+ * A node of a stats tree, allowing for selection of a field for viewing its statistics.  Also the associated
+ * cell renderer is here.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */

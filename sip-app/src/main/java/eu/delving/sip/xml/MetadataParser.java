@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Iterate through the xml file, producing groovy nodes.
+ * Iterate through the xml file, producing groovy node trees wrapped in MetadataRecord instances.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  * @author Serkan Demirel <serkan@blackbuilt.nl>

@@ -42,7 +42,8 @@ import java.util.List;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
- * A node of the analysis tree
+ * A node of the analysis tree, where the statistics are stored, and also the node mappings associated
+ * with this source tree node so this info can be shown in the interface.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */

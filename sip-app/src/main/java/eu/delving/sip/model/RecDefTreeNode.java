@@ -43,7 +43,8 @@ import static eu.delving.sip.base.SwingHelper.HILIGHTED_COLOR;
 import static eu.delving.sip.base.SwingHelper.MAPPED_COLOR;
 
 /**
- * Represent an element in the JTree
+ * Represent an element of a record definition in the tree, including an HTML representation and the associated
+ * cell renderer.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */

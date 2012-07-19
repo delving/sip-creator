@@ -57,7 +57,7 @@ import java.util.concurrent.Executors;
 import static org.apache.http.HttpStatus.*;
 
 /**
- * Connect to the culture hub using HTTP
+ * Connect to the culture hub using HTTP for fetching, uploading, and unlocking datasets.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

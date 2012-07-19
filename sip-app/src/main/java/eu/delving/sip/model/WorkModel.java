@@ -33,7 +33,10 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * A model of all the work that is being done in background threads at any time.
+ * A model of all the work that is being done in background threads at any time.  The contents of the list
+ * are shown to the outside world through a periodically updated list model of sorted entries.  Work can be
+ * shown or not, depending on its type, and long term jobs also have an associated progress listener which
+ * allows for cancellation as well as reporting of progress.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

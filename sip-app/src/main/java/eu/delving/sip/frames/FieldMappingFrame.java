@@ -45,7 +45,9 @@ import static eu.delving.metadata.StringUtil.toGroovyIdentifier;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
- * Refining the mapping interactively
+ * Refining the mapping interactively involves editing the mapping code for an individual NodeMapping.  This involves
+ * a code window or alternatively a dictionary, and choices about which operator to use.  Here you can also
+ * revert to the default generated mapping code, and some lists of available functions and variables are provided.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

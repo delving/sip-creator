@@ -47,7 +47,7 @@ import java.util.Collections;
 import static eu.delving.sip.base.SwingHelper.scrollV;
 
 /**
- * Show statistics in an html panel, with special tricks for separately threading the html generation
+ * Show the statistics bar charts and histograms for input, source, and output in various tabs.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

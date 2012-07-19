@@ -35,7 +35,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Save the mapping whenever things change
+ * Save the mapping whenever things change.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

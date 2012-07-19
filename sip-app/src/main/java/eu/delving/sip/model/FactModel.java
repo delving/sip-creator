@@ -21,15 +21,13 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.RecMapping;
-
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * An observable map, with knowledge of RecordMapping
+ * An observable map of facts, used in various places.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
@@ -59,14 +57,6 @@ public class FactModel {
             facts.put(name, value);
         }
         fireFactUpdated(name);
-    }
-
-    public boolean copyToRecordMapping(RecMapping recMapping) {
-        boolean changed = false;
-        for (Map.Entry<String, String> entry : facts.entrySet()) {
-            if (recMapping.setFact(entry.getKey(), entry.getValue())) changed = true;
-        }
-        return changed;
     }
 
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();

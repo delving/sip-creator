@@ -45,7 +45,8 @@ import java.util.Map;
 import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
 /**
- * Fetch a data set from the culture hub
+ * Fetch a list of datasets from the culture hub and display them, allowing the user to pick datasets
+ * for download.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

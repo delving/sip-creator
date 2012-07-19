@@ -33,7 +33,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * This class describes a utility function (closure) which is available in the
+ * This class describes a utility function (closure) which is available in the mapping code so that
+ * re-used code need not be repeated.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

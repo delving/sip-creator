@@ -37,7 +37,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 /**
- * Show the live work model
+ * Show the live work model in detail, and pop up a cancellation dialog when one is selected.  The full list
+ * is shown here and the mini list is made available for placement on a small section of the desktop.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

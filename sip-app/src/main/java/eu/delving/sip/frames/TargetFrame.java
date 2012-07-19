@@ -40,7 +40,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * Render the record definition as a JTree
+ * Render the record definition as a tree, with a filter function for navigating in large trees.  There are also
+ * menus attached to this frame which can be used to open parts of the record definition (related to opt-lists)
+ * which are normally hidden so that something can be mapped there.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

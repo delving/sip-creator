@@ -39,10 +39,13 @@ import java.awt.event.KeyEvent;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 
 /**
- * Runs the validation for a file.
+ * Runs the mapping on all records of the input and validates the resulting records before discarding them (they
+ * need not be stored).  Processing also records statistics and a file containing the invalid records and a
+ * report of the numbers afterward.
  *
  * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
+
 public class ValidateAction extends AbstractAction {
     private SipModel sipModel;
     private Swing investigate;

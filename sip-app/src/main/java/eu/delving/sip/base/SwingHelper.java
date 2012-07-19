@@ -29,7 +29,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 
 /**
- * Help with SpringLayout forms
+ * Gathering together a number of things that are done with the Swing library from many parts of the code.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

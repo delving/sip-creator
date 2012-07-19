@@ -55,7 +55,8 @@ import java.io.File;
 import static eu.delving.sip.files.DataSetState.NO_DATA;
 
 /**
- * The main application
+ * The main application, based on the SipModel and bringing everything together in a big frame with a central
+ * desktop pane, with a side panel and panels along the bottom, as well as menus above.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
