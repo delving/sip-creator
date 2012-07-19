@@ -36,6 +36,4 @@ public interface ProgressListener {
     void prepareFor(int total);
 
     boolean setProgress(int progress);
-
-    void finished(boolean success);
 }

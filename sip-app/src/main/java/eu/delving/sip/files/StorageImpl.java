@@ -459,8 +459,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public PrintWriter openReportWriter(RecMapping recMapping) throws StorageException {
-            File file = new File(here, FileType.REPORT.getName(recMapping.getPrefix()));
+        public PrintWriter openReportWriter(String prefix) throws StorageException {
+            File file = new File(here, FileType.REPORT.getName(prefix));
             try {
                 return new PrintWriter(file);
             }
@@ -470,9 +470,9 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public List<String> getReport(RecMapping recMapping) throws StorageException {
+        public List<String> getReport(String prefix) throws StorageException {
             try {
-                File file = reportFile(here, recMapping);
+                File file = reportFile(here, prefix);
                 return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
             }
             catch (IOException e) {
@@ -517,11 +517,9 @@ public class StorageImpl implements Storage {
                     }
                     hasher.update(buffer, bytesRead);
                 }
-                if (progressListener != null) progressListener.finished(!cancelled);
                 delete(statsFile(here, false, null));
             }
             catch (Exception e) {
-                if (progressListener != null) progressListener.finished(false);
                 throw new StorageException("Unable to capture XML input into " + source.getAbsolutePath(), e);
             }
             finally {
@@ -637,10 +635,7 @@ public class StorageImpl implements Storage {
                                 }
                                 hasher.update(buffer, bytesRead);
                             }
-                            if (progressListener != null) {
-                                progressListener.finished(!cancelled);
-                                progressListener = null;
-                            }
+                            if (progressListener != null) progressListener = null;
                         }
                         finally {
                             IOUtils.closeQuietly(outputStream);
@@ -664,7 +659,6 @@ public class StorageImpl implements Storage {
                             IOUtils.closeQuietly(output);
                         }
                         if (progressListener != null && !progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
-                            progressListener.finished(false);
                             break;
                         }
                     }

@@ -22,6 +22,7 @@
 package eu.delving.sip.menus;
 
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
@@ -41,6 +42,7 @@ public class DataSetMenu extends JMenu {
     private final String SELECTED_SPEC = "selectedSpec";
     private final String SELECTED_PREFIX = "selectedPrefix";
     private SipModel sipModel;
+    private UnlockMappingAction unlockMappingAction = new UnlockMappingAction();
     private ButtonGroup buttonGroup;
 
     public DataSetMenu(final SipModel sipModel) {
@@ -57,9 +59,13 @@ public class DataSetMenu extends JMenu {
         refresh();
     }
 
-    public void refreshAndChoose(DataSet dataSet) {
+    public Action getUnlockMappingAction() {
+        return unlockMappingAction;
+    }
+
+    public void refreshAndChoose(DataSet dataSet, String prefix) {
         if (dataSet != null) {
-            setPreference(dataSet, null);
+            setPreference(dataSet, prefix);
         }
         else {
             clearPreference();
@@ -92,6 +98,8 @@ public class DataSetMenu extends JMenu {
     private void refresh() {
         buttonGroup = new ButtonGroup();
         removeAll();
+        add(unlockMappingAction);
+        addSeparator();
         try {
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 for (String prefix : dataSet.getPrefixes()) {
@@ -158,4 +166,34 @@ public class DataSetMenu extends JMenu {
             return selectedSpec.equals(dataSet.getSpec()) && selectedPrefix.equals(prefix);
         }
     }
+
+    private class UnlockMappingAction extends AbstractAction implements Work {
+
+        private UnlockMappingAction() {
+            super("Unlock this mapping for further editing");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            sipModel.exec(this);
+        }
+
+        @Override
+        public void run() {
+            sipModel.getMappingModel().setLocked(false);
+            try {
+                sipModel.getDataSetModel().deleteValidation();
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to delete validation", e);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.UNLOCK_MAPPING;
+        }
+    }
+
+
 }

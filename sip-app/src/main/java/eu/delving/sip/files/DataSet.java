@@ -101,9 +101,9 @@ public interface DataSet {
 
     void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 
-    PrintWriter openReportWriter(RecMapping recMapping) throws StorageException;
+    PrintWriter openReportWriter(String prefix) throws StorageException;
 
-    List<String> getReport(RecMapping recordMapping) throws StorageException;
+    List<String> getReport(String prefix) throws StorageException;
 
     void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException;
 

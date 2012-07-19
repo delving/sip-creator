@@ -368,7 +368,6 @@ public class CultureHubClient {
                         context.getFeedback().alert("Unable to remove local data set");
                     }
                 }
-                progressListener.finished(success);
                 if (finished != null) Swing.Exec.later(finished);
             }
         }
@@ -425,18 +424,13 @@ public class CultureHubClient {
                                 HttpPost upload = createUploadRequest(dataSet, file, progressListener);
                                 FileEntity fileEntity = (FileEntity) upload.getEntity();
                                 log.info("Uploading " + file);
-                                try {
-                                    HttpResponse uploadResponse = httpClient.execute(upload);
-                                    EntityUtils.consume(uploadResponse.getEntity());
-                                    code = Code.from(uploadResponse);
-                                    if (code != Code.OK && !fileEntity.abort) {
-                                        context.invalidateTokens();
-                                        reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
-                                        return;
-                                    }
-                                }
-                                finally {
-                                    if (progressListener != null) progressListener.finished(!fileEntity.abort);
+                                HttpResponse uploadResponse = httpClient.execute(upload);
+                                EntityUtils.consume(uploadResponse.getEntity());
+                                code = Code.from(uploadResponse);
+                                if (code != Code.OK && !fileEntity.abort) {
+                                    context.invalidateTokens();
+                                    reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
+                                    return;
                                 }
                             }
                             break;
@@ -651,7 +645,7 @@ public class CultureHubClient {
         get.setHeader("Accept", "text/xml");
         return get;
     }
-    
+
     private void reportResponse(Code code, StatusLine statusLine) {
         context.getFeedback().alert(String.format(
                 "Problem communicating with the CultureHub: %s. Status [%d] %s",

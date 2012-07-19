@@ -23,7 +23,6 @@ package eu.delving.sip.files;
 
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.RecMapping;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
@@ -162,8 +161,8 @@ public class StorageHelper {
         return dir.listFiles(new PrefixFileFilter(VALIDATION));
     }
 
-    static File reportFile(File dir, RecMapping recMapping) {
-        return new File(dir, REPORT.getName(recMapping.getPrefix()));
+    static File reportFile(File dir, String prefix) {
+        return new File(dir, REPORT.getName(prefix));
     }
 
     static File statsFile(File dir, boolean sourceFormat, String prefix) {

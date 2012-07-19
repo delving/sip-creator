@@ -43,8 +43,15 @@ public class WorkModel {
     private ExecutorService executor = Executors.newCachedThreadPool();
     private List<JobContext> jobContexts = new CopyOnWriteArrayList<JobContext>();
     private JobListModel jobListModel = new JobListModel();
+    private Feedback feedback;
 
-    public WorkModel() {
+    public interface ProgressIndicator {
+        void cancel();
+        String getString(boolean full);
+    }
+
+    public WorkModel(Feedback feedback) {
+        this.feedback = feedback;
         Timer tick = new Timer(REFRESH_RATE, jobListModel);
         tick.setRepeats(true);
         tick.start();
@@ -181,7 +188,7 @@ public class WorkModel {
         private Date start;
         private Future<?> future;
         private Queue<Work> queue = new ConcurrentLinkedQueue<Work>();
-        private SimpleProgress progress;
+        private ProgressImpl progressImpl;
 
         public JobContext(Work work) {
             this.queue.add(work);
@@ -200,7 +207,6 @@ public class WorkModel {
             if (isEmpty()) return true;
             if (!future.isDone()) return false;
 //          todo:  future.isCancelled()
-            if (progress != null) progress.finished(true);
             queue.remove();
             if (isEmpty()) return true;
             launch();
@@ -230,15 +236,17 @@ public class WorkModel {
             }
         }
 
-        public String getFullProgress() {
-            return progress == null ? null : progress.toFullString();
-        }
-
-        public String getMiniProgress() {
-            return progress == null ? null : progress.toString();
+        public ProgressIndicator getProgressIndicator() {
+            return progressImpl;
         }
 
         public void add(Work work) {
+            if (work instanceof Work.LongTermWork) {
+                if (!isEmpty() && work.getClass() == getWork().getClass() && !isDone()) {
+                    feedback.alert(this + " busy");
+                    return;
+                }
+            }
             queue.add(work);
         }
 
@@ -251,10 +259,10 @@ public class WorkModel {
             this.future = executor.submit(getWork());
             this.start = new Date();
             if (getWork() instanceof Work.LongTermWork) {
-                ((Work.LongTermWork) getWork()).setProgressListener(progress = new SimpleProgress());
+                ((Work.LongTermWork) getWork()).setProgressListener(progressImpl = new ProgressImpl());
             }
             else {
-                progress = null;
+                progressImpl = null;
             }
         }
 
@@ -276,14 +284,14 @@ public class WorkModel {
 
         @Override
         public String toString() {
-            return (isEmpty() ? "empty" : job().toString()) + start.toString();
+            return isEmpty() ? "empty" : job().toString();
         }
     }
 
-    private static class SimpleProgress implements ProgressListener {
+    private static class ProgressImpl implements ProgressListener, ProgressIndicator {
         private String progressMessage, indeterminateMessage;
         private int current, maximum;
-        private boolean finished, success;
+        private boolean cancelled;
 
         @Override
         public void setProgressMessage(String message) {
@@ -303,35 +311,39 @@ public class WorkModel {
         @Override
         public boolean setProgress(int progress) {
             this.current = progress;
-            return true; // todo: false if you want to cancel
-        }
-
-        @Override
-        public void finished(boolean success) {
-            this.finished = true;
-            this.success = success;
-        }
-
-        public String toFullString() {
-            String message = progressMessage;
-            if (indeterminateMessage != null && current == 0) message = indeterminateMessage;
-            if (maximum == 0) {
-                return String.format("%d : %s", current, message);
-            }
-            else {
-                return String.format("%d/%d : %s", current, maximum, message);
-            }
+            return !cancelled;
         }
 
         @Override
         public String toString() {
-            if (maximum == 0) {
-                return String.format("%d", current);
-            }
-            else {
-                return String.format("%d/%d", current, maximum);
-            }
+            return "SimpleProgress";
         }
 
+        @Override
+        public void cancel() {
+            cancelled = true;
+        }
+
+        @Override
+        public String getString(boolean full) {
+            if (full) {
+                String message = progressMessage;
+                if (indeterminateMessage != null && current == 0) message = indeterminateMessage;
+                if (maximum == 0) {
+                    return String.format("%d : %s", current, message);
+                }
+                else {
+                    return String.format("%d/%d : %s", current, maximum, message);
+                }
+            }
+            else {
+                if (maximum == 0) {
+                    return String.format("%d", current);
+                }
+                else {
+                    return String.format("%d/%d", current, maximum);
+                }
+            }
+        }
     }
 }
