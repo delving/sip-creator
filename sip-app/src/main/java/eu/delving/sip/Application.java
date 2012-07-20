@@ -345,6 +345,11 @@ public class Application {
         public Feedback getFeedback() {
             return feedback;
         }
+
+        @Override
+        public void exec(Work work) {
+            sipModel.exec(work);
+        }
     }
 
     private class PasswordFetcher implements OAuthClient.PasswordRequest, ActionListener {

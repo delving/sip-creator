@@ -187,9 +187,11 @@ public class CreateModel {
         sipModel.exec(new Swing() {
             @Override
             public void run() {
+                if  (sipModel.getMappingModel().hasRecMapping()) {
+                    sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
+                }
                 sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();
                 sipModel.getStatsModel().getSourceTree().clearHighlighted();
-                sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
                 switch (setter) {
                     case SOURCE:
                         if (sourceTreeNodes == null) return;

@@ -259,14 +259,14 @@ public class WorkModel {
         }
 
         private void launch() {
-            this.future = executor.submit(getWork());
-            this.start = new Date();
             if (getWork() instanceof Work.LongTermWork) {
                 ((Work.LongTermWork) getWork()).setProgressListener(progressImpl = new ProgressImpl());
             }
             else {
                 progressImpl = null;
             }
+            this.future = executor.submit(getWork());
+            this.start = new Date();
         }
 
         private Work.Kind kind() {
@@ -292,18 +292,13 @@ public class WorkModel {
     }
 
     private static class ProgressImpl implements ProgressListener, ProgressIndicator {
-        private String progressMessage, indeterminateMessage;
+        private String progressMessage;
         private int current, maximum;
         private boolean cancelled;
 
         @Override
         public void setProgressMessage(String message) {
             this.progressMessage = message;
-        }
-
-        @Override
-        public void setIndeterminateMessage(String message) {
-            this.indeterminateMessage = message;
         }
 
         @Override
@@ -330,13 +325,11 @@ public class WorkModel {
         @Override
         public String getString(boolean full) {
             if (full) {
-                String message = progressMessage;
-                if (indeterminateMessage != null && current == 0) message = indeterminateMessage;
                 if (maximum == 0) {
-                    return String.format("%d : %s", current, message);
+                    return String.format("%d : %s", current, progressMessage);
                 }
                 else {
-                    return String.format("%d/%d : %s", current, maximum, message);
+                    return String.format("%d/%d : %s", current, maximum, progressMessage);
                 }
             }
             else {

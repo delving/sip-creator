@@ -225,11 +225,6 @@ public class TestMappingValidation {
             }
 
             @Override
-            public void setIndeterminateMessage(String message) {
-                System.out.println("indeterminate = "+message);
-            }
-
-            @Override
             public void prepareFor(int total) {
                 System.out.println("prepareFor = "+total);
             }

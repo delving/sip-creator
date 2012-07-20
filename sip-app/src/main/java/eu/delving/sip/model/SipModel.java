@@ -285,7 +285,6 @@ public class SipModel {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setIndeterminateMessage(String.format("Preparing dataset %s for mapping %s", dataSet.getSpec(), prefix));
         }
 
         @Override
