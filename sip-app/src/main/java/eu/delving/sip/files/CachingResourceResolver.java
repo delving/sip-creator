@@ -34,7 +34,8 @@ import org.w3c.dom.ls.LSResourceResolver;
 import java.io.*;
 
 /**
- * Fetch XML resources and cache them.
+ * Fetch XML resources using HTTP and cache them locally in a subdirectory beside all of the directories for
+ * the datasets.  With the resources fetched, it becomes possible to work off-line.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

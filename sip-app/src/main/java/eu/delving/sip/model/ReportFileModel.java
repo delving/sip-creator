@@ -31,7 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A list model for showing the contents of the validation file
+ * A list model for showing the contents of the validation files, one for each mapping.  This class rather naively
+ * just loads all of the lines of the file, which could be problematic if it is very large.  It should be made
+ * more clever when time permits.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

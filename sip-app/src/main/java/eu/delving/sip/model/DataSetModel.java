@@ -39,7 +39,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
 /**
- * An observable hole to put the current data set
+ * An observable hole to put the current dataset, where the contents of the dataset directory is checked frequently
+ * to notice independently when the state has changed through the disappearance or arrival of files with particular
+ * name patterns.  Many classes throughout the SIP-Creator observe this model and the state changes are broadcast
+ * in the Swing thread so that they can directly influence the GUI.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

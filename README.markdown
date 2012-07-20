@@ -1,12 +1,18 @@
 # Delving SIP-Creator
 
-The Delving Platform centers around the CultureHub online server, which gives people the ability to search and navigate large datasets of cultural heritage metadata.  The SIP-Creator is the standalone tool that is used to prepare and manage these large datasets, and then to upload them to the CultureHub.  SIP stands for "Submission Information Package", a term from OAIS which refers to the packages as they initially arrive online.
+The Delving SIP-Creator is a Java application with an elaborate graphical user interface for transforming any given input source of XML records into any of a number of defined output record formats.  It is launched in a browser using the Java Web Start technology, and it is currently bundled with the Delving CultureHub server platform.
+
+SIP stands for "Submission Information Package", a term from OAIS which refers to the packages as they initially arrive online. The SIP-Creator application automatically synchronizes its locally stored data with the online server.
+
+## Transformation
+
+The job of XML transformation is generally performed by XSLT scripts, but these can be hard to build and maintain due to their verboseness.  Typically, XML transformation amounts to rearranging the structure such that the content segments of the source are rearranged and copied into the target format. In many cases, however, it is not enough to just copy field contents verbatim, but rather some manipulation must take place on the way.  Fields may need to be combined or split, and field contents may need to be changed on the way, such as turning an identifier into a full image or web page URL.
 
 ## Groovy
 
 The core technology of the SIP-Creator is built around on the Groovy programming language, since it is "builder" code in Groovy which actually does the mapping work.  Most of the Groovy code responsible for the mapping, at least its global structure, is generated automatically.
 
-The SIP-Creator user only has only to work on tiny snippets of code at any given time, and the charm of the user interface is that the code that is adjusted by the user is automatically compiled and executed on-the-fly.  This way it is possible for mappers to see the results of their work immediately, and the process of mapping becomes a lot more effective and satisfying.
+The SIP-Creator user who builds the mapping only has to work on tiny parts of code at any given time, any code that is adjusted by the user is automatically compiled and executed on-the-fly.  This way it is possible for mappers to see the results of their work immediately, and the process of mapping becomes a lot more effective and satisfying.
 
 The key advantage of having a full-fledged dynamic programming language at the mapper's disposal becomes very clear as the trickiness of the corner cases of real-world mapping challenges present themselves.
 
@@ -17,6 +23,14 @@ Datasets come from many different places, and from a number of different storage
 The only real requirement for what is taken as input to the SIP-Creator is that it be XML encoded with UTF-8.  The structure of that XML will naturally determine how easy or difficult the mapping process is, but generally any form of XML can be consumed.
 
 The source XML can either be imported from an accessible drive/volume on the mapper's own computer or local network, or it can be harvested using the OAI-PMH protocol if there is a server available.
+
+## Statistics
+
+At every step along the way from input to producing the output, statistics are gathered in the form of histograms which are displayed as various bar graphs in a pop-up frame.  Some of these give insight into the quality of the records as a whole, and others let you zoom in on a particular field to view statistics about its contents.
+
+## Validation
+
+To ensure that the output complies to the desired record structure, there is an XML Schema which is separate from the record definition which can independently verify that the output is correct.  In many cases the target format is a known format with an existing schema, which is then simply employed for validation of each record individually.
 
 ## Step by Step
 
@@ -38,11 +52,11 @@ The basic work-flow of ingesting metadata into the CultureHub using the SIP-Crea
 
 * Make mappings from source structure to target record structure by selecting and clicking
 
-* Refine mappings where necessary to do manipulations using Groovy
+* Refine mappings where necessary to do manipulations using Groovy code
 
-* Validate the output of the mapping against the target record structure, to ensure that the dataset is ready for using on the CultureHub
+* Validate the output of the mapping against the target record structure using the XSD, to ensure that the dataset is ready for using on the CultureHub
 
-* After validation, the dataset can be uploaded to the CultureHub
+* After validation, the dataset can be uploaded to the CultureHub at any time
 
 * Indexing of the dataset for search and navigation is done via the web interface of the CultureHub
 
@@ -62,14 +76,6 @@ This project consists of two modules, because the part of the code responsible f
     * *live coding*, auto-compilation-execution of Groovy snippets
     * download, import, analysis, mapping, refinement, validation, upload
     * caches data in `~/SIPCreatorWorkspace` directory
-
-## Deployment
-
-The SIP-Creator is deployed to users with Java Web Start technology, which in this case involves placing the JAR files associated with the SIP-Creator in a public directory along with an icon and a dynamically-generated "launch file" __sip-creator.jnlp__, which us used by the Web Start.
-
-In the root of the culture-hub project there is an __ant__ `build.xml` which will prepare for this deployment.  The command `ant downloadSipCreator` will install the jars in `/public/sip-creator` of the CultureHub project.
-
-When the user clicks on the CultureHub link to the SIP-Creator __sip-creator.jnlp__ file, it is automatically generated by a scala class there called `SipCreator`, which can only be accessed by a logged-in user and puts that user's username into the launch file, thereby personalizing it.
 
 ## Contact
 

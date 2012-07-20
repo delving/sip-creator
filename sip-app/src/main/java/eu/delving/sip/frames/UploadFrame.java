@@ -36,7 +36,8 @@ import java.util.List;
 import static eu.delving.sip.base.SwingHelper.scrollV;
 
 /**
- * Show the live work model
+ * This frame shows the contents of the ReportFileModel which can contain multiple validation reports, shown in
+ * multiple tabs.  The idea is that only after viewing these reports should you be deciding to upload a mapping.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

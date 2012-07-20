@@ -33,7 +33,7 @@ import java.io.StringReader;
 import java.util.Map;
 
 /**
- * Wrapping the mapping mechanism for easy access from Scala
+ * Wrapping the mapping mechanism so that mappings can be executed independent of the rest of the SIP-Creator.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */

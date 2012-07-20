@@ -22,7 +22,8 @@
 package eu.delving.sip.model;
 
 /**
- * Handle exceptions that happen under the hood
+ * Through this interface, the code can interact with the user.  Pop-up dialogs can give alerts or ask questions
+ * in a number of ways.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

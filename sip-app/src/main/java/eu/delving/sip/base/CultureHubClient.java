@@ -51,20 +51,18 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.apache.http.HttpStatus.*;
 
 /**
- * Connect to the culture hub using HTTP
+ * Connect to the culture hub using HTTP for fetching, uploading, and unlocking datasets.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class CultureHubClient {
     private static final int CONNECTION_TIMEOUT = 1000 * 60 * 30;
-    private static final int BLOCK_SIZE = 4096;
+    private static final int BLOCK_SIZE = 1024;
     private Logger log = Logger.getLogger(getClass());
     private Context context;
     private HttpClient httpClient;
@@ -81,6 +79,8 @@ public class CultureHubClient {
         void dataSetCreated(DataSet dataSet);
 
         Feedback getFeedback();
+
+        void exec(Work work);
     }
 
     public enum Code {
@@ -145,7 +145,7 @@ public class CultureHubClient {
     }
 
     public void fetchDataSetList(ListReceiveListener listReceiveListener) {
-        exec(new ListFetcher(1, listReceiveListener));
+        context.exec(new ListFetcher(1, listReceiveListener));
     }
 
     public interface UnlockListener {
@@ -153,15 +153,15 @@ public class CultureHubClient {
     }
 
     public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
-        exec(new Unlocker(1, dataSet, unlockListener));
+        context.exec(new Unlocker(1, dataSet, unlockListener));
     }
 
     public void downloadDataSet(DataSet dataSet, Swing finished) {
-        exec(new DataSetDownloader(1, dataSet, finished));
+        context.exec(new DataSetDownloader(1, dataSet, finished));
     }
 
     public void uploadFiles(DataSet dataSet, Swing finished) throws StorageException {
-        exec(new FileUploader(1, dataSet, finished));
+        context.exec(new FileUploader(1, dataSet, finished));
     }
 
     private abstract class Attempt implements Work {
@@ -179,7 +179,7 @@ public class CultureHubClient {
             if (shouldRetry()) {
                 context.getFeedback().alert("Authorization failed, retrying...");
                 context.invalidateTokens();
-                exec(retry);
+                context.exec(retry);
                 return true;
             }
             else {
@@ -322,7 +322,6 @@ public class CultureHubClient {
             boolean success = false;
             try {
                 HttpGet get = createDownloadRequest(dataSet);
-                progressListener.prepareFor(-1);
                 HttpResponse response = httpClient.execute(get);
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
@@ -386,7 +385,6 @@ public class CultureHubClient {
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
             progressListener.setProgressMessage(String.format("Downloading the data of '%s' from the culture hub.", dataSet.getSpec()));
-            progressListener.setIndeterminateMessage(String.format("Culture hub is preparing '%s' for download.", dataSet.getSpec()));
         }
     }
 
@@ -482,10 +480,6 @@ public class CultureHubClient {
                     "Uploading the data of '%s' to the culture hub",
                     dataSet.getSpec()
             ));
-            progressListener.setIndeterminateMessage(String.format(
-                    "Culture hub is processing '%s' metadata",
-                    dataSet.getSpec()
-            ));
         }
     }
 
@@ -567,7 +561,6 @@ public class CultureHubClient {
                     }
                 }
                 outputStream.flush();
-                if (progressListener != null) progressListener.prepareFor(-1);
             }
             finally {
                 inputStream.close();
@@ -712,11 +705,5 @@ public class CultureHubClient {
         public String username;
         public String fullname;
         public String email;
-    }
-
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
-
-    public void exec(Work work) {
-        executor.execute(work);
     }
 }

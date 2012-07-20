@@ -33,7 +33,9 @@ import java.awt.event.ActionListener;
 import java.util.Enumeration;
 
 /**
- * The menu for choosing from local data sets.
+ * The menu for choosing from local dataset/prefix combinations, which triggers the SipModel to load when
+ * choices are made, and which gets updated when things on disk may have changed.  There is also a connection
+ * with the WorkModel which prevents datasets from being selected when there is a long-term job busy on them.
  *
  * @author Gerald de Jong, Beautiful Code BV, <gerald@delving.eu>
  */

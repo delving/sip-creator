@@ -22,7 +22,8 @@
 package eu.delving.metadata;
 
 /**
- * Easy indenting output to a string builder
+ * Easy indenting output to a string builder, which has a special facility for collecting the code associated
+ * with one particular node mapping, so that each can be edited individually
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

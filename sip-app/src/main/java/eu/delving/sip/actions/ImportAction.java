@@ -45,7 +45,7 @@ import java.util.Map;
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
 /**
- * Import a new file
+ * Import a new file from the file system or initiate a harvest of data from an OAI-PMH source.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

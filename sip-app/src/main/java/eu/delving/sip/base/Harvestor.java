@@ -54,7 +54,8 @@ import static eu.delving.sip.files.Storage.*;
 import static org.apache.http.HttpStatus.*;
 
 /**
- * Harvest data files from OAI-PMH targets
+ * Harvest a data file from an OAI-PMH target through a series of requests, each with its own
+ * resumption token.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

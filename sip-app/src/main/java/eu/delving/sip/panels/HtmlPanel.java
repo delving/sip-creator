@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 /**
- * A bit of simple HTML can be put in a panel like this
+ * A bit of simple HTML can be put in a panel like this and displayed anywhere.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */

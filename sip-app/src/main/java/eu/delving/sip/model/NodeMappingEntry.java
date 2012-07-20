@@ -28,10 +28,11 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * An entry in the NodeMappingListModel
+ * An entry in the NodeMappingListModel, with its associated cell renderer.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
+
 public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
     private int index = -1;
     private NodeMapping nodeMapping;

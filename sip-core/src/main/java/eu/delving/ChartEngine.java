@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Make charts from Stats
+ * Make charts in the form of images from Stats, so that these charts can also appear on the server-side.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */

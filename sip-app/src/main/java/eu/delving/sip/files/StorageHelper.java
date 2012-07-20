@@ -35,7 +35,9 @@ import static eu.delving.sip.files.Storage.*;
 import static eu.delving.sip.files.Storage.FileType.*;
 
 /**
- * This class contains helpers for the StorageImpl to lean on
+ * This class contains helpers for the StorageImpl to lean on.  It does all of the searching for file name
+ * patterns that the storage system needs, as well as maintaining the previous versions of various
+ * types of files.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

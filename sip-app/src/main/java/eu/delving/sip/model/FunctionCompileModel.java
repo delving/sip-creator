@@ -53,7 +53,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Manage the compiling and running of functions
+ * Manage the compiling and running of functions.  Resembles the MappingCompileModel, with input/code/output/docs.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
@@ -69,14 +69,12 @@ public class FunctionCompileModel {
     private TriggerTimer triggerTimer = new TriggerTimer();
     private GroovyCodeResource groovyCodeResource;
     private FunctionRunner functionRunner;
-    private Feedback feedback;
     private volatile boolean busy;
     private MappingFunction mappingFunction;
     private boolean ignoreDocChanges;
 
-    public FunctionCompileModel(SipModel sipModel, Feedback feedback, GroovyCodeResource groovyCodeResource) {
+    public FunctionCompileModel(SipModel sipModel, GroovyCodeResource groovyCodeResource) {
         this.sipModel = sipModel;
-        this.feedback = feedback;
         this.groovyCodeResource = groovyCodeResource;
         this.inputDocument.addDocumentListener(new DocChangeListener() {
             @Override
