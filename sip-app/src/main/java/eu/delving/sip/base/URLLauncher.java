@@ -34,7 +34,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * todo: javadoc
+ * Listen to the caret position of the XML output area and use WebStart's acces to the launching browser
+ * to open a page containing any URL found selected under the caret.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

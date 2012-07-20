@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Handle the filtering of tree nodes, both source and target
+ * Superclass to handle the filtering of tree nodes, both source and target.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

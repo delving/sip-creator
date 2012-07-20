@@ -46,7 +46,9 @@ import java.util.regex.Pattern;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
- * The transformation from input record to output
+ * This frame shows an input record's XML in the form of a tree, with an added ability to copy the values from
+ * any node for other purposes.  There are controls to create selection criteria for choosing particular
+ * records as the scan proceeds, and buttons for going to the first or the next record.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

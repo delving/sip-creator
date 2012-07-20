@@ -34,7 +34,9 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
 import static eu.delving.sip.base.SwingHelper.setError;
 
 /**
- * The transformation from input record to output
+ * This frame shows the entire output record so that the user can see the "big picture" with only the
+ * input tree and the output XML.  This frame also shows the errors as reported by the compile/validate
+ * system.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

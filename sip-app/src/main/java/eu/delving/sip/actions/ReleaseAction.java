@@ -34,7 +34,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 /**
- * Delete local copy and unlock on the hub
+ * Delete local copy of a dataset by putting it into an "attic" directory (for backup) and unlock the dataset
+ * on the hub so that others can lock it and work on it.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

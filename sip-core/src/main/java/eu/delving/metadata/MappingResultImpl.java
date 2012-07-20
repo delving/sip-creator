@@ -33,7 +33,8 @@ import java.util.*;
 import static eu.delving.metadata.SystemField.*;
 
 /**
- * The result of the mapping engine
+ * The result of the mapping engine is wrapped in this class so that some post-processing and checking
+ * can be done on the resulting Node tree.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

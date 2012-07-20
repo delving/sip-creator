@@ -50,7 +50,8 @@ import static eu.delving.metadata.NodeMappingChange.DICTIONARY;
 import static eu.delving.sip.base.DictionaryHelper.*;
 
 /**
- * Dictionary editing
+ * Dictionary editing is handled by this panel, and it is set up to create an efficient workflow.  The user
+ * cycles through select-and-assign steps and the shrinking list of unassigned values is always in view.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

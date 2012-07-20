@@ -44,8 +44,10 @@ import java.util.TreeSet;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
- * The structure of the input data, tree, variables and statistics.
- * From here mappings are made.
+ * This frame shows a tree of nodes which is gathered during the analysis process on the input data, and each
+ * node contains its statistics.  A filter mechanism allows for selection in a large tree.  This frame also
+ * allows for the initial choices of record root and unique element so that conversion to standard form
+ * can be done.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

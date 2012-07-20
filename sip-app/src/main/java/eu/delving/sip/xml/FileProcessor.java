@@ -49,7 +49,9 @@ import java.util.Map;
 import static eu.delving.groovy.XmlNodePrinter.toXml;
 
 /**
- * Take the input and config information and produce an output xml file
+ * Process an input file, mapping it to output records which are validated and used to gather statistics.
+ * A validation report is produced. Output can be recorded for experts as well.  The processing is paused
+ * for user input when invalid records are encountered.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

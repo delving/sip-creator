@@ -31,7 +31,7 @@ import java.lang.reflect.InvocationTargetException;
 import static javax.swing.JOptionPane.*;
 
 /**
- * Give the user feedback in different ways
+ * Give the user feedback in different ways, with pop-up alerts and various kinds of question dialogs.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

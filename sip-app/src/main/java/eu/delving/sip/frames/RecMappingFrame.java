@@ -40,7 +40,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Render the record mapping as a list of NodeMapping instances
+ * Render the record mapping as a list of NodeMapping instances, so that an individual NodeMapping can be
+ * selected for editing in the FieldMappingFrame.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

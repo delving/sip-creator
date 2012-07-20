@@ -49,7 +49,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
 
 /**
- * This model is behind the scenario with input data, groovy code, and output record
+ * Hold the code/documentation/output Swing documents and generate, compile, and run the Groovy code of either an
+ * entire mapping, or one stripped to show only one NodeMapping at a time.  Compilation is triggered automatically
+ * when editing action in the input document stops for a time.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

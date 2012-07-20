@@ -29,7 +29,11 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * This model is a list of mappings that could be applied
+ * This model is a list of mappings that could be added to the current mapping, as well as the list of functions
+ * that can also be a part of a mapping.  To feed this model, all we have to do is put a mapping file in the
+ * associated resource directory /templates/.  Additions can be copy-pasted from successful mappings.  Selection of
+ * which node mappings may be relevant is based on the source paths, so only node mappings with recognized
+ * source paths will appear.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

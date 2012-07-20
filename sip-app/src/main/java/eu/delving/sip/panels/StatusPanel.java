@@ -38,7 +38,7 @@ import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.DataSetState.values;
 
 /**
- * The bottom of the main screen, below the desktop pane
+ * The bottom of the main screen, below the desktop pane, intended to represent the workflow to users.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

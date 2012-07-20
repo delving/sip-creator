@@ -23,7 +23,6 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
@@ -48,14 +47,14 @@ import java.util.prefs.Preferences;
 import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
 /**
- * This model is behind the whole sip creator, as a facade for all the models related to a data set
+ * This is the grand model behind the whole SIP-Creator and it holds all of the other models.  Its state
+ * corresponds that of a dataset with attention set specific record mapping within, described by its prefix.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class SipModel {
     private static final Logger LOG = Logger.getLogger(SipModel.class);
-    private XmlSerializer serializer = new XmlSerializer();
     private WorkModel workModel;
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
@@ -90,7 +89,7 @@ public class SipModel {
         this.feedback = feedback;
         this.workModel = new WorkModel(feedback);
         dataSetModel = new DataSetModel(this);
-        functionCompileModel = new FunctionCompileModel(this, feedback, groovyCodeResource);
+        functionCompileModel = new FunctionCompileModel(this, groovyCodeResource);
         recordCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.RECORD, groovyCodeResource);
         fieldCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.FIELD, groovyCodeResource);
         parseListeners.add(recordCompileModel.getParseEar());
@@ -286,7 +285,6 @@ public class SipModel {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setIndeterminateMessage(String.format("Preparing dataset %s for mapping %s", dataSet.getSpec(), prefix));
         }
 
         @Override

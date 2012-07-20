@@ -46,7 +46,10 @@ import java.util.List;
 import static eu.delving.sip.base.FrameBase.INSETS;
 
 /**
- * Hold on to all the frames and manage their arrangemenbt
+ * Hold on to all the frames and manage their arrangement on the desktop.  It is possible to make adjustments in
+ * how the frames are arranged in the different views because the default arrangements are copied into a file the
+ * data directory and can be modified for subsequent runs of the program.  Useful changes should be copied
+ * back into the default XML file eventually.
  *
  * @author Gerald de Jong
  */

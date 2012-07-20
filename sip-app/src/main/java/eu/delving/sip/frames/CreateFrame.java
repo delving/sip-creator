@@ -40,7 +40,9 @@ import java.awt.event.ActionEvent;
 import java.util.SortedSet;
 
 /**
- * Choices have been made in the trees, now we actually make the mapping
+ * The frame used for actually creating the mapping, while showing the parts of it in different windows
+ * so that the user is well-informed about the mapping being made.  Creation of mappings requires a
+ * fairly elaborate state machine which is to be found in the CreateModel.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

@@ -5,7 +5,7 @@ import eu.delving.sip.files.DataSet;
 import static eu.delving.sip.base.Work.Kind.*;
 
 /**
- * A runnable that will be executed in the workder thread
+ * A runnable that will be executed in the worker thread
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

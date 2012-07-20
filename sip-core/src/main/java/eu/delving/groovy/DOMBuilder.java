@@ -39,6 +39,9 @@ import java.util.*;
  * Custom node builder which executes closures if they are found as attribute values, or if
  * an element closure returns a String or GString.
  *
+ * This class is actually core to the transformation process because it gives the "Builder Pattern"
+ * a very different character by executing closures for values.
+ *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 

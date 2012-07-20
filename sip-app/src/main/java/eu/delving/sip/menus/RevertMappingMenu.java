@@ -36,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * The menu for choosing to revert to a previous mapping.
+ * The menu for choosing to revert to a previous mapping, with the list appearing in chronological order.
  *
  * @author Gerald de Jong, Beautiful Code BV, <gerald@delving.eu>
  */

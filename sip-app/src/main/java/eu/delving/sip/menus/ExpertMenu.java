@@ -34,7 +34,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 /**
- * Special functions for experts
+ * Special functions for experts, not to be spoken of in mixed company, or among people with potential heart
+ * conditions.
  *
  * @author Gerald de Jong, Beautiful Code BV, <gerald@delving.eu>
  */

@@ -37,7 +37,7 @@ import java.util.List;
 import static eu.delving.sip.base.SwingHelper.getTemplate;
 
 /**
- * A list of node mappings
+ * A list of node mapping entries set up to change when the mapping changes, ready for placement in a JList.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */

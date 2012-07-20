@@ -41,7 +41,9 @@ import static eu.delving.sip.model.CreateState.*;
 import static eu.delving.sip.model.CreateTransition.*;
 
 /**
- * This model holds the source and destination of a node mapping, and is observable.
+ * This model holds the source (potentially multiple siblings) and destination of a potential node mapping, as
+ * well as a node mapping itself once it has been created.  There is a fairly elaborate state machine here
+ * which takes care of all the changes that can be made and all the ways the UI should respond.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
@@ -185,9 +187,11 @@ public class CreateModel {
         sipModel.exec(new Swing() {
             @Override
             public void run() {
+                if  (sipModel.getMappingModel().hasRecMapping()) {
+                    sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
+                }
                 sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();
                 sipModel.getStatsModel().getSourceTree().clearHighlighted();
-                sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
                 switch (setter) {
                     case SOURCE:
                         if (sourceTreeNodes == null) return;
