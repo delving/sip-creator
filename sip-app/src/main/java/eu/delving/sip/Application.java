@@ -33,6 +33,7 @@ import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
+import eu.delving.sip.frames.WorkFrame;
 import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
@@ -48,6 +49,8 @@ import org.apache.commons.lang.StringUtils;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -75,10 +78,9 @@ public class Application {
     private StatusPanel statusPanel;
     private HelpPanel helpPanel;
     private Timer resizeTimer;
-    private String instance;
     private ExpertMenu expertMenu;
 
-    private Application(final File storageDirectory, String instance) throws StorageException {
+    private Application(final File storageDirectory) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -108,7 +110,7 @@ public class Application {
         feedback = new VisualFeedback(desktop);
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         Storage storage = new StorageImpl(storageDirectory, cultureHubClient.getHttpClient());
-        sipModel = new SipModel(storage, groovyCodeResource, feedback, instance);
+        sipModel = new SipModel(storage, groovyCodeResource, feedback);
         expertMenu = new ExpertMenu(sipModel);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
@@ -240,10 +242,27 @@ public class Application {
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
         statusPanel.setReaction(DataSetState.VALIDATED, allFrames.getUploadAction());
-        p.add(statusPanel, BorderLayout.CENTER);
+        JPanel center = new JPanel(new BorderLayout());
+        center.add(statusPanel, BorderLayout.CENTER);
+        center.add(createWorkPanel(), BorderLayout.EAST);
+        p.add(center, BorderLayout.CENTER);
         p.add(allFrames.getBigWindowsPanel(), BorderLayout.EAST);
         p.setPreferredSize(new Dimension(80, 80));
         return p;
+    }
+
+    private JPanel createWorkPanel() {
+        JPanel workPanel = new JPanel(new BorderLayout());
+        final WorkFrame workFrame = allFrames.getWorkFrame();
+        workPanel.add(AllFrames.miniScrollV("Work", workFrame.getMiniList()));
+        workFrame.getMiniList().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() || workFrame.getMiniList().isSelectionEmpty()) return;
+                workFrame.getAction().actionPerformed(null);
+            }
+        });
+        return workPanel;
     }
 
     private JMenuBar createMenuBar() {
@@ -424,18 +443,6 @@ public class Application {
         }
     }
 
-//    private static class Launcher extends AbstractAction implements Swing {
-//        private String[] args;
-//        private Set<String> instances = new TreeSet<String>();
-//
-//    // todo: this is for later.  just one instance now
-//
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            new Thread(this).start(); // todo: this whole launcher should change
-//        }
-//    }
-
     public static void main(final String[] args) throws StorageException {
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -443,8 +450,7 @@ public class Application {
                 final File storageDirectory = StorageFinder.getStorageDirectory(args);
                 if (storageDirectory == null) return;
                 try {
-                    int instance = 1;
-                    Application application = new Application(storageDirectory, String.valueOf(instance));
+                    Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
                     application.allFrames.restore();
                 }

@@ -34,8 +34,6 @@ import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -177,6 +175,10 @@ public class AllFrames {
         };
     }
 
+    public WorkFrame getWorkFrame() {
+        return workFrame;
+    }
+
     public Action getUploadAction() {
         return uploadFrame.getUploadAction();
     }
@@ -222,19 +224,9 @@ public class AllFrames {
             arrangements.add(Box.createVerticalStrut(5));
         }
         arrangements.add(Box.createVerticalGlue());
-        JPanel work = new JPanel(new BorderLayout());
-        work.add(miniScrollV("Work", workFrame.getMiniList()));
         JPanel p = new JPanel(new BorderLayout());
         p.add(arrangements, BorderLayout.CENTER);
-        p.add(work, BorderLayout.SOUTH);
         p.setPreferredSize(new Dimension(110, 400));
-        workFrame.getMiniList().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting() || workFrame.getMiniList().isSelectionEmpty()) return;
-                workFrame.getAction().actionPerformed(null);
-            }
-        });
         return p;
     }
 
@@ -244,6 +236,7 @@ public class AllFrames {
         JScrollPane scroll = new JScrollPane(content);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scroll.setPreferredSize(new Dimension(200, 200));
         p.add(scroll);
         return p;
     }
@@ -255,6 +248,7 @@ public class AllFrames {
         p.add(createHotkeyButton(statsFrame));
         p.add(createHotkeyButton(functionFrame));
         p.add(createHotkeyButton(mappingCodeFrame));
+        p.add(createHotkeyButton(uploadFrame));
         return p;
     }
 

@@ -82,8 +82,8 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, String instance) throws StorageException {
-        this.preferences = Preferences.userNodeForPackage(getClass()).node(instance);
+    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback) throws StorageException {
+        this.preferences = Preferences.userNodeForPackage(getClass());
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
