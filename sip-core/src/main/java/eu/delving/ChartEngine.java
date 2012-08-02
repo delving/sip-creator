@@ -57,7 +57,7 @@ public class ChartEngine {
         return chartHelper.hasFrequencyChart();
     }
 
-    public void wrieFieldFrequencyPNG(OutputStream outputStream) throws IOException {
+    public void writeFieldFrequencyPNG(OutputStream outputStream) throws IOException {
         writePNG(outputStream, chartHelper.getFieldFrequencyChart());
     }
 

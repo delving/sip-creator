@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import eu.delving.MappingResult;
 import eu.delving.groovy.XmlSerializer;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -45,18 +46,23 @@ public class MappingResultImpl implements MappingResult {
     private Map<String, List<String>> allFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> systemFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> searchFields = new TreeMap<String, List<String>>();
-    private Node node;
+    private Node root, rootAugmented;
     private RecDefTree recDefTree;
 
-    public MappingResultImpl(XmlSerializer serializer, Node node, RecDefTree recDefTree) {
+    public MappingResultImpl(XmlSerializer serializer, Node root, RecDefTree recDefTree) {
         this.serializer = serializer;
-        this.node = node;
+        this.root = root;
         this.recDefTree = recDefTree;
     }
 
     @Override
     public Node root() {
-        return node;
+        return root;
+    }
+
+    @Override
+    public Node rootAugmented() {
+        return rootAugmented;
     }
 
     @Override
@@ -99,6 +105,16 @@ public class MappingResultImpl implements MappingResult {
         throw new MissingFieldsException(out.toString());
     }
 
+    @Override
+    public String toXml() {
+        return serializer.toXml(root);
+    }
+
+    @Override
+    public String toXmlAugmented() {
+        return serializer.toXml(rootAugmented);
+    }
+
     public MappingResult resolve() {
         if (recDefTree.getRecDef().flat) {
             resolveFlatRecord();
@@ -106,11 +122,21 @@ public class MappingResultImpl implements MappingResult {
         else if (recDefTree.getRecDef().prefix.equals("aff")) {
             resolveAFFRecord();
         }
+        rootAugmented = root.cloneNode(true);
+        Document document = rootAugmented.getOwnerDocument();
+        Element systemFieldNode = document.createElementNS(null, "system-fields");
+        for (Map.Entry<String, List<String>> field : systemFields.entrySet()) {
+            for (String value : field.getValue()) {
+                Node element = systemFieldNode.appendChild(document.createElementNS(null, field.getKey()));
+                element.appendChild(document.createTextNode(value));
+            }
+        }
+        rootAugmented.appendChild(systemFieldNode);
         return this;
     }
 
     public String toString() {
-        return serializer.toXml(node);
+        return toXml();
     }
 
     private void addIfMissing(SystemField systemField, Set<String> keys, Set<String> missing) {
@@ -118,11 +144,11 @@ public class MappingResultImpl implements MappingResult {
     }
 
     private void resolveAFFRecord() {
-        resolveAFFRecord((Element) node);
+        resolveAFFRecord((Element) root);
     }
 
     private void resolveFlatRecord() {
-        NodeList kids = node.getChildNodes();
+        NodeList kids = root.getChildNodes();
         for (int walk = 0; walk < kids.getLength(); walk++) {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
@@ -134,8 +160,9 @@ public class MappingResultImpl implements MappingResult {
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
+                    String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
                     String value = getTextFromChildren(kid);
-                    put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), value);
+                    put(name, value);
                     handleMarkedField(recDefNode, value);
                     break;
                 default:
@@ -158,8 +185,9 @@ public class MappingResultImpl implements MappingResult {
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
                     if (recDefNode.isLeafElem()) {
+                        String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
                         String value = getTextFromChildren(kid);
-                        put(String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType()), value);
+                        put(name, value);
                         handleMarkedField(recDefNode, value);
                     }
                     else {
