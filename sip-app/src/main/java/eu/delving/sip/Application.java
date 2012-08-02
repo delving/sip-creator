@@ -228,11 +228,6 @@ public class Application {
     }
 
     private JPanel createStatePanel() {
-        JPanel p = new JPanel(new BorderLayout(10,10));
-        p.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createBevelBorder(0),
-                BorderFactory.createEmptyBorder(6, 6, 6, 6)
-        ));
         statusPanel.setReaction(DataSetState.ABSENT, allFrames.prepareForNothing());
         statusPanel.setReaction(NO_DATA, importAction);
         statusPanel.setReaction(DataSetState.IMPORTED, new InputAnalyzer());
@@ -242,12 +237,14 @@ public class Application {
         statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(DataSetState.MAPPING, validateAction);
         statusPanel.setReaction(DataSetState.VALIDATED, allFrames.getUploadAction());
-        JPanel center = new JPanel(new BorderLayout());
-        center.add(statusPanel, BorderLayout.CENTER);
-        center.add(createWorkPanel(), BorderLayout.EAST);
-        p.add(center, BorderLayout.CENTER);
-        p.add(allFrames.getBigWindowsPanel(), BorderLayout.EAST);
-        p.setPreferredSize(new Dimension(80, 80));
+        JPanel p = new JPanel(new GridLayout(1, 0, 6, 6));
+        p.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createBevelBorder(0),
+                BorderFactory.createEmptyBorder(6, 6, 6, 6)
+        ));
+        p.add(statusPanel);
+        p.add(createWorkPanel());
+        p.add(allFrames.getBigWindowsPanel());
         return p;
     }
 

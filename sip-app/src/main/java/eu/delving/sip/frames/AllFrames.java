@@ -236,14 +236,14 @@ public class AllFrames {
         JScrollPane scroll = new JScrollPane(content);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scroll.setPreferredSize(new Dimension(200, 200));
+        scroll.setPreferredSize(new Dimension(200, 80));
         p.add(scroll);
         return p;
     }
 
 
     public JPanel getBigWindowsPanel() {
-        JPanel p = new JPanel(new GridLayout(1, 0));
+        JPanel p = new JPanel(new GridLayout(2, 2));
         p.setBorder(BorderFactory.createTitledBorder("Global Frames"));
         p.add(createHotkeyButton(statsFrame));
         p.add(createHotkeyButton(functionFrame));
