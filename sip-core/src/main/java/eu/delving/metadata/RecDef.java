@@ -93,6 +93,8 @@ public class RecDef {
 
     public Elem root;
 
+    public List<Dict> dicts;
+
     public List<OptList> opts;
 
     @XStreamAlias("field-markers")
