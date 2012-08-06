@@ -124,14 +124,12 @@ public class MappingResultImpl implements MappingResult {
         }
         rootAugmented = root.cloneNode(true);
         Document document = rootAugmented.getOwnerDocument();
-        Element systemFieldNode = document.createElementNS(null, "system-fields");
         for (Map.Entry<String, List<String>> field : systemFields.entrySet()) {
             for (String value : field.getValue()) {
-                Node element = systemFieldNode.appendChild(document.createElementNS(null, field.getKey()));
+                Node element = rootAugmented.appendChild(document.createElementNS(null, field.getKey()));
                 element.appendChild(document.createTextNode(value));
             }
         }
-        rootAugmented.appendChild(systemFieldNode);
         return this;
     }
 
