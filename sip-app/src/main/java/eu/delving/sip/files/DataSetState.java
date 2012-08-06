@@ -54,13 +54,14 @@ public enum DataSetState {
     }
 
     public String toHtml() {
-        StringBuilder out = new StringBuilder("<html><strong>&quot;");
+        StringBuilder out = new StringBuilder("<html><table><tr><td width=20%><h2>&quot;");
         out.append(toTitle());
-        out.append("&quot;</strong><br>");
+        out.append("&quot;</h2></td><td width=80%>");
         for (int walk = 1; walk < description.length; walk++) {
             String line = description[walk];
             out.append("<p>").append(line).append("</p>");
         }
+        out.append("</td></table></html>");
         return out.toString();
     }
 }

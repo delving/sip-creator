@@ -75,7 +75,8 @@ public class TestMappingEngine {
                 "icn", "http://www.icn.nl/schemas/icn/"
         ));
         MappingResult result = mappingEngine.execute(input("icn"));
-        System.out.println(result);
+        System.out.println(result.toXml());
+        System.out.println(result.toXmlAugmented());
 //        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
 //            System.out.println(entry.getKey() + " -> "+entry.getValue());
 //        }

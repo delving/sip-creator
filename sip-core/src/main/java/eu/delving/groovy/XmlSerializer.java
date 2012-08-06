@@ -102,7 +102,13 @@ public class XmlSerializer {
         List<Attribute> attributes = getAttributes(node);
         String indentString = indentString(level);
         out.add(eventFactory.createCharacters(indentString));
-        out.add(eventFactory.createStartElement(node.getPrefix(), node.getNamespaceURI(), node.getLocalName(), attributes.iterator(), null));
+        out.add(eventFactory.createStartElement(
+                node.getPrefix() == null ? "" : node.getPrefix(),
+                node.getNamespaceURI() == null ? "" : node.getNamespaceURI(),
+                node.getLocalName(),
+                attributes.iterator(),
+                null
+        ));
         NodeList kids = node.getChildNodes();
         boolean nodeHasSubelement = false;
         for (int walk = 0; walk < kids.getLength(); walk++) {

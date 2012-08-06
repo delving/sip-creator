@@ -60,6 +60,7 @@ public class DownloadAction extends AbstractAction {
     private Cancel cancel = new Cancel();
     private DataSetListModel listModel = new DataSetListModel();
     private JList list = new JList(listModel);
+    private String localUser;
 
     public DownloadAction(JDesktopPane parent, SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Download another data set");
@@ -68,10 +69,11 @@ public class DownloadAction extends AbstractAction {
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
         );
+        this.localUser = sipModel.getStorage().getUsername();
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
         downloadDialog = new DownloadDialog((JFrame) SwingUtilities.getWindowAncestor(parent));
-        list.setCellRenderer(new DataSetCellRenderer(sipModel.getStorage().getUsername()));
+        list.setCellRenderer(new DataSetCellRenderer());
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fetch.setEnabled(false);
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -238,7 +240,7 @@ public class DownloadAction extends AbstractAction {
         }
 
         public boolean isDownloadable() {
-            return dataSet == null && dataSetEntry.lockedBy == null;
+            return dataSetEntry.lockedBy == null;
         }
 
         @Override
@@ -295,12 +297,6 @@ public class DownloadAction extends AbstractAction {
     }
 
     private class DataSetCellRenderer extends DefaultListCellRenderer {
-        private String localUser;
-
-        private DataSetCellRenderer(String localUser) {
-            this.localUser = localUser;
-        }
-
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             String string;
@@ -311,19 +307,21 @@ public class DownloadAction extends AbstractAction {
                 Entry entry = (Entry) value;
                 String message;
                 CultureHubClient.LockedBy lockedBy = entry.dataSetEntry.lockedBy;
-                if (entry.dataSet != null) {
-                    message = "Already in workspace";
-                }
-                else if (lockedBy != null) {
+                if (lockedBy != null) {
                     if (localUser.equals(lockedBy.username)) {
-                        message = "Locked by yourself, downloaded elsewhere";
+                        message = "Locked by yourself";
                     }
                     else {
-                        message = String.format("Owned by '%s' <%s>", lockedBy.username, lockedBy.email);
+                        message = String.format("Locked by '%s' <%s>", lockedBy.username, lockedBy.email);
                     }
                 }
                 else {
-                    message = "Download";
+                    if (entry.dataSet != null) {
+                        message = "Already in workspace, archive and download";
+                    }
+                    else {
+                        message = "Download";
+                    }
                 }
                 string = String.format("<html><font size=+1><b>%s</b> - </font><i>%s</i>", entry.getSpec(), message);
             }

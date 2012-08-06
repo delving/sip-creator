@@ -111,55 +111,10 @@ public class OptList {
         @XStreamAsAttribute
         public boolean hidden;
 
-        @XStreamImplicit
-        public List<DictOptList> dictOptLists;
+        public List<Dict> dicts;
 
         @XStreamOmitField
         public OptList parent;
-
-        public String toString() {
-            return value;
-        }
-    }
-
-    @XStreamAlias("dict-opt-list")
-    public static class DictOptList {
-        @XStreamAsAttribute
-        public String displayName;
-
-        @XStreamAsAttribute
-        public String dictionary;
-
-        @XStreamAsAttribute
-        public Path keyPath;
-
-        @XStreamAsAttribute
-        public Path valuePath;
-
-        @XStreamAsAttribute
-        public Tag key;
-
-        @XStreamAsAttribute
-        public Tag value;
-
-        @XStreamImplicit
-        public List<DictOpt> opts;
-
-        @XStreamOmitField
-        public Opt parent;
-    }
-
-    @XStreamAlias("dict-opt")
-    public static class DictOpt {
-
-        @XStreamAsAttribute
-        public String key;
-
-        @XStreamAsAttribute
-        public String value;
-
-        @XStreamOmitField
-        public DictOptList parent;
 
         public String toString() {
             return value;

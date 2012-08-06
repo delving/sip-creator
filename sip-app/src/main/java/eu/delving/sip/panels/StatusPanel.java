@@ -47,15 +47,16 @@ public class StatusPanel extends JPanel {
 
     private static final Border DEFAULT_BORDER = BorderFactory.createTitledBorder("Actions");
     private List<StateAction> actions = new ArrayList<StateAction>();
+    private JButton button = new JButton();
 
     public StatusPanel(final SipModel sipModel) {
-        super(new GridLayout(1, 0, 5, 5));
+        super(new BorderLayout());
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
             public void recMappingSet(MappingModel mappingModel) {
                 if (mappingModel.hasRecMapping()) {
                     setBorder(BorderFactory.createTitledBorder(String.format(
-                            "Actions - [%s -> %s]",
+                            "Action - [%s -> %s]",
                             sipModel.getDataSetModel().getDataSet().getSpec(),
                             mappingModel.getRecMapping().getPrefix().toUpperCase()
                     )));
@@ -70,16 +71,17 @@ public class StatusPanel extends JPanel {
             actions.add(action);
             if (state == SOURCED) sipModel.getDataSetModel().addListener(new SourcedListener(action));
         }
-        for (StateAction action : actions) {
-            JButton button = new JButton(action);
-            button.setToolTipText(action.state.toHtml());
-            add(button);
-        }
+        button.setAction(actions.get(0));
+        add(button, BorderLayout.CENTER);
         setBorder(DEFAULT_BORDER);
     }
 
     public void setState(DataSetState state) {
-        for (StateAction action : actions) action.enableIf(state);
+        for (StateAction action : actions) {
+            boolean itIsMe = state == action.state;
+            action.setEnabled(itIsMe);
+            if (itIsMe) button.setAction(action);
+        }
     }
 
     public void setReaction(DataSetState state, Swing swing) {
@@ -96,7 +98,7 @@ public class StatusPanel extends JPanel {
         private Action action;
 
         private StateAction(DataSetState state) {
-            super(state.toTitle());
+            super(state.toHtml());
             this.state = state;
             setEnabled(false);
         }
@@ -109,22 +111,13 @@ public class StatusPanel extends JPanel {
             this.action = action;
         }
 
-        public void enableIf(DataSetState state) {
-            if (this.state == state) {
-                setEnabled(true);
-            }
-            else if (isEnabled()) {
-                setEnabled(false);
-            }
-        }
-
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             if (swing != null) swing.run();
             if (action != null) action.actionPerformed(null);
         }
     }
-    
+
     private class SourcedListener implements DataSetModel.SwingListener {
         private StateAction sourcedAction;
 

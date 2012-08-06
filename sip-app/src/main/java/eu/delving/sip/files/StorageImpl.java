@@ -672,6 +672,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public void remove() throws StorageException {
+            if (here.listFiles(FILE_FILTER).length == 0) return;
             for (File file : here.listFiles(ATTIC_FILTER)) delete(file);
             String now = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
             File saveDirectory = new File(here, now);
