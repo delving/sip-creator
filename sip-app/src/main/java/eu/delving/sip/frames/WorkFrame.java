@@ -46,13 +46,12 @@ import java.text.SimpleDateFormat;
 public class WorkFrame extends FrameBase {
     private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("hh:mm:ss");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
-    private static final Font TINY = new Font("Serif", Font.PLAIN, 8);
     private JList fullList, miniList;
 
     public WorkFrame(JDesktopPane desktop, final SipModel sipModel) {
         super(Which.WORK, desktop, sipModel, "Work");
         this.miniList = new JList(sipModel.getWorkModel().getListModel());
-        this.miniList.setFont(TINY);
+        this.miniList.setFont(MONOSPACED);
         this.miniList.setCellRenderer(new MiniCellRenderer());
         this.fullList = new JList(sipModel.getWorkModel().getListModel());
         this.fullList.setFont(MONOSPACED);

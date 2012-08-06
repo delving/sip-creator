@@ -328,6 +328,7 @@ public class CultureHubClient {
                     Code code = Code.from(response);
                     switch (code) {
                         case OK:
+                            dataSet.remove();
                             dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
                             success = true;
                             context.dataSetCreated(dataSet);

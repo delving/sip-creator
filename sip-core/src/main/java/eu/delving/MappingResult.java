@@ -36,6 +36,8 @@ public interface MappingResult {
 
     Node root();
 
+    Node rootAugmented();
+
     Map<String, List<String>> fields();
 
     Map<String, List<String>> systemFields();
@@ -43,6 +45,10 @@ public interface MappingResult {
     Map<String, List<String>> searchFields();
 
     void checkMissingFields() throws MissingFieldsException;
+
+    String toXml();
+
+    String toXmlAugmented();
 
     public static class MissingFieldsException extends Exception {
         public MissingFieldsException(String message) {

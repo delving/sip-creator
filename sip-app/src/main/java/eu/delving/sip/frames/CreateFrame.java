@@ -217,7 +217,7 @@ public class CreateFrame extends FrameBase {
 
     private class CopyMappingAction extends AbstractAction {
         private CopyMappingAction() {
-            super("<html><h3>Use selected mapping hint</h3></html>");
+            super("<html><b>Use selected mapping hint</b></html>");
         }
 
         @Override
