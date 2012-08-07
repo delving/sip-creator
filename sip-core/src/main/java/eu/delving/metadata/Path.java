@@ -61,7 +61,6 @@ public class Path implements Comparable<Path>, Serializable {
         while (matcher.find()) {
             String part = matcher.group(0).substring(1);
             int at = part.indexOf("@");
-            if (at > 0) throw new IllegalArgumentException(String.format("@ only at the beginning '%s' in path %s", part, pathString));
             Tag newTag;
             if (at == 0) {
                 newTag = Tag.attribute(part.substring(1));
