@@ -18,10 +18,12 @@ public class TestSchemaRepository {
     @Test
     public void read() {
         SchemaRepository repo = new SchemaRepository(new ResourceFetcher());
-        String schema = repo.getSchema("icn", "1.0.0", "record-definition.xml");
-        System.out.println(schema);
-        schema = repo.getSchema("icn", "1.0.0", "validation.xsd");
-        System.out.println(schema);
+        for (SchemaRepository.Format format : repo.getFormats()) {
+            String schema = repo.getSchema(format.prefix, "1.0.0", "record-definition.xml");
+            System.out.println(schema.split("\\n").length + " lines");
+            schema = repo.getSchema(format.prefix, "1.0.0", "validation.xsd");
+            System.out.println(schema.split("\\n").length + " lines");
+        }
     }
 
     private class ResourceFetcher implements SchemaRepository.Fetcher {
@@ -48,7 +50,7 @@ public class TestSchemaRepository {
             InputStream inputStream = getClass().getResource(path).openStream();
             StringBuilder xml = new StringBuilder();
             for (String line : IOUtils.readLines(inputStream)) {
-                xml.append(line);
+                xml.append(line).append('\n');
             }
             return xml.toString();
         }

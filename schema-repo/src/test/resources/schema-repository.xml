@@ -2,11 +2,29 @@
 <schemas>
     <format prefix="icn">
         <version number="1.0.0">
-            <author>Thomas Wikman</author>
+            <author>Delving</author>
             <message>Initial version</message>
-            <date>2012-06-04</date>
-            <file name="record-definition.xml" hash="46ED64AA5D86EFC770E223C733E855C2"/>
-            <file name="validation.xsd" hash="9FBCB3F40DAF33E24ADBB8B329D1CDAB"/>
+            <date>2012-08-08</date>
+            <file name="record-definition.xml" hash="C02DBD84F9D3C13EC76C878DA08FF971"/>
+            <file name="validation.xsd" hash="1E975659EB62A4B8B95B74103510C8FA"/>
+        </version>
+    </format>
+    <format prefix="abm">
+        <version number="1.0.0">
+            <author>Delving</author>
+            <message>Initial version</message>
+            <date>2012-08-08</date>
+            <file name="record-definition.xml" hash="71EE6FE93C4F171D7F4FCF35FA1D1FD3"/>
+            <file name="validation.xsd" hash="07DA1ED971676BBC629104EFBB1CB49B"/>
+        </version>
+    </format>
+    <format prefix="tib">
+        <version number="1.0.0">
+            <author>Delving</author>
+            <message>Initial version</message>
+            <date>2012-08-08</date>
+            <file name="record-definition.xml" hash="22D6E0D86C637E9E2137747AF9B01EBD"/>
+            <file name="validation.xsd" hash="75F7060F746CB268427F25B1D18A7BB0"/>
         </version>
     </format>
 </schemas>
