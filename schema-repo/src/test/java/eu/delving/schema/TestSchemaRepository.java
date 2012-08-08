@@ -31,7 +31,7 @@ public class TestSchemaRepository {
 
     private void fetchTest(SchemaRepository.Fetcher fetcher) {
         SchemaRepository repo = new SchemaRepository(fetcher);
-        for (SchemaRepository.Format format : repo.getFormats()) {
+        for (SchemaRepository.Schema format : repo.getFormats()) {
             String schema = repo.getSchema(format.prefix, "1.0.0", "record-definition.xml");
             System.out.println(schema.split("\\n").length + " lines");
             schema = repo.getSchema(format.prefix, "1.0.0", "validation.xsd");

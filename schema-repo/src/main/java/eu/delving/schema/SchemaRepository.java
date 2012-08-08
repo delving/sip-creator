@@ -43,15 +43,15 @@ public class SchemaRepository {
         }
     }
 
-    public List<Format> getFormats() {
-        return schemas.formats;
+    public List<Schema> getFormats() {
+        return schemas.schemas;
     }
 
     public String getSchema(String prefix, String versionNumber, String fileName) {
         String hash = null;
-        for (Format format : schemas.formats) {
-            if (!format.prefix.equals(prefix)) continue;
-            for (Version version : format.versions) {
+        for (Schema schema : schemas.schemas) {
+            if (!schema.prefix.equals(prefix)) continue;
+            for (Version version : schema.versions) {
                 if (!version.number.equals(versionNumber)) continue;
                 for (SchemaFile schemaFile : version.files) {
                     if (!schemaFile.name.equals(fileName)) continue;
@@ -83,11 +83,11 @@ public class SchemaRepository {
     @XStreamAlias("schemas")
     public static class Schemas {
         @XStreamImplicit
-        List<Format> formats;
+        List<Schema> schemas;
     }
 
-    @XStreamAlias("format")
-    public static class Format {
+    @XStreamAlias("schema")
+    public static class Schema {
         @XStreamAsAttribute
         String prefix;
         @XStreamImplicit
