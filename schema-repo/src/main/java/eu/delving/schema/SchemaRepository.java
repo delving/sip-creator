@@ -17,7 +17,6 @@ import java.util.List;
  */
 
 public class SchemaRepository {
-    private static final int BLOCK_SIZE = 4096;
     private MessageDigest messageDigest;
     private Schemas schemas;
     private Fetcher fetcher;

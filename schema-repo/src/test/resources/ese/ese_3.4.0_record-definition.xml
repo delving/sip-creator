@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<record-definition prefix="ese" flat="true">
+
+    <namespaces>
+        <namespace prefix="ese" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-3.4.xsd"/>
+        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
+        <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
+        <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.4.xsd"/>
+    </namespaces>
+
+    <root tag="europeana:record">
+
+        <elem tag="dc:title"/>
+        <elem tag="dc:creator"/>
+        <elem tag="dc:subject"/>
+        <elem tag="dc:description"/>
+        <elem tag="dc:publisher"/>
+        <elem tag="dc:contributor"/>
+        <elem tag="dc:date"/>
+        <elem tag="dc:type"/>
+        <elem tag="dc:format"/>
+        <elem tag="dc:identifier"/>
+        <elem tag="dc:source"/>
+        <elem tag="dc:language"/>
+        <elem tag="dc:relation"/>
+        <elem tag="dc:coverage"/>
+        <elem tag="dc:rights"/>
+
+        <elem tag="dcterms:provenance"/>
+        <elem tag="dcterms:alternative"/>
+        <elem tag="dcterms:conformsTo"/>        
+        <elem tag="dcterms:created"/>           
+        <elem tag="dcterms:extent"/>            
+        <elem tag="dcterms:hasFormat"/>         
+        <elem tag="dcterms:hasPart"/>           
+        <elem tag="dcterms:hasVersion"/>        
+        <elem tag="dcterms:isFormatOf"/>        
+        <elem tag="dcterms:isPartOf"/>          
+        <elem tag="dcterms:isReferencedBy"/>    
+        <elem tag="dcterms:isReplacedBy"/>      
+        <elem tag="dcterms:isRequiredBy"/>      
+        <elem tag="dcterms:isVersionOf"/>       
+        <elem tag="dcterms:issued"/>            
+        <elem tag="dcterms:medium"/>            
+        <elem tag="dcterms:references"/>
+        <elem tag="dcterms:replaces"/>          
+        <elem tag="dcterms:requires"/>          
+        <elem tag="dcterms:spatial"/>           
+        <elem tag="dcterms:tableOfContents"/>   
+        <elem tag="dcterms:temporal"/>
+
+        <elem tag="europeana:unstored"/>
+        <elem tag="europeana:object" fieldType="link"/>
+        <elem tag="europeana:provider"/>        <!-- required -->
+        <elem tag="europeana:type"/>            <!-- required -->
+        <elem tag="europeana:rights"/>          <!-- required -->
+        <elem tag="europeana:dataProvider"/>    <!-- required -->
+        <elem tag="europeana:isShownBy" fieldType="link"/>       <!-- required or below-->
+        <elem tag="europeana:isShownAt" fieldType="link"/>       <!-- required or above-->
+        <elem tag="europeana:UGC"/>            <!-- required -->
+
+    </root>
+
+    <field-markers>
+        <!-- system fields -->
+        <field-marker name="CREATOR" path="/europeana:record/dc:creator"/>
+        <field-marker name="TITLE" path="/europeana:record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/europeana:record/dc:description"/>
+        <field-marker name="OWNER" path="/europeana:record/europeana:dataProvider"/>
+        <field-marker name="PROVIDER" path="/europeana:record/europeana:provider"/>
+        <field-marker name="LANDING_PAGE" path="/europeana:record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/europeana:record/europeana:object"/>
+
+        <!-- todo: these should have paths, currently they are checked for presence but not resolved-->
+        <field-marker name="SPEC"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
+
+        <field-marker type="fact" name="dataProvider" path="/europeana:record/europeana:dataProvider"/>
+        <field-marker type="fact" name="provider" path="/europeana:record/europeana:provider"/>
+        <field-marker type="fact" name="rights" path="/europeana:record/europeana:rights"/>
+        <field-marker type="fact" name="type" path="/europeana:record/europeana:type"/>
+    </field-markers>
+
+</record-definition>
+
+
+
