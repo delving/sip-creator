@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * See if it works
@@ -16,8 +18,19 @@ import java.io.InputStream;
 public class TestSchemaRepository {
 
     @Test
-    public void read() {
-        SchemaRepository repo = new SchemaRepository(new ResourceFetcher());
+    public void testLocal() {
+        System.out.println("from local resources:");
+        fetchTest(new ResourceFetcher());
+    }
+
+    @Test
+    public void testSchemasDelvingEU() {
+        System.out.println("from schemas.delving.eu:");
+        fetchTest(new HTTPFetcher());
+    }
+
+    private void fetchTest(SchemaRepository.Fetcher fetcher) {
+        SchemaRepository repo = new SchemaRepository(fetcher);
         for (SchemaRepository.Format format : repo.getFormats()) {
             String schema = repo.getSchema(format.prefix, "1.0.0", "record-definition.xml");
             System.out.println(schema.split("\\n").length + " lines");
@@ -26,7 +39,7 @@ public class TestSchemaRepository {
         }
     }
 
-    private class ResourceFetcher implements SchemaRepository.Fetcher {
+    private abstract class GenericFetcher implements SchemaRepository.Fetcher {
 
         @Override
         public String fetchList() {
@@ -43,19 +56,44 @@ public class TestSchemaRepository {
         public Boolean isValidating() {
             return true;
         }
+
+        String getFileContents(String path) {
+            try {
+                InputStream inputStream = getURL(path).openStream();
+                StringBuilder xml = new StringBuilder();
+                for (String line : IOUtils.readLines(inputStream)) {
+                    xml.append(line).append('\n');
+                }
+                return xml.toString();
+            }
+            catch (IOException e) {
+                throw new RuntimeException("oops", e);
+            }
+        }
+
+        abstract URL getURL(String path);
     }
 
-    private String getFileContents(String path) {
-        try {
-            InputStream inputStream = getClass().getResource(path).openStream();
-            StringBuilder xml = new StringBuilder();
-            for (String line : IOUtils.readLines(inputStream)) {
-                xml.append(line).append('\n');
-            }
-            return xml.toString();
-        }
-        catch (IOException e) {
-            throw new RuntimeException("oops", e);
+    private class ResourceFetcher extends GenericFetcher {
+
+        @Override
+        public URL getURL(String path) {
+            return getClass().getResource(path);
         }
     }
+
+    private class HTTPFetcher extends GenericFetcher {
+
+        @Override
+        public URL getURL(String path) {
+            try {
+                return new URL("http://schemas.delving.eu"+path);
+            }
+            catch (MalformedURLException e) {
+                throw new RuntimeException("HTTP failed");
+            }
+        }
+    }
+
+
 }
