@@ -5,8 +5,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 /**
@@ -16,16 +17,10 @@ import java.util.List;
  */
 
 public class SchemaRepository {
-
-    public static void main(String[] args) throws IOException {
-        InputStream in = SchemaRepository.class.getResource("/test-repository.xml").openStream();
-        XStream xstream = new XStream();
-        xstream.processAnnotations(Schemas.class);
-        Schemas schemas = (Schemas) xstream.fromXML(in);
-        System.out.println(schemas.formats.size());
-    }
-
+    private static final int BLOCK_SIZE = 4096;
+    private MessageDigest messageDigest;
     private Schemas schemas;
+    private Fetcher fetcher;
 
     public interface Fetcher {
         String fetchList();
@@ -36,9 +31,16 @@ public class SchemaRepository {
     }
 
     public SchemaRepository(Fetcher fetcher) {
+        this.fetcher = fetcher;
         XStream xstream = new XStream();
         xstream.processAnnotations(Schemas.class);
         this.schemas = (Schemas) xstream.fromXML(fetcher.fetchList());
+        try {
+            this.messageDigest = MessageDigest.getInstance("MD5");
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 not available??");
+        }
     }
 
     public List<Format> getFormats() {
@@ -58,7 +60,22 @@ public class SchemaRepository {
                 }
             }
         }
-        return hash;
+        if (hash == null) return null;
+        String schema = fetcher.fetchSchema(prefix, versionNumber, fileName);
+        if (fetcher.isValidating()) {
+            String foundHash = getHashString(schema);
+            if (!hash.equals(foundHash)) throw new IllegalStateException(fileName + ": expected hash " + foundHash);
+        }
+        return schema;
+    }
+
+    public String getHashString(String value) {
+        try {
+            return toHexadecimal(messageDigest.digest(value.getBytes("UTF-8")));
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // == all of this is for binding
@@ -94,6 +111,17 @@ public class SchemaRepository {
         String name;
         @XStreamAsAttribute
         String hash;
+    }
+
+
+    static final String HEXES = "0123456789ABCDEF";
+
+    private static String toHexadecimal(byte[] raw) {
+        final StringBuilder hex = new StringBuilder(2 * raw.length);
+        for (final byte b : raw) {
+            hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
+        }
+        return hex.toString();
     }
 
 }

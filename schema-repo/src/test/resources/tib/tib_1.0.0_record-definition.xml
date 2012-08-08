@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+<record-definition prefix="tib" flat="true">
+
+    <namespaces>
+        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
+        <namespace prefix="dcterms" uri="http://purl.org/dc/terms/" schema="http://dublincore.org/schemas/xmls/qdc/dcterms.xsd"/>
+        <namespace prefix="europeana" uri="http://www.europeana.eu/schemas/ese/" schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"/>
+        <namespace prefix="tib" uri="http://www.tib.nl/schemas/tib/" schema="TIB-1.0.xsd"/>
+        <namespace prefix="delving" uri="http://schemas.delving.eu/" schema="delving-1.0.xsd"/>
+    </namespaces>
+
+    <functions>
+        <mapping-function name="cleanAdlibImageReference">
+            <sample-input>
+                <string>..\..\..\Images PH\OKS 1989-001 [01].JPG</string>
+                <string>../../../Images PH/OKS 1989-001 [01].JPG</string>
+            </sample-input>
+            <groovy-code>
+                <string>it.replaceAll(&apos;; &apos;, &apos;_&apos;).replaceAll(&apos;JPG&apos;, &apos;jpg&apos;).replaceAll(&quot;.*?[\\\\|//]&quot;, &quot;&quot;).replaceAll(&quot; &quot;, &quot;%20&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="deepZoomUrl">
+            <sample-input>
+                <string>D:/Documents/Schilderij/010.jpg</string>
+            </sample-input>
+            <groovy-code>
+                <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;jpg|JPG|jpeg|tif|TIF&apos;,&apos;tif.dzi&apos;)</string>
+                <string>&quot;http://thuisinbrabant.delving.org/iip/deepzoom/mnt/tib/tiles/thuisinbrabant/${spec}/${image}&quot;</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="isShownAt">
+            <sample-input>
+                <string>123</string>
+            </sample-input>
+            <groovy-code>
+                <string>&quot;http://www.thuisinbrabant.nl/${spec}/${it}&quot;</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="largeThumbnail">
+            <sample-input>
+                <string>D:/Documents/Schilderij/010.jpg</string>
+            </sample-input>
+            <groovy-code>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/thuisinbrabant/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/500&quot;</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="lowercase">
+            <sample-input>
+                <string>Bla bla</string>
+                <string>BLA bla bla</string>
+            </sample-input>
+            <groovy-code>
+                <string>&quot;${it.toString().toLowerCase()}&quot;</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="reverseNames">
+            <sample-input>
+                <string>Sjoerd Siebinga</string>
+                <string>Siebinga, Sjoerd</string>
+                <string>Siebinga, Sjoerd Michiel</string>
+            </sample-input>
+            <groovy-code>
+                <string>parts = it.toString().split(&quot;,&quot;)</string>
+                <string>if (parts.length &gt; 1) {</string>
+                <string>&quot;${parts[1].trim()} ${parts[0]}&quot;</string>
+                <string>}</string>
+                <string>else {</string>
+                <string>&quot;${it}&quot;</string>
+                <string>}</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="smallThumbnail">
+            <groovy-code>
+                <string>&quot;http://thuisinbrabant.delving.org/thumbnail/thuisinbrabant/${spec}/${it.replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;.jpg|.JPG|.jpeg|.tif|.TIF&apos;, &apos;&apos;)}/180&quot;</string>
+            </groovy-code>
+        </mapping-function>
+        <mapping-function name="toLocalId">
+            <sample-input>
+                <string>1231231</string>
+                <string>232455</string>
+                <string>12345</string>
+            </sample-input>
+            <groovy-code>
+                <string>&quot;${spec}/${it}&quot;</string>
+            </groovy-code>
+        </mapping-function>
+    </functions>
+
+    <root tag="tib:record">
+
+        <!-- tib -->
+        <elem tag="tib:citName"/>
+        <elem tag="tib:citOldId"/>
+        <elem tag="tib:thumbLarge" fieldType="link" function="largeThumbnail"/>
+        <elem tag="tib:thumbSmall" fieldType="link" function="smallThumbnail"/>
+        <elem tag="tib:collection"/>
+        <elem tag="tib:creatorRole" function="lowercase"/>
+        <elem tag="tib:productionPeriod" fieldType="string"/>
+        <elem tag="tib:productionStart"/>
+        <elem tag="tib:productionEnd"/>
+        <elem tag="tib:creatorBirthYear"/>
+        <elem tag="tib:creatorDeathYear"/>
+        <elem tag="tib:formatted"/>
+        <elem tag="tib:year"/>
+        <elem tag="tib:dimension"/>
+        <elem tag="tib:objectNumber"/>
+        <elem tag="tib:objectSoort" function="lowercase"/>
+        <elem tag="tib:material" function="lowercase"/>
+        <elem tag="tib:place"/>
+        <elem tag="tib:technique" function="lowercase" fieldType="string"/>
+        <elem tag="tib:color" function="lowercase" fieldType="string"/>
+        <elem tag="tib:design" function="lowercase" fieldType="string"/>
+        <elem tag="tib:exhibition" function="lowercase" fieldType="string"/>
+        <elem tag="tib:subjectDepicted" function="lowercase" fieldType="string"/>
+        <elem tag="tib:date"/>
+        <elem tag="tib:collectionPart"/>
+        <elem tag="tib:person"/>
+        <elem tag="tib:region"/>
+        <elem tag="tib:event"/>
+        <elem tag="tib:theme"/>
+        <elem tag="tib:pageStart"/>
+        <elem tag="tib:pageEnd"/>
+        <elem tag="tib:pages"/>
+        <elem tag="tib:vindplaats"/>
+        <elem tag="tib:location"/>
+
+        <!-- dc -->
+        <elem tag="dc:title"/>                                         <!-- ESE 3.4 -->
+        <elem tag="dc:creator" function="reverseNames"/>                                        <!-- ESE 3.4 -->
+        <elem tag="dc:subject"/>                                       <!-- ESE 3.4 -->
+        <elem tag="dc:description"/>                                   <!-- ESE 3.4 -->
+        <elem tag="dc:publisher"/>                                     <!-- ESE 3.4 -->
+        <elem tag="dc:contributor"/>                                   <!-- ESE 3.4 -->
+        <elem tag="dc:date"/>                                          <!-- ESE 3.4 -->
+        <elem tag="dc:type"/>                                          <!-- ESE 3.4 -->
+        <elem tag="dc:format"/>                                        <!-- ESE 3.4 -->
+        <elem tag="dc:identifier"/>                                    <!-- ESE 3.4 -->
+        <elem tag="dc:source"/>                                        <!-- ESE 3.4 -->
+        <elem tag="dc:language"/>                                      <!-- ESE 3.4 -->
+        <elem tag="dc:relation"/>                                      <!-- ESE 3.4 -->
+        <elem tag="dc:coverage"/>                                      <!-- ESE 3.4 -->
+        <elem tag="dc:rights"/>                                        <!-- ESE 3.4 -->
+
+        <!--dcterms-->
+        <elem tag="dcterms:created"/>                                  <!-- ESE 3.4 -->
+        <elem tag="dcterms:extent"/>                                   <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasFormat"/>                                <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasPart"/>                                  <!-- ESE 3.4 -->
+        <elem tag="dcterms:hasVersion"/>                               <!-- ESE 3.4 -->
+        <elem tag="dcterms:isFormatOf"/>                               <!-- ESE 3.4 -->
+        <elem tag="dcterms:isPartOf"/>                                 <!-- ESE 3.4 -->
+        <elem tag="dcterms:isReferencedBy"/>                           <!-- ESE 3.4 -->
+        <elem tag="dcterms:isReplacedBy"/>                             <!-- ESE 3.4 -->
+        <elem tag="dcterms:isRequiredBy"/>                             <!-- ESE 3.4 -->
+        <elem tag="dcterms:isVersionOf"/>                              <!-- ESE 3.4 -->
+        <elem tag="dcterms:issued"/>                                   <!-- ESE 3.4 -->
+        <elem tag="dcterms:medium"/>                                   <!-- ESE 3.4 -->
+        <elem tag="dcterms:references"/>                               <!-- ESE 3.4 -->
+        <elem tag="dcterms:replaces"/>                                 <!-- ESE 3.4 -->
+        <elem tag="dcterms:requires"/>                                 <!-- ESE 3.4 -->
+        <elem tag="dcterms:tableOfContents"/>                          <!-- ESE 3.4 -->
+        <elem tag="dcterms:alternative"/>                              <!-- ESE 3.4 -->
+        <elem tag="dcterms:spatial"/>                                  <!-- ESE 3.4 -->
+        <elem tag="dcterms:temporal"/>                                 <!-- ESE 3.4 -->
+        <elem tag="dcterms:provenance"/>                               <!-- ESE 3.4 -->
+        <elem tag="dcterms:rightsHolder"/>                             <!-- NOT part of ESE 3.4 -->
+
+        <!--europeana-->
+        <elem tag="europeana:isShownBy" function="largeThumbnail" fieldType="link" operator="FIRST"/>                              <!-- ESE 3.4 -->
+        <elem tag="europeana:rights" fieldType="link"/>                                 <!-- ESE 3.4 -->
+        <elem tag="europeana:isShownAt" function="isShownAt" fieldType="link" operator="FIRST"/>                              <!-- ESE 3.4 -->
+        <elem tag="europeana:unstored" fieldType="unstored"/>                               <!-- ESE 3.4 -->
+        <elem tag="europeana:object" function="smallThumbnail" fieldType="link" operator="FIRST"/>                                  <!-- ESE 3.4 -->
+        <elem tag="europeana:provider" fieldType="string"/>                               <!-- ESE 3.4 -->
+        <elem tag="europeana:dataProvider" fieldType="string"/>                           <!-- ESE 3.4 -->
+        <elem tag="europeana:type"/>                                   <!-- ESE 3.4 -->
+
+        <!-- moved from europeana to delving -->
+        <elem tag="europeana:uri" function="toLocalId" operator="FIRST"/>                                    <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD-->
+        <elem tag="europeana:language"/>                               <!-- ESE 3.4, not accepted by the office and not part of the ESE XSD -->
+        <elem tag="europeana:country"/>                                <!-- ESE 3.4,  not accepted by the office and not part of the ESE XSD -->
+        <elem tag="europeana:collectionName"/>                         <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:collectionTitle"/>                        <!-- NOT part of ESE 3.4 -->
+        <elem tag="europeana:source"/>                                 <!-- NOT part of ESE 3.4 -->
+
+        <!-- original delving namespace -->
+        <elem tag="delving:year"/>
+        <elem tag="delving:thumbnail" function="smallThumbnail" fieldType="link"/>
+        <elem tag="delving:deepZoomUrl" fieldType="link" function="deepZoomUrl"/>
+        <elem tag="delving:fullTextObjectUrl" fieldType="link"/>
+        <elem tag="delving:fullText"/>
+    </root>
+
+    <field-markers>
+        <!-- system fields -->
+        <field-marker name="CREATOR" path="/record/dc:creator"/>
+        <field-marker name="TITLE" path="/record/dc:title"/>
+        <field-marker name="DESCRIPTION" path="/record/dc:description"/>
+        <field-marker name="PROVIDER" path="/record/europeana:provider"/>
+        <field-marker name="OWNER" path="/record/europeana:dataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/record/europeana:isShownAt"/>
+        <field-marker name="THUMBNAIL" path="/record/europeana:object"/>
+        <field-marker name="THUMBNAIL" path="/record/delving:thumbnail"/>
+
+        <!-- todo: these should have paths, currently they are checked for presence but not resolved-->
+        <field-marker name="SPEC"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
+
+        <field-marker type="search" name="SNIPPET" path="/record/delving:fullText"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dc:subject"/>
+        <field-marker type="search" name="SNIPPET" path="/record/dcterms:alternative"/>
+        <field-marker type="search" name="SNIPPET" path="/record/europeana:collectionTitle"/>
+
+        <field-marker type="fact" name="spec" path="/record/europeana:collectionName"/>
+        <field-marker type="fact" name="name" path="/record/europeana:collectionTitle"/>
+        <field-marker type="fact" name="name" path="/record/tib:collection"/>
+        <field-marker type="fact" name="country" path="/record/europeana:country"/>
+        <field-marker type="fact" name="dataProvider" path="/record/europeana:dataProvider"/>
+        <field-marker type="fact" name="language" path="/record/europeana:language"/>
+        <field-marker type="fact" name="provider" path="/record/europeana:provider"/>
+        <field-marker type="fact" name="rights" path="/record/europeana:rights"/>
+        <field-marker type="fact" name="type" path="/record/europeana:type"/>
+
+    </field-markers>
+
+</record-definition>
+
+

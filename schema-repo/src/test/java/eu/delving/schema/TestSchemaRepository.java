@@ -20,33 +20,40 @@ public class TestSchemaRepository {
         SchemaRepository repo = new SchemaRepository(new ResourceFetcher());
         String schema = repo.getSchema("icn", "1.0.0", "record-definition.xml");
         System.out.println(schema);
+        schema = repo.getSchema("icn", "1.0.0", "validation.xsd");
+        System.out.println(schema);
     }
 
     private class ResourceFetcher implements SchemaRepository.Fetcher {
 
         @Override
         public String fetchList() {
-            try {
-                InputStream inputStream = getClass().getResource("/test-repository.xml").openStream();
-                StringBuilder xml = new StringBuilder();
-                for (String line : IOUtils.readLines(inputStream)) {
-                    xml.append(line);
-                }
-                return xml.toString();
-            }
-            catch (IOException e) {
-                throw new RuntimeException("oops", e);
-            }
+            return getFileContents("/schema-repository.xml");
         }
 
         @Override
-        public String fetchSchema(String prefix, String version, String fileName) {
-            throw new RuntimeException("not implemented");
+        public String fetchSchema(String prefix, String versionNumber, String fileName) {
+            String path = String.format("/%s/%s_%s_%s", prefix, prefix, versionNumber, fileName);
+            return getFileContents(path);
         }
 
         @Override
         public Boolean isValidating() {
-            return false;
+            return true;
+        }
+    }
+
+    private String getFileContents(String path) {
+        try {
+            InputStream inputStream = getClass().getResource(path).openStream();
+            StringBuilder xml = new StringBuilder();
+            for (String line : IOUtils.readLines(inputStream)) {
+                xml.append(line);
+            }
+            return xml.toString();
+        }
+        catch (IOException e) {
+            throw new RuntimeException("oops", e);
         }
     }
 }

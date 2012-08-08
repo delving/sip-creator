@@ -5,9 +5,8 @@
             <author>Thomas Wikman</author>
             <message>Initial version</message>
             <date>2012-06-04</date>
-            <file name="record-definition.xml" hash="33ABC9A976B4D246827BC86D0D382BDA"/>
-            <file name="view-definition.xml" hash="7B1876690CDAA61C4A0D5E5E834992C3"/>
-            <file name="validation.xsd" hash="AA06CC91B106CDB533B50EDCB135A067"/>
+            <file name="record-definition.xml" hash="46ED64AA5D86EFC770E223C733E855C2"/>
+            <file name="validation.xsd" hash="9FBCB3F40DAF33E24ADBB8B329D1CDAB"/>
         </version>
     </format>
 </schemas>
