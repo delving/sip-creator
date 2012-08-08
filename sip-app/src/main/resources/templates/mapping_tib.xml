@@ -53,23 +53,6 @@
         <node-mapping inputPath="/input/production.place" outputPath="/tib:record/tib:place"/>
         <node-mapping inputPath="/input/creator.role" outputPath="/tib:record/tib:creatorRole"/>
 
-        <!--DC-->
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:publisher" outputPath="/tib:record/dc:publisher"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:contributor" outputPath="/tib:record/dc:contributor"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:date" outputPath="/tib:record/dc:date"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:type" outputPath="/tib:record/dc:type"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:format" outputPath="/tib:record/dc:format"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:identifier" outputPath="/tib:record/dc:identifier"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:source" outputPath="/tib:record/dc:source"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:language" outputPath="/tib:record/dc:language"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:relation" outputPath="/tib:record/dc:relation"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:coverage" outputPath="/tib:record/dc:coverage"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:rights" outputPath="/tib:record/dc:rights"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:title" outputPath="/tib:record/dc:title"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:creator" outputPath="/tib:record/dc:creator"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:subject" outputPath="/tib:record/dc:subject"/>
-        <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:description" outputPath="/tib:record/dc:description"/>
-
         <!--abc- dublic core OAI-PMH -->
         <node-mapping inputPath="/input/metadata/oai_dc:dc/image" outputPath="/tib:record/tib:thumbLarge"/>
         <node-mapping inputPath="/input/metadata/oai_dc:dc/image" outputPath="/tib:record/tib:thumbSmall"/>
