@@ -24,7 +24,7 @@
             <message>Initial version</message>
             <date>2012-08-08</date>
             <file name="record-definition.xml" hash="22D6E0D86C637E9E2137747AF9B01EBD"/>
-            <file name="validation.xsd" hash="75F7060F746CB268427F25B1D18A7BB0"/>                   t
+            <file name="validation.xsd" hash="75F7060F746CB268427F25B1D18A7BB0"/>
         </version>
     </schema>
     <schema prefix="ese">
@@ -33,7 +33,7 @@
             <message>Initial version for Delving</message>
             <date>2012-08-08</date>
             <file name="record-definition.xml" hash="B94060616C32F1966914974A32DE1603"/>
-            <file name="validation.xsd" hash="92539433C3545934A18A91DB8223179A"/>                   t
+            <file name="validation.xsd" hash="92539433C3545934A18A91DB8223179A"/>
         </version>
     </schema>
 </schemas>
