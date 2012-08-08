@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<schemas>
+    <format prefix="icn">
+        <version number="1.0.0">
+            <author>Thomas Wikman</author>
+            <message>Initial version</message>
+            <date>2012-06-04</date>
+            <file name="record-definition.xml" hash="33ABC9A976B4D246827BC86D0D382BDA"/>
+            <file name="view-definition.xml" hash="7B1876690CDAA61C4A0D5E5E834992C3"/>
+            <file name="validation.xsd" hash="AA06CC91B106CDB533B50EDCB135A067"/>
+        </version>
+    </format>
+</schemas>
