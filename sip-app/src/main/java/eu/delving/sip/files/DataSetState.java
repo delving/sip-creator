@@ -28,15 +28,15 @@ package eu.delving.sip.files;
  */
 
 public enum DataSetState {
-    ABSENT("Clear", "There is currently no dataset selected", "Press here to clear the screen"),
-    NO_DATA("Import", "This dataset is currently empty", "Press here to import data into it"),
-    IMPORTED("Analyze Imp", "There is data imported for this dataset", "Press here to analyze the imported data"),
-    ANALYZED_IMPORT("Delimit", "The dataset is analyzed", "Press here to show analysis frames"),
-    DELIMITED("Convert", "The delimiters have been set", "Press here to convert the data to source format"),
-    SOURCED("Analyze Src","The source data is available", "Press here to analyze the source"),
-    ANALYZED_SOURCE("Map", "The source data has been analyzed", "Press here to show mapping frames"),
-    MAPPING("Validate", "There is a mapping present", "Press here to try and transform and validate the data"),
-    VALIDATED("Upload", "This dataset has been validated", "Press here to initiate upload to Culture Hub");
+    ABSENT("Clear", "No dataset selected", "Clear the screen"),
+    NO_DATA("Import", "Dataset has no data yet", "Import data into it"),
+    IMPORTED("Analyze Import", "Data has been imported", "Analyze the imported data"),
+    ANALYZED_IMPORT("Delimit", "Dataset has been analyzed", "Choose record root and unique element"),
+    DELIMITED("Convert", "Delimiters have been set", "Convert the data to source format"),
+    SOURCED("Analyze Source","Source data is available", "Analyze the source data"),
+    ANALYZED_SOURCE("Map", "Source data has been analyzed", "Building the mapping is now possible"),
+    MAPPING("Validate", "There is a mapping", "Transform and validate all of the data"),
+    VALIDATED("Upload", "Dataset has been validated", "Initiate upload to CultureHub");
 
     private String[] description;
 
@@ -44,24 +44,16 @@ public enum DataSetState {
         this.description = description;
     }
 
-    public String toTitle() {
-        return description[0];
-//        return WordUtils.capitalize(toString().replaceAll("_", " ").toLowerCase());
-    }
-
     public boolean atLeast(DataSetState state) {
         return ordinal() >= state.ordinal();
     }
 
     public String toHtml() {
-        StringBuilder out = new StringBuilder("<html><table><tr><td width=20%><h2>&quot;");
-        out.append(toTitle());
-        out.append("&quot;</h2></td><td width=80%>");
-        for (int walk = 1; walk < description.length; walk++) {
-            String line = description[walk];
-            out.append("<p>").append(line).append("</p>");
-        }
-        out.append("</td></table></html>");
-        return out.toString();
+        return String.format(
+                "<html><center><b>&quot;%s&quot;</b><br>" +
+                        "Status is now : %s<br>" +
+                        "Press here to : %s<br>",
+                description[0], description[1], description[2]
+        );
     }
 }
