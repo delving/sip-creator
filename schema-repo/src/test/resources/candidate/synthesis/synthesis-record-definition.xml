@@ -112,7 +112,7 @@
                 <elem tag="displayMethod"/>
                 <elem tag="displayDescription"/>
 
-                <elem tag="eventActor" attrs="type, key, localId, roleInEventUri, schema, schemaUri">
+                <elem tag="eventActor" attrs="type, key, roleInEventUri, localId, schema, schemaUri">
                     <elem tag="displayRoleInEvent"/>
                     <elem tag="displayActor"/>
                     <elem tag="displayNationality"/>
@@ -131,7 +131,7 @@
                     </elem>
                 </elem>
 
-                <elem tag="eventPlace" attrs="type, key, localId, roleInEventUri, schema, schemaUri">
+                <elem tag="eventPlace" attrs="type, key, roleInEventUri, localId, schema, schemaUri">
                     <elem tag="displayRoleInEvent"/>
                     <elem tag="displayPlace"/>
                     <elem tag="displayDescription"/>
@@ -156,39 +156,22 @@
 
     </root>
 
-    <dicts>
-        <!--this is where the non-embedded dicts appear-->
-    </dicts>
 
     <opts>
 
-        <!--<opt-list dictionary="CLUMP"-->
-                  <!--path="/lido/administrativeMetadata/recordWrap/recordID"-->
-                  <!--key="@type"-->
-                  <!--displayName="MoreFake">-->
-            <!--<opt key="rv" value="reverse reverse"/>-->
-            <!--<opt key="fw" value="forward forward"/>-->
-            <!--<opt key="pause" value="Pause Pause!"/>-->
-        <!--</opt-list>-->
-
-        <!--<opt-list dictionary="CAT" path="/record/thing/category"-->
-                  <!--key="@key"-->
-                  <!--schemaUri="@schemaUri"-->
-                  <!--displayName="Category">-->
-            <!--<opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>-->
-            <!--<opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>-->
-            <!--<opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>-->
-            <!--<opt key="crm_e31" scehamUri="http://www.cidoc-crm.org/rdfs/E31.Document" value="Document"/>-->
-        <!--</opt-list>-->
+        <opt-list dictionary="true" path="/record/thing/category" key="@key" schemaUri="@schemaUri" displayName="Category">
+            <opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>
+            <opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>
+            <opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>
+            <opt key="crm_e31" scehamUri="http://www.cidoc-crm.org/rdfs/E31.Document" value="Document"/>
+        </opt-list>
 
         <opt-list path="/record/findingAid/c" key="@key" value="@type" displayName="FindingAid">
             <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fonds" value="root">
-                <dicts>
-                    <dict path="/record/facets/facet" key="@key" value="@type" name="Facets">
-                        <entry value="A"/>
-                        <entry value="B"/>
-                    </dict>
-                </dicts>
+                <opt-list path="/record/facets/facet" key="@key" value="@type" displayName="Facets">
+                    <opt value="A"/>
+                    <opt value="B"/>
+                </opt-list>
             </opt>
         </opt-list>
 
@@ -207,30 +190,7 @@
         </opt-list>
 
         <opt-list path="/record/events/event" key="@key" value="@type" schema="@schema" schemaUri="@schemaUri" displayName="Events">
-            <opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production" value="Production">
-                <dicts>
-                    <dict name="ActorRoleInEvent"
-                          uri="something:interesting"
-                          lang="en"
-                          valuePath="/record/events/event/eventActor/displayRoleInEvent"
-                          keyPath="/record/events/event/eventActor/@roleInEventUri"
-                          displayName="Actor's Role in Event">
-                        <entry key="a" value="Photographer"/>
-                        <entry key="b" value="Creator"/>
-                        <entry key="c" value="Factory"/>
-                        <entry key="d" value="Company owner"/>
-                        <entry key="e" value="Producer"/>
-                    </dict>
-
-                    <dict name="PlaceRoleInEvent"
-                          valuePath="/record/events/event/eventPlace/displayRoleInEvent"
-                          keyPath="/record/events/event/eventPlace/@roleInEventUri"
-                          displayName="Place's Role in Event">
-                        <entry key="a" value="Production place"/>
-                        <entry key="b" value="What the fuck, need to check up this!"/>
-                    </dict>
-                </dicts>
-            </opt>
+            <opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production" value="Production"/>
             <opt hidden="true" key="crm_e65" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E65.Creation" value="Creation"/>
             <opt hidden="true" key="crm_e8" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E8.Acquisition" value="Acquisition"/>
             <opt hidden="true" key="crm_e16" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E16.Measurement" value="Measurement"/>
@@ -292,24 +252,17 @@
     </opts>
 
     <field-markers>
-        <field-marker name="dataProvider" type="fact" path="/record/admin/displayDataProvider"/>
-        <field-marker name="country" type="fact" path="/record/admin/displayDataProviderCountry"/>
-        <field-marker name="provider" type="fact" path="/record/admin/displayProvider"/>
+        <field-marker type="fact" path="/record/admin/displayDataProvider" name="dataProvider"/>
+        <field-marker type="fact" path="/record/admin/displayDataProviderCountry" name="country"/>
+        <field-marker type="fact" path="/record/admin/displayProvider" name="provider"/>
 
-        <field-marker name="CREATOR" path="/record/events/event[crm_e12]/eventActor/displayActor"/>
-        <field-marker name="TITLE" path="/record/thing/displayTitle"/>
-        <field-marker name="DESCRIPTION" path="/record/thing/displayDescription"/>
-        <field-marker name="OWNER" path="/record/admin/displayDataProvider"/>
-        <field-marker name="LANDING_PAGE" path="/record/resources/resource[http://id.culturecloud.eu/concepts/#landingPage]/resourceUrl"/>
-        <field-marker name="THUMBNAIL" path="/record/resources/resource[http://id.culturecloud.eu/concepts/#thumbnail]/resourceUrl"/>
-
-        <!-- todo: these should have paths, because currently their presence is checked but they are not resolved-->
-        <field-marker name="SPEC"/>
-        <field-marker name="PROVIDER"/>
-        <field-marker name="DEEP_ZOOM_URL"/>
-        <field-marker name="THUMBNAIL"/>
-
-        <field-marker name="SNIPPET" type="search" path="/record/thing/displayDescription"/>
+        <!--<field-marker name="CREATOR" xpath="/record/thing/displayTitle/"/>-->
+        <!--<field-marker name="TITLE" xpath="/record/thing/displayTitle/"/>-->
+        <!--<field-marker name="DESCRIPTION" xpath="/record/thing/displayDescription/"/>-->
+        <!--<field-marker name="OWNER" xpath="/record/admin/dataProvider"/>-->
+        <!--<field-marker name="LANDING_PAGE" xpath="/record/thing/displayTitle/"/>-->
+        <!--<field-marker name="THUMBNAIL" xpath="/record/thing/displayTitle/"/>-->
+        <!--<field-marker name="SNIPPET" xpath="/record/thing/displayDescription"/>-->
     </field-markers>
 
     <docs>

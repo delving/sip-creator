@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<record-definition prefix="fullitin" flat="false">
+
+    <!--<version>1.0</version>-->
+
+    <namespaces>
+        <namespace prefix="itin" uri="http://schemas.delving.eu/itin/"
+                   schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
+    </namespaces>
+
+    <attrs>
+
+        <attr tag="type" hidden="true"/>
+        <attr tag="label" hidden="true"/>
+
+        <attr tag="sourceId"/>
+        <attr tag="type"/>
+
+        <attr tag="organizationType">
+            <options> <!--todo: must become an opt-list-->
+                <string>Onbekend / n.v.t.</string>
+                <string>Onderwijsinstelling</string>
+                <string>Overheidsinstelling</string>
+                <string>Overig</string>
+                <string>Toeristisch commercieel</string>
+                <string>Toeristisch publiek</string>
+                <string>Vereniging</string>
+                <string>Weborganisaties</string>
+            </options>
+        </attr>
+
+        <attr tag="referenceType">
+            <options>
+                <string>Boek</string>
+                <string>Tijdschrift</string>
+                <string>Krant</string>
+                <string>Wetenschappelijk tijdschrift</string>
+                <string>Bron</string>
+                <string>Link</string>
+                <string>Overig</string>
+            </options>
+        </attr>
+
+        <attr tag="eventType">
+            <options>
+                <string>Andere tocht</string>
+                <string>Concert</string>
+                <string>Festival</string>
+                <string>Fietstocht</string>
+                <string>Lezing</string>
+                <string>Markt</string>
+                <string>Overig</string>
+                <string>Re-enactment</string>
+                <string>Rondleiding</string>
+                <string>Tentoonstelling</string>
+                <string>Theater</string>
+                <string>Wandeltocht</string>
+            </options>
+        </attr>
+
+        <attr tag="accommodationType">
+            <options> <!--todo: must become an opt-list-->
+                <string>café</string>
+                <string>hotel</string>
+                <string>restaurant</string>
+                <string>overig</string>
+            </options>
+        </attr>
+
+        <attr tag="placeType">
+            <options> <!--todo: must become an opt-list-->
+                <string></string>
+                <string>hotel</string>
+                <string>restaurant</string>
+                <string>overig</string>
+            </options>
+        </attr>
+
+        <!--Participant-->
+        <attr tag="extra"/>
+        <attr tag="firstName"/>
+        <attr tag="lastName"/>
+        <attr tag="position"/>
+
+        <!-- Link -->
+        <attr tag="name"/>
+        <attr tag="entitytype"/>
+        <attr tag="bundle"/>
+        <attr tag="id"/>
+        <attr tag="linkType"/>
+        <attr tag="pathalias"/>
+        <attr tag="path"/>
+
+    </attrs>
+
+    <elems>
+
+        <elem tag="itinNode" elems="title, language, taglines, summary, body, media, path"/>
+
+        <elem tag="title"/>
+        <elem tag="language"/>
+        <elem tag="taglines"/>
+        <elem tag="summary"/>
+        <elem tag="body"/>
+        <elem tag="media"/>
+        <elem tag="path"/>
+
+        <elem tag="open" elems="open_days, open_description"/>
+        <elem tag="open_days"/>
+        <elem tag="open_description"/>
+
+
+        <elem tag="taxonomy" elems="category, subject, tags, sections"/>
+        <elem tag="subject"/>
+        <elem tag="tags"/>
+        <elem tag="sections"/>
+        <elem tag="category"/>
+
+        <!-- Location, address, contact gis -->
+        <elem tag="location" elems="name, address, urls, gis"/>
+
+        <elem tag="address" elems="country, province, region, city, postcode, streetAddress, phone, email, url, gis"/>
+
+        <elem tag="contact" attrs="type" elems="position, name, city, postcode, streetAddress, phone, email, url, gis"/>
+
+        <elem tag="urls" elems="url"/>
+
+
+        <elem tag="country"/>
+        <elem tag="province"/>
+        <elem tag="region"/>
+        <elem tag="city"/>
+        <elem tag="postcode"/>
+        <elem tag="streetAddress"/>
+
+        <elem tag="position"/>
+        <elem tag="place"/>
+        <elem tag="phone"/>
+        <elem tag="email"/>
+        <elem tag="url"/>
+
+        <elem tag="name"/>
+
+        <elem tag="environment"/>
+        <elem tag="telecoms"/>
+        <elem tag="access"/>
+
+        <elem tag="gis" elems="geonamesUri, geonamesId, place, long, lat"/>
+        <elem tag="geonamesUri"/>
+        <elem tag="geonamesId"/>
+        <elem tag="place"/>
+        <elem tag="long"/>
+        <elem tag="lat"/>
+
+
+        <!-- Date-->
+        <elem tag="calendar" elems="startDate, startTime, endDate, endTime, year"/>
+        <elem tag="startDate"/>
+        <elem tag="startTime"/>
+        <elem tag="endDate"/>
+        <elem tag="endTime"/>
+        <elem tag="year"/>
+
+        <!--Link-->
+        <elem tag="links" elems="link"/>
+        <elem tag="link" attrs="name, type, entitytype, bundle, id, linkType, pathalias, path"/>
+
+    </elems>
+
+
+    <root tag="record">
+
+        <elem tag="recordType" attrs="type, label, sourceId"/>
+
+        <elem tag="admin" singular="true" unmapable="true">
+            <elem tag="displayDataProvider"/>
+            <elem tag="displayDataProviderCountry"/>
+            <elem tag="displayProvider"/>
+        </elem>
+
+        <elem tag="organization" attrs="sourceId, organizationType" elems="itinNode, open, address, contact, taxonomy">
+
+        </elem>
+
+
+        <elem tag="history_person" elems="itinNode, taxonomy">
+
+            <elem tag="life">
+                <elem tag="dates"/>
+                <!-- birth, death dates-->
+                <elem tag="life"/>
+                <!-- birth, death year-->
+                <elem tag="date_circa"/>
+                <elem tag="birth_place"/>
+                <elem tag="death_place"/>
+                <elem tag="residence"/>
+            </elem>
+            <elem tag="nickname"/>
+            <elem tag="function"/>
+            <elem tag="gender"/>
+            <elem tag="person_category"/>
+
+        </elem>
+
+        <elem tag="reference" attrs="referenceType" elems="media, path">
+
+            <elem tag="language"/>
+            <elem tag="title"/>
+            <elem tag="source"/>
+            <elem tag="author"/>
+            <elem tag="pub_location"/>
+            <elem tag="pub_year"/>
+            <elem tag="book">
+                <elem tag="publisher"/>
+            </elem>
+            <elem tag="magazine"/>
+            <!-- group -->
+            <elem tag="book_magazine">
+                <elem tag="isbn"/>
+                <elem tag="issn"/>
+                <elem tag="magazine_name"/>
+                <elem tag="magazine_issue"/>
+            </elem>
+            <elem tag="pages"/>
+            <elem tag="page_numbers"/>
+            <elem tag="website">
+                <elem tag="organisation_name"/>
+                <elem tag="url"/>
+            </elem>
+            <elem tag="related_pvb"/>
+            <elem tag="related_history_person"/>
+        </elem>
+
+        <elem tag="event" attrs="sourceId, eventType" elems="calendar, contact, location, links, itinNode">
+
+
+            <elem tag="categories">
+                <elem tag="category" attrs="type"/>
+            </elem>
+
+            <elem tag="eventDetail" elems="urls">
+                <elem tag="title"/>
+                <elem tag="shortDescription"/>
+                <elem tag="longDescription"/>
+                <elem tag="notes"/>
+                <elem tag="media">
+                    <elem tag="file" attrs="type">
+                        <elem tag="description"/>
+                        <elem tag="hlink"/>
+                        <elem tag="title"/>
+                    </elem>
+                </elem>
+            </elem>
+
+            <elem tag="participants">
+                <elem tag="participant" attrs="extra, firstName, lastName, position"/>
+            </elem>
+            <elem tag="organiser" elems="name, address"/>
+            <elem tag="status"/>
+            <elem tag="websiteUrl"/>
+        </elem>
+
+        <elem tag="pvb" elems="taxonomy, media, path, links">
+
+            <elem tag="language"/>
+            <elem tag="title"/>
+            <elem tag="description" elems="taglines, summary, body">
+                <elem tag="year"/>
+                <elem tag="date"/>
+                <elem tag="date_year"/>
+                <elem tag="date_circa"/>
+                <elem tag="importance"/>
+                <elem tag="poi_type"/>
+            </elem>
+            <elem tag="additional"/>
+            <elem tag="poi_subtype"/>
+            <elem tag="factual_info">
+                <elem tag="poi_friends"/>
+                <elem tag="poi_friends_of"/>
+                <elem tag="poi_society_info"/>
+                <elem tag="poi_society"/>
+            </elem>
+            <elem tag="use"/>
+            <elem tag="suggestions"/>
+            <elem tag="info">
+                <elem tag="directions"/>
+                <elem tag="public_transportation"/>
+                <elem tag="phone"/>
+                <elem tag="url"/>
+                <elem tag="email"/>
+                <elem tag="twitter"/>
+                <elem tag="facebook"/>
+                <elem tag="hyves"/>
+            </elem>
+            <elem tag="surroundings">
+                <elem tag="surroundings"/>
+            </elem>
+            <elem tag="visitor_info">
+                <elem tag="public_access"/>
+                <elem tag="days_open"/>
+                <elem tag="visitor_info"/>
+                <elem tag="fee"/>
+                <elem tag="fees"/>
+                <elem tag="cjp"/>
+                <elem tag="children_friendly"/>
+                <elem tag="facilities">
+                    <elem tag="facilities_shop"/>
+                    <elem tag="facilities_horeca"/>
+                    <elem tag="facilities_toilet"/>
+                    <elem tag="facilities_parking"/>
+                    <elem tag="facilities_wheelchair"/>
+                    <elem tag="wifi"/>
+                    <elem tag="efacilities_other"/>
+                </elem>
+            </elem>
+            <elem tag="history">
+                <elem tag="history"/>
+                <elem tag="use"/>
+            </elem>
+            <elem tag="amazon"/>
+            <elem tag="ref_collection"/>
+            <elem tag="sources"/>
+            <elem tag="attachments"/>
+        </elem>
+
+        <elem tag="place" attrs="sourceId, placeType" elems="itinNode, location, taxonomy">
+
+            <elem tag="wapen">
+                <elem tag="wapen"/>
+                <elem tag="wapen_toelichting"/>
+            </elem>
+        </elem>
+
+
+        <elem tag="accommodation" attrs="sourceId, accommodationType" elems="itinNode, open, contact, taxonomy, links">
+
+            <elem tag="classification"/>
+            <elem tag="public_transport"/>
+            <elem tag="sources"/>
+            <elem tag="amazon"/>
+
+        </elem>
+
+        <elem tag="history_period" elems="itinNode, taxonomy">
+
+            <elem tag="experience"/>
+            <elem tag="sources"/>
+            <elem tag="period_date"/>
+        </elem>
+
+
+        <!--<elem tag="object" elems="path">-->
+
+        <!--<elem tag="language"/>-->
+        <!--<elem tag="title"/>-->
+        <!--<elem tag="taglines"/>-->
+        <!--<elem tag="summary"/>-->
+        <!--<elem tag="body"/>-->
+        <!--<elem tag="organisation"/>-->
+        <!--<elem tag="identifier"/>-->
+        <!--<elem tag="dc_publisher"/>-->
+        <!--<elem tag="object_type"/>-->
+        <!--<elem tag="scene"/>-->
+        <!--<elem tag="onderwerp">-->
+        <!--<elem tag="ref_pvb"/>-->
+        <!--<elem tag="ref_persons"/>-->
+        <!--<elem tag="history_events"/>-->
+        <!--<elem tag="media_subject"/>-->
+        <!--</elem>-->
+        <!--<elem tag="metadata">-->
+        <!--<elem tag="creator"/>-->
+        <!--<elem tag="creation_date"/>-->
+        <!--<elem tag="material"/>-->
+        <!--<elem tag="size"/>-->
+        <!--</elem>-->
+        <!--<elem tag="remarks"/>-->
+        <!--<elem tag="copyright"/>-->
+        <!--<elem tag="sources"/>-->
+        <!--</elem>-->
+
+        <!--<elem tag="history_event" elems="taxonomy, media, path">-->
+
+        <!--<elem tag="language"/>-->
+        <!--<elem tag="title"/>-->
+        <!--<elem tag="taglines"/>-->
+        <!--<elem tag="summary"/>-->
+        <!--<elem tag="body"/>-->
+        <!--<elem tag="history_date"/>-->
+        <!--<elem tag="date"/>-->
+        <!--<elem tag="date_year"/>-->
+        <!--<elem tag="date_circa"/>-->
+        <!--<elem tag="url"/>-->
+        <!--<elem tag="contact"/>-->
+        <!--<elem tag="sources"/>-->
+        <!--<elem tag="ref_other"/>-->
+
+        <!--</elem>-->
+
+
+        <!--<elem tag="pvb_story" elems="taxonomy, media, path">-->
+
+        <!--<elem tag="language"/>-->
+        <!--<elem tag="title"/>-->
+        <!--<elem tag="taglines"/>-->
+        <!--<elem tag="summary"/>-->
+        <!--<elem tag="body"/>-->
+        <!--<elem tag="story_type"/>-->
+        <!--<elem tag="story_year"/>-->
+        <!--<elem tag="date"/>-->
+        <!--<elem tag="date_year"/>-->
+        <!--<elem tag="date_circa"/>-->
+        <!--<elem tag="ref_pvb"/>-->
+
+        <!--<elem tag="experience">-->
+        <!--<elem tag="exp_why"/>-->
+        <!--<elem tag="experience"/>-->
+        <!--</elem>-->
+        <!--<elem tag="sources"/>-->
+        <!--<elem tag="attachments"/>-->
+        <!--</elem>-->
+
+
+        <!--<elem tag="page">-->
+
+        <!--<elem tag="language"/>-->
+        <!--<elem tag="title"/>-->
+        <!--<elem tag="taglines"/>-->
+        <!--<elem tag="summary"/>-->
+        <!--<elem tag="body"/>-->
+        <!--<elem tag="media"/>-->
+        <!--<elem tag="path"/>-->
+
+        <!--</elem>-->
+
+
+        <!--<elem tag="author" elems="taxonomy, media, path">-->
+
+        <!--<elem tag="language"/>-->
+        <!--<elem tag="title"/>-->
+        <!--<elem tag="taglines"/>-->
+        <!--<elem tag="summary"/>-->
+        <!--<elem tag="body"/>-->
+        <!--<elem tag="phone"/>-->
+        <!--<elem tag="email"/>-->
+        <!--<elem tag="twitter"/>-->
+        <!--<elem tag="facebook"/>-->
+        <!--<elem tag="hyves"/>-->
+        <!--<elem tag="linkedin"/>-->
+        <!--<elem tag="url"/>-->
+
+        <!--</elem>-->
+
+
+        <!--<elem tag="route" elems="taxonomy, media, path">-->
+
+        <!--<elem tag="language"/>-->
+        <!--<elem tag="title"/>-->
+        <!--<elem tag="taglines"/>-->
+        <!--<elem tag="summary"/>-->
+        <!--<elem tag="body"/>-->
+        <!--<elem tag="routeyou_id"/>-->
+        <!--<elem tag="route_type"/>-->
+        <!--<elem tag="related_pvb"/>-->
+
+        <!--</elem>-->
+
+    </root>
+
+
+    <opts>
+        <opt-list path="/record/recordType" key="@type" value="@label">
+
+            <opt hidden="true" key="organization" value="Organization"/>
+            <opt hidden="true" key="history_person" value="Historical person"/>
+            <opt hidden="true" key="reference" value="Bibliography"/>
+            <opt hidden="true" key="event" value="Event"/>
+            <opt hidden="true" key="pvb" value="Place of interest"/>
+            <opt hidden="true" key="place" value="Place"/>
+            <opt hidden="true" key="accommodation" value="Accommodation"/>
+            <opt hidden="true" key="history_period" value="Historical period"/>
+
+        </opt-list>
+    </opts>
+
+
+    <field-markers>
+        <field-marker type="fact" path="/record/admin/displayDataProvider" name="dataProvider"/>
+        <field-marker type="fact" path="/record/admin/displayDataProviderCountry" name="country"/>
+        <field-marker type="fact" path="/record/admin/displayProvider" name="provider"/>
+    </field-markers>
+
+</record-definition>

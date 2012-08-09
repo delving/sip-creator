@@ -22,6 +22,7 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.*;
+import eu.delving.schema.Fetcher;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
@@ -32,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.http.client.HttpClient;
+import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
 import javax.xml.validation.SchemaFactory;
@@ -59,14 +61,13 @@ import static eu.delving.sip.files.StorageHelper.*;
 
 public class StorageImpl implements Storage {
     private File home;
-    private HttpClient httpClient;
     private SchemaFactory schemaFactory;
     private SchemaRepository schemaRepository;
+    private LSResourceResolver resolver;
 
-    public StorageImpl(File home, HttpClient httpClient) throws StorageException {
+    public StorageImpl(File home, Fetcher fetcher, HttpClient httpClient) throws StorageException {
         this.home = home;
-        this.httpClient = httpClient;
-        HTTPSchemaFetcher fetcher = new HTTPSchemaFetcher(httpClient);
+        this.resolver = new CachingResourceResolver(this, httpClient);
         try {
             this.schemaRepository = new SchemaRepository(fetcher);
         }
@@ -718,7 +719,7 @@ public class StorageImpl implements Storage {
     private SchemaFactory schemaFactory() {
         if (schemaFactory == null) {
             schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-            if (httpClient != null) schemaFactory.setResourceResolver(new CachingResourceResolver(this, httpClient));
+            if (resolver != null) schemaFactory.setResourceResolver(resolver);
         }
         return schemaFactory;
     }
