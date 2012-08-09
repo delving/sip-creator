@@ -22,6 +22,8 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.*;
+import eu.delving.schema.SchemaRepository;
+import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.xml.SourceConverter;
@@ -43,6 +45,8 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
+import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
 import static eu.delving.sip.files.Storage.FileType.*;
 import static eu.delving.sip.files.StorageHelper.*;
 
@@ -57,10 +61,18 @@ public class StorageImpl implements Storage {
     private File home;
     private HttpClient httpClient;
     private SchemaFactory schemaFactory;
+    private SchemaRepository schemaRepository;
 
     public StorageImpl(File home, HttpClient httpClient) throws StorageException {
         this.home = home;
         this.httpClient = httpClient;
+        HTTPSchemaFetcher fetcher = new HTTPSchemaFetcher(httpClient);
+        try {
+            this.schemaRepository = new SchemaRepository(fetcher);
+        }
+        catch (IOException e) {
+            throw new StorageException("Unable to create Schema Repository", e);
+        }
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new StorageException(String.format("Unable to create storage directory in %s", home.getAbsolutePath()));
@@ -80,7 +92,7 @@ public class StorageImpl implements Storage {
         return new File(cacheDir, fileName);
     }
 
-    @Override
+   @Override
     public Map<String, DataSet> getDataSets() {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
@@ -111,6 +123,7 @@ public class StorageImpl implements Storage {
     public class DataSetImpl implements DataSet, Serializable {
 
         private File here;
+        private Map<String, String> dataSetFacts;
 
         public DataSetImpl(File here) {
             this.here = here;
@@ -130,43 +143,44 @@ public class StorageImpl implements Storage {
         public String getLatestPrefix() {
             File latestMapping = latestMappingFileOrNull(here);
             if (latestMapping != null) return extractName(latestMapping, FileType.MAPPING);
-            Iterator<File> defWalk = findRecordDefinitionFiles(here).iterator();
-            if (!defWalk.hasNext()) return null;
-            String name = defWalk.next().getName();
-            return name.substring(0, name.length() - RECORD_DEFINITION.getSuffix().length());
+            List<SchemaVersion> schemaVersions = getSchemaVersions();
+            if (schemaVersions.isEmpty()) return null;
+            return schemaVersions.get(0).getPrefix();
         }
 
         @Override
-        public List<String> getPrefixes() throws StorageException {
-            List<String> prefixes = new ArrayList<String>();
-            try {
-                List<File> recDefFile = findRecordDefinitionFiles(here);
-                for (File file : recDefFile) {
-                    String fileName = file.getName();
-                    String prefix = fileName.substring(0, fileName.length() - RECORD_DEFINITION.getSuffix().length());
-                    prefixes.add(prefix);
+        public List<SchemaVersion> getSchemaVersions() {
+            List<SchemaVersion> schemaVersions = new ArrayList<SchemaVersion>();
+            String fact = getDataSetFacts().get(SCHEMA_VERSIONS);
+            if (fact != null) {
+                for (String sv : fact.split(" *, *")) {
+                    schemaVersions.add(new SchemaVersion(sv));
                 }
             }
-            catch (Exception e) {
-                throw new StorageException("Unable to load metadata model", e);
+            return schemaVersions;
+        }
+
+        @Override
+        public RecDef getRecDef(String prefix) throws StorageException {
+            for (SchemaVersion walk : getSchemaVersions()) {
+                if (!prefix.equals(walk.getPrefix())) continue;
+                return recDef(walk);
             }
-            return prefixes;
+            throw new StorageException("No record definition for prefix "+prefix);
+        }
+
+        @Override
+        public Validator newValidator(String prefix) throws StorageException {
+            for (SchemaVersion walk : getSchemaVersions()) {
+                if (!prefix.equals(walk.getPrefix())) continue;
+                return validator(walk);
+            }
+            throw new StorageException("No validation schema for prefix "+prefix);
         }
 
         @Override
         public boolean isValidated(String prefix) throws StorageException {
             return findLatestFile(here, VALIDATION, prefix).exists();
-        }
-
-        @Override
-        public RecDef getRecDef(String prefix) throws StorageException {
-            try {
-                File file = recordDefinitionFile(here, prefix);
-                return RecDef.read(new FileInputStream(file));
-            }
-            catch (FileNotFoundException e) {
-                throw new StorageException("Unable to load record definition for " + prefix, e);
-            }
         }
 
         @Override
@@ -219,7 +233,8 @@ public class StorageImpl implements Storage {
         @Override
         public Map<String, String> getDataSetFacts() {
             try {
-                return readFacts(factsFile(here));
+                if (dataSetFacts == null) dataSetFacts = readFacts(factsFile(here));
+                return dataSetFacts;
             }
             catch (IOException e) {
                 return new TreeMap<String, String>();
@@ -422,19 +437,6 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public Validator newValidator(String prefix) throws StorageException {
-            try {
-                File schemaFile = schemaFile(here, prefix);
-                if (!schemaFile.exists())
-                    throw new StorageException("Schema file not found: " + schemaFile.getAbsolutePath());
-                return schemaFactory().newSchema(schemaFile).newValidator();
-            }
-            catch (SAXException e) {
-                throw new StorageException("Unable to create a validator", e);
-            }
-        }
-
-        @Override
         public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException {
             if (validation == null) {
                 deleteValidation(metadataPrefix);
@@ -594,7 +596,8 @@ public class StorageImpl implements Storage {
             try {
                 List<File> files = new ArrayList<File>();
                 files.add(Hasher.ensureFileHashed(hintsFile(here)));
-                for (String prefix : getPrefixes()) {
+                for (SchemaVersion schemaVersion : getSchemaVersions()) {
+                    String prefix = schemaVersion.getPrefix();
                     files.add(findLatestHashed(here, MAPPING, prefix));
                     files.add(findLatestHashed(here, VALIDATION, prefix));
                     files.add(findLatestHashed(here, RESULT_STATS, prefix));
@@ -715,4 +718,39 @@ public class StorageImpl implements Storage {
         }
         return schemaFactory;
     }
+
+    private RecDef recDef(SchemaVersion schemaVersion) throws StorageException {
+        String fileName = schemaVersion.getFullFileName(RECORD_DEFINITION);
+        try {
+            File file = cache(fileName);
+            if (!file.exists()) {
+                String recDefXML = schemaRepository.getSchema(schemaVersion, RECORD_DEFINITION);
+                FileUtils.write(file, recDefXML, "UTF-8");
+            }
+            return RecDef.read(new FileInputStream(file));
+        }
+        catch (IOException e) {
+            throw new StorageException("Unable to load " + fileName, e);
+        }
+    }
+
+    private Validator validator(SchemaVersion schemaVersion) throws StorageException {
+        String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
+        try {
+            File file = cache(fileName);
+            if (!file.exists()) {
+                String valXML = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
+                FileUtils.write(file, valXML, "UTF-8");
+            }
+            return schemaFactory().newSchema(file).newValidator();
+        }
+        catch (SAXException e) {
+            throw new StorageException("Unable to create a validator", e);
+        }
+        catch (IOException e) {
+            throw new StorageException("Unable to load " + fileName, e);
+        }
+    }
+
+
 }

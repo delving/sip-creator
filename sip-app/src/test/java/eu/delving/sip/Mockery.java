@@ -32,6 +32,7 @@ import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.xml.MetadataParser;
 import org.apache.commons.io.FileUtils;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Node;
 
 import javax.xml.stream.XMLStreamException;
@@ -67,7 +68,7 @@ public class Mockery {
         root = new File(target, "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
-        storage = new StorageImpl(root, null);
+        storage = new StorageImpl(root, new DefaultHttpClient());
     }
 
     public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {
@@ -80,11 +81,6 @@ public class Mockery {
         File factsSourceDir = new File(getClass().getResource(String.format("/test/%s/dataset", prefix)).getFile());
         if (!factsSourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
-        File factDefinitionList = new File(getClass().getResource("/definitions/global/fact-definition-list.xml").getFile());
-        FileUtils.copyFileToDirectory(factDefinitionList, dataSetDir);
-        File definitionSourceDir = new File(getClass().getResource(String.format("/definitions/%s", prefix)).getFile());
-        if (!definitionSourceDir.isDirectory()) throw new RuntimeException();
-        FileUtils.copyDirectory(definitionSourceDir, dataSetDir);
         dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()), prefix);
         recMapping = RecMapping.create(prefix, dataSetModel);
     }

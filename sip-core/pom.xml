@@ -103,6 +103,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>eu.delving</groupId>
+            <artifactId>schema-repo</artifactId>
+            <version>1.0.8-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>

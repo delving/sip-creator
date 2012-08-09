@@ -24,6 +24,7 @@ package eu.delving.sip.files;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
+import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.model.Feedback;
 import eu.delving.stats.Stats;
@@ -51,11 +52,13 @@ public interface DataSet {
 
     String getLatestPrefix();
 
-    List<String> getPrefixes() throws StorageException;
-
-    boolean isValidated(String prefix) throws StorageException;
+    List<SchemaVersion> getSchemaVersions();
 
     RecDef getRecDef(String prefix) throws StorageException;
+
+    Validator newValidator(String prefix) throws StorageException;
+
+    boolean isValidated(String prefix) throws StorageException;
 
     DataSetState getState(String prefix);
 
@@ -96,8 +99,6 @@ public interface DataSet {
     void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException;
 
     List<File> getRecMappingFiles(String prefix) throws StorageException;
-
-    Validator newValidator(String prefix) throws StorageException;
 
     void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 

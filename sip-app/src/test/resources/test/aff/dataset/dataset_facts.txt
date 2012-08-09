@@ -6,6 +6,7 @@ language=nl
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
 spec=icn
+schemaVersions=aff_0.1.0
 
 
 

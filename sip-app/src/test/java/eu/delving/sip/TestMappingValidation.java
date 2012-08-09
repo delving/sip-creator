@@ -133,27 +133,27 @@ public class TestMappingValidation {
     }
 
     private void runFullCycle(int expectedRecords) throws Exception {
-        assertEquals(4, mock.fileCount());
+        assertEquals(1, mock.fileCount());
         dataSet().externalToImported(mock.sampleInputFile(), null);
-        assertEquals(5, mock.fileCount());
+        assertEquals(2, mock.fileCount());
         assertEquals(IMPORTED, state());
 
         performAnalysis();
-        assertEquals(6, mock.fileCount());
+        assertEquals(3, mock.fileCount());
         assertEquals(ANALYZED_IMPORT, state());
 
         assertEquals(String.valueOf(expectedRecords), mock.hints().get(Storage.RECORD_COUNT));
         dataSet().setHints(mock.hints());
-        assertEquals(7, mock.fileCount());
+        assertEquals(4, mock.fileCount());
         assertEquals(DELIMITED, state());
 
         assertFalse(dataSet().getLatestStats().sourceFormat);
         dataSet().importedToSource(null, null);
-        assertEquals(8, mock.fileCount());
+        assertEquals(5, mock.fileCount());
         assertEquals(SOURCED, state());
 
         performAnalysis();
-        assertEquals(9, mock.fileCount());
+        assertEquals(6, mock.fileCount());
         Stats stats = dataSet().getLatestStats();
         assertTrue(stats.sourceFormat);
         SourceTreeNode tree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());

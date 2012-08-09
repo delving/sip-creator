@@ -21,6 +21,7 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -102,39 +103,34 @@ public class DataSetMenu extends JMenu {
         removeAll();
         add(unlockMappingAction);
         addSeparator();
-        try {
-            for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
-                for (String prefix : dataSet.getPrefixes()) {
-                    final DataSetItem item = new DataSetItem(dataSet, prefix);
-                    buttonGroup.add(item);
-                    add(item);
-                    item.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            sipModel.setDataSetPrefix(item.getDataSet(), item.getPrefix(), new Swing() {
-                                @Override
-                                public void run() {
-                                    setPreference(item.getDataSet(), item.getPrefix());
-                                }
-                            });
-                        }
-                    });
-                    if (item.isPreferred()) sipModel.exec(new Swing() {
-                        @Override
-                        public void run() {
-                            item.doClick();
-                        }
-                    });
-                }
-            }
-            if (buttonGroup.getButtonCount() == 0) {
-                JMenuItem empty = new JMenuItem("No data sets available");
-                empty.setEnabled(false);
-                add(empty);
+        for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
+            for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
+                final DataSetItem item = new DataSetItem(dataSet, schemaVersion.getPrefix());
+                buttonGroup.add(item);
+                add(item);
+                item.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        sipModel.setDataSetPrefix(item.getDataSet(), item.getPrefix(), new Swing() {
+                            @Override
+                            public void run() {
+                                setPreference(item.getDataSet(), item.getPrefix());
+                            }
+                        });
+                    }
+                });
+                if (item.isPreferred()) sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        item.doClick();
+                    }
+                });
             }
         }
-        catch (final StorageException e) {
-            sipModel.getFeedback().alert("Problem loading data set list", e);
+        if (buttonGroup.getButtonCount() == 0) {
+            JMenuItem empty = new JMenuItem("No data sets available");
+            empty.setEnabled(false);
+            add(empty);
         }
     }
 

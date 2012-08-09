@@ -207,19 +207,6 @@ public class StorageHelper {
         return getRecent(files, which, fileType);
     }
 
-    static File recordDefinitionFile(File dir, String prefix) {
-        return new File(dir, RECORD_DEFINITION.getName(prefix));
-    }
-
-    static File schemaFile(File dir, String prefix) {
-        return new File(dir, SCHEMA.getName(prefix));
-    }
-
-    static List<File> findRecordDefinitionFiles(File dir) {
-        File[] files = dir.listFiles(new SuffixFileFilter(Storage.FileType.RECORD_DEFINITION));
-        return Arrays.asList(files);
-    }
-
     static File findLatestHashed(File dir, FileType fileType, String prefix) throws StorageException {
         File latestFile = findLatestFile(dir, fileType, prefix);
         if (!latestFile.exists()) throw new StorageException("Missing file "+latestFile.getAbsolutePath());

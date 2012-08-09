@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<schemas>
+    <schema prefix="icn">
+        <version number="1.0.0">
+            <author>Delving</author>
+            <message>Initial version</message>
+            <date>2012-08-08</date>
+            <file name="record-definition.xml" hash="CD38063D3F1A1EC5DF25B416C88B2502"/>
+            <file name="validation.xsd" hash="7D768B4F36D6096E7A6D089E5004032E"/>
+        </version>
+    </schema>
+    <schema prefix="abm">
+        <version number="1.0.0">
+            <author>Delving</author>
+            <message>Initial version</message>
+            <date>2012-08-08</date>
+            <file name="record-definition.xml" hash="7A57F8636DFA4352DCA7790E826C28E5"/>
+            <file name="validation.xsd" hash="2DA205BE533534182710D4B96A3EA00F"/>
+        </version>
+    </schema>
+    <schema prefix="tib">
+        <version number="1.0.0">
+            <author>Delving</author>
+            <message>Initial version</message>
+            <date>2012-08-08</date>
+            <file name="record-definition.xml" hash="AEE72807D148EB9796745FF7F1547294"/>
+            <file name="validation.xsd" hash="D9335E3289A6D4EDDBA8ACA73814D794"/>
+        </version>
+    </schema>
+    <schema prefix="ese">
+        <version number="3.4.0">
+            <author>Europeana</author>
+            <message>Initial version for Delving</message>
+            <date>2012-08-08</date>
+            <file name="record-definition.xml" hash="BFEDE3EB3E93192A098732C4F1943D02"/>
+            <file name="validation.xsd" hash="9AC2878055418BD8074AA7FF35922A7F"/>
+        </version>
+    </schema>
+    <schema prefix="aff">
+        <version number="0.1.0">
+            <author>Thomas Wikman</author>
+            <message>Initial version for Delving</message>
+            <date>2012-08-09</date>
+            <file name="record-definition.xml" hash="C6E6CC43BE28E49E5666C7EC007439E0"/>
+            <file name="validation.xsd" hash="150401127437FA37496D3E144274B55C"/>
+        </version>
+    </schema>
+</schemas>

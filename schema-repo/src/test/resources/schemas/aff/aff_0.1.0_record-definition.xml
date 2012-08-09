@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record-definition prefix="aff" flat="false">
+
+    <!--<version>1.0</version>-->
+
+    <namespaces>
+        <namespace prefix="aff" uri="http://schemas.delving.eu/aff/"
+                   schema="http://schemas.delving.eu/aff/aff_1.0.xsd"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="id"/>
+        <attr tag="localId"/>
+        <attr tag="level"/>
+        <attr tag="conceptType"/>
+        <attr tag="categoryUri"/>
+        <attr tag="schema"/>
+        <attr tag="schemaUri"/>
+        <attr tag="roleInEventUri"/>
+        <attr tag="isPartOfLocalId"/>
+        <attr tag="collectionUri"/>
+        <attr tag="isPartOfCollectionUri"/>
+        <attr tag="lang"/>
+        <attr tag="MIME"/>
+        <attr tag="rightsUri"/>
+        <attr tag="uri"/>
+        <attr tag="relationType"/>
+        <attr tag="dataProviderUri"/>
+        <attr tag="providerUri"/>
+        <attr tag="providerHubUri"/>
+        <attr tag="type" hidden="true"/>
+        <attr tag="key" hidden="true"/>
+        <attr tag="hubId" systemField="true"/>
+        <attr tag="hubRecordUrl" systemField="true"/>
+        <attr tag="delvingMediaUri" systemField="true"/>
+    </attrs>
+
+    <elems>
+        <elem tag="date" elems="earliestDate, latestDate"/>
+        <elem tag="earliestDate"/>
+        <elem tag="latestDate"/>
+    </elems>
+
+    <root tag="record">
+
+        <elem tag="admin" singular="true" attrs="dataProviderUri, providerUri, providerHubUri" unmappable="true">
+            <elem tag="displayDataProvider"/>
+            <elem tag="displayDataProviderCountry"/>
+            <elem tag="displayProvider"/>
+            <elem tag="lastChanged"/>
+            <elem tag="defaultLang"/>
+            <elem tag="UGC"/>
+        </elem>
+
+        <elem tag="findingAid" singular="true" unmappable="true">
+            <elem tag="c" attrs="type, key, lang, level, localId, uri" unmappable="true">
+                <elem tag="displayTitle"/>
+                <elem tag="displayDescription"/>
+
+                <elem tag="c" attrs="type, key, level, localId, uri" unmappable="true">
+                    <elem tag="displayTitle"/>
+                    <elem tag="displayDescription"/>
+
+                    <elem tag="c" attrs="type, key, level, localId, uri" unmappable="true">
+                        <elem tag="displayTitle"/>
+                        <elem tag="displayDescription"/>
+                    </elem>
+                </elem>
+            </elem>
+        </elem>
+
+        <elem tag="collections" singular="true" unmappable="true">
+            <elem tag="collection" attrs="localId, lang, schema, schemaUri" unmappable="true">
+                <elem tag="displayCollection"/>
+                <elem tag="displayDescription"/>
+            </elem>
+        </elem>
+
+        <elem tag="thing" attrs="localId, lang, hubId" singular="true" unmappable="true">
+            <elem tag="uri"/>
+            <elem tag="category" attrs="key, schemaUri"/>
+            <elem tag="displayIdentification"/>
+            <elem tag="displayTitle"/>
+            <elem tag="displayDescription"/>
+            <elem tag="displayInscription"/>
+            <elem tag="dimensions">
+                <elem tag="displayDimension"/>
+            </elem>
+            <elem tag="years">
+                <elem tag="year"/>
+            </elem>
+            <elem tag="displayRights"/>
+        </elem>
+
+        <elem tag="relations" singular="true" unmappable="true">
+            <elem tag="relation" attrs="type, key, localId, uri, relationType">
+                <elem tag="displayRelation"/>
+            </elem>
+        </elem>
+
+        <elem tag="concepts" singular="true" unmappable="true">
+            <elem tag="concept" attrs="type, key, conceptType, localId, lang, schema, schemaUri">
+                <elem tag="displayConcept"/>
+            </elem>
+        </elem>
+
+        <elem tag="events" singular="true" unmappable="true">
+            <elem tag="event" elems="date" attrs="type, key, lang, schema, schemaUri">
+                <elem tag="displayDate"/>
+                <elem tag="displayEvent"/>
+                <elem tag="displayPeriod"/>
+                <elem tag="displayMethod"/>
+                <elem tag="displayDescription"/>
+
+                <elem tag="eventActor" attrs="type, key, localId, roleInEventUri, schema, schemaUri">
+                    <elem tag="displayRoleInEvent"/>
+                    <elem tag="displayActor"/>
+                    <elem tag="displayNationality"/>
+                    <elem tag="displayDescription"/>
+
+                    <elem tag="relatedEvent" attrs="type, key">
+                        <elem tag="displayDate"/>
+                        <elem tag="displayEvent"/>
+                        <elem tag="displayDescription"/>
+
+                        <elem tag="relatedEventPlace" attrs="type, key, localId, schema, schemaUri" unmappable="true">
+                            <elem tag="displayPlace"/>
+                            <elem tag="lat"/>
+                            <elem tag="long"/>
+                        </elem>
+                    </elem>
+                </elem>
+
+                <elem tag="eventPlace" attrs="type, key, localId, roleInEventUri, schema, schemaUri">
+                    <elem tag="displayRoleInEvent"/>
+                    <elem tag="displayPlace"/>
+                    <elem tag="displayDescription"/>
+                    <elem tag="lat"/>
+                    <elem tag="long"/>
+
+                    <elem tag="partOfPlace" attrs="type, key, localId">
+                        <elem tag="displayPlace"/>
+                        <elem tag="lat"/>
+                        <elem tag="long"/>
+                    </elem>
+                </elem>
+            </elem>
+        </elem>
+
+        <elem tag="resources" singular="true" unmappable="true">
+            <elem tag="resource" attrs="type, key, lang, MIME, rightsUri">
+                <elem tag="resourceUrl"/>
+                <elem tag="displayRights"/>
+            </elem>
+        </elem>
+
+    </root>
+
+    <dicts>
+        <!--this is where the non-embedded dicts appear-->
+    </dicts>
+
+    <opts>
+
+        <!--<opt-list dictionary="CLUMP"-->
+                  <!--path="/lido/administrativeMetadata/recordWrap/recordID"-->
+                  <!--key="@type"-->
+                  <!--displayName="MoreFake">-->
+            <!--<opt key="rv" value="reverse reverse"/>-->
+            <!--<opt key="fw" value="forward forward"/>-->
+            <!--<opt key="pause" value="Pause Pause!"/>-->
+        <!--</opt-list>-->
+
+        <!--<opt-list dictionary="CAT" path="/record/thing/category"-->
+                  <!--key="@key"-->
+                  <!--schemaUri="@schemaUri"-->
+                  <!--displayName="Category">-->
+            <!--<opt key="crm_e70" scehamUri="http://www.cidoc-crm.org/rdfs/E70.Thing" value="Thing"/>-->
+            <!--<opt key="crm_e22" scehamUri="http://www.cidoc-crm.org/rdfs/E22.Man-Made_Object" value="Man-Made Object"/>-->
+            <!--<opt key="crm_e73" scehamUri="http://www.cidoc-crm.org/rdfs/E73.Information_Object" value="Information Object"/>-->
+            <!--<opt key="crm_e31" scehamUri="http://www.cidoc-crm.org/rdfs/E31.Document" value="Document"/>-->
+        <!--</opt-list>-->
+
+        <opt-list path="/record/findingAid/c" key="@key" value="@type" displayName="FindingAid">
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fonds" value="root">
+                <dicts>
+                    <dict path="/record/facets/facet" key="@key" value="@type" name="Facets">
+                        <entry value="A"/>
+                        <entry value="B"/>
+                    </dict>
+                </dicts>
+            </opt>
+        </opt-list>
+
+        <opt-list path="/record/findingAid/c/c" key="@key" value="@type" displayName="FindingAid">
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#fond" value="level_1"/>
+        </opt-list>
+
+        <opt-list path="/record/findingAid/c/c/c" key="@key" value="@type" displayName="FindingAid">
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#file" value="level_2"/>
+        </opt-list>
+
+        <opt-list path="/record/relations/relation" key="@key" value="@type" displayName="Relations">
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#isPartOf" value="isPartof"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#hasPart" value="hasPart"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#sameaAs" value="sameAs"/>
+        </opt-list>
+
+        <opt-list path="/record/events/event" key="@key" value="@type" schema="@schema" schemaUri="@schemaUri" displayName="Events">
+            <opt key="crm_e12" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E12.Production" value="Production">
+                <dicts>
+                    <dict name="ActorRoleInEvent"
+                          uri="something:interesting"
+                          lang="en"
+                          valuePath="/record/events/event/eventActor/displayRoleInEvent"
+                          keyPath="/record/events/event/eventActor/@roleInEventUri"
+                          displayName="Actor's Role in Event">
+                        <entry key="a" value="Photographer"/>
+                        <entry key="b" value="Creator"/>
+                        <entry key="c" value="Factory"/>
+                        <entry key="d" value="Company owner"/>
+                        <entry key="e" value="Producer"/>
+                    </dict>
+
+                    <dict name="PlaceRoleInEvent"
+                          valuePath="/record/events/event/eventPlace/displayRoleInEvent"
+                          keyPath="/record/events/event/eventPlace/@roleInEventUri"
+                          displayName="Place's Role in Event">
+                        <entry key="a" value="Production place"/>
+                        <entry key="b" value="What the fuck, need to check up this!"/>
+                    </dict>
+                </dicts>
+            </opt>
+            <opt hidden="true" key="crm_e65" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E65.Creation" value="Creation"/>
+            <opt hidden="true" key="crm_e8" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E8.Acquisition" value="Acquisition"/>
+            <opt hidden="true" key="crm_e16" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E16.Measurement" value="Measurement"/>
+            <opt hidden="true" key="crm_e67" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E67.Birth" value="Birth"/>
+            <opt hidden="true" key="crm_e69" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E69.Death" value="Death"/>
+            <opt hidden="true" key="crm_e6" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E6.Destruction" value="Destruction"/>
+            <opt hidden="true" key="crm_e9" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E9.Move" value="Move"/>
+            <opt hidden="true" key="crm_e10" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E10.Transfer_of_Custody" value="TransferOfCustody"/>
+            <opt hidden="true" key="crm_e14" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E14.Condition_Assessment" value="ConditionAssessment"/>
+            <opt hidden="true" key="crm_e66" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E66.Formation" value="Formation"/>
+            <opt hidden="true" key="crm_e85" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E85.Joining" value="Joining"/>
+            <opt hidden="true" key="crm_e86" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E86.Leaving" value="Leaving"/>
+            <opt hidden="true" key="frbr_f30" schema="cidoc-crm" schemaUri="http://www.??????????/rdfs/F30.Publication_Event" value="PublicationEvent"/>
+            <!-- FRBRoo namespace in mid June 2012-->
+            <opt hidden="true" key="frbr_f31" schema="cidoc-crm" schemaUri="http://www.??????????.org/rdfs/F31.Performance" value="Performance"/>
+            <!-- FRBRoo namespace in mid June 2012-->
+            <opt hidden="true" key="cc_collecting" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Collecting" value="Collecting"/>
+            <opt hidden="true" key="cc_commissioning" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Commissioning" value="Commissioning"/>
+            <opt hidden="true" key="cc_designing" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Designing" value="Designing"/>
+            <opt hidden="true" key="cc_excavation" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Excavation" value="Excavation"/>
+            <opt hidden="true" key="cc_exhibition" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Exhibition" value="Exhibition"/>
+            <opt hidden="true" key="cc_finding" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Finding" value="Finding"/>
+            <opt hidden="true" key="cc_loss" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Loss" value="Loss"/>
+            <opt hidden="true" key="cc_use" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#Use" value="Use"/>
+            <opt hidden="true" key="cc_meeting" schema="culturecloud" schemaUri="http://id.culturecloud.eu/events/#meeting" value="Meeting"/>
+        </opt-list>
+
+        <opt-list path="/record/events/event/eventActor/relatedEvent" key="@key" value="@type" displayName="Related Events">
+            <opt key="crm_e67" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E67.Birth" value="Birth"/>
+            <opt key="crm_e69" schema="cidoc-crm" schemaUri="http://www.cidoc-crm.org/rdfs/E69.Death" value="Death"/>
+        </opt-list>
+
+        <opt-list path="/record/events/event/eventPlace/partOfPlace" key="@key" value="@type" displayName="Event place">
+            <opt key="A.ADM2" schema="geonames" schemaUri="http://www.geonames.org/ontology#A.ADM2" value="Municipality"/>
+            <opt key="A.ADM1" schema="geonames" schemaUri="http://www.geonames.org/ontology#A.ADM1" value="Region"/>
+            <opt key="http://www.geonames.org/#countryCode" value="Country"/>
+        </opt-list>
+
+        <opt-list path="/record/concepts/concept" key="@key" value="@type" displayName="Concepts">
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#workType" value="workType"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#objectName" value="keyword"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#classification" value="classification"/>
+            <opt hidden="true" key="http://www.cidoc-crm.org/rdfs/P129B.is_subject_of" value="subject"/>
+            <opt hidden="true" key="http://www.cidoc-crm.org/rdfs/E57.Material" value="material"/>
+            <opt hidden="true" key="http://www.cidoc-crm.org/rdfs/P32F_used_general_technique" value="technique"/>
+        </opt-list>
+
+        <opt-list path="/record/resources/resource" key="@key" value="@type" displayName="Resources">
+            <opt key="http://id.culturecloud.eu/concepts/#thumbnail" value="thumbnail"/>
+            <opt key="http://id.culturecloud.eu/concepts/#fullImage" value="fullImage"/>
+            <opt key="http://id.culturecloud.eu/concepts/#landingPage" value="landingPage"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#hubRecordUrl" value="hubUrl"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#deepZoom" value="deepZoomImage"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#document" value="documentFile"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#dound" value="soundFile"/>
+            <opt hidden="true" key="http://id.culturecloud.eu/concepts/#video" value="videoFile"/>
+        </opt-list>
+
+    </opts>
+
+    <field-markers>
+        <field-marker name="dataProvider" type="fact" path="/record/admin/displayDataProvider"/>
+        <field-marker name="country" type="fact" path="/record/admin/displayDataProviderCountry"/>
+        <field-marker name="provider" type="fact" path="/record/admin/displayProvider"/>
+
+        <field-marker name="CREATOR" path="/record/events/event[crm_e12]/eventActor/displayActor"/>
+        <field-marker name="TITLE" path="/record/thing/displayTitle"/>
+        <field-marker name="DESCRIPTION" path="/record/thing/displayDescription"/>
+        <field-marker name="OWNER" path="/record/admin/displayDataProvider"/>
+        <field-marker name="LANDING_PAGE" path="/record/resources/resource[http://id.culturecloud.eu/concepts/#landingPage]/resourceUrl"/>
+        <field-marker name="THUMBNAIL" path="/record/resources/resource[http://id.culturecloud.eu/concepts/#thumbnail]/resourceUrl"/>
+
+        <!-- todo: these should have paths, because currently their presence is checked but they are not resolved-->
+        <field-marker name="SPEC"/>
+        <field-marker name="PROVIDER"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
+        <field-marker name="THUMBNAIL"/>
+
+        <field-marker name="SNIPPET" type="search" path="/record/thing/displayDescription"/>
+    </field-markers>
+
+    <docs>
+        <doc path="/record/thing/displayTitle">
+            <string>Description: The name given to the resource. Typically, a Title will be a name by which the resource
+                is formally known.
+            </string>
+        </doc>
+    </docs>
+
+</record-definition>
+
+
+
