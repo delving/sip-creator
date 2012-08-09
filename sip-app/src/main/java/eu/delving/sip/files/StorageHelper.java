@@ -209,12 +209,12 @@ public class StorageHelper {
 
     static File findLatestHashed(File dir, FileType fileType, String prefix) throws StorageException {
         File latestFile = findLatestFile(dir, fileType, prefix);
-        if (!latestFile.exists()) throw new StorageException("Missing file "+latestFile.getAbsolutePath());
+        if (!latestFile.exists()) throw new StorageException("Missing file " + latestFile.getAbsolutePath());
         try {
             return Hasher.ensureFileHashed(latestFile);
         }
         catch (IOException e) {
-            throw new StorageException("Unable to hash file "+latestFile);
+            throw new StorageException("Unable to hash file " + latestFile);
         }
     }
 
@@ -278,18 +278,40 @@ public class StorageHelper {
         }
     }
 
-    static class SuffixFileFilter implements FileFilter {
-        private Storage.FileType fileType;
+    static final String[][] HACK_VERSION_HINTS = {
+            {"icn", "1.0.0"},
+            {"abm", "1.0.0"},
+            {"tib", "1.0.0"},
+            {"ese", "3.4.0"},
+            {"aff", "0.1.0"},
+    };
 
-        SuffixFileFilter(Storage.FileType fileType) {
-            this.fileType = fileType;
+    static String temporarilyHackedSchemaVersions(File dir) {
+        File[] xsds = dir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().endsWith("-validation.xsd");
+            }
+        });
+        String hacked = "";
+        boolean first = true;
+        for (File xsd : xsds) {
+            String prefix = xsd.getName();
+            prefix = prefix.substring(0, prefix.indexOf("-"));
+            for (String[] hint : HACK_VERSION_HINTS) {
+                if (hint[0].equals(prefix)) {
+                    String schemaVersion = String.format("%s_%s", prefix, hint[1]);
+                    if (first) {
+                        hacked += schemaVersion;
+                        first = false;
+                    }
+                    else {
+                        hacked += ", " + schemaVersion;
+                    }
+                }
+            }
         }
-
-        @Override
-        public boolean accept(File file) {
-            String name = file.getName();
-            return file.isFile() && name.endsWith(fileType.getSuffix());
-        }
+        return hacked;
     }
 
     static String extractName(File file, Storage.FileType fileType) {

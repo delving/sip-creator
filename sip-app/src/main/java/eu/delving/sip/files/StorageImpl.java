@@ -99,6 +99,7 @@ public class StorageImpl implements Storage {
         if (list != null) {
             for (File directory : list) {
                 if (!directory.isDirectory()) continue;
+                if (directory.getName().equals(CACHE_DIR)) continue;
                 boolean hasFiles = false;
                 File[] files = directory.listFiles();
                 if (files != null) {
@@ -152,6 +153,9 @@ public class StorageImpl implements Storage {
         public List<SchemaVersion> getSchemaVersions() {
             List<SchemaVersion> schemaVersions = new ArrayList<SchemaVersion>();
             String fact = getDataSetFacts().get(SCHEMA_VERSIONS);
+            if (fact == null) {
+                fact = temporarilyHackedSchemaVersions(here);
+            }
             if (fact != null) {
                 for (String sv : fact.split(" *, *")) {
                     schemaVersions.add(new SchemaVersion(sv));
@@ -751,6 +755,5 @@ public class StorageImpl implements Storage {
             throw new StorageException("Unable to load " + fileName, e);
         }
     }
-
 
 }
