@@ -36,8 +36,6 @@ import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
@@ -250,15 +248,6 @@ public class MediaIngestAction extends AbstractAction {
             mediaFiles.add(new MediaFile(originalFile.getAbsolutePath(), hashedFile.getName()));
         }
 
-//        private MediaMetadata getMetadataFor(File originalFile) throws IOException {
-//            ImageReader reader = getImageReaderFor(originalFile);
-//            reader.setInput(ImageIO.createImageInputStream(originalFile), true);
-//            MediaMetadata meta = new MediaMetadata();
-//            meta.width = reader.getWidth(0);
-//            meta.height = reader.getHeight(0);
-//            return meta;
-//        }
-
         public void purge() {
             Map<String, Counter> counts = new HashMap<String, Counter>();
             for (MediaFile mediaFile : mediaFiles) {
@@ -294,8 +283,6 @@ public class MediaIngestAction extends AbstractAction {
 
         public String path;
 
-//        public MediaMetadata metadata;
-
         public Set<String> keywords;
 
         public MediaFile() {
@@ -308,26 +295,6 @@ public class MediaIngestAction extends AbstractAction {
             Collections.addAll(keywords, path.split("[\\/]"));
         }
 
-//        public MediaFile(String path, String name, MediaMetadata metadata) {
-//            this.path = path;
-//            this.name = name;
-//            this.metadata = metadata;
-//            this.keywords = new TreeSet<String>();
-//            Collections.addAll(keywords, path.split("[\\/]"));
-//        }
-    }
-
-//    @XStreamAlias("metadata")
-//    public static class MediaMetadata {
-//        public int width;
-//        public int height;
-//    }
-
-    private static ImageReader getImageReaderFor(File file) throws IOException {
-        String extension = getExtension(file);
-        Iterator<ImageReader> readersBySuffix = ImageIO.getImageReadersBySuffix(extension);
-        if (!readersBySuffix.hasNext()) throw new IOException("No reader for suffix of "+file.getName());
-        return readersBySuffix.next();
     }
 
     private static String getExtension(File file) {
@@ -335,6 +302,4 @@ public class MediaIngestAction extends AbstractAction {
         if (lastDot < 1) return "";
         return file.getName().substring(lastDot + 1).toLowerCase();
     }
-
-
 }
