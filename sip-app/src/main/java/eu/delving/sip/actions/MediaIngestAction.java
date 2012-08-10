@@ -21,6 +21,10 @@
 
 package eu.delving.sip.actions;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.SwingHelper;
@@ -32,6 +36,8 @@ import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
@@ -103,7 +109,7 @@ public class MediaIngestAction extends AbstractAction {
         );
         if (doImport) {
             setEnabled(false);
-            sipModel.exec(new DirectoryScanner(dataSet, file));
+            sipModel.exec(new DirectoryScanner(dataSet, file, TEST_DESTINATION));
             return true;
         }
         return false;
@@ -129,15 +135,19 @@ public class MediaIngestAction extends AbstractAction {
 
 
     private class DirectoryScanner implements Work.LongTermWork, Work.DataSetWork {
+        public static final String INDEX_FILE = "media-files.xml";
+        public static final int ALLOWED_FAILURES = 3;
         private Hasher hasher = new Hasher();
-        private File root;
+        private File sourceDirectory, targetDirectory;
         private List<File> fileList = new ArrayList<File>();
         private ProgressListener progressListener;
         private DataSet dataSet;
+        private MediaFiles mediaFiles = new MediaFiles();
 
-        private DirectoryScanner(DataSet dataSet, File root) {
+        private DirectoryScanner(DataSet dataSet, File sourceDirectory, File targetDirectory) {
             this.dataSet = dataSet;
-            this.root = root;
+            this.sourceDirectory = sourceDirectory;
+            this.targetDirectory = targetDirectory;
         }
 
         @Override
@@ -152,34 +162,58 @@ public class MediaIngestAction extends AbstractAction {
 
         @Override
         public void run() {
-            gather(root);
+            gatherFilesFrom(sourceDirectory);
             progressListener.prepareFor(fileList.size());
             TEST_DESTINATION.mkdirs();
+            int failures = 0;
             int walk = 0;
             for (File file : fileList) {
                 progressListener.setProgress(walk++);
                 if (!isMediaFile(file)) continue;
                 try {
-                    File destinationFile = new File(TEST_DESTINATION, "MEDIA_IMPORT");
+                    File destinationFile = new File(targetDirectory, "FILE_BEING_COPIED");
                     OutputStream outputStream = hasher.createDigestOutputStream(new FileOutputStream(destinationFile));
                     InputStream inputStream = new FileInputStream(file);
                     IOUtils.copy(inputStream, outputStream);
-                    File hashedFile = new File(TEST_DESTINATION, String.format("%s.%s", hasher.getHashString(), getExtension(file)));
+                    File hashedFile = new File(targetDirectory, String.format("%s.%s", hasher.getHashString(), getExtension(file)));
                     FileUtils.deleteQuietly(hashedFile);
-                    destinationFile.renameTo(hashedFile);
+                    if (!destinationFile.renameTo(hashedFile)) {
+                        throw new IOException("Unable to rename " + destinationFile + " to " + hashedFile);
+                    }
+                    mediaFiles.add(file, hashedFile);
                 }
                 catch (IOException e) {
-                    sipModel.getFeedback().alert("Problem while scanning directories for media", e);
+                    if (++failures == ALLOWED_FAILURES) {
+                        sipModel.getFeedback().alert("Too many failures scanning directories for media", e);
+                    }
+                    else {
+                        sipModel.getFeedback().alert(String.format(
+                                "Problem %d/%d while scanning directories for media",
+                                failures, ALLOWED_FAILURES), e
+                        );
+                    }
                 }
+            }
+            mediaFiles.purge();
+            try {
+                File indexFile = new File(targetDirectory, INDEX_FILE);
+                XStream stream = new XStream();
+                stream.processAnnotations(MediaFiles.class);
+                FileOutputStream out = new FileOutputStream(indexFile);
+                stream.toXML(mediaFiles, out);
+                out.close();
+            }
+            catch (IOException e) {
+                throw new RuntimeException("Unable to write " + INDEX_FILE + " in " + targetDirectory.getAbsolutePath(), e);
             }
         }
 
-        private void gather(File dir) {
+        private void gatherFilesFrom(File dir) {
             File[] files = dir.listFiles();
             if (files == null) return;
             for (File file : files) {
                 if (file.isDirectory()) {
-                    gather(file);
+                    gatherFilesFrom(file);
                 }
                 else {
                     fileList.add(file);
@@ -194,15 +228,113 @@ public class MediaIngestAction extends AbstractAction {
             return true;
         }
 
-        private String getExtension(File file) {
-            int lastDot = file.getName().lastIndexOf('.');
-            if (lastDot < 1) return "";
-            return file.getName().substring(lastDot + 1).toLowerCase();
-        }
-
         @Override
         public DataSet getDataSet() {
             return dataSet;
         }
     }
+
+    @XStreamAlias("media-files")
+    public static class MediaFiles {
+        @XStreamAsAttribute
+        public Date date;
+        @XStreamImplicit
+        public List<MediaFile> mediaFiles;
+
+        public MediaFiles() {
+            this.date = new Date();
+        }
+
+        public void add(File originalFile, File hashedFile) throws IOException {
+            if (mediaFiles == null) mediaFiles = new ArrayList<MediaFile>();
+            mediaFiles.add(new MediaFile(originalFile.getAbsolutePath(), hashedFile.getName()));
+        }
+
+//        private MediaMetadata getMetadataFor(File originalFile) throws IOException {
+//            ImageReader reader = getImageReaderFor(originalFile);
+//            reader.setInput(ImageIO.createImageInputStream(originalFile), true);
+//            MediaMetadata meta = new MediaMetadata();
+//            meta.width = reader.getWidth(0);
+//            meta.height = reader.getHeight(0);
+//            return meta;
+//        }
+
+        public void purge() {
+            Map<String, Counter> counts = new HashMap<String, Counter>();
+            for (MediaFile mediaFile : mediaFiles) {
+                for (String keyword : mediaFile.keywords) {
+                    Counter counter = counts.get(keyword);
+                    if (counter == null) counts.put(keyword, counter = new Counter(keyword));
+                    counter.count++;
+                }
+            }
+            for (Counter counter : counts.values()) {
+                if (counter.count == mediaFiles.size()) {
+                    for (MediaFile mediaFile : mediaFiles) {
+                        mediaFile.keywords.remove(counter.keyword);
+                    }
+                }
+            }
+        }
+    }
+
+    private static class Counter {
+        String keyword;
+        int count;
+
+        private Counter(String keyword) {
+            this.keyword = keyword;
+        }
+    }
+
+    @XStreamAlias("file")
+    public static class MediaFile {
+        @XStreamAsAttribute
+        public String name;
+
+        public String path;
+
+//        public MediaMetadata metadata;
+
+        public Set<String> keywords;
+
+        public MediaFile() {
+        }
+
+        public MediaFile(String path, String name) {
+            this.path = path;
+            this.name = name;
+            this.keywords = new HashSet<String>(23);
+            Collections.addAll(keywords, path.split("[\\/]"));
+        }
+
+//        public MediaFile(String path, String name, MediaMetadata metadata) {
+//            this.path = path;
+//            this.name = name;
+//            this.metadata = metadata;
+//            this.keywords = new TreeSet<String>();
+//            Collections.addAll(keywords, path.split("[\\/]"));
+//        }
+    }
+
+//    @XStreamAlias("metadata")
+//    public static class MediaMetadata {
+//        public int width;
+//        public int height;
+//    }
+
+    private static ImageReader getImageReaderFor(File file) throws IOException {
+        String extension = getExtension(file);
+        Iterator<ImageReader> readersBySuffix = ImageIO.getImageReadersBySuffix(extension);
+        if (!readersBySuffix.hasNext()) throw new IOException("No reader for suffix of "+file.getName());
+        return readersBySuffix.next();
+    }
+
+    private static String getExtension(File file) {
+        int lastDot = file.getName().lastIndexOf('.');
+        if (lastDot < 1) return "";
+        return file.getName().substring(lastDot + 1).toLowerCase();
+    }
+
+
 }
