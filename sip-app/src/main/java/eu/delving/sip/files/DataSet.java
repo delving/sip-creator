@@ -52,6 +52,8 @@ public interface DataSet {
 
     String getLatestPrefix();
 
+    File getMediaDirectory();
+
     List<SchemaVersion> getSchemaVersions();
 
     RecDef getRecDef(String prefix) throws StorageException;

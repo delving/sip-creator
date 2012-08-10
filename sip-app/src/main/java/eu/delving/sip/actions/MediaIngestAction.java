@@ -27,6 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -46,6 +47,7 @@ import java.util.*;
 import java.util.List;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
+import static eu.delving.sip.files.Storage.INDEX_FILE;
 
 /**
  * Import media to be matched with a dataset
@@ -56,7 +58,6 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
 public class MediaIngestAction extends AbstractAction {
     private static final String[] MEDIA_FILE_EXTENSIONS = {"tif", "tiff", "jpg", "jpeg", "gif", "png"};
     private static final Set<String> EXTENSIONS = new HashSet<String>(Arrays.asList(MEDIA_FILE_EXTENSIONS));
-    private static final File TEST_DESTINATION = new File("/tmp/media");
     private JDesktopPane parent;
     private SipModel sipModel;
     private final String RECENT_DIR = "recentMediaDirectory";
@@ -71,7 +72,6 @@ public class MediaIngestAction extends AbstractAction {
         );
         this.parent = parent;
         this.sipModel = sipModel;
-        setEnabled(false);
         prepareChooser();
         sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
@@ -107,7 +107,7 @@ public class MediaIngestAction extends AbstractAction {
         );
         if (doImport) {
             setEnabled(false);
-            sipModel.exec(new DirectoryScanner(dataSet, file, TEST_DESTINATION));
+            sipModel.exec(new DirectoryScanner(dataSet, file, dataSet.getMediaDirectory()));
             return true;
         }
         return false;
@@ -133,7 +133,6 @@ public class MediaIngestAction extends AbstractAction {
 
 
     private class DirectoryScanner implements Work.LongTermWork, Work.DataSetWork {
-        public static final String INDEX_FILE = "media-files.xml";
         public static final int ALLOWED_FAILURES = 3;
         private Hasher hasher = new Hasher();
         private File sourceDirectory, targetDirectory;
@@ -160,9 +159,10 @@ public class MediaIngestAction extends AbstractAction {
 
         @Override
         public void run() {
+            try {
             gatherFilesFrom(sourceDirectory);
             progressListener.prepareFor(fileList.size());
-            TEST_DESTINATION.mkdirs();
+            targetDirectory.mkdirs();
             int failures = 0;
             int walk = 0;
             for (File file : fileList) {
@@ -203,6 +203,15 @@ public class MediaIngestAction extends AbstractAction {
             }
             catch (IOException e) {
                 throw new RuntimeException("Unable to write " + INDEX_FILE + " in " + targetDirectory.getAbsolutePath(), e);
+            }
+            }
+            finally {
+                sipModel.exec(new Swing() {
+                    @Override
+                    public void run() {
+                        setEnabled(true);
+                    }
+                });
             }
         }
 
@@ -283,7 +292,7 @@ public class MediaIngestAction extends AbstractAction {
 
         public String path;
 
-        public Set<String> keywords;
+        public List<String> keywords;
 
         public MediaFile() {
         }
@@ -291,8 +300,12 @@ public class MediaIngestAction extends AbstractAction {
         public MediaFile(String path, String name) {
             this.path = path;
             this.name = name;
-            this.keywords = new HashSet<String>(23);
-            Collections.addAll(keywords, path.split("[\\/]"));
+            this.keywords = new ArrayList<String>();
+            for (String part : path.split("[\\/:;]")) {
+                part = part.trim().toLowerCase();
+                if (part.isEmpty()) continue;
+                keywords.add(part);
+            }
         }
 
     }

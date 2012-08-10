@@ -151,6 +151,11 @@ public class StorageImpl implements Storage {
         }
 
         @Override
+        public File getMediaDirectory() {
+            return new File(here, MEDIA_DIR);
+        }
+
+        @Override
         public List<SchemaVersion> getSchemaVersions() {
             List<SchemaVersion> schemaVersions = new ArrayList<SchemaVersion>();
             String fact = getDataSetFacts().get(SCHEMA_VERSIONS);
