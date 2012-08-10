@@ -21,6 +21,7 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.sip.actions.MediaIngestAction;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -43,12 +44,13 @@ import java.io.File;
 public class ExpertMenu extends JMenu {
     private SipModel sipModel;
 
-    public ExpertMenu(final SipModel sipModel) {
+    public ExpertMenu(JDesktopPane desktop, final SipModel sipModel) {
         super("Expert");
         this.sipModel = sipModel;
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
         add(new WriteOutputAction());
+        add(new MediaIngestAction(desktop, sipModel));
     }
 
     private class MaxUniqueValueLengthAction extends AbstractAction {

@@ -124,7 +124,7 @@ public class ImportAction extends AbstractAction {
         chooser.setMultiSelectionEnabled(false);
     }
 
-    public boolean selectInputFile(File file) {
+    private boolean selectInputFile(File file) {
         if (!file.exists() || sipModel.getDataSetModel().isEmpty()) return false;
         String spec = sipModel.getDataSetModel().getDataSet().getSpec();
         boolean doImport = sipModel.getFeedback().confirm(

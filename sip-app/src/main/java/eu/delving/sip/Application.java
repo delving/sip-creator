@@ -113,7 +113,7 @@ public class Application {
         HttpClient http = cultureHubClient.getHttpClient();
         Storage storage = new StorageImpl(storageDirectory, new HTTPSchemaFetcher(http) , http);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
-        expertMenu = new ExpertMenu(sipModel);
+        expertMenu = new ExpertMenu(desktop, sipModel);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
         home.addComponentListener(new ComponentAdapter() {

@@ -95,6 +95,7 @@ public class Hasher {
     }
 
     public DigestOutputStream createDigestOutputStream(OutputStream outputStream) {
+        messageDigest.reset();
         return new DigestOutputStream(outputStream, messageDigest);
     }
 
