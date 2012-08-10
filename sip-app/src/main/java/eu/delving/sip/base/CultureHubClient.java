@@ -27,10 +27,12 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -161,7 +163,11 @@ public class CultureHubClient {
     }
 
     public void uploadFiles(DataSet dataSet, Swing finished) throws StorageException {
-        context.exec(new FileUploader(1, dataSet, finished));
+        context.exec(new DataUploader(1, dataSet, finished));
+    }
+
+    public void uploadMedia(DataSet dataSet, Swing finished) throws StorageException {
+        context.exec(new MediaUploader(1, dataSet, finished));
     }
 
     private abstract class Attempt implements Work {
@@ -389,13 +395,13 @@ public class CultureHubClient {
         }
     }
 
-    private class FileUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
+    private class DataUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
         private DataSet dataSet;
         private List<File> uploadFiles;
         private ProgressListener progressListener;
         private Swing finished;
 
-        FileUploader(int attempt, DataSet dataSet, Swing finished) throws StorageException {
+        DataUploader(int attempt, DataSet dataSet, Swing finished) throws StorageException {
             super(attempt);
             this.dataSet = dataSet;
             this.uploadFiles = dataSet.getUploadFiles();
@@ -434,7 +440,103 @@ public class CultureHubClient {
                             }
                             break;
                         case UNAUTHORIZED:
-                            if (reactToUnauthorized(new FileUploader(attempt + 1, dataSet, finished))) {
+                            if (reactToUnauthorized(new DataUploader(attempt + 1, dataSet, finished))) {
+                                finished = null;
+                            }
+                            else {
+                                context.getFeedback().alert("Unable to complete upload");
+                            }
+                            break;
+                        default:
+                            context.invalidateTokens();
+                            reportResponse(code, listResponse.getStatusLine());
+                            break;
+                    }
+                    EntityUtils.consume(listResponse.getEntity());
+                }
+                else {
+                    throw new IOException("Empty entity");
+                }
+            }
+            catch (OAuthProblemException e) {
+                reportOAuthProblem(e);
+            }
+            catch (Exception e) {
+                log.error("Error while connecting", e);
+                context.getFeedback().alert("Authorization system problem: " + e.getMessage());
+            }
+            finally {
+                if (finished != null) Swing.Exec.later(finished);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.UPLOAD;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setProgressMessage(String.format(
+                    "Uploading the data of '%s' to the culture hub",
+                    dataSet.getSpec()
+            ));
+        }
+    }
+
+    private class MediaUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
+        private DataSet dataSet;
+        private ProgressListener progressListener;
+        private Swing finished;
+
+        MediaUploader(int attempt, DataSet dataSet, Swing finished) throws StorageException {
+            super(attempt);
+            this.dataSet = dataSet;
+            this.finished = finished;
+        }
+
+        @Override
+        public void run() {
+            try {
+                FileInputStream inputStream = new FileInputStream(new File(dataSet.getMediaDirectory(), Storage.MEDIA_DIR));
+                MediaFiles mediaFiles = MediaFiles.read(inputStream);
+                inputStream.close();
+                HttpPost listRequest = createSubmitRequest(dataSet, mediaFiles);
+                HttpResponse listResponse = httpClient.execute(listRequest);
+                HttpEntity listEntity = listResponse.getEntity();
+                if (listEntity != null) {
+                    Code code = Code.from(listResponse);
+                    switch (code) {
+                        case OK:
+                            String listString = EntityUtils.toString(listEntity);
+                            Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
+                            List<File> uploadFiles = new ArrayList<File>();
+                            for (MediaFiles.MediaFile file : mediaFiles.mediaFiles) {
+                                if (!requestedFiles.contains(file.name)) continue;
+                                uploadFiles.add(new File(dataSet.getMediaDirectory(), file.name));
+                            }
+                            for (File file : uploadFiles) {
+                                HttpPost upload = createUploadRequest(dataSet, file, progressListener);
+                                FileEntity fileEntity = (FileEntity) upload.getEntity();
+                                log.info("Uploading media " + file);
+                                HttpResponse uploadResponse = httpClient.execute(upload);
+                                EntityUtils.consume(uploadResponse.getEntity());
+                                code = Code.from(uploadResponse);
+                                if (code != Code.OK && !fileEntity.abort) {
+                                    context.invalidateTokens();
+                                    reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
+                                    return;
+                                }
+                            }
+                            break;
+                        case UNAUTHORIZED:
+                            if (reactToUnauthorized(new DataUploader(attempt + 1, dataSet, finished))) {
                                 finished = null;
                             }
                             else {
@@ -608,15 +710,32 @@ public class CultureHubClient {
                 context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
         );
         HttpPost post = new HttpPost(url);
-        post.setEntity(createListEntity(uploadFiles));
+        post.setEntity(createListEntityFiles(uploadFiles));
         post.setHeader("Accept", "text/plain");
         return post;
     }
 
-    private HttpEntity createListEntity(List<File> uploadFiles) throws UnsupportedEncodingException {
-        StringBuilder fileList = new StringBuilder();
-        for (File file : uploadFiles) fileList.append(file.getName()).append("\n");
-        return new StringEntity(fileList.toString());
+    private HttpEntity createListEntityFiles(List<File> uploadFiles) throws UnsupportedEncodingException {
+        List<String> names = new ArrayList<String>(uploadFiles.size());
+        for (File file : uploadFiles) names.add(file.getName());
+        return createListEntityStrings(names);
+    }
+
+    private HttpEntity createListEntityStrings(List<String> uploadFiles) throws UnsupportedEncodingException {
+        return new StringEntity(StringUtils.join(uploadFiles, '\n'));
+    }
+
+    private HttpPost createSubmitRequest(DataSet dataSet, MediaFiles mediaFiles) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
+        String url = String.format(
+                "%s/submit/%s/%s?accessKey=%s",
+                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
+        );
+        HttpPost post = new HttpPost(url);
+        List<String> names = new ArrayList<String>();
+        for (MediaFiles.MediaFile file : mediaFiles.mediaFiles) names.add(file.name);
+        post.setEntity(createListEntityStrings(names));
+        post.setHeader("Accept", "text/plain");
+        return post;
     }
 
     private HttpPost createUploadRequest(DataSet dataSet, File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {

@@ -26,8 +26,8 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
+import eu.delving.sip.actions.DataImportAction;
 import eu.delving.sip.actions.DownloadAction;
-import eu.delving.sip.actions.ImportAction;
 import eu.delving.sip.actions.ReleaseAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.*;
@@ -113,7 +113,7 @@ public class Application {
         HttpClient http = cultureHubClient.getHttpClient();
         Storage storage = new StorageImpl(storageDirectory, new HTTPSchemaFetcher(http) , http);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
-        expertMenu = new ExpertMenu(desktop, sipModel);
+        expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
         home.addComponentListener(new ComponentAdapter() {
@@ -155,7 +155,7 @@ public class Application {
             }
         });
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
-        importAction = new ImportAction(desktop, sipModel);
+        importAction = new DataImportAction(desktop, sipModel);
         dataSetMenu = new DataSetMenu(sipModel);
         validateAction = new ValidateAction(sipModel, dataSetMenu, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
