@@ -34,6 +34,7 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.xml.MetadataParser;
+import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -194,6 +195,10 @@ public class Mockery {
 
         public String getFileContents(String path) throws IOException {
             File schemas = new File("schema-repo/src/test/resources/schemas");
+            if (!schemas.exists()) {
+                schemas = new File("../schema-repo/src/test/resources/schemas");
+                Assert.assertTrue(schemas.exists());
+            }
             InputStream in = new FileInputStream(new File(schemas, path));
             StringBuilder text = new StringBuilder();
             boolean firstLine = true;
