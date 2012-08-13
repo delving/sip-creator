@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
     <artifactId>sip-creator</artifactId>
-    <version>1.0.7-SNAPSHOT</version>
+    <version>1.0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>SIP-Creator</name>
     <description>
@@ -101,7 +101,6 @@
     <pluginRepositories/>
 
     <modules>
-        <module>schema-repo</module>
         <module>sip-core</module>
         <module>sip-app</module>
     </modules>
