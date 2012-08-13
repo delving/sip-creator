@@ -504,7 +504,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                FileInputStream inputStream = new FileInputStream(new File(dataSet.getMediaDirectory(), Storage.MEDIA_DIR));
+                FileInputStream inputStream = new FileInputStream(new File(dataSet.getMediaDirectory(), Storage.INDEX_FILE));
                 MediaFiles mediaFiles = MediaFiles.read(inputStream);
                 inputStream.close();
                 HttpPost listRequest = createSubmitRequest(dataSet, mediaFiles);

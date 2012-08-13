@@ -25,6 +25,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,7 +44,7 @@ import java.util.*;
 public class MediaFiles {
 
     public static void write(MediaFiles mediaFiles, File indexFile) throws IOException {
-        XStream stream = new XStream();
+        XStream stream = new XStream(new PureJavaReflectionProvider());
         stream.processAnnotations(MediaFiles.class);
         FileOutputStream out = new FileOutputStream(indexFile);
         stream.toXML(mediaFiles, out);
@@ -50,9 +52,11 @@ public class MediaFiles {
     }
 
     public static MediaFiles read(InputStream inputStream) {
-        XStream stream = new XStream();
+        XStream stream = new XStream(new PureJavaReflectionProvider());
         stream.processAnnotations(MediaFiles.class);
-        return (MediaFiles) stream.fromXML(inputStream);
+        MediaFiles mediaFiles = (MediaFiles) stream.fromXML(inputStream);
+        mediaFiles.resolve();
+        return mediaFiles;
     }
 
     @XStreamAsAttribute
@@ -60,13 +64,45 @@ public class MediaFiles {
     @XStreamImplicit
     public List<MediaFile> mediaFiles;
 
-    public MediaFiles() {
-        this.date = new Date();
+    @XStreamOmitField
+    private Map<String, MediaFile> quickMap;
+
+    @XStreamOmitField
+    private Set<String> fileNames;
+
+    public MediaFile getQuick(String quickHash) {
+        return quickMap.get(quickHash);
     }
 
-    public void add(File originalFile, File hashedFile) throws IOException {
+    public boolean contains(File file) {
+        return fileNames.contains(file.getName());
+    }
+
+    public void removeExcess(Set<String> otherFileNames) {
+        Set<String> excess = new HashSet<String>();
+        excess.addAll(fileNames);
+        excess.removeAll(otherFileNames);
+        Iterator<MediaFile> walk = mediaFiles.iterator();
+        while (walk.hasNext()) {
+            if (excess.contains(walk.next().name)) {
+                walk.remove();
+            }
+        }
+    }
+
+    public void add(File sourceFile, File hashedFile, String quickHash) throws IOException {
         if (mediaFiles == null) mediaFiles = new ArrayList<MediaFile>();
-        mediaFiles.add(new MediaFile(originalFile.getAbsolutePath(), hashedFile.getName()));
+        mediaFiles.add(new MediaFile(sourceFile, hashedFile, quickHash));
+    }
+
+    private void resolve() {
+        date = new Date();
+        quickMap = new HashMap<String, MediaFile>();
+        fileNames = new HashSet<String>();
+        for (MediaFile file : mediaFiles) {
+            quickMap.put(file.quickHash, file);
+            fileNames.add(file.name);
+        }
     }
 
     public void purge() {
@@ -90,6 +126,9 @@ public class MediaFiles {
     @XStreamAlias("file")
     public static class MediaFile {
         @XStreamAsAttribute
+        public String quickHash;
+
+        @XStreamAsAttribute
         public String name;
 
         public String path;
@@ -99,9 +138,10 @@ public class MediaFiles {
         public MediaFile() {
         }
 
-        public MediaFile(String path, String name) {
-            this.path = path;
-            this.name = name;
+        public MediaFile(File sourceFile, File hashedFile, String quickHash) {
+            this.path = sourceFile.getAbsolutePath();
+            this.name = hashedFile.getName();
+            this.quickHash = quickHash;
             this.keywords = new ArrayList<String>();
             for (String part : path.split("[\\/:;]")) {
                 part = part.trim().toLowerCase();
@@ -110,6 +150,9 @@ public class MediaFiles {
             }
         }
 
+        public boolean matchesSourceFile(File file) {
+            return path.equals(file.getAbsolutePath());
+        }
     }
 
     public static class Counter {

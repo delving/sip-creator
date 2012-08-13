@@ -126,7 +126,7 @@ public class MediaImportAction extends AbstractAction {
         private List<File> fileList = new ArrayList<File>();
         private ProgressListener progressListener;
         private DataSet dataSet;
-        private MediaFiles mediaFiles = new MediaFiles();
+        private MediaFiles mediaFiles;
 
         private DirectoryScanner(DataSet dataSet, File sourceDirectory, File targetDirectory) {
             this.dataSet = dataSet;
@@ -147,48 +147,10 @@ public class MediaImportAction extends AbstractAction {
         @Override
         public void run() {
             try {
-            gatherFilesFrom(sourceDirectory);
-            progressListener.prepareFor(fileList.size());
-            targetDirectory.mkdirs();
-            int failures = 0;
-            int walk = 0;
-            for (File file : fileList) {
-                progressListener.setProgress(walk++);
-                if (!isMediaFile(file)) continue;
-                try {
-                    File destinationFile = new File(targetDirectory, "COPY_IN_PROGRESS");
-                    OutputStream outputStream = hasher.createDigestOutputStream(new FileOutputStream(destinationFile));
-                    InputStream inputStream = new FileInputStream(file);
-                    IOUtils.copy(inputStream, outputStream);
-                    File hashedFile = new File(targetDirectory, String.format(
-                            "%s.%s",
-                            hasher.getHashString(), getExtension(file).toLowerCase())
-                    );
-                    FileUtils.deleteQuietly(hashedFile);
-                    if (!destinationFile.renameTo(hashedFile)) {
-                        throw new IOException("Unable to rename " + destinationFile + " to " + hashedFile);
-                    }
-                    mediaFiles.add(file, hashedFile);
-                }
-                catch (IOException e) {
-                    if (++failures == ALLOWED_FAILURES) {
-                        sipModel.getFeedback().alert("Too many failures scanning directories for media", e);
-                    }
-                    else {
-                        sipModel.getFeedback().alert(String.format(
-                                "Problem %d/%d while scanning directories for media",
-                                failures, ALLOWED_FAILURES), e
-                        );
-                    }
-                }
-            }
-            mediaFiles.purge();
-            try {
-                MediaFiles.write(mediaFiles, new File(targetDirectory, INDEX_FILE));
+                scanDirectories();
             }
             catch (IOException e) {
-                throw new RuntimeException("Unable to write " + INDEX_FILE + " in " + targetDirectory.getAbsolutePath(), e);
-            }
+                sipModel.getFeedback().alert("Problem while scanning directories for media", e);
             }
             finally {
                 sipModel.exec(new Swing() {
@@ -197,6 +159,53 @@ public class MediaImportAction extends AbstractAction {
                         setEnabled(true);
                     }
                 });
+            }
+        }
+
+        private void scanDirectories() throws IOException {
+            gatherFilesFrom(sourceDirectory);
+            progressListener.prepareFor(fileList.size());
+            targetDirectory.mkdirs();
+            File indexFile = new File(targetDirectory, INDEX_FILE);
+            mediaFiles = indexFile.exists() ? MediaFiles.read(new FileInputStream(indexFile)) : new MediaFiles();
+            Set<String> fileNames = new HashSet<String>();
+            File[] files = targetDirectory.listFiles();
+            if (files != null) {
+                for (File mediaFile : files) {
+                    if (mediaFile.getName().equals(INDEX_FILE)) continue;
+                    fileNames.add(mediaFile.getName());
+                }
+            }
+            mediaFiles.removeExcess(fileNames);
+            int walk = 0;
+            for (File file : fileList) {
+                progressListener.setProgress(walk++);
+                handleSourceFile(file);
+            }
+            mediaFiles.purge();
+            MediaFiles.write(mediaFiles, indexFile);
+        }
+
+        private void handleSourceFile(File file) throws IOException {
+            if (!isMediaFile(file)) return;
+            String quickHash = Hasher.quickHash(file);
+            MediaFiles.MediaFile mediaFile = mediaFiles.getQuick(quickHash);
+            if (mediaFile == null || !mediaFile.matchesSourceFile(file)) {
+                File destinationFile = new File(targetDirectory, "COPY_IN_PROGRESS");
+                OutputStream outputStream = hasher.createDigestOutputStream(new FileOutputStream(destinationFile));
+                InputStream inputStream = new FileInputStream(file);
+                IOUtils.copy(inputStream, outputStream);
+                File hashedFile = new File(targetDirectory, String.format(
+                        "%s.%s",
+                        hasher.getHashString(), getExtension(file).toLowerCase())
+                );
+                if (hashedFile.exists()) {
+                    FileUtils.deleteQuietly(hashedFile);
+                }
+                if (!destinationFile.renameTo(hashedFile)) {
+                    throw new IOException("Unable to rename " + destinationFile + " to " + hashedFile);
+                }
+                mediaFiles.add(file, hashedFile, quickHash);
             }
         }
 
