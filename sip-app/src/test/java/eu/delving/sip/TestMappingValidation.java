@@ -112,7 +112,6 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
-    @Ignore
     @Test
     public void testTib() throws Exception {
         mock.prepareDataset(

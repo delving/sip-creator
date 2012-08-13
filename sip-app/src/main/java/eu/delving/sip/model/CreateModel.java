@@ -34,8 +34,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static eu.delving.sip.files.DataSetState.ABSENT;
-import static eu.delving.sip.files.DataSetState.MAPPING;
+import static eu.delving.sip.files.DataSetState.*;
 import static eu.delving.sip.model.CreateModel.Setter.*;
 import static eu.delving.sip.model.CreateState.*;
 import static eu.delving.sip.model.CreateTransition.*;
@@ -187,6 +186,7 @@ public class CreateModel {
         sipModel.exec(new Swing() {
             @Override
             public void run() {
+                if (!sipModel.getDataSetModel().getDataSetState().atLeast(SOURCED)) return;
                 if  (sipModel.getMappingModel().hasRecMapping()) {
                     sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
                 }

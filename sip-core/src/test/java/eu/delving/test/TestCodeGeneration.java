@@ -114,7 +114,7 @@ public class TestCodeGeneration {
         printWithLineNumbers(mappingRunner.getCode());
         Node node = mappingRunner.runMapping(createInputRecord());
 
-        String xml = new XmlSerializer().toXml(node);
+        String xml = new XmlSerializer().toXml(node, true);
         System.out.println(xml);
         Assert.assertEquals(EXPECT, xml);
     }

@@ -104,7 +104,7 @@ public class SipModel {
         mm.addChangeListener(recordCompileModel.getMappingModelChangeListener());
         mm.addSetListener(fieldCompileModel.getMappingModelSetListener());
         mm.addChangeListener(fieldCompileModel.getMappingModelChangeListener());
-        mm.addChangeListener(mappingHintsModel);
+        mm.addChangeListener(mappingHintsModel.getMappingChangeListener());
         mm.addSetListener(mappingSaveTimer);
         mm.addChangeListener(mappingSaveTimer);
         mm.addChangeListener(new MappingModel.ChangeListener() {
@@ -441,6 +441,7 @@ public class SipModel {
         public void run() {
             try {
                 dataSetModel.getDataSet().importedToSource(feedback, progressListener);
+                mappingHintsModel.refresh();
                 exec(new Swing() {
                     @Override
                     public void run() {

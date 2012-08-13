@@ -55,7 +55,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
-import static eu.delving.sip.files.DataSetState.NO_DATA;
+import static eu.delving.sip.files.DataSetState.*;
 
 /**
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
@@ -228,15 +228,15 @@ public class Application {
     }
 
     private JPanel createStatePanel() {
-        statusPanel.setReaction(DataSetState.ABSENT, allFrames.prepareForNothing());
+        statusPanel.setReaction(ABSENT, allFrames.prepareForNothing());
         statusPanel.setReaction(NO_DATA, importAction);
-        statusPanel.setReaction(DataSetState.IMPORTED, new InputAnalyzer());
-        statusPanel.setReaction(DataSetState.ANALYZED_IMPORT, allFrames.prepareForDelimiting());
-        statusPanel.setReaction(DataSetState.DELIMITED, new ConvertPerformer());
-        statusPanel.setReaction(DataSetState.SOURCED, new InputAnalyzer());
-        statusPanel.setReaction(DataSetState.ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
-        statusPanel.setReaction(DataSetState.MAPPING, validateAction);
-        statusPanel.setReaction(DataSetState.VALIDATED, allFrames.getUploadAction());
+        statusPanel.setReaction(IMPORTED, new InputAnalyzer());
+        statusPanel.setReaction(ANALYZED_IMPORT, allFrames.prepareForDelimiting());
+        statusPanel.setReaction(DELIMITED, new ConvertPerformer());
+        statusPanel.setReaction(SOURCED, new InputAnalyzer());
+        statusPanel.setReaction(ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
+        statusPanel.setReaction(MAPPING, validateAction);
+        statusPanel.setReaction(VALIDATED, allFrames.getUploadAction());
         JPanel p = new JPanel(new GridLayout(1, 0, 6, 6));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
