@@ -475,6 +475,7 @@ public class FunctionFrame extends FrameBase {
 
         @Override
         public Object getElementAt(int i) {
+            if (i < 0) return null;
             return functions.get(i);
         }
 

@@ -21,6 +21,7 @@
 
 package eu.delving;
 
+import eu.delving.metadata.SystemField;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public interface MappingResult {
 
     Map<String, List<String>> fields();
 
-    Map<String, List<String>> systemFields();
+    Map<SystemField, List<String>> systemFields();
 
     Map<String, List<String>> searchFields();
 

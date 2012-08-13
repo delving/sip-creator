@@ -28,23 +28,39 @@ package eu.delving.metadata;
  */
 
 public enum SystemField {
-    TITLE("delving_title"),
-    DESCRIPTION("delving_description"),
-    PROVIDER("delving_provider"),
-    OWNER("delving_owner"),
-    CREATOR("delving_creator"),
-    THUMBNAIL("delving_thumbnail"),
-    LANDING_PAGE("delving_landingPage"),
-    DEEP_ZOOM_URL("delving_deepZoomUrl"),
-    SPEC("delving_spec");
 
-    private final String tag;
+    TITLE,
+    DESCRIPTION,
+    PROVIDER,
+    OWNER,
+    CREATOR,
+    THUMBNAIL,
+    LANDING_PAGE("landingPage"),
+    DEEP_ZOOM_URL("deepZoomUrl"),
+    SPEC;
 
-    private SystemField(String tag) {
-        this.tag = tag;
+    public static final String NAMESPACE_URI = "http://schemas.delving.eu";
+    public static final String PREFIX = "delving";
+
+    private String localPart;
+
+    private SystemField() {
+        this.localPart = toString().toLowerCase();
     }
 
-    public String getTag() {
-        return tag;
+    private SystemField(String localPart) {
+        this.localPart = localPart;
+    }
+
+    public String getLocalPart() {
+        return localPart;
+    }
+
+    public String getPrefix() {
+        return PREFIX;
+    }
+
+    public String getNamespaceURI() {
+        return NAMESPACE_URI;
     }
 }

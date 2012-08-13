@@ -28,14 +28,14 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
-    <artifactId>sip-core</artifactId>
+    <artifactId>schema-repo</artifactId>
     <packaging>jar</packaging>
-    <name>SIP-Core</name>
+    <name>Schema-Repo</name>
     <version>1.0.8-SNAPSHOT</version>
     <description>
-        A Minimal set of classes shared between client and server, avoiding dependency on core module.
+        Schema repository
     </description>
-    <inceptionYear>2010</inceptionYear>
+    <inceptionYear>2012</inceptionYear>
 
     <organization>
         <name>Delving B.V.</name>
@@ -44,22 +44,8 @@
 
     <developers>
         <developer>
-            <name>Sjoerd Siebinga</name>
-            <email>sjoerd@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
             <name>Gerald de Jong</name>
             <email>gerald@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Eric van der Meulen</name>
-            <email>eric@delving.eu</email>
             <roles>
                 <role>developer</role>
             </roles>
@@ -117,23 +103,6 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>1.0.13</version>
         </dependency>
     </dependencies>
 

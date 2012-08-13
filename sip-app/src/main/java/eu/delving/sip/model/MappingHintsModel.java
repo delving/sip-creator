@@ -38,14 +38,20 @@ import java.util.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class MappingHintsModel implements MappingModel.ChangeListener {
+public class MappingHintsModel {
     private RecMapping mappingHints;
     private SipModel sipModel;
+    private MappingEar mappingEar = new MappingEar();
     private NodeMappingListModel nodeMappingListModel = new NodeMappingListModel();
     private SourceTreeNode sourceTree;
 
     public MappingHintsModel(SipModel sipModel) {
         this.sipModel = sipModel;
+    }
+
+
+    public MappingEar getMappingChangeListener() {
+        return mappingEar;
     }
 
     public NodeMappingListModel getNodeMappingListModel() {
@@ -58,27 +64,14 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
 
     public void setSourceTree(SourceTreeNode sourceTree) {
         this.sourceTree = sourceTree;
-        if (sourceTree != null) fillNodeMappings();
+        if (sourceTree != null) refresh();
     }
 
     public SortedSet<MappingFunction> getFunctions() {
         return mappingHints != null ? mappingHints.getFunctions() : null;
     }
 
-    private void fetchMappingHints(String metadataPrefix, RecDefModel recDefModel) {
-        mappingHints = null;
-        String resourceName = "/templates/" + Storage.FileType.MAPPING.getName(metadataPrefix);
-        URL resource = getClass().getResource(resourceName);
-        if (resource == null) return;
-        try {
-            mappingHints = RecMapping.read(resource.openStream(), recDefModel);
-        }
-        catch (Exception e) {
-            sipModel.getFeedback().alert("Unable to read mapping hints file: " + resourceName, e);
-        }
-    }
-
-    private void fillNodeMappings() {
+    public void refresh() {
         final List<NodeMapping> mappingHintList = new ArrayList<NodeMapping>();
         Set<Path> sourcePaths = new HashSet<Path>();
         sourceTree.getPaths(sourcePaths);
@@ -110,25 +103,41 @@ public class MappingHintsModel implements MappingModel.ChangeListener {
         });
     }
 
-    @Override
-    public void lockChanged(MappingModel mappingModel, boolean locked) {
+    private void fetchMappingHints(String metadataPrefix, RecDefModel recDefModel) {
+        mappingHints = null;
+        String resourceName = "/templates/" + Storage.FileType.MAPPING.getName(metadataPrefix);
+        URL resource = getClass().getResource(resourceName);
+        if (resource == null) return;
+        try {
+            mappingHints = RecMapping.read(resource.openStream(), recDefModel);
+        }
+        catch (Exception e) {
+            sipModel.getFeedback().alert("Unable to read mapping hints file: " + resourceName, e);
+        }
     }
 
-    @Override
-    public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-    }
+    private class MappingEar implements MappingModel.ChangeListener {
 
-    @Override
-    public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
-    }
+        @Override
+        public void lockChanged(MappingModel mappingModel, boolean locked) {
+        }
 
-    @Override
-    public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        if (sourceTree != null) fillNodeMappings();
-    }
+        @Override
+        public void functionChanged(MappingModel mappingModel, MappingFunction function) {
+        }
 
-    @Override
-    public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        if (sourceTree != null) fillNodeMappings();
+        @Override
+        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+        }
+
+        @Override
+        public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            if (sourceTree != null) refresh();
+        }
+
+        @Override
+        public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            if (sourceTree != null) refresh();
+        }
     }
 }

@@ -56,9 +56,10 @@ public class TestMappingEngine {
 
     @Test
     public void validateTreeNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("lido"), classLoader(), new MockRecDefModel("lido"), namespaces(
+        Map<String, String> namespaces = createNamespaces(
                 "lido", "http://www.lido-schema.org"
-        ));
+        );
+        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel("lido"), mapping("lido"));
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("lido"));
 //        System.out.println(result);
@@ -68,12 +69,13 @@ public class TestMappingEngine {
 
     @Test
     public void validateFlatNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("icn"), classLoader(), new MockRecDefModel("icn"), namespaces(
+        Map<String, String> namespaces = createNamespaces(
                 "dc", "http://purl.org/dc/elements/1.1/",
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "icn", "http://www.icn.nl/schemas/icn/"
-        ));
+        );
+        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel("icn"), mapping("icn"));
         MappingResult result = mappingEngine.execute(input("icn"));
         System.out.println(result.toXml());
         System.out.println(result.toXmlAugmented());
@@ -85,27 +87,40 @@ public class TestMappingEngine {
     }
 
     @Test
+    public void rawNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        Map<String, String> namespaces = createNamespaces(
+                "", "http://raw.org",
+                "dc", "http://purl.org/dc/elements/1.1/",
+                "dcterms", "http://purl.org/dc/terms/",
+                "europeana", "http://www.europeana.eu/schemas/ese/",
+                "icn", "http://www.icn.nl/schemas/icn/"
+        );
+        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces);
+        MappingResult result = mappingEngine.execute(input("icn"));
+        System.out.println(result.toXml());
+    }
+
+    @Test
     public void validateTIBNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("tib"), classLoader(), new MockRecDefModel("tib"), namespaces(
+        Map<String, String> namspaces = createNamespaces(
                 "dc", "http://purl.org/dc/elements/1.1/",
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "tib", "http://thuisinbrabant.nl"
-        ));
+        );
+        MappingEngine mappingEngine = new MappingEngine(classLoader(), namspaces, new MockRecDefModel("tib"), mapping("tib"));
         MappingResult result = mappingEngine.execute(input("tib"));
         System.out.println(result);
-//        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
-//            System.out.println(entry.getKey() + " -> "+entry.getValue());
-//        }
         Source source = new DOMSource(result.root());
         validator("tib").validate(source);
     }
 
     @Test
     public void tryAff() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
+        Map<String, String> namespaces = createNamespaces(
                 "lido", "http://www.lido-schema.org"
-        ));
+        );
+        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel("aff"), mapping("aff"));
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
@@ -113,18 +128,19 @@ public class TestMappingEngine {
 
     @Test
     public void indexDocumentFromAFF() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        MappingEngine mappingEngine = new MappingEngine(mapping("aff"), classLoader(), new MockRecDefModel("aff"), namespaces(
+        Map<String, String> namespaces = createNamespaces(
                 "lido", "http://www.lido-schema.org"
-        ));
+        );
+        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel("aff"), mapping("aff"));
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
-        Map<String,List<String>> allFields = result.fields();
+        Map<String, List<String>> allFields = result.fields();
 //        System.out.println(allFields);
         Assert.assertFalse(allFields.isEmpty());
     }
 
-    private Map<String, String> namespaces(String... arg) {
+    private Map<String, String> createNamespaces(String... arg) {
         Map<String, String> map = new TreeMap<String, String>();
         for (int walk = 0; walk < arg.length; walk += 2) map.put(arg[walk], arg[walk + 1]);
         return map;

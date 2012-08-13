@@ -98,17 +98,22 @@ public class MappingModel implements RecDefNodeListener {
     }
 
     public void notifyLockChanged(boolean locked) {
-        for (ChangeListener changeListener : changeListeners) changeListener.lockChanged(this, locked);
+        for (ChangeListener changeListener : changeListeners) {
+            changeListener.lockChanged(this, locked);
+        }
     }
 
     public void notifyFunctionChanged(MappingFunction mappingFunction) {
-        for (ChangeListener changeListener : changeListeners) changeListener.functionChanged(this, mappingFunction);
+        for (ChangeListener changeListener : changeListeners) {
+            changeListener.functionChanged(this, mappingFunction);
+        }
     }
 
     @Override
     public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping, NodeMappingChange change) {
-        for (ChangeListener changeListener : changeListeners)
+        for (ChangeListener changeListener : changeListeners) {
             changeListener.nodeMappingChanged(this, recDefNode, nodeMapping, change);
+        }
     }
 
     @Override

@@ -24,18 +24,26 @@ package eu.delving.groovy;
 import com.ctc.wstx.exc.WstxParsingException;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
 
 /**
  * When the MetadataRecord instances are not coming from the parse of an input file
- * using the MetadataParser, they can be produced one by one using the fromXml method, which
+ * using the MetadataParser, they can be produced one by one using the metadataRecordFrom method, which
  * first cleverly wraps the record and then parses it.
  *
  * @author Gerald de Jong <gerald@delving.eu>
@@ -43,6 +51,7 @@ import java.util.Map;
 
 public class MetadataRecordFactory {
     private XMLInputFactory2 inputFactory = (XMLInputFactory2) XMLInputFactory2.newInstance();
+    private DocumentBuilder documentBuilder;
     private Map<String, String> namespaces;
 
     public MetadataRecordFactory(Map<String, String> namespaces) {
@@ -51,13 +60,27 @@ public class MetadataRecordFactory {
         inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
         inputFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
         inputFactory.configureForSpeed();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            documentBuilder = factory.newDocumentBuilder();
+        }
+        catch (ParserConfigurationException e) {
+            throw new RuntimeException("Parser config?",e);
+        }
     }
 
     public MetadataRecord fromGroovyNode(GroovyNode rootNode, int recordNumber, int recordCount) {
         return new MetadataRecord(rootNode, recordNumber, recordCount);
     }
 
-    public MetadataRecord fromXml(String recordContents) throws XMLStreamException {
+    public Node nodeFromXml(String recordContents) throws IOException, SAXException {
+        String recordString = createCompleteRecordString(recordContents);
+        Document document = documentBuilder.parse(new InputSource(new StringReader(recordString)));
+        return document.getDocumentElement();
+    }
+
+    public MetadataRecord metadataRecordFrom(String recordContents) throws XMLStreamException {
         String recordString = createCompleteRecordString(recordContents);
         try {
             Reader reader = new StringReader(recordString);
@@ -128,9 +151,9 @@ public class MetadataRecordFactory {
                 out.append(String.format(" xmlns:%s=\"%s\"", namespace.getKey(), namespace.getValue()));
             }
         }
-        out.append(">");
+        out.append(">\n");
         out.append(xmlRecord);
-        out.append("</record>");
+        out.append("\n</record>");
         return out.toString();
     }
 }

@@ -198,7 +198,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     }
                     catch (Exception e) {
                         invalidCount++;
-                        reportWriter.println(serializer.toXml(node));
+                        reportWriter.println(serializer.toXml(node, true));
                         reportWriter.println("===");
                         if (!allowInvalid) {
                             switch (askHowToProceed(record.getRecordNumber())) {
@@ -212,7 +212,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                     break;
                                 case INVESTIGATE:
                                     done = true;
-                                    problemXML = serializer.toXml(node);
+                                    problemXML = serializer.toXml(node, true);
                                     problemMessage = e.getMessage();
                                     listener.failed(this);
                                     break;

@@ -44,7 +44,7 @@ public class MappingResultImpl implements MappingResult {
     private Logger logger = Logger.getLogger(getClass());
     private XmlSerializer serializer;
     private Map<String, List<String>> allFields = new TreeMap<String, List<String>>();
-    private Map<String, List<String>> systemFields = new TreeMap<String, List<String>>();
+    private Map<SystemField, List<String>> systemFields = new TreeMap<SystemField, List<String>>();
     private Map<String, List<String>> searchFields = new TreeMap<String, List<String>>();
     private Node root, rootAugmented;
     private RecDefTree recDefTree;
@@ -52,7 +52,7 @@ public class MappingResultImpl implements MappingResult {
     public MappingResultImpl(XmlSerializer serializer, Node root, RecDefTree recDefTree) {
         this.serializer = serializer;
         this.root = root;
-        this.recDefTree = recDefTree;
+        this.recDefTree = recDefTree; // todo: if null!!
     }
 
     @Override
@@ -71,7 +71,7 @@ public class MappingResultImpl implements MappingResult {
     }
 
     @Override
-    public Map<String, List<String>> systemFields() {
+    public Map<SystemField, List<String>> systemFields() {
         return systemFields;
     }
 
@@ -83,7 +83,7 @@ public class MappingResultImpl implements MappingResult {
     @Override
     public void checkMissingFields() throws MissingFieldsException {
         Set<String> missing = new TreeSet<String>();
-        Set<String> keys = systemFields.keySet();
+        Set<SystemField> keys = systemFields.keySet();
         addIfMissing(TITLE, keys, missing);
         addIfMissing(OWNER, keys, missing);
         addIfMissing(PROVIDER, keys, missing);
@@ -107,12 +107,12 @@ public class MappingResultImpl implements MappingResult {
 
     @Override
     public String toXml() {
-        return serializer.toXml(root);
+        return serializer.toXml(root, recDefTree != null);
     }
 
     @Override
     public String toXmlAugmented() {
-        return serializer.toXml(rootAugmented);
+        return serializer.toXml(rootAugmented, true);
     }
 
     public MappingResult resolve() {
@@ -124,9 +124,12 @@ public class MappingResultImpl implements MappingResult {
         }
         rootAugmented = root.cloneNode(true);
         Document document = rootAugmented.getOwnerDocument();
-        for (Map.Entry<String, List<String>> field : systemFields.entrySet()) {
+        for (Map.Entry<SystemField, List<String>> field : systemFields.entrySet()) {
             for (String value : field.getValue()) {
-                Node element = rootAugmented.appendChild(document.createElementNS(null, field.getKey()));
+                Node element = rootAugmented.appendChild(document.createElementNS(
+                        SystemField.NAMESPACE_URI,
+                        String.format("%s:%s", SystemField.PREFIX, field.getKey().getLocalPart())
+                ));
                 element.appendChild(document.createTextNode(value));
             }
         }
@@ -137,8 +140,8 @@ public class MappingResultImpl implements MappingResult {
         return toXml();
     }
 
-    private void addIfMissing(SystemField systemField, Set<String> keys, Set<String> missing) {
-        if (!keys.contains(systemField.toString())) missing.add(systemField.toString());
+    private void addIfMissing(SystemField systemField, Set<SystemField> keys, Set<String> missing) {
+        if (!keys.contains(systemField)) missing.add(systemField.toString());
     }
 
     private void resolveAFFRecord() {
@@ -201,7 +204,7 @@ public class MappingResultImpl implements MappingResult {
     private void handleMarkedField(RecDefNode recDefNode, String value) {
         for (RecDef.FieldMarker fieldMarker : recDefNode.getFieldMarkers()) {
             if (fieldMarker.type == null) {
-                putSystem(fieldMarker.name, value);
+                putSystem(SystemField.valueOf(fieldMarker.name), value);
             }
             else if ("search".equals(fieldMarker.type)) {
                 putSearch(fieldMarker.name, value);
@@ -209,8 +212,10 @@ public class MappingResultImpl implements MappingResult {
         }
     }
 
-    private void putSystem(String key, String value) {
-        put(systemFields, key, value);
+    private void putSystem(SystemField key, String value) {
+        List<String> list = systemFields.get(key);
+        if (list == null) systemFields.put(key, list = new ArrayList<String>(4));
+        list.add(value);
     }
 
     private void putSearch(String key, String value) {
