@@ -26,9 +26,12 @@ import eu.delving.metadata.MappingResultImpl;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Map;
 
@@ -43,16 +46,28 @@ public class MappingEngine {
     private MetadataRecordFactory metadataRecordFactory;
     private MappingRunner mappingRunner;
 
-    public MappingEngine(String mapping, ClassLoader classLoader, RecDefModel recDefModel, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
-        RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
-        GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
-        mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
-        metadataRecordFactory = new MetadataRecordFactory(namespaces);
+    public MappingEngine(ClassLoader classLoader, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
+        this(classLoader, namespaces, null, null);
     }
 
-    public MappingResult execute(String recordXML) throws XMLStreamException, MappingException {
-        MetadataRecord metadataRecord = metadataRecordFactory.fromXml(recordXML);
-        return new MappingResultImpl(serializer, mappingRunner.runMapping(metadataRecord), mappingRunner.getRecDefTree()).resolve();
+    public MappingEngine(ClassLoader classLoader, Map<String, String> namespaces, RecDefModel recDefModel, String mapping) throws FileNotFoundException, MetadataException {
+        metadataRecordFactory = new MetadataRecordFactory(namespaces);
+        if (mapping != null) {
+            RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
+            GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
+        }
+    }
+
+    public MappingResult execute(String recordXML) throws XMLStreamException, MappingException, IOException, SAXException {
+        if (mappingRunner != null) {
+            MetadataRecord metadataRecord = metadataRecordFactory.metadataRecordFrom(recordXML);
+            return new MappingResultImpl(serializer, mappingRunner.runMapping(metadataRecord), mappingRunner.getRecDefTree()).resolve();
+        }
+        else {
+            Node root = metadataRecordFactory.nodeFromXml(recordXML);
+            return new MappingResultImpl(serializer, root, null);
+        }
     }
 
     public String toString() {

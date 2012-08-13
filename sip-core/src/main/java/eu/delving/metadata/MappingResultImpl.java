@@ -52,7 +52,7 @@ public class MappingResultImpl implements MappingResult {
     public MappingResultImpl(XmlSerializer serializer, Node root, RecDefTree recDefTree) {
         this.serializer = serializer;
         this.root = root;
-        this.recDefTree = recDefTree;
+        this.recDefTree = recDefTree; // todo: if null!!
     }
 
     @Override
@@ -107,12 +107,12 @@ public class MappingResultImpl implements MappingResult {
 
     @Override
     public String toXml() {
-        return serializer.toXml(root);
+        return serializer.toXml(root, recDefTree != null);
     }
 
     @Override
     public String toXmlAugmented() {
-        return serializer.toXml(rootAugmented);
+        return serializer.toXml(rootAugmented, true);
     }
 
     public MappingResult resolve() {

@@ -282,7 +282,7 @@ public class MappingCompileModel {
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
                     if (node == null) return;
-                    String output = serializer.toXml(node);
+                    String output = serializer.toXml(node, true);
                     if (validator != null) {
                         ForgivingErrorHandler handler = new ForgivingErrorHandler();
                         validator.setErrorHandler(handler);

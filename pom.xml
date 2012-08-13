@@ -101,7 +101,6 @@
     <pluginRepositories/>
 
     <modules>
-        <module>schema-repo</module>
         <module>sip-core</module>
         <module>sip-app</module>
     </modules>
