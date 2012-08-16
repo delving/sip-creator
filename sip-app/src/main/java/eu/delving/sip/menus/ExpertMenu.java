@@ -21,7 +21,6 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.actions.MediaImportAction;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -54,8 +53,8 @@ public class ExpertMenu extends JMenu {
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
         add(new WriteOutputAction());
-        add(new MediaImportAction(desktop, sipModel));
-        add(new UploadMediaAction());
+//        add(new MediaImportAction(desktop, sipModel));
+//        add(new UploadMediaAction());
     }
 
     private class MaxUniqueValueLengthAction extends AbstractAction {
