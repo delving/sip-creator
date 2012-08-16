@@ -13,8 +13,7 @@ import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
 import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
@@ -30,18 +29,18 @@ public class TestSchemaRepository {
     @Test
     public void compare() throws IOException {
         HTTPFetcher httpFetcher = new HTTPFetcher();
-        ResourceFetcher resourceFetcher = new ResourceFetcher();
-        SchemaRepository repo = new SchemaRepository(resourceFetcher);
+        LocalFetcher localFetcher = new LocalFetcher();
+        SchemaRepository repo = new SchemaRepository(localFetcher);
         for (Schema schema : repo.getSchemas()) {
             SchemaVersion schemaVersion = new SchemaVersion(
                     schema.prefix,
                     schema.versions.get(0).number
             );
             String http = httpFetcher.fetchSchema(schemaVersion, SchemaType.RECORD_DEFINITION).trim();
-            String resource = resourceFetcher.fetchSchema(schemaVersion, SchemaType.RECORD_DEFINITION).trim();
+            String resource = localFetcher.fetchSchema(schemaVersion, SchemaType.RECORD_DEFINITION).trim();
             Assert.assertEquals("Should be identical", resource, http);
             http = httpFetcher.fetchSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA).trim();
-            resource = resourceFetcher.fetchSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA).trim();
+            resource = localFetcher.fetchSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA).trim();
             Assert.assertEquals("Should be identical", resource, http);
         }
     }
@@ -49,7 +48,7 @@ public class TestSchemaRepository {
     @Test
     public void testLocal() throws IOException {
         System.out.println("from local resources:");
-        fetchTest(new ResourceFetcher());
+        fetchTest(new LocalFetcher());
     }
 
     @Test
@@ -108,7 +107,8 @@ public class TestSchemaRepository {
         }
     }
 
-    private class ResourceFetcher implements Fetcher {
+    private class LocalFetcher implements Fetcher {
+        private File schemas;
 
         @Override
         public String fetchList() {
@@ -131,8 +131,9 @@ public class TestSchemaRepository {
         }
 
         public String getFileContents(String path) {
-            InputStream in = getClass().getResourceAsStream("/schemas" + path);
+            if (schemas == null) findSchemasDirectory();
             try {
+                InputStream in = new FileInputStream(new File(schemas, path));
                 StringBuilder text = new StringBuilder();
                 boolean firstLine = true;
                 for (String line : IOUtils.readLines(in, "UTF-8")) {
@@ -148,6 +149,29 @@ public class TestSchemaRepository {
             }
             catch (IOException e) {
                 throw new RuntimeException(e);
+            }
+        }
+
+        private void findSchemasDirectory() {
+            String here = new File(".").getAbsolutePath();
+            schemas = new File(here.substring(0, here.length() - 1)); // remove the dot
+            while (true) {
+                String schemasPath = schemas.getAbsolutePath();
+                if (schemasPath.length() > 1) {
+                    File[] schemaDirectory = schemas.listFiles(new SchemaFilter());
+                    if (schemaDirectory.length == 1) {
+                        schemas = schemaDirectory[0];
+                        break;
+                    }
+                }
+                schemas = schemas.getParentFile();
+            }
+        }
+
+        private class SchemaFilter implements FileFilter {
+            @Override
+            public boolean accept(File directory) {
+                return directory.isDirectory() && directory.getName().equals("schemas.delving.eu");
             }
         }
     }
