@@ -1,8 +1,28 @@
+/*
+ * Copyright 2011, 2012 Delving BV
+ *
+ *  Licensed under the EUPL, Version 1.0 or? as soon they
+ *  will be approved by the European Commission - subsequent
+ *  versions of the EUPL (the "Licence");
+ *  you may not use this work except in compliance with the
+ *  Licence.
+ *  You may obtain a copy of the Licence at:
+ *
+ *  http://ec.europa.eu/idabc/eupl
+ *
+ *  Unless required by applicable law or agreed to in
+ *  writing, software distributed under the Licence is
+ *  distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ *  express or implied.
+ *  See the Licence for the specific language governing
+ *  permissions and limitations under the Licence.
+ */
+
 package eu.delving.schema;
 
-
+import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.schema.xml.Schema;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -13,7 +33,7 @@ import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.IOException;
 
 import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
 import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
@@ -29,7 +49,7 @@ public class TestSchemaRepository {
     @Test
     public void compare() throws IOException {
         HTTPFetcher httpFetcher = new HTTPFetcher();
-        LocalFetcher localFetcher = new LocalFetcher();
+        FileSystemFetcher localFetcher = new FileSystemFetcher();
         SchemaRepository repo = new SchemaRepository(localFetcher);
         for (Schema schema : repo.getSchemas()) {
             SchemaVersion schemaVersion = new SchemaVersion(
@@ -48,7 +68,7 @@ public class TestSchemaRepository {
     @Test
     public void testLocal() throws IOException {
         System.out.println("from local resources:");
-        fetchTest(new LocalFetcher());
+        fetchTest(new FileSystemFetcher());
     }
 
     @Test
@@ -104,75 +124,6 @@ public class TestSchemaRepository {
                 throw new IOException("HTTP Error " + line.getStatusCode() + " " + line.getReasonPhrase());
             }
             return EntityUtils.toString(response.getEntity());
-        }
-    }
-
-    private class LocalFetcher implements Fetcher {
-        private File schemas;
-
-        @Override
-        public String fetchList() {
-            return getFileContents(SCHEMA_DIRECTORY);
-        }
-
-        @Override
-        public String fetchFactDefinitions(String versionNumber) throws IOException {
-            return getFileContents(FACT_DEFINITIONS);
-        }
-
-        @Override
-        public String fetchSchema(SchemaVersion schemaVersion, SchemaType schemaType) {
-            return getFileContents(schemaVersion.getPath(schemaType));
-        }
-
-        @Override
-        public Boolean isValidating() {
-            return true;
-        }
-
-        public String getFileContents(String path) {
-            if (schemas == null) findSchemasDirectory();
-            try {
-                InputStream in = new FileInputStream(new File(schemas, path));
-                StringBuilder text = new StringBuilder();
-                boolean firstLine = true;
-                for (String line : IOUtils.readLines(in, "UTF-8")) {
-                    if (firstLine) {
-                        firstLine = false;
-                    }
-                    else {
-                        text.append('\n');
-                    }
-                    text.append(line);
-                }
-                return text.toString();
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private void findSchemasDirectory() {
-            String here = new File(".").getAbsolutePath();
-            schemas = new File(here.substring(0, here.length() - 1)); // remove the dot
-            while (true) {
-                String schemasPath = schemas.getAbsolutePath();
-                if (schemasPath.length() > 1) {
-                    File[] schemaDirectory = schemas.listFiles(new SchemaFilter());
-                    if (schemaDirectory.length == 1) {
-                        schemas = schemaDirectory[0];
-                        break;
-                    }
-                }
-                schemas = schemas.getParentFile();
-            }
-        }
-
-        private class SchemaFilter implements FileFilter {
-            @Override
-            public boolean accept(File directory) {
-                return directory.isDirectory() && directory.getName().equals("schemas.delving.eu");
-            }
         }
     }
 

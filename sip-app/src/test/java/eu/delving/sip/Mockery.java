@@ -26,17 +26,13 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.*;
-import eu.delving.schema.Fetcher;
-import eu.delving.schema.SchemaType;
-import eu.delving.schema.SchemaVersion;
+import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.xml.MetadataParser;
-import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Node;
 
@@ -73,7 +69,7 @@ public class Mockery {
         root = new File(target, "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
-        storage = new StorageImpl(root, new ResourceFetcher(), new DefaultHttpClient());
+        storage = new StorageImpl(root, new FileSystemFetcher(), new DefaultHttpClient());
     }
 
     public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {
@@ -170,50 +166,4 @@ public class Mockery {
     private void delete(File file) {
         FileUtils.deleteQuietly(file);
     }
-
-    private class ResourceFetcher implements Fetcher {
-
-        @Override
-        public String fetchList() throws IOException {
-            return getFileContents(SCHEMA_DIRECTORY);
-        }
-
-        @Override
-        public String fetchFactDefinitions(String versionNumber) throws IOException {
-            return getFileContents(FACT_DEFINITIONS);
-        }
-
-        @Override
-        public String fetchSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
-            return getFileContents(schemaVersion.getPath(schemaType));
-        }
-
-        @Override
-        public Boolean isValidating() {
-            return false;
-        }
-
-        public String getFileContents(String path) throws IOException {
-            File schemas = new File("schema-repo/src/test/resources/schemas");
-            if (!schemas.exists()) {
-                schemas = new File("../schema-repo/src/test/resources/schemas");
-                Assert.assertTrue(schemas.exists());
-            }
-            InputStream in = new FileInputStream(new File(schemas, path));
-            StringBuilder text = new StringBuilder();
-            boolean firstLine = true;
-            for (String line : IOUtils.readLines(in, "UTF-8")) {
-                if (firstLine) {
-                    firstLine = false;
-                }
-                else {
-                    text.append('\n');
-                }
-                text.append(line);
-            }
-            return text.toString();
-        }
-    }
-
-
 }
