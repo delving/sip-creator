@@ -21,6 +21,8 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -42,13 +44,17 @@ import java.io.File;
 
 public class ExpertMenu extends JMenu {
     private SipModel sipModel;
+    private CultureHubClient cultureHubClient;
 
-    public ExpertMenu(final SipModel sipModel) {
+    public ExpertMenu(JDesktopPane desktop, final SipModel sipModel, CultureHubClient cultureHubClient) {
         super("Expert");
         this.sipModel = sipModel;
+        this.cultureHubClient = cultureHubClient;
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
         add(new WriteOutputAction());
+//        add(new MediaImportAction(desktop, sipModel));
+//        add(new UploadMediaAction());
     }
 
     private class MaxUniqueValueLengthAction extends AbstractAction {
@@ -152,6 +158,29 @@ public class ExpertMenu extends JMenu {
         private void failedAnswer(String message) {
             sipModel.getFeedback().alert(message);
             sipModel.getPreferences().put(FileProcessor.OUTPUT_FILE_PREF, "");
+        }
+    }
+
+    private class UploadMediaAction extends AbstractAction {
+        private UploadMediaAction() {
+            super("Upload media files");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            setEnabled(false);
+            if (sipModel.getDataSetModel().isEmpty()) return;
+            try {
+                cultureHubClient.uploadMedia(sipModel.getDataSetModel().getDataSet(), new Swing() {
+                    @Override
+                    public void run() {
+                        setEnabled(true);
+                    }
+                });
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to upload media", e);
+            }
         }
     }
 }

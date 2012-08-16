@@ -52,9 +52,7 @@ public interface Storage {
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         VALIDATION(null, "validation_", ".int", "validation_%s.int", 1),
         RESULT_STATS(null, "stats-result_", ".xml.gz", "stats-result_%s.xml.gz", 1),
-        REPORT(null, null, null, "report_%s.txt", 1),
-        RECORD_DEFINITION(null, null, "-record-definition.xml", "%s-record-definition.xml", 1),
-        SCHEMA(null, null, "-validation.xsd", "%s-validation.xsd", 1);
+        REPORT(null, null, null, "report_%s.txt", 1);
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;
@@ -105,10 +103,13 @@ public interface Storage {
     String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
     String MAX_UNIQUE_VALUE_LENGTH = "maxUniqueValueLength";
     String UNIQUE_VALUE_CONVERTER = "uniqueValueConverter";
+    String SCHEMA_VERSIONS = "schemaVersions";
     String HARVEST_URL = "harvestUrl";
     String HARVEST_PREFIX = "harvestPrefix";
     String HARVEST_SPEC = "harvestSpec";
     String CACHE_DIR = "Cache";
+    String MEDIA_DIR = "Media";
+    String INDEX_FILE = "media-files.xml";
     String HELP_FILE = "help.html";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
