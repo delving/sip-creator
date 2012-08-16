@@ -22,6 +22,7 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.*;
+import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -76,7 +77,8 @@ public class DataSetModel implements RecDefModel {
     public List<String> getInvalidPrefixes() throws StorageException {
         List<String> invalid = new ArrayList<String>();
         if (!isEmpty()) {
-            for (String prefix : dataSet.getPrefixes()) {
+            for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
+                String prefix = schemaVersion.getPrefix();
                 if (!dataSet.isValidated(prefix)) invalid.add(prefix);
             }
         }

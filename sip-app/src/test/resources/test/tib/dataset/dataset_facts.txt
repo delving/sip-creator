@@ -6,4 +6,4 @@ language=nl
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
 spec=tib
-
+schemaVersions=tib_1.0.0

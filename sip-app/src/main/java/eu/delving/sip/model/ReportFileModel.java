@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -62,24 +63,19 @@ public class ReportFileModel {
 
     public void refresh() {
         if (sipModel.getDataSetModel().isEmpty()) return;
-        try {
-            DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-            reports.clear();
-            for (String prefix : dataSet.getPrefixes()) {
-                ProcessingReport processingReport = new ProcessingReport(dataSet, prefix);
-                reports.add(processingReport);
-                sipModel.exec(processingReport);
+        DataSet dataSet = sipModel.getDataSetModel().getDataSet();
+        reports.clear();
+        for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
+            ProcessingReport processingReport = new ProcessingReport(dataSet, schemaVersion.getPrefix());
+            reports.add(processingReport);
+            sipModel.exec(processingReport);
+        }
+        sipModel.exec(new Swing() {
+            @Override
+            public void run() {
+                listener.reportsUpdated(ReportFileModel.this);
             }
-            sipModel.exec(new Swing() {
-                @Override
-                public void run() {
-                    listener.reportsUpdated(ReportFileModel.this);
-                }
-            });
-        }
-        catch (StorageException e) {
-            sipModel.getFeedback().alert("Validation Report", e);
-        }
+        });
     }
 
     public class ProcessingReport implements Work.DataSetPrefixWork {
@@ -134,7 +130,7 @@ public class ReportFileModel {
                     }
                 }
                 else {
-                    summary.add(String.format("Processing not yet performed for %s.",prefix.toUpperCase()));
+                    summary.add(String.format("Processing not yet performed for %s.", prefix.toUpperCase()));
                 }
                 invalidListModel.setLines(invalid);
                 sipModel.exec(invalidListModel);

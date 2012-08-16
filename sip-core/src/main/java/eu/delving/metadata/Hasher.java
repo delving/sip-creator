@@ -39,6 +39,8 @@ import java.util.zip.GZIPInputStream;
 public class Hasher {
     private static final String SEPARATOR = "__";
     private static final int BLOCK_SIZE = 4096;
+    private static final int QUICK_SAMPLES = 8;
+    public static final int QUICK_SAMPLE_SIZE = 1024;
     private MessageDigest messageDigest;
 
     public static String extractFileName(File file) {
@@ -85,6 +87,21 @@ public class Hasher {
         return hash.equals(hasher.getHashString());
     }
 
+    public static String quickHash(File file) throws IOException {
+        Hasher hasher = new Hasher();
+        RandomAccessFile raf = new RandomAccessFile(file, "r");
+        byte [] chunk = new byte[QUICK_SAMPLE_SIZE];
+        long length = raf.length() - chunk.length;
+        long step = length/QUICK_SAMPLES;
+        for (int walk=0; walk<QUICK_SAMPLES; walk++) {
+            raf.seek(step * walk);
+            raf.readFully(chunk);
+            hasher.update(chunk, chunk.length);
+        }
+        raf.close();
+        return hasher.getHashString().substring(4, 14);
+    }
+
     public Hasher() {
         try {
             this.messageDigest = MessageDigest.getInstance("MD5");
@@ -95,6 +112,7 @@ public class Hasher {
     }
 
     public DigestOutputStream createDigestOutputStream(OutputStream outputStream) {
+        messageDigest.reset();
         return new DigestOutputStream(outputStream, messageDigest);
     }
 

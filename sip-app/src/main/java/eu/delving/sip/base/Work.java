@@ -61,6 +61,7 @@ public interface Work extends Runnable {
         SEEK_RESET(DATA_SET),
 
         IMPORT_SOURCE(DATA_SET),
+        IMPORT_MEDIA(DATA_SET),
         PARSE_ANALYZE(DATA_SET),
         CONVERT_SOURCE(DATA_SET),
         SCAN_RECORDS(DATA_SET),

@@ -50,7 +50,7 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class ImportAction extends AbstractAction {
+public class DataImportAction extends AbstractAction {
     private JDesktopPane parent;
     private SipModel sipModel;
     private final String RECENT_DIR = "recentImportDirectory";
@@ -59,7 +59,7 @@ public class ImportAction extends AbstractAction {
     private HarvestAction harvestAction = new HarvestAction();
     private JFileChooser chooser = new JFileChooser("XML Metadata Source File");
 
-    public ImportAction(JDesktopPane parent, SipModel sipModel) {
+    public DataImportAction(JDesktopPane parent, SipModel sipModel) {
         super("Import new data into this data set");
         putValue(Action.SMALL_ICON, SwingHelper.IMPORT_ICON);
         putValue(
@@ -124,7 +124,7 @@ public class ImportAction extends AbstractAction {
         chooser.setMultiSelectionEnabled(false);
     }
 
-    public boolean selectInputFile(File file) {
+    private boolean selectInputFile(File file) {
         if (!file.exists() || sipModel.getDataSetModel().isEmpty()) return false;
         String spec = sipModel.getDataSetModel().getDataSet().getSpec();
         boolean doImport = sipModel.getFeedback().confirm(

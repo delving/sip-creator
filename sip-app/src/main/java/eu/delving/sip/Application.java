@@ -26,8 +26,8 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
+import eu.delving.sip.actions.DataImportAction;
 import eu.delving.sip.actions.DownloadAction;
-import eu.delving.sip.actions.ImportAction;
 import eu.delving.sip.actions.ReleaseAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.*;
@@ -45,6 +45,7 @@ import eu.delving.sip.panels.StatusPanel;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.HttpClient;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -109,9 +110,10 @@ public class Application {
         });
         feedback = new VisualFeedback(desktop);
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
-        Storage storage = new StorageImpl(storageDirectory, cultureHubClient.getHttpClient());
+        HttpClient http = cultureHubClient.getHttpClient();
+        Storage storage = new StorageImpl(storageDirectory, new HTTPSchemaFetcher(http) , http);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
-        expertMenu = new ExpertMenu(sipModel);
+        expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
         home.addComponentListener(new ComponentAdapter() {
@@ -122,7 +124,7 @@ public class Application {
         });
         desktop.setBackground(new Color(190, 190, 200));
         allFrames = new AllFrames(desktop, sipModel, cultureHubClient);
-        helpPanel = new HelpPanel(sipModel, cultureHubClient.getHttpClient());
+        helpPanel = new HelpPanel(sipModel, http);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
@@ -153,7 +155,7 @@ public class Application {
             }
         });
         downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
-        importAction = new ImportAction(desktop, sipModel);
+        importAction = new DataImportAction(desktop, sipModel);
         dataSetMenu = new DataSetMenu(sipModel);
         validateAction = new ValidateAction(sipModel, dataSetMenu, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
@@ -167,7 +169,7 @@ public class Application {
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
         home.setIconImage(logo.getImage());
         oauthClient = new OAuthClient(
-                cultureHubClient.getHttpClient(),
+                http,
                 StorageFinder.getHostPort(storageDirectory),
                 StorageFinder.getUser(storageDirectory),
                 new PasswordFetcher()
