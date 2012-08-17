@@ -83,6 +83,10 @@ public class MappingRunner {
         return recMapping.getRecDefTree();
     }
 
+    public RecDef getRecDef() {
+        return getRecDefTree().getRecDef();
+    }
+
     public String getCode() {
         return code;
     }
@@ -94,15 +98,14 @@ public class MappingRunner {
         try {
             Binding binding = new Binding();
             DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getNamespaces());
-            RecDef recDef = recMapping.getRecDefTree().getRecDef();
-            binding.setVariable("_optLookup", recDef.optLookup);
+            binding.setVariable("_optLookup", getRecDef().optLookup);
             binding.setVariable("output", builder);
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));
             if (pluginBinding != null) {
                 List<MappingFunction> functions = new ArrayList<MappingFunction>();
                 functions.addAll(recMapping.getFunctions());
-                functions.addAll(getRecDefTree().getRecDef().functions);
+                if (getRecDef().functions != null) functions.addAll(getRecDef().functions);
                 for (MappingFunction function : functions) {
                     Object functionBinding = pluginBinding.getFunctionBinding(function.name);
                     if (functionBinding == null) continue;

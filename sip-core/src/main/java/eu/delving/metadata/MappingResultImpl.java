@@ -116,6 +116,7 @@ public class MappingResultImpl implements MappingResult {
     }
 
     public MappingResult resolve() {
+        elementHasContent((Element) root);
         if (recDefTree.getRecDef().flat) {
             resolveFlatRecord();
         }
@@ -134,6 +135,41 @@ public class MappingResultImpl implements MappingResult {
             }
         }
         return this;
+    }
+
+    private boolean elementHasContent(Element element) {
+        NodeList kids = element.getChildNodes();
+        boolean elementContent = false;
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            if (kid.getNodeType() == Node.ELEMENT_NODE) {
+                Element kidElement = (Element) kid;
+                boolean textChildren = nodeHasTextChildren(kidElement);
+                if (textChildren) {
+                    elementContent = true;
+                }
+                else if (elementHasContent(kidElement)) {
+                    elementContent = true;
+                }
+                else {
+                    element.removeChild(kidElement);
+                }
+            }
+        }
+        return elementContent;
+    }
+
+    private boolean nodeHasTextChildren(Element element) {
+        NodeList kids = element.getChildNodes();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.TEXT_NODE:
+                case Node.CDATA_SECTION_NODE:
+                    return !kid.getTextContent().trim().isEmpty();
+            }
+        }
+        return false;
     }
 
     public String toString() {

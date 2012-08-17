@@ -91,8 +91,8 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = engine(namespaces, "icn");
         MappingResult result = mappingEngine.execute(input("icn"));
-        System.out.println(result.toXml());
-        System.out.println(result.toXmlAugmented());
+//        System.out.println(result.toXml());
+//        System.out.println(result.toXmlAugmented());
 //        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
 //            System.out.println(entry.getKey() + " -> "+entry.getValue());
 //        }
@@ -111,7 +111,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces);
         MappingResult result = mappingEngine.execute(input("icn"));
-        System.out.println(result.toXml());
+//        System.out.println(result.toXml());
     }
 
     @Test
@@ -124,7 +124,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = engine(namespaces, "tib");
         MappingResult result = mappingEngine.execute(input("tib"));
-        System.out.println(result);
+//        System.out.println(result);
         Source source = new DOMSource(result.root());
         validator("tib").validate(source);
     }
@@ -135,10 +135,10 @@ public class TestMappingEngine {
                 "lido", "http://www.lido-schema.org"
         );
         MappingEngine mappingEngine = engine(namespaces, "aff");
-        System.out.println(mappingEngine);
+//        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("aff"));
         String xml = result.toXml();
-        System.out.println(result);
+//        System.out.println(result);
         Assert.assertTrue("media file not matched", xml.indexOf("4F8EF966FF32B363C1E611A9EAE3370A") > 0);
     }
 
