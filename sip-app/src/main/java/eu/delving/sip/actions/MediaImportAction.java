@@ -22,7 +22,7 @@
 package eu.delving.sip.actions;
 
 import eu.delving.metadata.Hasher;
-import eu.delving.sip.base.MediaFiles;
+import eu.delving.plugin.MediaFiles;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -40,7 +40,7 @@ import java.io.*;
 import java.util.*;
 
 import static eu.delving.sip.files.DataSetState.ABSENT;
-import static eu.delving.sip.files.Storage.INDEX_FILE;
+import static eu.delving.sip.files.Storage.MEDIA_INDEX;
 
 /**
  * Import media to be matched with a dataset
@@ -95,7 +95,7 @@ public class MediaImportAction extends AbstractAction {
         );
         if (doImport) {
             setEnabled(false);
-            sipModel.exec(new DirectoryScanner(dataSet, file, dataSet.getMediaDirectory()));
+            sipModel.exec(new DirectoryScanner(dataSet, file));
             return true;
         }
         return false;
@@ -120,18 +120,18 @@ public class MediaImportAction extends AbstractAction {
     }
 
     private class DirectoryScanner implements Work.LongTermWork, Work.DataSetWork {
-        public static final int ALLOWED_FAILURES = 3;
         private Hasher hasher = new Hasher();
-        private File sourceDirectory, targetDirectory;
+        private File sourceDirectory, targetDirectory, mediaIndexFile;
         private List<File> fileList = new ArrayList<File>();
         private ProgressListener progressListener;
         private DataSet dataSet;
         private MediaFiles mediaFiles;
 
-        private DirectoryScanner(DataSet dataSet, File sourceDirectory, File targetDirectory) {
+        private DirectoryScanner(DataSet dataSet, File sourceDirectory) {
             this.dataSet = dataSet;
             this.sourceDirectory = sourceDirectory;
-            this.targetDirectory = targetDirectory;
+            this.targetDirectory = dataSet.getMediaDirectory();
+            this.mediaIndexFile = dataSet.getMediaIndexFile();
         }
 
         @Override
@@ -166,13 +166,12 @@ public class MediaImportAction extends AbstractAction {
             gatherFilesFrom(sourceDirectory);
             progressListener.prepareFor(fileList.size());
             targetDirectory.mkdirs();
-            File indexFile = new File(targetDirectory, INDEX_FILE);
-            mediaFiles = indexFile.exists() ? MediaFiles.read(new FileInputStream(indexFile)) : new MediaFiles();
+            mediaFiles = mediaIndexFile.exists() ? MediaFiles.read(new FileInputStream(mediaIndexFile)) : MediaFiles.create();
             Set<String> fileNames = new HashSet<String>();
             File[] files = targetDirectory.listFiles();
             if (files != null) {
                 for (File mediaFile : files) {
-                    if (mediaFile.getName().equals(INDEX_FILE)) continue;
+                    if (mediaFile.getName().equals(MEDIA_INDEX)) continue;
                     fileNames.add(mediaFile.getName());
                 }
             }
@@ -183,7 +182,7 @@ public class MediaImportAction extends AbstractAction {
                 handleSourceFile(file);
             }
             mediaFiles.purge();
-            MediaFiles.write(mediaFiles, indexFile);
+            MediaFiles.write(mediaFiles, mediaIndexFile);
         }
 
         private void handleSourceFile(File file) throws IOException {

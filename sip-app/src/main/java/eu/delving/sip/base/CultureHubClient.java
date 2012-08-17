@@ -26,6 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.metadata.Hasher;
+import eu.delving.plugin.MediaFiles;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -504,7 +505,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                FileInputStream inputStream = new FileInputStream(new File(dataSet.getMediaDirectory(), Storage.INDEX_FILE));
+                FileInputStream inputStream = new FileInputStream(new File(dataSet.getMediaDirectory(), Storage.MEDIA_INDEX));
                 MediaFiles mediaFiles = MediaFiles.read(inputStream);
                 inputStream.close();
                 HttpPost listRequest = createSubmitRequest(dataSet, mediaFiles);

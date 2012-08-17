@@ -47,15 +47,15 @@ public class MappingEngine {
     private MappingRunner mappingRunner;
 
     public MappingEngine(ClassLoader classLoader, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
-        this(classLoader, namespaces, null, null);
+        this(classLoader, namespaces, null, null, null);
     }
 
-    public MappingEngine(ClassLoader classLoader, Map<String, String> namespaces, RecDefModel recDefModel, String mapping) throws FileNotFoundException, MetadataException {
+    public MappingEngine(ClassLoader classLoader, Map<String, String> namespaces, RecDefModel recDefModel, PluginBinding pluginBinding, String mapping) throws FileNotFoundException, MetadataException {
         metadataRecordFactory = new MetadataRecordFactory(namespaces);
         if (mapping != null) {
             RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
             GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
-            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, pluginBinding, null);
         }
     }
 

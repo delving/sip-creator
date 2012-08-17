@@ -21,10 +21,8 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.CodeOut;
-import eu.delving.metadata.EditPath;
-import eu.delving.metadata.RecDefTree;
-import eu.delving.metadata.RecMapping;
+import eu.delving.PluginBinding;
+import eu.delving.metadata.*;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
@@ -63,13 +61,15 @@ public class MappingRunner {
     private Script script;
     private GroovyCodeResource groovyCodeResource;
     private RecMapping recMapping;
+    private PluginBinding pluginBinding;
     private GroovyNode factsNode = new GroovyNode(null, "facts");
     private String code;
     private int counter = 0;
 
-    public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath) {
+    public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, PluginBinding pluginBinding, EditPath editPath) {
         this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
+        this.pluginBinding = pluginBinding;
         CodeOut codeOut = CodeOut.create();
         recMapping.toCode(codeOut, editPath);
         code = codeOut.toString();
@@ -87,17 +87,28 @@ public class MappingRunner {
         return code;
     }
 
-    public Node runMapping(MetadataRecord metadataRecord) throws MappingException  {
+    public Node runMapping(MetadataRecord metadataRecord) throws MappingException {
         if ((counter % 100) == 0) groovyCodeResource.flush();
         if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
         counter += 1;
         try {
             Binding binding = new Binding();
             DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getNamespaces());
-            binding.setVariable("_optLookup", recMapping.getRecDefTree().getRecDef().optLookup);
+            RecDef recDef = recMapping.getRecDefTree().getRecDef();
+            binding.setVariable("_optLookup", recDef.optLookup);
             binding.setVariable("output", builder);
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));
+            if (pluginBinding != null) {
+                List<MappingFunction> functions = new ArrayList<MappingFunction>();
+                functions.addAll(recMapping.getFunctions());
+                functions.addAll(getRecDefTree().getRecDef().functions);
+                for (MappingFunction function : functions) {
+                    Object functionBinding = pluginBinding.getFunctionBinding(function.name);
+                    if (functionBinding == null) continue;
+                    binding.setVariable(String.format("_%s_", function.name), functionBinding);
+                }
+            }
             script.setBinding(binding);
             return stripEmptyElements(script.run());
         }

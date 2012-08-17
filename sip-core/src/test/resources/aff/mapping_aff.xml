@@ -136,8 +136,8 @@
     <node-mapping inputPath="/input/acquisition.source" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventActor"/>
     <node-mapping inputPath="/input/acquisition.source" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventActor/aff:displayActor"/>
     <node-mapping inputPath="/input/acquisition.place" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventPlace/aff:displayPlace"/>
-    <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#thumbnail]/aff:resourceUrl"/>
-    <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#fullImage]/aff:resourceUrl"/>
-    <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#landingPage]/aff:resourceUrl"/>
+    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#thumbnail]/aff:resourceUrl"/>
+    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#fullImage]/aff:resourceUrl"/>
+    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#landingPage]/aff:resourceUrl"/>
   </node-mappings>
 </rec-mapping>

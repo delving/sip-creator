@@ -151,6 +151,11 @@ public class StorageImpl implements Storage {
         }
 
         @Override
+        public File getMediaIndexFile() {
+            return new File(here, MEDIA_INDEX);
+        }
+
+        @Override
         public File getMediaDirectory() {
             return new File(here, MEDIA_DIR);
         }

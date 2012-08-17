@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.PluginBinding;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
@@ -48,7 +49,7 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class DataSetModel implements RecDefModel {
+public class DataSetModel implements RecDefModel, PluginBinding {
     private DataSet dataSet;
     private DataSetState currentState = ABSENT;
     private MappingModel mappingModel;
@@ -115,6 +116,11 @@ public class DataSetModel implements RecDefModel {
         catch (StorageException e) {
             throw new MetadataException(e);
         }
+    }
+
+    @Override
+    public Object getFunctionBinding(String functionName) throws MetadataException {
+        return null; // todo: generally, how to fix?
     }
 
     public void setDataSet(final DataSet dataSet, String prefix) throws StorageException {

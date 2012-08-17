@@ -109,7 +109,7 @@ public interface Storage {
     String HARVEST_SPEC = "harvestSpec";
     String CACHE_DIR = "Cache";
     String MEDIA_DIR = "Media";
-    String INDEX_FILE = "media-files.xml";
+    String MEDIA_INDEX = "media-files.xml";
     String HELP_FILE = "help.html";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));

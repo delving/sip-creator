@@ -22,6 +22,7 @@
 package eu.delving.sip.xml;
 
 import eu.delving.MappingResult;
+import eu.delving.PluginBinding;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.ProgressListener;
@@ -61,6 +62,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private XmlSerializer serializer = new XmlSerializer();
     private Feedback feedback;
     private DataSet dataSet;
+    private PluginBinding pluginBinding;
     private RecMapping recMapping;
     private BitSet valid;
     private PrintWriter reportWriter;
@@ -99,6 +101,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.recordCount = recordCount;
         this.feedback = sipModel.getFeedback();
         this.dataSet = sipModel.getDataSetModel().getDataSet();
+        this.pluginBinding = sipModel.getDataSetModel();
         this.recMapping = sipModel.getMappingModel().getRecMapping();
         this.outputDirectory = outputDirectory;
         this.groovyCodeResource = groovyCodeResource;
@@ -166,7 +169,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         Validator validator;
         try {
             validator = createValidator();
-            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, pluginBinding, null);
             parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
             reportWriter = getDataSet().openReportWriter(recMapping.getPrefix());
             if (outputDirectory != null) xmlOutput = createXmlOutput();
