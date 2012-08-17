@@ -90,6 +90,10 @@ public class MediaFiles {
             MediaFile file = value.get(key.getChild());
             if (file != null) return file.name;
         }
+        if (matchTree.size() == 1) {
+            MediaFile file = matchTree.values().iterator().next().get(key.getBastard());
+            if (file != null) return file.name;
+        }
         return "";
     }
 
@@ -169,6 +173,12 @@ public class MediaFiles {
             return childKey;
         }
 
+        private MatchTreeKey getBastard() {
+            MatchTreeKey childKey = new MatchTreeKey("?" + key);
+            childKey.index = index + 1;
+            return childKey;
+        }
+
         public String toString() {
             return key.substring(0, index + 1);
         }
@@ -228,7 +238,13 @@ public class MediaFiles {
         public MediaFile get(MatchTreeKey key) {
             if (mediaFile != null) return mediaFile;
             MatchTreeValue value = matchTree.get(key);
-            if (value == null) return null;
+            if (value == null) {
+                if (matchTree.size() == 1) {
+                    MediaFile file = matchTree.values().iterator().next().get(key.getBastard());
+                    if (file != null) return file;
+                }
+                return null;
+            }
             return value.get(key.getChild());
         }
     }

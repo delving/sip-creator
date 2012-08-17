@@ -44,5 +44,7 @@ public class TestMediaFiles {
 //        mediaFiles.printMatchTree();
         String fileName = mediaFiles.match("D:\\whatever\\we\\encounter\\16513-01.tif");
         assertEquals("mismatch", "3FDD9FF7D732B16C9F2DE2DBB19D5975.tif", fileName);
+        fileName = mediaFiles.match("16513-01");
+        assertEquals("mismatch", "3FDD9FF7D732B16C9F2DE2DBB19D5975.tif", fileName);
     }
 }
