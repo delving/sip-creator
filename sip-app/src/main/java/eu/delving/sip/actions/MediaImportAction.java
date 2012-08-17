@@ -181,7 +181,6 @@ public class MediaImportAction extends AbstractAction {
                 progressListener.setProgress(walk++);
                 handleSourceFile(file);
             }
-            mediaFiles.purge();
             MediaFiles.write(mediaFiles, mediaIndexFile);
         }
 
