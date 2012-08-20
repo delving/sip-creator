@@ -123,7 +123,7 @@ public class TestSchemaRepository {
             if (line.getStatusCode() != HttpStatus.SC_OK) {
                 throw new IOException("HTTP Error " + line.getStatusCode() + " " + line.getReasonPhrase());
             }
-            return EntityUtils.toString(response.getEntity());
+            return EntityUtils.toString(response.getEntity(), "UTF-8");
         }
     }
 
