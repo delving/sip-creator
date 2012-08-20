@@ -108,9 +108,9 @@ public class DataSetModel implements RecDefModel, PluginBinding {
     }
 
     @Override
-    public RecDefTree createRecDef(String prefix) throws MetadataException {
+    public RecDefTree createRecDefTree(SchemaVersion schemaVersion) throws MetadataException {
         try {
-            RecDef recDef = dataSet.getRecDef(prefix);
+            RecDef recDef = dataSet.getRecDef(schemaVersion.getPrefix());
             return RecDefTree.create(recDef);
         }
         catch (StorageException e) {

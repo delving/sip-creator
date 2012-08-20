@@ -30,6 +30,7 @@ import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.plugin.MediaFiles;
+import eu.delving.schema.SchemaVersion;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -204,7 +205,7 @@ public class TestMappingEngine {
         }
 
         @Override
-        public RecDefTree createRecDef(String prefix) throws MetadataException {
+        public RecDefTree createRecDefTree(SchemaVersion schemaVersion) throws MetadataException {
             if (!this.prefix.equals(prefix)) throw new RuntimeException();
             return RecDefTree.create(RecDef.read(stream(String.format("/%s/%s-record-definition.xml", prefix, prefix))));
         }

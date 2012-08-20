@@ -26,6 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import eu.delving.schema.SchemaVersion;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -53,6 +54,9 @@ public class RecMapping {
     String prefix;
 
     @XStreamAsAttribute
+    String schemaVersion;
+
+    @XStreamAsAttribute
     boolean locked;
 
     @XStreamAlias("facts")
@@ -70,13 +74,19 @@ public class RecMapping {
     public RecMapping() {
     }
 
-    private RecMapping(String prefix, RecDefTree recDefTree) {
-        this.prefix = prefix;
+    private RecMapping(RecDefTree recDefTree) {
+        this.prefix = recDefTree.getRecDef().prefix;
+        this.schemaVersion = recDefTree.getRecDef().version;
         this.recDefTree = recDefTree;
     }
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public SchemaVersion getSchemaVersion() {
+        if (prefix == null || schemaVersion == null) throw new IllegalStateException("Prefix and/or schemaVersion missing");
+        return new SchemaVersion(prefix, schemaVersion);
     }
 
     public boolean isLocked() {
@@ -181,8 +191,8 @@ public class RecMapping {
         }
     }
 
-    public static RecMapping create(String prefix, RecDefModel recDefModel) throws MetadataException {
-        RecMapping recMapping = new RecMapping(prefix, recDefModel.createRecDef(prefix));
+    public static RecMapping create(RecDefTree recDefTree) throws MetadataException {
+        RecMapping recMapping = new RecMapping(recDefTree);
         recMapping.resolve();
         return recMapping;
     }
@@ -213,8 +223,16 @@ public class RecMapping {
 
     public static RecMapping read(Reader reader, RecDefModel recDefModel) throws MetadataException {
         RecMapping recMapping = (RecMapping) stream().fromXML(reader);
-        recMapping.recDefTree = recDefModel.createRecDef(recMapping.prefix);
+        recMapping.recDefTree = recDefModel.createRecDefTree(recMapping.getSchemaVersion());
         recMapping.resolve();
+        return recMapping;
+    }
+
+    public static RecMapping upgrade(RecMapping previousVersion, String version, RecDefModel recDefModel) throws MetadataException {
+        SchemaVersion schemaVersion = new SchemaVersion(previousVersion.getPrefix(), version);
+        RecDefTree recDefTree =  recDefModel.createRecDefTree(schemaVersion);
+        RecMapping recMapping = new RecMapping(recDefTree);
+        // todo: copy stuff carefully
         return recMapping;
     }
 
