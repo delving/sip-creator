@@ -157,15 +157,13 @@ public class StorageImpl implements Storage {
 
         @Override
         public List<SchemaVersion> getSchemaVersions() {
-            List<SchemaVersion> schemaVersions = new ArrayList<SchemaVersion>();
             String fact = getDataSetFacts().get(SCHEMA_VERSIONS);
+            List<SchemaVersion> schemaVersions = new ArrayList<SchemaVersion>();
             if (fact == null) {
-                fact = temporarilyHackedSchemaVersions(here);
+                schemaVersions = temporarilyHackedSchemaVersions(here);
             }
-            if (fact != null) {
-                for (String sv : fact.split(" *, *")) {
-                    schemaVersions.add(new SchemaVersion(sv));
-                }
+            else {
+                for (String sv : fact.split(" *, *")) schemaVersions.add(new SchemaVersion(sv));
             }
             return schemaVersions;
         }
@@ -407,7 +405,10 @@ public class StorageImpl implements Storage {
             }
             else {
                 try {
-                    return RecMapping.create(prefix, recDefModel);
+                    for (SchemaVersion schemaVersion : getSchemaVersions()) {
+                        if (prefix.equals(schemaVersion.getPrefix())) return RecMapping.create(recDefModel.createRecDefTree(schemaVersion));
+                    }
+                    throw new StorageException("Unable to find version for "+prefix);
                 }
                 catch (MetadataException e) {
                     throw new StorageException("Unable to load record definition", e);

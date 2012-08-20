@@ -75,6 +75,6 @@ public class HTTPSchemaFetcher implements Fetcher {
         if (line.getStatusCode() != HttpStatus.SC_OK) {
             throw new IOException("HTTP Error " + line.getStatusCode() + " " + line.getReasonPhrase());
         }
-        return EntityUtils.toString(response.getEntity()).trim();
+        return EntityUtils.toString(response.getEntity(), "UTF-8").trim();
     }
 }

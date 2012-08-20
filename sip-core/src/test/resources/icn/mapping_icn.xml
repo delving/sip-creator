@@ -1,4 +1,4 @@
-<rec-mapping prefix="icn">
+<rec-mapping prefix="icn" schemaVersion="1.0.0">
   <facts>
     <entry>
       <string>orgId</string>

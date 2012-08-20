@@ -23,6 +23,7 @@ package eu.delving.test;
 
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
+import eu.delving.schema.SchemaVersion;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.w3c.dom.Node;
@@ -44,7 +45,7 @@ public class TestCodeGeneration {
 
     static {
         try {
-            recMapping = RecMapping.create("lido", recDefModel());
+            recMapping = RecMapping.create(recDefModel().createRecDefTree(new SchemaVersion("lido", "1.0.0")));
             recMapping.getRecDefTree().setListener(new RecDefNodeListener() {
                 @Override
                 public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping, NodeMappingChange change) {
@@ -220,8 +221,8 @@ public class TestCodeGeneration {
         return new RecDefModel() {
 
             @Override
-            public RecDefTree createRecDef(String prefix) {
-                if (!"lido".equals(prefix)) throw new RuntimeException();
+            public RecDefTree createRecDefTree(SchemaVersion schemaVersion) {
+                if (!"lido".equals(schemaVersion.getPrefix())) throw new RuntimeException();
                 try {
                     URL url = TestCodeGeneration.class.getResource("/codegen/test-code-generation-recdef.xml");
                     InputStream inputStream = url.openStream();

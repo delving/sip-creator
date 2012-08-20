@@ -1,4 +1,4 @@
-<rec-mapping prefix="aff">
+<rec-mapping prefix="aff" schemaVersion="1.0.0">
   <facts>
     <entry>
       <string>spec</string>

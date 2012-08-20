@@ -47,6 +47,18 @@ import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
 public class TestSchemaRepository {
 
     @Test
+    public void testLocal() throws IOException {
+        System.out.println("from local resources:");
+        fetchTest(new FileSystemFetcher());
+    }
+
+    @Test
+    public void testSchemasDelvingEU() throws IOException {
+        System.out.println("from schemas.delving.eu:");
+        fetchTest(new HTTPFetcher());
+    }
+
+    @Test
     public void compare() throws IOException {
         HTTPFetcher httpFetcher = new HTTPFetcher();
         FileSystemFetcher localFetcher = new FileSystemFetcher();
@@ -63,18 +75,6 @@ public class TestSchemaRepository {
             resource = localFetcher.fetchSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA).trim();
             Assert.assertEquals("Should be identical", resource, http);
         }
-    }
-
-    @Test
-    public void testLocal() throws IOException {
-        System.out.println("from local resources:");
-        fetchTest(new FileSystemFetcher());
-    }
-
-    @Test
-    public void testSchemasDelvingEU() throws IOException {
-        System.out.println("from schemas.delving.eu:");
-        fetchTest(new HTTPFetcher());
     }
 
     private void fetchTest(Fetcher fetcher) throws IOException {
@@ -123,7 +123,7 @@ public class TestSchemaRepository {
             if (line.getStatusCode() != HttpStatus.SC_OK) {
                 throw new IOException("HTTP Error " + line.getStatusCode() + " " + line.getReasonPhrase());
             }
-            return EntityUtils.toString(response.getEntity());
+            return EntityUtils.toString(response.getEntity(), "UTF-8");
         }
     }
 
