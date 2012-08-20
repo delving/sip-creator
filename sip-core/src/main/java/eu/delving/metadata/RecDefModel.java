@@ -21,6 +21,8 @@
 
 package eu.delving.metadata;
 
+import eu.delving.schema.SchemaVersion;
+
 /**
  * This interface describes objects which are able to deliver all of the information
  * about the target record definitions.  It creates a fresh RecDefTree every time
@@ -32,5 +34,5 @@ package eu.delving.metadata;
 
 public interface RecDefModel {
 
-    RecDefTree createRecDef(String prefix) throws MetadataException;
+    RecDefTree createRecDefTree(SchemaVersion schemaVersion) throws MetadataException;
 }

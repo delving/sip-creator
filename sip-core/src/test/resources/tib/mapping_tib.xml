@@ -1,4 +1,4 @@
-<rec-mapping prefix="tib">
+<rec-mapping prefix="tib" schemaVersion="1.0.0">
   <facts>
     <entry>
       <string>orgId</string>

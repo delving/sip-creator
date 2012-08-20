@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<record-definition prefix="aff" flat="false">
+<record-definition prefix="aff" version="0.1.0" flat="false">
 
     <!--<version>1.0</version>-->
 

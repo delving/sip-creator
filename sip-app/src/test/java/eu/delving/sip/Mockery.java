@@ -83,7 +83,7 @@ public class Mockery {
         if (!factsSourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
         dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()), prefix);
-        recMapping = RecMapping.create(prefix, dataSetModel);
+        recMapping = dataSetModel.getDataSet().getRecMapping(prefix, dataSetModel);
     }
 
     public Storage storage() {

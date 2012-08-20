@@ -23,6 +23,7 @@ package eu.delving.sip.files;
 
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.Path;
+import eu.delving.schema.SchemaVersion;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
@@ -286,29 +287,19 @@ public class StorageHelper {
             {"aff", "0.1.0"},
     };
 
-    static String temporarilyHackedSchemaVersions(File dir) {
+    static List<SchemaVersion> temporarilyHackedSchemaVersions(File dir) {
         File[] xsds = dir.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return file.isFile() && file.getName().endsWith("-validation.xsd");
             }
         });
-        String hacked = "";
-        boolean first = true;
+        List<SchemaVersion> hacked = new ArrayList<SchemaVersion>();
         for (File xsd : xsds) {
             String prefix = xsd.getName();
             prefix = prefix.substring(0, prefix.indexOf("-"));
             for (String[] hint : HACK_VERSION_HINTS) {
-                if (hint[0].equals(prefix)) {
-                    String schemaVersion = String.format("%s_%s", prefix, hint[1]);
-                    if (first) {
-                        hacked += schemaVersion;
-                        first = false;
-                    }
-                    else {
-                        hacked += ", " + schemaVersion;
-                    }
-                }
+                if (hint[0].equals(prefix)) hacked.add(new SchemaVersion(prefix, hint[1]));
             }
         }
         return hacked;

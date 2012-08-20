@@ -43,8 +43,7 @@ public class SchemaVersion {
     }
 
     public SchemaVersion(String prefix, String version) {
-        this.prefix = prefix;
-        this.version = version;
+        this(prefix + "_" + version);
     }
 
     public String getPrefix() {
