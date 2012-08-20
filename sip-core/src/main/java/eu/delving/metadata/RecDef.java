@@ -60,7 +60,6 @@ import java.util.*;
 public class RecDef {
 
     private static final String DELIM = "[ ,]+";
-    private static final String INDENT = "    ";
 
     public static RecDef read(InputStream in) {
         try {
@@ -79,6 +78,9 @@ public class RecDef {
 
     @XStreamAsAttribute
     public String prefix;
+
+    @XStreamAsAttribute
+    public String version;
 
     @XStreamAsAttribute
     public boolean flat;
@@ -137,6 +139,7 @@ public class RecDef {
     }
 
     private void resolve() {
+        if (prefix == null || version == null) throw new RuntimeException("Prefix and/or version missing");
         root.resolve(Path.create(), this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);

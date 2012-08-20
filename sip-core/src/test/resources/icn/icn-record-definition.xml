@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<record-definition prefix="icn" flat="true">
+<record-definition prefix="icn" version="1.0.0" flat="true">
 
     <namespaces>
         <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
