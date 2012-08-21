@@ -46,6 +46,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A unit test of the mapping engine
@@ -111,7 +113,12 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = new MappingEngine(classLoader(), namspaces, new MockRecDefModel("tib"), mapping("tib"));
         MappingResult result = mappingEngine.execute(input("tib"));
-        System.out.println(result);
+        String augmented = result.toXmlAugmented();
+        Matcher matcher = Pattern.compile("<delving:thumbnail>").matcher(augmented);
+        Assert.assertTrue("first one not found", matcher.find());
+        Assert.assertFalse("second one should not be found", matcher.find());
+//        System.out.println(matcher.find() + " - "+matcher.find());
+//        System.out.println(augmented);
         Source source = new DOMSource(result.root());
         validator("tib").validate(source);
     }
