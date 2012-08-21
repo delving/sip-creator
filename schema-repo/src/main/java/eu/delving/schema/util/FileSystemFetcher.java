@@ -61,7 +61,7 @@ public class FileSystemFetcher implements Fetcher {
     public String getFileContents(String path) {
         if (schemas == null) findSchemasDirectory();
         try {
-            return FileUtils.readFileToString(new File(schemas, path));
+            return FileUtils.readFileToString(new File(schemas, path), "UTF-8");
         }
         catch (IOException e) {
             throw new RuntimeException(e);

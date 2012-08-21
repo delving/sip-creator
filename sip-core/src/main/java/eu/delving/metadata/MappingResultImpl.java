@@ -126,14 +126,34 @@ public class MappingResultImpl implements MappingResult {
         Document document = rootAugmented.getOwnerDocument();
         for (Map.Entry<SystemField, List<String>> field : systemFields.entrySet()) {
             for (String value : field.getValue()) {
-                Node element = rootAugmented.appendChild(document.createElementNS(
+                Element freshElement = document.createElementNS(
                         SystemField.NAMESPACE_URI,
                         String.format("%s:%s", SystemField.PREFIX, field.getKey().getLocalPart())
-                ));
-                element.appendChild(document.createTextNode(value));
+                );
+                if (!isDuplicate(freshElement, value)) {
+                    Node rootChild = rootAugmented.appendChild(freshElement);
+                    rootChild.appendChild(document.createTextNode(value));
+                }
             }
         }
         return this;
+    }
+
+    private boolean isDuplicate(Element element, String value) {
+        NodeList kids = rootAugmented.getChildNodes();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.ELEMENT_NODE:
+                    boolean samePrefix = kid.getPrefix().equals(element.getPrefix());
+                    boolean sameLocalName = kid.getLocalName().equals(element.getLocalName());
+                    if (samePrefix && sameLocalName) {
+                        Node text = kid.getFirstChild();
+                        if (value.equals(text.getTextContent())) return true;
+                    }
+            }
+        }
+        return false;
     }
 
     public String toString() {
