@@ -53,8 +53,7 @@ import java.util.TreeMap;
 
 public class Mockery {
     private static final String ORG = "organization";
-    private File root;
-    private File dataSetDir;
+    private File root, target, dataSetDir;
     private Storage storage;
     private DataSetModel dataSetModel = new DataSetModel();
     private RecMapping recMapping;
@@ -62,7 +61,7 @@ public class Mockery {
     private String prefix;
 
     public Mockery() throws StorageException, MetadataException {
-        File target = null, target1 = new File("sip-app/target"), target2 = new File("target");
+        File target1 = new File("sip-app/target"), target2 = new File("target");
         if (target1.exists()) target = target1;
         if (target2.exists()) target = target2;
         if (target == null) throw new RuntimeException("target directory not found: " + target);
@@ -84,6 +83,10 @@ public class Mockery {
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
         dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()), prefix);
         recMapping = dataSetModel.getDataSet().getRecMapping(prefix, dataSetModel);
+    }
+
+    public File tempFile() throws IOException {
+        return File.createTempFile("validation", "temp", target);
     }
 
     public Storage storage() {
