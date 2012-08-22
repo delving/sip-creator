@@ -82,8 +82,7 @@ public class StatsFrame extends FrameBase {
     private JComponent createWest() {
         final JTabbedPane tabs = new JTabbedPane();
         for (StatsSet statsSet : statsSets) tabs.addTab(statsSet.statsSetName, statsSet.treePanel);
-        int width = getFontMetrics(getFont()).stringWidth("this is a very long string to determine width");
-        tabs.setPreferredSize(new Dimension(width, 10));
+        tabs.setPreferredSize(new Dimension(300, 10));
         tabs.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent changeEvent) {
