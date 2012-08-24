@@ -24,6 +24,8 @@ package eu.delving.sip.base;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
+import javax.jnlp.ServiceManager;
+import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
@@ -116,5 +118,15 @@ public class SwingHelper {
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         p.add(scroll);
         return p;
+    }
+
+    public static boolean isDevelopmentMode() {
+        try {
+            ServiceManager.lookup("javax.jnlp.BasicService");
+            return false;
+        }
+        catch (UnavailableServiceException ue) {
+            return true;
+        }
     }
 }

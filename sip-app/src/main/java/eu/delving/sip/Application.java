@@ -26,6 +26,8 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
+import eu.delving.schema.Fetcher;
+import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.actions.DataImportAction;
 import eu.delving.sip.actions.DownloadAction;
 import eu.delving.sip.actions.ReleaseAction;
@@ -56,6 +58,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
 import static eu.delving.sip.files.DataSetState.*;
 
 /**
@@ -111,7 +114,8 @@ public class Application {
         feedback = new VisualFeedback(desktop);
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         HttpClient http = cultureHubClient.getHttpClient();
-        Storage storage = new StorageImpl(storageDirectory, new HTTPSchemaFetcher(http) , http);
+        Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher() : new HTTPSchemaFetcher(http);
+        Storage storage = new StorageImpl(storageDirectory, fetcher, http);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient);
         statusPanel = new StatusPanel(sipModel);

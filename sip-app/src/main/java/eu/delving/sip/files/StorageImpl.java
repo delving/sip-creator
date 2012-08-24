@@ -26,6 +26,7 @@ import eu.delving.schema.Fetcher;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
@@ -734,7 +735,7 @@ public class StorageImpl implements Storage {
         String fileName = schemaVersion.getFullFileName(RECORD_DEFINITION);
         try {
             File file = cache(fileName);
-            if (!file.exists()) {
+            if (!file.exists() || SwingHelper.isDevelopmentMode()) {
                 String recDefXML = schemaRepository.getSchema(schemaVersion, RECORD_DEFINITION);
                 FileUtils.write(file, recDefXML, "UTF-8");
             }
@@ -749,7 +750,7 @@ public class StorageImpl implements Storage {
         String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
         try {
             File file = cache(fileName);
-            if (!file.exists()) {
+            if (!file.exists() || SwingHelper.isDevelopmentMode()) {
                 String valXML = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
                 FileUtils.write(file, valXML, "UTF-8");
             }
