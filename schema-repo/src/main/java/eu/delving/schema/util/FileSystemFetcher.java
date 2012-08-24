@@ -55,7 +55,7 @@ public class FileSystemFetcher implements Fetcher {
 
     @Override
     public Boolean isValidating() {
-        return true;
+        return false;
     }
 
     public String getFileContents(String path) {
