@@ -28,7 +28,7 @@ package eu.delving.schema;
  */
 
 public enum SchemaType {
-    FACT_DEFINITIONS("fact-definition-list_%s.xml"),
+    FACT_DEFINITIONS("definition-list.xml"),
     RECORD_DEFINITION("record-definition.xml"),
     VALIDATION_SCHEMA("validation.xsd"),
     VIEW_DEFINITION("view-definition.xml");
