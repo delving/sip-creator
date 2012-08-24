@@ -36,8 +36,6 @@ public interface Fetcher {
 
     String fetchList() throws IOException;
 
-    String fetchFactDefinitions(String versionNumber) throws IOException;
-
     String fetchSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException;
 
     Boolean isValidating();
