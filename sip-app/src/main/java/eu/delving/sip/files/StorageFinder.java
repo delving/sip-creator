@@ -121,7 +121,7 @@ public class StorageFinder {
 
     private static File createHostPortDirectory(String[] args) {
         if (args.length > 0) {
-            String user = args[0];
+            String user = args[0].trim();
             URL codebase = getCodebase();
             String host = codebase.getHost();
             int port = codebase.getPort();
