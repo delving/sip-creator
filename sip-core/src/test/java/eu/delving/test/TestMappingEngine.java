@@ -67,7 +67,7 @@ public class TestMappingEngine {
 
     @Before
     public void initRepo() throws IOException {
-        schemaRepo = new SchemaRepository(new FileSystemFetcher());
+        schemaRepo = new SchemaRepository(new FileSystemFetcher(true));
     }
 
     @Test
