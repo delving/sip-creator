@@ -68,7 +68,7 @@ public class Mockery {
         root = new File(target, "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
-        storage = new StorageImpl(root, new FileSystemFetcher(), new DefaultHttpClient());
+        storage = new StorageImpl(root, new FileSystemFetcher(true), new DefaultHttpClient());
     }
 
     public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {
