@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
 @XStreamAlias("path")
 public class Path implements Comparable<Path>, Serializable {
     private static final Pattern PAT = Pattern.compile("/([^\\[/]*)(\\[([^\\]]*)\\])?");
-    private static final Path ROOT = new Path();
+    public static final Path ROOT = new Path();
     private Path parent;
     private Tag tag;
     private String string;

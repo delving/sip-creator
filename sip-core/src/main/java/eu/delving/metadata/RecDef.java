@@ -135,6 +135,11 @@ public class RecDef {
         throw new RuntimeException(String.format("No elem [%s]", tag));
     }
 
+    public String getFieldType(Path path) {
+        path = path.withDefaultPrefix(prefix);
+        return root.getFieldType(path);
+    }
+
     public String toString() {
         List<Path> paths = new ArrayList<Path>();
         Path path = Path.create();
@@ -383,6 +388,18 @@ public class RecDef {
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
+        }
+
+        public String getFieldType(Path path) {
+            if (path.getTag(0).equals(tag)) {
+                if (path.parent() == Path.ROOT) return fieldType;
+                Path subPath = path.withRootRemoved();
+                for (Elem sub : elemList) {
+                    String fieldType = sub.getFieldType(subPath);
+                    if (fieldType != null) return fieldType;
+                }
+            }
+            return null;
         }
     }
 
