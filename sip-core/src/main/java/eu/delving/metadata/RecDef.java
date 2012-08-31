@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import eu.delving.schema.SchemaVersion;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -107,6 +108,11 @@ public class RecDef {
     @XStreamOmitField
     public Map<String, Map<String, OptList.Opt>> optLookup = new TreeMap<String, Map<String, OptList.Opt>>();
 
+    public SchemaVersion getSchemaVersion() {
+        if (prefix == null || version == null) throw new IllegalArgumentException("Mapping lacks prefix or version");
+        return new SchemaVersion(prefix, version);
+    }
+
     public Map<String, String> getNamespacesMap() {
         Map<String, String> ns = new HashMap<String, String>();
         if (namespaces != null) for (Namespace namespace : namespaces) ns.put(namespace.prefix, namespace.uri);
@@ -127,6 +133,11 @@ public class RecDef {
             if (def.tag.equals(tag)) return def;
         }
         throw new RuntimeException(String.format("No elem [%s]", tag));
+    }
+
+    public String getFieldType(Path path) {
+        path = path.withDefaultPrefix(prefix);
+        return root.getFieldType(path);
     }
 
     public String toString() {
@@ -377,6 +388,18 @@ public class RecDef {
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
+        }
+
+        public String getFieldType(Path path) {
+            if (path.getTag(0).equals(tag)) {
+                if (path.parent() == Path.ROOT) return fieldType;
+                Path subPath = path.withRootRemoved();
+                for (Elem sub : elemList) {
+                    String fieldType = sub.getFieldType(subPath);
+                    if (fieldType != null) return fieldType;
+                }
+            }
+            return null;
         }
     }
 

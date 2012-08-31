@@ -160,6 +160,6 @@ public class RecDefTree implements RecDefNodeListener {
             if (marker.path == null) continue;
             marker.resolve(this);
         }
-        if (!missing.isEmpty()) throw new IllegalStateException("Record definition missing system fields: "+missing);
+        if (!missing.isEmpty()) System.out.println("Warning: "+ recDef.getSchemaVersion()+" is missing system fields: "+missing);
     }
 }
