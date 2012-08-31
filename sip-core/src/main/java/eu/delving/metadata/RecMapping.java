@@ -276,7 +276,7 @@ public class RecMapping {
     public static final String[][] HACK_VERSION_HINTS = {
             {"icn", "1.0.0"},
             {"abm", "1.0.0"},
-            {"tib", "1.0.0"},
+            {"tib", "1.0.1"},
             {"ese", "3.4.0"},
             {"aff", "0.1.0"},
             {"itin", "1.0.0"},
