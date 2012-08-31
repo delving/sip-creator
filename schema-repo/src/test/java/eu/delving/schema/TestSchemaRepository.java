@@ -49,7 +49,7 @@ public class TestSchemaRepository {
     @Test
     public void testLocal() throws IOException {
         System.out.println("from local resources:");
-        fetchTest(new FileSystemFetcher());
+        fetchTest(new FileSystemFetcher(true));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class TestSchemaRepository {
     @Test
     public void compareLocalToOnline() throws IOException {
         HTTPFetcher httpFetcher = new HTTPFetcher();
-        FileSystemFetcher localFetcher = new FileSystemFetcher();
+        FileSystemFetcher localFetcher = new FileSystemFetcher(true);
         SchemaRepository repo = new SchemaRepository(localFetcher);
         for (Schema schema : repo.getSchemas()) {
             SchemaVersion schemaVersion = new SchemaVersion(

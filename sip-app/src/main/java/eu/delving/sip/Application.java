@@ -114,7 +114,7 @@ public class Application {
         feedback = new VisualFeedback(desktop);
         CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
         HttpClient http = cultureHubClient.getHttpClient();
-        Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher() : new HTTPSchemaFetcher(http);
+        Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(http);
         Storage storage = new StorageImpl(storageDirectory, fetcher, http);
         sipModel = new SipModel(storage, groovyCodeResource, feedback);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient);

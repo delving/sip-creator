@@ -37,6 +37,11 @@ import java.io.IOException;
  */
 public class FileSystemFetcher implements Fetcher {
     private File schemas;
+    private boolean validating;
+
+    public FileSystemFetcher(boolean validating) {
+        this.validating = validating;
+    }
 
     @Override
     public String fetchList() {
@@ -50,7 +55,7 @@ public class FileSystemFetcher implements Fetcher {
 
     @Override
     public Boolean isValidating() {
-        return false;
+        return validating;
     }
 
     public String getFileContents(String path) {

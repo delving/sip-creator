@@ -170,21 +170,17 @@ public class InputFrame extends FrameBase {
                 toolTip = String.format("Size: %d", ((List) node.getNodeValue()).size());
             }
             else {
-                String value = node.text();
-                if (value.contains("\n") || value.length() >= MAX_LENGTH) {
-                    int index = value.indexOf('\n');
-                    if (index > 0) {
-                        value = value.substring(0, index);
-                    }
-                    if (value.length() >= MAX_LENGTH) {
-                        value = value.substring(0, MAX_LENGTH);
-                    }
-                    string = String.format("<html><b>%s</b> = %s ...</html>", node.getNodeName(), value);
-                    toolTip = node.text();
+                String truncated = node.text();
+                if (truncated.contains("\n") || truncated.length() >= MAX_LENGTH) {
+                    int index = truncated.indexOf('\n');
+                    if (index > 0) truncated = truncated.substring(0, index);
+                    if (truncated.length() >= MAX_LENGTH) truncated = truncated.substring(0, MAX_LENGTH);
+                    string = String.format("<html><b>%s</b> = %s ...</html>", node.getNodeName(), truncated);
+                    toolTip = tameTooltipText(node.text());
                 }
                 else {
-                    string = String.format("<html><b>%s</b> = %s</html>", node.getNodeName(), value);
-                    toolTip = value;
+                    string = String.format("<html><b>%s</b> = %s</html>", node.getNodeName(), truncated);
+                    toolTip = truncated;
                 }
             }
             if (this.node.getNodeValue() instanceof List) {
@@ -261,6 +257,21 @@ public class InputFrame extends FrameBase {
         private void compilePathList(List<TreeNode> list) {
             if (parent != null) parent.compilePathList(list);
             list.add(this);
+        }
+
+        private String tameTooltipText(String text) {
+            List<String> lines = new ArrayList<String>();
+            while (text.length() > MAX_LENGTH) {
+                int pos = text.indexOf(' ', MAX_LENGTH - 10);
+                if (pos < 0) break;
+                if (pos > MAX_LENGTH + 5) pos = MAX_LENGTH;
+                lines.add(text.substring(0, pos).trim());
+                text = text.substring(pos).trim();
+            }
+            if (!text.trim().isEmpty()) lines.add(text);
+            StringBuilder html = new StringBuilder("<html>");
+            for (String line : lines) html.append(line).append("<br/>\n");
+            return html.toString();
         }
 
         @Override
