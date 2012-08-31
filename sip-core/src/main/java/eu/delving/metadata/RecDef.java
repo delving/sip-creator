@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import eu.delving.schema.SchemaVersion;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -106,6 +107,11 @@ public class RecDef {
 
     @XStreamOmitField
     public Map<String, Map<String, OptList.Opt>> optLookup = new TreeMap<String, Map<String, OptList.Opt>>();
+
+    public SchemaVersion getSchemaVersion() {
+        if (prefix == null || version == null) throw new IllegalArgumentException("Mapping lacks prefix or version");
+        return new SchemaVersion(prefix, version);
+    }
 
     public Map<String, String> getNamespacesMap() {
         Map<String, String> ns = new HashMap<String, String>();
