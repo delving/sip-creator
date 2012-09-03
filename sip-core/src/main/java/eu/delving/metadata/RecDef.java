@@ -390,9 +390,13 @@ public class RecDef {
             for (Elem elem : elemList) elem.resolve(path, recDef);
         }
 
-        public String getFieldType(Path path) {
+        String getFieldType() {
+            return fieldType != null ? fieldType : "text";
+        }
+
+        private String getFieldType(Path path) {
             if (path.getTag(0).equals(tag)) {
-                if (path.parent() == Path.ROOT) return fieldType;
+                if (path.parent() == Path.ROOT) return getFieldType();
                 Path subPath = path.withRootRemoved();
                 for (Elem sub : elemList) {
                     String fieldType = sub.getFieldType(subPath);
