@@ -61,6 +61,7 @@ import java.util.*;
 public class RecDef {
 
     private static final String DELIM = "[ ,]+";
+    public static final String DEFAULT_FIELD_TYPE = "text";
 
     public static RecDef read(InputStream in) {
         try {
@@ -276,6 +277,10 @@ public class RecDef {
         public String toString() {
             return tag.toString();
         }
+
+        public String getFieldType() {
+            return fieldType != null ? fieldType : DEFAULT_FIELD_TYPE;
+        }
     }
 
     @XStreamAlias("elem")
@@ -391,7 +396,7 @@ public class RecDef {
         }
 
         String getFieldType() {
-            return fieldType != null ? fieldType : "text";
+            return fieldType != null ? fieldType : DEFAULT_FIELD_TYPE;
         }
 
         private String getFieldType(Path path) {
