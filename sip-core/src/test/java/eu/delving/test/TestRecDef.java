@@ -37,7 +37,9 @@ public class TestRecDef {
 
     @Test
     public void fetchFieldType() {
-        Assert.assertEquals("", "gumby", recDef().getFieldType(Path.create("/lido/objectPublishedID")));
+        Assert.assertEquals("special value gumby not found", "gumby", recDef().getFieldType(Path.create("/lido/objectPublishedID")));
+        Assert.assertEquals("default not returned", "text", recDef().getFieldType(Path.create("/lido/lidoRecID")));
+        Assert.assertNull("null not returned for nonexistent path", recDef().getFieldType(Path.create("/lido/someCrazyValue")));
     }
 
     private static RecDef recDef() {
