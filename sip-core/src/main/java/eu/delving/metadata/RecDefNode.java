@@ -118,7 +118,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public String getFieldType() {
-        return elem.getFieldType();
+        return elem != null ?elem.getFieldType() : attr.getFieldType();
     }
 
     public boolean isAttr() {
