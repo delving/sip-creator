@@ -56,6 +56,9 @@ public class SourceConverter {
     public static final String CONVERTER_DELIMITER = ":::";
     private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
+    private static final int MAX_ANONYMOUS_REMEMBER_LENGTH = 45;
+    private Random random = new Random();
+    private Map<String, String> anonymousMap = new HashMap<String, String>();
     private Feedback feedback;
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
@@ -63,7 +66,7 @@ public class SourceConverter {
     private Path recordRootPath;
     private Path uniqueElementPath;
     private Map<String, String> namespaces;
-    private int recordCount, totalRecords;
+    private int recordCount, totalRecords, anonymousRecords;
     private ProgressListener progressListener;
     private String unique;
     private StartElement start;
@@ -84,6 +87,7 @@ public class SourceConverter {
         this.uniqueElementPath = uniqueElementPath;
         this.maxUniqueValueLength = maxUniqueValueLength;
         this.namespaces = namespaces;
+        this.anonymousRecords = Integer.parseInt(System.getProperty("anonymousRecords", "0"));
         if (uniqueConverter != null) {
             int divider = uniqueConverter.indexOf(CONVERTER_DELIMITER);
             if (divider > 0) {
@@ -183,28 +187,32 @@ public class SourceConverter {
             }
         }
         finally {
-            if (feedback != null && uniqueRepeatCount > 0) feedback.alert(String.format("Uniqueness violations : " + uniqueRepeatCount));
+            if (feedback != null && uniqueRepeatCount > 0) {
+                feedback.alert(String.format("Uniqueness violations : " + uniqueRepeatCount));
+            }
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         }
     }
 
     private void outputRecord(XMLEventWriter out) throws XMLStreamException {
-        String uniqueValue = getUniqueValue();
-        if (!uniqueValue.isEmpty()) {
-            if (uniqueness.contains(uniqueValue)) {
-                uniqueRepeatCount++;
-            }
-            else {
-                uniqueness.add(uniqueValue);
-                Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
-                unique = null;
-                List<Attribute> attrs = new ArrayList<Attribute>();
-                attrs.add(id);
-                out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
-                for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
-                out.add(eventFactory.createEndElement("", "", RECORD_TAG));
-                out.add(eventFactory.createCharacters("\n"));
+        if (anonymousRecords == 0 || recordCount < anonymousRecords) {
+            String uniqueValue = getUniqueValue();
+            if (!uniqueValue.isEmpty()) {
+                if (uniqueness.contains(uniqueValue)) {
+                    uniqueRepeatCount++;
+                }
+                else {
+                    uniqueness.add(uniqueValue);
+                    Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
+                    unique = null;
+                    List<Attribute> attrs = new ArrayList<Attribute>();
+                    attrs.add(id);
+                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
+                    for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
+                    out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                    out.add(eventFactory.createCharacters("\n"));
+                }
             }
         }
         clearEvents();
@@ -268,8 +276,30 @@ public class SourceConverter {
             StringBuilder out = new StringBuilder(line.length());
             for (char c : line.toCharArray()) out.append(Character.isWhitespace(c) ? ' ' : c);
             String clean = out.toString().replaceAll(" +", " ").trim();
+            if (anonymousRecords > 0) clean = anonymize(clean);
             if (!clean.isEmpty()) lines.add(clean);
         }
+    }
+
+    private String anonymize(String string) {
+        String anonymized = anonymousMap.get(string);
+        if (anonymized == null) {
+            StringBuilder out = new StringBuilder(string.length());
+            for (char c : string.toCharArray()) {
+                if (Character.isLowerCase(c)) {
+                    out.append((char) ('a' + (Math.abs(random.nextInt()) % 26)));
+                }
+                else if (Character.isUpperCase(c)) {
+                    out.append((char) ('A' + (Math.abs(random.nextInt()) % 26)));
+                }
+                else {
+                    out.append(c);
+                }
+            }
+            anonymized = out.toString();
+            if (string.length() <= MAX_ANONYMOUS_REMEMBER_LENGTH) anonymousMap.put(string, anonymized);
+        }
+        return anonymized;
     }
 
     private void clearEvents() {

@@ -25,9 +25,13 @@ import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +45,7 @@ public class StorageFinder {
     private static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "DelvingSIPCreator");
     private static final Pattern HPU_HUMAN = Pattern.compile("([A-Za-z0-9.-]+):([0-9]+)/([A-Za-z0-9]+)");
     private static final Pattern HPU_DIRECTORY = Pattern.compile("([A-Za-z0-9_-]+)__([0-9]+)___([A-Za-z0-9]+)");
+    public static final String CHOSEN_DIRECTORY = "chosenDirectory";
 
     public static File getStorageDirectory(String[] args) {
         if (!WORKSPACE_DIR.exists()) {
@@ -145,12 +150,25 @@ public class StorageFinder {
     }
 
     private static File chooseDirectory(File[] directories) {
-        String[] endpoints = new String[directories.length];
-        for (int walk = 0; walk < directories.length; walk++) endpoints[walk] = getHostPortUser(directories[walk]);
-        JComboBox box = new JComboBox(endpoints);
-        int okCancel = JOptionPane.showConfirmDialog(null, box, "Choose server", JOptionPane.OK_CANCEL_OPTION);
+        List<String> selectable = new ArrayList<String>();
+        for (File directory : directories) {
+            if (!HPU_DIRECTORY.matcher(directory.getName()).find()) continue;
+            selectable.add(getHostPortUser(directory));
+        }
+        String preference = Preferences.userRoot().get(CHOSEN_DIRECTORY, "");
+        JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
+        ButtonGroup buttonGroup = new ButtonGroup();
+        for (String choice : selectable) {
+            JRadioButton b = new JRadioButton(choice);
+            b.setActionCommand(choice);
+            if (choice.equals(preference)) b.setSelected(true);
+            buttonGroup.add(b);
+            buttonPanel.add(b);
+        }
+        int okCancel = JOptionPane.showConfirmDialog(null, buttonPanel, "Choose server", JOptionPane.OK_CANCEL_OPTION);
         if (okCancel == JOptionPane.CANCEL_OPTION) return null;
-        String hostPort = (String) box.getSelectedItem();
+        String hostPort = buttonGroup.getSelection().getActionCommand();
+        Preferences.userRoot().put(CHOSEN_DIRECTORY, hostPort);
         return createDirectory(hostPort);
     }
 
