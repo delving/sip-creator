@@ -56,9 +56,6 @@ public class SourceConverter {
     public static final String CONVERTER_DELIMITER = ":::";
     private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
-    private static final int MAX_ANONYMOUS_REMEMBER_LENGTH = 45;
-    private Random random = new Random();
-    private Map<String, String> anonymousMap = new HashMap<String, String>();
     private Feedback feedback;
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
@@ -87,7 +84,6 @@ public class SourceConverter {
         this.uniqueElementPath = uniqueElementPath;
         this.maxUniqueValueLength = maxUniqueValueLength;
         this.namespaces = namespaces;
-        this.anonymousRecords = Integer.parseInt(System.getProperty("anonymousRecords", "0"));
         if (uniqueConverter != null) {
             int divider = uniqueConverter.indexOf(CONVERTER_DELIMITER);
             if (divider > 0) {
@@ -103,6 +99,7 @@ public class SourceConverter {
 
     public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
+        anonymousRecords = Integer.parseInt(System.getProperty("anonymousRecords", "0"));
         Path path = Path.create();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
@@ -282,24 +279,38 @@ public class SourceConverter {
     }
 
     private String anonymize(String string) {
-        String anonymized = anonymousMap.get(string);
-        if (anonymized == null) {
-            StringBuilder out = new StringBuilder(string.length());
-            for (char c : string.toCharArray()) {
-                if (Character.isLowerCase(c)) {
-                    out.append((char) ('a' + (Math.abs(random.nextInt()) % 26)));
-                }
-                else if (Character.isUpperCase(c)) {
-                    out.append((char) ('A' + (Math.abs(random.nextInt()) % 26)));
-                }
-                else {
-                    out.append(c);
-                }
+        if (string.startsWith("http")) { // preserve the beginning and the end
+            int slashSlash = string.indexOf("//");
+            int nextSlash = string.indexOf("/", slashSlash + 1);
+            int finalSlash = string.lastIndexOf("/");
+            if (slashSlash > 0 && nextSlash > 0 && finalSlash > 0) {
+                return String.format(
+                        "%s%s%s%s",
+                        string.substring(0, slashSlash),
+                        anonymizeString(string.substring(slashSlash, nextSlash)),
+                        anonymizeString(string.substring(nextSlash, finalSlash)),
+                        string.substring(finalSlash)
+                );
             }
-            anonymized = out.toString();
-            if (string.length() <= MAX_ANONYMOUS_REMEMBER_LENGTH) anonymousMap.put(string, anonymized);
         }
-        return anonymized;
+        return anonymizeString(string);
+    }
+
+    private String anonymizeString(String string) {
+        StringBuilder out = new StringBuilder(string.length());
+        Random random = new Random(string.hashCode());
+        for (char c : string.toCharArray()) {
+            if (Character.isLowerCase(c)) {
+                out.append((char) ('a' + (Math.abs(random.nextInt()) % 26)));
+            }
+            else if (Character.isUpperCase(c)) {
+                out.append((char) ('A' + (Math.abs(random.nextInt()) % 26)));
+            }
+            else {
+                out.append(c);
+            }
+        }
+        return out.toString();
     }
 
     private void clearEvents() {
