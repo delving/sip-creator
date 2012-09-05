@@ -21,6 +21,7 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.metadata.Hasher;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -30,6 +31,7 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
+import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -55,6 +57,8 @@ public class ExpertMenu extends JMenu {
         add(new WriteOutputAction());
 //        add(new MediaImportAction(desktop, sipModel));
 //        add(new UploadMediaAction());
+        int anonRecords = Integer.parseInt(System.getProperty(SourceConverter.ANONYMOUS_RECORDS_PROPERTY, "0"));
+        if (anonRecords > 0) add(new CreateSampleDataSetAction());
     }
 
     private class MaxUniqueValueLengthAction extends AbstractAction {
@@ -183,4 +187,46 @@ public class ExpertMenu extends JMenu {
             }
         }
     }
+
+    private class CreateSampleDataSetAction extends AbstractAction {
+
+        private CreateSampleDataSetAction() {
+            super("Create a sample dataset for culture hub testing");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            String answer = sipModel.getFeedback().ask(
+                    "Enter the directory where the dataset is to be stored",
+                    System.getProperty("user.home")
+            );
+            if (answer != null) {
+                answer = answer.trim();
+                File directory = new File(answer);
+                if (!directory.exists()) {
+                    sipModel.getFeedback().alert(answer + " doesn't exist");
+                }
+                else if (!directory.isDirectory()) {
+                    sipModel.getFeedback().alert(answer + " is not a directory");
+                }
+                else if (!sipModel.getDataSetModel().isEmpty()) {
+                    File outputDirectory = new File(directory, sipModel.getDataSetModel().getDataSet().getSpec());
+                    FileUtils.deleteQuietly(outputDirectory);
+                    outputDirectory.mkdirs();
+                    try {
+                        for (File file : sipModel.getDataSetModel().getDataSet().getUploadFiles()) {
+                            File targetFile = new File(outputDirectory, Hasher.extractFileName(file));
+                            FileUtils.copyFile(file, targetFile);
+                        }
+                        sipModel.getFeedback().alert("Look in "+outputDirectory);
+                    }
+                    catch (Exception e) {
+                        sipModel.getFeedback().alert("Unable to copy upload files to " + outputDirectory, e);
+                    }
+                }
+            }
+        }
+    }
+
+
 }

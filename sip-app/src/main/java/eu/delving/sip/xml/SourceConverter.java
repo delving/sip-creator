@@ -54,6 +54,7 @@ import static eu.delving.sip.files.Storage.RECORD_TAG;
 
 public class SourceConverter {
     public static final String CONVERTER_DELIMITER = ":::";
+    public static final String ANONYMOUS_RECORDS_PROPERTY = "anonymousRecords";
     private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
     private Feedback feedback;
@@ -99,7 +100,7 @@ public class SourceConverter {
 
     public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
-        anonymousRecords = Integer.parseInt(System.getProperty("anonymousRecords", "0"));
+        anonymousRecords = Integer.parseInt(System.getProperty(ANONYMOUS_RECORDS_PROPERTY, "0"));
         Path path = Path.create();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
@@ -297,6 +298,7 @@ public class SourceConverter {
     }
 
     private String anonymizeString(String string) {
+        if (moreNumbersThanLetters(string)) return string;
         StringBuilder out = new StringBuilder(string.length());
         Random random = new Random(string.hashCode());
         for (char c : string.toCharArray()) {
@@ -311,6 +313,19 @@ public class SourceConverter {
             }
         }
         return out.toString();
+    }
+
+    private boolean moreNumbersThanLetters(String string) {
+        int letters = 0, numbers = 0;
+        for (char c : string.toCharArray()) {
+            if (Character.isLetter(c)) {
+                letters++;
+            }
+            else if (Character.isDigit(c)) {
+                numbers++;
+            }
+        }
+        return numbers > letters;
     }
 
     private void clearEvents() {
