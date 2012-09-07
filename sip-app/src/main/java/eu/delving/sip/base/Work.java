@@ -67,6 +67,7 @@ public interface Work extends Runnable {
         SCAN_RECORDS(DATA_SET),
         PROCESS(DATA_SET_PREFIX),
         LOAD_REPORT(DATA_SET_PREFIX),
+        RELOAD_MAPPING(DATA_SET_PREFIX),
 
         FETCH_LIST(NETWORK),
         FETCH_HELP(NETWORK),
@@ -74,8 +75,7 @@ public interface Work extends Runnable {
         HARVEST(NETWORK_DATA_SET),
         UNLOCK(NETWORK_DATA_SET),
         DOWNLOAD(NETWORK_DATA_SET),
-        UPLOAD(NETWORK_DATA_SET)
-        ;
+        UPLOAD(NETWORK_DATA_SET);
 
         private Kind kind;
 

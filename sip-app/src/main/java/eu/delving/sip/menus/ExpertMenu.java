@@ -27,6 +27,8 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.DataSetModel;
+import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.SourceConverter;
@@ -35,6 +37,7 @@ import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
 /**
@@ -55,6 +58,7 @@ public class ExpertMenu extends JMenu {
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
         add(new WriteOutputAction());
+        add(new ReloadMappingAction());
 //        add(new MediaImportAction(desktop, sipModel));
 //        add(new UploadMediaAction());
         int anonRecords = Integer.parseInt(System.getProperty(SourceConverter.ANONYMOUS_RECORDS_PROPERTY, "0"));
@@ -227,6 +231,53 @@ public class ExpertMenu extends JMenu {
             }
         }
     }
+
+    private class ReloadMappingAction extends AbstractAction {
+        private ReloadMappingAction() {
+            super("Reload record definition");
+            putValue(
+                    Action.ACCELERATOR_KEY,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_MASK|KeyEvent.ALT_MASK)
+            );
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            if (!sipModel.getMappingModel().hasRecMapping()) return;
+            sipModel.exec(new Work.DataSetPrefixWork() {
+
+                final MappingModel mm = sipModel.getMappingModel();
+                final DataSetModel dsm = sipModel.getDataSetModel();
+
+                @Override
+                public String getPrefix() {
+                    return sipModel.getMappingModel().getPrefix();
+                }
+
+                @Override
+                public DataSet getDataSet() {
+                    return sipModel.getDataSetModel().getDataSet();
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.RELOAD_MAPPING;
+                }
+
+                @Override
+                public void run() {
+                    try {
+                        dsm.getDataSet().setRecMapping(dsm.getRecMapping(), true);
+                        mm.setRecMapping(dsm.getRecMapping());
+                    }
+                    catch (StorageException e) {
+                        sipModel.getFeedback().alert("Cannot refresh the mapping", e);
+                    }
+                }
+            });
+        }
+    }
+
 
 
 }
