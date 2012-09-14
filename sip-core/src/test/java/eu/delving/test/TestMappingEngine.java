@@ -84,6 +84,21 @@ public class TestMappingEngine {
     }
 
     @Test
+    public void validateESENode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+        Map<String, String> namespaces = createNamespaces(
+                "dc", "http://purl.org/dc/elements/1.1/",
+                "dcterms", "http://purl.org/dc/terms/",
+                "europeana", "http://www.europeana.eu/schemas/ese/"
+        );
+        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("ese"));
+        MappingResult result = mappingEngine.execute(input("ese"));
+        System.out.println(result.toXml());
+        System.out.println(result.toXmlAugmented());
+        Source source = new DOMSource(result.root());
+        validator(new SchemaVersion("ese", "3.4.0")).validate(source);
+    }
+
+    @Test
     public void validateFlatNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         Map<String, String> namespaces = createNamespaces(
                 "dc", "http://purl.org/dc/elements/1.1/",
@@ -95,10 +110,7 @@ public class TestMappingEngine {
         MappingResult result = mappingEngine.execute(input("icn"));
         System.out.println(result.toXml());
         System.out.println(result.toXmlAugmented());
-//        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
-//            System.out.println(entry.getKey() + " -> "+entry.getValue());
-//        }
-        Source source = new DOMSource(result.root());
+        Source source = new DOMSource(result.rootAugmented());
         validator(new SchemaVersion("icn", "1.0.0")).validate(source);
     }
 
