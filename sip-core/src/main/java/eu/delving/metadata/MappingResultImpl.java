@@ -82,6 +82,7 @@ public class MappingResultImpl implements MappingResult {
 
     @Override
     public void checkMissingFields() throws MissingFieldsException {
+        if (!isRecDefDelvingAware()) return;
         Set<String> missing = new TreeSet<String>();
         Set<SystemField> keys = systemFields.keySet();
         addIfMissing(TITLE, keys, missing);
@@ -122,21 +123,30 @@ public class MappingResultImpl implements MappingResult {
         else if (recDefTree.getRecDef().prefix.equals("aff")) {
             resolveAFFRecord();
         }
-        rootAugmented = root.cloneNode(true);
-        Document document = rootAugmented.getOwnerDocument();
-        for (Map.Entry<SystemField, List<String>> field : systemFields.entrySet()) {
-            for (String value : field.getValue()) {
-                Element freshElement = document.createElementNS(
-                        SystemField.NAMESPACE_URI,
-                        String.format("%s:%s", SystemField.PREFIX, field.getKey().getLocalPart())
-                );
-                if (!isDuplicate(freshElement, value)) {
-                    Node rootChild = rootAugmented.appendChild(freshElement);
-                    rootChild.appendChild(document.createTextNode(value));
+        if (isRecDefDelvingAware()) {
+            rootAugmented = root.cloneNode(true);
+            Document document = rootAugmented.getOwnerDocument();
+            for (Map.Entry<SystemField, List<String>> field : systemFields.entrySet()) {
+                for (String value : field.getValue()) {
+                    Element freshElement = document.createElementNS(
+                            SystemField.NAMESPACE_URI,
+                            String.format("%s:%s", SystemField.PREFIX, field.getKey().getLocalPart())
+                    );
+                    if (!isDuplicate(freshElement, value)) {
+                        Node rootChild = rootAugmented.appendChild(freshElement);
+                        rootChild.appendChild(document.createTextNode(value));
+                    }
                 }
             }
         }
+        else {
+            rootAugmented = root;
+        }
         return this;
+    }
+
+    public String toString() {
+        return toXml();
     }
 
     private boolean isDuplicate(Element element, String value) {
@@ -156,8 +166,8 @@ public class MappingResultImpl implements MappingResult {
         return false;
     }
 
-    public String toString() {
-        return toXml();
+    private boolean isRecDefDelvingAware() {
+        return recDefTree.getRecDef().getNamespacesMap().containsKey(PREFIX);
     }
 
     private void addIfMissing(SystemField systemField, Set<SystemField> keys, Set<String> missing) {
