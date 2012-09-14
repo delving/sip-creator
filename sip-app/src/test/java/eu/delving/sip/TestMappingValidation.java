@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static eu.delving.sip.files.DataSetState.*;
 import static org.junit.Assert.*;
@@ -90,15 +91,14 @@ public class TestMappingValidation {
         runFullCycle(2);
     }
 
-    @Ignore
     @Test
     public void testEse() throws Exception {
         mock.prepareDataset(
                 "ese",
-                "/Medialab/Record",
-                "/Medialab/Record/OBS_GUID"
+                "/harvest/OAI-PMH/ListRecords/record",
+                "/harvest/OAI-PMH/ListRecords/record/header/identifier"
         );
-        runFullCycle(3);
+        runFullCycle(6);
     }
 
     @Ignore
@@ -133,7 +133,7 @@ public class TestMappingValidation {
     }
 
     private void runFullCycle(int expectedRecords) throws Exception {
-        assertEquals(1, mock.fileCount());
+        assertEquals(String.valueOf(Arrays.asList(mock.files())), 1, mock.fileCount());
         dataSet().externalToImported(mock.sampleInputFile(), null);
         assertEquals(2, mock.fileCount());
         assertEquals(IMPORTED, state());
@@ -169,8 +169,6 @@ public class TestMappingValidation {
 //        System.out.println(XmlNodePrinter.toXml(record.getRootNode()));
 
         Node node = mock.runMapping(record);
-//        System.out.println(new XmlSerializer().toXml(node));
-
         Source source = new DOMSource(node);
         try {
             mock.validator().validate(source);
