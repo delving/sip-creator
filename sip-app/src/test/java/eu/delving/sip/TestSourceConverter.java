@@ -63,7 +63,7 @@ public class TestSourceConverter {
             "<b:shh silent=\"very\">quiet</b:shh>",
             "</we-are-in-record>",
             "               <we-are-in-record xmlns:c=\"http://c\">           ",
-            "<a:boo>very scary</a:boo>",
+            "<a:boo>http://somewhere.com/anurl/path/gumby.jpg</a:boo>",
             "<b:shh>deathly quiet",
             "</b:shh>",
             "<a:unique>0404040404</a:unique>",
@@ -119,12 +119,50 @@ public class TestSourceConverter {
                 "<b:shh silent=\"very\">quiet</b:shh>",
                 "</input>",
                 "<input id=\"before_404040404_after\">",
-                "<a:boo>very scary</a:boo>",
+                "<a:boo>http://somewhere.com/anurl/path/gumby.jpg</a:boo>",
                 "<b:shh>deathly quiet</b:shh>",
                 "<a:unique>0404040404</a:unique>",
                 "<c:long lang=\"stupid\">this is very much</c:long>",
                 "<c:long lang=\"stupid\">a multi-line field</c:long>",
                 "<c:long lang=\"stupid\">it even contains strange spaces</c:long>",
+                "</input>",
+                "</delving-sip-source>",
+        };
+        Assert.assertEquals("Unexpected output", StringUtils.join(expect, '\n'), StringUtils.join(lines, '\n'));
+    }
+
+    @Test
+    public void runThroughAnon() throws IOException, XMLStreamException {
+        String inputString = StringUtils.join(INPUT, "\n");
+        System.setProperty("anonymousRecords", "10");
+        InputStream in = new ByteArrayInputStream(inputString.getBytes("UTF-8"));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        converter.parse(in, out);
+        String outputString = out.toString("UTF-8");
+        String[] lines = outputString.split("\n");
+        for (String line : lines) {
+            System.out.println("\"" + line.replaceAll("\"", "\\\\\"") + "\",");
+        }
+        String[] expect = {
+                "<?xml version='1.0' encoding='UTF-8'?>",
+                "<delving-sip-source xmlns:a=\"http://a\" xmlns:b=\"http://b\" xmlns:c=\"http://c\">",
+                "<input id=\"before_3030030_after\">",
+                "<a:boo>&amp;bnepw > cab > 1</a:boo>",
+                "<a:wrapper>",
+                "<a:middle>",
+                "<a:inside>vuot</a:inside>",
+                "</a:middle>",
+                "</a:wrapper>",
+                "<a:unique>03030030</a:unique>",
+                "<b:shh silent=\"very\">slrbn</b:shh>",
+                "</input>",
+                "<input id=\"before_404040404_after\">",
+                "<a:boo>http://mxqalbsqe.qix/wcgxn/vufv/gumby.jpg</a:boo>",
+                "<b:shh>zdljlih svfuv</b:shh>",
+                "<a:unique>0404040404</a:unique>",
+                "<c:long lang=\"stupid\">zlnn zh ggjr jhui</c:long>",
+                "<c:long lang=\"stupid\">j evjhl-spwp dtldn</c:long>",
+                "<c:long lang=\"stupid\">tk qqok tlaltkva nrluweh svqimp</c:long>",
                 "</input>",
                 "</delving-sip-source>",
         };

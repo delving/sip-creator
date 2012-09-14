@@ -137,7 +137,6 @@ public class Application {
                     @Override
                     public void run() {
                         dataSetMenu.getUnlockMappingAction().setEnabled(locked);
-                        expertMenu.setEnabled(!locked);
                     }
                 });
             }
