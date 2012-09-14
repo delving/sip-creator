@@ -61,10 +61,7 @@ public class Mockery {
     private String prefix;
 
     public Mockery() throws StorageException, MetadataException {
-        File target1 = new File("sip-app/target"), target2 = new File("target");
-        if (target1.exists()) target = target1;
-        if (target2.exists()) target = target2;
-        if (target == null) throw new RuntimeException("target directory not found: " + target);
+        this.target = getTargetDirectory();
         root = new File(target, "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
@@ -168,5 +165,13 @@ public class Mockery {
 
     private void delete(File file) {
         FileUtils.deleteQuietly(file);
+    }
+
+    public static File getTargetDirectory() {
+        File target = new File("sip-app/target");
+        if (target.exists()) return target;
+        target = new File("target");
+        if (target.exists()) return target;
+        throw new RuntimeException("target directory not found");
     }
 }
