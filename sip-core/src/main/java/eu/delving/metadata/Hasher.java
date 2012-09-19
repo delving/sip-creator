@@ -116,6 +116,17 @@ public class Hasher {
         return new DigestOutputStream(outputStream, messageDigest);
     }
 
+    public void update(String string) {
+        byte[] bytes = new byte[0];
+        try {
+            bytes = string.getBytes("UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        update(bytes, bytes.length);
+    }
+
     public void update(byte[] buffer, int bytes) {
         messageDigest.update(buffer, 0, bytes);
     }

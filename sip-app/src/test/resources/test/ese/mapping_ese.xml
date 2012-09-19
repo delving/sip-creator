@@ -1,14 +1,94 @@
-<?xml version="1.0"?>
-<rec-mapping prefix="ese">
-    <node-mappings>
-        <!--/input/OBS_GUID-->
-        <!--/europeana:record/dc:identifier-->
-
-        <!--/input/Afbeelding-->
-        <!--/europeana:record/europeana:isShownBy-->
-
-        <!--/input/Hoogte /input/Breedte-->
-        <!--/europeana:record/dc:format-->
-    </node-mappings>
+<rec-mapping prefix="ese" schemaVersion="3.4.0" locked="false">
+  <facts>
+    <entry>
+      <string>orgId</string>
+      <string>dimcon</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>archief-eemland-k-en-o</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Archief Eemland</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>ese_3.4.0, icn_1.0.0</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Archief Eemland, Kaarten en Ontwerptekeningen</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://creativecommons.org/licenses/by-sa/3.0/nl/</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Rijksdienst voor het Cultureelerfgoed</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string>IMAGE</string>
+    </entry>
+    <entry>
+      <string>country</string>
+      <string>netherlands</string>
+    </entry>
+  </facts>
+  <functions>
+    <mapping-function name="imageFromId">
+      <sample-input>
+        <string>identifier</string>
+      </sample-input>
+      <groovy-code>
+        <string>&quot;http://images.memorix.nl/gam/thumb/200x200/${it}.jpg&quot;</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="urlFromId">
+      <sample-input>
+        <string>one:two</string>
+        <string>justone</string>
+      </sample-input>
+      <groovy-code>
+        <string>int colon = it.indexOf(&apos;:&apos;)</string>
+        <string>if (colon &gt; 0) it = it.substring(colon+1)</string>
+        <string>&quot;http://www.archiefeemland.nl/collectie/fotos/detail?id=${it}&quot;</string>
+      </groovy-code>
+    </mapping-function>
+  </functions>
+  <node-mappings>
+    <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:description" outputPath="/europeana:record/dc:title">
+      <groovy-code>
+        <string>if (_absent_) {</string>
+        <string>&apos;Onbekend&apos;</string>
+        <string>}</string>
+        <string>&quot;${_dcdescription}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:creator" outputPath="/europeana:record/dc:creator"/>
+    <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:date" outputPath="/europeana:record/dc:date"/>
+    <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:identifier" outputPath="/europeana:record/dc:identifier"/>
+    <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:source" outputPath="/europeana:record/dc:source"/>
+    <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:coverage" outputPath="/europeana:record/dc:coverage"/>
+    <node-mapping inputPath="/input/about/files/file/uuid" outputPath="/europeana:record/europeana:object" operator="FIRST">
+      <groovy-code>
+        <string>imageFromId(_uuid)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/provider" outputPath="/europeana:record/europeana:provider"/>
+    <node-mapping inputPath="/facts/type" outputPath="/europeana:record/europeana:type"/>
+    <node-mapping inputPath="/facts/rights" outputPath="/europeana:record/europeana:rights"/>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/europeana:record/europeana:dataProvider"/>
+    <node-mapping inputPath="/input/header/identifier" outputPath="/europeana:record/europeana:isShownAt">
+      <groovy-code>
+        <string>urlFromId(_identifier)</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
 </rec-mapping>
-
