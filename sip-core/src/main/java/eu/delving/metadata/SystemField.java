@@ -40,7 +40,7 @@ public enum SystemField {
     DEEP_ZOOM_URL("deepZoomUrl"),
     SPEC;
 
-    public static final String NAMESPACE_URI = "http://schemas.delving.eu";
+    public static final String NAMESPACE_URI = "http://schemas.delving.eu/";
     public static final String PREFIX = "delving";
 
     private String localPart;

@@ -104,6 +104,7 @@ public class TestMappingEngine {
                 "dc", "http://purl.org/dc/elements/1.1/",
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/",
+                "delving", "http://schemas.delving.eu/",
                 "icn", "http://www.icn.nl/schemas/icn/"
         );
         MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("icn"));
@@ -111,7 +112,8 @@ public class TestMappingEngine {
         System.out.println(result.toXml());
         System.out.println(result.toXmlAugmented());
         Source source = new DOMSource(result.rootAugmented());
-        validator(new SchemaVersion("icn", "1.0.0")).validate(source);
+        Validator validator = validator(new SchemaVersion("icn", "1.0.1"));
+        validator.validate(source);
     }
 
     @Test
