@@ -68,9 +68,9 @@ public class StorageImpl implements Storage {
 
     public StorageImpl(File home, Fetcher fetcher, HttpClient httpClient) throws StorageException {
         this.home = home;
-        this.resolver = new CachingResourceResolver(this, httpClient);
+        if (httpClient != null) this.resolver = new CachingResourceResolver(this, httpClient);
         try {
-            this.schemaRepository = new SchemaRepository(fetcher);
+            if (fetcher != null) this.schemaRepository = new SchemaRepository(fetcher);
         }
         catch (IOException e) {
             throw new StorageException("Unable to create Schema Repository", e);
@@ -499,55 +499,81 @@ public class StorageImpl implements Storage {
         public void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException {
             int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
             if (progressListener != null) progressListener.prepareFor(fileBlocks);
-            File source = new File(here, FileType.IMPORTED.getName());
+            File imported = new File(here, FileType.IMPORTED.getName());
             Hasher hasher = new Hasher();
             boolean cancelled = false;
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
+                outputStream = new GZIPOutputStream(new FileOutputStream(imported));
                 CountingInputStream countingInput;
-                if (inputFile.getName().endsWith(".xml")) {
+                if (inputFile.getName().endsWith(".xml.zip")) {
                     inputStream = new FileInputStream(inputFile);
                     countingInput = new CountingInputStream(inputStream);
-                    inputStream = countingInput;
-                }
-                else if (inputFile.getName().endsWith(".xml.gz")) {
-                    inputStream = new FileInputStream(inputFile);
-                    countingInput = new CountingInputStream(inputStream);
-                    inputStream = new GZIPInputStream(countingInput);
+                    ZipEntryXmlReader reader = new ZipEntryXmlReader(countingInput);
+                    Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
+                    writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+                    writer.write("<zip-entries>\n");
+                    while (true) {
+                        String line = reader.readLine();
+                        if (line == null) break;
+                        if (line.startsWith("<?xml")) continue;
+                        writer.write(line);
+                        writer.write("\n");
+                        if (progressListener != null) {
+                            if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
+                                cancelled = true;
+                                break;
+                            }
+                        }
+                        hasher.update(line);
+                    }
+                    writer.write("</zip-entries>\n");
+                    writer.close();
                 }
                 else {
-                    throw new IllegalArgumentException("Input file should be .xml or .xml.gz, but it is " + inputFile.getName());
-                }
-                outputStream = new GZIPOutputStream(new FileOutputStream(source));
-                byte[] buffer = new byte[BLOCK_SIZE];
-                int bytesRead;
-                while (-1 != (bytesRead = inputStream.read(buffer))) {
-                    outputStream.write(buffer, 0, bytesRead);
-                    if (progressListener != null) {
-                        if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
-                            cancelled = true;
-                            break;
-                        }
+                    if (inputFile.getName().endsWith(".xml")) {
+                        inputStream = new FileInputStream(inputFile);
+                        countingInput = new CountingInputStream(inputStream);
+                        inputStream = countingInput;
                     }
-                    hasher.update(buffer, bytesRead);
+                    else if (inputFile.getName().endsWith(".xml.gz")) {
+                        inputStream = new FileInputStream(inputFile);
+                        countingInput = new CountingInputStream(inputStream);
+                        inputStream = new GZIPInputStream(countingInput);
+                    }
+                    else {
+                        throw new IllegalArgumentException("Input file should be .xml, .xml.gz or .xml.zip, but it is " + inputFile.getName());
+                    }
+                    byte[] buffer = new byte[BLOCK_SIZE];
+                    int bytesRead;
+                    while (-1 != (bytesRead = inputStream.read(buffer))) {
+                        outputStream.write(buffer, 0, bytesRead);
+                        if (progressListener != null) {
+                            if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
+                                cancelled = true;
+                                break;
+                            }
+                        }
+                        hasher.update(buffer, bytesRead);
+                    }
                 }
                 delete(statsFile(here, false, null));
             }
             catch (Exception e) {
-                throw new StorageException("Unable to capture XML input into " + source.getAbsolutePath(), e);
+                throw new StorageException("Unable to capture XML input into " + imported.getAbsolutePath(), e);
             }
             finally {
                 IOUtils.closeQuietly(inputStream);
                 IOUtils.closeQuietly(outputStream);
             }
             if (cancelled) {
-                delete(source);
+                delete(imported);
             }
             else {
                 File hashedSource = new File(here, hasher.prefixFileName(FileType.IMPORTED.getName()));
                 if (hashedSource.exists()) {
-                    delete(source);
+                    delete(imported);
                     throw new StorageException("This import was identical to the previous one. Discarded.");
                 }
             }
@@ -715,6 +741,10 @@ public class StorageImpl implements Storage {
             catch (IOException e) {
                 throw new StorageException(String.format("Unable to create output stream from %s", file.getAbsolutePath()), e);
             }
+        }
+
+        public File getHere() {
+            return here;
         }
 
         @Override

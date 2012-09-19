@@ -113,12 +113,16 @@ public class DataImportAction extends AbstractAction {
         chooser.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return file.isFile() && file.getName().endsWith(".xml") || file.getName().endsWith(".xml.gz");
+                return file.isFile() &&
+                        (file.getName().endsWith(".xml")
+                                || file.getName().endsWith(".xml.gz")
+                                || file.getName().endsWith(".xml.zip"
+                        ));
             }
 
             @Override
             public String getDescription() {
-                return "XML or GZIP/XML Files";
+                return "Files ending with .xml, .xml.gz, or .xml.zip";
             }
         });
         chooser.setMultiSelectionEnabled(false);

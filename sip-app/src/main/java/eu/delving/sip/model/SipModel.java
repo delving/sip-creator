@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.*;
+import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
@@ -293,12 +294,14 @@ public class SipModel {
                 final Stats stats = dataSet.getLatestStats();
                 final Map<String, String> facts = dataSet.getDataSetFacts();
                 final Map<String, String> hints = dataSet.getHints();
+                final List<SchemaVersion> schemaVersions = dataSet.getSchemaVersions();
                 final String prefixToUse = prefix.isEmpty() ? dataSet.getLatestPrefix() : prefix;
                 dataSetModel.setDataSet(dataSet, prefixToUse);
                 final RecMapping recMapping = dataSetModel.getRecMapping();
                 dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
                 mappingHintsModel.initialize(prefixToUse, dataSetModel);
                 dataSetModel.getMappingModel().setFacts(facts);
+                dataSetModel.getMappingModel().setSchemaVersion(schemaVersions);
                 recordCompileModel.setValidator(dataSetModel.newValidator());
                 exec(new Swing() {
                     @Override

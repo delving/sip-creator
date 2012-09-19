@@ -93,6 +93,11 @@ public class RecMapping {
         return new SchemaVersion(prefix, schemaVersion);
     }
 
+    public void setSchemaVersion(SchemaVersion schemaVersion) {
+        if (!schemaVersion.getPrefix().equals(prefix)) throw new IllegalArgumentException("Trying to set version for the wrong schema");
+        this.schemaVersion = schemaVersion.getVersion();
+    }
+
     public boolean isLocked() {
         return locked;
     }
