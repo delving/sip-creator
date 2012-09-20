@@ -22,11 +22,17 @@
 package eu.delving.sip.base;
 
 import eu.delving.sip.model.Feedback;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.prefs.Preferences;
 
 import static javax.swing.JOptionPane.*;
 
@@ -39,9 +45,11 @@ import static javax.swing.JOptionPane.*;
 public class VisualFeedback implements Feedback {
     private Logger log = Logger.getLogger(getClass());
     private JDesktopPane desktop;
+    private PasswordFetcher passwordFetcher;
 
-    public VisualFeedback(JDesktopPane desktop) {
+    public VisualFeedback(JFrame frame, JDesktopPane desktop, Preferences preferences) {
         this.desktop = desktop;
+        this.passwordFetcher = new PasswordFetcher(frame, preferences);
     }
 
     @Override
@@ -94,6 +102,11 @@ public class VisualFeedback implements Feedback {
     @Override
     public boolean form(String title, Object... components) {
         return askOption(desktop, components, title, OK_CANCEL_OPTION, QUESTION_MESSAGE);
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordFetcher.getPassword();
     }
 
     private void inYourFace(String message, String extra) {
@@ -185,4 +198,80 @@ public class VisualFeedback implements Feedback {
             throw new RuntimeException(e);
         }
     }
+
+    private class PasswordFetcher implements OAuthClient.PasswordRequest, ActionListener {
+        private static final String PASSWORD = "Password";
+        private JDialog dialog;
+        private Preferences preferences;
+        private JPasswordField passwordField = new JPasswordField(15);
+        private JCheckBox savePassword = new JCheckBox("Save password");
+        private StringBuilder password = new StringBuilder();
+        private JButton ok = new JButton("Ok");
+
+        private PasswordFetcher(JFrame frame, Preferences preferences) {
+            this.dialog = new JDialog(frame, "Culture Hub", true);
+            this.preferences = preferences;
+            // We disable the submit button by default and if the content != empty
+            ok.addActionListener(this);
+            ok.setEnabled(false);
+            String savedPassword = preferences.get(PASSWORD, "");
+            savePassword.setSelected(!savedPassword.isEmpty());
+            passwordField.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent documentEvent) {
+                    ok.setEnabled(!StringUtils.isWhitespace(new String(passwordField.getPassword())));
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent documentEvent) {
+                    insertUpdate(documentEvent);
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent documentEvent) {
+                    insertUpdate(documentEvent);
+                }
+            });
+            passwordField.setText(savedPassword);
+            JLabel labelA = new JLabel("Password: ");
+            labelA.setLabelFor(passwordField);
+            passwordField.addActionListener(this);
+
+            JPanel fieldPanel = new JPanel(new BorderLayout(10, 10));
+            fieldPanel.add(labelA, BorderLayout.WEST);
+            fieldPanel.add(passwordField, BorderLayout.CENTER);
+
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            buttonPanel.add(ok);
+
+            JPanel wrap = new JPanel(new GridLayout(0, 1, 5, 5));
+            wrap.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            wrap.add(fieldPanel);
+            wrap.add(savePassword);
+            wrap.add(buttonPanel);
+
+            dialog.getContentPane().add(wrap, BorderLayout.CENTER);
+            dialog.pack();
+        }
+
+        @Override
+        public String getPassword() {
+            dialog.setLocation(
+                    (Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getSize().width) / 2,
+                    (Toolkit.getDefaultToolkit().getScreenSize().height - dialog.getSize().height) / 2
+            );
+            dialog.setVisible(true);
+            return password.length() == 0 ? null : password.toString();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            password.setLength(0);
+            password.append(new String(passwordField.getPassword()));
+            preferences.put(PASSWORD, savePassword.isSelected() ? password.toString() : "");
+            dialog.setVisible(false);
+        }
+    }
+
+
 }

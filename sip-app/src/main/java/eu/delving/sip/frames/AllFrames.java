@@ -57,6 +57,7 @@ public class AllFrames {
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
     private FrameBase[] frames;
+    private DataSetFrame dataSetFrame;
     private FunctionFrame functionFrame;
     private MappingCodeFrame mappingCodeFrame;
     private StatsFrame statsFrame;
@@ -68,15 +69,10 @@ public class AllFrames {
     private String currentView = "";
     private SipModel sipModel;
 
-    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
-        final String CREATE = "create";
-        analysis.getActionMap().put(CREATE, create.getCreateMappingAction());
-        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
-    }
-
     public AllFrames(JDesktopPane desktop, final SipModel sipModel, final CultureHubClient cultureHubClient) {
         this.desktop = desktop;
         this.sipModel = sipModel;
+        dataSetFrame = new DataSetFrame(desktop, sipModel, cultureHubClient);
         functionFrame = new FunctionFrame(desktop, sipModel);
         mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
         statsFrame = new StatsFrame(desktop, sipModel);
@@ -175,6 +171,10 @@ public class AllFrames {
         };
     }
 
+    public DataSetFrame getDataSetFrame() {
+        return dataSetFrame;
+    }
+
     public WorkFrame getWorkFrame() {
         return workFrame;
     }
@@ -267,6 +267,12 @@ public class AllFrames {
     public void rebuildView() {
         if (currentView.isEmpty()) return;
         selectView(currentView);
+    }
+
+    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
+        final String CREATE = "create";
+        analysis.getActionMap().put(CREATE, create.getCreateMappingAction());
+        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
     private FrameBase frame(FrameBase.Which which) {

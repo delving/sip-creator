@@ -88,6 +88,11 @@ public class StorageImpl implements Storage {
     }
 
     @Override
+    public String getHostPort() {
+        return StorageFinder.getHostPort(home);
+    }
+
+    @Override
     public File cache(String fileName) {
         File cacheDir = new File(home, CACHE_DIR);
         if (!cacheDir.exists() && !cacheDir.mkdirs()) throw new RuntimeException("Couldn't create cache dir");
