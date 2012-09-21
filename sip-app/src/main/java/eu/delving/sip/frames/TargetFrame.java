@@ -36,7 +36,10 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.*;
 
 /**
@@ -65,8 +68,8 @@ public class TargetFrame extends FrameBase {
         }
     });
 
-    public TargetFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.TARGET, desktop, sipModel, "Target");
+    public TargetFrame(SipModel sipModel) {
+        super(Which.TARGET, sipModel, "Target");
         createRecDefTree(sipModel);
         timer.setRepeats(false);
         recDefTree.setDropMode(DropMode.ON);

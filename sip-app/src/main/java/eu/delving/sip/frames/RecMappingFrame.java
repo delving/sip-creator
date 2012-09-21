@@ -32,11 +32,15 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.RevertMappingMenu;
 import eu.delving.sip.model.*;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JMenuBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 
 /**
@@ -51,8 +55,8 @@ public class RecMappingFrame extends FrameBase {
     private JList nodeMappingList;
     private RevertMappingMenu revertMappingMenu;
 
-    public RecMappingFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings");
+    public RecMappingFrame(final SipModel sipModel) {
+        super(Which.REC_MAPPING, sipModel, "Node Mappings");
         revertMappingMenu = new RevertMappingMenu(sipModel);
         setJMenuBar(createMenuBar());
         nodeMappingList = sipModel.getMappingModel().getNodeMappingListModel().createJList();

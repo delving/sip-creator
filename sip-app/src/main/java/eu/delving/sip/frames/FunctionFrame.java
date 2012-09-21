@@ -76,8 +76,8 @@ public class FunctionFrame extends FrameBase {
     private ModelStateListener modelStateListener = new ModelStateListener();
     private UndoManager undoManager = new UndoManager();
 
-    public FunctionFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.FUNCTIONS, desktop, sipModel, "Functions");
+    public FunctionFrame(SipModel sipModel) {
+        super(Which.FUNCTIONS, sipModel, "Functions");
         inputArea = new JTextArea(sipModel.getFunctionCompileModel().getInputDocument());
         inputArea.setFont(MONOSPACED);
         docArea = new JTextArea(sipModel.getFunctionCompileModel().getDocDocument());

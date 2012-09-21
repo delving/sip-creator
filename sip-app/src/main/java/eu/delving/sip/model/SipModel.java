@@ -33,12 +33,14 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
+import javax.swing.JDesktopPane;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +58,8 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
 public class SipModel {
     private static final Logger LOG = Logger.getLogger(SipModel.class);
+    private JDesktopPane desktop;
+    private AllFrames.ViewSelector viewSelector;
     private WorkModel workModel;
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
@@ -83,7 +87,8 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, Preferences preferences) throws StorageException {
+    public SipModel(JDesktopPane desktop, Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, Preferences preferences) throws StorageException {
+        this.desktop = desktop;
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
@@ -164,6 +169,18 @@ public class SipModel {
                 }
             }
         });
+    }
+
+    public JDesktopPane getDesktop() {
+        return desktop;
+    }
+
+    public AllFrames.ViewSelector getViewSelector() {
+        return viewSelector;
+    }
+
+    public void setViewSelector(AllFrames.ViewSelector viewSelector) {
+        this.viewSelector = viewSelector;
     }
 
     private void clearValidation() {

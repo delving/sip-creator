@@ -49,8 +49,6 @@ public abstract class FrameBase extends JInternalFrame {
     private JMenuBar originalMenuBar;
     private Which which;
     private Placement placement;
-    protected JDesktopPane desktopPane;
-    protected JComponent parent;
     protected FrameBase childFrame;
     protected JComponent focusOwner;
     protected SipModel sipModel;
@@ -88,7 +86,7 @@ public abstract class FrameBase extends JInternalFrame {
         Dimension getSize();
     }
 
-    protected FrameBase(Which which, final JComponent parent, SipModel sipModel, String title) {
+    protected FrameBase(Which which, SipModel sipModel, String title) {
         super(
                 title,
                 true, // resizable
@@ -104,14 +102,12 @@ public abstract class FrameBase extends JInternalFrame {
         catch (PropertyVetoException e) {
             throw new RuntimeException(e);
         }
-        this.parent = parent;
         this.sipModel = sipModel;
         this.action = new PopupAction(title);
         for (int pos = 0; pos < 4; pos++) {
             adjustActions.add(new AdjustAction(pos, 1));
             adjustActions.add(new AdjustAction(pos, -1));
         }
-        this.desktopPane = parent instanceof FrameBase ? ((FrameBase) parent).desktopPane : JOptionPane.getDesktopPaneForComponent(parent);
         positionTimer = new Timer(DEFAULT_MOVE_INTERVAL,
                 new ActionListener() {
                     @Override
@@ -227,12 +223,6 @@ public abstract class FrameBase extends JInternalFrame {
     public void openFrame() {
         init();
         boolean added = addIfAbsent();
-        if (parent instanceof FrameBase) {
-            ((FrameBase) parent).setChildFrame(FrameBase.this);
-            // Need to inform parent its about to lose its focus due
-            // to child opening
-            ((FrameBase) parent).childOpening();
-        }
         super.show();
         if (added) {
             if (placement == null) placement = new DefaultPlacement();
@@ -268,9 +258,9 @@ public abstract class FrameBase extends JInternalFrame {
 
     private boolean addIfAbsent() {
         boolean add = true;
-        JInternalFrame[] frames = desktopPane.getAllFrames();
+        JInternalFrame[] frames = sipModel.getDesktop().getAllFrames();
         for (JInternalFrame frame : frames) if (frame == this) add = false;
-        if (add) desktopPane.add(this);
+        if (add) sipModel.getDesktop().add(this);
         return add;
     }
 
@@ -281,7 +271,7 @@ public abstract class FrameBase extends JInternalFrame {
      */
     public void ensureOnScreen() {
         Point loc = getLocation();
-        Dimension desktopSize = desktopPane.getSize();
+        Dimension desktopSize = sipModel.getDesktop().getSize();
         if (loc.y - INSETS.top + 1 < 0) {
             loc.y = INSETS.top - 1;
             setLocation(loc);
@@ -367,9 +357,6 @@ public abstract class FrameBase extends JInternalFrame {
 
             @Override
             public void internalFrameClosing(InternalFrameEvent e) {
-                if (parent != null && parent instanceof FrameBase) {
-                    ((FrameBase) parent).childClosing();
-                }
             }
         });
     }
@@ -545,7 +532,7 @@ public abstract class FrameBase extends JInternalFrame {
 
         @Override
         public Dimension getSize() {
-            Dimension s = desktopPane.getSize();
+            Dimension s = sipModel.getDesktop().getSize();
             return new Dimension(s.width - margin * 2, s.height - margin * 2);
         }
     }

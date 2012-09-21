@@ -57,8 +57,8 @@ public class DataSetFrame extends FrameBase {
     private DownloadAction downloadAction = new DownloadAction();
     private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
 
-    public DataSetFrame(JDesktopPane desktop, final SipModel sipModel, CultureHubClient cultureHubClient) {
-        super(Which.DATA_SET, desktop, sipModel, "Data Sets");
+    public DataSetFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
+        super(Which.DATA_SET, sipModel, "Data Sets");
         this.cultureHubClient = cultureHubClient;
         this.dataSetList = new JList(listModel);
         this.dataSetList.setFont(MONOSPACED);
@@ -72,8 +72,7 @@ public class DataSetFrame extends FrameBase {
                 editAction.checkEnabled();
             }
         });
-        int busyCheckDelay = 500;
-        listModel.setStateCheckDelay(busyCheckDelay);
+        listModel.setStateCheckDelay(500);
         getAction().putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -152,7 +151,7 @@ public class DataSetFrame extends FrameBase {
                 @Override
                 public void run() {
                     setEnabled(true);
-                    // todo: trigger the
+                    sipModel.getViewSelector().selectView(AllFrames.View.QUICK_MAPPING);
                 }
             });
         }

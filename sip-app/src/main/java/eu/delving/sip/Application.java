@@ -115,7 +115,7 @@ public class Application {
         HttpClient httpClient = createHttpClient(String.format("http://%s", StorageFinder.getHostPort(storageDirectory)));
         Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
         Storage storage = new StorageImpl(storageDirectory, fetcher, httpClient);
-        sipModel = new SipModel(storage, groovyCodeResource, feedback, preferences);
+        sipModel = new SipModel(desktop ,storage, groovyCodeResource, feedback, preferences);
         CultureHubClient cultureHubClient = new CultureHubClient(sipModel, httpClient);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient);
         statusPanel = new StatusPanel(sipModel);
@@ -123,11 +123,11 @@ public class Application {
         home.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
-                allFrames.rebuildView();
+                allFrames.getViewSelector().refreshView();
             }
         });
         desktop.setBackground(new Color(190, 190, 200));
-        allFrames = new AllFrames(desktop, sipModel, cultureHubClient);
+        allFrames = new AllFrames(sipModel, cultureHubClient);
         helpPanel = new HelpPanel(sipModel, httpClient);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
@@ -292,7 +292,7 @@ public class Application {
                     home.getContentPane().remove(helpPanel);
                 }
                 home.getContentPane().validate();
-                allFrames.rebuildView();
+                allFrames.getViewSelector().refreshView();
             }
         });
         menu.add(item);

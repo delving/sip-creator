@@ -39,7 +39,10 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,8 +67,8 @@ public class StatsFrame extends FrameBase {
     private JPanel fieldCountPanel = emptyPanel();
     private JPanel valueHistogramPanel = emptyPanel();
 
-    public StatsFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.STATS, desktop, sipModel, "Stats");
+    public StatsFrame(SipModel sipModel) {
+        super(Which.STATS, sipModel, "Stats");
         wireUp();
         getAction().putValue(
                 Action.ACCELERATOR_KEY,

@@ -27,7 +27,10 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -46,8 +49,8 @@ public class MappingCodeFrame extends FrameBase {
     private JTextArea recordArea = new JTextArea();
     private JTextArea fieldArea = new JTextArea();
 
-    public MappingCodeFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CODE, desktop, sipModel, "Code");
+    public MappingCodeFrame(final SipModel sipModel) {
+        super(Which.CODE, sipModel, "Code");
         fieldArea.setFont(MONOSPACED);
         recordArea.setFont(MONOSPACED);
         Ear ear = new Ear();
@@ -61,7 +64,7 @@ public class MappingCodeFrame extends FrameBase {
 
             @Override
             public Dimension getSize() {
-                return new Dimension(desktopPane.getSize().width - MARG * 2, desktopPane.getSize().height - MARG * 2);
+                return new Dimension(sipModel.getDesktop().getSize().width - MARG * 2, sipModel.getDesktop().getSize().height - MARG * 2);
             }
         });
         getAction().putValue(
