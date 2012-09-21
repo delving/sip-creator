@@ -29,6 +29,8 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.panels.HtmlPanel;
+import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -41,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * Show the datasets both local and on the server, so all info about their status is unambiguous.
@@ -55,7 +59,9 @@ public class DataSetFrame extends FrameBase {
     private CultureHubClient cultureHubClient;
     private EditAction editAction = new EditAction();
     private DownloadAction downloadAction = new DownloadAction();
+    private UnlockAction unlockAction = new UnlockAction();
     private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
+    private HtmlPanel htmlPanel = new HtmlPanel("Data Set");
 
     public DataSetFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
@@ -70,35 +76,55 @@ public class DataSetFrame extends FrameBase {
                 if (e.getValueIsAdjusting()) return;
                 downloadAction.checkEnabled();
                 editAction.checkEnabled();
+                unlockAction.checkEnabled();
+                fillHtmlPanel();
             }
         });
         listModel.setStateCheckDelay(500);
         getAction().putValue(
                 Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
         );
         editAction.checkEnabled();
         downloadAction.checkEnabled();
+        unlockAction.checkEnabled();
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.add(new JButton(refreshAction), BorderLayout.NORTH);
         content.add(SwingHelper.scrollV("Data Sets", dataSetList), BorderLayout.CENTER);
-        JPanel bp = new JPanel(new GridLayout(0, 1));
+        content.add(createEast(), BorderLayout.EAST);
+        fillHtmlPanel();
+    }
+
+    private JPanel createEast() {
+        JPanel bp = new JPanel(new GridLayout(0, 1, 10, 10));
+        bp.add(new JButton(refreshAction));
         bp.add(new JButton(editAction));
         bp.add(new JButton(downloadAction));
-        content.add(bp, BorderLayout.SOUTH);
+        bp.add(new JButton(unlockAction));
+        bp.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel p = new JPanel(new BorderLayout(10, 10));
+        htmlPanel.setPreferredSize(new Dimension(500, 500));
+        p.add(htmlPanel, BorderLayout.CENTER);
+        p.add(bp, BorderLayout.SOUTH);
+        return p;
     }
 
     public void fireRefresh() {
         refreshAction.actionPerformed(null);
     }
 
+    private void fillHtmlPanel() {
+        StringTemplate template = SwingHelper.getTemplate("data-set");
+        template.setAttribute("entry", getSelectedEntry());
+        htmlPanel.setHtml(template.toString());
+    }
+
     private class RefreshAction extends AbstractAction {
 
         private RefreshAction() {
-            super("Refresh this list");
+            super("Refresh the list of data sets from the culture hub");
         }
 
         @Override
@@ -124,7 +150,7 @@ public class DataSetFrame extends FrameBase {
     private class EditAction extends AbstractAction {
 
         private EditAction() {
-            super("Select for editing");
+            super("Select a mapping of this data set for editing");
         }
 
         public void checkEnabled() {
@@ -160,7 +186,7 @@ public class DataSetFrame extends FrameBase {
             JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
             ButtonGroup buttonGroup = new ButtonGroup();
             for (SchemaVersion schemaVersion : schemaVersions) {
-                JRadioButton b = new JRadioButton(schemaVersion.getPrefix());
+                JRadioButton b = new JRadioButton(schemaVersion.getPrefix() + " mapping");
                 if (buttonGroup.getButtonCount() == 0) b.setSelected(true);
                 b.setActionCommand(schemaVersion.getPrefix());
                 buttonGroup.add(b);
@@ -173,7 +199,7 @@ public class DataSetFrame extends FrameBase {
     private class DownloadAction extends AbstractAction {
 
         private DownloadAction() {
-            super("Download");
+            super("Download from the culture hub for editing locally");
         }
 
         public void checkEnabled() {
@@ -201,8 +227,63 @@ public class DataSetFrame extends FrameBase {
         }
     }
 
+    public class UnlockAction extends AbstractAction {
+
+        public UnlockAction() {
+            super("Unlock this data set for others to access");
+        }
+
+        public void checkEnabled() {
+            Entry entry = getSelectedEntry();
+            this.setEnabled(entry != null && entry.getState() == State.LOCKED);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Entry entry = getSelectedEntry();
+            if (entry == null) return;
+            boolean unlock = sipModel.getFeedback().confirm(
+                    "Unlock",
+                    String.format("<html>Are you sure that you want to delete your local copy of<br>" +
+                            "this data set %s, and unlock it so that someone else can access it?",
+                            entry.getSpec()
+                    )
+            );
+            if (unlock) unlockDataSet(entry.getDataSet());
+        }
+
+        private void unlockDataSet(final DataSet dataSet) {
+            cultureHubClient.unlockDataSet(dataSet, new CultureHubClient.UnlockListener() {
+                @Override
+                public void unlockComplete(boolean successful) {
+                    if (successful) {
+                        try {
+                            sipModel.exec(new Swing() {
+                                @Override
+                                public void run() {
+                                    sipModel.seekReset(); // release the file handle
+                                }
+                            });
+                            sipModel.getDataSetModel().clearDataSet();
+                            dataSet.remove();
+                        }
+                        catch (StorageException e) {
+                            sipModel.getFeedback().alert("Unable to remove data set", e);
+                        }
+                    }
+                    else {
+                        sipModel.getFeedback().alert("Unable to unlock the data set");
+                    }
+                }
+            });
+        }
+
+    }
+
+
     private Entry getSelectedEntry() {
-        return (Entry) dataSetList.getSelectedValue();
+        Object selectedObject = dataSetList.getSelectedValue();
+        return selectedObject != null && selectedObject instanceof Entry ? (Entry) selectedObject : null;
     }
 
     private class Entry implements Comparable<Entry> {
@@ -222,6 +303,14 @@ public class DataSetFrame extends FrameBase {
 
         public String getSpec() {
             return dataSetEntry != null ? dataSetEntry.spec : dataSet.getSpec();
+        }
+
+        public CultureHubClient.DataSetEntry getDataSetEntry() {
+            return dataSetEntry;
+        }
+
+        public DataSet getDataSet() {
+            return dataSet;
         }
 
         public List<SchemaVersion> getSchemaVersions() {
@@ -350,48 +439,48 @@ public class DataSetFrame extends FrameBase {
     private class DataSetCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            Color foreground;
+            Icon icon;
             String string;
             if (value instanceof String) {
                 string = (String) value;
-                foreground = Color.BLACK;
+                icon = null;
             }
             else {
                 Entry entry = (Entry) value;
                 State state = entry.getState();
-                foreground = state.color;
+                icon = state.icon;
                 string = String.format("%s - %s", entry.getSpec(), state.string);
                 int substitution = string.indexOf("%s");
                 if (substitution > 0) {
                     string = String.format(string, entry.dataSetEntry.lockedBy.email);
                 }
             }
-            JComponent component = (JComponent) super.getListCellRendererComponent(list, string, index, isSelected, cellHasFocus);
-            component.setForeground(isSelected ? Color.WHITE : foreground);
-            return component;
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, isSelected, cellHasFocus);
+            label.setIcon(icon);
+            return label;
         }
     }
 
     private enum State {
-        LOCKED(true, false, "locked by you", new Color(0, 160, 0)),
-        AVAILABLE(false, true, "can be downloaded", new Color(200, 0, 200)),
-        UNAVAILABLE(false, false, "locked by %s", new Color(128, 128, 128)),
-        BUSY(false, false, "busy locally", new Color(60, 90, 240)),
-        ORPHAN_TAKEN(true, false, "locked by %s but present locally (unusual), cannot be downloaded", Color.RED),
-        ORPHAN_LONELY(true, false, "only present locally (unusual)", Color.RED),
-        ORPHAN_UPDATE(false, true, "owned by you, but not present locally (unusual), can be downloaded", Color.RED),
-        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", Color.RED);
+        LOCKED(true, false, "locked by you", DATASET_LOCKED_ICON),
+        AVAILABLE(false, true, "can be downloaded", DATASET_DOWNLOAD_ICON),
+        UNAVAILABLE(false, false, "locked by %s", DATASET_UNAVAILABLE_ICON),
+        BUSY(false, false, "busy locally", DATASET_BUSY_ICON),
+        ORPHAN_TAKEN(true, false, "locked by %s but present locally (unusual), cannot be downloaded", DATASET_HUH_ICON),
+        ORPHAN_LONELY(true, false, "only present locally (unusual)", DATASET_HUH_ICON),
+        ORPHAN_UPDATE(false, true, "owned by you, but not present locally (unusual), can be downloaded", DATASET_HUH_ICON),
+        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", DATASET_HUH_ICON);
 
         private final String string;
-        private final Color color;
+        private final Icon icon;
         private final boolean selectable;
         private final boolean downloadable;
 
-        private State(boolean selectable, boolean downloadable, String string, Color color) {
+        private State(boolean selectable, boolean downloadable, String string, Icon icon) {
             this.selectable = selectable;
             this.downloadable = downloadable;
             this.string = string;
-            this.color = color;
+            this.icon = icon;
         }
 
         public String toString() {

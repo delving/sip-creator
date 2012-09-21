@@ -29,8 +29,6 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.Fetcher;
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.actions.DataImportAction;
-import eu.delving.sip.actions.DownloadAction;
-import eu.delving.sip.actions.ReleaseAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
@@ -73,7 +71,7 @@ public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
-    private Action downloadAction, importAction, uploadAction, releaseAction, validateAction;
+    private Action importAction, uploadAction, validateAction;
     private JFrame home;
     private JDesktopPane desktop;
     private AllFrames allFrames;
@@ -136,7 +134,7 @@ public class Application {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
-//                        dataSetMenu.getUnlockMappingAction().setEnabled(locked);
+//                        dataSetMenu.getUnlockMappingAction().setEnabled(locked); todo
                     }
                 });
             }
@@ -157,11 +155,9 @@ public class Application {
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
         });
-        downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
         importAction = new DataImportAction(desktop, sipModel);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
-        releaseAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -198,7 +194,6 @@ public class Application {
                         });
                         home.setTitle("Delving SIP Creator");
                         sipModel.seekReset();
-//                        dataSetMenu.refreshAndChoose(null, null);
                         break;
                     default:
                         DataSetModel dataSetModel = sipModel.getDataSetModel();
@@ -301,11 +296,9 @@ public class Application {
 
     private JMenu createFileMenu() {
         JMenu menu = new JMenu("File");
-        menu.add(downloadAction);
         menu.add(importAction);
         menu.add(validateAction);
         menu.add(uploadAction);
-        menu.add(releaseAction);
         return menu;
     }
 

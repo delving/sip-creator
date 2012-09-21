@@ -73,6 +73,7 @@ public class AllFrames {
             for (Arrangement arrangement : arrangements) {
                 if (arrangement.source.name == view) {
                     arrangement.actionPerformed(null);
+                    currentView = arrangement.source.name;
                     return;
                 }
             }

@@ -777,6 +777,18 @@ public class CultureHubClient {
             return String.format("%s_%s", spec, orgId);
         }
 
+        public int getRecordCount() {
+            return recordCount;
+        }
+
+        public LockedBy getLockedBy() {
+            return lockedBy;
+        }
+
+        public CreatedBy getCreatedBy() {
+            return createdBy;
+        }
+
         public String toString() {
             return "data-set spec=" + spec;
         }
@@ -794,6 +806,18 @@ public class CultureHubClient {
         public String username;
         public String fullname;
         public String email;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getFullname() {
+            return fullname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
     }
 
     @XStreamAlias("createdBy")
@@ -801,5 +825,17 @@ public class CultureHubClient {
         public String username;
         public String fullname;
         public String email;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getFullname() {
+            return fullname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
     }
 }
