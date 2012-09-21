@@ -148,15 +148,6 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public String getLatestPrefix() {
-            File latestMapping = latestMappingFileOrNull(here);
-            if (latestMapping != null) return extractName(latestMapping, FileType.MAPPING);
-            List<SchemaVersion> schemaVersions = getSchemaVersions();
-            if (schemaVersions.isEmpty()) return null;
-            return schemaVersions.get(0).getPrefix();
-        }
-
-        @Override
         public File getMediaDirectory() {
             return new File(here, MEDIA_DIR);
         }

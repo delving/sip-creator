@@ -295,11 +295,10 @@ public class SipModel {
                 final Map<String, String> facts = dataSet.getDataSetFacts();
                 final Map<String, String> hints = dataSet.getHints();
                 final List<SchemaVersion> schemaVersions = dataSet.getSchemaVersions();
-                final String prefixToUse = prefix.isEmpty() ? dataSet.getLatestPrefix() : prefix;
-                dataSetModel.setDataSet(dataSet, prefixToUse);
+                dataSetModel.setDataSet(dataSet, prefix);
                 final RecMapping recMapping = dataSetModel.getRecMapping();
                 dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-                mappingHintsModel.initialize(prefixToUse, dataSetModel);
+                mappingHintsModel.initialize(prefix, dataSetModel);
                 dataSetModel.getMappingModel().setFacts(facts);
                 dataSetModel.getMappingModel().setSchemaVersion(schemaVersions);
                 recordCompileModel.setValidator(dataSetModel.newValidator());

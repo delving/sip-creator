@@ -773,6 +773,10 @@ public class CultureHubClient {
         public LockedBy lockedBy;
         public CreatedBy createdBy;
 
+        public String getDirectoryName() {
+            return String.format("%s_%s", spec, orgId);
+        }
+
         public String toString() {
             return "data-set spec=" + spec;
         }

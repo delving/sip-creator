@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <frame-arrangements>
-    <arrangement name="First Contact">
-        <frame where="0011" which="SOURCE"/>
+    <arrangement name="Data Set">
+        <frame where="0011" which="DATA_SET"/>
     </arrangement>
     <arrangement name="Quick Mapping">
         <frame where="0013" which="SOURCE"/>

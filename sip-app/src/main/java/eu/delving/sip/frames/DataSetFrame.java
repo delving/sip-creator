@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
@@ -48,12 +49,13 @@ import java.util.Map;
  */
 
 public class DataSetFrame extends FrameBase {
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
+    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
     private DataSetListModel listModel = new DataSetListModel();
     private JList dataSetList;
     private CultureHubClient cultureHubClient;
     private EditAction editAction = new EditAction();
     private DownloadAction downloadAction = new DownloadAction();
+    private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
 
     public DataSetFrame(JDesktopPane desktop, final SipModel sipModel, CultureHubClient cultureHubClient) {
         super(Which.DATA_SET, desktop, sipModel, "Data Sets");
@@ -76,12 +78,48 @@ public class DataSetFrame extends FrameBase {
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
         );
+        editAction.checkEnabled();
+        downloadAction.checkEnabled();
     }
 
     @Override
     protected void buildContent(Container content) {
+        content.add(new JButton(refreshAction), BorderLayout.NORTH);
         content.add(SwingHelper.scrollV("Data Sets", dataSetList), BorderLayout.CENTER);
-        content.add(new JButton(downloadAction), BorderLayout.SOUTH);
+        JPanel bp = new JPanel(new GridLayout(0, 1));
+        bp.add(new JButton(editAction));
+        bp.add(new JButton(downloadAction));
+        content.add(bp, BorderLayout.SOUTH);
+    }
+
+    public void fireRefresh() {
+        refreshAction.actionPerformed(null);
+    }
+
+    private class RefreshAction extends AbstractAction {
+
+        private RefreshAction() {
+            super("Refresh this list");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            setEnabled(false);
+            listModel.setMessage("Loading");
+            cultureHubClient.fetchDataSetList(new CultureHubClient.ListReceiveListener() {
+                @Override
+                public void listReceived(List<CultureHubClient.DataSetEntry> entries) {
+                    listModel.setEntries(entries);
+                    setEnabled(true);
+                }
+
+                @Override
+                public void failed(Exception e) {
+                    sipModel.getFeedback().alert("Unable to fetch data set list", e);
+                    setEnabled(true);
+                }
+            });
+        }
     }
 
     private class EditAction extends AbstractAction {
@@ -99,34 +137,44 @@ public class DataSetFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             Entry entry = getSelectedEntry();
             if (entry == null) return;
+            List<SchemaVersion> schemaVersions = entry.getSchemaVersions();
+            if (schemaVersions == null || schemaVersions.isEmpty()) return;
             setEnabled(false);
-            String prefix = "prefix"; // todo: pop up to ask for prefix
+            String prefix;
+            if (schemaVersions.size() == 1) {
+                prefix = schemaVersions.get(0).getPrefix();
+            }
+            else {
+                prefix = askForPrefix(schemaVersions);
+                if (prefix == null) return;
+            }
             sipModel.setDataSetPrefix(entry.dataSet, prefix, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);
+                    // todo: trigger the
                 }
             });
+        }
 
-            try {
-                DataSet dataSet = sipModel.getStorage().createDataSet(entry.getSpec(), entry.getOrganization());
-                cultureHubClient.downloadDataSet(dataSet, new Swing() {
-                    @Override
-                    public void run() {
-                        setEnabled(true);
-                    }
-                });
+        private String askForPrefix(List<SchemaVersion> schemaVersions) {
+            JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
+            ButtonGroup buttonGroup = new ButtonGroup();
+            for (SchemaVersion schemaVersion : schemaVersions) {
+                JRadioButton b = new JRadioButton(schemaVersion.getPrefix());
+                if (buttonGroup.getButtonCount() == 0) b.setSelected(true);
+                b.setActionCommand(schemaVersion.getPrefix());
+                buttonGroup.add(b);
+                buttonPanel.add(b);
             }
-            catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to create data set called " + entry.getSpec(), e);
-            }
+            return sipModel.getFeedback().form("Choose Schema", buttonPanel) ? buttonGroup.getSelection().getActionCommand() : null;
         }
     }
 
     private class DownloadAction extends AbstractAction {
 
         private DownloadAction() {
-            super("Download selected data set");
+            super("Download");
         }
 
         public void checkEnabled() {
@@ -152,35 +200,33 @@ public class DataSetFrame extends FrameBase {
                 sipModel.getFeedback().alert("Unable to create data set called " + entry.getSpec(), e);
             }
         }
-
     }
 
     private Entry getSelectedEntry() {
-        Entry entry = (Entry) dataSetList.getSelectedValue();
-        if (entry == null) return null;
-        if (!entry.getState().downloadable) return null;
-        return entry;
+        return (Entry) dataSetList.getSelectedValue();
     }
 
     private class Entry implements Comparable<Entry> {
         private CultureHubClient.DataSetEntry dataSetEntry;
         private DataSet dataSet;
-        private String prefix;
         private State previousState;
 
-        private Entry(CultureHubClient.DataSetEntry dataSetEntry, DataSet dataSet, String prefix) {
+        private Entry(CultureHubClient.DataSetEntry dataSetEntry, DataSet dataSet) {
             this.dataSetEntry = dataSetEntry;
             this.dataSet = dataSet;
-            this.prefix = prefix;
             this.previousState = getState();
         }
 
         public String getOrganization() {
-            return dataSetEntry.orgId;
+            return dataSetEntry != null ? dataSetEntry.orgId : dataSet.getOrganization();
         }
 
         public String getSpec() {
-            return dataSetEntry.spec;
+            return dataSetEntry != null ? dataSetEntry.spec : dataSet.getSpec();
+        }
+
+        public List<SchemaVersion> getSchemaVersions() {
+            return dataSet != null ? dataSet.getSchemaVersions() : null;
         }
 
         public State getState() {
@@ -216,11 +262,18 @@ public class DataSetFrame extends FrameBase {
 
         @Override
         public int compareTo(Entry entry) {
-            return dataSetEntry.spec.compareTo(entry.dataSetEntry.spec);
+            return getSpec().compareTo(entry.getSpec());
+        }
+
+        public boolean hasStateChanged() {
+            State newState = getState();
+            if (newState == previousState) return false;
+            previousState = newState;
+            return true;
         }
 
         public String toString() {
-            return dataSetEntry.spec;
+            return String.format("DataSet(%s)", getSpec());
         }
 
         private boolean isBusy() {
@@ -230,13 +283,6 @@ public class DataSetFrame extends FrameBase {
         private boolean isLockedByUser() {
             boolean absent = dataSetEntry == null || dataSetEntry.lockedBy == null;
             return !absent && sipModel.getStorage().getUsername().equals(dataSetEntry.lockedBy.username);
-        }
-
-        public boolean hasStateChanged() {
-            State newState = getState();
-            if (newState == previousState) return false;
-            previousState = newState;
-            return true;
         }
     }
 
@@ -263,19 +309,23 @@ public class DataSetFrame extends FrameBase {
             fireIntervalAdded(this, 0, getSize());
         }
 
-        public void setEntries(java.util.List<CultureHubClient.DataSetEntry> entries) {
+        public void setEntries(List<CultureHubClient.DataSetEntry> entries) {
             message = null;
+            List<Entry> freshEntries = new ArrayList<Entry>();
             Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
-            int size = getSize();
-            this.entries.clear();
-            fireIntervalRemoved(this, 0, size);
-            if (entries != null) {
-                for (CultureHubClient.DataSetEntry incoming : entries) {
-                    String key = incoming.spec + "_" + incoming.orgId;
-                    this.entries.add(new Entry(incoming, dataSets.get(key), "prefix")); // todo: PREFIX!!!
-                }
+            for (CultureHubClient.DataSetEntry incoming : entries) {
+                DataSet dataSet = dataSets.get(incoming.getDirectoryName());
+                freshEntries.add(new Entry(incoming, dataSet));
+                if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
             }
-            Collections.sort(this.entries);
+            for (DataSet dataSet : dataSets.values()) { // remaining ones
+                freshEntries.add(new Entry(null, dataSet));
+            }
+            Collections.sort(freshEntries);
+            int size = getSize();
+            this.entries = new ArrayList<Entry>();
+            fireIntervalRemoved(this, 0, size);
+            this.entries = freshEntries;
             fireIntervalAdded(this, 0, getSize());
         }
 
@@ -311,26 +361,27 @@ public class DataSetFrame extends FrameBase {
                 Entry entry = (Entry) value;
                 State state = entry.getState();
                 foreground = state.color;
-                string = state.toString();
-                if (string.indexOf("%s") > 0) {
+                string = String.format("%s - %s", entry.getSpec(), state.string);
+                int substitution = string.indexOf("%s");
+                if (substitution > 0) {
                     string = String.format(string, entry.dataSetEntry.lockedBy.email);
                 }
             }
             JComponent component = (JComponent) super.getListCellRendererComponent(list, string, index, isSelected, cellHasFocus);
-            component.setForeground(foreground);
+            component.setForeground(isSelected ? Color.WHITE : foreground);
             return component;
         }
     }
 
     private enum State {
-        LOCKED(true, false, "locked by you", new Color(0, 180, 0)),
-        AVAILABLE(false, true, "can be downloaded", new Color(0, 120, 0)),
-        UNAVAILABLE(false, false, "locked by %s", new Color(250, 30, 0)),
+        LOCKED(true, false, "locked by you", new Color(0, 160, 0)),
+        AVAILABLE(false, true, "can be downloaded", new Color(200, 0, 200)),
+        UNAVAILABLE(false, false, "locked by %s", new Color(128, 128, 128)),
         BUSY(false, false, "busy locally", new Color(60, 90, 240)),
-        ORPHAN_TAKEN(true, false, "locked by %s but present locally (unusual), cannot be downloaded", new Color(230, 60, 220)),
-        ORPHAN_LONELY(true, false, "only present locally (unusual)", new Color(230, 60, 220)),
-        ORPHAN_UPDATE(false, true, "owned by you, but not present locally (unusual), can be downloaded", new Color(230, 60, 220)),
-        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", new Color(230, 60, 220));
+        ORPHAN_TAKEN(true, false, "locked by %s but present locally (unusual), cannot be downloaded", Color.RED),
+        ORPHAN_LONELY(true, false, "only present locally (unusual)", Color.RED),
+        ORPHAN_UPDATE(false, true, "owned by you, but not present locally (unusual), can be downloaded", Color.RED),
+        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", Color.RED);
 
         private final String string;
         private final Color color;

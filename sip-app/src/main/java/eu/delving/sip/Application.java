@@ -272,9 +272,8 @@ public class Application {
     }
 
     private JMenu createDataSetMenu() {
-        JMenu menu = new JMenu("Data Sets");
+        JMenu menu = new JMenu("Locking"); // todo: think of something better than a menu
         menu.add(new UnlockMappingAction());
-        menu.add(allFrames.getDataSetFrame().getAction());
         return menu;
     }
 
@@ -384,7 +383,7 @@ public class Application {
                 try {
                     Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
-                    application.allFrames.restore();
+                    application.allFrames.initiate();
                 }
                 catch (StorageException e) {
                     JOptionPane.showMessageDialog(null, "Unable to create the storage directory");

@@ -53,7 +53,6 @@ import static eu.delving.sip.base.FrameBase.INSETS;
  */
 
 public class AllFrames {
-    private final String CURRENT_VIEW_PREF = "currentView";
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
     private FrameBase[] frames;
@@ -72,12 +71,12 @@ public class AllFrames {
     public AllFrames(JDesktopPane desktop, final SipModel sipModel, final CultureHubClient cultureHubClient) {
         this.desktop = desktop;
         this.sipModel = sipModel;
-        dataSetFrame = new DataSetFrame(desktop, sipModel, cultureHubClient);
         functionFrame = new FunctionFrame(desktop, sipModel);
         mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
         statsFrame = new StatsFrame(desktop, sipModel);
         workFrame = new WorkFrame(desktop, sipModel);
         uploadFrame = new UploadFrame(desktop, sipModel, cultureHubClient);
+        dataSetFrame = new DataSetFrame(desktop, sipModel, cultureHubClient);
         CreateFrame create = new CreateFrame(desktop, sipModel);
         addSpaceBarCreate(create, create);
         FrameBase source = new SourceFrame(desktop, sipModel);
@@ -89,6 +88,7 @@ public class AllFrames {
         FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel);
         FrameBase output = new OutputFrame(desktop, sipModel);
         this.frames = new FrameBase[]{
+                dataSetFrame,
                 source,
                 create,
                 target,
@@ -166,13 +166,19 @@ public class AllFrames {
         return new Swing() {
             @Override
             public void run() {
-                selectNewView("First Contact");
+                selectNewView("Quick Mapping");
             }
         };
     }
 
-    public DataSetFrame getDataSetFrame() {
-        return dataSetFrame;
+    public void initiate() {
+        sipModel.exec(new Swing() {
+            @Override
+            public void run() {
+                selectView("Data Set");
+                dataSetFrame.fireRefresh();
+            }
+        });
     }
 
     public WorkFrame getWorkFrame() {
@@ -181,10 +187,6 @@ public class AllFrames {
 
     public Action getUploadAction() {
         return uploadFrame.getUploadAction();
-    }
-
-    public void restore() {
-        selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
     }
 
     public JMenu getFrameMenu() {
@@ -380,7 +382,6 @@ public class AllFrames {
                 block.frame.setPlacement(situation);
             }
             for (Block block : blocks) block.frame.openFrame();
-            sipModel.getPreferences().put(CURRENT_VIEW_PREF, currentView = toString());
             for (FrameBase base : frames) base.setArrangementSource(source, this);
         }
 
