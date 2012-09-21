@@ -59,7 +59,7 @@ public class DataSetFrame extends FrameBase {
     private CultureHubClient cultureHubClient;
     private EditAction editAction = new EditAction();
     private DownloadAction downloadAction = new DownloadAction();
-    private UnlockAction unlockAction = new UnlockAction();
+    private ReleaseAction releaseAction = new ReleaseAction();
     private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
     private HtmlPanel htmlPanel = new HtmlPanel("Data Set");
 
@@ -76,7 +76,7 @@ public class DataSetFrame extends FrameBase {
                 if (e.getValueIsAdjusting()) return;
                 downloadAction.checkEnabled();
                 editAction.checkEnabled();
-                unlockAction.checkEnabled();
+                releaseAction.checkEnabled();
                 fillHtmlPanel();
             }
         });
@@ -87,7 +87,7 @@ public class DataSetFrame extends FrameBase {
         );
         editAction.checkEnabled();
         downloadAction.checkEnabled();
-        unlockAction.checkEnabled();
+        releaseAction.checkEnabled();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class DataSetFrame extends FrameBase {
         bp.add(new JButton(refreshAction));
         bp.add(new JButton(editAction));
         bp.add(new JButton(downloadAction));
-        bp.add(new JButton(unlockAction));
+        bp.add(new JButton(releaseAction));
         bp.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel p = new JPanel(new BorderLayout(10, 10));
         htmlPanel.setPreferredSize(new Dimension(500, 500));
@@ -227,15 +227,15 @@ public class DataSetFrame extends FrameBase {
         }
     }
 
-    public class UnlockAction extends AbstractAction {
+    public class ReleaseAction extends AbstractAction {
 
-        public UnlockAction() {
-            super("Unlock this data set for others to access");
+        public ReleaseAction() {
+            super("Release your ownership of this data set");
         }
 
         public void checkEnabled() {
             Entry entry = getSelectedEntry();
-            this.setEnabled(entry != null && entry.getState() == State.LOCKED);
+            this.setEnabled(entry != null && entry.getState() == State.OWNED_BY_YOU);
         }
 
         @Override
@@ -243,7 +243,7 @@ public class DataSetFrame extends FrameBase {
             Entry entry = getSelectedEntry();
             if (entry == null) return;
             boolean unlock = sipModel.getFeedback().confirm(
-                    "Unlock",
+                    "Release",
                     String.format("<html>Are you sure that you want to delete your local copy of<br>" +
                             "this data set %s, and unlock it so that someone else can access it?",
                             entry.getSpec()
@@ -326,7 +326,7 @@ public class DataSetFrame extends FrameBase {
                     return State.ORPHAN_ARCHIVE;
                 }
                 else if (isLockedByUser()) {
-                    return State.LOCKED;
+                    return State.OWNED_BY_YOU;
                 }
                 else { // locked by somebody else
                     return State.ORPHAN_TAKEN;
@@ -462,13 +462,13 @@ public class DataSetFrame extends FrameBase {
     }
 
     private enum State {
-        LOCKED(true, false, "locked by you", DATASET_LOCKED_ICON),
+        OWNED_BY_YOU(true, false, "you are owner", DATASET_LOCKED_ICON),
         AVAILABLE(false, true, "can be downloaded", DATASET_DOWNLOAD_ICON),
-        UNAVAILABLE(false, false, "locked by %s", DATASET_UNAVAILABLE_ICON),
+        UNAVAILABLE(false, false, "owner is %s", DATASET_UNAVAILABLE_ICON),
         BUSY(false, false, "busy locally", DATASET_BUSY_ICON),
-        ORPHAN_TAKEN(true, false, "locked by %s but present locally (unusual), cannot be downloaded", DATASET_HUH_ICON),
+        ORPHAN_TAKEN(true, false, "owner is %s but present locally (unusual), cannot be downloaded", DATASET_HUH_ICON),
         ORPHAN_LONELY(true, false, "only present locally (unusual)", DATASET_HUH_ICON),
-        ORPHAN_UPDATE(false, true, "owned by you, but not present locally (unusual), can be downloaded", DATASET_HUH_ICON),
+        ORPHAN_UPDATE(false, true, "you are owner, but not present locally (unusual), can be downloaded", DATASET_HUH_ICON),
         ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", DATASET_HUH_ICON);
 
         private final String string;

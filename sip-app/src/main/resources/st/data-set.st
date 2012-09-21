@@ -35,7 +35,7 @@ $if (entry.dataSetEntry)$
     <dd>$entry.dataSetEntry.recordCount$</dd>
 
 $if (entry.dataSetEntry.lockedBy)$
-  <dt>Locked by:</dt>
+  <dt>Owned by:</dt>
     <dd>$entry.dataSetEntry.lockedBy.fullname$ &lt;$entry.dataSetEntry.lockedBy.email$&gt;</dd>
 $endif$
 

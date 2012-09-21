@@ -80,6 +80,7 @@ public class Application {
     private HelpPanel helpPanel;
     private Timer resizeTimer;
     private ExpertMenu expertMenu;
+    private Application.UnlockMappingAction unlockMappingAction;
 
     private Application(final File storageDirectory) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
@@ -134,7 +135,7 @@ public class Application {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
-//                        dataSetMenu.getUnlockMappingAction().setEnabled(locked); todo
+                        unlockMappingAction.setEnabled(locked);
                     }
                 });
             }
@@ -158,6 +159,7 @@ public class Application {
         importAction = new DataImportAction(desktop, sipModel);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
+        unlockMappingAction = new UnlockMappingAction();
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -235,7 +237,10 @@ public class Application {
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
         ));
-        p.add(statusPanel);
+        JPanel sp = new JPanel(new BorderLayout());
+        sp.add(statusPanel, BorderLayout.CENTER);
+        sp.add(new JButton(unlockMappingAction), BorderLayout.EAST);
+        p.add(sp);
         p.add(createWorkPanel());
         p.add(allFrames.getBigWindowsPanel());
         return p;
@@ -258,18 +263,11 @@ public class Application {
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
         bar.add(createFileMenu());
-        bar.add(createDataSetMenu());
         bar.add(allFrames.getViewMenu());
         bar.add(allFrames.getFrameMenu());
         bar.add(expertMenu);
         bar.add(createHelpMenu());
         return bar;
-    }
-
-    private JMenu createDataSetMenu() {
-        JMenu menu = new JMenu("Locking"); // todo: think of something better than a menu
-        menu.add(new UnlockMappingAction());
-        return menu;
     }
 
     private JMenu createHelpMenu() {
@@ -305,7 +303,9 @@ public class Application {
     private class UnlockMappingAction extends AbstractAction implements Work {
 
         private UnlockMappingAction() {
-            super("Unlock this mapping for further editing");
+            super("<html><center><b>Unlock</b><br>" +
+                    "<p>Edit Mapping</p>");
+            setEnabled(false);
         }
 
         @Override
