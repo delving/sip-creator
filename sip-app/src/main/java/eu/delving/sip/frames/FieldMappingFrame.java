@@ -69,8 +69,8 @@ public class FieldMappingFrame extends FrameBase {
     private DictionaryPanel dictionaryPanel;
     private UndoManager undoManager = new UndoManager();
 
-    public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.FIELD_MAPPING, desktop, sipModel, "Field Mapping");
+    public FieldMappingFrame(SipModel sipModel) {
+        super(Which.FIELD_MAPPING, sipModel, "Field Mapping");
         dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);

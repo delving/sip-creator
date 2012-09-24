@@ -34,7 +34,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -73,8 +75,8 @@ public class SourceFrame extends FrameBase {
         }
     });
 
-    public SourceFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.SOURCE, desktop, sipModel, "Source");
+    public SourceFrame(SipModel sipModel) {
+        super(Which.SOURCE, sipModel, "Source");
         sourceTree = new JTree(sipModel.getStatsModel().getSourceTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {

@@ -88,6 +88,11 @@ public class StorageImpl implements Storage {
     }
 
     @Override
+    public String getHostPort() {
+        return StorageFinder.getHostPort(home);
+    }
+
+    @Override
     public File cache(String fileName) {
         File cacheDir = new File(home, CACHE_DIR);
         if (!cacheDir.exists() && !cacheDir.mkdirs()) throw new RuntimeException("Couldn't create cache dir");
@@ -140,15 +145,6 @@ public class StorageImpl implements Storage {
         @Override
         public String getOrganization() {
             return getOrganizationFromDirectory(here);
-        }
-
-        @Override
-        public String getLatestPrefix() {
-            File latestMapping = latestMappingFileOrNull(here);
-            if (latestMapping != null) return extractName(latestMapping, FileType.MAPPING);
-            List<SchemaVersion> schemaVersions = getSchemaVersions();
-            if (schemaVersions.isEmpty()) return null;
-            return schemaVersions.get(0).getPrefix();
         }
 
         @Override

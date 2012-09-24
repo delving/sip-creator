@@ -26,13 +26,14 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
-import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -49,12 +50,10 @@ import static eu.delving.sip.files.DataSetState.MAPPING;
 public class ValidateAction extends AbstractAction {
     private SipModel sipModel;
     private Swing investigate;
-    private DataSetMenu dataSetMenu;
 
-    public ValidateAction(SipModel sipModel, DataSetMenu dataSetMenu, Swing investigate) {
+    public ValidateAction(SipModel sipModel, Swing investigate) {
         super("<html><b>Map and validate all records</b>");
         this.sipModel = sipModel;
-        this.dataSetMenu = dataSetMenu;
         this.investigate = investigate;
         setEnabled(false);
         putValue(Action.SMALL_ICON, SwingHelper.VALIDATE_ICON);
@@ -87,7 +86,7 @@ public class ValidateAction extends AbstractAction {
                             sipModel.setDataSetPrefix(fileProcessor.getDataSet(), fileProcessor.getPrefix(), new Swing() {
                                 @Override
                                 public void run() {
-                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
+//                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
                                     sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
                                     investigate.run();
                                 }

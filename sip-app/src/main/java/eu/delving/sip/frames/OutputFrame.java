@@ -24,11 +24,16 @@ package eu.delving.sip.frames;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 import static eu.delving.sip.base.SwingHelper.setError;
@@ -44,8 +49,8 @@ import static eu.delving.sip.base.SwingHelper.setError;
 public class OutputFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
 
-    public OutputFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.OUTPUT, desktop, sipModel, "Output");
+    public OutputFrame(final SipModel sipModel) {
+        super(Which.OUTPUT, sipModel, "Output");
         sipModel.getRecordCompileModel().setEnabled(false);
     }
 

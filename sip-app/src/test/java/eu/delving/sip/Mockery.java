@@ -82,10 +82,6 @@ public class Mockery {
         recMapping = dataSetModel.getDataSet().getRecMapping(prefix, dataSetModel);
     }
 
-    public File tempFile() throws IOException {
-        return File.createTempFile("validation", "temp", target);
-    }
-
     public Storage storage() {
         return storage;
     }

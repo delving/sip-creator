@@ -41,4 +41,6 @@ public interface Feedback {
     boolean confirm(String title, String message);
 
     boolean form(String title, Object ... components);
+
+    String getPassword();
 }
