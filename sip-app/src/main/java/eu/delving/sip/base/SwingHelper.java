@@ -28,7 +28,8 @@ import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 
 /**
  * Gathering together a number of things that are done with the Swing library from many parts of the code.
@@ -58,6 +59,11 @@ public class SwingHelper {
     public static final Icon RELEASE_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/release-icon.png"));
     public static final Icon REWIND_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/rewind-icon.png"));
     public static final Icon PLAY_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/play-icon.png"));
+    public static final Icon DATASET_LOCKED_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-locked.png"));
+    public static final Icon DATASET_DOWNLOAD_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-download.png"));
+    public static final Icon DATASET_UNAVAILABLE_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-unavailable.png"));
+    public static final Icon DATASET_BUSY_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-busy.png"));
+    public static final Icon DATASET_HUH_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-huh.png"));
 
     private static final StringTemplateGroup STRING_TEMPLATE = new StringTemplateGroup("Templates");
 

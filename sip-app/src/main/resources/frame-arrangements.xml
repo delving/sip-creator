@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
 <frame-arrangements>
-    <arrangement name="First Contact">
-        <frame where="0011" which="SOURCE"/>
+    <arrangement name="DATA_SETS">
+        <frame where="0011" which="DATA_SET"/>
     </arrangement>
-    <arrangement name="Quick Mapping">
+    <arrangement name="QUICK_MAPPING">
         <frame where="0013" which="SOURCE"/>
         <frame where="1012" which="CREATE"/>
         <frame where="1211" which="REC_MAPPING"/>
         <frame where="2013" which="TARGET"/>
     </arrangement>
-    <arrangement name="Big Picture">
+    <arrangement name="BIG_PICTURE">
         <frame where="0011" which="INPUT"/>
         <frame where="1011" which="OUTPUT"/>
     </arrangement>
-    <arrangement name="Code Tweaking">
+    <arrangement name="CODE_TWEAKING">
         <frame where="0011" which="REC_MAPPING"/>
         <frame where="1031" which="FIELD_MAPPING"/>
         <frame where="4011" which="INPUT"/>
     </arrangement>
-    <arrangement name="Deep Delving">
+    <arrangement name="DEEP_DELVING">
         <frame where="0011" which="FIELD_MAPPING"/>
     </arrangement>
-    <arrangement name="Decadent Display">
+    <arrangement name="DECADENT_DISPLAY">
         <frame where="0024" which="SOURCE"/>
         <frame where="2013" which="CREATE"/>
         <frame where="3023" which="TARGET"/>

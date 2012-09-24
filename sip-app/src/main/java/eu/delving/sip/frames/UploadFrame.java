@@ -28,7 +28,10 @@ import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -49,8 +52,8 @@ public class UploadFrame extends FrameBase implements ReportFileModel.Listener {
     private UploadAction uploadAction = new UploadAction();
     private JButton uploadButton = new JButton(uploadAction);
 
-    public UploadFrame(JDesktopPane desktop, SipModel sipModel, CultureHubClient cultureHubClient) {
-        super(Which.UPLOAD, desktop, sipModel, "Upload");
+    public UploadFrame(SipModel sipModel, CultureHubClient cultureHubClient) {
+        super(Which.UPLOAD, sipModel, "Upload");
         this.cultureHubClient = cultureHubClient;
         center.add(EMPTY_LABEL);
         sipModel.getReportFileModel().setListener(this);

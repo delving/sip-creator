@@ -35,7 +35,10 @@ import eu.delving.sip.panels.HtmlPanel;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.SortedSet;
 
@@ -62,8 +65,8 @@ public class CreateFrame extends FrameBase {
     private CreateMappingAction createMappingAction;
     private CopyMappingAction copyMappingAction;
 
-    public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CREATE, desktop, sipModel, "Create");
+    public CreateFrame(SipModel sipModel) {
+        super(Which.CREATE, sipModel, "Create");
         createModel = sipModel.getCreateModel();
         mappingHintsList = sipModel.getMappingHintsModel().getNodeMappingListModel().createJList();
         createMappingAction = new CreateMappingAction();

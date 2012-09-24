@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static eu.delving.sip.base.FrameBase.INSETS;
+import static eu.delving.sip.frames.AllFrames.View.*;
 
 /**
  * Hold on to all the frames and manage their arrangement on the desktop.  It is possible to make adjustments in
@@ -53,10 +54,10 @@ import static eu.delving.sip.base.FrameBase.INSETS;
  */
 
 public class AllFrames {
-    private final String CURRENT_VIEW_PREF = "currentView";
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
     private FrameBase[] frames;
+    private DataSetFrame dataSetFrame;
     private FunctionFrame functionFrame;
     private MappingCodeFrame mappingCodeFrame;
     private StatsFrame statsFrame;
@@ -64,35 +65,68 @@ public class AllFrames {
     private UploadFrame uploadFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
-    private JDesktopPane desktop;
-    private String currentView = "";
+    private View currentView = CLEAR;
     private SipModel sipModel;
+    private ViewSelector viewSelector = new ViewSelector() {
+        @Override
+        public void selectView(View view) {
+            for (Arrangement arrangement : arrangements) {
+                if (arrangement.source.name == view) {
+                    arrangement.actionPerformed(null);
+                    currentView = arrangement.source.name;
+                    return;
+                }
+            }
+            for (FrameBase frame : frames) frame.closeFrame();
+            currentView = CLEAR;
+        }
 
-    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
-        final String CREATE = "create";
-        analysis.getActionMap().put(CREATE, create.getCreateMappingAction());
-        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
+        @Override
+        public void refreshView() {
+            selectView(currentView);
+        }
+    };
+
+    public enum View {
+        CLEAR,
+        DATA_SETS,
+        QUICK_MAPPING,
+        BIG_PICTURE,
+        CODE_TWEAKING,
+        DEEP_DELVING,
+        DECADENT_DISPLAY;
+
+        public String getString() {
+            return super.toString().replaceAll("_", " ");
+        }
     }
 
-    public AllFrames(JDesktopPane desktop, final SipModel sipModel, final CultureHubClient cultureHubClient) {
-        this.desktop = desktop;
+    public interface ViewSelector {
+        void selectView(View view);
+        void refreshView();
+    }
+
+    public AllFrames(final SipModel sipModel, final CultureHubClient cultureHubClient) {
         this.sipModel = sipModel;
-        functionFrame = new FunctionFrame(desktop, sipModel);
-        mappingCodeFrame = new MappingCodeFrame(desktop, sipModel);
-        statsFrame = new StatsFrame(desktop, sipModel);
-        workFrame = new WorkFrame(desktop, sipModel);
-        uploadFrame = new UploadFrame(desktop, sipModel, cultureHubClient);
-        CreateFrame create = new CreateFrame(desktop, sipModel);
+        sipModel.setViewSelector(viewSelector);
+        functionFrame = new FunctionFrame(sipModel);
+        mappingCodeFrame = new MappingCodeFrame(sipModel);
+        statsFrame = new StatsFrame(sipModel);
+        workFrame = new WorkFrame(sipModel);
+        uploadFrame = new UploadFrame(sipModel, cultureHubClient);
+        dataSetFrame = new DataSetFrame(sipModel, cultureHubClient);
+        CreateFrame create = new CreateFrame(sipModel);
         addSpaceBarCreate(create, create);
-        FrameBase source = new SourceFrame(desktop, sipModel);
+        FrameBase source = new SourceFrame(sipModel);
         addSpaceBarCreate(create, source);
-        TargetFrame target = new TargetFrame(desktop, sipModel);
+        TargetFrame target = new TargetFrame(sipModel);
         addSpaceBarCreate(create, target);
-        FrameBase input = new InputFrame(desktop, sipModel);
-        FrameBase recMapping = new RecMappingFrame(desktop, sipModel);
-        FrameBase fieldMapping = new FieldMappingFrame(desktop, sipModel);
-        FrameBase output = new OutputFrame(desktop, sipModel);
+        FrameBase input = new InputFrame(sipModel);
+        FrameBase recMapping = new RecMappingFrame(sipModel);
+        FrameBase fieldMapping = new FieldMappingFrame(sipModel);
+        FrameBase output = new OutputFrame(sipModel);
         this.frames = new FrameBase[]{
+                dataSetFrame,
                 source,
                 create,
                 target,
@@ -139,11 +173,15 @@ public class AllFrames {
         }
     }
 
+    public ViewSelector getViewSelector() {
+        return viewSelector;
+    }
+
     public Swing prepareForNothing() {
         return new Swing() {
             @Override
             public void run() {
-                selectNewView("");
+                viewSelector.selectView(CLEAR);
             }
         };
     }
@@ -152,7 +190,7 @@ public class AllFrames {
         return new Swing() {
             @Override
             public void run() {
-                selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Quick Mapping");
+                viewSelector.selectView(component.getSize().width > 1600 ? DECADENT_DISPLAY : QUICK_MAPPING);
             }
         };
     }
@@ -161,7 +199,7 @@ public class AllFrames {
         return new Swing() {
             @Override
             public void run() {
-                selectNewView(component.getSize().width > 1600 ? "Decadent Display" : "Big Picture");
+                viewSelector.selectView(component.getSize().width > 1600 ? DECADENT_DISPLAY : BIG_PICTURE);
             }
         };
     }
@@ -170,9 +208,19 @@ public class AllFrames {
         return new Swing() {
             @Override
             public void run() {
-                selectNewView("First Contact");
+                viewSelector.selectView(QUICK_MAPPING);
             }
         };
+    }
+
+    public void initiate() {
+        sipModel.exec(new Swing() {
+            @Override
+            public void run() {
+                viewSelector.selectView(DATA_SETS);
+                dataSetFrame.fireRefresh();
+            }
+        });
     }
 
     public WorkFrame getWorkFrame() {
@@ -181,10 +229,6 @@ public class AllFrames {
 
     public Action getUploadAction() {
         return uploadFrame.getUploadAction();
-    }
-
-    public void restore() {
-        selectNewView(sipModel.getPreferences().get(CURRENT_VIEW_PREF, ""));
     }
 
     public JMenu getFrameMenu() {
@@ -264,9 +308,10 @@ public class AllFrames {
         return button;
     }
 
-    public void rebuildView() {
-        if (currentView.isEmpty()) return;
-        selectView(currentView);
+    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
+        final String CREATE = "create";
+        analysis.getActionMap().put(CREATE, create.getCreateMappingAction());
+        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
     private FrameBase frame(FrameBase.Which which) {
@@ -274,21 +319,21 @@ public class AllFrames {
         throw new RuntimeException(which + " not found");
     }
 
-    private void selectNewView(String viewName) {
-        if (currentView.equals(viewName)) return;
-        selectView(viewName);
-    }
-
-    private void selectView(String viewName) {
-        for (Arrangement arrangement : arrangements) {
-            if (arrangement.toString().equals(viewName)) {
-                arrangement.actionPerformed(null);
-                return;
-            }
-        }
-        for (FrameBase frame : frames) frame.closeFrame();
-        currentView = "";
-    }
+//    private void selectNewView(View view) {
+//        if (currentView == view) return;
+//        selectView(view);
+//    }
+//
+//    private void selectView(View view) {
+//        for (Arrangement arrangement : arrangements) {
+//            if (arrangement.source.name == view) {
+//                arrangement.actionPerformed(null);
+//                return;
+//            }
+//        }
+//        for (FrameBase frame : frames) frame.closeFrame();
+//        currentView = CLEAR;
+//    }
 
     private static class Situation implements FrameBase.Placement {
         private Point location;
@@ -349,7 +394,7 @@ public class AllFrames {
         private ViewIcon small, large;
 
         Arrangement(XArrangement source, int viewIndex) {
-            super(source.name);
+            super(source.name.getString());
             putValue(
                     Action.ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -370,11 +415,10 @@ public class AllFrames {
             }
             for (FrameBase frame : frames) frame.closeFrame();
             for (Block block : blocks) {
-                Situation situation = block.situate(desktop.getSize(), rows, cols, true);
+                Situation situation = block.situate(sipModel.getDesktop().getSize(), rows, cols, true);
                 block.frame.setPlacement(situation);
             }
             for (Block block : blocks) block.frame.openFrame();
-            sipModel.getPreferences().put(CURRENT_VIEW_PREF, currentView = toString());
             for (FrameBase base : frames) base.setArrangementSource(source, this);
         }
 
@@ -470,7 +514,7 @@ public class AllFrames {
     @XStreamAlias("arrangement")
     public static class XArrangement {
         @XStreamAsAttribute
-        public String name;
+        public View name;
 
         @XStreamImplicit
         public List<XFrame> frames;

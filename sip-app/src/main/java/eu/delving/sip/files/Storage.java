@@ -36,6 +36,8 @@ public interface Storage {
 
     String getUsername();
 
+    String getHostPort();
+
     File cache(String fileName);
 
     Map<String, DataSet> getDataSets();

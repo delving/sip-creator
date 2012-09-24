@@ -31,7 +31,10 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -40,7 +43,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
@@ -76,8 +78,8 @@ public class InputFrame extends FrameBase {
         }
     }
 
-    public InputFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.INPUT, desktop, sipModel, "Input");
+    public InputFrame(SipModel sipModel) {
+        super(Which.INPUT, sipModel, "Input");
         sipModel.addParseListener(new SipModel.ParseListener() {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {
