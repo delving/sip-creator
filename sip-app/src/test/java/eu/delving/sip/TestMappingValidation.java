@@ -101,15 +101,15 @@ public class TestMappingValidation {
         runFullCycle(6);
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testIcn() throws Exception {
         mock.prepareDataset(
                 "icn",
-                "/recordList/record",
-                "/recordList/record/priref"
-        );
-        runFullCycle(4);
+                "/delving-sip-source/input",
+                "/delving-sip-source/input/@id"
+                );
+        runFullCycle(15);
     }
 
     @Test
