@@ -6,11 +6,28 @@ import junit.framework.TestCase;
  */
 public class MappingCategoryTest extends TestCase {
 
-    public void testToId() throws Exception {
-//        assertEquals("FriesMuseum/A67A9A4DE4614CD58383725A52E126E53C70233A", MappingCategory.toId("S00318", "FriesMuseum").get(0).toString());
+    // conversion website => http://www.uwgb.edu/dutchs/UsefulData/ConvertUTMNoOZ.HTM
+    // examples UTM
+    // 258602.1675	6648773.532 33
+    // with zone 32 you will get into the North Sea
+    // https://www.ibm.com/developerworks/java/library/j-coordconvert/
+
+    public void testConvertUTM33toLatLong() {
+        assertEquals("59.907116155083855,10.68295344097448", MappingCategory.utm33AsLatLngString("258644.154187,6648939.72091"));
     }
 
-    public void testToLegacyId() throws Exception {
-//        assertEquals("FriesMuseum/78D76134063B88D19D9064950ECC219DEE999834", MappingCategory.toLegacyId("S00318", "FriesMuseum"));
+    public void testLatLongToUTM33() {
+        assertEquals("32 V 258644.154187 6648939.72091", MappingCategory.latLngAsUTM33String("59.907116,10.682953"));
+    }
+
+    public void testRoundTrip() {
+        String latLong = "59.907116155083855,10.68295344097448";
+        Double easting = 258644.154;
+        Double northing = 6648939.72;
+        Double lat = 59.907116;
+        Double lng = 4.682953;
+        final double[] doubles = new UtmCoordinateConversion().utm2LatLon("33 V " + easting + " " + northing);
+        assertEquals(lat, doubles[0]);
+//        assertEquals(easting + "", new UtmCoordinateConversion().latLon2UTM(lat, lng));
     }
 }
