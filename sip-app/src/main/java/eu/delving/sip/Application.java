@@ -44,6 +44,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -330,7 +331,6 @@ public class Application {
         }
     }
 
-
     private class InputAnalyzer implements Swing {
         @Override
         public void run() {
@@ -364,7 +364,8 @@ public class Application {
         catch (URISyntaxException e) {
             throw new RuntimeException("Bad address: " + serverUrl, e);
         }
-        return new DefaultHttpClient(httpParams);
+        ThreadSafeClientConnManager threaded = new ThreadSafeClientConnManager();
+        return new DefaultHttpClient(threaded, httpParams);
     }
 
     public static void main(final String[] args) throws StorageException {
