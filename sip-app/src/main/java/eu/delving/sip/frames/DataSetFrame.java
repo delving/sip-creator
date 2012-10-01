@@ -208,7 +208,7 @@ public class DataSetFrame extends FrameBase {
         }
 
         @Override
-        public void actionPerformed(ActionEvent actionEvent) {
+        public void actionPerformed(final ActionEvent actionEvent) {
             Entry entry = getSelectedEntry();
             if (entry == null) return;
             setEnabled(false);
@@ -218,6 +218,7 @@ public class DataSetFrame extends FrameBase {
                     @Override
                     public void run() {
                         setEnabled(true);
+                        refreshAction.actionPerformed(actionEvent);
                     }
                 });
             }
@@ -262,6 +263,7 @@ public class DataSetFrame extends FrameBase {
                                 @Override
                                 public void run() {
                                     sipModel.seekReset(); // release the file handle
+                                    refreshAction.actionPerformed(null); // no need for an action event
                                 }
                             });
                             sipModel.getDataSetModel().clearDataSet();
