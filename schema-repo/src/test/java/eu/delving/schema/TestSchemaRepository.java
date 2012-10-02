@@ -23,6 +23,7 @@ package eu.delving.schema;
 
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.schema.xml.Schema;
+import eu.delving.schema.xml.Version;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -31,12 +32,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
-import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
+import static eu.delving.schema.SchemaType.*;
 
 /**
  * See if it works
@@ -58,16 +59,14 @@ public class TestSchemaRepository {
         fetchTest(new HTTPFetcher());
     }
 
+    @Ignore
     @Test
-    public void compare() throws IOException {
+    public void compareLocalToOnline() throws IOException {
         HTTPFetcher httpFetcher = new HTTPFetcher();
         FileSystemFetcher localFetcher = new FileSystemFetcher();
         SchemaRepository repo = new SchemaRepository(localFetcher);
         for (Schema schema : repo.getSchemas()) {
-            SchemaVersion schemaVersion = new SchemaVersion(
-                    schema.prefix,
-                    schema.versions.get(0).number
-            );
+            SchemaVersion schemaVersion = new SchemaVersion(schema.prefix, schema.versions.get(0).number);
             String http = httpFetcher.fetchSchema(schemaVersion, SchemaType.RECORD_DEFINITION).trim();
             String resource = localFetcher.fetchSchema(schemaVersion, SchemaType.RECORD_DEFINITION).trim();
             Assert.assertEquals("Should be identical", resource, http);
@@ -80,17 +79,27 @@ public class TestSchemaRepository {
     private void fetchTest(Fetcher fetcher) throws IOException {
         SchemaRepository repo = new SchemaRepository(fetcher);
         for (Schema schema : repo.getSchemas()) {
-            SchemaVersion schemaVersion = new SchemaVersion(
-                    schema.prefix,
-                    schema.versions.get(0).number
-            );
-            String content = repo.getSchema(schemaVersion, RECORD_DEFINITION);
-            Assert.assertTrue(content != null);
-            System.out.println(content.split("\\n").length + " lines");
-            content = repo.getSchema(schemaVersion, VALIDATION_SCHEMA);
-            Assert.assertTrue(content != null);
-            System.out.println(content.split("\\n").length + " lines");
+            for (Version version : schema.versions) {
+                SchemaVersion schemaVersion = new SchemaVersion(schema.prefix, version.number);
+                if (schema.prefix.equals("facts")) {
+                    String content = repo.getSchema(schemaVersion, FACT_DEFINITIONS);
+                    Assert.assertTrue(content != null);
+                    System.out.println(schemaVersion.getFullFileName(FACT_DEFINITIONS) + ": " + lineCount(content) + " lines");
+                }
+                else {
+                    String content = repo.getSchema(schemaVersion, RECORD_DEFINITION);
+                    Assert.assertTrue(content != null);
+                    System.out.println(schemaVersion.getFullFileName(RECORD_DEFINITION) + ": " + lineCount(content) + " lines");
+                    content = repo.getSchema(schemaVersion, VALIDATION_SCHEMA);
+                    Assert.assertTrue(content != null);
+                    System.out.println(schemaVersion.getFullFileName(VALIDATION_SCHEMA) + ": " + lineCount(content) + " lines");
+                }
+            }
         }
+    }
+
+    private int lineCount(String content) {
+        return content.split("\\n").length;
     }
 
     private class HTTPFetcher implements Fetcher {
@@ -99,11 +108,6 @@ public class TestSchemaRepository {
         @Override
         public String fetchList() throws IOException {
             return getFileContents(SCHEMA_DIRECTORY);
-        }
-
-        @Override
-        public String fetchFactDefinitions(String versionNumber) throws IOException {
-            return getFileContents(FACT_DEFINITIONS);
         }
 
         @Override
@@ -121,7 +125,7 @@ public class TestSchemaRepository {
             HttpResponse response = httpClient.execute(get);
             StatusLine line = response.getStatusLine();
             if (line.getStatusCode() != HttpStatus.SC_OK) {
-                throw new IOException("HTTP Error " + line.getStatusCode() + " " + line.getReasonPhrase());
+                throw new IOException("HTTP Error " + line.getStatusCode() + " " + line.getReasonPhrase() + " >> " + path);
             }
             return EntityUtils.toString(response.getEntity(), "UTF-8");
         }

@@ -54,6 +54,7 @@ import static eu.delving.sip.files.Storage.RECORD_TAG;
 
 public class SourceConverter {
     public static final String CONVERTER_DELIMITER = ":::";
+    public static final String ANONYMOUS_RECORDS_PROPERTY = "anonymousRecords";
     private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
     private Feedback feedback;
@@ -63,7 +64,7 @@ public class SourceConverter {
     private Path recordRootPath;
     private Path uniqueElementPath;
     private Map<String, String> namespaces;
-    private int recordCount, totalRecords;
+    private int recordCount, totalRecords, anonymousRecords;
     private ProgressListener progressListener;
     private String unique;
     private StartElement start;
@@ -99,6 +100,7 @@ public class SourceConverter {
 
     public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException {
         if (progressListener != null) progressListener.prepareFor(totalRecords);
+        anonymousRecords = Integer.parseInt(System.getProperty(ANONYMOUS_RECORDS_PROPERTY, "0"));
         Path path = Path.create();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
@@ -183,28 +185,32 @@ public class SourceConverter {
             }
         }
         finally {
-            if (feedback != null && uniqueRepeatCount > 0) feedback.alert(String.format("Uniqueness violations : " + uniqueRepeatCount));
+            if (feedback != null && uniqueRepeatCount > 0) {
+                feedback.alert(String.format("Uniqueness violations : " + uniqueRepeatCount));
+            }
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         }
     }
 
     private void outputRecord(XMLEventWriter out) throws XMLStreamException {
-        String uniqueValue = getUniqueValue();
-        if (!uniqueValue.isEmpty()) {
-            if (uniqueness.contains(uniqueValue)) {
-                uniqueRepeatCount++;
-            }
-            else {
-                uniqueness.add(uniqueValue);
-                Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
-                unique = null;
-                List<Attribute> attrs = new ArrayList<Attribute>();
-                attrs.add(id);
-                out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
-                for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
-                out.add(eventFactory.createEndElement("", "", RECORD_TAG));
-                out.add(eventFactory.createCharacters("\n"));
+        if (anonymousRecords == 0 || recordCount < anonymousRecords) {
+            String uniqueValue = getUniqueValue();
+            if (!uniqueValue.isEmpty()) {
+                if (uniqueness.contains(uniqueValue)) {
+                    uniqueRepeatCount++;
+                }
+                else {
+                    uniqueness.add(uniqueValue);
+                    Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
+                    unique = null;
+                    List<Attribute> attrs = new ArrayList<Attribute>();
+                    attrs.add(id);
+                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
+                    for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
+                    out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                    out.add(eventFactory.createCharacters("\n"));
+                }
             }
         }
         clearEvents();
@@ -268,8 +274,58 @@ public class SourceConverter {
             StringBuilder out = new StringBuilder(line.length());
             for (char c : line.toCharArray()) out.append(Character.isWhitespace(c) ? ' ' : c);
             String clean = out.toString().replaceAll(" +", " ").trim();
+            if (anonymousRecords > 0) clean = anonymize(clean);
             if (!clean.isEmpty()) lines.add(clean);
         }
+    }
+
+    private String anonymize(String string) {
+        if (string.startsWith("http")) { // preserve the beginning and the end
+            int slashSlash = string.indexOf("//");
+            int nextSlash = string.indexOf("/", slashSlash + 1);
+            int finalSlash = string.lastIndexOf("/");
+            if (slashSlash > 0 && nextSlash > 0 && finalSlash > 0) {
+                return String.format(
+                        "%s%s%s%s",
+                        string.substring(0, slashSlash),
+                        anonymizeString(string.substring(slashSlash, nextSlash)),
+                        anonymizeString(string.substring(nextSlash, finalSlash)),
+                        string.substring(finalSlash)
+                );
+            }
+        }
+        return anonymizeString(string);
+    }
+
+    private String anonymizeString(String string) {
+        if (moreNumbersThanLetters(string)) return string;
+        StringBuilder out = new StringBuilder(string.length());
+        Random random = new Random(string.hashCode());
+        for (char c : string.toCharArray()) {
+            if (Character.isLowerCase(c)) {
+                out.append((char) ('a' + (Math.abs(random.nextInt()) % 26)));
+            }
+            else if (Character.isUpperCase(c)) {
+                out.append((char) ('A' + (Math.abs(random.nextInt()) % 26)));
+            }
+            else {
+                out.append(c);
+            }
+        }
+        return out.toString();
+    }
+
+    private boolean moreNumbersThanLetters(String string) {
+        int letters = 0, numbers = 0;
+        for (char c : string.toCharArray()) {
+            if (Character.isLetter(c)) {
+                letters++;
+            }
+            else if (Character.isDigit(c)) {
+                numbers++;
+            }
+        }
+        return numbers > letters;
     }
 
     private void clearEvents() {

@@ -53,11 +53,6 @@ public class HTTPSchemaFetcher implements Fetcher {
     }
 
     @Override
-    public String fetchFactDefinitions(String versionNumber) throws IOException {
-        return fetchFile(FACT_DEFINITIONS);
-    }
-
-    @Override
     public String fetchSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
         return fetchFile(schemaVersion.getPath(schemaType));
     }

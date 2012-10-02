@@ -98,15 +98,13 @@ public class MappingRunner {
         try {
             Binding binding = new Binding();
             DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getNamespaces());
-            binding.setVariable("_optLookup", getRecDef().optLookup);
+            RecDef recDef = recMapping.getRecDefTree().getRecDef();
+            binding.setVariable("_optLookup", recDef.optLookup);
             binding.setVariable("output", builder);
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));
             if (pluginBinding != null) {
-                List<MappingFunction> functions = new ArrayList<MappingFunction>();
-                functions.addAll(recMapping.getFunctions());
-                if (getRecDef().functions != null) functions.addAll(getRecDef().functions);
-                for (MappingFunction function : functions) {
+                for (MappingFunction function : gatherFunctions()) {
                     Object functionBinding = pluginBinding.getFunctionBinding(function.name);
                     if (functionBinding == null) continue;
                     binding.setVariable(String.format("_%s_", function.name), functionBinding);
@@ -143,6 +141,13 @@ public class MappingRunner {
                 throw new MappingException(metadataRecord, "Unexpected: " + e.toString(), e);
             }
         }
+    }
+
+    private List<MappingFunction> gatherFunctions() {
+        List<MappingFunction> functions = new ArrayList<MappingFunction>();
+        if (recMapping.getFunctions() != null) functions.addAll(recMapping.getFunctions());
+        if (getRecDefTree().getRecDef().functions != null) functions.addAll(getRecDefTree().getRecDef().functions);
+        return functions;
     }
 
     private Node stripEmptyElements(Object nodeObject) {

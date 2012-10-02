@@ -52,9 +52,9 @@ public interface DataSet {
 
     String getLatestPrefix();
 
-    File getMediaIndexFile();
-
     File getMediaDirectory();
+
+    File getMediaIndexFile();
 
     List<SchemaVersion> getSchemaVersions();
 
