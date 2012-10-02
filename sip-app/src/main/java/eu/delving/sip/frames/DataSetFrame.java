@@ -36,9 +36,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -78,6 +76,14 @@ public class DataSetFrame extends FrameBase {
                 editAction.checkEnabled();
                 releaseAction.checkEnabled();
                 fillHtmlPanel();
+            }
+        });
+        this.dataSetList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() > 1 && editAction.isEnabled()) {
+                    editAction.actionPerformed(null);
+                }
             }
         });
         listModel.setStateCheckDelay(500);

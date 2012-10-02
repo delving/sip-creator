@@ -132,6 +132,16 @@ public class TestMappingValidation {
         runFullCycle(4);
     }
 
+    @Test
+    public void testAbm() throws Exception {
+        mock.prepareDataset(
+                "abm",
+                "/metadata/record/metadata/abm:record",
+                "/metadata/record/metadata/abm:record/dc:identifier"
+        );
+        runFullCycle(42);
+    }
+
     private void runFullCycle(int expectedRecords) throws Exception {
         assertEquals(String.valueOf(Arrays.asList(mock.files())), 1, mock.fileCount());
         dataSet().externalToImported(mock.sampleInputFile(), null);

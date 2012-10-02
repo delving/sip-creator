@@ -35,6 +35,8 @@ public enum SystemField {
     OWNER,
     CREATOR,
     THUMBNAIL,
+    GEOHASH,
+    ADDRESS,
     IMAGE_URL("imageUrl"),
     LANDING_PAGE("landingPage"),
     DEEP_ZOOM_URL("deepZoomUrl"),
