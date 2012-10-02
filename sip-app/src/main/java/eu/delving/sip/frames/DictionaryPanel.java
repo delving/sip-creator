@@ -36,11 +36,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,8 +57,6 @@ import static eu.delving.sip.base.DictionaryHelper.*;
 
 public class DictionaryPanel extends JPanel {
     public static final String COPY_VERBATIM = "<<< verbatim >>>";
-    public static final String ASSIGN_SELECTED = "Assign Selected";
-    public static final String ASSIGN_ALL = "Assign All";
     public static final String NO_DICTIONARY = "No dictionary for this mapping";
     private SipModel sipModel;
     private CreateModel createModel;
@@ -67,7 +64,6 @@ public class DictionaryPanel extends JPanel {
     private JLabel statusLabel = new JLabel(NO_DICTIONARY, JLabel.CENTER);
     private DictionaryModel dictionaryModel = new DictionaryModel(statusLabel);
     private JTextField patternField = new JTextField(6);
-    private JButton assign = new JButton(ASSIGN_ALL);
     private ValueModel valueModel = new ValueModel();
     private JList valueList = new JList(valueModel);
     private JTable table = new JTable(dictionaryModel, createTableColumnModel());
@@ -85,6 +81,15 @@ public class DictionaryPanel extends JPanel {
         this.timer.setRepeats(false);
         valueList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         valueList.setPrototypeCellValue("somelongoptionvaluename");
+        ASSIGN_ACTION.setEnabled(false);
+        valueList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() > 1 && ASSIGN_ACTION.isEnabled()) {
+                    ASSIGN_ACTION.actionPerformed(null);
+                }
+            }
+        });
         add(createCenter(), BorderLayout.CENTER);
         add(createEast(), BorderLayout.EAST);
         add(createSouth(), BorderLayout.SOUTH);
@@ -97,7 +102,7 @@ public class DictionaryPanel extends JPanel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 int[] selectedRows = table.getSelectedRows();
-                assign.setText(selectedRows.length > 0 ? ASSIGN_SELECTED : ASSIGN_ALL);
+                ASSIGN_ACTION.setEnabled(selectedRows.length > 0);
             }
         });
         p.add(createNorth(), BorderLayout.NORTH);
@@ -123,13 +128,15 @@ public class DictionaryPanel extends JPanel {
         p.add(label);
         p.add(patternField);
         p.add(showAssigned);
+        p.add(new JButton(ALL_ACTION));
+        p.add(new JButton(NONE_ACTION));
         return p;
     }
 
     private JPanel createEast() {
         JPanel p = new JPanel(new BorderLayout());
         p.add(SwingHelper.scrollV("Target Values", valueList), BorderLayout.CENTER);
-        p.add(assign, BorderLayout.SOUTH);
+        p.add(new JButton(ASSIGN_ACTION), BorderLayout.SOUTH);
         return p;
     }
 
@@ -308,34 +315,6 @@ public class DictionaryPanel extends JPanel {
                 timer.restart();
             }
         });
-        assign.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String value = getChosenValue();
-                int[] selectedRows = table.getSelectedRows();
-                if (selectedRows.length > 0) {
-                    for (int row : selectedRows) table.getModel().setValueAt(value, row, 1);
-                }
-                else {
-                    for (int row = 0; row < table.getModel().getRowCount(); row++)
-                        table.getModel().setValueAt(value, row, 1);
-                }
-                patternField.setText("");
-                patternField.requestFocus();
-                sipModel.exec(new Work() {
-                    @Override
-                    public void run() {
-                        if (createModel.hasNodeMapping()) createModel.getNodeMapping().notifyChanged(DICTIONARY);
-                    }
-
-                    @Override
-                    public Job getJob() {
-                        return Job.NOTIFY_DICTIONARY_CHANGED;
-                    }
-                });
-                timer.restart();
-            }
-        });
     }
 
     private void setSelectionPattern() {
@@ -376,6 +355,36 @@ public class DictionaryPanel extends JPanel {
             return values.get(index);
         }
     }
+
+    private final Action ASSIGN_ACTION = new AbstractAction("Assign Selected") {
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            String value = getChosenValue();
+            int[] selectedRows = table.getSelectedRows();
+            if (selectedRows.length > 0) {
+                for (int row : selectedRows) table.getModel().setValueAt(value, row, 1);
+            }
+            else {
+                for (int row = 0; row < table.getModel().getRowCount(); row++)
+                    table.getModel().setValueAt(value, row, 1);
+            }
+            patternField.setText("");
+            patternField.requestFocus();
+            sipModel.exec(new Work() {
+                @Override
+                public void run() {
+                    if (createModel.hasNodeMapping()) createModel.getNodeMapping().notifyChanged(DICTIONARY);
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.NOTIFY_DICTIONARY_CHANGED;
+                }
+            });
+            timer.restart();
+        }
+    };
 
     private final Action REFRESH_ACTION = new AbstractAction("Refresh Dictionary") {
 
@@ -418,6 +427,20 @@ public class DictionaryPanel extends JPanel {
                     return Job.REMOVE_DICTIONARY;
                 }
             });
+        }
+    };
+
+    private final Action ALL_ACTION = new AbstractAction("All") {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            table.selectAll();
+        }
+    };
+
+    private final Action NONE_ACTION = new AbstractAction("None") {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            table.clearSelection();
         }
     };
 }
