@@ -1,9 +1,9 @@
 name=ABM Test
 provider=Testmeister
-country=netherlands
+country=norway
 dataProvider=Sourcer
 language=nl
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
 spec=abm
-
+schemaVersions=abm_1.0.4
