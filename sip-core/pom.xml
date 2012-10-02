@@ -31,7 +31,7 @@
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
-    <version>1.0.11-SNAPSHOT</version>
+    <version>1.0.12-SNAPSHOT</version>
     <description>
         A Minimal set of classes shared between client and server, avoiding dependency on core module.
     </description>
@@ -142,8 +142,15 @@
         <dependency>
             <groupId>uk.org.mygrid.resources.jcoord</groupId>
             <artifactId>jcoord</artifactId>
-            <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.osgeo</groupId>
+            <artifactId>proj4j</artifactId>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.osgeo</groupId>-->
+            <!--<artifactId>proj4j-support</artifactId>-->
+        <!--</dependency>-->
     </dependencies>
 
 </project>
