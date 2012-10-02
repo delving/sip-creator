@@ -20,8 +20,6 @@
  */
 
 import eu.delving.groovy.GroovyNode
-import uk.me.jstott.jcoord.LatLng
-import uk.me.jstott.jcoord.UTMRef
 
 /**
  * This category is used to give DSL features to the Groovy builder
@@ -229,33 +227,4 @@ public class MappingCategory {
         }
         return out.toString()
     }
-
-  static UTMRef convertLatLongToUTM33(String text) {
-    String[] split = text.replaceAll(" ", "").split(",")
-    LatLng lng = new uk.me.jstott.jcoord.LatLng(split.head().toDouble(), split.last().toDouble())
-    UTMRef utm = lng.toUTMRef()
-    return utm
-  }
-
-  static String getEasting(UTMRef utm) {return utm.easting as String}
-  static String getNorthing(UTMRef utm) {return utm.northing as String}
-  static String latLngAsUTM33String(String text) {
-    UTMRef utm = convertLatLongToUTM33(text)
-    return utm.lngZone + " " + utm.latZone + " " + utm.easting.toString() + " " + utm.northing.toString()
-  }
-
-  static LatLng convertUTM33ToLatLong(String text) {
-    String[] split = text.replaceAll(" ", "").split(",")
-    UTMRef ref = new uk.me.jstott.jcoord.UTMRef(split.head().toDouble(), split.last().toDouble(), "V" as char, 33.intValue())
-    return ref.toLatLng()
-  }
-
-  static String getLat(LatLng latLng) {latLng.lat as String}
-  static String getLng(LatLng latLng) {latLng.lng as String}
-  static String utm33AsLatLngString(String text) {
-    def latLng = convertUTM33ToLatLong(text)
-    return latLng.lat.toString() + "," + latLng.lng.toString()
-  }
-
-
 }
