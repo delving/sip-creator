@@ -90,6 +90,8 @@ public class MappingResultImpl implements MappingResult {
         addIfMissing(PROVIDER, keys, missing);
         addIfMissing(LANDING_PAGE, keys, missing);
         addIfMissing(THUMBNAIL, keys, missing);
+        addIfMissing(GEOHASH, keys, missing);
+        addIfMissing(ADDRESS, keys, missing);
         if (missing.isEmpty()) return;
         if (missing.size() == 1 && (missing.contains(LANDING_PAGE.toString()) || missing.contains(THUMBNAIL.toString()))) {
             return; // ok, only need one of these two
