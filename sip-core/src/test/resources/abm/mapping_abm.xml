@@ -1,0 +1,122 @@
+<rec-mapping prefix="abm" schemaVersion="1.0.5" locked="false">
+  <facts>
+    <entry>
+      <string>orgId</string>
+      <string>delving</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>arkivportalen</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>arkivportalen.no</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>abm_1.0.5</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>arkivportalen</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://creativecommons.org/publicdomain/zero/1.0/</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Norsk Kulturråd</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>no</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string>IMAGE</string>
+    </entry>
+    <entry>
+      <string>country</string>
+      <string>norway</string>
+    </entry>
+  </facts>
+  <functions>
+    <mapping-function name="convertToIdentifier">
+      <sample-input>
+        <string>someidentifier</string>
+      </sample-input>
+      <groovy-code>
+        <string>def uriBytes = it.toString().getBytes(&quot;UTF-8&quot;);</string>
+        <string>def digest = java.security.MessageDigest.getInstance(&quot;SHA-1&quot;)</string>
+        <string>def hash = new StringBuilder()</string>
+        <string>for (Byte b in digest.digest(uriBytes)) {</string>
+        <string>hash.append(&apos;0123456789ABCDEF&apos;[(b &amp; 0xF0) &gt;&gt; 4])</string>
+        <string>hash.append(&apos;0123456789ABCDEF&apos;[b &amp; 0x0F])</string>
+        <string>}</string>
+        <string>&quot;$spec/$hash&quot;.toString()</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="convertUTMtoLatLng">
+      <sample-input>
+        <string>269296, 6650445</string>
+      </sample-input>
+      <groovy-code>
+        <string>String[] split = it.replaceAll(&quot; &quot;, &quot;&quot;).split(&quot;,&quot;)</string>
+        <string>return new uk.me.jstott.jcoord.UTMRef(split.head().toDouble(), split.last().toDouble(), &quot;V&quot; as char, 33).toLatLng()</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="gumby">
+      <sample-input>
+        <string>59.926690377311154, 10.871213013807207</string>
+      </sample-input>
+      <groovy-code>
+        <string>String[] split = it.replaceAll(&quot; &quot;, &quot;&quot;).split(&quot;,&quot;)</string>
+        <string>uk.me.jstott.jcoord.UTMRef utm = new uk.me.jstott.jcoord.LatLng(split.head().toDouble(), split.last().toDouble()).toUTMRef()</string>
+        <string>return &quot;${utm.lngZone} ${utm.latZone} ${utm.easting} ${utm.northing}&quot;</string>
+      </groovy-code>
+    </mapping-function>
+  </functions>
+  <node-mappings>
+    <node-mapping inputPath="/input/abm:contentProvider" outputPath="/abm:record/abm:contentProvider"/>
+    <node-mapping inputPath="/constant" outputPath="/abm:record/abm:category">
+      <groovy-code>
+        <string>&apos;Plant&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/dc:contributor" outputPath="/abm:record/dc:contributor"/>
+    <node-mapping inputPath="/input/dc:creator" outputPath="/abm:record/dc:creator"/>
+    <node-mapping inputPath="/input/dc:description" outputPath="/abm:record/dc:description"/>
+    <node-mapping inputPath="/input/dc:format" outputPath="/abm:record/dc:format"/>
+    <node-mapping inputPath="/input/dc:identifier" outputPath="/abm:record/dc:identifier"/>
+    <node-mapping inputPath="/input/dc:publisher" outputPath="/abm:record/dc:publisher"/>
+    <node-mapping inputPath="/input/dc:source" outputPath="/abm:record/dc:source"/>
+    <node-mapping inputPath="/input/dc:subject" outputPath="/abm:record/dc:subject"/>
+    <node-mapping inputPath="/input/dc:title" outputPath="/abm:record/dc:title"/>
+    <node-mapping inputPath="/input/dc:type" outputPath="/abm:record/dc:type"/>
+    <node-mapping inputPath="/input/dcterms:alternative" outputPath="/abm:record/dcterms:alternative"/>
+    <node-mapping inputPath="/input/dcterms:created" outputPath="/abm:record/dcterms:created"/>
+    <node-mapping inputPath="/input/dcterms:isPartOf" outputPath="/abm:record/dcterms:isPartOf"/>
+    <node-mapping inputPath="/input/dcterms:medium" outputPath="/abm:record/dcterms:medium"/>
+    <node-mapping inputPath="/input/dcterms:spatial" outputPath="/abm:record/dcterms:spatial"/>
+    <node-mapping inputPath="/input/europeana:isShownBy" outputPath="/abm:record/europeana:isShownBy"/>
+    <node-mapping inputPath="/facts/rights" outputPath="/abm:record/europeana:rights"/>
+    <node-mapping inputPath="/input/europeana:isShownAt" outputPath="/abm:record/europeana:isShownAt"/>
+    <node-mapping inputPath="/input/europeana:object" outputPath="/abm:record/europeana:object"/>
+    <node-mapping inputPath="/facts/provider" outputPath="/abm:record/europeana:provider"/>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/abm:record/europeana:dataProvider"/>
+    <node-mapping inputPath="/facts/type" outputPath="/abm:record/europeana:type"/>
+    <node-mapping inputPath="/input/dc:identifier" outputPath="/abm:record/europeana:uri">
+      <groovy-code>
+        <string>&quot;${convertToIdentifier(_dcidentifier)}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/language" outputPath="/abm:record/europeana:language"/>
+    <node-mapping inputPath="/facts/country" outputPath="/abm:record/europeana:country"/>
+    <node-mapping inputPath="/facts/spec" outputPath="/abm:record/europeana:collectionName"/>
+    <node-mapping inputPath="/facts/name" outputPath="/abm:record/europeana:collectionTitle"/>
+    <node-mapping inputPath="/input/europeana:object" outputPath="/abm:record/delving:thumbnail"/>
+    <node-mapping inputPath="/input/abm:geo-experiment" outputPath="/abm:record/abm:geo"/>
+    <node-mapping inputPath="/input/abm:address-experiment" outputPath="/abm:record/abm:address"/>
+  </node-mappings>
+</rec-mapping>
