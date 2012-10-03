@@ -113,8 +113,8 @@ public class TestMappingEngine {
         Source source = new DOMSource(result.root());
         Validator validator = validator(new SchemaVersion("abm", "1.0.5"));
         validator.validate(source);
-        System.out.println("Augmented:");
-        System.out.println(result.toXmlAugmented());
+        System.out.println("SystemFields:");
+        System.out.println(result.systemFields());
     }
 
     @Test
