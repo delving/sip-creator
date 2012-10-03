@@ -99,21 +99,22 @@ public class TestMappingEngine {
     }
 
     @Test
-    public void validateFlatNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
+    public void validateABMNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         Map<String, String> namespaces = createNamespaces(
                 "dc", "http://purl.org/dc/elements/1.1/",
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "delving", "http://schemas.delving.eu/",
-                "icn", "http://www.icn.nl/schemas/icn/"
+                "abm", "http://abmu.org/abm"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("icn"));
-        MappingResult result = mappingEngine.execute(input("icn"));
+        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("abm"));
+        MappingResult result = mappingEngine.execute(input("abm"));
         System.out.println(result.toXml());
-        System.out.println(result.toXmlAugmented());
-        Source source = new DOMSource(result.rootAugmented());
-        Validator validator = validator(new SchemaVersion("icn", "1.0.1"));
+        Source source = new DOMSource(result.root());
+        Validator validator = validator(new SchemaVersion("abm", "1.0.5"));
         validator.validate(source);
+        System.out.println("SystemFields:");
+        System.out.println(result.systemFields());
     }
 
     @Test
@@ -224,13 +225,15 @@ public class TestMappingEngine {
         try {
             return IOUtils.toString(stream(resourcePath), "UTF-8");
         }
-        catch (IOException e) {
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private InputStream stream(String resourcePath) {
-        return getClass().getResourceAsStream(resourcePath);
+        InputStream resource = getClass().getResourceAsStream(resourcePath);
+        if (resource == null) throw new RuntimeException("Resource not found: "+resourcePath);
+        return resource;
     }
 
 }
