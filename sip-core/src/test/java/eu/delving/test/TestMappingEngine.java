@@ -114,7 +114,7 @@ public class TestMappingEngine {
         Validator validator = validator(new SchemaVersion("abm", "1.0.5"));
         validator.validate(source);
         System.out.println("SystemFields:");
-        System.out.println(result.systemFields());
+        System.out.println(result.copyFields());
     }
 
     @Test
