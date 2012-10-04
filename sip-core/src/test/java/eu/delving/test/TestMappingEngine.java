@@ -75,7 +75,7 @@ public class TestMappingEngine {
         Map<String, String> namespaces = createNamespaces(
                 "lido", "http://www.lido-schema.org"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("lido"));
+        MappingEngine mappingEngine = MappingEngine.Factory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("lido"));
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("lido"));
 //        System.out.println(result);
@@ -90,7 +90,7 @@ public class TestMappingEngine {
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("ese"));
+        MappingEngine mappingEngine = MappingEngine.Factory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("ese"));
         MappingResult result = mappingEngine.execute(input("ese"));
         System.out.println(result.toXml());
         System.out.println(result.toXmlAugmented());
@@ -107,7 +107,7 @@ public class TestMappingEngine {
                 "delving", "http://schemas.delving.eu/",
                 "abm", "http://abmu.org/abm"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("abm"));
+        MappingEngine mappingEngine = MappingEngine.Factory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("abm"));
         MappingResult result = mappingEngine.execute(input("abm"));
         System.out.println(result.toXml());
         Source source = new DOMSource(result.root());
@@ -126,7 +126,7 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "icn", "http://www.icn.nl/schemas/icn/"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces);
+        MappingEngine mappingEngine = MappingEngine.Factory.newInstance(classLoader(), namespaces);
         MappingResult result = mappingEngine.execute(input("icn"));
         System.out.println(result.toXml());
     }
@@ -139,7 +139,7 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "tib", "http://thuisinbrabant.nl"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namspaces, new MockRecDefModel(), mapping("tib"));
+        MappingEngine mappingEngine = MappingEngine.Factory.newInstance(classLoader(), namspaces, new MockRecDefModel(), mapping("tib"));
         MappingResult result = mappingEngine.execute(input("tib"));
         String augmented = result.toXmlAugmented();
         Matcher matcher = Pattern.compile("<delving:thumbnail>").matcher(augmented);
@@ -156,7 +156,7 @@ public class TestMappingEngine {
         Map<String, String> namespaces = createNamespaces(
                 "lido", "http://www.lido-schema.org"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
+        MappingEngine mappingEngine = MappingEngine.Factory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
@@ -167,7 +167,7 @@ public class TestMappingEngine {
         Map<String, String> namespaces = createNamespaces(
                 "lido", "http://www.lido-schema.org"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
+        MappingEngine mappingEngine = MappingEngine.Factory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute(input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
