@@ -364,7 +364,7 @@ public class WorkModel {
             double proportionComplete = (double) current / maximum;
             if (startTime == 0 || startTime == now) {
                 startTime = now;
-                return "time unknown";
+                return "";
             }
             else if (proportionComplete < 0.01) {
                 return "estimating time";
@@ -394,11 +394,11 @@ public class WorkModel {
                     return String.format("%d minute%s %d seconds", minutes, minutes > 1 ? "s" : "", seconds);
                 }
             }
-            else if (seconds > 15) {
+            else if (seconds > 5) {
                 return String.format("%d seconds", seconds);
             }
             else {
-                return "a few seconds";
+                return "wait for it..";
             }
         }
     }
