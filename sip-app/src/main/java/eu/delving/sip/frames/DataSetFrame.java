@@ -51,7 +51,6 @@ import static eu.delving.sip.base.SwingHelper.*;
  */
 
 public class DataSetFrame extends FrameBase {
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
     private DataSetListModel listModel = new DataSetListModel();
     private JList dataSetList;
     private CultureHubClient cultureHubClient;
@@ -65,7 +64,6 @@ public class DataSetFrame extends FrameBase {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.cultureHubClient = cultureHubClient;
         this.dataSetList = new JList(listModel);
-        this.dataSetList.setFont(MONOSPACED);
         this.dataSetList.setCellRenderer(new DataSetCellRenderer());
         this.dataSetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.dataSetList.addListSelectionListener(new ListSelectionListener() {
@@ -488,7 +486,7 @@ public class DataSetFrame extends FrameBase {
         ORPHAN_LONELY(true, false, "only present locally (unusual)", DATASET_HUH_ICON),
         ORPHAN_UPDATE(false, true, "you are owner, but not present locally (unusual), can be downloaded", DATASET_HUH_ICON),
         ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", DATASET_HUH_ICON),
-        NEEDS_FETCH(true, false, "locally available, refresh to fetch culture hub info", DATASET_HUH_ICON);
+        NEEDS_FETCH(true, false, "locally available, refresh to fetch culture hub info", DATASET_DOWNLOAD_ICON);
 
         private final String string;
         private final Icon icon;
