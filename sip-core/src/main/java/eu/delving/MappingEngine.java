@@ -21,56 +21,59 @@
 
 package eu.delving;
 
-import eu.delving.groovy.*;
-import eu.delving.metadata.MappingResultImpl;
+import eu.delving.groovy.MappingException;
+import eu.delving.metadata.MappingEngineImpl;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecDefModel;
-import eu.delving.metadata.RecMapping;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Map;
 
 /**
- * Wrapping the mapping mechanism so that mappings can be executed independent of the rest of the SIP-Creator.
+ * Provide a mapping service to take text XML.
  *
  * @author Gerald de Jong <geralddejong@gmail.com>
  */
 
-public class MappingEngine {
-    private XmlSerializer serializer = new XmlSerializer();
-    private MetadataRecordFactory metadataRecordFactory;
-    private MappingRunner mappingRunner;
+public interface MappingEngine {
 
-    public MappingEngine(ClassLoader classLoader, Map<String, String> namespaces) throws FileNotFoundException, MetadataException {
-        this(classLoader, namespaces, null, null);
-    }
+    /**
+     * Take the XML record and execute the mapping, with a result that has various ways of accessing
+     * the mapped record data.
+     *
+     * @param recordXML what gets parsed and mapped
+     * @return a result with
+     * @throws XMLStreamException
+     * @throws MappingException
+     * @throws IOException
+     * @throws SAXException
+     */
 
-    public MappingEngine(ClassLoader classLoader, Map<String, String> namespaces, RecDefModel recDefModel, String mapping) throws FileNotFoundException, MetadataException {
-        metadataRecordFactory = new MetadataRecordFactory(namespaces);
-        if (mapping != null) {
-            RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
-            GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
-            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
+    MappingResult execute(String recordXML) throws XMLStreamException, MappingException, IOException, SAXException;
+
+    /**
+     * Create mapping engines
+     */
+
+    public static class Factory {
+
+        public static MappingEngine newInstance(
+                ClassLoader classLoader,
+                Map<String, String> namespaces
+        ) throws FileNotFoundException, MetadataException {
+            return new MappingEngineImpl(classLoader, namespaces, null, null);
         }
-    }
 
-    public MappingResult execute(String recordXML) throws XMLStreamException, MappingException, IOException, SAXException {
-        if (mappingRunner != null) {
-            MetadataRecord metadataRecord = metadataRecordFactory.metadataRecordFrom(recordXML);
-            return new MappingResultImpl(serializer, mappingRunner.runMapping(metadataRecord), mappingRunner.getRecDefTree()).resolve();
+        public static MappingEngine newInstance(
+                ClassLoader classLoader,
+                Map<String, String> namespaces,
+                RecDefModel recDefModel,
+                String mapping
+        ) throws FileNotFoundException, MetadataException {
+            return new MappingEngineImpl(classLoader, namespaces, recDefModel, mapping);
         }
-        else {
-            Node root = metadataRecordFactory.nodeFromXml(recordXML);
-            return new MappingResultImpl(serializer, root, null);
-        }
-    }
-
-    public String toString() {
-        return mappingRunner.getCode();
     }
 }
