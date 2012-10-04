@@ -118,7 +118,12 @@ public class DataSetFrame extends FrameBase {
     }
 
     public void fireRefresh() {
-        refreshAction.actionPerformed(null);
+        if (SwingHelper.isDevelopmentMode()) {
+            listModel.setHubEntries(null);
+        }
+        else {
+            refreshAction.actionPerformed(null);
+        }
     }
 
     private void fillHtmlPanel() {
@@ -140,13 +145,14 @@ public class DataSetFrame extends FrameBase {
             cultureHubClient.fetchDataSetList(new CultureHubClient.ListReceiveListener() {
                 @Override
                 public void listReceived(List<CultureHubClient.DataSetEntry> entries) {
-                    listModel.setEntries(entries);
+                    listModel.setHubEntries(entries);
                     setEnabled(true);
                 }
 
                 @Override
                 public void failed(Exception e) {
                     sipModel.getFeedback().alert("Unable to fetch data set list", e);
+                    listModel.setHubEntries(null);
                     setEnabled(true);
                 }
             });
@@ -384,6 +390,7 @@ public class DataSetFrame extends FrameBase {
 
     private class DataSetListModel extends AbstractListModel {
         private String message;
+        private boolean needsFetch;
         private List<Entry> entries = new ArrayList<Entry>();
 
         public void setStateCheckDelay(int delay) { // call only once
@@ -405,14 +412,17 @@ public class DataSetFrame extends FrameBase {
             fireIntervalAdded(this, 0, getSize());
         }
 
-        public void setEntries(List<CultureHubClient.DataSetEntry> entries) {
+        public void setHubEntries(List<CultureHubClient.DataSetEntry> list) {
             message = null;
+            needsFetch = list == null;
             List<Entry> freshEntries = new ArrayList<Entry>();
             Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
-            for (CultureHubClient.DataSetEntry incoming : entries) {
-                DataSet dataSet = dataSets.get(incoming.getDirectoryName());
-                freshEntries.add(new Entry(incoming, dataSet));
-                if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
+            if (list != null) {
+                for (CultureHubClient.DataSetEntry incoming : list) {
+                    DataSet dataSet = dataSets.get(incoming.getDirectoryName());
+                    freshEntries.add(new Entry(incoming, dataSet));
+                    if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
+                }
             }
             for (DataSet dataSet : dataSets.values()) { // remaining ones
                 freshEntries.add(new Entry(null, dataSet));
@@ -455,7 +465,7 @@ public class DataSetFrame extends FrameBase {
             }
             else {
                 Entry entry = (Entry) value;
-                State state = entry.getState();
+                State state = listModel.needsFetch ? State.NEEDS_FETCH : entry.getState();
                 icon = state.icon;
                 string = String.format("%s - %s", entry.getSpec(), state.string);
                 int substitution = string.indexOf("%s");
@@ -477,7 +487,8 @@ public class DataSetFrame extends FrameBase {
         ORPHAN_TAKEN(true, false, "owner is %s but present locally (unusual), cannot be downloaded", DATASET_HUH_ICON),
         ORPHAN_LONELY(true, false, "only present locally (unusual)", DATASET_HUH_ICON),
         ORPHAN_UPDATE(false, true, "you are owner, but not present locally (unusual), can be downloaded", DATASET_HUH_ICON),
-        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", DATASET_HUH_ICON);
+        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", DATASET_HUH_ICON),
+        NEEDS_FETCH(true, false, "locally available, refresh to fetch culture hub info", DATASET_HUH_ICON);
 
         private final String string;
         private final Icon icon;
