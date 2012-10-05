@@ -54,15 +54,12 @@ import static eu.delving.sip.frames.AllFrames.View.*;
  */
 
 public class AllFrames {
-    private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
-    private Dimension SMALL_ICON_SIZE = new Dimension(30, 18);
+    private Dimension LARGE_ICON_SIZE = new Dimension(70, 50);
+    private Dimension SMALL_ICON_SIZE = new Dimension(20, 12);
     private FrameBase[] frames;
     private DataSetFrame dataSetFrame;
-    private FunctionFrame functionFrame;
-    private MappingCodeFrame mappingCodeFrame;
-    private StatsFrame statsFrame;
     private WorkFrame workFrame;
-    private UploadFrame uploadFrame;
+    private ReportFrame reportFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private View currentView = CLEAR;
@@ -71,9 +68,9 @@ public class AllFrames {
         @Override
         public void selectView(View view) {
             for (Arrangement arrangement : arrangements) {
-                if (arrangement.source.name == view) {
+                if (arrangement.source.view == view) {
                     arrangement.actionPerformed(null);
-                    currentView = arrangement.source.name;
+                    currentView = arrangement.source.view;
                     return;
                 }
             }
@@ -94,27 +91,42 @@ public class AllFrames {
         BIG_PICTURE,
         CODE_TWEAKING,
         DEEP_DELVING,
-        DECADENT_DISPLAY;
+        DECADENT_DISPLAY,
+        FUNCTIONS,
+        MAPPING_CODE,
+        STATISTICS,
+        REPORT;
 
-        public String getString() {
-            return super.toString().replaceAll("_", " ");
+        public String getHtml() {
+            int us = super.toString().indexOf("_");
+            if (us < 0) {
+                return String.format("<html>%s</html>", super.toString());
+            }
+            else {
+                return String.format(
+                        "<html><center>%s<br>%s</center></html>",
+                        super.toString().substring(0, us),
+                        super.toString().substring(us + 1)
+                );
+            }
         }
     }
 
     public interface ViewSelector {
         void selectView(View view);
+
         void refreshView();
     }
 
     public AllFrames(final SipModel sipModel, final CultureHubClient cultureHubClient) {
         this.sipModel = sipModel;
         sipModel.setViewSelector(viewSelector);
-        functionFrame = new FunctionFrame(sipModel);
-        mappingCodeFrame = new MappingCodeFrame(sipModel);
-        statsFrame = new StatsFrame(sipModel);
         workFrame = new WorkFrame(sipModel);
-        uploadFrame = new UploadFrame(sipModel, cultureHubClient);
         dataSetFrame = new DataSetFrame(sipModel, cultureHubClient);
+        reportFrame = new ReportFrame(sipModel, cultureHubClient);
+        FunctionFrame functionFrame = new FunctionFrame(sipModel);
+        MappingCodeFrame mappingCodeFrame = new MappingCodeFrame(sipModel);
+        StatsFrame statsFrame = new StatsFrame(sipModel);
         CreateFrame create = new CreateFrame(sipModel);
         addSpaceBarCreate(create, create);
         FrameBase source = new SourceFrame(sipModel);
@@ -133,7 +145,11 @@ public class AllFrames {
                 input,
                 recMapping,
                 fieldMapping,
-                output
+                output,
+                functionFrame,
+                mappingCodeFrame,
+                statsFrame,
+                reportFrame
         };
         try {
             File file = frameArrangementsFile();
@@ -228,7 +244,7 @@ public class AllFrames {
     }
 
     public Action getUploadAction() {
-        return uploadFrame.getUploadAction();
+        return reportFrame.getUploadAction();
     }
 
     public JMenu getFrameMenu() {
@@ -239,11 +255,7 @@ public class AllFrames {
             menu.add(frame.getAction());
         }
         menu.addSeparator();
-        menu.add(statsFrame.getAction());
-        menu.add(functionFrame.getAction());
-        menu.add(mappingCodeFrame.getAction());
         menu.add(workFrame.getAction());
-        menu.add(uploadFrame.getAction());
         return menu;
     }
 
@@ -262,8 +274,8 @@ public class AllFrames {
         for (Arrangement a : this.arrangements) {
             JButton b = new JButton(a);
             b.setHorizontalTextPosition(JButton.CENTER);
-            b.setVerticalTextPosition(JButton.BOTTOM);
-            b.setFont(new Font("Sans", Font.ITALIC, 10));
+            b.setVerticalTextPosition(JButton.CENTER);
+            b.setFont(new Font("Sans", Font.BOLD, 10));
             arrangements.add(b);
             arrangements.add(Box.createVerticalStrut(5));
         }
@@ -285,16 +297,6 @@ public class AllFrames {
         return p;
     }
 
-
-    public JPanel getBigWindowsPanel() {
-        JPanel p = new JPanel(new GridLayout(2, 2));
-        p.setBorder(BorderFactory.createTitledBorder("Global Frames"));
-        p.add(createHotkeyButton(statsFrame));
-        p.add(createHotkeyButton(functionFrame));
-        p.add(createHotkeyButton(mappingCodeFrame));
-        p.add(createHotkeyButton(uploadFrame));
-        return p;
-    }
 
     private JButton createHotkeyButton(FrameBase frame) {
         Action action = frame.getAction();
@@ -318,22 +320,6 @@ public class AllFrames {
         for (FrameBase frame : frames) if (frame.getWhich() == which) return frame;
         throw new RuntimeException(which + " not found");
     }
-
-//    private void selectNewView(View view) {
-//        if (currentView == view) return;
-//        selectView(view);
-//    }
-//
-//    private void selectView(View view) {
-//        for (Arrangement arrangement : arrangements) {
-//            if (arrangement.source.name == view) {
-//                arrangement.actionPerformed(null);
-//                return;
-//            }
-//        }
-//        for (FrameBase frame : frames) frame.closeFrame();
-//        currentView = CLEAR;
-//    }
 
     private static class Situation implements FrameBase.Placement {
         private Point location;
@@ -394,7 +380,7 @@ public class AllFrames {
         private ViewIcon small, large;
 
         Arrangement(XArrangement source, int viewIndex) {
-            super(source.name.getString());
+            super(source.view.getHtml());
             putValue(
                     Action.ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -420,6 +406,7 @@ public class AllFrames {
             }
             for (Block block : blocks) block.frame.openFrame();
             for (FrameBase base : frames) base.setArrangementSource(source, this);
+            currentView = source.view;
         }
 
         public String toString() {
@@ -477,6 +464,7 @@ public class AllFrames {
         public void paintIcon(Component component, Graphics graphics, int x, int y) {
             this.component = component;
             Graphics2D g = (Graphics2D) graphics;
+            g.setColor(Color.GRAY);
             int rows = 0;
             int cols = 0;
             for (Block block : a.blocks) {
@@ -514,7 +502,7 @@ public class AllFrames {
     @XStreamAlias("arrangement")
     public static class XArrangement {
         @XStreamAsAttribute
-        public View name;
+        public View view;
 
         @XStreamImplicit
         public List<XFrame> frames;

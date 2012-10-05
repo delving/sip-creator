@@ -243,7 +243,6 @@ public class Application {
         sp.add(new JButton(unlockMappingAction), BorderLayout.EAST);
         p.add(sp);
         p.add(createWorkPanel());
-        p.add(allFrames.getBigWindowsPanel());
         return p;
     }
 
