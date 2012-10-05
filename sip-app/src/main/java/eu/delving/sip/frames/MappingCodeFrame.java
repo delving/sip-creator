@@ -55,7 +55,7 @@ public class MappingCodeFrame extends FrameBase {
     private JTextArea fieldArea = new JTextArea();
 
     public MappingCodeFrame(final SipModel sipModel) {
-        super(Which.CODE, sipModel, "Code");
+        super(Which.MAPPING_CODE, sipModel, "Mapping Code");
         pathListArea.setFont(MONOSPACED);
         pathListGroovyArea.setFont(MONOSPACED);
         recordArea.setFont(MONOSPACED);

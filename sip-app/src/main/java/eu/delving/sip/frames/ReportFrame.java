@@ -45,15 +45,15 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class UploadFrame extends FrameBase implements ReportFileModel.Listener {
+public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     public static final JLabel EMPTY_LABEL = new JLabel("No reports available", JLabel.CENTER);
     private JPanel center = new JPanel(new BorderLayout());
     private CultureHubClient cultureHubClient;
     private UploadAction uploadAction = new UploadAction();
     private JButton uploadButton = new JButton(uploadAction);
 
-    public UploadFrame(SipModel sipModel, CultureHubClient cultureHubClient) {
-        super(Which.UPLOAD, sipModel, "Upload");
+    public ReportFrame(SipModel sipModel, CultureHubClient cultureHubClient) {
+        super(Which.REPORT, sipModel, "Report");
         this.cultureHubClient = cultureHubClient;
         center.add(EMPTY_LABEL);
         sipModel.getReportFileModel().setListener(this);
