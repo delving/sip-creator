@@ -277,7 +277,14 @@ public class DictionaryPanel extends JPanel {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
-                        boolean isDictionary = createModel.hasNodeMapping() && createModel.getNodeMapping().dictionary != null;
+                        boolean isDictionary = false;
+                        if (createModel.hasNodeMapping()) {
+                            NodeMapping nodeMapping = createModel.getNodeMapping();
+                            if (nodeMapping.dictionary == null && isDictionaryPossible(nodeMapping)) {
+                                refreshDictionary(nodeMapping);
+                            }
+                            if (nodeMapping.dictionary != null) isDictionary = true;
+                        }
                         DELETE_ACTION.setEnabled(isDictionary);
                         if (isDictionary) {
                             valueModel.setRecDefTreeNode(createModel.getRecDefTreeNode());
@@ -393,8 +400,16 @@ public class DictionaryPanel extends JPanel {
             sipModel.exec(new Work() {
                 @Override
                 public void run() {
-                    if (isDictionaryPossible(createModel.getNodeMapping()))
-                        refreshDictionary(createModel.getNodeMapping());
+                    final NodeMapping nodeMapping = createModel.getNodeMapping();
+                    if (isDictionaryPossible(nodeMapping)) {
+                        refreshDictionary(nodeMapping);
+                        sipModel.exec(new Swing() {
+                            @Override
+                            public void run() {
+                                dictionaryModel.setNodeMapping(nodeMapping);
+                            }
+                        });
+                    }
                 }
 
                 @Override
