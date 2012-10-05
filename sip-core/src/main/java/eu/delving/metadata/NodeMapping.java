@@ -235,7 +235,7 @@ public class NodeMapping {
     }
 
     public boolean isUserCodeEditable() {
-        return (recDefNode.isAttr() || recDefNode.isLeafElem()) && !hasDictionary();
+        return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
 
     private boolean isSimilar(String codeString, Iterator<String> walk) {
