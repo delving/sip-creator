@@ -33,7 +33,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -114,7 +114,7 @@ public class MappingCompileModel {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if (enabled) triggerCompile();
+        triggerCompile();
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {
