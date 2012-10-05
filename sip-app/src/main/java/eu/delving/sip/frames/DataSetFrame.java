@@ -80,6 +80,7 @@ public class DataSetFrame extends FrameBase {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1 && editAction.isEnabled()) {
+                    if (dataSetList.getSelectedIndex() != dataSetList.locationToIndex(e.getPoint())) return;
                     editAction.actionPerformed(null);
                 }
             }

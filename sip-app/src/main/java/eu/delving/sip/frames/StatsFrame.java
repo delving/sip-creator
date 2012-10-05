@@ -68,7 +68,7 @@ public class StatsFrame extends FrameBase {
     private JPanel valueHistogramPanel = emptyPanel();
 
     public StatsFrame(SipModel sipModel) {
-        super(Which.STATS, sipModel, "Stats");
+        super(Which.STATISTICS, sipModel, "Stats");
         wireUp();
         getAction().putValue(
                 Action.ACCELERATOR_KEY,

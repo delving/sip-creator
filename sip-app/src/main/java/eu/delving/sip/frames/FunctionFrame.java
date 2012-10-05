@@ -499,7 +499,7 @@ public class FunctionFrame extends FrameBase {
         public String getToolTipText(MouseEvent evt) {
             int index = this.locationToIndex(evt.getPoint());
             MappingFunction mappingFunction = (MappingFunction) getModel().getElementAt(index);
-            return mappingFunction.getDocumentation();
+            return mappingFunction == null ? "" : mappingFunction.getDocumentation();
         }
     }
 
