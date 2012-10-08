@@ -398,7 +398,7 @@ public class WorkModel {
                 return String.format("%d seconds", seconds);
             }
             else {
-                return "wait for it..";
+                return "a few seconds";
             }
         }
     }
