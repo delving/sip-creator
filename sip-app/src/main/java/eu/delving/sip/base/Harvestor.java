@@ -28,7 +28,6 @@ import eu.delving.sip.files.DataSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
@@ -66,11 +65,11 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     private static final Path RECORD_ROOT = Path.create("/OAI-PMH/ListRecords/record");
     private static final Path ERROR = Path.create("/OAI-PMH/error");
     private static final Path RESUMPTION_TOKEN = Path.create("/OAI-PMH/ListRecords/resumptionToken");
-    private Logger log = Logger.getLogger(getClass());
+    private Logger log = Logger.getLogger(Harvestor.class);
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-    private HttpClient httpClient;
+    private DefaultHttpClient httpClient;
     private OutputStream outputStream;
     private XMLEventWriter out;
     private NamespaceCollector namespaceCollector = new NamespaceCollector();
@@ -289,18 +288,17 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
 
     private HttpEntity doGet(String url) throws IOException {
         HttpGet get = new HttpGet(url);
-//        get.setHeader("Accept", "text/xml");
+        get.setHeader("Accept", "text/xml");
         HttpResponse response = httpClient.execute(get);
         switch (Code.from(response)) {
             case OK:
                 break;
             case UNAUTHORIZED:
-                break;
+                throw new IOException("Access not authorized");
             case SYSTEM_ERROR:
+                throw new IOException("OAI-PMH Server error");
             case UNKNOWN_RESPONSE:
-//                    log.warn("Unable to download source. HTTP response " + response.getStatusLine().getReasonPhrase());
-//                    context.tellUser("Unable to download data set"); // todo: tell them why
-                break;
+                throw new IOException("OAI-PMH Server Unknown response:" + response.getStatusLine());
         }
         return response.getEntity();
     }
@@ -424,7 +422,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || Harvestor.class != o.getClass()) return false;
         Harvestor harvestor = (Harvestor) o;
         return dataSet.getSpec().equals(harvestor.dataSet.getSpec());
     }
