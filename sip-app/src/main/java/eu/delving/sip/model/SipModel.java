@@ -342,7 +342,7 @@ public class SipModel {
                         seekFirstRecord();
                     }
                 });
-                Swing.Exec.later(success);
+                if (success != null) Swing.Exec.later(success);
             }
             catch (Exception e) {
                 feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);
