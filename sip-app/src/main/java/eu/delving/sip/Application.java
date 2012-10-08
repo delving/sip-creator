@@ -29,6 +29,8 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.Fetcher;
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.actions.DataImportAction;
+import eu.delving.sip.actions.SelectAnotherMappingAction;
+import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
@@ -81,7 +83,8 @@ public class Application {
     private HelpPanel helpPanel;
     private Timer resizeTimer;
     private ExpertMenu expertMenu;
-    private Application.UnlockMappingAction unlockMappingAction;
+    private UnlockMappingAction unlockMappingAction;
+    private SelectAnotherMappingAction selectAnotherMappingAction;
 
     private Application(final File storageDirectory) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
@@ -160,7 +163,8 @@ public class Application {
         importAction = new DataImportAction(desktop, sipModel);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
-        unlockMappingAction = new UnlockMappingAction();
+        unlockMappingAction = new UnlockMappingAction(sipModel);
+        selectAnotherMappingAction = new SelectAnotherMappingAction(sipModel);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -238,11 +242,14 @@ public class Application {
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
         ));
-        JPanel sp = new JPanel(new BorderLayout());
-        sp.add(statusPanel, BorderLayout.CENTER);
-        sp.add(new JButton(unlockMappingAction), BorderLayout.EAST);
-        p.add(sp);
-        p.add(createWorkPanel());
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.add(statusPanel, BorderLayout.CENTER);
+        leftPanel.add(new JButton(unlockMappingAction), BorderLayout.EAST);
+        p.add(leftPanel);
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(createWorkPanel(), BorderLayout.CENTER);
+        rightPanel.add(new JButton(selectAnotherMappingAction), BorderLayout.WEST);
+        p.add(rightPanel);
         return p;
     }
 
@@ -298,36 +305,6 @@ public class Application {
         menu.add(validateAction);
         menu.add(uploadAction);
         return menu;
-    }
-
-    private class UnlockMappingAction extends AbstractAction implements Work {
-
-        private UnlockMappingAction() {
-            super("<html><center><b>Unlock</b><br>" +
-                    "<p>Edit Mapping</p>");
-            setEnabled(false);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.exec(this);
-        }
-
-        @Override
-        public void run() {
-            sipModel.getMappingModel().setLocked(false);
-            try {
-                sipModel.getDataSetModel().deleteValidation();
-            }
-            catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to delete validation", e);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.UNLOCK_MAPPING;
-        }
     }
 
     private class InputAnalyzer implements Swing {
