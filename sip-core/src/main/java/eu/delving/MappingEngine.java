@@ -22,15 +22,10 @@
 package eu.delving;
 
 import eu.delving.groovy.MappingException;
-import eu.delving.metadata.MappingEngineImpl;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.RecDefModel;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Provide a mapping service to take text XML.
@@ -54,26 +49,4 @@ public interface MappingEngine {
 
     MappingResult execute(String recordXML) throws XMLStreamException, MappingException, IOException, SAXException;
 
-    /**
-     * Create mapping engines
-     */
-
-    public static class Factory {
-
-        public static MappingEngine newInstance(
-                ClassLoader classLoader,
-                Map<String, String> namespaces
-        ) throws FileNotFoundException, MetadataException {
-            return new MappingEngineImpl(classLoader, namespaces, null, null);
-        }
-
-        public static MappingEngine newInstance(
-                ClassLoader classLoader,
-                Map<String, String> namespaces,
-                RecDefModel recDefModel,
-                String mapping
-        ) throws FileNotFoundException, MetadataException {
-            return new MappingEngineImpl(classLoader, namespaces, recDefModel, mapping);
-        }
-    }
 }
