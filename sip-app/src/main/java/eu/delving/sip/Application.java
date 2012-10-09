@@ -120,7 +120,8 @@ public class Application {
         Storage storage = new StorageImpl(storageDirectory, fetcher, httpClient);
         sipModel = new SipModel(desktop ,storage, groovyCodeResource, feedback, preferences);
         CultureHubClient cultureHubClient = new CultureHubClient(sipModel, httpClient);
-        expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient);
+        allFrames = new AllFrames(sipModel, cultureHubClient);
+        expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
         home.addComponentListener(new ComponentAdapter() {
@@ -130,7 +131,6 @@ public class Application {
             }
         });
         desktop.setBackground(new Color(190, 190, 200));
-        allFrames = new AllFrames(sipModel, cultureHubClient);
         helpPanel = new HelpPanel(sipModel, httpClient);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
@@ -271,7 +271,6 @@ public class Application {
         JMenuBar bar = new JMenuBar();
         bar.add(createFileMenu());
         bar.add(allFrames.getViewMenu());
-        bar.add(allFrames.getFrameMenu());
         bar.add(expertMenu);
         bar.add(createHelpMenu());
         return bar;

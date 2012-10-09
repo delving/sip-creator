@@ -23,10 +23,12 @@ package eu.delving.sip.menus;
 
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
@@ -35,9 +37,10 @@ import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JDesktopPane;
+import javax.swing.JMenu;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 
 /**
@@ -50,15 +53,18 @@ import java.io.File;
 public class ExpertMenu extends JMenu {
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
+    private AllFrames allFrames;
 
-    public ExpertMenu(JDesktopPane desktop, final SipModel sipModel, CultureHubClient cultureHubClient) {
+    public ExpertMenu(JDesktopPane desktop, final SipModel sipModel, CultureHubClient cultureHubClient, AllFrames allFrames) {
         super("Expert");
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
+        this.allFrames = allFrames;
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
         add(new WriteOutputAction());
         add(new ReloadMappingAction());
+        add(new ToggleFrameArrangements());
 //        add(new MediaImportAction(desktop, sipModel));
 //        add(new UploadMediaAction());
         int anonRecords = Integer.parseInt(System.getProperty(SourceConverter.ANONYMOUS_RECORDS_PROPERTY, "0"));
@@ -235,10 +241,6 @@ public class ExpertMenu extends JMenu {
     private class ReloadMappingAction extends AbstractAction {
         private ReloadMappingAction() {
             super("Reload record definition");
-            putValue(
-                    Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_MASK|KeyEvent.ALT_MASK)
-            );
         }
 
         @Override
@@ -275,6 +277,17 @@ public class ExpertMenu extends JMenu {
                     }
                 }
             });
+        }
+    }
+
+    private class ToggleFrameArrangements extends AbstractAction {
+        public ToggleFrameArrangements() {
+            super("Toggle Frame Arrangement Editing");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            for (FrameBase frame : allFrames.getFrames()) frame.toggleEditMenu();
         }
     }
 
