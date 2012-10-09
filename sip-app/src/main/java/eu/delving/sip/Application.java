@@ -242,14 +242,21 @@ public class Application {
                 BorderFactory.createBevelBorder(0),
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
         ));
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.add(statusPanel, BorderLayout.CENTER);
-        leftPanel.add(new JButton(unlockMappingAction), BorderLayout.EAST);
-        p.add(leftPanel);
+        p.add(statusPanel);
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(createWorkPanel(), BorderLayout.CENTER);
-        rightPanel.add(new JButton(selectAnotherMappingAction), BorderLayout.WEST);
+        rightPanel.add(createButtonPanel(), BorderLayout.WEST);
         p.add(rightPanel);
+        return p;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        JButton b;
+        p.add(b = new JButton(unlockMappingAction));
+        b.setHorizontalAlignment(JButton.LEFT);
+        p.add(b = new JButton(selectAnotherMappingAction));
+        b.setHorizontalAlignment(JButton.LEFT);
         return p;
     }
 

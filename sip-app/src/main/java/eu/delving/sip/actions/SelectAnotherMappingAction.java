@@ -23,6 +23,7 @@ package eu.delving.sip.actions;
 
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
@@ -40,8 +41,8 @@ import java.util.List;
  */
 
 public class SelectAnotherMappingAction extends AbstractAction implements Work {
-    public static final String DEFAULT_HTML = "<html><center><b>Select</b><br><p>Another mapping</p>";
-    public static final String SINGLE_SELECTION_HTML = "<html><center><b>Select</b><br><p>%s mapping</p>";
+    public static final String DEFAULT_HTML = "<html><b>Select</b><br><p>Another mapping</p>";
+    public static final String SINGLE_SELECTION_HTML = "<html><b>Select</b><br><p>%s mapping</p>";
     private SipModel sipModel;
     private List<SchemaVersion> choices = new ArrayList<SchemaVersion>();
 
@@ -77,6 +78,7 @@ public class SelectAnotherMappingAction extends AbstractAction implements Work {
             }
         });
         setEnabled(false);
+        putValue(Action.SMALL_ICON, SwingHelper.ICON_SELECT_ANOTHER);
     }
 
     @Override

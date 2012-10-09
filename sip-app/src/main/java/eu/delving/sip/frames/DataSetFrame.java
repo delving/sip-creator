@@ -104,16 +104,22 @@ public class DataSetFrame extends FrameBase {
 
     private JPanel createEast() {
         JPanel bp = new JPanel(new GridLayout(0, 1, 10, 10));
-        bp.add(new JButton(refreshAction));
-        bp.add(new JButton(editAction));
-        bp.add(new JButton(downloadAction));
-        bp.add(new JButton(releaseAction));
+        bp.add(button(refreshAction));
+        bp.add(button(editAction));
+        bp.add(button(downloadAction));
+        bp.add(button(releaseAction));
         bp.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel p = new JPanel(new BorderLayout(10, 10));
         htmlPanel.setPreferredSize(new Dimension(500, 500));
         p.add(htmlPanel, BorderLayout.CENTER);
         p.add(bp, BorderLayout.SOUTH);
         return p;
+    }
+
+    private JButton button(Action action) {
+        JButton button = new JButton(action);
+        button.setHorizontalAlignment(JButton.LEFT);
+        return button;
     }
 
     public void fireRefresh() {
@@ -135,6 +141,7 @@ public class DataSetFrame extends FrameBase {
 
         private RefreshAction() {
             super("Refresh the list of data sets from the culture hub");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_FETCH_LIST);
         }
 
         @Override
@@ -162,6 +169,7 @@ public class DataSetFrame extends FrameBase {
 
         private EditAction() {
             super("Select a mapping of this data set for editing");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_EDIT);
         }
 
         public void checkEnabled() {
@@ -211,6 +219,7 @@ public class DataSetFrame extends FrameBase {
 
         private DownloadAction() {
             super("Download from the culture hub for editing locally");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_DOWNLOAD);
         }
 
         public void checkEnabled() {
@@ -243,6 +252,7 @@ public class DataSetFrame extends FrameBase {
 
         public ReleaseAction() {
             super("Release your ownership of this data set");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_EMPTY);
         }
 
         public void checkEnabled() {
@@ -479,15 +489,15 @@ public class DataSetFrame extends FrameBase {
     }
 
     private enum State {
-        OWNED_BY_YOU(true, false, "you are owner", DATASET_LOCKED_ICON),
-        AVAILABLE(false, true, "can be downloaded", DATASET_DOWNLOAD_ICON),
-        UNAVAILABLE(false, false, "owner is %s", DATASET_UNAVAILABLE_ICON),
-        BUSY(false, false, "busy locally", DATASET_BUSY_ICON),
-        ORPHAN_TAKEN(true, false, "owner is %s but present locally (unusual), cannot be downloaded", DATASET_HUH_ICON),
-        ORPHAN_LONELY(true, false, "only present locally (unusual)", DATASET_HUH_ICON),
-        ORPHAN_UPDATE(false, true, "you are owner, but not present locally (unusual), can be downloaded", DATASET_HUH_ICON),
-        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", DATASET_HUH_ICON),
-        NEEDS_FETCH(true, false, "locally available, refresh to fetch culture hub info", DATASET_DOWNLOAD_ICON);
+        OWNED_BY_YOU(true, false, "you are owner", ICON_OWNED),
+        AVAILABLE(false, true, "can be downloaded", ICON_DOWNLOAD),
+        UNAVAILABLE(false, false, "owner is %s", ICON_UNAVAILABLE),
+        BUSY(false, false, "busy locally", SwingHelper.ICON_BUSY),
+        ORPHAN_TAKEN(true, false, "owner is %s but present locally (unusual), cannot be downloaded", ICON_HUH),
+        ORPHAN_LONELY(true, false, "only present locally (unusual)", ICON_HUH),
+        ORPHAN_UPDATE(false, true, "you are owner, but not present locally (unusual), can be downloaded", ICON_HUH),
+        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", ICON_HUH),
+        NEEDS_FETCH(true, false, "locally available, refresh to fetch culture hub info", ICON_OWNED);
 
         private final String string;
         private final Icon icon;

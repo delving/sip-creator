@@ -293,17 +293,17 @@ public class InputFrame extends FrameBase {
             if (value instanceof GroovyTreeNode) {
                 GroovyTreeNode node = (GroovyTreeNode) value;
                 if (node.attrKey != null) {
-                    setIcon(SwingHelper.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
                 else if (!node.isLeaf()) {
-                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_COMPOSITE);
                 }
                 else {
-                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_VALUE);
                 }
             }
             else {
-                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.ICON_COMPOSITE);
             }
             return component;
         }
@@ -313,7 +313,7 @@ public class InputFrame extends FrameBase {
 
     private class RewindAction extends AbstractAction {
         private RewindAction() {
-            putValue(Action.SMALL_ICON, SwingHelper.REWIND_ICON);
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_REWIND);
         }
 
         @Override
@@ -327,7 +327,7 @@ public class InputFrame extends FrameBase {
 
     private class PlayAction extends AbstractAction {
         private PlayAction() {
-            putValue(Action.SMALL_ICON, SwingHelper.PLAY_ICON);
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_PLAY);
         }
 
         @Override

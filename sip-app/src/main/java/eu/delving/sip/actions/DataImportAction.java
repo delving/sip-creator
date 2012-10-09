@@ -61,7 +61,7 @@ public class DataImportAction extends AbstractAction {
 
     public DataImportAction(JDesktopPane parent, SipModel sipModel) {
         super("Import new data into this data set");
-        putValue(Action.SMALL_ICON, SwingHelper.IMPORT_ICON);
+        putValue(Action.SMALL_ICON, SwingHelper.ICON_IMPORT);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())

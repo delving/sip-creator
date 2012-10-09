@@ -21,11 +21,13 @@
 
 package eu.delving.sip.actions;
 
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import java.awt.event.ActionEvent;
 
 /**
@@ -39,10 +41,11 @@ public class UnlockMappingAction extends AbstractAction implements Work {
     private SipModel sipModel;
 
     public UnlockMappingAction(SipModel sipModel) {
-        super("<html><center><b>Unlock</b><br>" +
+        super("<html><b>Unlock</b><br>" +
                 "<p>Edit Mapping</p>");
         this.sipModel = sipModel;
         setEnabled(false);
+        putValue(Action.SMALL_ICON, SwingHelper.ICON_UNLOCK);
     }
 
     @Override

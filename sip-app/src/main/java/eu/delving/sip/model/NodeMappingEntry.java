@@ -24,8 +24,10 @@ package eu.delving.sip.model;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.sip.base.SwingHelper;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import java.awt.Component;
 
 /**
  * An entry in the NodeMappingListModel, with its associated cell renderer.
@@ -96,13 +98,13 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
             JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, selected, cellHasFocus);
             NodeMappingEntry entry = (NodeMappingEntry) value;
             if (entry.getNodeMapping().recDefNode.isAttr()) {
-                setIcon(SwingHelper.ATTRIBUTE_ICON);
+                setIcon(SwingHelper.ICON_ATTRIBUTE);
             }
             else if (entry.getNodeMapping().recDefNode.isLeafElem()) {
-                setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                setIcon(SwingHelper.ICON_VALUE);
             }
             else {
-                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.ICON_COMPOSITE);
             }
             if (entry.isHighlighted()) {
                 setBackground(SwingHelper.HILIGHTED_COLOR);
