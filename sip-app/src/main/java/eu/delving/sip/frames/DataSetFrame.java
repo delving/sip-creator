@@ -56,6 +56,7 @@ public class DataSetFrame extends FrameBase {
     private DownloadAction downloadAction = new DownloadAction();
     private ReleaseAction releaseAction = new ReleaseAction();
     private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
+    private JTextField patternField = new JTextField(6);
 
     public DataSetFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
@@ -100,6 +101,7 @@ public class DataSetFrame extends FrameBase {
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
         p.add(button(refreshAction));
+        p.add(createFilter());
         p.add(button(editAction));
         p.add(button(downloadAction));
         p.add(button(releaseAction));
@@ -110,6 +112,15 @@ public class DataSetFrame extends FrameBase {
         JButton button = new JButton(action);
         button.setHorizontalAlignment(JButton.LEFT);
         return button;
+    }
+
+    private JPanel createFilter() {
+        JLabel label = new JLabel("Filter:", JLabel.RIGHT);
+        label.setLabelFor(patternField);
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(label, BorderLayout.WEST);
+        p.add(patternField, BorderLayout.CENTER);
+        return p;
     }
 
     public void fireRefresh() {
@@ -131,11 +142,12 @@ public class DataSetFrame extends FrameBase {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
-            // todo: change the icon to a waiting one
+            // todo: change the icon to a waiting one?
             cultureHubClient.fetchDataSetList(new CultureHubClient.ListReceiveListener() {
                 @Override
                 public void listReceived(List<CultureHubClient.DataSetEntry> entries) {
                     tableModel.setHubEntries(entries);
+                    patternField.setText(null);
                     setEnabled(true);
                 }
 
@@ -143,6 +155,7 @@ public class DataSetFrame extends FrameBase {
                 public void failed(Exception e) {
                     sipModel.getFeedback().alert("Unable to fetch data set list", e);
                     tableModel.setHubEntries(null);
+                    patternField.setText(null);
                     setEnabled(true);
                 }
             });
@@ -286,7 +299,6 @@ public class DataSetFrame extends FrameBase {
         }
     }
 
-
     private Row getSelectedRow() {
         int rowIndex = dataSetTable.getSelectedRow();
         return rowIndex < 0 ? null : tableModel.getRow(rowIndex);
@@ -297,6 +309,7 @@ public class DataSetFrame extends FrameBase {
         private List<Row> rows = new ArrayList<Row>();
         private Map<Integer, Integer> index;
         private boolean needsFetch;
+        private String pattern = "";
 
         private DataSetTableModel() {
             createColumnModel();
@@ -310,9 +323,13 @@ public class DataSetFrame extends FrameBase {
             Timer timer = new Timer(delay, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    if (!patternField.getText().equalsIgnoreCase(pattern)) {
+                        pattern = patternField.getText().toLowerCase();
+                        setPattern();
+                    }
                     int row = 0;
                     for (Row entry : rows) {
-                        if (entry.hasStateChanged()) fireTableCellUpdated(row, 1);
+                        if (entry.hasStateChanged()) fireTableRowsUpdated(row, row);
                         row++;
                     }
                 }
@@ -321,19 +338,26 @@ public class DataSetFrame extends FrameBase {
             timer.start();
         }
 
-        public void setPattern(String pattern) {
-            String sought = pattern.toLowerCase();
-            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-            int actual = 0, virtual = 0;
-            for (Row row : rows) {
-                if (row.getSpec().contains(sought)) {
-                    map.put(virtual, actual);
-                    virtual++;
+        public void setPattern() {
+            if (pattern.isEmpty()) {
+                if (index != null) {
+                    index = null;
+                    fireTableStructureChanged();
                 }
-                actual++;
             }
-            index = map;
-            fireTableStructureChanged();
+            else {
+                Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+                int actual = 0, virtual = 0;
+                for (Row row : rows) {
+                    if (row.getSpec().contains(pattern)) {
+                        map.put(virtual, actual);
+                        virtual++;
+                    }
+                    actual++;
+                }
+                index = map;
+                fireTableStructureChanged();
+            }
         }
 
         public void setHubEntries(List<CultureHubClient.DataSetEntry> list) {
@@ -365,7 +389,12 @@ public class DataSetFrame extends FrameBase {
 
         @Override
         public int getRowCount() {
-            return rows.size();
+            if (index != null) {
+                return index.size();
+            }
+            else {
+                return rows.size();
+            }
         }
 
         @Override
@@ -379,33 +408,56 @@ public class DataSetFrame extends FrameBase {
         }
 
         private TableColumn createSpecColumn() {
-            TableColumn tc = new TableColumn(0, 100);
+            TableColumn tc = new TableColumn(0, 400);
             tc.setHeaderValue("Spec");
-            tc.setWidth(400);
             tc.setMinWidth(100);
             return tc;
         }
 
         private TableColumn createStateColumn() {
-            TableColumn tc = new TableColumn(1, 100);
-            tc.setCellRenderer(new StateCellRenderer());
+            TableColumn tc = new TableColumn(1, 300);
+            tc.setCellRenderer(new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    State state = tableModel.needsFetch ? State.NEEDS_FETCH : (State) value;
+                    label.setIcon(state.icon);
+                    label.setText(state.string);
+                    return label;
+                }
+            });
             tc.setHeaderValue("State");
-            tc.setWidth(400);
             tc.setMinWidth(100);
             return tc;
         }
 
-        private TableColumn createOwnedColumn() {
-            TableColumn tc = new TableColumn(2, 100);
-            tc.setHeaderValue("Owner");
-            tc.setWidth(400);
+        private TableColumn createRecordCountColumn() {
+            TableColumn tc = new TableColumn(2, 150);
+            tc.setHeaderValue("Records");
+            tc.setCellRenderer(new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    label.setHorizontalAlignment(JLabel.RIGHT);
+                    return label;
+                }
+            });
             tc.setMinWidth(100);
+            tc.setMaxWidth(200);
+            return tc;
+        }
+
+        private TableColumn createOwnedColumn() {
+            TableColumn tc = new TableColumn(3, 200);
+            tc.setHeaderValue("Owner");
+            tc.sizeWidthToFit();
             return tc;
         }
 
         private void createColumnModel() {
             columnModel.addColumn(createSpecColumn());
             columnModel.addColumn(createStateColumn());
+            columnModel.addColumn(createRecordCountColumn());
             columnModel.addColumn(createOwnedColumn());
         }
 
@@ -413,27 +465,18 @@ public class DataSetFrame extends FrameBase {
         public Object getValueAt(int rowIndex, int columnIndex) {
             Row row = getRow(rowIndex);
             State state = row.getState();
+            CultureHubClient.DataSetEntry entry = row.getDataSetEntry();
             switch (columnIndex) {
                 case 0:
                     return row.getSpec();
                 case 1:
                     return state;
                 case 2:
-                    CultureHubClient.DataSetEntry entry = row.getDataSetEntry();
+                    return entry == null ? "" : String.format("   %11d   ", entry.recordCount);
+                case 3:
                     return entry == null || entry.lockedBy == null ? "" : entry.lockedBy;
             }
             throw new RuntimeException();
-        }
-    }
-
-    private class StateCellRenderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            State state = tableModel.needsFetch ? State.NEEDS_FETCH : (State) value;
-            label.setIcon(state.icon);
-            label.setText(state.string);
-            return label;
         }
     }
 
