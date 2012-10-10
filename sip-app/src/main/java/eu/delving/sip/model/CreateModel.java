@@ -186,39 +186,45 @@ public class CreateModel {
         sipModel.exec(new Swing() {
             @Override
             public void run() {
-                if (!sipModel.getDataSetModel().getDataSetState().atLeast(SOURCED)) return;
-                if  (sipModel.getMappingModel().hasRecMapping()) {
-                    sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
+                try {
+                    if (!sipModel.getDataSetModel().getDataSetState().atLeast(SOURCED)) return;
+                    if (sipModel.getMappingModel().hasRecMapping()) {
+                        sipModel.getMappingModel().getRecDefTreeRoot().clearHighlighted();
+                    }
+                    sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();
+                    sipModel.getStatsModel().getSourceTree().clearHighlighted();
+                    switch (setter) {
+                        case SOURCE:
+                            if (sourceTreeNodes == null) return;
+                            for (SourceTreeNode node : sourceTreeNodes) {
+                                for (NodeMapping nodeMapping : node.getNodeMappings()) {
+                                    sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping).setHighlighted();
+                                    sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode).setHighlighted();
+                                }
+                            }
+                            break;
+                        case TARGET:
+                            if (recDefTreeNode == null) return;
+                            for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
+                                NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
+                                entry.setHighlighted();
+                                for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
+                                    ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+                                }
+                            }
+                            break;
+                        case NODE_MAPPING:
+                            if (nodeMapping == null || nodeMapping.getSourceTreeNodes() == null) return;
+                            for (Object node : nodeMapping.getSourceTreeNodes())
+                                ((SourceTreeNode) node).setHighlighted();
+                            RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
+                            RecDefTreeNode recDefTreeNode = root.getRecDefTreeNode(nodeMapping.recDefNode);
+                            recDefTreeNode.setHighlighted();
+                            break;
+                    }
                 }
-                sipModel.getMappingModel().getNodeMappingListModel().clearHighlighted();
-                sipModel.getStatsModel().getSourceTree().clearHighlighted();
-                switch (setter) {
-                    case SOURCE:
-                        if (sourceTreeNodes == null) return;
-                        for (SourceTreeNode node : sourceTreeNodes) {
-                            for (NodeMapping nodeMapping : node.getNodeMappings()) {
-                                sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping).setHighlighted();
-                                sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode).setHighlighted();
-                            }
-                        }
-                        break;
-                    case TARGET:
-                        if (recDefTreeNode == null) return;
-                        for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
-                            NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
-                            entry.setHighlighted();
-                            for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
-                                ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
-                            }
-                        }
-                        break;
-                    case NODE_MAPPING:
-                        if (nodeMapping == null || nodeMapping.getSourceTreeNodes() == null) return;
-                        for (Object node : nodeMapping.getSourceTreeNodes()) ((SourceTreeNode) node).setHighlighted();
-                        RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
-                        RecDefTreeNode recDefTreeNode = root.getRecDefTreeNode(nodeMapping.recDefNode);
-                        recDefTreeNode.setHighlighted();
-                        break;
+                catch (Exception e) {
+                    System.out.println("Ate exception: " + e);
                 }
             }
         });

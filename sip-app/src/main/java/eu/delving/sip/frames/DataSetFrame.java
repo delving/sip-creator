@@ -29,18 +29,16 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.panels.HtmlPanel;
-import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import static eu.delving.sip.base.SwingHelper.*;
 
@@ -51,41 +49,38 @@ import static eu.delving.sip.base.SwingHelper.*;
  */
 
 public class DataSetFrame extends FrameBase {
-    private DataSetListModel listModel = new DataSetListModel();
-    private JList dataSetList;
+    private DataSetTableModel tableModel = new DataSetTableModel();
+    private JTable dataSetTable;
     private CultureHubClient cultureHubClient;
     private EditAction editAction = new EditAction();
     private DownloadAction downloadAction = new DownloadAction();
     private ReleaseAction releaseAction = new ReleaseAction();
     private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
-    private HtmlPanel htmlPanel = new HtmlPanel("Data Set");
 
     public DataSetFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.cultureHubClient = cultureHubClient;
-        this.dataSetList = new JList(listModel);
-        this.dataSetList.setCellRenderer(new DataSetCellRenderer());
-        this.dataSetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.dataSetList.addListSelectionListener(new ListSelectionListener() {
+        this.dataSetTable = new JTable(tableModel, tableModel.getColumnModel());
+        this.dataSetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.dataSetTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
                 downloadAction.checkEnabled();
                 editAction.checkEnabled();
                 releaseAction.checkEnabled();
-                fillHtmlPanel();
             }
         });
-        this.dataSetList.addMouseListener(new MouseAdapter() {
+        this.dataSetTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1 && editAction.isEnabled()) {
-                    if (dataSetList.getSelectedIndex() != dataSetList.locationToIndex(e.getPoint())) return;
+                    if (dataSetTable.getSelectedRow() != dataSetTable.rowAtPoint(e.getPoint())) return;
                     editAction.actionPerformed(null);
                 }
             }
         });
-        listModel.setStateCheckDelay(500);
+        tableModel.setStateCheckDelay(500);
         getAction().putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -97,22 +92,17 @@ public class DataSetFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(SwingHelper.scrollV("Data Sets", dataSetList), BorderLayout.CENTER);
-        content.add(createEast(), BorderLayout.EAST);
-        fillHtmlPanel();
+        content.add(SwingHelper.scrollV("Data Sets", dataSetTable), BorderLayout.CENTER);
+        content.add(createSouth(), BorderLayout.SOUTH);
     }
 
-    private JPanel createEast() {
-        JPanel bp = new JPanel(new GridLayout(0, 1, 10, 10));
-        bp.add(button(refreshAction));
-        bp.add(button(editAction));
-        bp.add(button(downloadAction));
-        bp.add(button(releaseAction));
-        bp.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel p = new JPanel(new BorderLayout(10, 10));
-        htmlPanel.setPreferredSize(new Dimension(500, 500));
-        p.add(htmlPanel, BorderLayout.CENTER);
-        p.add(bp, BorderLayout.SOUTH);
+    private JPanel createSouth() {
+        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        p.setBorder(BorderFactory.createTitledBorder("Actions"));
+        p.add(button(refreshAction));
+        p.add(button(editAction));
+        p.add(button(downloadAction));
+        p.add(button(releaseAction));
         return p;
     }
 
@@ -124,17 +114,11 @@ public class DataSetFrame extends FrameBase {
 
     public void fireRefresh() {
         if (SwingHelper.isDevelopmentMode()) {
-            listModel.setHubEntries(null);
+            tableModel.setHubEntries(null);
         }
         else {
             refreshAction.actionPerformed(null);
         }
-    }
-
-    private void fillHtmlPanel() {
-        StringTemplate template = SwingHelper.getTemplate("data-set");
-        template.setAttribute("entry", getSelectedEntry());
-        htmlPanel.setHtml(template.toString());
     }
 
     private class RefreshAction extends AbstractAction {
@@ -147,18 +131,18 @@ public class DataSetFrame extends FrameBase {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
-            listModel.setMessage("Loading");
+            // todo: change the icon to a waiting one
             cultureHubClient.fetchDataSetList(new CultureHubClient.ListReceiveListener() {
                 @Override
                 public void listReceived(List<CultureHubClient.DataSetEntry> entries) {
-                    listModel.setHubEntries(entries);
+                    tableModel.setHubEntries(entries);
                     setEnabled(true);
                 }
 
                 @Override
                 public void failed(Exception e) {
                     sipModel.getFeedback().alert("Unable to fetch data set list", e);
-                    listModel.setHubEntries(null);
+                    tableModel.setHubEntries(null);
                     setEnabled(true);
                 }
             });
@@ -173,15 +157,15 @@ public class DataSetFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            Entry entry = getSelectedEntry();
-            this.setEnabled(entry != null && entry.getState().selectable);
+            Row row = getSelectedRow();
+            this.setEnabled(row != null && row.getState().selectable);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Entry entry = getSelectedEntry();
-            if (entry == null) return;
-            List<SchemaVersion> schemaVersions = entry.getSchemaVersions();
+            Row row = getSelectedRow();
+            if (row == null) return;
+            List<SchemaVersion> schemaVersions = row.getSchemaVersions();
             if (schemaVersions == null || schemaVersions.isEmpty()) return;
             setEnabled(false);
             String prefix;
@@ -192,7 +176,7 @@ public class DataSetFrame extends FrameBase {
                 prefix = askForPrefix(schemaVersions);
                 if (prefix == null) return;
             }
-            sipModel.setDataSetPrefix(entry.dataSet, prefix, new Swing() {
+            sipModel.setDataSetPrefix(row.dataSet, prefix, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);
@@ -223,17 +207,17 @@ public class DataSetFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            Entry entry = getSelectedEntry();
-            this.setEnabled(entry != null && entry.getState().downloadable);
+            Row row = getSelectedRow();
+            this.setEnabled(row != null && row.getState().downloadable);
         }
 
         @Override
         public void actionPerformed(final ActionEvent actionEvent) {
-            Entry entry = getSelectedEntry();
-            if (entry == null) return;
+            Row row = getSelectedRow();
+            if (row == null) return;
             setEnabled(false);
             try {
-                DataSet dataSet = sipModel.getStorage().createDataSet(entry.getSpec(), entry.getOrganization());
+                DataSet dataSet = sipModel.getStorage().createDataSet(row.getSpec(), row.getOrganization());
                 cultureHubClient.downloadDataSet(dataSet, new Swing() {
                     @Override
                     public void run() {
@@ -243,7 +227,7 @@ public class DataSetFrame extends FrameBase {
                 });
             }
             catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to create data set called " + entry.getSpec(), e);
+                sipModel.getFeedback().alert("Unable to create data set called " + row.getSpec(), e);
             }
         }
     }
@@ -256,22 +240,22 @@ public class DataSetFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            Entry entry = getSelectedEntry();
-            this.setEnabled(entry != null && entry.getState() == State.OWNED_BY_YOU);
+            Row row = getSelectedRow();
+            this.setEnabled(row != null && row.getState() == State.OWNED_BY_YOU);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Entry entry = getSelectedEntry();
-            if (entry == null) return;
+            Row row = getSelectedRow();
+            if (row == null) return;
             boolean unlock = sipModel.getFeedback().confirm(
                     "Release",
                     String.format("<html>Are you sure that you want to delete your local copy of<br>" +
                             "this data set %s, and unlock it so that someone else can access it?",
-                            entry.getSpec()
+                            row.getSpec()
                     )
             );
-            if (unlock) unlockDataSet(entry.getDataSet());
+            if (unlock) unlockDataSet(row.getDataSet());
         }
 
         private void unlockDataSet(final DataSet dataSet) {
@@ -300,21 +284,155 @@ public class DataSetFrame extends FrameBase {
                 }
             });
         }
-
     }
 
 
-    private Entry getSelectedEntry() {
-        Object selectedObject = dataSetList.getSelectedValue();
-        return selectedObject != null && selectedObject instanceof Entry ? (Entry) selectedObject : null;
+    private Row getSelectedRow() {
+        int rowIndex = dataSetTable.getSelectedRow();
+        return rowIndex < 0 ? null : tableModel.getRow(rowIndex);
     }
 
-    private class Entry implements Comparable<Entry> {
+    private class DataSetTableModel extends AbstractTableModel {
+        private DefaultTableColumnModel columnModel = new DefaultTableColumnModel();
+        private List<Row> rows = new ArrayList<Row>();
+        private Map<Integer, Integer> index;
+        private boolean needsFetch;
+
+        private DataSetTableModel() {
+            createColumnModel();
+        }
+
+        public TableColumnModel getColumnModel() {
+            return columnModel;
+        }
+
+        public void setStateCheckDelay(int delay) { // call only once
+            Timer timer = new Timer(delay, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int row = 0;
+                    for (Row entry : rows) {
+                        if (entry.hasStateChanged()) fireTableCellUpdated(row, 1);
+                        row++;
+                    }
+                }
+            });
+            timer.setRepeats(true);
+            timer.start();
+        }
+
+        public void setPattern(String pattern) {
+            String sought = pattern.toLowerCase();
+            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+            int actual = 0, virtual = 0;
+            for (Row row : rows) {
+                if (row.getSpec().contains(sought)) {
+                    map.put(virtual, actual);
+                    virtual++;
+                }
+                actual++;
+            }
+            index = map;
+            fireTableStructureChanged();
+        }
+
+        public void setHubEntries(List<CultureHubClient.DataSetEntry> list) {
+            needsFetch = list == null;
+            List<Row> freshRows = new ArrayList<Row>();
+            Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
+            if (list != null) {
+                for (CultureHubClient.DataSetEntry incoming : list) {
+                    DataSet dataSet = dataSets.get(incoming.getDirectoryName());
+                    freshRows.add(new Row(incoming, dataSet));
+                    if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
+                }
+            }
+            for (DataSet dataSet : dataSets.values()) { // remaining ones
+                freshRows.add(new Row(null, dataSet));
+            }
+            Collections.sort(freshRows);
+            rows = freshRows;
+            fireTableStructureChanged();
+        }
+
+        public Row getRow(int rowIndex) {
+            if (index != null) {
+                Integer foundRow = index.get(rowIndex);
+                if (foundRow != null) rowIndex = foundRow;
+            }
+            return rows.get(rowIndex);
+        }
+
+        @Override
+        public int getRowCount() {
+            return rows.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columnModel.getColumnCount();
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return false;
+        }
+
+        private TableColumn createSpecColumn() {
+            TableColumn tc = new TableColumn(0, 100);
+            tc.setHeaderValue("Spec");
+            tc.setWidth(400);
+            tc.setMinWidth(100);
+            return tc;
+        }
+
+        private TableColumn createStateColumn() {
+            TableColumn tc = new TableColumn(1, 100);
+            tc.setCellRenderer(new CellRenderer());
+            tc.setHeaderValue("State");
+            tc.setWidth(400);
+            tc.setMinWidth(100);
+            return tc;
+        }
+
+        private void createColumnModel() {
+            columnModel.addColumn(createSpecColumn());
+            columnModel.addColumn(createStateColumn());
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            Row row = getRow(rowIndex);
+            State state = row.getState();
+            switch (columnIndex) {
+                case 0:
+                    return row.getSpec();
+                case 1:
+                    return state;
+
+                // row.dataSetEntry.lockedBy.email
+            }
+            throw new RuntimeException();
+        }
+    }
+
+    private class CellRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            State state = tableModel.needsFetch ? State.NEEDS_FETCH : (State) value;
+            label.setIcon(state.icon);
+            label.setText(state.string);
+            return label;
+        }
+    }
+
+    private class Row implements Comparable<Row> {
         private CultureHubClient.DataSetEntry dataSetEntry;
         private DataSet dataSet;
         private State previousState;
 
-        private Entry(CultureHubClient.DataSetEntry dataSetEntry, DataSet dataSet) {
+        private Row(CultureHubClient.DataSetEntry dataSetEntry, DataSet dataSet) {
             this.dataSetEntry = dataSetEntry;
             this.dataSet = dataSet;
             this.previousState = getState();
@@ -372,8 +490,8 @@ public class DataSetFrame extends FrameBase {
         }
 
         @Override
-        public int compareTo(Entry entry) {
-            return getSpec().compareTo(entry.getSpec());
+        public int compareTo(Row row) {
+            return getSpec().compareTo(row.getSpec());
         }
 
         public boolean hasStateChanged() {
@@ -397,106 +515,15 @@ public class DataSetFrame extends FrameBase {
         }
     }
 
-    private class DataSetListModel extends AbstractListModel {
-        private String message;
-        private boolean needsFetch;
-        private List<Entry> entries = new ArrayList<Entry>();
-
-        public void setStateCheckDelay(int delay) { // call only once
-            Timer disableTimer = new Timer(delay, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    listModel.checkState();
-                }
-            });
-            disableTimer.setRepeats(true);
-            disableTimer.start();
-        }
-
-        public void setMessage(String message) {
-            int size = getSize();
-            entries.clear();
-            fireIntervalRemoved(this, 0, size);
-            this.message = message;
-            fireIntervalAdded(this, 0, getSize());
-        }
-
-        public void setHubEntries(List<CultureHubClient.DataSetEntry> list) {
-            message = null;
-            needsFetch = list == null;
-            List<Entry> freshEntries = new ArrayList<Entry>();
-            Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
-            if (list != null) {
-                for (CultureHubClient.DataSetEntry incoming : list) {
-                    DataSet dataSet = dataSets.get(incoming.getDirectoryName());
-                    freshEntries.add(new Entry(incoming, dataSet));
-                    if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
-                }
-            }
-            for (DataSet dataSet : dataSets.values()) { // remaining ones
-                freshEntries.add(new Entry(null, dataSet));
-            }
-            Collections.sort(freshEntries);
-            int size = getSize();
-            this.entries = new ArrayList<Entry>();
-            fireIntervalRemoved(this, 0, size);
-            this.entries = freshEntries;
-            fireIntervalAdded(this, 0, getSize());
-        }
-
-        public void checkState() {
-            int index = 0;
-            for (Entry entry : entries) {
-                if (entry.hasStateChanged()) fireContentsChanged(this, index, index);
-                index++;
-            }
-        }
-
-        @Override
-        public int getSize() {
-            return message != null ? 1 : entries.size();
-        }
-
-        @Override
-        public Object getElementAt(int i) {
-            return message != null ? message : entries.get(i);
-        }
-    }
-
-    private class DataSetCellRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            Icon icon;
-            String string;
-            if (value instanceof String) {
-                string = (String) value;
-                icon = null;
-            }
-            else {
-                Entry entry = (Entry) value;
-                State state = listModel.needsFetch ? State.NEEDS_FETCH : entry.getState();
-                icon = state.icon;
-                string = String.format("%s - %s", entry.getSpec(), state.string);
-                int substitution = string.indexOf("%s");
-                if (substitution > 0) {
-                    string = String.format(string, entry.dataSetEntry.lockedBy.email);
-                }
-            }
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, isSelected, cellHasFocus);
-            label.setIcon(icon);
-            return label;
-        }
-    }
-
     private enum State {
-        OWNED_BY_YOU(true, false, "you are owner", ICON_OWNED),
-        AVAILABLE(false, true, "can be downloaded", ICON_DOWNLOAD),
-        UNAVAILABLE(false, false, "owner is %s", ICON_UNAVAILABLE),
-        BUSY(false, false, "busy locally", SwingHelper.ICON_BUSY),
-        ORPHAN_TAKEN(true, false, "owner is %s but present locally (unusual), cannot be downloaded", ICON_HUH),
+        OWNED_BY_YOU(true, false, "yours", ICON_OWNED),
+        AVAILABLE(false, true, "downloadable", ICON_DOWNLOAD),
+        UNAVAILABLE(false, false, "taken", ICON_UNAVAILABLE),
+        BUSY(false, false, "busy", SwingHelper.ICON_BUSY),
+        ORPHAN_TAKEN(true, false, "taken but present locally (unusual)", ICON_HUH),
         ORPHAN_LONELY(true, false, "only present locally (unusual)", ICON_HUH),
-        ORPHAN_UPDATE(false, true, "you are owner, but not present locally (unusual), can be downloaded", ICON_HUH),
-        ORPHAN_ARCHIVE(true, true, "not locked but present locally (unusual), can archive and download", ICON_HUH),
+        ORPHAN_UPDATE(false, true, "yours but not present locally (unusual)", ICON_HUH),
+        ORPHAN_ARCHIVE(true, true, "free but present locally (unusual)", ICON_HUH),
         NEEDS_FETCH(true, false, "locally available, refresh to fetch culture hub info", ICON_OWNED);
 
         private final String string;
