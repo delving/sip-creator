@@ -219,12 +219,13 @@ public class WorkModel {
         }
 
         public String getDataSet() {
-            if (isEmpty()) return null;
+            final Work work = queue.isEmpty() ? null : queue.peek();
+            if (work == null) return null;
             switch (kind()) {
                 case NETWORK_DATA_SET:
                 case DATA_SET:
                 case DATA_SET_PREFIX:
-                    DataSet dataSet = ((Work.DataSetWork) getWork()).getDataSet();
+                    DataSet dataSet = ((Work.DataSetWork) work).getDataSet();
                     return dataSet == null ? null : dataSet.getSpec();
                 default:
                     return null;
@@ -398,7 +399,7 @@ public class WorkModel {
                 return String.format("%d seconds", seconds);
             }
             else {
-                return "wait for it..";
+                return "a few seconds";
             }
         }
     }

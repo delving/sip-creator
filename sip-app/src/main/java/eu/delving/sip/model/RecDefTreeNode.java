@@ -28,10 +28,12 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.SwingHelper;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.*;
+import javax.swing.JTree;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -199,23 +201,23 @@ public class RecDefTreeNode extends FilterNode {
             if (value instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) value;
                 if (node.recDefNode.isUnmappable()) {
-                    setIcon(SwingHelper.UNMAPPABLE_ICON);
+                    setIcon(SwingHelper.ICON_UNMAPPABLE);
                 }
                 else if (node.recDefNode.isAttr()) {
-                    setIcon(SwingHelper.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
                 else if (node.hasChildElements()) {
-                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_COMPOSITE);
                 }
                 else {
-                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_VALUE);
                 }
                 if (!node.recDefNode.getNodeMappings().isEmpty()) {
                     markNodeMappings(sel, node);
                 }
             }
             else {
-                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.ICON_COMPOSITE);
             }
             return component;
         }

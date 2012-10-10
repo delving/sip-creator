@@ -83,6 +83,9 @@ public class FieldMappingFrame extends FrameBase {
         codeArea.setTabSize(3);
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setWrapStyleWord(true);
+        mainTab.addTab("Code", createCodeOutputPanel());
+        mainTab.addTab("Dictionary", dictionaryPanel);
+        mainTab.addTab("Documentation", scrollVH(docArea));
         attachAction(UNDO_ACTION);
         attachAction(REDO_ACTION);
         new URLLauncher(sipModel, outputArea, sipModel.getFeedback());
@@ -107,14 +110,7 @@ public class FieldMappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        add(createTabs(), BorderLayout.CENTER);
-    }
-
-    private JComponent createTabs() {
-        mainTab.addTab("Code", createCodeOutputPanel());
-        mainTab.addTab("Dictionary", dictionaryPanel);
-        mainTab.addTab("Documentation", scrollVH(docArea));
-        return mainTab;
+        add(mainTab, BorderLayout.CENTER);
     }
 
     private JPanel createCodeOutputPanel() {

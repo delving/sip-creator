@@ -56,7 +56,7 @@ public class ValidateAction extends AbstractAction {
         this.sipModel = sipModel;
         this.investigate = investigate;
         setEnabled(false);
-        putValue(Action.SMALL_ICON, SwingHelper.VALIDATE_ICON);
+        putValue(Action.SMALL_ICON, SwingHelper.ICON_VALIDATE);
         KeyStroke keyStrokeV = KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(Action.ACCELERATOR_KEY, keyStrokeV);
         this.sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
