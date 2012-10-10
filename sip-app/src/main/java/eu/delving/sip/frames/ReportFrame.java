@@ -110,7 +110,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
         private UploadAction() {
             super("Upload");
-            putValue(Action.SMALL_ICON, SwingHelper.UPLOAD_ICON);
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_UPLOAD);
         }
 
         @Override

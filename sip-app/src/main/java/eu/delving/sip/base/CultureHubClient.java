@@ -769,7 +769,6 @@ public class CultureHubClient {
         public String orgId;
         public String state;
         public int recordCount;
-        public Ownership ownership;
         public LockedBy lockedBy;
         public CreatedBy createdBy;
 
@@ -794,13 +793,6 @@ public class CultureHubClient {
         }
     }
 
-    @XStreamAlias("ownership")
-    public static class Ownership {
-        public String username;
-        public String fullname;
-        public String email;
-    }
-
     @XStreamAlias("lockedBy")
     public static class LockedBy {
         public String username;
@@ -817,6 +809,10 @@ public class CultureHubClient {
 
         public String getEmail() {
             return email;
+        }
+
+        public String toString() {
+            return String.format("%s <%s>", fullname, email);
         }
     }
 

@@ -25,16 +25,15 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.SwingHelper;
 
-import javax.swing.*;
+import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
-import java.util.List;
 
 /**
  * A node of a stats tree, allowing for selection of a field for viewing its statistics.  Also the associated
@@ -203,13 +202,13 @@ public class StatsNode implements TreeNode, Comparable<StatsNode> {
             if (value instanceof StatsNode) {
                 StatsNode node = (StatsNode) value;
                 if (node.getTag().isAttribute()) {
-                    setIcon(SwingHelper.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
                 else if (node.getChildNodes().iterator().hasNext()) {
-                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_COMPOSITE);
                 }
                 else {
-                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_VALUE);
                 }
             }
             return component;

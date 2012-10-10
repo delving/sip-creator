@@ -26,9 +26,12 @@ import eu.delving.sip.model.RecDefTreeNode;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SourceTreeNode;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -52,7 +55,7 @@ public class NodeTransferHandler extends TransferHandler {
 
     @Override
     public Icon getVisualRepresentation(Transferable transferable) {
-        return SwingHelper.VALUE_ELEMENT_ICON;
+        return SwingHelper.ICON_VALUE;
     }
 
     @Override

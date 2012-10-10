@@ -30,6 +30,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.net.URL;
 
 /**
  * Gathering together a number of things that are done with the Swing library from many parts of the code.
@@ -40,30 +41,40 @@ import java.awt.Color;
 public class SwingHelper {
     private static Color NORMAL_BG = Color.WHITE;
     private static Color NORMAL_FG = Color.BLACK;
-    private static Color ERROR_BG = new Color(255,200,200);
-    public static Color UNEDITABLE_BG = new Color(255,255,200);
-    private static Color DELIMITER_BG = new Color(255,255,200);
-    public static Color MAPPED_COLOR = new Color(220,255,220);
-    public static Color HILIGHTED_COLOR = new Color(255,205,205);
-    public static Color LONG_TERM_JOB_COLOR = new Color(255,180,180);
-    public static Color NORMAL_JOB_COLOR = new Color(200,255,200);
+    private static Color ERROR_BG = new Color(255, 200, 200);
+    public static Color UNEDITABLE_BG = new Color(255, 255, 200);
+    private static Color DELIMITER_BG = new Color(255, 255, 200);
+    public static Color MAPPED_COLOR = new Color(220, 255, 220);
+    public static Color HILIGHTED_COLOR = new Color(255, 205, 205);
+    public static Color LONG_TERM_JOB_COLOR = new Color(255, 180, 180);
+    public static Color NORMAL_JOB_COLOR = new Color(200, 255, 200);
 
-    public static final Icon VALUE_ELEMENT_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/value-element-icon.png"));
-    public static final Icon COMPOSITE_ELEMENT_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/composite-element-icon.png"));
-    public static final Icon DOWNLOAD_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/download-icon.png"));
-    public static final Icon UPLOAD_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/upload-icon.png"));
-    public static final Icon ATTRIBUTE_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/attribute-icon.png"));
-    public static final Icon UNMAPPABLE_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/unmappable-element-icon.png"));
-    public static final Icon IMPORT_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/import-icon.png"));
-    public static final Icon VALIDATE_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/validate-icon.png"));
-    public static final Icon RELEASE_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/release-icon.png"));
-    public static final Icon REWIND_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/rewind-icon.png"));
-    public static final Icon PLAY_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/play-icon.png"));
-    public static final Icon DATASET_LOCKED_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-locked.png"));
-    public static final Icon DATASET_DOWNLOAD_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-download.png"));
-    public static final Icon DATASET_UNAVAILABLE_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-unavailable.png"));
-    public static final Icon DATASET_BUSY_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-busy.png"));
-    public static final Icon DATASET_HUH_ICON = new ImageIcon(SwingHelper.class.getResource("/icons/dataset-huh.png"));
+    public static final Icon ICON_VALUE = icon("value");
+    public static final Icon ICON_COMPOSITE = icon("composite");
+    public static final Icon ICON_ATTRIBUTE = icon("attribute");
+    public static final Icon ICON_UNMAPPABLE = icon("unmappable");
+    public static final Icon ICON_REWIND = icon("rewind");
+    public static final Icon ICON_PLAY = icon("play");
+    public static final Icon ICON_VALIDATE = icon("validate");
+    public static final Icon ICON_UNLOCK = icon("unlock");
+    public static final Icon ICON_SELECT_ANOTHER = icon("choose-another");
+    public static final Icon ICON_DOWNLOAD = icon("download");
+    public static final Icon ICON_UPLOAD = icon("upload");
+    public static final Icon ICON_IMPORT = icon("import");
+    public static final Icon ICON_EMPTY = icon("empty");
+    public static final Icon ICON_OWNED = icon("owned");
+    public static final Icon ICON_UNAVAILABLE = icon("unavailable");
+    public static final Icon ICON_BUSY = icon("busy");
+    public static final Icon ICON_HUH = icon("huh");
+    public static final Icon ICON_FETCH_LIST = icon("fetch-list");
+    public static final Icon ICON_EDIT = icon("edit");
+
+    private static Icon icon(String resource) {
+        String name = "/icons/"+ resource + ".png";
+        URL url = SwingHelper.class.getResource(name);
+        if (url == null) throw new RuntimeException("Cannot find " + name);
+        return new ImageIcon(url);
+    }
 
     private static final StringTemplateGroup STRING_TEMPLATE = new StringTemplateGroup("Templates");
 

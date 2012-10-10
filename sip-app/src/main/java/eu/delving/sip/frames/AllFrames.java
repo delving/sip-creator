@@ -25,13 +25,11 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import eu.delving.sip.base.CultureHubClient;
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.Work;
+import eu.delving.sip.base.*;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.WordUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,8 +52,7 @@ import static eu.delving.sip.frames.AllFrames.View.*;
  */
 
 public class AllFrames {
-    private Dimension LARGE_ICON_SIZE = new Dimension(70, 50);
-    private Dimension SMALL_ICON_SIZE = new Dimension(20, 12);
+    private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private FrameBase[] frames;
     private DataSetFrame dataSetFrame;
     private WorkFrame workFrame;
@@ -98,17 +95,7 @@ public class AllFrames {
         REPORT;
 
         public String getHtml() {
-            int us = super.toString().indexOf("_");
-            if (us < 0) {
-                return String.format("<html>%s</html>", super.toString());
-            }
-            else {
-                return String.format(
-                        "<html><center>%s<br>%s</center></html>",
-                        super.toString().substring(0, us),
-                        super.toString().substring(us + 1)
-                );
-            }
+            return WordUtils.capitalizeFully(super.toString().replaceAll("_", " "));
         }
     }
 
@@ -153,7 +140,6 @@ public class AllFrames {
         };
         try {
             File file = frameArrangementsFile();
-            createDefaultFrameArrangements(file);
             try {
                 addFrameArrangements(new FileInputStream(file));
             }
@@ -180,13 +166,17 @@ public class AllFrames {
         XStream stream = new XStream();
         stream.processAnnotations(FrameArrangements.class);
         frameArrangements = (FrameArrangements) stream.fromXML(inputStream);
-        int viewIndex = 1;
+        int viewIndex = 0;
         for (XArrangement view : frameArrangements.arrangements) {
             Arrangement arrangement = new Arrangement(view, viewIndex++);
             for (XFrame frame : view.frames) arrangement.blocks.add(new Block(frame));
             arrangements.add(arrangement);
             arrangement.source = view;
         }
+    }
+
+    public FrameBase[] getFrames() {
+        return frames;
     }
 
     public ViewSelector getViewSelector() {
@@ -247,43 +237,27 @@ public class AllFrames {
         return reportFrame.getUploadAction();
     }
 
-    public JMenu getFrameMenu() {
-        JMenu menu = new JMenu("Frames");
-        int index = 1;
-        for (FrameBase frame : frames) {
-            frame.setAccelerator(index++);
-            menu.add(frame.getAction());
-        }
-        menu.addSeparator();
-        menu.add(workFrame.getAction());
-        return menu;
-    }
-
     public JMenu getViewMenu() {
         JMenu menu = new JMenu("View");
         for (Action action : arrangements) menu.add(action);
-        menu.addSeparator();
-        menu.add(new EditAction());
         return menu;
     }
 
-    public JPanel getSidePanel() {
+    public JComponent getSidePanel() {
         JPanel arrangements = new JPanel();
         arrangements.setLayout(new BoxLayout(arrangements, BoxLayout.Y_AXIS));
-        arrangements.setBorder(BorderFactory.createTitledBorder("Arrangements"));
         for (Arrangement a : this.arrangements) {
             JButton b = new JButton(a);
             b.setHorizontalTextPosition(JButton.CENTER);
-            b.setVerticalTextPosition(JButton.CENTER);
-            b.setFont(new Font("Sans", Font.BOLD, 10));
+            b.setVerticalTextPosition(JButton.BOTTOM);
+            b.setFont(new Font("Sans", Font.PLAIN, 10));
             arrangements.add(b);
             arrangements.add(Box.createVerticalStrut(5));
         }
         arrangements.add(Box.createVerticalGlue());
         JPanel p = new JPanel(new BorderLayout());
         p.add(arrangements, BorderLayout.CENTER);
-        p.setPreferredSize(new Dimension(110, 400));
-        return p;
+        return SwingHelper.scrollV(p);
     }
 
     public static JComponent miniScrollV(String title, JComponent content) {
@@ -295,19 +269,6 @@ public class AllFrames {
         scroll.setPreferredSize(new Dimension(200, 80));
         p.add(scroll);
         return p;
-    }
-
-
-    private JButton createHotkeyButton(FrameBase frame) {
-        Action action = frame.getAction();
-        JButton button = new JButton(action);
-        KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-        if (stroke != null) {
-            String modifiers = KeyEvent.getKeyModifiersText(stroke.getModifiers());
-            String keyText = KeyEvent.getKeyText(stroke.getKeyCode());
-            button.setText(button.getText() + " " + modifiers + keyText);
-        }
-        return button;
     }
 
     private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
@@ -377,18 +338,17 @@ public class AllFrames {
     private class Arrangement extends AbstractAction implements Swing {
         List<Block> blocks = new ArrayList<Block>();
         public XArrangement source;
-        private ViewIcon small, large;
+        private ViewIcon icon;
 
         Arrangement(XArrangement source, int viewIndex) {
             super(source.view.getHtml());
+            int keyCode = (viewIndex <= 9 ? KeyEvent.VK_0 : KeyEvent.VK_A - 10) + viewIndex;
             putValue(
                     Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_0 + viewIndex, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+                    KeyStroke.getKeyStroke(keyCode, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
             );
-            small = new ViewIcon(this, SMALL_ICON_SIZE);
-            putValue(Action.SMALL_ICON, small);
-            large = new ViewIcon(this, LARGE_ICON_SIZE);
-            putValue(Action.LARGE_ICON_KEY, large);
+            icon = new ViewIcon(this, LARGE_ICON_SIZE);
+            putValue(Action.LARGE_ICON_KEY, icon);
         }
 
         @Override
@@ -416,8 +376,6 @@ public class AllFrames {
         @Override
         public void run() {
             actionPerformed(null);
-            small.refresh();
-            large.refresh();
             sipModel.exec(new Work() {
                 @Override
                 public void run() {
@@ -436,17 +394,6 @@ public class AllFrames {
                     return Job.READ_FRAME_ARRANGEMENTS;
                 }
             });
-        }
-    }
-
-    private class EditAction extends AbstractAction {
-        public EditAction() {
-            super("Edit Frame Arrangements");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            for (FrameBase frame : frames) frame.toggleEditMenu();
         }
     }
 

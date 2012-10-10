@@ -29,15 +29,15 @@ import eu.delving.sip.files.Storage;
 import eu.delving.stats.Stats;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.*;
+import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
-import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.*;
 
@@ -333,13 +333,13 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             if (value instanceof SourceTreeNode) {
                 SourceTreeNode node = (SourceTreeNode) value;
                 if (node.getTag().isAttribute()) {
-                    setIcon(SwingHelper.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
                 else if (node.getChildren().iterator().hasNext()) {
-                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_COMPOSITE);
                 }
                 else {
-                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_VALUE);
                 }
                 if (node.isRecordRoot() || node.isUniqueElement()) {
                     markDelimiters(sel, node);
