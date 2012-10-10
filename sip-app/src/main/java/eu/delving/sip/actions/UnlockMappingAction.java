@@ -41,8 +41,7 @@ public class UnlockMappingAction extends AbstractAction implements Work {
     private SipModel sipModel;
 
     public UnlockMappingAction(SipModel sipModel) {
-        super("<html><b>Unlock</b><br>" +
-                "<p>Edit Mapping</p>");
+        super("Unlock mapping for editing");
         this.sipModel = sipModel;
         setEnabled(false);
         putValue(Action.SMALL_ICON, SwingHelper.ICON_UNLOCK);

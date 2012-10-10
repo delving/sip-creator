@@ -63,7 +63,6 @@ public class InputFrame extends FrameBase {
 
     private enum Filter {
         REGEX("Regex"),
-        REGEX_CI("Regex (CI)"),
         MODULO("Modulo");
 
         private String name;
@@ -109,12 +108,16 @@ public class InputFrame extends FrameBase {
     private JPanel createRecordButtonPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Filter"));
-        JPanel bp = new JPanel(new GridLayout(1, 0));
-        bp.add(new JButton(rewind));
-        bp.add(new JButton(play));
-        p.add(bp, BorderLayout.EAST);
         p.add(filterBox, BorderLayout.WEST);
         p.add(filterField, BorderLayout.CENTER);
+        p.add(createButtonPanel(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel p = new JPanel(new GridLayout(1, 0));
+        p.add(new JButton(rewind));
+        p.add(new JButton(play));
         return p;
     }
 
@@ -313,6 +316,7 @@ public class InputFrame extends FrameBase {
 
     private class RewindAction extends AbstractAction {
         private RewindAction() {
+            super("First");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_REWIND);
         }
 
@@ -327,6 +331,7 @@ public class InputFrame extends FrameBase {
 
     private class PlayAction extends AbstractAction {
         private PlayAction() {
+            super("Next");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_PLAY);
         }
 
@@ -350,13 +355,6 @@ public class InputFrame extends FrameBase {
                     @Override
                     public boolean accept(MetadataRecord record) {
                         return record.contains(Pattern.compile(filterString));
-                    }
-                };
-            case REGEX_CI:
-                return new SipModel.ScanPredicate() {
-                    @Override
-                    public boolean accept(MetadataRecord record) {
-                        return record.contains(Pattern.compile(filterString, Pattern.CASE_INSENSITIVE));
                     }
                 };
             case MODULO:

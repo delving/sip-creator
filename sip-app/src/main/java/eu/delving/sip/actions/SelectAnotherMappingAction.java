@@ -41,13 +41,13 @@ import java.util.List;
  */
 
 public class SelectAnotherMappingAction extends AbstractAction implements Work {
-    public static final String DEFAULT_HTML = "<html><b>Select</b><br><p>Another mapping</p>";
-    public static final String SINGLE_SELECTION_HTML = "<html><b>Select</b><br><p>%s mapping</p>";
+    public static final String DEFAULT_STRING = "Select another schema";
+    public static final String SINGLE_SELECTION_HTML = "Select the %s schema";
     private SipModel sipModel;
     private List<SchemaVersion> choices = new ArrayList<SchemaVersion>();
 
     public SelectAnotherMappingAction(final SipModel sipModel) {
-        super(DEFAULT_HTML);
+        super(DEFAULT_STRING);
         this.sipModel = sipModel;
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
@@ -69,7 +69,7 @@ public class SelectAnotherMappingAction extends AbstractAction implements Work {
                                     break;
                                 default: // 0 or 2 or more
                                     setEnabled(!choices.isEmpty());
-                                    putValue(Action.NAME, DEFAULT_HTML);
+                                    putValue(Action.NAME, DEFAULT_STRING);
                                     break;
                             }
                         }

@@ -28,7 +28,7 @@ import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.Fetcher;
 import eu.delving.schema.util.FileSystemFetcher;
-import eu.delving.sip.actions.DataImportAction;
+import eu.delving.sip.actions.ImportAction;
 import eu.delving.sip.actions.SelectAnotherMappingAction;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
@@ -160,7 +160,7 @@ public class Application {
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
         });
-        importAction = new DataImportAction(desktop, sipModel);
+        importAction = new ImportAction(desktop, sipModel);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
         unlockMappingAction = new UnlockMappingAction(sipModel);
@@ -257,6 +257,8 @@ public class Application {
         b.setHorizontalAlignment(JButton.LEFT);
         p.add(b = new JButton(selectAnotherMappingAction));
         b.setHorizontalAlignment(JButton.LEFT);
+        p.add(b = new JButton(importAction));
+        b.setHorizontalAlignment(JButton.LEFT);
         return p;
     }
 
@@ -276,7 +278,6 @@ public class Application {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        bar.add(createFileMenu());
         bar.add(allFrames.getViewMenu());
         bar.add(expertMenu);
         bar.add(createHelpMenu());
@@ -302,14 +303,6 @@ public class Application {
             }
         });
         menu.add(item);
-        return menu;
-    }
-
-    private JMenu createFileMenu() {
-        JMenu menu = new JMenu("File");
-        menu.add(importAction);
-        menu.add(validateAction);
-        menu.add(uploadAction);
         return menu;
     }
 
