@@ -411,11 +411,22 @@ public class DataSetFrame extends FrameBase {
         }
 
         private TableColumn createSpecColumn() {
-            return column("Spec", 0, "how long can a spec name actually be?");
+            TableColumn tc = column("Spec", 0, "how long can a spec name actually be?");
+            tc.setCellRenderer(new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    String spec = (String) value;
+                    DataSet dataSet = sipModel.getDataSetModel().getDataSet();
+                    if (dataSet != null && dataSet.getSpec().equals(spec)) label.setFont(label.getFont().deriveFont(Font.BOLD, 18));
+                    return label;
+                }
+            });
+            return tc;
         }
 
         private TableColumn createStateColumn() {
-            TableColumn tc = column("State", 1, State.NEEDS_FETCH.string+"extra");
+            TableColumn tc = column("State", 1, State.NEEDS_FETCH.string + "extra");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
