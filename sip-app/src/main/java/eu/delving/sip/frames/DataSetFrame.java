@@ -208,7 +208,7 @@ public class DataSetFrame extends FrameBase {
 
         public void checkEnabled() {
             Row row = getSelectedRow();
-            this.setEnabled(row != null && row.getState().downloadable);
+            this.setEnabled(!tableModel.needsFetch && row != null && row.getState().downloadable);
         }
 
         @Override
@@ -241,7 +241,7 @@ public class DataSetFrame extends FrameBase {
 
         public void checkEnabled() {
             Row row = getSelectedRow();
-            this.setEnabled(row != null && row.getState() == State.OWNED_BY_YOU);
+            this.setEnabled(!tableModel.needsFetch && row != null && row.getState() == State.OWNED_BY_YOU);
         }
 
         @Override
@@ -388,8 +388,16 @@ public class DataSetFrame extends FrameBase {
 
         private TableColumn createStateColumn() {
             TableColumn tc = new TableColumn(1, 100);
-            tc.setCellRenderer(new CellRenderer());
+            tc.setCellRenderer(new StateCellRenderer());
             tc.setHeaderValue("State");
+            tc.setWidth(400);
+            tc.setMinWidth(100);
+            return tc;
+        }
+
+        private TableColumn createOwnedColumn() {
+            TableColumn tc = new TableColumn(2, 100);
+            tc.setHeaderValue("Owner");
             tc.setWidth(400);
             tc.setMinWidth(100);
             return tc;
@@ -398,6 +406,7 @@ public class DataSetFrame extends FrameBase {
         private void createColumnModel() {
             columnModel.addColumn(createSpecColumn());
             columnModel.addColumn(createStateColumn());
+            columnModel.addColumn(createOwnedColumn());
         }
 
         @Override
@@ -409,14 +418,15 @@ public class DataSetFrame extends FrameBase {
                     return row.getSpec();
                 case 1:
                     return state;
-
-                // row.dataSetEntry.lockedBy.email
+                case 2:
+                    CultureHubClient.DataSetEntry entry = row.getDataSetEntry();
+                    return entry == null || entry.lockedBy == null ? "" : entry.lockedBy;
             }
             throw new RuntimeException();
         }
     }
 
-    private class CellRenderer extends DefaultTableCellRenderer {
+    private class StateCellRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);

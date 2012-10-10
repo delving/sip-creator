@@ -818,6 +818,10 @@ public class CultureHubClient {
         public String getEmail() {
             return email;
         }
+
+        public String toString() {
+            return String.format("%s <%s>", fullname, email);
+        }
     }
 
     @XStreamAlias("createdBy")
