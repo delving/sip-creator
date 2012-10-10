@@ -62,6 +62,9 @@ public class DataSetFrame extends FrameBase {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.cultureHubClient = cultureHubClient;
         this.dataSetTable = new JTable(tableModel, tableModel.getColumnModel());
+        this.dataSetTable.setFont(this.dataSetTable.getFont().deriveFont(Font.PLAIN, 14));
+        this.dataSetTable.setRowHeight(25);
+        this.dataSetTable.setIntercellSpacing(new Dimension(12, 4));
         this.dataSetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.dataSetTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -408,14 +411,11 @@ public class DataSetFrame extends FrameBase {
         }
 
         private TableColumn createSpecColumn() {
-            TableColumn tc = new TableColumn(0, 400);
-            tc.setHeaderValue("Spec");
-            tc.setMinWidth(100);
-            return tc;
+            return column("Spec", 0, "how long can a spec name actually be?");
         }
 
         private TableColumn createStateColumn() {
-            TableColumn tc = new TableColumn(1, 300);
+            TableColumn tc = column("State", 1, State.NEEDS_FETCH.string+"extra");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -432,8 +432,7 @@ public class DataSetFrame extends FrameBase {
         }
 
         private TableColumn createRecordCountColumn() {
-            TableColumn tc = new TableColumn(2, 150);
-            tc.setHeaderValue("Records");
+            TableColumn tc = column("Record Count", 2, "   manyrecords   ");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -442,16 +441,21 @@ public class DataSetFrame extends FrameBase {
                     return label;
                 }
             });
-            tc.setMinWidth(100);
-            tc.setMaxWidth(200);
             return tc;
         }
 
         private TableColumn createOwnedColumn() {
-            TableColumn tc = new TableColumn(3, 200);
-            tc.setHeaderValue("Owner");
-            tc.sizeWidthToFit();
-            return tc;
+            return column("Owner", 3, "Somebody's long name <andtheirbig@email.address>");
+        }
+
+        private TableColumn column(String title, int index, String prototype) {
+            JLabel label = new JLabel(prototype);
+            int width = label.getPreferredSize().width;
+            TableColumn tableColumn = new TableColumn(index, width);
+            tableColumn.setHeaderValue(title);
+            tableColumn.setMaxWidth(width * 2);
+            tableColumn.setMinWidth(width * 3 / 4);
+            return tableColumn;
         }
 
         private void createColumnModel() {
@@ -573,11 +577,11 @@ public class DataSetFrame extends FrameBase {
         AVAILABLE(false, true, "downloadable", ICON_DOWNLOAD),
         UNAVAILABLE(false, false, "taken", ICON_UNAVAILABLE),
         BUSY(false, false, "busy", SwingHelper.ICON_BUSY),
-        ORPHAN_TAKEN(true, false, "taken but present locally (unusual)", ICON_HUH),
-        ORPHAN_LONELY(true, false, "only present locally (unusual)", ICON_HUH),
-        ORPHAN_UPDATE(false, true, "yours but not present locally (unusual)", ICON_HUH),
-        ORPHAN_ARCHIVE(true, true, "free but present locally (unusual)", ICON_HUH),
-        NEEDS_FETCH(true, false, "locally available, refresh to fetch culture hub info", ICON_OWNED);
+        ORPHAN_TAKEN(true, false, "taken but present locally", ICON_HUH),
+        ORPHAN_LONELY(true, false, "only present locally", ICON_HUH),
+        ORPHAN_UPDATE(false, true, "yours but absent locally)", ICON_HUH),
+        ORPHAN_ARCHIVE(true, true, "free but present locally", ICON_HUH),
+        NEEDS_FETCH(true, false, "refresh to fetch culture hub info", ICON_OWNED);
 
         private final String string;
         private final Icon icon;
