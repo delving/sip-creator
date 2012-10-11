@@ -99,7 +99,7 @@ public class StorageImpl implements Storage {
         return new File(cacheDir, fileName);
     }
 
-   @Override
+    @Override
     public Map<String, DataSet> getDataSets() {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
@@ -171,7 +171,7 @@ public class StorageImpl implements Storage {
                 if (!prefix.equals(walk.getPrefix())) continue;
                 return recDef(walk);
             }
-            throw new StorageException("No record definition for prefix "+prefix);
+            throw new StorageException("No record definition for prefix " + prefix);
         }
 
         @Override
@@ -180,7 +180,7 @@ public class StorageImpl implements Storage {
                 if (!prefix.equals(walk.getPrefix())) continue;
                 return validator(walk);
             }
-            throw new StorageException("No validation schema for prefix "+prefix);
+            throw new StorageException("No validation schema for prefix " + prefix);
         }
 
         @Override
@@ -405,7 +405,7 @@ public class StorageImpl implements Storage {
                     for (SchemaVersion schemaVersion : getSchemaVersions()) {
                         if (prefix.equals(schemaVersion.getPrefix())) return RecMapping.create(recDefModel.createRecDefTree(schemaVersion));
                     }
-                    throw new StorageException("Unable to find version for "+prefix);
+                    throw new StorageException("Unable to find version for " + prefix);
                 }
                 catch (MetadataException e) {
                     throw new StorageException("Unable to load record definition", e);
@@ -541,9 +541,15 @@ public class StorageImpl implements Storage {
                     else {
                         throw new IllegalArgumentException("Input file should be .xml, .xml.gz or .xml.zip, but it is " + inputFile.getName());
                     }
+                    boolean headerFound = false;
                     byte[] buffer = new byte[BLOCK_SIZE];
                     int bytesRead;
                     while (-1 != (bytesRead = inputStream.read(buffer))) {
+                        if (!headerFound) {
+                            String chunk = new String(buffer, 0, XML_HEADER.length(), "UTF-8");
+                            if (!XML_HEADER.equals(chunk)) throw new StorageException(String.format("Not an XML File. Must begin with '%s...'.", XML_HEADER));
+                            headerFound = true;
+                        }
                         outputStream.write(buffer, 0, bytesRead);
                         if (progressListener != null) {
                             if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
@@ -555,6 +561,9 @@ public class StorageImpl implements Storage {
                     }
                 }
                 delete(statsFile(here, false, null));
+            }
+            catch (StorageException e) {
+                throw e;
             }
             catch (Exception e) {
                 throw new StorageException("Unable to capture XML input into " + imported.getAbsolutePath(), e);
