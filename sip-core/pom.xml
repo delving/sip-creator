@@ -31,7 +31,7 @@
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
-    <version>1.0.14-SNAPSHOT</version>
+    <version>1.0.15-SNAPSHOT</version>
     <description>
         A Minimal set of classes shared between client and server, avoiding dependency on core module.
     </description>
