@@ -147,10 +147,6 @@
             <groupId>org.osgeo</groupId>
             <artifactId>proj4j</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.osgeo</groupId>-->
-            <!--<artifactId>proj4j-support</artifactId>-->
-        <!--</dependency>-->
     </dependencies>
 
 </project>
