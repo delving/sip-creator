@@ -48,6 +48,7 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static eu.delving.metadata.StringUtil.*;
 import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
 import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
 import static eu.delving.sip.files.Storage.FileType.*;
@@ -99,7 +100,7 @@ public class StorageImpl implements Storage {
         return new File(cacheDir, fileName);
     }
 
-   @Override
+    @Override
     public Map<String, DataSet> getDataSets() {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
@@ -171,7 +172,7 @@ public class StorageImpl implements Storage {
                 if (!prefix.equals(walk.getPrefix())) continue;
                 return recDef(walk);
             }
-            throw new StorageException("No record definition for prefix "+prefix);
+            throw new StorageException("No record definition for prefix " + prefix);
         }
 
         @Override
@@ -180,7 +181,7 @@ public class StorageImpl implements Storage {
                 if (!prefix.equals(walk.getPrefix())) continue;
                 return validator(walk);
             }
-            throw new StorageException("No validation schema for prefix "+prefix);
+            throw new StorageException("No validation schema for prefix " + prefix);
         }
 
         @Override
@@ -403,9 +404,10 @@ public class StorageImpl implements Storage {
             else {
                 try {
                     for (SchemaVersion schemaVersion : getSchemaVersions()) {
-                        if (prefix.equals(schemaVersion.getPrefix())) return RecMapping.create(recDefModel.createRecDefTree(schemaVersion));
+                        if (prefix.equals(schemaVersion.getPrefix()))
+                            return RecMapping.create(recDefModel.createRecDefTree(schemaVersion));
                     }
-                    throw new StorageException("Unable to find version for "+prefix);
+                    throw new StorageException("Unable to find version for " + prefix);
                 }
                 catch (MetadataException e) {
                     throw new StorageException("Unable to load record definition", e);
@@ -503,7 +505,47 @@ public class StorageImpl implements Storage {
             try {
                 outputStream = new GZIPOutputStream(new FileOutputStream(imported));
                 CountingInputStream countingInput;
-                if (inputFile.getName().endsWith(".xml.zip")) {
+                String name = inputFile.getName();
+                if (name.endsWith(".csv")) {
+                    inputStream = new FileInputStream(inputFile);
+                    countingInput = new CountingInputStream(inputStream);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(countingInput, "UTF-8"));
+                    Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
+                    writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+                    writer.write("<csv-entries>\n");
+                    String line;
+                    List<String> titles = null;
+                    int lineNumber = 0;
+                    while ((line = reader.readLine()) != null) {
+                        if (lineNumber == 0) {
+                            titles = csvLineParse(line);
+                            for (int walk = 0; walk < titles.size(); walk++) {
+                                titles.set(walk, csvTitleToTag(titles.get(walk), walk));
+                            }
+                        }
+                        else {
+                            List<String> values = csvLineParse(line);
+                            if (values.size() != titles.size()) {
+                                throw new StorageException(String.format(
+                                        "Expected %d fields in CSV file on line %d",
+                                        titles.size(), lineNumber
+                                ));
+                            }
+                            writer.write(String.format("<csv-entry line=\"%d\">\n", lineNumber));
+                            for (int walk = 0; walk < titles.size(); walk++) {
+                                writer.write(String.format(
+                                        "   <%s>%s</%s>\n",
+                                        titles.get(walk), csvEscapeXML(values.get(walk)), titles.get(walk))
+                                );
+                            }
+                            writer.write("</csv-entry>\n");
+                        }
+                        lineNumber++;
+                    }
+                    writer.write("</csv-entries>\n");
+                    writer.close();
+                }
+                else if (name.endsWith(".xml.zip")) {
                     inputStream = new FileInputStream(inputFile);
                     countingInput = new CountingInputStream(inputStream);
                     ZipEntryXmlReader reader = new ZipEntryXmlReader(countingInput);
@@ -528,18 +570,18 @@ public class StorageImpl implements Storage {
                     writer.close();
                 }
                 else {
-                    if (inputFile.getName().endsWith(".xml")) {
+                    if (name.endsWith(".xml")) {
                         inputStream = new FileInputStream(inputFile);
                         countingInput = new CountingInputStream(inputStream);
                         inputStream = countingInput;
                     }
-                    else if (inputFile.getName().endsWith(".xml.gz")) {
+                    else if (name.endsWith(".xml.gz")) {
                         inputStream = new FileInputStream(inputFile);
                         countingInput = new CountingInputStream(inputStream);
                         inputStream = new GZIPInputStream(countingInput);
                     }
                     else {
-                        throw new IllegalArgumentException("Input file should be .xml, .xml.gz or .xml.zip, but it is " + inputFile.getName());
+                        throw new IllegalArgumentException("Input file should be .xml, .xml.gz or .xml.zip, but it is " + name);
                     }
                     byte[] buffer = new byte[BLOCK_SIZE];
                     int bytesRead;
@@ -556,8 +598,11 @@ public class StorageImpl implements Storage {
                 }
                 delete(statsFile(here, false, null));
             }
+            catch (StorageException e) {
+                throw e;
+            }
             catch (Exception e) {
-                throw new StorageException("Unable to capture XML input into " + imported.getAbsolutePath(), e);
+                throw new StorageException("Unable to capture input from " + inputFile.getAbsolutePath(), e);
             }
             finally {
                 IOUtils.closeQuietly(inputStream);
