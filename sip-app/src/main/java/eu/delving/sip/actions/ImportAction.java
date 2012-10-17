@@ -113,16 +113,17 @@ public class ImportAction extends AbstractAction {
         chooser.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return file.isFile() &&
-                        (file.getName().endsWith(".xml")
+                return file.isFile() && (
+                        file.getName().endsWith(".xml")
                                 || file.getName().endsWith(".xml.gz")
-                                || file.getName().endsWith(".xml.zip"
-                        ));
+                                || file.getName().endsWith(".xml.zip")
+                                || file.getName().endsWith(".csv")
+                );
             }
 
             @Override
             public String getDescription() {
-                return "Files ending with .xml, .xml.gz, or .xml.zip";
+                return "Files ending with .xml, .xml.gz, .xml.zip, or .csv";
             }
         });
         chooser.setMultiSelectionEnabled(false);
@@ -156,7 +157,7 @@ public class ImportAction extends AbstractAction {
 
     private class ChooseFileAction extends AbstractAction {
         private ChooseFileAction() {
-            super("<html><center><br><h2>Read</h2>Import from XML dump file<br>from your computer's file system<br><br>");
+            super("<html><center><br><h2>Read</h2>Import from XML/CSV file<br>from your computer's file system<br><br>");
         }
 
         @Override
