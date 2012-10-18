@@ -38,6 +38,71 @@ public class StringUtil {
 
     private static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
 
+    public static String csvEscapeXML(String value) {
+        StringBuilder tag = new StringBuilder();
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '&':
+                    tag.append("&amp;");
+                    break;
+                case '<':
+                    tag.append("&lt;");
+                    break;
+                default:
+                    tag.append(c);
+            }
+        }
+        return tag.toString();
+    }
+
+    public static String csvTitleToTag(String title, int index) {
+        StringBuilder tag = new StringBuilder();
+        for (char c : title.toCharArray()) {
+            if (Character.isLetterOrDigit(c)) tag.append(Character.toLowerCase(c));
+        }
+        String tagString = tag.toString();
+        return tagString.isEmpty() ? String.format("column%d", index) : tagString;
+    }
+
+    public static List<String> csvLineParse(String line) {
+        List<String> strings = new ArrayList<String>();
+        boolean inQuotes = false;
+        StringBuilder field = new StringBuilder();
+        for (int walk = 0; walk < line.length(); walk++) {
+            char ch = line.charAt(walk);
+            switch (ch) {
+                case ',':
+                    if (!inQuotes) {
+                        strings.add(field.toString());
+                        field.setLength(0);
+                    }
+                    break;
+                case '"':
+                    if (inQuotes) {
+                        if (walk + 1 < line.length() && line.charAt(walk + 1) == '"') { // two quotes escapes one
+                            field.append('"');
+                            walk++; // skip the next char, it's a quote
+                        }
+                        else {
+                            inQuotes = false;
+                        }
+                    }
+                    else {
+                        inQuotes = true;
+                    }
+                    break;
+                case '\t':
+                case ' ':
+                    if (inQuotes) field.append(ch);
+                    break;
+                default:
+                    field.append(ch);
+            }
+        }
+        strings.add(field.toString());
+        return strings;
+    }
+
     public static void toDictionaryCode(NodeMapping nodeMapping, CodeOut codeOut) {
         if (!nodeMapping.hasDictionary()) return;
         OptBox optBox = nodeMapping.recDefNode.getDictionaryOptBox();
@@ -53,7 +118,8 @@ public class StringUtil {
             ));
         }
         codeOut._line("]");
-        for (OptRole field : OptRole.getFields()) toLookupClosure(codeOut, optBox.getDictionaryName(), field.getFieldName());
+        for (OptRole field : OptRole.getFields())
+            toLookupClosure(codeOut, optBox.getDictionaryName(), field.getFieldName());
     }
 
     private static void toLookupClosure(CodeOut codeOut, String name, String field) {
@@ -114,7 +180,8 @@ public class StringUtil {
         try {
             int length = document.getLength();
             return document.getText(0, length);
-        } catch (BadLocationException e) {
+        }
+        catch (BadLocationException e) {
             throw new RuntimeException(e);
         }
     }
@@ -210,7 +277,8 @@ public class StringUtil {
             int pos = UNICODE.indexOf(c);
             if (pos > -1) {
                 sb.append(PLAIN_ASCII.charAt(pos));
-            } else if (DELETED.indexOf(c) < 0) {
+            }
+            else if (DELETED.indexOf(c) < 0) {
                 sb.append(c);
             }
         }
@@ -225,10 +293,14 @@ public class StringUtil {
 
     public static int braceCount(String line) {
         int count = 0;
-        for (int walk=0; walk<line.length(); walk++) {
-            switch(line.charAt(walk)) {
-                case '{': count++; break;
-                case '}': count--; break;
+        for (int walk = 0; walk < line.length(); walk++) {
+            switch (line.charAt(walk)) {
+                case '{':
+                    count++;
+                    break;
+                case '}':
+                    count--;
+                    break;
             }
         }
         return count;
