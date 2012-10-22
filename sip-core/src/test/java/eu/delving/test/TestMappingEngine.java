@@ -78,7 +78,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("lido"));
 //        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute(input("lido"));
+        MappingResult result = mappingEngine.execute("validateTreeNode", input("lido"));
 //        System.out.println(result);
         Source source = new DOMSource(result.root());
         validator(new SchemaVersion("lido", "1.0.0")).validate(source);
@@ -92,7 +92,7 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/"
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("ese"));
-        MappingResult result = mappingEngine.execute(input("ese"));
+        MappingResult result = mappingEngine.execute("validateESENode", input("ese"));
         System.out.println(result.toXml());
         System.out.println(result.toXmlAugmented());
         Source source = new DOMSource(result.root());
@@ -109,7 +109,7 @@ public class TestMappingEngine {
                 "abm", "http://abmu.org/abm"
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("abm"));
-        MappingResult result = mappingEngine.execute(input("abm"));
+        MappingResult result = mappingEngine.execute("validateABMNode", input("abm"));
         System.out.println(result.toXml());
         Source source = new DOMSource(result.root());
         Validator validator = validator(new SchemaVersion("abm", "1.0.5"));
@@ -128,7 +128,7 @@ public class TestMappingEngine {
                 "icn", "http://www.icn.nl/schemas/icn/"
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces);
-        MappingResult result = mappingEngine.execute(input("icn"));
+        MappingResult result = mappingEngine.execute("rawNode", input("icn"));
         System.out.println(result.toXml());
     }
 
@@ -141,7 +141,7 @@ public class TestMappingEngine {
                 "tib", "http://thuisinbrabant.nl"
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namspaces, new MockRecDefModel(), mapping("tib"));
-        MappingResult result = mappingEngine.execute(input("tib"));
+        MappingResult result = mappingEngine.execute("validateTIBNode", input("tib"));
         String augmented = result.toXmlAugmented();
         Matcher matcher = Pattern.compile("<delving:thumbnail>").matcher(augmented);
         Assert.assertTrue("first one not found", matcher.find());
@@ -159,7 +159,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
 //        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute(input("aff"));
+        MappingResult result = mappingEngine.execute("tryAff", input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
     }
 
@@ -170,7 +170,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
 //        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute(input("aff"));
+        MappingResult result = mappingEngine.execute("indexDocumentFromAFF", input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
         Map<String, List<String>> allFields = result.fields();
 //        System.out.println(allFields);

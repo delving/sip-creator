@@ -85,9 +85,9 @@
     <node-mapping inputPath="/facts/type" outputPath="/europeana:record/europeana:type"/>
     <node-mapping inputPath="/facts/rights" outputPath="/europeana:record/europeana:rights"/>
     <node-mapping inputPath="/facts/dataProvider" outputPath="/europeana:record/europeana:dataProvider"/>
-    <node-mapping inputPath="/input/header/identifier" outputPath="/europeana:record/europeana:isShownAt">
+    <node-mapping inputPath="/input/@id" outputPath="/europeana:record/europeana:isShownAt">
       <groovy-code>
-        <string>urlFromId(_identifier)</string>
+        <string>urlFromId(_id)</string>
       </groovy-code>
     </node-mapping>
   </node-mappings>
