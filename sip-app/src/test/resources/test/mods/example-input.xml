@@ -1,82 +1,21 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<delving-sip-source xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
-<input id="oai-jhm-50000101">
-<header>
-<identifier>oai:jhm:50000101</identifier>
-<datestamp>11/10/2010</datestamp>
-<setSpec>jhmbas:()</setSpec>
-</header>
-<metadata>
-<oai_dc:dc>
-<dc:title>chanoekia</dc:title>
-<dc:creator>anoniem</dc:creator>
-<dc:subject>ChanoekaChanoeka begint op 25 Kislew en duurt acht dagen.</dc:subject>
-<dc:publisher>Joods Historisch Museum</dc:publisher>
-<dc:date>1700=1800</dc:date>
-<dc:identifier>00203</dc:identifier>
-<dc:coverage>Nederland</dc:coverage>
-<image>108N013</image>
-<image>020B021</image>
-<image/>
-<image>501N015</image>
-</oai_dc:dc>
-</metadata>
-</input>
-<input id="oai-jhm-50011169">
-<header>
-<identifier>oai:jhm:50011169</identifier>
-<datestamp>11/10/2010</datestamp>
-<setSpec>jhmbas:()</setSpec>
-</header>
-<metadata>
-<oai_dc:dc>
-<dc:title>glas-in-loodraam</dc:title>
-<dc:creator>Schouten, Firma</dc:creator>
-<dc:subject>Grote Synagoge (Amsterdam)Grote Synagoge, bouwjaar: 1671</dc:subject>
-<dc:subject>synagogegebouw</dc:subject>
-<dc:publisher>Joods Historisch Museum</dc:publisher>
-<dc:date>1911=1913</dc:date>
-<dc:identifier>08200</dc:identifier>
-<dc:coverage>Delft &amp; Nederland</dc:coverage>
-</oai_dc:dc>
-</metadata>
-</input>
-<input id="oai-jhm-50011172">
-<header>
-<identifier>oai:jhm:50011172</identifier>
-<datestamp>11/10/2010</datestamp>
-<setSpec>jhmbas:()</setSpec>
-</header>
-<metadata>
-<oai_dc:dc>
-<dc:title>glas-in-loodraam</dc:title>
-<dc:creator>Schouten, Firma</dc:creator>
-<dc:subject>Grote Synagoge (Amsterdam)Grote Synagoge, bouwjaar: 1671</dc:subject>
-<dc:subject>synagogegebouw</dc:subject>
-<dc:publisher>Joods Historisch Museum</dc:publisher>
-<dc:date>1911=1913</dc:date>
-<dc:identifier>08203</dc:identifier>
-<dc:coverage>Delft &amp; Nederland</dc:coverage>
-</oai_dc:dc>
-</metadata>
-</input>
-<input id="oai-jhm-50011173">
-<header>
-<identifier>oai:jhm:50011173</identifier>
-<datestamp>11/10/2010</datestamp>
-<setSpec>jhmbas:()</setSpec>
-</header>
-<metadata>
-<oai_dc:dc>
-<dc:title>glas-in-loodraam</dc:title>
-<dc:creator>Schouten, Firma</dc:creator>
-<dc:subject>Grote Synagoge (Amsterdam)Grote Synagoge, bouwjaar: 1671</dc:subject>
-<dc:subject>synagogegebouw</dc:subject>
-<dc:publisher>Joods Historisch Museum</dc:publisher>
-<dc:date>1911=1913</dc:date>
-<dc:identifier>08204</dc:identifier>
-<dc:coverage>Delft &amp; Nederland</dc:coverage>
-</oai_dc:dc>
-</metadata>
-</input>
-</delving-sip-source>
+<example-dublin-core xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <copied>
+        <!--snagged from http://www.loc.gov/standards/mods/dcsimple-mods.html-->
+        <dc:title>Florida Environments Online</dc:title>
+        <dc:format>text</dc:format>
+        <dc:subject>Environmental sciences</dc:subject>
+        <dc:subject>Geology</dc:subject>
+        <dc:subject>Agriculture</dc:subject>
+        <dc:type>Collection</dc:type>
+        <dc:type>Text</dc:type>
+        <dc:description>Florida Environments Online contains both digital full text materials and research bibliographies about the ecology and environment of Florida. Digitized materials include more than 200 seminal texts on species and ecosystems selected by scientific experts throughout the state of Florida and digitized specifically for the Linking Florida's Natural Heritage project. They also include the publications of the Florida Geological Society, and agricultural documents created by the Agricultural Experiment Station/Extension Service (IFAS) and the Florida Department of Agriculture and Consumer Affairs, as well as engineering documents created by the UF Engineering and Industrial Experiment Station.</dc:description>
+        <dc:contributor>Florida Geological Society</dc:contributor>
+        <dc:contributor>Florida Department of Agriculture and Consumer Affairs</dc:contributor>
+        <dc:contributor>Agricultural Experiment Station/Extension Service (IFAS)</dc:contributor>
+        <dc:contributor>University of Florida Engineering and Industrial Experiment Station</dc:contributor>
+        <dc:language>en</dc:language>
+        <dc:identifier>http://palmm.fcla.edu/feol/</dc:identifier>
+        <dc:language>en</dc:language>
+    </copied>
+</example-dublin-core>

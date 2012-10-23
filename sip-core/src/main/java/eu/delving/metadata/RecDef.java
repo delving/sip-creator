@@ -471,7 +471,9 @@ public class RecDef {
 
         public Elem copy() {
             try {
-                return (Elem) this.clone();
+                Elem clone = (Elem) this.clone();
+                clone.attrList = new ArrayList<Attr>();
+                return clone;
             }
             catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
