@@ -39,6 +39,7 @@ public interface MappingEngine {
      * Take the XML record and execute the mapping, with a result that has various ways of accessing
      * the mapped record data.
      *
+     * @param id the record id
      * @param recordXML what gets parsed and mapped
      * @return a result with
      * @throws XMLStreamException
@@ -47,6 +48,6 @@ public interface MappingEngine {
      * @throws SAXException
      */
 
-    MappingResult execute(String recordXML) throws XMLStreamException, MappingException, IOException, SAXException;
+    MappingResult execute(String id, String recordXML) throws XMLStreamException, MappingException, IOException, SAXException;
 
 }

@@ -583,9 +583,15 @@ public class StorageImpl implements Storage {
                     else {
                         throw new IllegalArgumentException("Input file should be .xml, .xml.gz or .xml.zip, but it is " + name);
                     }
+                    boolean headerFound = false;
                     byte[] buffer = new byte[BLOCK_SIZE];
                     int bytesRead;
                     while (-1 != (bytesRead = inputStream.read(buffer))) {
+                        if (!headerFound) {
+                            String chunk = new String(buffer, 0, XML_HEADER.length(), "UTF-8");
+                            if (!XML_HEADER.equals(chunk)) throw new StorageException(String.format("Not an XML File. Must begin with '%s...'.", XML_HEADER));
+                            headerFound = true;
+                        }
                         outputStream.write(buffer, 0, bytesRead);
                         if (progressListener != null) {
                             if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
