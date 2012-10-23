@@ -23,6 +23,7 @@ package eu.delving.metadata;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
+import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.schema.SchemaVersion;
 
@@ -119,6 +120,9 @@ public class RecDef {
 
     public List<Attr> attrs;
 
+    @XStreamAlias("attr-groups")
+    public List<AttrGroup> attrGroups;
+
     public List<Elem> elems;
 
     public Elem root;
@@ -146,19 +150,23 @@ public class RecDef {
         return ns;
     }
 
-    public Attr attr(Tag tag) {
-        for (Attr def : attrs) {
-            def.tag = def.tag.defaultPrefix(prefix);
-            if (def.tag.equals(tag)) return def;
+    public Attr attr(Tag tag, String where) {
+        for (Attr attr : attrs) {
+            attr.tag = attr.tag.defaultPrefix(prefix);
+            if (attr.tag.equals(tag)) return attr;
         }
-        throw new RuntimeException(String.format("No attr [%s]", tag));
+        throw new RuntimeException(String.format("No attr [%s] at %s", tag, where));
+    }
+
+    public AttrGroup attrGroup(String name, String where) {
+        for (AttrGroup attrGroup : attrGroups) {
+            if (name.equals(attrGroup.name)) return attrGroup;
+        }
+        throw new RuntimeException(String.format("No attr group [%s] at %s", name, where));
     }
 
     public Elem elem(Tag tag) {
-        for (Elem def : elems) {
-            def.tag = def.tag.defaultPrefix(prefix);
-            if (def.tag.equals(tag)) return def;
-        }
+        for (Elem elem : elems) if (elem.tag.equals(tag)) return elem.copy();
         throw new RuntimeException(String.format("No elem [%s]", tag));
     }
 
@@ -178,6 +186,9 @@ public class RecDef {
 
     private void resolve() {
         if (prefix == null || version == null) throw new RuntimeException("Prefix and/or version missing");
+        if (attrs != null) for (Attr attr: attrs) attr.tag = attr.tag.defaultPrefix(prefix);
+        if (attrGroups != null) for (AttrGroup attrGroup : attrGroups) attrGroup.resolve(this);
+        if (elems != null) for (Elem elem : elems) elem.tag = elem.tag.defaultPrefix(prefix);
         root.resolve(Path.create(), this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
@@ -193,12 +204,6 @@ public class RecDef {
     private void collectPaths(Attr attr, Path path, List<Path> paths) {
         path = path.child(attr.tag);
         paths.add(path);
-    }
-
-    private Attr findAttr(Path path) {
-        Attr found = root.findAttr(path, 0);
-        if (found == null) throw new RuntimeException("No attribute found for path " + path);
-        return found;
     }
 
     Elem findElem(Path path) {
@@ -245,30 +250,49 @@ public class RecDef {
         @XStreamImplicit
         public List<String> lines;
 
+        public List<DocParagraph> paras;
+
         public void resolve(RecDef recDef) {
             if (recDef.prefix == null) throw new RuntimeException("No prefix found");
-            Elem elem;
-            Attr attr;
             if (path != null) {
-                if (lines == null) throw new RuntimeException("Lines is null for " + path);
                 path = path.withDefaultPrefix(recDef.prefix);
-                elem = recDef.root.findElem(path, 0);
-                attr = recDef.root.findAttr(path, 0);
+                Elem elem = recDef.root.findElem(path, 0);
+                Attr attr = recDef.root.findAttr(path, 0);
                 if (elem == null && attr == null) throw new RuntimeException("Cannot find path " + path);
+                if (elem != null) elem.doc = this;
+                if (attr != null) attr.doc = this;
             }
             else if (tag != null) {
-                if (lines == null) throw new RuntimeException("Lines is null for " + tag);
                 tag = tag.defaultPrefix(recDef.prefix);
-                elem = recDef.root.findElem(tag);
-                attr = recDef.root.findAttr(tag);
-                if (elem == null && attr == null) throw new RuntimeException("Cannot find tag " + tag);
+                resolveTag(recDef.root);
             }
             else {
-                throw new RuntimeException("Neither path nor tag available: " + lines);
+                throw new RuntimeException("Neither path nor tag available!");
             }
-            if (elem != null) elem.doc = this;
-            if (attr != null) attr.doc = this;
         }
+
+        private void resolveTag(Elem elem) {
+            if (this.tag.isAttribute()) {
+                if (elem.attrList != null) for (Attr attr : elem.attrList) {
+                    if (attr.tag.equals(this.tag)) attr.doc = this;
+                }
+            }
+            else {
+                if (elem.tag.equals(this.tag)) elem.doc = this;
+            }
+            if (elem.elemList != null) for (Elem subElem : elem.elemList) {
+                resolveTag(subElem);
+            }
+        }
+    }
+
+    @XStreamAlias("para")
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"content"})
+    public static class DocParagraph {
+        @XStreamAsAttribute
+        public String name;
+
+        public String content;
     }
 
     @XStreamAlias("namespace")
@@ -279,15 +303,6 @@ public class RecDef {
 
         @XStreamAsAttribute
         public String uri;
-    }
-
-    @XStreamAlias("role")
-    public static class Role {
-        @XStreamAsAttribute
-        public String name;
-
-        @XStreamAsAttribute
-        public String i18n;
     }
 
     @XStreamAlias("attr")
@@ -315,11 +330,34 @@ public class RecDef {
         }
     }
 
+    @XStreamAlias("attr-group")
+    public static class AttrGroup {
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamImplicit
+        public List<String> tags;
+
+        @XStreamOmitField
+        public List<Attr> attrs = new ArrayList<Attr>();
+
+        public void resolve(RecDef recDef) {
+            for (String tagString : tags) {
+                Tag tag = Tag.attribute(tagString).defaultPrefix(recDef.prefix);
+                attrs.add(recDef.attr(tag, "attr-group " + name));
+            }
+        }
+    }
+
     @XStreamAlias("elem")
-    public static class Elem {
+    public static class Elem implements Cloneable {
 
         @XStreamAsAttribute
         public Tag tag;
+
+        @XStreamAsAttribute
+        @XStreamAlias("attr-groups")
+        public String attrGroups;
 
         @XStreamAsAttribute
         public String attrs;
@@ -368,24 +406,6 @@ public class RecDef {
             return tag.toString();
         }
 
-        public Elem findElem(Tag tag) {
-            if (this.tag.equals(tag)) return this;
-            for (Elem sub : elemList) {
-                Elem found = sub.findElem(tag);
-                if (found != null) return found;
-            }
-            return null;
-        }
-
-        public Attr findAttr(Tag tag) {
-            for (Attr attr : attrList) if (attr.tag.equals(tag)) return attr;
-            for (Elem sub : elemList) {
-                Attr found = sub.findAttr(tag);
-                if (found != null) return found;
-            }
-            return null;
-        }
-
         public Elem findElem(Path path, int level) {
             Tag levelTag = path.getTag(level);
             if (levelTag == null || !levelTag.equals(tag)) return null;
@@ -414,9 +434,15 @@ public class RecDef {
             tag = tag.defaultPrefix(recDef.prefix);
             if (attrs != null) {
                 for (String localName : attrs.split(DELIM)) {
-                    attrList.add(recDef.attr(Tag.attribute(recDef.prefix, localName)));
+                    attrList.add(recDef.attr(Tag.attribute(recDef.prefix, localName), path.toString()));
                 }
                 attrs = null;
+            }
+            if (attrGroups != null) {
+                for (String name : attrGroups.split(DELIM)) {
+                    attrList.addAll(recDef.attrGroup(name, path.toString()).attrs);
+                }
+                attrGroups = null;
             }
             if (elems != null) {
                 for (String localName : elems.split(DELIM)) {
@@ -441,6 +467,15 @@ public class RecDef {
                 }
             }
             return null;
+        }
+
+        public Elem copy() {
+            try {
+                return (Elem) this.clone();
+            }
+            catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

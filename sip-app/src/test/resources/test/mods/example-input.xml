@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<delving-sip-source xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+<input id="oai-jhm-50000101">
+<header>
+<identifier>oai:jhm:50000101</identifier>
+<datestamp>11/10/2010</datestamp>
+<setSpec>jhmbas:()</setSpec>
+</header>
+<metadata>
+<oai_dc:dc>
+<dc:title>chanoekia</dc:title>
+<dc:creator>anoniem</dc:creator>
+<dc:subject>ChanoekaChanoeka begint op 25 Kislew en duurt acht dagen.</dc:subject>
+<dc:publisher>Joods Historisch Museum</dc:publisher>
+<dc:date>1700=1800</dc:date>
+<dc:identifier>00203</dc:identifier>
+<dc:coverage>Nederland</dc:coverage>
+<image>108N013</image>
+<image>020B021</image>
+<image/>
+<image>501N015</image>
+</oai_dc:dc>
+</metadata>
+</input>
+<input id="oai-jhm-50011169">
+<header>
+<identifier>oai:jhm:50011169</identifier>
+<datestamp>11/10/2010</datestamp>
+<setSpec>jhmbas:()</setSpec>
+</header>
+<metadata>
+<oai_dc:dc>
+<dc:title>glas-in-loodraam</dc:title>
+<dc:creator>Schouten, Firma</dc:creator>
+<dc:subject>Grote Synagoge (Amsterdam)Grote Synagoge, bouwjaar: 1671</dc:subject>
+<dc:subject>synagogegebouw</dc:subject>
+<dc:publisher>Joods Historisch Museum</dc:publisher>
+<dc:date>1911=1913</dc:date>
+<dc:identifier>08200</dc:identifier>
+<dc:coverage>Delft &amp; Nederland</dc:coverage>
+</oai_dc:dc>
+</metadata>
+</input>
+<input id="oai-jhm-50011172">
+<header>
+<identifier>oai:jhm:50011172</identifier>
+<datestamp>11/10/2010</datestamp>
+<setSpec>jhmbas:()</setSpec>
+</header>
+<metadata>
+<oai_dc:dc>
+<dc:title>glas-in-loodraam</dc:title>
+<dc:creator>Schouten, Firma</dc:creator>
+<dc:subject>Grote Synagoge (Amsterdam)Grote Synagoge, bouwjaar: 1671</dc:subject>
+<dc:subject>synagogegebouw</dc:subject>
+<dc:publisher>Joods Historisch Museum</dc:publisher>
+<dc:date>1911=1913</dc:date>
+<dc:identifier>08203</dc:identifier>
+<dc:coverage>Delft &amp; Nederland</dc:coverage>
+</oai_dc:dc>
+</metadata>
+</input>
+<input id="oai-jhm-50011173">
+<header>
+<identifier>oai:jhm:50011173</identifier>
+<datestamp>11/10/2010</datestamp>
+<setSpec>jhmbas:()</setSpec>
+</header>
+<metadata>
+<oai_dc:dc>
+<dc:title>glas-in-loodraam</dc:title>
+<dc:creator>Schouten, Firma</dc:creator>
+<dc:subject>Grote Synagoge (Amsterdam)Grote Synagoge, bouwjaar: 1671</dc:subject>
+<dc:subject>synagogegebouw</dc:subject>
+<dc:publisher>Joods Historisch Museum</dc:publisher>
+<dc:date>1911=1913</dc:date>
+<dc:identifier>08204</dc:identifier>
+<dc:coverage>Delft &amp; Nederland</dc:coverage>
+</oai_dc:dc>
+</metadata>
+</input>
+</delving-sip-source>

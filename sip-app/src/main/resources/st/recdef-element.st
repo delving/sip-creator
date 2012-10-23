@@ -7,9 +7,16 @@ $if (nodeMappings)$
     }$
 $endif$
 $if (doc)$
-    $doc.lines:{ line |
-        <tr><td><p>$line$</p></td></tr>
-    }$
+    $if (doc.lines)$
+        $doc.lines:{ line |
+            <tr><td><p>$line$</p></td></tr>
+        }$
+    $endif$
+    $if (doc.paras)$
+        $doc.paras:{ para |
+            <tr><td><b>$para.name$</b><br><p>$para.content$</p></td></tr>
+        }$
+    $endif$
 $endif$
 $if (optList)$
     <tr><td>

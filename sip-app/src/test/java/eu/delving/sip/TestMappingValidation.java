@@ -69,6 +69,17 @@ public class TestMappingValidation {
         mock.delete();
     }
 
+//    @Ignore
+    @Test
+    public void testMods() throws Exception {
+        mock.prepareDataset(
+                "mods",
+                "/delving-sip-source/input",
+                "/delving-sip-source/input/@id"
+        );
+        runFullCycle(4);
+    }
+
     @Ignore
     @Test
     public void testAbc() throws Exception {
