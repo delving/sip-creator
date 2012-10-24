@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -317,9 +318,9 @@ public class WorkModel {
         }
 
         @Override
-        public boolean setProgress(int progress) {
+        public void setProgress(int progress) throws CancelException {
             this.current = progress;
-            return !cancelled;
+            if (cancelled) throw new CancelException();
         }
 
         @Override

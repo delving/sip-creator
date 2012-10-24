@@ -25,12 +25,9 @@ import eu.delving.metadata.*;
 import eu.delving.schema.Fetcher;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaVersion;
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
-import eu.delving.sip.base.Work;
-import eu.delving.sip.model.Feedback;
-import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -42,10 +39,8 @@ import org.xml.sax.SAXException;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
-import java.security.DigestOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -298,12 +293,17 @@ public class StorageImpl implements Storage {
 
         @Override
         public File importedOutput() {
-            return importedFile(here);
+            return new File(here, IMPORTED.getName());
         }
 
         @Override
         public InputStream openImportedInputStream() throws StorageException {
-            return zipIn(importedFile(here));
+            return zipIn(findOrCreate(here, IMPORTED));
+        }
+
+        @Override
+        public File sourceOutput() {
+            return new File(here, SOURCE.getName());
         }
 
         @Override
@@ -495,62 +495,6 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public Work createFileImporter(File inputFile, final Swing finished) {
-            return new FileImporter(inputFile, this, new Runnable() {
-                @Override
-                public void run() {
-                    delete(statsFile(here, false, null));
-                    if (finished != null) Swing.Exec.later(finished);
-                }
-            });
-        }
-
-        @Override
-        public void importedToSource(Feedback feedback, ProgressListener progressListener) throws StorageException {
-            if (!isRecentlyImported()) {
-                throw new StorageException("Import to source would be redundant, since source is newer");
-            }
-            if (!statsFile(here, false, null).exists()) {
-                throw new StorageException("No analysis stats so conversion doesn't trust the record count");
-            }
-            try {
-                Map<String, String> hints = getHints();
-                Path recordRoot = getRecordRoot(hints);
-                int recordCount = getRecordCount(hints);
-                Path uniqueElement = getUniqueElement(hints);
-                int maxUniqueValueLength = getMaxUniqueValueLength(hints);
-                String uniqueValueConverter = getUniqueValueConverter(hints);
-                Stats stats = getStats(false, null);
-                SourceConverter converter = new SourceConverter(
-                        feedback,
-                        recordRoot,
-                        recordCount,
-                        uniqueElement,
-                        maxUniqueValueLength,
-                        uniqueValueConverter,
-                        stats.namespaces
-                );
-                converter.setProgressListener(progressListener);
-                Hasher hasher = new Hasher();
-                DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(new File(here, FileType.SOURCE.getName())));
-                converter.parse(openImportedInputStream(), digestOut); // streams closed within parse()
-                File source = new File(here, FileType.SOURCE.getName());
-                File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
-                if (hashedSource.exists()) FileUtils.deleteQuietly(hashedSource);
-                FileUtils.moveFile(source, hashedSource);
-                FileUtils.deleteQuietly(statsFile(here, true, null));
-            }
-            catch (StorageException e) {
-                throw e;
-            }
-            catch (Exception e) {
-                File source = new File(here, FileType.SOURCE.getName());
-                delete(source);
-                throw new StorageException("Unable to convert source: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
         public void deleteSource() throws StorageException {
             for (File file : findSourceFiles(here)) delete(file);
         }
@@ -579,8 +523,7 @@ public class StorageImpl implements Storage {
             ZipEntry zipEntry;
             byte[] buffer = new byte[BLOCK_SIZE];
             int bytesRead;
-            boolean cancelled = false;
-            if (progressListener != null) progressListener.prepareFor((int) (streamLength / BLOCK_SIZE));
+            progressListener.prepareFor((int) (streamLength / BLOCK_SIZE));
             CountingInputStream counting = new CountingInputStream(inputStream);
             ZipInputStream zipInputStream = new ZipInputStream(counting);
             String unzippedName = FileType.SOURCE.getName().substring(0, FileType.SOURCE.getName().length() - ".gz".length());
@@ -593,17 +536,11 @@ public class StorageImpl implements Storage {
                         GZIPOutputStream outputStream = null;
                         try {
                             outputStream = new GZIPOutputStream(new FileOutputStream(source));
-                            while (!cancelled && -1 != (bytesRead = zipInputStream.read(buffer))) {
+                            while (-1 != (bytesRead = zipInputStream.read(buffer))) {
                                 outputStream.write(buffer, 0, bytesRead);
-                                if (progressListener != null) {
-                                    if (!progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
-                                        cancelled = true;
-                                        break;
-                                    }
-                                }
+                                progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
                                 hasher.update(buffer, bytesRead);
                             }
-                            if (progressListener != null) progressListener = null;
                         }
                         finally {
                             IOUtils.closeQuietly(outputStream);
@@ -626,11 +563,12 @@ public class StorageImpl implements Storage {
                         finally {
                             IOUtils.closeQuietly(output);
                         }
-                        if (progressListener != null && !progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE))) {
-                            break;
-                        }
+                        progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
                     }
                 }
+            }
+            catch (CancelException e) {
+                throw new StorageException("Cancellation", e);
             }
             catch (IOException e) {
                 throw new StorageException("Unable to accept SipZip file", e);
@@ -648,24 +586,6 @@ public class StorageImpl implements Storage {
             }
             catch (IOException e) {
                 throw new StorageException(String.format("Unable to save files in %s to directory %s", here.getName(), now), e);
-            }
-        }
-
-        private InputStream zipIn(File file) throws StorageException {
-            try {
-                return new GZIPInputStream(new FileInputStream(file));
-            }
-            catch (IOException e) {
-                throw new StorageException(String.format("Unable to create input stream from %s", file.getAbsolutePath()), e);
-            }
-        }
-
-        private OutputStream zipOut(File file) throws StorageException {
-            try {
-                return new GZIPOutputStream(new FileOutputStream(file));
-            }
-            catch (IOException e) {
-                throw new StorageException(String.format("Unable to create output stream from %s", file.getAbsolutePath()), e);
             }
         }
 

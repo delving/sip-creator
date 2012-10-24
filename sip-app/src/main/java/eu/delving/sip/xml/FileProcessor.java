@@ -24,6 +24,7 @@ package eu.delving.sip.xml;
 import eu.delving.MappingResult;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -180,10 +181,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             while (!done) {
                 MetadataRecord record = parser.nextRecord();
                 if (record == null) break;
-                if (!progressListener.setProgress(record.getRecordNumber())) {
-                    done = true;
-                    break;
-                }
+                progressListener.setProgress(record.getRecordNumber());
                 this.recordNumber = record.getRecordNumber();
                 try {
                     Node node = mappingRunner.runMapping(record);
@@ -238,8 +236,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 }
             }
         }
-        catch (MetadataParser.AbortException e) {
-            done = true;
+        catch (CancelException e) {
+            listener.aborted(this);
         }
         catch (Exception e) {
             feedback.alert("File processing problem", e);

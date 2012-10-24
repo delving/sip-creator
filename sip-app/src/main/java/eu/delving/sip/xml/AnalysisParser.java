@@ -23,6 +23,7 @@ package eu.delving.sip.xml;
 
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -120,7 +121,7 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
                     switch (input.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             if (++count % ELEMENT_STEP == 0) {
-                                if (listener != null && !progressListener.setProgress(count)) running = false;
+                                if (listener != null) progressListener.setProgress(count);
                             }
                             for (int walk = 0; walk < input.getNamespaceCount(); walk++) {
                                 stats.recordNamespace(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
@@ -158,6 +159,9 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
             else {
                 listener.failure(null, null);
             }
+        }
+        catch (CancelException e) {
+            listener.failure("Cancellation", e);
         }
         catch (Exception e) {
             try {

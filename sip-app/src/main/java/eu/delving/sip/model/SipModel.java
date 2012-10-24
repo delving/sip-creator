@@ -29,14 +29,12 @@ import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
+import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
@@ -352,9 +350,14 @@ public class SipModel {
 
     }
 
-    public void importSource(final File file, Swing finished) {
+    public void importSource(final File file, final Swing finished) {
         clearValidations();
-        exec(dataSetModel.getDataSet().createFileImporter(file, finished));
+        exec(new FileImporter(file, dataSetModel.getDataSet(), new Runnable() {
+            @Override
+            public void run() {
+                Swing.Exec.later(finished);
+            }
+        }));
     }
 
     public void analyzeFields() {
@@ -395,31 +398,9 @@ public class SipModel {
 
     public void convertSource() {
         clearValidations();
-        exec(new ConversionRunner(dataSetModel.getDataSet()));
-    }
-
-    private class ConversionRunner implements Work.DataSetWork, Work.LongTermWork {
-        private DataSet dataSet;
-        private ProgressListener progressListener;
-
-        private ConversionRunner(DataSet dataSet) {
-            this.dataSet = dataSet;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.CONVERT_SOURCE;
-        }
-
-        @Override
-        public void run() {
-            try {
-                dataSetModel.getDataSet().importedToSource(feedback, progressListener);
+        exec(new SourceConverter(dataSetModel.getDataSet(), new Runnable() {
+            @Override
+            public void run() {
                 mappingHintsModel.refresh();
                 exec(new Swing() {
                     @Override
@@ -428,19 +409,7 @@ public class SipModel {
                     }
                 });
             }
-            catch (StorageException e) {
-                feedback.alert("Conversion failed: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void setProgressListener(ProgressListener progressListener) {
-            this.progressListener = progressListener;
-            progressListener.setProgressMessage(String.format(
-                    "Converting source data of '%s' to standard form",
-                    dataSet.getSpec()
-            ));
-        }
+        }));
     }
 
     public void processFile(FileProcessor.Listener listener) {
@@ -528,18 +497,13 @@ public class SipModel {
                 }
                 metadataParser.setProgressListener(progressListener);
                 MetadataRecord metadataRecord;
-                try {
-                    while ((metadataRecord = metadataParser.nextRecord()) != null) {
-                        if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
-                            for (ParseListener parseListener : parseListeners) {
-                                parseListener.updatedRecord(metadataRecord);
-                            }
-                            break;
+                while ((metadataRecord = metadataParser.nextRecord()) != null) {
+                    if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
+                        for (ParseListener parseListener : parseListeners) {
+                            parseListener.updatedRecord(metadataRecord);
                         }
+                        break;
                     }
-                }
-                catch (MetadataParser.AbortException e) {
-                    // do nothing
                 }
             }
             catch (Exception e) {
