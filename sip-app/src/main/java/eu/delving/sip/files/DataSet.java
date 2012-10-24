@@ -26,6 +26,8 @@ import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
 import eu.delving.stats.Stats;
 
@@ -106,7 +108,7 @@ public interface DataSet {
 
     List<String> getReport(String prefix) throws StorageException;
 
-    void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException;
+    Work createFileImporter(File inputFile, Swing finished);
 
     void importedToSource(Feedback feedback, ProgressListener progressListener) throws StorageException;
 

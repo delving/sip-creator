@@ -31,6 +31,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.FilterTreeModel;
 import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.xml.AnalysisParser;
@@ -145,7 +146,7 @@ public class TestMappingValidation {
 
     private void runFullCycle(int expectedRecords) throws Exception {
         assertEquals(String.valueOf(Arrays.asList(mock.files())), 2, mock.fileCount());
-        dataSet().externalToImported(mock.sampleInputFile(), null);
+        dataSet().createFileImporter(mock.sampleInputFile(), null).run();
         assertEquals(3, mock.fileCount());
         assertEquals(IMPORTED, state());
 
@@ -244,6 +245,11 @@ public class TestMappingValidation {
             public boolean setProgress(int progress) {
                 System.out.println("progress = "+progress);
                 return false;  // todo: implement
+            }
+
+            @Override
+            public Feedback getFeedback() {
+                return null; // todo: better to use something like the log
             }
         };
     }

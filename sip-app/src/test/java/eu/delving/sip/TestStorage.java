@@ -43,7 +43,7 @@ public class TestStorage {
         Storage storage = new StorageImpl(storageDir, null, null);
         File zip = new File(getClass().getResource("/zip/ZipImport.xml.zip").getFile());
         DataSet dataSet = storage.createDataSet("spek", "orgy");
-        dataSet.externalToImported(zip, null);
+        dataSet.createFileImporter(zip, null).run();
         File importedFile = new File(((StorageImpl.DataSetImpl)dataSet).getHere(), "imported.xml.gz");
         Assert.assertTrue("imported file not created", importedFile.exists());
     }

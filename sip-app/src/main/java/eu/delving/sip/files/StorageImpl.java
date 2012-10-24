@@ -26,7 +26,9 @@ import eu.delving.schema.Fetcher;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
@@ -48,7 +50,6 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static eu.delving.metadata.StringUtil.*;
 import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
 import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
 import static eu.delving.sip.files.Storage.FileType.*;
@@ -494,136 +495,14 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException {
-            int fileBlocks = (int) (inputFile.length() / BLOCK_SIZE);
-            if (progressListener != null) progressListener.prepareFor(fileBlocks);
-            File imported = new File(here, FileType.IMPORTED.getName());
-            Hasher hasher = new Hasher();
-            boolean cancelled = false;
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-            try {
-                outputStream = new GZIPOutputStream(new FileOutputStream(imported));
-                CountingInputStream countingInput;
-                String name = inputFile.getName();
-                if (name.endsWith(".csv")) {
-                    inputStream = new FileInputStream(inputFile);
-                    countingInput = new CountingInputStream(inputStream);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(countingInput, "UTF-8"));
-                    Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
-                    writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-                    writer.write("<csv-entries>\n");
-                    String line;
-                    List<String> titles = null;
-                    int lineNumber = 0;
-                    while ((line = reader.readLine()) != null) {
-                        if (lineNumber == 0) {
-                            titles = csvLineParse(line);
-                            for (int walk = 0; walk < titles.size(); walk++) {
-                                titles.set(walk, csvTitleToTag(titles.get(walk), walk));
-                            }
-                        }
-                        else {
-                            List<String> values = csvLineParse(line);
-                            if (values.size() != titles.size()) {
-                                throw new StorageException(String.format(
-                                        "Expected %d fields in CSV file on line %d",
-                                        titles.size(), lineNumber
-                                ));
-                            }
-                            writer.write(String.format("<csv-entry line=\"%d\">\n", lineNumber));
-                            for (int walk = 0; walk < titles.size(); walk++) {
-                                writer.write(String.format(
-                                        "   <%s>%s</%s>\n",
-                                        titles.get(walk), csvEscapeXML(values.get(walk)), titles.get(walk))
-                                );
-                            }
-                            writer.write("</csv-entry>\n");
-                        }
-                        lineNumber++;
-                    }
-                    writer.write("</csv-entries>\n");
-                    writer.close();
+        public Work createFileImporter(File inputFile, final Swing finished) {
+            return new FileImporter(inputFile, this, new Runnable() {
+                @Override
+                public void run() {
+                    delete(statsFile(here, false, null));
+                    if (finished != null) Swing.Exec.later(finished);
                 }
-                else if (name.endsWith(".xml.zip")) {
-                    inputStream = new FileInputStream(inputFile);
-                    countingInput = new CountingInputStream(inputStream);
-                    ZipEntryXmlReader reader = new ZipEntryXmlReader(countingInput);
-                    Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
-                    writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-                    writer.write("<zip-entries>\n");
-                    while (true) {
-                        String line = reader.readLine();
-                        if (line == null) break;
-                        if (line.startsWith("<?xml")) continue;
-                        writer.write(line);
-                        writer.write("\n");
-                        if (progressListener != null) {
-                            if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
-                                cancelled = true;
-                                break;
-                            }
-                        }
-                        hasher.update(line);
-                    }
-                    writer.write("</zip-entries>\n");
-                    writer.close();
-                }
-                else {
-                    if (name.endsWith(".xml")) {
-                        inputStream = new FileInputStream(inputFile);
-                        countingInput = new CountingInputStream(inputStream);
-                        inputStream = countingInput;
-                    }
-                    else if (name.endsWith(".xml.gz")) {
-                        inputStream = new FileInputStream(inputFile);
-                        countingInput = new CountingInputStream(inputStream);
-                        inputStream = new GZIPInputStream(countingInput);
-                    }
-                    else {
-                        throw new IllegalArgumentException("Input file should be .xml, .xml.gz or .xml.zip, but it is " + name);
-                    }
-                    boolean headerFound = false;
-                    byte[] buffer = new byte[BLOCK_SIZE];
-                    int bytesRead;
-                    while (-1 != (bytesRead = inputStream.read(buffer))) {
-                        if (!headerFound) {
-                            String chunk = new String(buffer, 0, XML_HEADER.length(), "UTF-8");
-                            if (!XML_HEADER.equals(chunk)) throw new StorageException(String.format("Not an XML File. Must begin with '%s...'.", XML_HEADER));
-                            headerFound = true;
-                        }
-                        outputStream.write(buffer, 0, bytesRead);
-                        if (progressListener != null) {
-                            if (!progressListener.setProgress((int) (countingInput.getByteCount() / BLOCK_SIZE))) {
-                                cancelled = true;
-                                break;
-                            }
-                        }
-                        hasher.update(buffer, bytesRead);
-                    }
-                }
-                delete(statsFile(here, false, null));
-            }
-            catch (StorageException e) {
-                throw e;
-            }
-            catch (Exception e) {
-                throw new StorageException("Unable to capture input from " + inputFile.getAbsolutePath(), e);
-            }
-            finally {
-                IOUtils.closeQuietly(inputStream);
-                IOUtils.closeQuietly(outputStream);
-            }
-            if (cancelled) {
-                delete(imported);
-            }
-            else {
-                File hashedSource = new File(here, hasher.prefixFileName(FileType.IMPORTED.getName()));
-                if (hashedSource.exists()) {
-                    delete(imported);
-                    throw new StorageException("This import was identical to the previous one. Discarded.");
-                }
-            }
+            });
         }
 
         @Override

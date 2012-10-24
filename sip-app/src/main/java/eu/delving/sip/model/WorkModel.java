@@ -25,8 +25,7 @@ import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ListModel;
+import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -263,7 +262,7 @@ public class WorkModel {
 
         private void launch() {
             if (getWork() instanceof Work.LongTermWork) {
-                ((Work.LongTermWork) getWork()).setProgressListener(progressImpl = new ProgressImpl());
+                ((Work.LongTermWork) getWork()).setProgressListener(progressImpl = new ProgressImpl(feedback));
             }
             else {
                 progressImpl = null;
@@ -295,10 +294,15 @@ public class WorkModel {
     }
 
     private static class ProgressImpl implements ProgressListener, ProgressIndicator {
+        private Feedback feedback;
         private String progressMessage;
         private int current, maximum;
         private boolean cancelled;
         private TimeEstimator timeEstimator;
+
+        private ProgressImpl(Feedback feedback) {
+            this.feedback = feedback;
+        }
 
         @Override
         public void setProgressMessage(String message) {
@@ -316,6 +320,11 @@ public class WorkModel {
         public boolean setProgress(int progress) {
             this.current = progress;
             return !cancelled;
+        }
+
+        @Override
+        public Feedback getFeedback() {
+            return feedback;
         }
 
         @Override

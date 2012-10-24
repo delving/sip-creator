@@ -21,6 +21,8 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.model.Feedback;
+
 /**
  * Allows for progress reporting from a long term process to the work model
  *
@@ -34,4 +36,6 @@ public interface ProgressListener {
     void prepareFor(int total);
 
     boolean setProgress(int progress);
+
+    Feedback getFeedback();
 }

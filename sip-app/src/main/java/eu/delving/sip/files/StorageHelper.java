@@ -146,7 +146,7 @@ public class StorageHelper {
     }
 
     static File importedFile(File dir) {
-        return findOrCreate(dir, IMPORTED);
+        return new File(dir, FileType.IMPORTED.getName());
     }
 
     static File sourceFile(File dir) {
@@ -310,15 +310,13 @@ public class StorageHelper {
         }
     }
 
-    static void delete(File file) throws StorageException {
+    static void delete(File file) {
         if (file.exists()) {
             if (file.isDirectory()) {
                 File[] files = file.listFiles();
                 if (files != null) for (File sub : files) delete(sub);
             }
-            if (!file.delete()) {
-                throw new StorageException(String.format("Unable to delete %s", file.getAbsolutePath()));
-            }
+            FileUtils.deleteQuietly(file);
         }
     }
 

@@ -40,7 +40,7 @@ import eu.delving.sip.xml.MetadataParser;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
-import javax.swing.JDesktopPane;
+import javax.swing.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -354,47 +354,7 @@ public class SipModel {
 
     public void importSource(final File file, Swing finished) {
         clearValidations();
-        exec(new SourceImporter(file, dataSetModel.getDataSet(), finished));
-    }
-
-    private class SourceImporter implements Work.DataSetWork, Work.LongTermWork {
-        private File file;
-        private DataSet dataSet;
-        private ProgressListener progressListener;
-        private Swing finished;
-
-        private SourceImporter(File file, DataSet dataSet, Swing finished) {
-            this.file = file;
-            this.dataSet = dataSet;
-            this.finished = finished;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.IMPORT_SOURCE;
-        }
-
-        @Override
-        public void run() {
-            try {
-                dataSet.externalToImported(file, progressListener);
-                Swing.Exec.later(finished);
-            }
-            catch (StorageException e) {
-                feedback.alert(String.format("Couldn't create Data Set from %s: %s", file.getAbsolutePath(), e.getMessage()), e);
-            }
-        }
-
-        @Override
-        public void setProgressListener(ProgressListener progressListener) {
-            this.progressListener = progressListener;
-            progressListener.setProgressMessage(String.format("Storing data for %s", dataSet.getSpec()));
-        }
+        exec(dataSetModel.getDataSet().createFileImporter(file, finished));
     }
 
     public void analyzeFields() {
