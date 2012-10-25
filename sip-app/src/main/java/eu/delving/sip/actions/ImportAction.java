@@ -50,7 +50,7 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class DataImportAction extends AbstractAction {
+public class ImportAction extends AbstractAction {
     private JDesktopPane parent;
     private SipModel sipModel;
     private final String RECENT_DIR = "recentImportDirectory";
@@ -59,9 +59,9 @@ public class DataImportAction extends AbstractAction {
     private HarvestAction harvestAction = new HarvestAction();
     private JFileChooser chooser = new JFileChooser("XML Metadata Source File");
 
-    public DataImportAction(JDesktopPane parent, SipModel sipModel) {
-        super("Import new data into this data set");
-        putValue(Action.SMALL_ICON, SwingHelper.IMPORT_ICON);
+    public ImportAction(JDesktopPane parent, SipModel sipModel) {
+        super("Import new source data");
+        putValue(Action.SMALL_ICON, SwingHelper.ICON_IMPORT);
         putValue(
                 Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -113,12 +113,17 @@ public class DataImportAction extends AbstractAction {
         chooser.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return file.isFile() && file.getName().endsWith(".xml") || file.getName().endsWith(".xml.gz");
+                return file.isFile() && (
+                        file.getName().endsWith(".xml")
+                                || file.getName().endsWith(".xml.gz")
+                                || file.getName().endsWith(".xml.zip")
+                                || file.getName().endsWith(".csv")
+                );
             }
 
             @Override
             public String getDescription() {
-                return "XML or GZIP/XML Files";
+                return "Files ending with .xml, .xml.gz, .xml.zip, or .csv";
             }
         });
         chooser.setMultiSelectionEnabled(false);
@@ -152,7 +157,7 @@ public class DataImportAction extends AbstractAction {
 
     private class ChooseFileAction extends AbstractAction {
         private ChooseFileAction() {
-            super("<html><center><br><h2>Read</h2>Import from XML dump file<br>from your computer's file system<br><br>");
+            super("<html><center><br><h2>Read</h2>Import from XML/CSV file<br>from your computer's file system<br><br>");
         }
 
         @Override

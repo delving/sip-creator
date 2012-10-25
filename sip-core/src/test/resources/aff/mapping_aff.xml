@@ -1,4 +1,4 @@
-<rec-mapping prefix="aff" schemaVersion="1.0.0">
+<rec-mapping prefix="aff">
   <facts>
     <entry>
       <string>spec</string>
@@ -33,17 +33,27 @@
       <string>netherlands</string>
     </entry>
   </facts>
-  <functions>
-    <mapping-function name="cleanUri">
-      <sample-input>
-        <string>abc-12 [01]</string>
-      </sample-input>
-      <groovy-code>
-        <string>it.replaceAll(&quot; &quot;, &quot;_&quot;).replaceAll(&quot;-&quot;, &quot;_&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)</string>
-      </groovy-code>
-    </mapping-function>
-  </functions>
-  <node-mappings>
+    <functions>
+        <mapping-function name="cleanUri">
+            <sample-input>
+                <string>abc-12 [01]</string>
+            </sample-input>
+            <groovy-code>
+                <string>it.replaceAll(&quot; &quot;, &quot;_&quot;).replaceAll(&quot;-&quot;, &quot;_&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)
+                </string>
+            </groovy-code>
+        </mapping-function>
+        <!--todo: nomally this function would be found in the record definition-->
+        <mapping-function name="matchMediaFile">
+            <sample-input>
+                <string>..\..\..\Images PH\04512-01.tif</string>
+            </sample-input>
+            <groovy-code>
+                <string>_matchMediaFile_.match(it.text())</string>
+            </groovy-code>
+        </mapping-function>
+    </functions>
+    <node-mappings>
     <node-mapping inputPath="/facts/dataProvider" outputPath="/aff:record/aff:admin/aff:displayDataProvider"/>
     <node-mapping inputPath="/facts/country" outputPath="/aff:record/aff:admin/aff:displayDataProviderCountry"/>
     <node-mapping inputPath="/facts/provider" outputPath="/aff:record/aff:admin/aff:displayProvider"/>
@@ -136,8 +146,21 @@
     <node-mapping inputPath="/input/acquisition.source" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventActor"/>
     <node-mapping inputPath="/input/acquisition.source" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventActor/aff:displayActor"/>
     <node-mapping inputPath="/input/acquisition.place" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventPlace/aff:displayPlace"/>
-    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#thumbnail]/aff:resourceUrl"/>
-    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#fullImage]/aff:resourceUrl"/>
-    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#landingPage]/aff:resourceUrl"/>
+    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#thumbnail]/aff:resourceUrl">
+        <!--todo: normally this would be found as function="matchMediaFile" in the record definition, so this is faking it-->
+        <groovy-code>
+            <string>matchMediaFile(_reproductionidentifierURL)</string>
+        </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#fullImage]/aff:resourceUrl">
+        <groovy-code>
+            <string>matchMediaFile(_reproductionidentifierURL)</string>
+        </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/reproduction.identifier_URL" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#landingPage]/aff:resourceUrl">
+        <groovy-code>
+            <string>matchMediaFile(_reproductionidentifierURL)</string>
+        </groovy-code>
+    </node-mapping>
   </node-mappings>
 </rec-mapping>

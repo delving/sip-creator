@@ -68,9 +68,10 @@ public class FieldMappingFrame extends FrameBase {
     private JList contextVarList = new ContextVarJList(contextVarModel);
     private DictionaryPanel dictionaryPanel;
     private UndoManager undoManager = new UndoManager();
+    private JTabbedPane mainTab = new JTabbedPane();
 
-    public FieldMappingFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.FIELD_MAPPING, desktop, sipModel, "Field Mapping");
+    public FieldMappingFrame(SipModel sipModel) {
+        super(Which.FIELD_MAPPING, sipModel, "Field Mapping");
         dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setFont(MONOSPACED);
@@ -82,6 +83,9 @@ public class FieldMappingFrame extends FrameBase {
         codeArea.setTabSize(3);
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setWrapStyleWord(true);
+        mainTab.addTab("Code", createCodeOutputPanel());
+        mainTab.addTab("Dictionary", dictionaryPanel);
+        mainTab.addTab("Documentation", scrollVH(docArea));
         attachAction(UNDO_ACTION);
         attachAction(REDO_ACTION);
         new URLLauncher(sipModel, outputArea, sipModel.getFeedback());
@@ -106,33 +110,17 @@ public class FieldMappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        add(createTabs(), BorderLayout.CENTER);
-    }
-
-    private JComponent createTabs() {
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Field", createCodeOutputPanel());
-        tabs.addTab("Dictionary", dictionaryPanel);
-        return tabs;
+        add(mainTab, BorderLayout.CENTER);
     }
 
     private JPanel createCodeOutputPanel() {
         JPanel center = new JPanel(new GridLayout(0, 1, 5, 5));
-        center.add(createCodeDocPanel());
+        center.add(scrollVH("Groovy Code", codeArea));
         center.add(createOutputPanel());
         JPanel p = new JPanel(new BorderLayout(5, 5));
         p.add(center, BorderLayout.CENTER);
         p.add(createBesideCodeOutput(), BorderLayout.EAST);
         return p;
-    }
-
-    private JComponent createCodeDocPanel() {
-        JPanel cp = new JPanel(new BorderLayout());
-        cp.add(scrollVH(codeArea), BorderLayout.CENTER);
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Groovy Code", cp);
-        tabs.addTab("Documentation", scrollVH(docArea));
-        return tabs;
     }
 
     private JPanel createBesideCodeOutput() {
@@ -223,6 +211,7 @@ public class FieldMappingFrame extends FrameBase {
                             operatorBoxSetting = true;
                             operatorBox.setSelectedIndex(nodeMapping.getOperator().ordinal());
                             operatorBoxSetting = false;
+                            mainTab.setSelectedIndex(nodeMapping.hasDictionary() ? 1 : 0);
                         }
                     });
                 }

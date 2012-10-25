@@ -21,6 +21,9 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
@@ -43,13 +46,17 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
 public class MappingCodeFrame extends FrameBase {
     private static int MARG = 30;
     public static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 10);
+    private JTextArea pathListArea = new JTextArea();
+    private JTextArea pathListGroovyArea = new JTextArea();
     private JTextArea recordArea = new JTextArea();
     private JTextArea fieldArea = new JTextArea();
 
-    public MappingCodeFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CODE, desktop, sipModel, "Code");
-        fieldArea.setFont(MONOSPACED);
+    public MappingCodeFrame(final SipModel sipModel) {
+        super(Which.MAPPING_CODE, sipModel, "Mapping Code");
+        pathListArea.setFont(MONOSPACED);
+        pathListGroovyArea.setFont(MONOSPACED);
         recordArea.setFont(MONOSPACED);
+        fieldArea.setFont(MONOSPACED);
         Ear ear = new Ear();
         sipModel.getFieldCompileModel().addListener(ear);
         sipModel.getRecordCompileModel().addListener(ear);
@@ -61,7 +68,7 @@ public class MappingCodeFrame extends FrameBase {
 
             @Override
             public Dimension getSize() {
-                return new Dimension(desktopPane.getSize().width - MARG * 2, desktopPane.getSize().height - MARG * 2);
+                return new Dimension(sipModel.getDesktop().getSize().width - MARG * 2, sipModel.getDesktop().getSize().height - MARG * 2);
             }
         });
         getAction().putValue(
@@ -71,10 +78,17 @@ public class MappingCodeFrame extends FrameBase {
     }
 
     @Override
+    protected void onOpen(boolean opened) {
+        sipModel.getRecordCompileModel().setEnabled(opened);
+    }
+
+    @Override
     protected void buildContent(Container content) {
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Whole Record", scrollVH(recordArea));
-        tabs.addTab("Current Mapping", scrollVH(fieldArea));
+        tabs.addTab("Mapping Text", scrollVH(pathListArea));
+        tabs.addTab("Mapping Text with Groovy Code", scrollVH(pathListGroovyArea));
+        tabs.addTab("Whole Record Code", scrollVH(recordArea));
+        tabs.addTab("Current Node Mapping Code", scrollVH(fieldArea));
         content.add(tabs);
     }
 
@@ -89,6 +103,8 @@ public class MappingCodeFrame extends FrameBase {
             switch (type) {
                 case RECORD:
                     exec(new CodeUpdater(code, recordArea));
+                    exec(new TextUpdater(sipModel.getMappingModel().getRecMapping(), false, pathListArea));
+                    exec(new TextUpdater(sipModel.getMappingModel().getRecMapping(), true, pathListGroovyArea));
                     break;
                 case FIELD:
                     exec(new CodeUpdater(code, fieldArea));
@@ -119,6 +135,41 @@ public class MappingCodeFrame extends FrameBase {
             }
             else {
                 textArea.setText("// No code");
+            }
+        }
+    }
+
+    private static class TextUpdater implements Swing {
+        private RecMapping recMapping;
+        private boolean withGroovy;
+        private JTextArea textArea;
+
+        private TextUpdater(RecMapping recMapping, boolean withGroovy, JTextArea textArea) {
+            this.recMapping = recMapping;
+            this.withGroovy = withGroovy;
+            this.textArea = textArea;
+        }
+
+        @Override
+        public void run() {
+            if (recMapping != null) {
+                StringBuilder text = new StringBuilder("\n\tDelving SIPCreator Mapping in Text Form\n");
+                text.append(String.format("\nSchema: %s\n", recMapping.getSchemaVersion()));
+                for (NodeMapping nodeMapping : recMapping.getNodeMappings()) {
+                    text.append('\n').append(nodeMapping.outputPath).append('\n');
+                    for (Path inputPath : nodeMapping.getInputPaths()) {
+                        text.append('\t').append(inputPath).append('\n');
+                    }
+                    if (withGroovy && nodeMapping.groovyCode != null) {
+                        for (String line : nodeMapping.groovyCode) {
+                            text.append("\t\t").append(line).append('\n');
+                        }
+                    }
+                }
+                textArea.setText(text.toString());
+            }
+            else {
+                textArea.setText("// No mapping");
             }
         }
     }

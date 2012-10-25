@@ -138,7 +138,14 @@
         <dependency>
             <groupId>jfree</groupId>
             <artifactId>jfreechart</artifactId>
-            <version>1.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.mygrid.resources.jcoord</groupId>
+            <artifactId>jcoord</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgeo</groupId>
+            <artifactId>proj4j</artifactId>
         </dependency>
     </dependencies>
 

@@ -53,8 +53,7 @@ import java.util.TreeMap;
 
 public class Mockery {
     private static final String ORG = "organization";
-    private File root;
-    private File dataSetDir;
+    private File root, target, dataSetDir;
     private Storage storage;
     private DataSetModel dataSetModel = new DataSetModel();
     private RecMapping recMapping;
@@ -62,14 +61,11 @@ public class Mockery {
     private String prefix;
 
     public Mockery() throws StorageException, MetadataException {
-        File target = null, target1 = new File("sip-app/target"), target2 = new File("target");
-        if (target1.exists()) target = target1;
-        if (target2.exists()) target = target2;
-        if (target == null) throw new RuntimeException("target directory not found: " + target);
+        this.target = getTargetDirectory();
         root = new File(target, "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
-        storage = new StorageImpl(root, new FileSystemFetcher(), new DefaultHttpClient());
+        storage = new StorageImpl(root, new FileSystemFetcher(true), new DefaultHttpClient());
     }
 
     public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {
@@ -165,5 +161,13 @@ public class Mockery {
 
     private void delete(File file) {
         FileUtils.deleteQuietly(file);
+    }
+
+    public static File getTargetDirectory() {
+        File target = new File("sip-app/target");
+        if (target.exists()) return target;
+        target = new File("target");
+        if (target.exists()) return target;
+        throw new RuntimeException("target directory not found");
     }
 }

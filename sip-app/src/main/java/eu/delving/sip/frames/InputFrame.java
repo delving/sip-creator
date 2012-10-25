@@ -61,7 +61,6 @@ public class InputFrame extends FrameBase {
 
     private enum Filter {
         REGEX("Regex"),
-        REGEX_CI("Regex (CI)"),
         MODULO("Modulo");
 
         private String name;
@@ -76,8 +75,8 @@ public class InputFrame extends FrameBase {
         }
     }
 
-    public InputFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.INPUT, desktop, sipModel, "Input");
+    public InputFrame(SipModel sipModel) {
+        super(Which.INPUT, sipModel, "Input");
         sipModel.addParseListener(new SipModel.ParseListener() {
             @Override
             public void updatedRecord(MetadataRecord metadataRecord) {
@@ -107,12 +106,16 @@ public class InputFrame extends FrameBase {
     private JPanel createRecordButtonPanel() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Filter"));
-        JPanel bp = new JPanel(new GridLayout(1, 0));
-        bp.add(new JButton(rewind));
-        bp.add(new JButton(play));
-        p.add(bp, BorderLayout.EAST);
         p.add(filterBox, BorderLayout.WEST);
         p.add(filterField, BorderLayout.CENTER);
+        p.add(createButtonPanel(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel p = new JPanel(new GridLayout(1, 0));
+        p.add(new JButton(rewind));
+        p.add(new JButton(play));
         return p;
     }
 
@@ -170,21 +173,17 @@ public class InputFrame extends FrameBase {
                 toolTip = String.format("Size: %d", ((List) node.getNodeValue()).size());
             }
             else {
-                String value = node.text();
-                if (value.contains("\n") || value.length() >= MAX_LENGTH) {
-                    int index = value.indexOf('\n');
-                    if (index > 0) {
-                        value = value.substring(0, index);
-                    }
-                    if (value.length() >= MAX_LENGTH) {
-                        value = value.substring(0, MAX_LENGTH);
-                    }
-                    string = String.format("<html><b>%s</b> = %s ...</html>", node.getNodeName(), value);
-                    toolTip = node.text();
+                String truncated = node.text();
+                if (truncated.contains("\n") || truncated.length() >= MAX_LENGTH) {
+                    int index = truncated.indexOf('\n');
+                    if (index > 0) truncated = truncated.substring(0, index);
+                    if (truncated.length() >= MAX_LENGTH) truncated = truncated.substring(0, MAX_LENGTH);
+                    string = String.format("<html><b>%s</b> = %s ...</html>", node.getNodeName(), truncated);
+                    toolTip = tameTooltipText(node.text());
                 }
                 else {
-                    string = String.format("<html><b>%s</b> = %s</html>", node.getNodeName(), value);
-                    toolTip = value;
+                    string = String.format("<html><b>%s</b> = %s</html>", node.getNodeName(), truncated);
+                    toolTip = truncated;
                 }
             }
             if (this.node.getNodeValue() instanceof List) {
@@ -263,6 +262,21 @@ public class InputFrame extends FrameBase {
             list.add(this);
         }
 
+        private String tameTooltipText(String text) {
+            List<String> lines = new ArrayList<String>();
+            while (text.length() > MAX_LENGTH) {
+                int pos = text.indexOf(' ', MAX_LENGTH - 10);
+                if (pos < 0) break;
+                if (pos > MAX_LENGTH + 5) pos = MAX_LENGTH;
+                lines.add(text.substring(0, pos).trim());
+                text = text.substring(pos).trim();
+            }
+            if (!text.trim().isEmpty()) lines.add(text);
+            StringBuilder html = new StringBuilder("<html>");
+            for (String line : lines) html.append(line).append("<br/>\n");
+            return html.toString();
+        }
+
         @Override
         public int compareTo(GroovyTreeNode gtn) {
             if (attrKey != null && gtn.attrKey == null) return -1;
@@ -280,17 +294,17 @@ public class InputFrame extends FrameBase {
             if (value instanceof GroovyTreeNode) {
                 GroovyTreeNode node = (GroovyTreeNode) value;
                 if (node.attrKey != null) {
-                    setIcon(SwingHelper.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
                 else if (!node.isLeaf()) {
-                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_COMPOSITE);
                 }
                 else {
-                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_VALUE);
                 }
             }
             else {
-                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.ICON_COMPOSITE);
             }
             return component;
         }
@@ -300,7 +314,8 @@ public class InputFrame extends FrameBase {
 
     private class RewindAction extends AbstractAction {
         private RewindAction() {
-            putValue(Action.SMALL_ICON, SwingHelper.REWIND_ICON);
+            super("First");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_REWIND);
         }
 
         @Override
@@ -314,7 +329,8 @@ public class InputFrame extends FrameBase {
 
     private class PlayAction extends AbstractAction {
         private PlayAction() {
-            putValue(Action.SMALL_ICON, SwingHelper.PLAY_ICON);
+            super("Next");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_PLAY);
         }
 
         @Override
@@ -337,13 +353,6 @@ public class InputFrame extends FrameBase {
                     @Override
                     public boolean accept(MetadataRecord record) {
                         return record.contains(Pattern.compile(filterString));
-                    }
-                };
-            case REGEX_CI:
-                return new SipModel.ScanPredicate() {
-                    @Override
-                    public boolean accept(MetadataRecord record) {
-                        return record.contains(Pattern.compile(filterString, Pattern.CASE_INSENSITIVE));
                     }
                 };
             case MODULO:

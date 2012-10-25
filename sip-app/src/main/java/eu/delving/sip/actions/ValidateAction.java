@@ -26,7 +26,6 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
-import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
@@ -49,15 +48,13 @@ import static eu.delving.sip.files.DataSetState.MAPPING;
 public class ValidateAction extends AbstractAction {
     private SipModel sipModel;
     private Swing investigate;
-    private DataSetMenu dataSetMenu;
 
-    public ValidateAction(SipModel sipModel, DataSetMenu dataSetMenu, Swing investigate) {
+    public ValidateAction(SipModel sipModel, Swing investigate) {
         super("<html><b>Map and validate all records</b>");
         this.sipModel = sipModel;
-        this.dataSetMenu = dataSetMenu;
         this.investigate = investigate;
         setEnabled(false);
-        putValue(Action.SMALL_ICON, SwingHelper.VALIDATE_ICON);
+        putValue(Action.SMALL_ICON, SwingHelper.ICON_VALIDATE);
         KeyStroke keyStrokeV = KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         putValue(Action.ACCELERATOR_KEY, keyStrokeV);
         this.sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
@@ -87,7 +84,7 @@ public class ValidateAction extends AbstractAction {
                             sipModel.setDataSetPrefix(fileProcessor.getDataSet(), fileProcessor.getPrefix(), new Swing() {
                                 @Override
                                 public void run() {
-                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
+//                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
                                     sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
                                     investigate.run();
                                 }

@@ -1,300 +1,583 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<recordList>
-    <record>
-        <priref>36</priref>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <input.source>Schilder</input.source>
-        <edit.time>11:10:40</edit.time>
-        <edit.time>13:43:22</edit.time>
-        <edit.time>11:32:32</edit.time>
-        <creator.history/>
-        <edit.name>daniel</edit.name>
-        <edit.name>daniel</edit.name>
-        <edit.name>fredau</edit.name>
-        <input.name>Conversie AIS</input.name>
-        <creator.date_of_death>1900</creator.date_of_death>
-        <creator.date_of_birth>2000</creator.date_of_birth>
-        <edit.date>2006-08-09</edit.date>
-        <edit.date>2005-09-28</edit.date>
-        <edit.date>2005-06-21</edit.date>
-        <input.date>2004-12-17</input.date>
-        <dimension.value>50.7</dimension.value>
-        <dimension.value>40.3</dimension.value>
-        <acquisition.method>schenking</acquisition.method>
-        <creator>onbekend</creator>
-        <acquisition.source>Wicheren, mej. M.A.J. van</acquisition.source>
-        <acquisition.date>1985</acquisition.date>
-        <condition>goed</condition>
-        <title>Portret van Pieter van Wicheren</title>
-        <location>P02-96B</location>
-        <location.date.start>2005-06-23</location.date.start>
-        <number_of_parts>1</number_of_parts>
-        <acquisition.place>Groningen</acquisition.place>
-        <object_name>schilderij</object_name>
-        <location.default>P02-96B</location.default>
-        <material>olieverf</material>
-        <material>doek</material>
-        <location_check.date>2005-06-23</location_check.date>
-        <location_check.name option="AT" value="AT">
-            <text language="0">AT</text>
-            <text language="1">AT</text>
-            <text language="2">AT</text>
-            <text language="3">AT</text>
-        </location_check.name>
-        <object_number>S1985-011</object_number>
-        <inscription.notes>omstreeks</inscription.notes>
-        <institution.code>0057</institution.code>
-        <current_owner>Fries Museum</current_owner>
-        <content.motif.general>portret</content.motif.general>
-        <creator.role>vervaardiger</creator.role>
-        <dimension.unit>cm</dimension.unit>
-        <dimension.unit>cm</dimension.unit>
-        <production.date.start>1845</production.date.start>
-        <production.date.notes>omstreeks 1850</production.date.notes>
-        <dimension.type>hoogte</dimension.type>
-        <dimension.type>breedte</dimension.type>
-        <production.date.end>1854</production.date.end>
-        <institution.place/>
-        <description>Busteportret.</description>
-        <institution.name>Fries Museum</institution.name>
-        <administration_name option="Schilderkunst tot 1925" value="Schilderkunst tot 1925">
-            <text language="0">Schilderkunst tot 1925</text>
-            <text language="1">Schilderkunst tot 1925</text>
-            <text language="2">Schilderkunst tot 1925</text>
-            <text language="3">Schilderkunst tot 1925</text>
-        </administration_name>
-    </record>
-    <record>
-        <priref>37</priref>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <input.source>Schilder</input.source>
-        <edit.time>13:29:55</edit.time>
-        <edit.time>14:01:25</edit.time>
-        <edit.time>13:28:20</edit.time>
-        <edit.time>11:31:54</edit.time>
-        <creator.history/>
-        <edit.name>daniel</edit.name>
-        <edit.name>anneke</edit.name>
-        <edit.name>anneke</edit.name>
-        <edit.name>fredau</edit.name>
-        <input.name>Conversie AIS</input.name>
-        <creator.date_of_death/>
-        <creator.date_of_birth/>
-        <edit.date>2005-08-23</edit.date>
-        <edit.date>2005-06-24</edit.date>
-        <edit.date>2005-06-23</edit.date>
-        <edit.date>2005-06-21</edit.date>
-        <input.date>2004-12-17</input.date>
-        <dimension.value>35.0</dimension.value>
-        <dimension.value>18.0</dimension.value>
-        <acquisition.method>schenking</acquisition.method>
-        <creator>Schaaff, A.</creator>
-        <acquisition.source>Meindersma, Douwe</acquisition.source>
-        <acquisition.date>1944</acquisition.date>
-        <condition>goed</condition>
-        <title>Portret van Joh. Meindersma</title>
-        <location>P02-93B</location>
-        <location.date.start>2005-06-23</location.date.start>
-        <number_of_parts>1</number_of_parts>
-        <acquisition.place>Rotterdam</acquisition.place>
-        <notes>Corr. 1944/106</notes>
-        <object_name>schilderij</object_name>
-        <location.default>P02-93B</location.default>
-        <material>olieverf</material>
-        <material>paneel</material>
-        <location_check.date>2005-06-23</location_check.date>
-        <location_check.name option="AT" value="AT">
-            <text language="0">AT</text>
-            <text language="1">AT</text>
-            <text language="2">AT</text>
-            <text language="3">AT</text>
-        </location_check.name>
-        <object_number>S1944-038</object_number>
-        <inscription.notes>H.Schaaff 1845</inscription.notes>
-        <institution.code>0057</institution.code>
-        <current_owner>Fries Genootschap</current_owner>
-        <content.motif.general>portret</content.motif.general>
-        <creator.role>vervaardiger</creator.role>
-        <dimension.unit>cm</dimension.unit>
-        <dimension.unit>cm</dimension.unit>
-        <production.date.start>1845</production.date.start>
-        <production.date.notes>H.Schaaff 1845</production.date.notes>
-        <dimension.type>hoogte</dimension.type>
-        <dimension.type>breedte</dimension.type>
-        <production.date.end>1845</production.date.end>
-        <institution.place/>
-        <description>Portret van Joh.Meindersma(1827-1913), bakker op hoek v.d. Korfmakersstraat,Lwd; Afgebeelde tot
-            knieën, zittende op stoel bij de tafel.
-        </description>
-        <institution.name>Fries Museum</institution.name>
-        <administration_name option="Schilderkunst tot 1925" value="Schilderkunst tot 1925">
-            <text language="0">Schilderkunst tot 1925</text>
-            <text language="1">Schilderkunst tot 1925</text>
-            <text language="2">Schilderkunst tot 1925</text>
-            <text language="3">Schilderkunst tot 1925</text>
-        </administration_name>
-    </record>
-    <record>
-        <priref>38</priref>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <input.source>Schilder</input.source>
-        <edit.time>12:18:45</edit.time>
-        <edit.time>15:14:26</edit.time>
-        <edit.time>11:30:02</edit.time>
-        <creator.history/>
-        <edit.name>fredau</edit.name>
-        <edit.name>anneke</edit.name>
-        <edit.name>fredau</edit.name>
-        <input.name>Conversie AIS</input.name>
-        <creator.date_of_death/>
-        <creator.date_of_birth/>
-        <edit.date>2007-02-08</edit.date>
-        <edit.date>2005-06-22</edit.date>
-        <edit.date>2005-06-21</edit.date>
-        <input.date>2004-12-17</input.date>
-        <dimension.value>54.0</dimension.value>
-        <dimension.value>42.5</dimension.value>
-        <acquisition.method>schenking</acquisition.method>
-        <creator>Hollandse meester</creator>
-        <acquisition.source>Post, Mr. J.Th.</acquisition.source>
-        <acquisition.date>1982</acquisition.date>
-        <condition>slecht</condition>
-        <title>Portret van Douwe Carel van Unia</title>
-        <location>P02-84A</location>
-        <location.date.start>2005-06-22</location.date.start>
-        <number_of_parts>1</number_of_parts>
-        <acquisition.place>Blaricum</acquisition.place>
-        <object_name>schilderij</object_name>
-        <location.default>P02-84A</location.default>
-        <material>olieverf</material>
-        <material>doek</material>
-        <location_check.date>2005-06-22</location_check.date>
-        <location_check.name option="AT" value="AT">
-            <text language="0">AT</text>
-            <text language="1">AT</text>
-            <text language="2">AT</text>
-            <text language="3">AT</text>
-        </location_check.name>
-        <object_number>S1982-079</object_number>
-        <inscription.notes>circa</inscription.notes>
-        <institution.code>0057</institution.code>
-        <current_owner>Fries Museum</current_owner>
-        <content.motif.general>portret</content.motif.general>
-        <content.motif.general>man</content.motif.general>
-        <creator.role>vervaardiger</creator.role>
-        <dimension.unit>cm</dimension.unit>
-        <dimension.unit>cm</dimension.unit>
-        <production.date.start>1675</production.date.start>
-        <production.date.notes>circa</production.date.notes>
-        <dimension.notes>ovaal</dimension.notes>
-        <dimension.type>hoogte</dimension.type>
-        <dimension.type>breedte</dimension.type>
-        <production.date.end>1699</production.date.end>
-        <institution.place/>
-        <description>Portret van Douwe Carel van Unia (±1650-1708)</description>
-        <institution.name>Fries Museum</institution.name>
-        <administration_name option="Schilderkunst tot 1925" value="Schilderkunst tot 1925">
-            <text language="0">Schilderkunst tot 1925</text>
-            <text language="1">Schilderkunst tot 1925</text>
-            <text language="2">Schilderkunst tot 1925</text>
-            <text language="3">Schilderkunst tot 1925</text>
-        </administration_name>
-    </record>
-    <record>
-        <priref>40</priref>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <edit.source>collect&gt;intern</edit.source>
-        <input.source>Schilder</input.source>
-        <edit.time>12:07:30</edit.time>
-        <edit.time>14:17:30</edit.time>
-        <edit.time>10:30:58</edit.time>
-        <edit.time>12:08:49</edit.time>
-        <creator.history/>
-        <edit.name>j.kuiper</edit.name>
-        <edit.name>daniel</edit.name>
-        <edit.name>daniel</edit.name>
-        <edit.name>fredau</edit.name>
-        <input.name>Conversie AIS</input.name>
-        <creator.date_of_death>1972</creator.date_of_death>
-        <creator.date_of_birth>1907</creator.date_of_birth>
-        <edit.date>2009-06-30</edit.date>
-        <edit.date>2006-06-26</edit.date>
-        <edit.date>2005-07-13</edit.date>
-        <edit.date>2005-06-16</edit.date>
-        <input.date>2004-12-17</input.date>
-        <dimension.value>36.6</dimension.value>
-        <dimension.value>29.0</dimension.value>
-        <dimension.value>39.5</dimension.value>
-        <dimension.value>31.0</dimension.value>
-        <acquisition.method>bruikleen</acquisition.method>
-        <creator>Struiksma, Goffe</creator>
-        <production.place>Heerenveen</production.place>
-        <acquisition.source>Struiksma, fam. N.</acquisition.source>
-        <acquisition.date>1984</acquisition.date>
-        <condition>matig</condition>
-        <title>Kompositie van huizen, bomen en water</title>
-        <condition.notes>iets beschadigd</condition.notes>
-        <location>J11-X01</location>
-        <location.date.start>2006-03-30</location.date.start>
-        <number_of_parts>1</number_of_parts>
-        <acquisition.place>Blokzijl</acquisition.place>
-        <notes>Lit.: De Vrije Fries, uitg.1985, blz. 153.</notes>
-        <object_name>schilderij</object_name>
-        <location.default>J11-X01</location.default>
-        <material>olieverf</material>
-        <material>doek</material>
-        <material>karton</material>
-        <location_check.date>2006-03-30</location_check.date>
-        <location_check.name option="AT" value="AT">
-            <text language="0">AT</text>
-            <text language="1">AT</text>
-            <text language="2">AT</text>
-            <text language="3">AT</text>
-        </location_check.name>
-        <object_number>S1984-055</object_number>
-        <inscription.notes>l.o.:G.Struiksma</inscription.notes>
-        <institution.code>0057</institution.code>
-        <current_owner>Struiksma, fam. N.</current_owner>
-        <content.motif.general>kompositie</content.motif.general>
-        <content.motif.general>Huizen</content.motif.general>
-        <content.motif.general>bomen</content.motif.general>
-        <content.motif.general>water</content.motif.general>
-        <creator.role>vervaardiger</creator.role>
-        <dimension.unit>cm</dimension.unit>
-        <dimension.unit>cm</dimension.unit>
-        <dimension.unit>cm</dimension.unit>
-        <dimension.unit>cm</dimension.unit>
-        <production.date.start>1932</production.date.start>
-        <production.date.notes>l.o.: G. Struiksma</production.date.notes>
-        <dimension.notes>in lijst</dimension.notes>
-        <dimension.part/>
-        <dimension.part/>
-        <dimension.part>lijst</dimension.part>
-        <dimension.part>lijst</dimension.part>
-        <dimension.type>hoogte</dimension.type>
-        <dimension.type>breedte</dimension.type>
-        <dimension.type>hoogte</dimension.type>
-        <dimension.type>breedte</dimension.type>
-        <production.date.end>1932</production.date.end>
-        <institution.place/>
-        <description>Schilderij is geschilderd in vierkanten en rechthoeken die illusie geven van huizen aan water met
-            bomen. Voorgesteld zijn verder lopende figuur, zeilbootje, vogels en kat. Geen lijst.
-        </description>
-        <institution.name>Fries Museum</institution.name>
-        <administration_name option="Schilderkunst vanaf 1925" value="Schilderkunst vanaf 1925">
-            <text language="0">Schilderkunst vanaf 1925</text>
-            <text language="1">Schilderkunst vanaf 1925</text>
-            <text language="2">Schilderkunst vanaf 1925</text>
-            <text language="3">Schilderkunst vanaf 1925</text>
-        </administration_name>
-    </record>
-</recordList>
+<?xml version="1.0"?>
+<metadata>
+<record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:100023</identifier><datestamp>2010-12-09</datestamp><setSpec>SFF</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">møtebok (Fjaler kommune. Formannskapet, Møtebøker)</dc:title>
+<dc:description xml:lang="no"> </dc:description>
+<dc:publisher>Fylkesarkivet i Sogn og Fjordane</dc:publisher>
+<dcterms:created>1896-1910</dcterms:created>
+<dc:type xml:lang="no">Stykke</dc:type>
+<dc:identifier>100023</dc:identifier>
+<dc:source xml:lang="no">Fylkesarkivet i Sogn og Fjordane</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=no-SFF_arkiv000000000500</dcterms:isPartOf>
+<europeana:object xsi:type="dcterms:URI">http://www.arkivportalen.no/arkivportalen-web/images/digitalisert_48.png</europeana:object>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=no-SFF_arkiv000000000500</europeana:isShownAt>
+<abm:contentProvider>Fylkesarkivet i Sogn og Fjordane</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000026</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Børge Brevhus</dc:title>
+<dc:creator>Børge Brevhus</dc:creator>
+<dc:description xml:lang="no">Børge Brevhus består av arkivmateriale og gjenstander. Gjenstandene er registrert i PRIMUS på følgende nummere: US.1796, US.1797, US.1798A-M, US.1996 og US.1997A-D.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>1855-1968</dcterms:created>
+<dc:type xml:lang="no">Arkiv</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000026</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:spatial>AKERSHUS, ULLENSAKER, Borgen</dcterms:spatial>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000026</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000027</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Saksarkiv ordnet etter organets hovedsystem (Børge Brevhus, Børge Brevhus)</dc:title>
+<dc:description xml:lang="no">Serien inneholder interne brev, kvitteringer, kvitteringsbøker og trykksaker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>1957-1968</dcterms:created>
+<dc:type xml:lang="no">Serie</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000027</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000026</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000027</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000028</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Brev inn/ ut. (Børge Brevhus, Saksarkiv ordnet etter organets hovedsystem)</dc:title>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>1962-1970</dcterms:created>
+<dc:type xml:lang="no">Serie</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000028</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000027</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000029</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Brev inn. Statistikk. (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19641229</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000029</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000029</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000030</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Brev inn. Statistikk (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:description xml:lang="no">Brev inn.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19650721</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000030</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000030</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000031</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Brev inn. Statistikk. (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:description xml:lang="no">Brev inn.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>1966-1966</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000031</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000031</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000032</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Brev inn. Statistikk. (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:description xml:lang="no">Brev inn.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>1967-1967</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000032</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000032</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000033</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Brev inn.  (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:description xml:lang="no">Nedleggelse av Børge brevhus.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19680423</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000033</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000033</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000034</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Rundskriv. (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:description xml:lang="no">Rundskriv.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19640227</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000034</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000034</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000035</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Brev inn. Rundskriv. (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:description xml:lang="no">Brev inn.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19640926</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000035</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000035</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000036</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Brev inn. Portotakst. (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:description xml:lang="no">Brev inn.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>1962-1970</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000036</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000036</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000037</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no"> Brev ut. Statistikk. (Børge Brevhus, Brev inn/ ut.)</dc:title>
+<dc:description xml:lang="no">Brev ut.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19640108</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000037</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000028</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000037</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000038</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Kvitteringer (Børge Brevhus, Saksarkiv ordnet etter organets hovedsystem)</dc:title>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>1958-1968</dcterms:created>
+<dc:type xml:lang="no">Serie</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000038</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000027</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000038</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000039</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Kuponger. (Børge Brevhus, Kvitteringer)</dc:title>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19631216-19661220</dcterms:created>
+<dc:type xml:lang="no">Stykke</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000039</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000038</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000039</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000040</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Følgebrev. (Børge Brevhus, Kuponger.)</dc:title>
+<dc:description xml:lang="no">Følgebrev innland.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19631216-19660927</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000040</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000039</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000040</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000041</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Adressekort. (Børge Brevhus, Kuponger.)</dc:title>
+<dc:description xml:lang="no">Innland. 30 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19641006-19661220</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000041</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000039</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000041</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000042</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Følgebrev. (Børge Brevhus, Kuponger.)</dc:title>
+<dc:description xml:lang="no">Følgebrev utland</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>1965</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000042</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000039</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000042</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000043</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Rekommandert post. (Børge Brevhus, Kvitteringer)</dc:title>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19650105</dcterms:created>
+<dc:type xml:lang="no">Stykke</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000043</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000038</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000043</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000044</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1965 (Børge Brevhus, Rekommandert post.)</dc:title>
+<dc:description xml:lang="no">Rekommandert post. 61 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19650105-19651204</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000044</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000043</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000044</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000045</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1966 (Børge Brevhus, Rekommandert post.)</dc:title>
+<dc:description xml:lang="no">Rekommandert post. 64 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19660117-19661221</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000045</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000043</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000045</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000046</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1967 (Børge Brevhus, Rekommandert post.)</dc:title>
+<dc:description xml:lang="no">Rekommandert post. 1 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19670103</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000046</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000043</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000046</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000047</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1975 (Børge Brevhus, Rekommandert post.)</dc:title>
+<dc:description xml:lang="no">Rekommandert post. 3 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19751203</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000047</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000043</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000047</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000048</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Frimerkebestilling (Børge Brevhus, Kvitteringer)</dc:title>
+<dc:description xml:lang="no">7 stk. Rekvierte merker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19630124-19641114</dcterms:created>
+<dc:type xml:lang="no">Stykke</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000048</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000038</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000048</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000049</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Verdikart. (Børge Brevhus, Kvitteringer)</dc:title>
+<dc:description xml:lang="no">Kvitteringsblokker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19650227-19680410</dcterms:created>
+<dc:type xml:lang="no">Stykke</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000049</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000038</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000049</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000050</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1963-64 (Børge Brevhus, Verdikart.)</dc:title>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19631218-19641231</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000050</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000049</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000050</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000051</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1965-66 (Børge Brevhus, Verdikart.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsblokker. Består både av enkeltark og blokker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19650227-19660131</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000051</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000049</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000051</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000052</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1966-67 (Børge Brevhus, Verdikart.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsblokker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19660201-19670109</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000052</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000049</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000052</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000053</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1967-68 (Børge Brevhus, Verdikart.)</dc:title>
+<dc:description xml:lang="no">Kvitreringsblokker. Består både av enkeltark og blokker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19670110-19680217</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000053</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000049</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000053</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000054</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1968 (Børge Brevhus, Verdikart.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsblokker. Består både av enkeltark og blokker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19680217-19680410</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000054</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000049</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000054</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000055</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Posttilvisninger. (Børge Brevhus, Kvitteringer)</dc:title>
+<dc:description xml:lang="no">Liste over posttilvisninger, inn-/utbetalingskort, innløste postinnkassasjoner.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19621130-19680430</dcterms:created>
+<dc:type xml:lang="no">Stykke</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000055</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000038</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000055</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000056</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1962-63 (Børge Brevhus, Posttilvisninger.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsbøker. 8 stk. </dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19621130-19631206</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000056</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000055</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000056</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000057</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1963-64. (Børge Brevhus, Posttilvisninger.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsbøker. 10 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19631206-19641231</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000057</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000055</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000057</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000058</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1965-66 (Børge Brevhus, Posttilvisninger.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsbøker. 9 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19650209-19660113</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000058</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000055</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000058</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000059</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1966-67 (Børge Brevhus, Posttilvisninger.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsbøker. 10 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19660113-19670120</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000059</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000055</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000059</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000060</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1967-68 (Børge Brevhus, Posttilvisninger.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsbøker. 8 stk.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19670120-19680131</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000060</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000055</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000060</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000061</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">1968 (Børge Brevhus, Posttilvisninger.)</dc:title>
+<dc:description xml:lang="no">Kvitteringsbøker. </dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dcterms:created>19680131-19680430</dcterms:created>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000061</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000055</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000061</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000062</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Ubrukte. (Børge Brevhus, Kvitteringer)</dc:title>
+<dc:description xml:lang="no">Verdikart, posttilvisninger, postkvitteringer og verdimerker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dc:type xml:lang="no">Stykke</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000062</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000038</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000062</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000063</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Verdikart. (Børge Brevhus, Ubrukte.)</dc:title>
+<dc:description xml:lang="no">3 stk. Blokker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000063</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000062</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000063</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000064</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Posttilvisninger. (Børge Brevhus, Ubrukte.)</dc:title>
+<dc:description xml:lang="no">7 stk. Bøker.</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000064</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000062</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000064</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000065</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Postkvitteringer. (Børge Brevhus, Ubrukte.)</dc:title>
+<dc:description xml:lang="no">3 stk. Blokker</dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000065</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000062</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000065</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record><record xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/"><header><identifier>oai:arkivportalen.no:nb-AFM_arkiv000000000066</identifier><datestamp>2011-04-01</datestamp><setSpec>AFM</setSpec></header><metadata><abm:record xsi:schemaLocation="http://to_be_decided/abm/ http://to_be_decided/abm/abm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:abm="http://to_be_decided/abm/" xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:title xml:lang="no">Verdimerker. (Børge Brevhus, Ubrukte.)</dc:title>
+<dc:description xml:lang="no">Skjema for bestilling av frimerker. Løse skjemaer som er brettet sammen og danner 4 bunker. </dc:description>
+<dc:publisher>Akershusmuseet</dc:publisher>
+<dc:type xml:lang="no">Mappe</dc:type>
+<dc:identifier>nb-AFM_arkiv000000000066</dc:identifier>
+<dc:source xml:lang="no">Akershusmuseet</dc:source>
+<dcterms:isPartOf xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000062</dcterms:isPartOf>
+<europeana:provider>abm</europeana:provider>
+<europeana:type>TEXT</europeana:type>
+<europeana:isShownAt xsi:type="dcterms:URI"> http://www.arkivportalen.no/arkivportalen-web/side/arkiv/detaljer?arkivId=nb-AFM_arkiv000000000066</europeana:isShownAt>
+<abm:contentProvider>Akershusmuseet</abm:contentProvider>
+</abm:record>
+</metadata></record>
+</metadata>

@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.*;
+import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
@@ -32,12 +33,14 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +58,8 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
 public class SipModel {
     private static final Logger LOG = Logger.getLogger(SipModel.class);
+    private JDesktopPane desktop;
+    private AllFrames.ViewSelector viewSelector;
     private WorkModel workModel;
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
@@ -82,11 +87,12 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback) throws StorageException {
-        this.preferences = Preferences.userNodeForPackage(getClass());
+    public SipModel(JDesktopPane desktop, Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, Preferences preferences) throws StorageException {
+        this.desktop = desktop;
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
+        this.preferences = preferences;
         this.workModel = new WorkModel(feedback);
         dataSetModel = new DataSetModel(this);
         functionCompileModel = new FunctionCompileModel(this, groovyCodeResource);
@@ -163,6 +169,18 @@ public class SipModel {
                 }
             }
         });
+    }
+
+    public JDesktopPane getDesktop() {
+        return desktop;
+    }
+
+    public AllFrames.ViewSelector getViewSelector() {
+        return viewSelector;
+    }
+
+    public void setViewSelector(AllFrames.ViewSelector viewSelector) {
+        this.viewSelector = viewSelector;
     }
 
     private void clearValidation() {
@@ -293,12 +311,13 @@ public class SipModel {
                 final Stats stats = dataSet.getLatestStats();
                 final Map<String, String> facts = dataSet.getDataSetFacts();
                 final Map<String, String> hints = dataSet.getHints();
-                final String prefixToUse = prefix.isEmpty() ? dataSet.getLatestPrefix() : prefix;
-                dataSetModel.setDataSet(dataSet, prefixToUse);
+                final List<SchemaVersion> schemaVersions = dataSet.getSchemaVersions();
+                dataSetModel.setDataSet(dataSet, prefix);
                 final RecMapping recMapping = dataSetModel.getRecMapping();
                 dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
-                mappingHintsModel.initialize(prefixToUse, dataSetModel);
+                mappingHintsModel.initialize(prefix, dataSetModel);
                 dataSetModel.getMappingModel().setFacts(facts);
+                dataSetModel.getMappingModel().setSchemaVersion(schemaVersions);
                 recordCompileModel.setValidator(dataSetModel.newValidator());
                 exec(new Swing() {
                     @Override
@@ -323,7 +342,7 @@ public class SipModel {
                         seekFirstRecord();
                     }
                 });
-                Swing.Exec.later(success);
+                if (success != null) Swing.Exec.later(success);
             }
             catch (Exception e) {
                 feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);

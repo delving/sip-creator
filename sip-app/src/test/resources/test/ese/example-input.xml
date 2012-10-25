@@ -1,81 +1,88 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<Medialab>
-  <Record>
-    <OBS_GUID>ec019259-6bd5-4946-acf9-00009b202184</OBS_GUID>
-    <Inventarisnummer>NK2825</Inventarisnummer>
-    <Vervaardiger>onbekend;; Cleve, M. I van</Vervaardiger>
-    <Titel>Landschap met boeren koeien melkend</Titel>
-    <Omschrijving>Landschap met boeren koeien melkend</Omschrijving>
-    <Vervaardigingsdatum>1550=1599</Vervaardigingsdatum>
-    <VervaardigingsdatumOpmerking></VervaardigingsdatumOpmerking>
-    <Vervaardigingsplaats></Vervaardigingsplaats>
-    <Acquisitienaam>Stichting Nederlands Kunstbezit</Acquisitienaam>
-    <Hoogte>49</Hoogte>
-    <Breedte>86</Breedte>
-    <Diameter_Diepte></Diameter_Diepte>
-    <Specifieke_Objectnaam>schilderij</Specifieke_Objectnaam>
-    <Trefwoorden>genre, landschap, schilderkunst</Trefwoorden>
-    <Algemene_Objectnaam>oude kunst</Algemene_Objectnaam>
-    <Materiaal>olieverf, paneel</Materiaal>
-    <Techniek></Techniek>
-    <Standplaats>Depot ICN</Standplaats>
-    <VervaardigerRol>rol: , Verv. naam: Cleve, M. I vanrol: m, Verv. naam: onbekend</VervaardigerRol>
-    <Afbeelding>http://www.oogle.com/NK/NK2825.jpg</Afbeelding>
-    <type>IMAGE</type>
-    <dataProvider>MegaHub</dataProvider>
-    <Provider>MediaLab</Provider>
-    <Rights>http://creativecommons.org/licenses/by/3.0/</Rights>
-  </Record>
-  <Record>
-    <OBS_GUID>a38b3f5d-3c09-4ea2-8357-00101094cd82</OBS_GUID>
-    <Inventarisnummer>SZ73414</Inventarisnummer>
-    <Vervaardiger>Siewert, F.</Vervaardiger>
-    <Titel>Molen</Titel>
-    <Omschrijving>Molen </Omschrijving>
-    <Vervaardigingsdatum></Vervaardigingsdatum>
-    <VervaardigingsdatumOpmerking></VervaardigingsdatumOpmerking>
-    <Vervaardigingsplaats></Vervaardigingsplaats>
-    <Acquisitienaam>BKR</Acquisitienaam>
-    <Hoogte>53.5</Hoogte>
-    <Breedte>74</Breedte>
-    <Diameter_Diepte></Diameter_Diepte>
-    <Specifieke_Objectnaam>aquarel</Specifieke_Objectnaam>
-    <Trefwoorden>werk op papier</Trefwoorden>
-    <Algemene_Objectnaam>moderne kunst</Algemene_Objectnaam>
-    <Materiaal>aquarel, inkt</Materiaal>
-    <Techniek>gewassen</Techniek>
-    <Standplaats>niet-museale instelling</Standplaats>
-    <VervaardigerRol>rol: , Verv. naam: Siewert, F.</VervaardigerRol>
-    <Afbeelding>http://www.oogle.com/K/K66091.jpg</Afbeelding>
-    <type>IMAGE</type>
-      <dataProvider>MegaHub</dataProvider>
-      <Provider>MediaLab</Provider>
-      <Rights>http://creativecommons.org/licenses/by/3.0/</Rights>
-  </Record>
-  <Record>
-    <OBS_GUID>868e9ee9-a3cf-43dc-a1e7-00102d69807f</OBS_GUID>
-    <Inventarisnummer>K66092</Inventarisnummer>
-    <Vervaardiger>Tsang, J.</Vervaardiger>
-    <Titel>Science fiction</Titel>
-    <Omschrijving>Science fiction </Omschrijving>
-    <Vervaardigingsdatum>1965</Vervaardigingsdatum>
-    <VervaardigingsdatumOpmerking></VervaardigingsdatumOpmerking>
-    <Vervaardigingsplaats></Vervaardigingsplaats>
-    <Acquisitienaam>onbekend/in bewerking</Acquisitienaam>
-    <Hoogte>24</Hoogte>
-    <Breedte>30.3</Breedte>
-    <Diameter_Diepte></Diameter_Diepte>
-    <Specifieke_Objectnaam>collage</Specifieke_Objectnaam>
-    <Trefwoorden>werk op papier</Trefwoorden>
-    <Algemene_Objectnaam>moderne kunst</Algemene_Objectnaam>
-    <Materiaal>inkt, oost-indische inkt, papier</Materiaal>
-    <Techniek>pentekening</Techniek>
-    <Standplaats>Depot ICN</Standplaats>
-    <VervaardigerRol>rol: i, Verv. naam: Tsang, J.</VervaardigerRol>
-    <Afbeelding>http://www.oogle.com//K/K66092.jpg</Afbeelding>
-    <type>IMAGE</type>
-      <dataProvider>MegaHub</dataProvider>
-      <Provider>MediaLab</Provider>
-      <Rights>http://creativecommons.org/licenses/by/3.0/</Rights>
-  </Record>
-</Medialab>
+<?xml version="1.0" encoding="UTF-8"?>
+<harvest>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:dc="http://dublincore.org/documents/dcmi-namespace/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+ <responseDate>2011-04-26T11:53:27Z</responseDate>
+ <request metadataPrefix="oai_dc" verb="ListRecords">http://api.memorix-maior.nl/collectiebeheer/oai-pmh/key/6ac5f51809825cedb31b20d6e3daf631/tenant/</request> 
+ <ListRecords>
+<record>
+	<header>
+	<identifier>12cf16ea-dc46-11df-a9e7-7590f0316edd</identifier><datestamp>2010-11-17T15:09:58Z</datestamp></header>
+	<metadata>
+		<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/           http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:description>Bloemendalsestraat 22/hoek Achter het Oude Weeshuis, en 24/ hoek Boldersstraat. Rechts het afgebrande pand Bloemendalsestraat 26.</dc:description><dc:description>bijzonderheden: Bloemendalsestraat 26 werd gesloopt in december 1977.</dc:description><dc:date>1971-08</dc:date><dc:identifier>01383</dc:identifier><dc:coverage>Amersfoort</dc:coverage><dc:coverage>Bloemendalsestraat - even</dc:coverage><dc:coverage>Achter het Oude Weeshuis</dc:coverage><dc:coverage>Boldersstraat</dc:coverage><dc:coverage>Ploegje</dc:coverage><dc:rights>Fotocinehouse Amersfoort</dc:rights></oai_dc:dc>
+	</metadata>
+			<about>
+	<files xmlns="http://api.memorix-maior.nl/REST/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API.xsd">
+				<file>075d0b39-890b-3d09-280f-fe3e5bcfc992</file>
+			</files>
+	</about>
+	</record>
+<record>
+	<header>
+	<identifier>12cf859e-dc46-11df-a9e7-7590f0316edd</identifier><datestamp>2010-11-17T15:09:58Z</datestamp></header>
+	<metadata>
+		<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:description>Bloemendalsestraat 34.</dc:description><dc:date>1969-11-24</dc:date><dc:identifier>01387</dc:identifier><dc:coverage>Amersfoort</dc:coverage><dc:coverage>Bloemendalsestraat - even</dc:coverage><dc:rights>Fotocinehouse Amersfoort</dc:rights></oai_dc:dc>
+	</metadata>
+			<about>
+	<files xmlns="http://api.memorix-maior.nl/REST/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API.xsd">
+				<file>5eed5be4-cd06-d9ae-8a8f-2b38e9efff09</file>
+			</files>
+	</about>
+	</record>
+<record>
+	<header>
+	<identifier>12cff042-dc46-11df-a9e7-7590f0316edd</identifier><datestamp>2010-11-17T15:09:58Z</datestamp></header>
+	<metadata>
+		<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:description>Bloemendalsestraat 62, 64 en 66 (van links af).</dc:description><dc:date>1971-08</dc:date><dc:identifier>01390</dc:identifier><dc:coverage>Amersfoort</dc:coverage><dc:coverage>Bloemendalsestraat - even</dc:coverage><dc:rights>Fotocinehouse Amersfoort</dc:rights></oai_dc:dc>
+	</metadata>
+			<about>
+	<files xmlns="http://api.memorix-maior.nl/REST/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API.xsd">
+				<file>96bf8905-0e31-af0a-4e41-1431f79a1f98</file>
+			</files>
+	</about>
+	</record>
+<record>
+	<header>
+	<identifier>12d056ea-dc46-11df-a9e7-7590f0316edd</identifier><datestamp>2010-11-17T15:09:58Z</datestamp></header>
+	<metadata>
+		<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:description>Bloemendalsestraat 56, 58 en 60 (van links af).</dc:description><dc:date>1969-03</dc:date><dc:identifier>01388</dc:identifier><dc:coverage>Amersfoort</dc:coverage><dc:coverage>Bloemendalsestraat - even</dc:coverage><dc:rights>Fotocinehouse Amersfoort</dc:rights></oai_dc:dc>
+	</metadata>
+			<about>
+	<files xmlns="http://api.memorix-maior.nl/REST/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API.xsd">
+				<file>2b12858c-35b9-5656-0423-db35a6a2c120</file>
+			</files>
+	</about>
+	</record>
+<record>
+	<header>
+	<identifier>12d0c198-dc46-11df-a9e7-7590f0316edd</identifier><datestamp>2010-11-17T15:09:58Z</datestamp></header>
+	<metadata>
+		<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:description>Bloemendalsestraat 19/hoek Teut: "De Gekroonde Laars". Rechts is een deel van Bloemendalsestraat 17 zichtbaar, links huizen aan de Teut.</dc:description><dc:description>bijzonderheden: Dit huis is een Rijksmonument.</dc:description><dc:date>1979-12</dc:date><dc:identifier>01373</dc:identifier><dc:coverage>Amersfoort</dc:coverage><dc:coverage>Bloemendalsestraat - oneven</dc:coverage><dc:coverage>Teut</dc:coverage><dc:coverage>19</dc:coverage><dc:rights>Fotocinehouse Amersfoort</dc:rights></oai_dc:dc>
+	</metadata>
+			<about>
+	<files xmlns="http://api.memorix-maior.nl/REST/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API.xsd">
+				<file>46fed2e7-93c6-dc9c-431e-56465c7f87ce</file>
+			</files>
+	</about>
+	</record>
+<record>
+	<header>
+	<identifier>12d1327c-dc46-11df-a9e7-7590f0316edd</identifier><datestamp>2010-11-17T15:09:58Z</datestamp></header>
+	<metadata>
+		<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:subject>stadsboerderij</dc:subject><dc:description>Bloemendalsestraat 61, voormalige stadsboerderij. Rechts 59.</dc:description><dc:date>1969-09</dc:date><dc:identifier>01377</dc:identifier><dc:coverage>Amersfoort</dc:coverage><dc:coverage>Bloemendalsestraat - oneven</dc:coverage><dc:coverage>61</dc:coverage><dc:coverage>59</dc:coverage><dc:rights>Fotocinehouse Amersfoort</dc:rights></oai_dc:dc>
+	</metadata>
+			<about>
+	<files xmlns="http://api.memorix-maior.nl/REST/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API.xsd">
+				<file>71fc52f1-2f1a-a28b-17bb-8d2f40b5672e</file>
+			</files>
+	</about>
+	</record>
+
+ </ListRecords>
+</OAI-PMH>
+</harvest>

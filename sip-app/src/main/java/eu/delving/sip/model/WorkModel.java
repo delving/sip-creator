@@ -50,6 +50,7 @@ public class WorkModel {
 
     public interface ProgressIndicator {
         void cancel();
+
         String getString(boolean full);
     }
 
@@ -217,12 +218,13 @@ public class WorkModel {
         }
 
         public String getDataSet() {
-            if (isEmpty()) return null;
+            final Work work = queue.isEmpty() ? null : queue.peek();
+            if (work == null) return null;
             switch (kind()) {
                 case NETWORK_DATA_SET:
                 case DATA_SET:
                 case DATA_SET_PREFIX:
-                    DataSet dataSet = ((Work.DataSetWork) getWork()).getDataSet();
+                    DataSet dataSet = ((Work.DataSetWork) work).getDataSet();
                     return dataSet == null ? null : dataSet.getSpec();
                 default:
                     return null;
@@ -295,6 +297,7 @@ public class WorkModel {
         private String progressMessage;
         private int current, maximum;
         private boolean cancelled;
+        private TimeEstimator timeEstimator;
 
         @Override
         public void setProgressMessage(String message) {
@@ -302,8 +305,10 @@ public class WorkModel {
         }
 
         @Override
-        public void prepareFor(int total) {
-            this.maximum = total;
+        public void prepareFor(int maximum) {
+            if (maximum <= 0) return;
+            this.maximum = maximum;
+            this.timeEstimator = new TimeEstimator(maximum);
         }
 
         @Override
@@ -329,7 +334,7 @@ public class WorkModel {
                     return String.format("%d : %s", current, progressMessage);
                 }
                 else {
-                    return String.format("%d/%d : %s", current, maximum, progressMessage);
+                    return String.format("%d/%d : %s %s", current, maximum, progressMessage, timeEstimator.getMessage(current));
                 }
             }
             else {
@@ -337,8 +342,63 @@ public class WorkModel {
                     return String.format("%d", current);
                 }
                 else {
-                    return String.format("%d/%d", current, maximum);
+                    return String.format("%d/%d %s", current, maximum, timeEstimator.getMessage(current));
                 }
+            }
+        }
+    }
+
+    private static class TimeEstimator {
+        public static final int ONE_SECOND = 1000;
+        public static final int ONE_MINUTE = ONE_SECOND * 60;
+        public static final int ONE_HOUR = ONE_MINUTE * 60;
+        private int maximum;
+        private long startTime;
+
+        private TimeEstimator(int maximum) {
+            this.maximum = maximum;
+        }
+
+        public String getMessage(int current) {
+            long now = System.currentTimeMillis();
+            double proportionComplete = (double) current / maximum;
+            if (startTime == 0 || startTime == now) {
+                startTime = now;
+                return "";
+            }
+            else if (proportionComplete < 0.01) {
+                return "estimating time";
+            }
+            else {
+                long millisElapsed = now - startTime;
+                double perMilli = (double) current / millisElapsed;
+                long totalMills = (long) (maximum / perMilli);
+                return getTimeString(totalMills - millisElapsed) + " to go";
+            }
+        }
+
+        private String getTimeString(long remaining) {
+            int hours = (int) (remaining / ONE_HOUR);
+            long minuteMillis = remaining - ONE_HOUR * hours;
+            int minutes = (int) (minuteMillis / ONE_MINUTE);
+            long secondMillis = minuteMillis - minutes * ONE_MINUTE;
+            int seconds = (int) (secondMillis / ONE_SECOND);
+            if (hours > 0) {
+                return String.format("%d hour%s %d minutes", hours, hours > 1 ? "s" : "", minutes);
+            }
+            else if (minutes > 0) {
+                if (minutes > 5) {
+                    return String.format("%d minutes", minutes);
+                }
+                else {
+                    return String.format("%d minute%s %d seconds", minutes, minutes > 1 ? "s" : "", seconds);
+                }
+            }
+            else if (seconds > 5) {
+                return String.format("%d seconds", seconds);
+            }
+            else {
+                return "a few seconds";
             }
         }
     }

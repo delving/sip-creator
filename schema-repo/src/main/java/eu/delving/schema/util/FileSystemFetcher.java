@@ -37,6 +37,11 @@ import java.io.IOException;
  */
 public class FileSystemFetcher implements Fetcher {
     private File schemas;
+    private boolean validating;
+
+    public FileSystemFetcher(boolean validating) {
+        this.validating = validating;
+    }
 
     @Override
     public String fetchList() {
@@ -50,13 +55,13 @@ public class FileSystemFetcher implements Fetcher {
 
     @Override
     public Boolean isValidating() {
-        return true;
+        return validating;
     }
 
     public String getFileContents(String path) {
         if (schemas == null) findSchemasDirectory();
         try {
-            return FileUtils.readFileToString(new File(schemas, path));
+            return FileUtils.readFileToString(new File(schemas, path), "UTF-8");
         }
         catch (IOException e) {
             throw new RuntimeException(e);

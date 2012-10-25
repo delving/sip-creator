@@ -203,13 +203,13 @@ public class StatsNode implements TreeNode, Comparable<StatsNode> {
             if (value instanceof StatsNode) {
                 StatsNode node = (StatsNode) value;
                 if (node.getTag().isAttribute()) {
-                    setIcon(SwingHelper.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
                 else if (node.getChildNodes().iterator().hasNext()) {
-                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_COMPOSITE);
                 }
                 else {
-                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_VALUE);
                 }
             }
             return component;

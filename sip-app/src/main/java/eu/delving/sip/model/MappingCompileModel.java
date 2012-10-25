@@ -114,7 +114,7 @@ public class MappingCompileModel {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if (enabled) triggerCompile();
+        triggerCompile();
     }
 
     public void setNodeMapping(NodeMapping nodeMapping) {

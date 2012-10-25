@@ -31,28 +31,22 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.model.SipModel;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 
 import static org.apache.http.HttpStatus.*;
@@ -64,27 +58,11 @@ import static org.apache.http.HttpStatus.*;
  */
 
 public class CultureHubClient {
-    private static final int CONNECTION_TIMEOUT = 1000 * 60 * 30;
     private static final int BLOCK_SIZE = 1024;
     private Logger log = Logger.getLogger(getClass());
-    private Context context;
+    private SipModel sipModel;
     private HttpClient httpClient;
-
-    public interface Context {
-        String getUser();
-
-        String getServerUrl();
-
-        String getAccessToken() throws OAuthSystemException, OAuthProblemException;
-
-        void invalidateTokens();
-
-        void dataSetCreated(DataSet dataSet);
-
-        Feedback getFeedback();
-
-        void exec(Work work);
-    }
+    private OAuthClient oauthClient;
 
     public enum Code {
         OK(SC_OK, "All is well"),
@@ -112,32 +90,21 @@ public class CultureHubClient {
         }
     }
 
-    public CultureHubClient(Context context) {
-        this.context = context;
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setSoTimeout(httpParams, CONNECTION_TIMEOUT);
-        HttpConnectionParams.setConnectionTimeout(httpParams, CONNECTION_TIMEOUT);
-        boolean proxyDetected = false;
-        try {
-            List<Proxy> proxies = ProxySelector.getDefault().select(new URI(context.getServerUrl()));
-            for (Proxy proxy : proxies) {
-                if (proxy.type() != Proxy.Type.HTTP) continue;
-                InetSocketAddress addr = (InetSocketAddress) proxy.address();
-                String host = addr.getHostName();
-                int port = addr.getPort();
-                HttpHost httpHost = new HttpHost(host, port);
-                ConnRouteParams.setDefaultProxy(httpParams, httpHost);
-                proxyDetected = true;
-            }
-        }
-        catch (URISyntaxException e) {
-            throw new RuntimeException("Bad address: " + context.getServerUrl(), e);
-        }
-        httpClient = new DefaultHttpClient(httpParams);
-    }
+    public CultureHubClient(SipModel sipModel, HttpClient httpClient) {
+        this.sipModel = sipModel;
+        this.httpClient = httpClient;
+        oauthClient = new OAuthClient(
+                httpClient,
+                sipModel.getStorage().getHostPort(),
+                sipModel.getStorage().getUsername(),
+                new OAuthClient.PasswordRequest() {
+                    @Override
+                    public String getPassword() {
+                        return feedback().getPassword();
+                    }
+                }
+        );
 
-    public HttpClient getHttpClient() {
-        return httpClient;
     }
 
     public interface ListReceiveListener {
@@ -148,7 +115,7 @@ public class CultureHubClient {
     }
 
     public void fetchDataSetList(ListReceiveListener listReceiveListener) {
-        context.exec(new ListFetcher(1, listReceiveListener));
+        sipModel.exec(new ListFetcher(1, listReceiveListener));
     }
 
     public interface UnlockListener {
@@ -156,19 +123,19 @@ public class CultureHubClient {
     }
 
     public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
-        context.exec(new Unlocker(1, dataSet, unlockListener));
+        sipModel.exec(new Unlocker(1, dataSet, unlockListener));
     }
 
     public void downloadDataSet(DataSet dataSet, Swing finished) {
-        context.exec(new DataSetDownloader(1, dataSet, finished));
+        sipModel.exec(new DataSetDownloader(1, dataSet, finished));
     }
 
     public void uploadFiles(DataSet dataSet, Swing finished) throws StorageException {
-        context.exec(new DataUploader(1, dataSet, finished));
+        sipModel.exec(new DataUploader(1, dataSet, finished));
     }
 
     public void uploadMedia(DataSet dataSet, Swing finished) throws StorageException {
-        context.exec(new MediaUploader(1, dataSet, finished));
+        sipModel.exec(new MediaUploader(1, dataSet, finished));
     }
 
     private abstract class Attempt implements Work {
@@ -184,9 +151,9 @@ public class CultureHubClient {
 
         protected boolean reactToUnauthorized(Work retry) {
             if (shouldRetry()) {
-                context.getFeedback().alert("Authorization failed, retrying...");
-                context.invalidateTokens();
-                context.exec(retry);
+                feedback().alert("Authorization failed, retrying...");
+                oauthClient.invalidateTokens();
+                sipModel.exec(retry);
                 return true;
             }
             else {
@@ -206,9 +173,7 @@ public class CultureHubClient {
         @Override
         public void run() {
             try {
-                String url = createListRequest();
-                log.info("requesting list: " + url);
-                HttpGet get = new HttpGet(url);
+                HttpGet get = createListRequest();
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
                 Code code = Code.from(response);
@@ -232,7 +197,7 @@ public class CultureHubClient {
                                     response.getStatusLine().getStatusCode(),
                                     response.getStatusLine().getReasonPhrase()
                             )));
-                            context.invalidateTokens();
+                            oauthClient.invalidateTokens();
                             break;
                     }
                     EntityUtils.consume(entity);
@@ -247,7 +212,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.error("Unable to fetch list", e);
-                context.getFeedback().alert(String.format("Error fetching list from hub: %s", e.getMessage()));
+                feedback().alert(String.format("Error fetching list from hub: %s", e.getMessage()));
                 listReceiveListener.failed(e);
             }
         }
@@ -286,7 +251,7 @@ public class CultureHubClient {
                         break;
                     default:
                         unlockListener.unlockComplete(false);
-                        context.invalidateTokens();
+                        oauthClient.invalidateTokens();
                         reportResponse(code, response.getStatusLine());
                         break;
                 }
@@ -297,7 +262,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.error("Unable to unlock dataset", e);
-                context.getFeedback().alert(String.format("Error unlocking dataset server: %s", e.getMessage()));
+                feedback().alert(String.format("Error unlocking dataset server: %s", e.getMessage()));
                 unlockListener.unlockComplete(false);
             }
         }
@@ -338,7 +303,6 @@ public class CultureHubClient {
                             dataSet.remove();
                             dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
                             success = true;
-                            context.dataSetCreated(dataSet);
                             break;
                         case UNAUTHORIZED:
                             if (reactToUnauthorized(new DataSetDownloader(attempt + 1, dataSet, finished))) {
@@ -349,7 +313,7 @@ public class CultureHubClient {
                             }
                             break;
                         default:
-                            context.invalidateTokens();
+                            oauthClient.invalidateTokens();
                             reportResponse(code, response.getStatusLine());
                             break;
                     }
@@ -364,7 +328,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.warn("Unable to download data set", e);
-                context.getFeedback().alert("Unable to download data set", e);
+                feedback().alert("Unable to download data set", e);
             }
             finally {
                 if (!success) {
@@ -372,7 +336,7 @@ public class CultureHubClient {
                         dataSet.remove();
                     }
                     catch (StorageException e1) {
-                        context.getFeedback().alert("Unable to remove local data set");
+                        feedback().alert("Unable to remove local data set");
                     }
                 }
                 if (finished != null) Swing.Exec.later(finished);
@@ -434,7 +398,7 @@ public class CultureHubClient {
                                 EntityUtils.consume(uploadResponse.getEntity());
                                 code = Code.from(uploadResponse);
                                 if (code != Code.OK && !fileEntity.abort) {
-                                    context.invalidateTokens();
+                                    oauthClient.invalidateTokens();
                                     reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
                                     return;
                                 }
@@ -445,11 +409,11 @@ public class CultureHubClient {
                                 finished = null;
                             }
                             else {
-                                context.getFeedback().alert("Unable to complete upload");
+                                feedback().alert("Unable to complete upload");
                             }
                             break;
                         default:
-                            context.invalidateTokens();
+                            oauthClient.invalidateTokens();
                             reportResponse(code, listResponse.getStatusLine());
                             break;
                     }
@@ -464,7 +428,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.error("Error while connecting", e);
-                context.getFeedback().alert("Authorization system problem: " + e.getMessage());
+                feedback().alert("Authorization system problem: " + e.getMessage());
             }
             finally {
                 if (finished != null) Swing.Exec.later(finished);
@@ -530,7 +494,7 @@ public class CultureHubClient {
                                 EntityUtils.consume(uploadResponse.getEntity());
                                 code = Code.from(uploadResponse);
                                 if (code != Code.OK && !fileEntity.abort) {
-                                    context.invalidateTokens();
+                                    oauthClient.invalidateTokens();
                                     reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
                                     return;
                                 }
@@ -541,11 +505,11 @@ public class CultureHubClient {
                                 finished = null;
                             }
                             else {
-                                context.getFeedback().alert("Unable to complete upload");
+                                feedback().alert("Unable to complete upload");
                             }
                             break;
                         default:
-                            context.invalidateTokens();
+                            oauthClient.invalidateTokens();
                             reportResponse(code, listResponse.getStatusLine());
                             break;
                     }
@@ -560,7 +524,7 @@ public class CultureHubClient {
             }
             catch (Exception e) {
                 log.error("Error while connecting", e);
-                context.getFeedback().alert("Authorization system problem: " + e.getMessage());
+                feedback().alert("Authorization system problem: " + e.getMessage());
             }
             finally {
                 if (finished != null) Swing.Exec.later(finished);
@@ -591,13 +555,13 @@ public class CultureHubClient {
         OAuthClient.Problem problem = OAuthClient.getProblem(e);
         switch (problem) {
             case EXPIRED_TOKEN:
-                context.getFeedback().alert(String.format("Expired token for user %s, please try again", context.getUser()));
+                feedback().alert(String.format("Expired token for user %s, please try again", sipModel.getStorage().getUsername()));
                 break;
             case INVALID_GRANT:
-                context.getFeedback().alert(String.format("Invalid password for user %s", context.getUser()));
+                feedback().alert(String.format("Invalid password for user %s", sipModel.getStorage().getUsername()));
                 break;
             default:
-                context.getFeedback().alert("Authorization problem: " + e);
+                feedback().alert("Authorization problem: " + e);
                 break;
         }
     }
@@ -688,32 +652,66 @@ public class CultureHubClient {
         return stream;
     }
 
-
-    private String createListRequest() throws OAuthSystemException, OAuthProblemException {
-        return String.format(
-                "%s/list?accessKey=%s",
-                context.getServerUrl(), context.getAccessToken()
-        );
+    private HttpGet createListRequest() throws OAuthSystemException, OAuthProblemException {
+        return createGet("list");
     }
 
     private HttpGet createDownloadRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
-        HttpGet get = new HttpGet(String.format(
-                "%s/fetch/%s/%s-sip.zip?accessKey=%s",
-                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
+        HttpGet get = createGet(String.format(
+                "fetch/%s/%s-sip.zip",
+                dataSet.getOrganization(), dataSet.getSpec()
         ));
         get.setHeader("Accept", "application/zip");
         return get;
     }
 
     private HttpPost createSubmitRequest(DataSet dataSet, List<File> uploadFiles) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
-        String url = String.format(
-                "%s/submit/%s/%s?accessKey=%s",
-                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
-        );
-        HttpPost post = new HttpPost(url);
+        HttpPost post = createPost(String.format(
+                "submit/%s/%s",
+                dataSet.getOrganization(), dataSet.getSpec()
+        ));
         post.setEntity(createListEntityFiles(uploadFiles));
         post.setHeader("Accept", "text/plain");
         return post;
+    }
+
+    private HttpPost createSubmitRequest(DataSet dataSet, MediaFiles mediaFiles) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
+        HttpPost post = createPost(String.format(
+                "submit/%s/%s",
+                dataSet.getOrganization(), dataSet.getSpec()
+        ));
+        List<String> names = new ArrayList<String>();
+        for (MediaFiles.MediaFile file : mediaFiles.mediaFiles) names.add(file.name);
+        post.setEntity(createListEntityStrings(names));
+        post.setHeader("Accept", "text/plain");
+        return post;
+    }
+
+    private HttpPost createUploadRequest(DataSet dataSet, File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
+        HttpPost post = createPost(String.format(
+                "submit/%s/%s/%s",
+                dataSet.getOrganization(), dataSet.getSpec(), file.getName()
+        ));
+        FileEntity fileEntity = new FileEntity(file, progressListener);
+        post.setEntity(fileEntity);
+        return post;
+    }
+
+    private HttpGet createUnlockRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
+        HttpGet get = createGet(String.format(
+                "unlock/%s/%s",
+                dataSet.getOrganization(), dataSet.getSpec()
+        ));
+        get.setHeader("Accept", "text/xml");
+        return get;
+    }
+
+    private HttpPost createPost(String path) throws OAuthSystemException, OAuthProblemException {
+        return new HttpPost(String.format("%s/%s?accessKey=%s", getServerUrl(), path, oauthClient.getToken()));
+    }
+
+    private HttpGet createGet(String path) throws OAuthSystemException, OAuthProblemException {
+        return new HttpGet(String.format("%s/%s?accessKey=%s", getServerUrl(), path, oauthClient.getToken()));
     }
 
     private HttpEntity createListEntityFiles(List<File> uploadFiles) throws UnsupportedEncodingException {
@@ -726,47 +724,21 @@ public class CultureHubClient {
         return new StringEntity(StringUtils.join(uploadFiles, '\n'));
     }
 
-    private HttpPost createSubmitRequest(DataSet dataSet, MediaFiles mediaFiles) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
-        String url = String.format(
-                "%s/submit/%s/%s?accessKey=%s",
-                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
-        );
-        HttpPost post = new HttpPost(url);
-        List<String> names = new ArrayList<String>();
-        for (MediaFiles.MediaFile file : mediaFiles.mediaFiles) names.add(file.name);
-        post.setEntity(createListEntityStrings(names));
-        post.setHeader("Accept", "text/plain");
-        return post;
-    }
-
-    private HttpPost createUploadRequest(DataSet dataSet, File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
-        String url = String.format(
-                "%s/submit/%s/%s/%s?accessKey=%s",
-                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), file.getName(), context.getAccessToken()
-        );
-        HttpPost upload = new HttpPost(url);
-        FileEntity fileEntity = new FileEntity(file, progressListener);
-        upload.setEntity(fileEntity);
-        return upload;
-    }
-
-    private HttpGet createUnlockRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
-        String url = String.format(
-                "%s/unlock/%s/%s?accessKey=%s",
-                context.getServerUrl(), dataSet.getOrganization(), dataSet.getSpec(), context.getAccessToken()
-        );
-        HttpGet get = new HttpGet(url);
-        get.setHeader("Accept", "text/xml");
-        return get;
-    }
-
     private void reportResponse(Code code, StatusLine statusLine) {
-        context.getFeedback().alert(String.format(
+        feedback().alert(String.format(
                 "Problem communicating with the CultureHub: %s. Status [%d] %s",
                 code.message,
                 statusLine.getStatusCode(),
                 statusLine.getReasonPhrase()
         ));
+    }
+
+    private Feedback feedback() {
+        return sipModel.getFeedback();
+    }
+
+    private String getServerUrl() {
+        return String.format("http://%s/api/sip-creator", sipModel.getStorage().getHostPort());
     }
 
     @XStreamAlias("data-set-list")
@@ -798,20 +770,28 @@ public class CultureHubClient {
         public String orgId;
         public String state;
         public int recordCount;
-        public Ownership ownership;
         public LockedBy lockedBy;
         public CreatedBy createdBy;
+
+        public String getDirectoryName() {
+            return String.format("%s_%s", spec, orgId);
+        }
+
+        public int getRecordCount() {
+            return recordCount;
+        }
+
+        public LockedBy getLockedBy() {
+            return lockedBy;
+        }
+
+        public CreatedBy getCreatedBy() {
+            return createdBy;
+        }
 
         public String toString() {
             return "data-set spec=" + spec;
         }
-    }
-
-    @XStreamAlias("ownership")
-    public static class Ownership {
-        public String username;
-        public String fullname;
-        public String email;
     }
 
     @XStreamAlias("lockedBy")
@@ -819,6 +799,22 @@ public class CultureHubClient {
         public String username;
         public String fullname;
         public String email;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getFullname() {
+            return fullname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String toString() {
+            return String.format("%s <%s>", fullname, email);
+        }
     }
 
     @XStreamAlias("createdBy")
@@ -826,5 +822,17 @@ public class CultureHubClient {
         public String username;
         public String fullname;
         public String email;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getFullname() {
+            return fullname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
     }
 }

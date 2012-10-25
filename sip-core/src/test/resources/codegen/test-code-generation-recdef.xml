@@ -126,7 +126,7 @@
 
     <root tag="lido" attrs="sortorder" required="true">
         <elem tag="lidoRecID" attrs="pref, type, source, encodinganalog, label" required="true"/>
-        <elem tag="objectPublishedID" attrs="pref, type, source, encodinganalog, label"/>
+        <elem tag="objectPublishedID" attrs="pref, type, source, encodinganalog, label" fieldType="gumby"/>
         <elem tag="category" elems="term, conceptID" singular="true"/>
 
         <elem tag="descriptiveMetadata" attrs="xml:lang" required="true">
@@ -262,7 +262,7 @@
         <field-marker name="OWNER"/>
         <field-marker name="PROVIDER"/>
         <field-marker name="LANDING_PAGE"/>
-        <field-marker name="THUMBNAIL"/>
+        <field-marker name="IMAGE_URL"/>
         <field-marker name="THUMBNAIL"/>
         <field-marker name="SPEC"/>
         <field-marker name="DEEP_ZOOM_URL"/>

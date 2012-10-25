@@ -85,8 +85,17 @@ public class RecMapping {
     }
 
     public SchemaVersion getSchemaVersion() {
-        if (prefix == null || schemaVersion == null) throw new IllegalStateException("Prefix and/or schemaVersion missing");
+        if (prefix == null) throw new IllegalArgumentException("Mapping lacks prefix");
+        if (schemaVersion == null) {
+            for (String [] hint : HACK_VERSION_HINTS) if (hint[0].equals(prefix)) schemaVersion = hint[1];
+        }
+        if (schemaVersion == null) throw new IllegalStateException("Mapping lacks schemaVersion missing");
         return new SchemaVersion(prefix, schemaVersion);
+    }
+
+    public void setSchemaVersion(SchemaVersion schemaVersion) {
+        if (!schemaVersion.getPrefix().equals(prefix)) throw new IllegalArgumentException("Trying to set version for the wrong schema");
+        this.schemaVersion = schemaVersion.getVersion();
     }
 
     public boolean isLocked() {
@@ -268,4 +277,16 @@ public class RecMapping {
         stream.processAnnotations(RecMapping.class);
         return stream;
     }
+
+    public static final String[][] HACK_VERSION_HINTS = {
+            {"icn", "1.0.0"},
+            {"abm", "1.0.0"},
+            {"tib", "1.0.1"},
+            {"ese", "3.4.0"},
+            {"aff", "0.1.0"},
+            {"itin", "1.0.0"},
+            {"lido", "1.0.0"},
+    };
+
+
 }

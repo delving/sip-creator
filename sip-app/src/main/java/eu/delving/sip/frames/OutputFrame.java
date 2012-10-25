@@ -44,8 +44,8 @@ import static eu.delving.sip.base.SwingHelper.setError;
 public class OutputFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
 
-    public OutputFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.OUTPUT, desktop, sipModel, "Output");
+    public OutputFrame(final SipModel sipModel) {
+        super(Which.OUTPUT, sipModel, "Output");
         sipModel.getRecordCompileModel().setEnabled(false);
     }
 

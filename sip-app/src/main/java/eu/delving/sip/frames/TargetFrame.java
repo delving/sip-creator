@@ -65,8 +65,8 @@ public class TargetFrame extends FrameBase {
         }
     });
 
-    public TargetFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.TARGET, desktop, sipModel, "Target");
+    public TargetFrame(SipModel sipModel) {
+        super(Which.TARGET, sipModel, "Target");
         createRecDefTree(sipModel);
         timer.setRepeats(false);
         recDefTree.setDropMode(DropMode.ON);

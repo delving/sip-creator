@@ -73,8 +73,8 @@ public class SourceFrame extends FrameBase {
         }
     });
 
-    public SourceFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.SOURCE, desktop, sipModel, "Source");
+    public SourceFrame(SipModel sipModel) {
+        super(Which.SOURCE, sipModel, "Source");
         sourceTree = new JTree(sipModel.getStatsModel().getSourceTreeModel()) {
             @Override
             public String getToolTipText(MouseEvent evt) {

@@ -64,8 +64,8 @@ public class StatsFrame extends FrameBase {
     private JPanel fieldCountPanel = emptyPanel();
     private JPanel valueHistogramPanel = emptyPanel();
 
-    public StatsFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.STATS, desktop, sipModel, "Stats");
+    public StatsFrame(SipModel sipModel) {
+        super(Which.STATISTICS, sipModel, "Stats");
         wireUp();
         getAction().putValue(
                 Action.ACCELERATOR_KEY,
@@ -82,8 +82,7 @@ public class StatsFrame extends FrameBase {
     private JComponent createWest() {
         final JTabbedPane tabs = new JTabbedPane();
         for (StatsSet statsSet : statsSets) tabs.addTab(statsSet.statsSetName, statsSet.treePanel);
-        int width = getFontMetrics(getFont()).stringWidth("this is a very long string to determine width");
-        tabs.setPreferredSize(new Dimension(width, 10));
+        tabs.setPreferredSize(new Dimension(300, 10));
         tabs.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent changeEvent) {

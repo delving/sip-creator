@@ -76,8 +76,8 @@ public class FunctionFrame extends FrameBase {
     private ModelStateListener modelStateListener = new ModelStateListener();
     private UndoManager undoManager = new UndoManager();
 
-    public FunctionFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.FUNCTIONS, desktop, sipModel, "Functions");
+    public FunctionFrame(SipModel sipModel) {
+        super(Which.FUNCTIONS, sipModel, "Functions");
         inputArea = new JTextArea(sipModel.getFunctionCompileModel().getInputDocument());
         inputArea.setFont(MONOSPACED);
         docArea = new JTextArea(sipModel.getFunctionCompileModel().getDocDocument());
@@ -499,7 +499,7 @@ public class FunctionFrame extends FrameBase {
         public String getToolTipText(MouseEvent evt) {
             int index = this.locationToIndex(evt.getPoint());
             MappingFunction mappingFunction = (MappingFunction) getModel().getElementAt(index);
-            return mappingFunction.getDocumentation();
+            return mappingFunction == null ? "" : mappingFunction.getDocumentation();
         }
     }
 

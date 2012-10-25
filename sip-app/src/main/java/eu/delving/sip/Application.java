@@ -26,36 +26,41 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
-import eu.delving.sip.actions.DataImportAction;
-import eu.delving.sip.actions.DownloadAction;
-import eu.delving.sip.actions.ReleaseAction;
+import eu.delving.schema.Fetcher;
+import eu.delving.schema.util.FileSystemFetcher;
+import eu.delving.sip.actions.ImportAction;
+import eu.delving.sip.actions.SelectAnotherMappingAction;
+import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.WorkFrame;
-import eu.delving.sip.menus.DataSetMenu;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
-import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
-import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthSystemException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.params.ConnRouteParams;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.net.*;
+import java.util.prefs.Preferences;
 
+import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
 import static eu.delving.sip.files.DataSetState.*;
 
 /**
@@ -69,17 +74,17 @@ public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
-    private Action downloadAction, importAction, uploadAction, releaseAction, validateAction;
+    private Action importAction, uploadAction, validateAction;
     private JFrame home;
     private JDesktopPane desktop;
-    private DataSetMenu dataSetMenu;
-    private OAuthClient oauthClient;
     private AllFrames allFrames;
     private VisualFeedback feedback;
     private StatusPanel statusPanel;
     private HelpPanel helpPanel;
     private Timer resizeTimer;
     private ExpertMenu expertMenu;
+    private UnlockMappingAction unlockMappingAction;
+    private SelectAnotherMappingAction selectAnotherMappingAction;
 
     private Application(final File storageDirectory) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
@@ -108,23 +113,25 @@ public class Application {
                 resizeTimer.restart();
             }
         });
-        feedback = new VisualFeedback(desktop);
-        CultureHubClient cultureHubClient = new CultureHubClient(new CultureHubClientContext(storageDirectory));
-        HttpClient http = cultureHubClient.getHttpClient();
-        Storage storage = new StorageImpl(storageDirectory, new HTTPSchemaFetcher(http) , http);
-        sipModel = new SipModel(storage, groovyCodeResource, feedback);
-        expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient);
+        Preferences preferences =   Preferences.userNodeForPackage(SipModel.class);
+        feedback = new VisualFeedback(home, desktop, preferences);
+        HttpClient httpClient = createHttpClient(String.format("http://%s", StorageFinder.getHostPort(storageDirectory)));
+        Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
+        Storage storage = new StorageImpl(storageDirectory, fetcher, httpClient);
+        sipModel = new SipModel(desktop ,storage, groovyCodeResource, feedback, preferences);
+        CultureHubClient cultureHubClient = new CultureHubClient(sipModel, httpClient);
+        allFrames = new AllFrames(sipModel, cultureHubClient);
+        expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
         home.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
-                allFrames.rebuildView();
+                allFrames.getViewSelector().refreshView();
             }
         });
         desktop.setBackground(new Color(190, 190, 200));
-        allFrames = new AllFrames(desktop, sipModel, cultureHubClient);
-        helpPanel = new HelpPanel(sipModel, http);
+        helpPanel = new HelpPanel(sipModel, httpClient);
         home.getContentPane().add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
@@ -132,8 +139,7 @@ public class Application {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
-                        dataSetMenu.getUnlockMappingAction().setEnabled(locked);
-                        expertMenu.setEnabled(!locked);
+                        unlockMappingAction.setEnabled(locked);
                     }
                 });
             }
@@ -154,12 +160,11 @@ public class Application {
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
         });
-        downloadAction = new DownloadAction(desktop, sipModel, cultureHubClient);
-        importAction = new DataImportAction(desktop, sipModel);
-        dataSetMenu = new DataSetMenu(sipModel);
-        validateAction = new ValidateAction(sipModel, dataSetMenu, allFrames.prepareForInvestigation(desktop));
+        importAction = new ImportAction(desktop, sipModel);
+        validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
-        releaseAction = new ReleaseAction(desktop, sipModel, cultureHubClient);
+        unlockMappingAction = new UnlockMappingAction(sipModel);
+        selectAnotherMappingAction = new SelectAnotherMappingAction(sipModel);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -168,12 +173,6 @@ public class Application {
         home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
         home.setIconImage(logo.getImage());
-        oauthClient = new OAuthClient(
-                http,
-                StorageFinder.getHostPort(storageDirectory),
-                StorageFinder.getUser(storageDirectory),
-                new PasswordFetcher()
-        );
         home.setJMenuBar(createMenuBar());
         home.addWindowListener(new WindowAdapter() {
             @Override
@@ -202,7 +201,6 @@ public class Application {
                         });
                         home.setTitle("Delving SIP Creator");
                         sipModel.seekReset();
-                        dataSetMenu.refreshAndChoose(null, null);
                         break;
                     default:
                         DataSetModel dataSetModel = sipModel.getDataSetModel();
@@ -245,8 +243,22 @@ public class Application {
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)
         ));
         p.add(statusPanel);
-        p.add(createWorkPanel());
-        p.add(allFrames.getBigWindowsPanel());
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(createWorkPanel(), BorderLayout.CENTER);
+        rightPanel.add(createButtonPanel(), BorderLayout.WEST);
+        p.add(rightPanel);
+        return p;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        JButton b;
+        p.add(b = new JButton(unlockMappingAction));
+        b.setHorizontalAlignment(JButton.LEFT);
+        p.add(b = new JButton(selectAnotherMappingAction));
+        b.setHorizontalAlignment(JButton.LEFT);
+        p.add(b = new JButton(importAction));
+        b.setHorizontalAlignment(JButton.LEFT);
         return p;
     }
 
@@ -266,10 +278,7 @@ public class Application {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
-        bar.add(createFileMenu());
-        bar.add(dataSetMenu);
         bar.add(allFrames.getViewMenu());
-        bar.add(allFrames.getFrameMenu());
         bar.add(expertMenu);
         bar.add(createHelpMenu());
         return bar;
@@ -290,20 +299,10 @@ public class Application {
                     home.getContentPane().remove(helpPanel);
                 }
                 home.getContentPane().validate();
-                allFrames.rebuildView();
+                allFrames.getViewSelector().refreshView();
             }
         });
         menu.add(item);
-        return menu;
-    }
-
-    private JMenu createFileMenu() {
-        JMenu menu = new JMenu("File");
-        menu.add(downloadAction);
-        menu.add(importAction);
-        menu.add(validateAction);
-        menu.add(uploadAction);
-        menu.add(releaseAction);
         return menu;
     }
 
@@ -321,125 +320,27 @@ public class Application {
         }
     }
 
-    private class CultureHubClientContext implements CultureHubClient.Context {
-
-        private File storageDirectory;
-
-        public CultureHubClientContext(File storageDirectory) {
-            this.storageDirectory = storageDirectory;
+    private HttpClient createHttpClient(String serverUrl) {
+        final int CONNECTION_TIMEOUT = 1000 * 60 * 30;
+        HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setSoTimeout(httpParams, CONNECTION_TIMEOUT);
+        HttpConnectionParams.setConnectionTimeout(httpParams, CONNECTION_TIMEOUT);
+        try {
+            java.util.List<Proxy> proxies = ProxySelector.getDefault().select(new URI(serverUrl));
+            for (Proxy proxy : proxies) {
+                if (proxy.type() != Proxy.Type.HTTP) continue;
+                InetSocketAddress addr = (InetSocketAddress) proxy.address();
+                String host = addr.getHostName();
+                int port = addr.getPort();
+                HttpHost httpHost = new HttpHost(host, port);
+                ConnRouteParams.setDefaultProxy(httpParams, httpHost);
+            }
         }
-
-        @Override
-        public String getUser() {
-            return StorageFinder.getUser(storageDirectory);
+        catch (URISyntaxException e) {
+            throw new RuntimeException("Bad address: " + serverUrl, e);
         }
-
-        @Override
-        public String getServerUrl() {
-            return String.format("http://%s/api/sip-creator", StorageFinder.getHostPort(storageDirectory));
-        }
-
-        @Override
-        public String getAccessToken() throws OAuthSystemException, OAuthProblemException {
-            return oauthClient.getToken();
-        }
-
-        @Override
-        public void invalidateTokens() {
-            oauthClient.invalidateTokens();
-        }
-
-        @Override
-        public void dataSetCreated(final DataSet dataSet) {
-            sipModel.exec(new Swing() {
-                @Override
-                public void run() {
-                    dataSetMenu.refreshAndChoose(dataSet, null);
-                }
-            });
-        }
-
-        @Override
-        public Feedback getFeedback() {
-            return feedback;
-        }
-
-        @Override
-        public void exec(Work work) {
-            sipModel.exec(work);
-        }
-    }
-
-    private class PasswordFetcher implements OAuthClient.PasswordRequest, ActionListener {
-
-        private static final String PASSWORD = "Password";
-        private JDialog dialog = new JDialog(home, "Culture Hub", true);
-        private JPasswordField passwordField = new JPasswordField(15);
-        private JCheckBox savePassword = new JCheckBox("Save password");
-        private StringBuilder password = new StringBuilder();
-        private JButton ok = new JButton("Ok");
-
-        private PasswordFetcher() {
-            // We disable the submit button by default and if the content != empty
-            ok.addActionListener(this);
-            ok.setEnabled(false);
-            String savedPassword = sipModel.getPreferences().get(PASSWORD, "");
-            savePassword.setSelected(!savedPassword.isEmpty());
-            passwordField.getDocument().addDocumentListener(new DocumentListener() {
-                @Override
-                public void insertUpdate(DocumentEvent documentEvent) {
-                    ok.setEnabled(!StringUtils.isWhitespace(new String(passwordField.getPassword())));
-                }
-
-                @Override
-                public void removeUpdate(DocumentEvent documentEvent) {
-                    insertUpdate(documentEvent);
-                }
-
-                @Override
-                public void changedUpdate(DocumentEvent documentEvent) {
-                    insertUpdate(documentEvent);
-                }
-            });
-            passwordField.setText(savedPassword);
-            JLabel labelA = new JLabel("Password: ");
-            labelA.setLabelFor(passwordField);
-            passwordField.addActionListener(this);
-
-            JPanel fieldPanel = new JPanel(new BorderLayout(10, 10));
-            fieldPanel.add(labelA, BorderLayout.WEST);
-            fieldPanel.add(passwordField, BorderLayout.CENTER);
-
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-            buttonPanel.add(ok);
-
-            JPanel wrap = new JPanel(new GridLayout(0, 1, 5, 5));
-            wrap.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            wrap.add(fieldPanel);
-            wrap.add(savePassword);
-            wrap.add(buttonPanel);
-
-            dialog.getContentPane().add(wrap, BorderLayout.CENTER);
-            dialog.pack();
-        }
-
-        @Override
-        public String getPassword() {
-            dialog.setLocation(
-                    (Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getSize().width) / 2,
-                    (Toolkit.getDefaultToolkit().getScreenSize().height - dialog.getSize().height) / 2
-            );
-            dialog.setVisible(true);
-            return password.length() == 0 ? null : password.toString();
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            password.setLength(0);
-            password.append(new String(passwordField.getPassword()));
-            sipModel.getPreferences().put(PASSWORD, savePassword.isSelected() ? password.toString() : "");
-            dialog.setVisible(false);
-        }
+        ThreadSafeClientConnManager threaded = new ThreadSafeClientConnManager();
+        return new DefaultHttpClient(threaded, httpParams);
     }
 
     public static void main(final String[] args) throws StorageException {
@@ -451,7 +352,7 @@ public class Application {
                 try {
                     Application application = new Application(storageDirectory);
                     application.home.setVisible(true);
-                    application.allFrames.restore();
+                    application.allFrames.initiate();
                 }
                 catch (StorageException e) {
                     JOptionPane.showMessageDialog(null, "Unable to create the storage directory");

@@ -96,13 +96,13 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
             JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, selected, cellHasFocus);
             NodeMappingEntry entry = (NodeMappingEntry) value;
             if (entry.getNodeMapping().recDefNode.isAttr()) {
-                setIcon(SwingHelper.ATTRIBUTE_ICON);
+                setIcon(SwingHelper.ICON_ATTRIBUTE);
             }
             else if (entry.getNodeMapping().recDefNode.isLeafElem()) {
-                setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                setIcon(SwingHelper.ICON_VALUE);
             }
             else {
-                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.ICON_COMPOSITE);
             }
             if (entry.isHighlighted()) {
                 setBackground(SwingHelper.HILIGHTED_COLOR);

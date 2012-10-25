@@ -333,13 +333,13 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             if (value instanceof SourceTreeNode) {
                 SourceTreeNode node = (SourceTreeNode) value;
                 if (node.getTag().isAttribute()) {
-                    setIcon(SwingHelper.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
                 else if (node.getChildren().iterator().hasNext()) {
-                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_COMPOSITE);
                 }
                 else {
-                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_VALUE);
                 }
                 if (node.isRecordRoot() || node.isUniqueElement()) {
                     markDelimiters(sel, node);

@@ -62,8 +62,8 @@ public class CreateFrame extends FrameBase {
     private CreateMappingAction createMappingAction;
     private CopyMappingAction copyMappingAction;
 
-    public CreateFrame(JDesktopPane desktop, SipModel sipModel) {
-        super(Which.CREATE, desktop, sipModel, "Create");
+    public CreateFrame(SipModel sipModel) {
+        super(Which.CREATE, sipModel, "Create");
         createModel = sipModel.getCreateModel();
         mappingHintsList = sipModel.getMappingHintsModel().getNodeMappingListModel().createJList();
         createMappingAction = new CreateMappingAction();

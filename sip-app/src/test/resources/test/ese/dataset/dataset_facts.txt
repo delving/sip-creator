@@ -6,3 +6,4 @@ language=nl
 provider=Testmeister
 rights=http://creativecommons.org/publicdomain/mark/1.0/
 type=IMAGE
+schemaVersions=ese_3.4.0

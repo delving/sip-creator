@@ -199,23 +199,23 @@ public class RecDefTreeNode extends FilterNode {
             if (value instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) value;
                 if (node.recDefNode.isUnmappable()) {
-                    setIcon(SwingHelper.UNMAPPABLE_ICON);
+                    setIcon(SwingHelper.ICON_UNMAPPABLE);
                 }
                 else if (node.recDefNode.isAttr()) {
-                    setIcon(SwingHelper.ATTRIBUTE_ICON);
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
                 else if (node.hasChildElements()) {
-                    setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_COMPOSITE);
                 }
                 else {
-                    setIcon(SwingHelper.VALUE_ELEMENT_ICON);
+                    setIcon(SwingHelper.ICON_VALUE);
                 }
                 if (!node.recDefNode.getNodeMappings().isEmpty()) {
                     markNodeMappings(sel, node);
                 }
             }
             else {
-                setIcon(SwingHelper.COMPOSITE_ELEMENT_ICON);
+                setIcon(SwingHelper.ICON_COMPOSITE);
             }
             return component;
         }

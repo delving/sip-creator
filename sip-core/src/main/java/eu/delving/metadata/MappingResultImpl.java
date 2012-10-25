@@ -31,7 +31,7 @@ import org.w3c.dom.NodeList;
 
 import java.util.*;
 
-import static eu.delving.metadata.SystemField.*;
+import static eu.delving.metadata.RecDef.*;
 
 /**
  * The result of the mapping engine is wrapped in this class so that some post-processing and checking
@@ -44,7 +44,7 @@ public class MappingResultImpl implements MappingResult {
     private Logger logger = Logger.getLogger(getClass());
     private XmlSerializer serializer;
     private Map<String, List<String>> allFields = new TreeMap<String, List<String>>();
-    private Map<SystemField, List<String>> systemFields = new TreeMap<SystemField, List<String>>();
+    private Map<String, List<String>> copyFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> searchFields = new TreeMap<String, List<String>>();
     private Node root, rootAugmented;
     private RecDefTree recDefTree;
@@ -71,8 +71,8 @@ public class MappingResultImpl implements MappingResult {
     }
 
     @Override
-    public Map<SystemField, List<String>> systemFields() {
-        return systemFields;
+    public Map<String, List<String>> copyFields() {
+        return copyFields;
     }
 
     @Override
@@ -82,15 +82,14 @@ public class MappingResultImpl implements MappingResult {
 
     @Override
     public void checkMissingFields() throws MissingFieldsException {
+        if (!isRecDefDelvingAware()) return;
         Set<String> missing = new TreeSet<String>();
-        Set<SystemField> keys = systemFields.keySet();
-        addIfMissing(TITLE, keys, missing);
-        addIfMissing(OWNER, keys, missing);
-        addIfMissing(PROVIDER, keys, missing);
-        addIfMissing(LANDING_PAGE, keys, missing);
-        addIfMissing(THUMBNAIL, keys, missing);
+        Set<String> keys = copyFields.keySet();
+        for (String required : REQUIRED_FIELDS) {
+            if (!keys.contains(required)) missing.add(required);
+        }
         if (missing.isEmpty()) return;
-        if (missing.size() == 1 && (missing.contains(LANDING_PAGE.toString()) || missing.contains(THUMBNAIL.toString()))) {
+        if (missing.size() == 1 && (missing.contains(LANDING_PAGE) || missing.contains(THUMBNAIL))) {
             return; // ok, only need one of these two
         }
         Map<String, Path> missingMap = new TreeMap<String, Path>();
@@ -123,16 +122,21 @@ public class MappingResultImpl implements MappingResult {
         else if (recDefTree.getRecDef().prefix.equals("aff")) {
             resolveAFFRecord();
         }
-        rootAugmented = root.cloneNode(true);
-        Document document = rootAugmented.getOwnerDocument();
-        for (Map.Entry<SystemField, List<String>> field : systemFields.entrySet()) {
-            for (String value : field.getValue()) {
-                Node element = rootAugmented.appendChild(document.createElementNS(
-                        SystemField.NAMESPACE_URI,
-                        String.format("%s:%s", SystemField.PREFIX, field.getKey().getLocalPart())
-                ));
-                element.appendChild(document.createTextNode(value));
+        if (isRecDefDelvingAware()) {
+            rootAugmented = root.cloneNode(true);
+            Document document = rootAugmented.getOwnerDocument();
+            for (Map.Entry<String, List<String>> field : copyFields.entrySet()) {
+                for (String value : field.getValue()) {
+                    Element freshElement = document.createElementNS(DELVING_NAMESPACE_URI, field.getKey());
+                    if (!isDuplicate(freshElement, value)) {
+                        Node rootChild = rootAugmented.appendChild(freshElement);
+                        rootChild.appendChild(document.createTextNode(value));
+                    }
+                }
             }
+        }
+        else {
+            rootAugmented = root;
         }
         return this;
     }
@@ -176,8 +180,25 @@ public class MappingResultImpl implements MappingResult {
         return toXml();
     }
 
-    private void addIfMissing(SystemField systemField, Set<SystemField> keys, Set<String> missing) {
-        if (!keys.contains(systemField)) missing.add(systemField.toString());
+    private boolean isDuplicate(Element element, String value) {
+        NodeList kids = rootAugmented.getChildNodes();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            switch (kid.getNodeType()) {
+                case Node.ELEMENT_NODE:
+                    boolean samePrefix = kid.getPrefix().equals(element.getPrefix());
+                    boolean sameLocalName = kid.getLocalName().equals(element.getLocalName());
+                    if (samePrefix && sameLocalName) {
+                        Node text = kid.getFirstChild();
+                        if (value.equals(text.getTextContent())) return true;
+                    }
+            }
+        }
+        return false;
+    }
+
+    private boolean isRecDefDelvingAware() {
+        return recDefTree.getRecDef().getNamespacesMap().containsKey(DELVING_PREFIX);
     }
 
     private void resolveAFFRecord() {
@@ -239,22 +260,22 @@ public class MappingResultImpl implements MappingResult {
 
     private void handleMarkedField(RecDefNode recDefNode, String value) {
         for (RecDef.FieldMarker fieldMarker : recDefNode.getFieldMarkers()) {
-            if (fieldMarker.type == null) {
-                putSystem(SystemField.valueOf(fieldMarker.name), value);
+            if (fieldMarker.name.startsWith(DELVING_PREFIX)) {
+                putCopyField(fieldMarker.name, value);
             }
             else if ("search".equals(fieldMarker.type)) {
-                putSearch(fieldMarker.name, value);
+                putSearchField(fieldMarker.name, value);
             }
         }
     }
 
-    private void putSystem(SystemField key, String value) {
-        List<String> list = systemFields.get(key);
-        if (list == null) systemFields.put(key, list = new ArrayList<String>(4));
+    private void putCopyField(String key, String value) {
+        List<String> list = copyFields.get(key);
+        if (list == null) copyFields.put(key, list = new ArrayList<String>(4));
         list.add(value);
     }
 
-    private void putSearch(String key, String value) {
+    private void putSearchField(String key, String value) {
         put(searchFields, key, value);
     }
 

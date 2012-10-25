@@ -23,6 +23,8 @@ package eu.delving.metadata;
 
 import java.util.*;
 
+import static eu.delving.metadata.RecDef.REQUIRED_FIELDS;
+
 /**
  * This class takes a RecDef instance and wraps itself around, ensuring
  * event propagation by brokering the Listener that is passed to every
@@ -154,12 +156,21 @@ public class RecDefTree implements RecDefNodeListener {
 
     private void resolve() {
         if (recDef.fieldMarkers == null) throw new IllegalStateException("Record definition must have field markers");
-        EnumSet<SystemField> missing = EnumSet.allOf(SystemField.class);
+        boolean[] present = new boolean[REQUIRED_FIELDS.length];
         for (RecDef.FieldMarker marker : recDef.fieldMarkers) {
-            if (marker.name != null && marker.type == null) missing.remove(SystemField.valueOf(marker.name));
             if (marker.path == null) continue;
             marker.resolve(this);
+            if (marker.name != null && marker.type == null) {
+                for (int index = 0; index < REQUIRED_FIELDS.length; index++) {
+                    if (marker.name.equals(REQUIRED_FIELDS[index])) present[index] = true;
+                }
+            }
         }
-        if (!missing.isEmpty()) throw new IllegalStateException("Record definition missing system fields: "+missing);
+        for (int index = 0; index < present.length; index++) {
+            if (!present[index]) System.out.println(String.format(
+                    "%s field markers missing required field %s",
+                    recDef.getSchemaVersion(), REQUIRED_FIELDS[index]
+            ));
+        }
     }
 }

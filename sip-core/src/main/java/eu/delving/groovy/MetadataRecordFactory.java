@@ -74,14 +74,14 @@ public class MetadataRecordFactory {
         return new MetadataRecord(rootNode, recordNumber, recordCount);
     }
 
-    public Node nodeFromXml(String recordContents) throws IOException, SAXException {
-        String recordString = createCompleteRecordString(recordContents);
+    public Node nodeFromXml(String id, String recordContents) throws IOException, SAXException {
+        String recordString = createCompleteRecordString(id, recordContents);
         Document document = documentBuilder.parse(new InputSource(new StringReader(recordString)));
         return document.getDocumentElement();
     }
 
-    public MetadataRecord metadataRecordFrom(String recordContents) throws XMLStreamException {
-        String recordString = createCompleteRecordString(recordContents);
+    public MetadataRecord metadataRecordFrom(String id, String recordContents) throws XMLStreamException {
+        String recordString = createCompleteRecordString(id, recordContents);
         try {
             Reader reader = new StringReader(recordString);
             XMLStreamReader2 input = (XMLStreamReader2) inputFactory.createXMLStreamReader(reader);
@@ -140,7 +140,7 @@ public class MetadataRecordFactory {
         }
     }
 
-    private String createCompleteRecordString(String xmlRecord) {
+    private String createCompleteRecordString(String id, String xmlRecord) {
         StringBuilder out = new StringBuilder("<?xml version=\"1.0\"?>\n");
         out.append("<record");
         for (Map.Entry<String, String> namespace : namespaces.entrySet()) {
@@ -151,6 +151,7 @@ public class MetadataRecordFactory {
                 out.append(String.format(" xmlns:%s=\"%s\"", namespace.getKey(), namespace.getValue()));
             }
         }
+        out.append(String.format(" id=\"%s\"", id));
         out.append(">\n");
         out.append(xmlRecord);
         out.append("\n</record>");

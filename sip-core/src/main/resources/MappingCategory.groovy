@@ -227,5 +227,4 @@ public class MappingCategory {
         }
         return out.toString()
     }
-
 }

@@ -51,8 +51,8 @@ public class RecMappingFrame extends FrameBase {
     private JList nodeMappingList;
     private RevertMappingMenu revertMappingMenu;
 
-    public RecMappingFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.REC_MAPPING, desktop, sipModel, "Node Mappings");
+    public RecMappingFrame(final SipModel sipModel) {
+        super(Which.REC_MAPPING, sipModel, "Node Mappings");
         revertMappingMenu = new RevertMappingMenu(sipModel);
         setJMenuBar(createMenuBar());
         nodeMappingList = sipModel.getMappingModel().getNodeMappingListModel().createJList();

@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import eu.delving.schema.SchemaVersion;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -60,6 +61,33 @@ import java.util.*;
 public class RecDef {
 
     private static final String DELIM = "[ ,]+";
+
+    public static final String DEFAULT_FIELD_TYPE = "text";
+    public static final String DELVING_NAMESPACE_URI = "http://schemas.delving.eu/";
+    public static final String DELVING_PREFIX = "delving";
+    public static final String[] REQUIRED_FIELDS = {
+            "delving:title",
+            "delving:owner",
+            "delving:provider",
+            "delving:landingPage",
+            "delving:thumbnail"
+    };
+    public static final String LANDING_PAGE = REQUIRED_FIELDS[3];
+    public static final String THUMBNAIL = REQUIRED_FIELDS[4];
+
+    public static final String[][] BACKWARDS_COMPATIBILITY_REFRERENCE = {
+            {"TITLE", "delving:title"},
+            {"OWNER", "delving:owner"},
+            {"PROVIDER", "delving:provider"},
+            {"LANDING_PAGE", "delving:landingPage"},
+            {"THUMBNAIL", "delving:thumbnail"},
+            {"DESCRIPTION", "delving:description"},
+            {"CREATOR", "delving:creator"},
+            {"GEOHASH", "delving:geohash"},
+            {"ADDRESS", "delving:address"},
+            {"IMAGE_URL", "delving:imageUrl"},
+            {"DEEP_ZOOM_URL", "delving:deepZoomUrl"},
+    };
 
     public static RecDef read(InputStream in) {
         try {
@@ -107,6 +135,11 @@ public class RecDef {
     @XStreamOmitField
     public Map<String, Map<String, OptList.Opt>> optLookup = new TreeMap<String, Map<String, OptList.Opt>>();
 
+    public SchemaVersion getSchemaVersion() {
+        if (prefix == null || version == null) throw new IllegalArgumentException("Mapping lacks prefix or version");
+        return new SchemaVersion(prefix, version);
+    }
+
     public Map<String, String> getNamespacesMap() {
         Map<String, String> ns = new HashMap<String, String>();
         if (namespaces != null) for (Namespace namespace : namespaces) ns.put(namespace.prefix, namespace.uri);
@@ -127,6 +160,11 @@ public class RecDef {
             if (def.tag.equals(tag)) return def;
         }
         throw new RuntimeException(String.format("No elem [%s]", tag));
+    }
+
+    public String getFieldType(Path path) {
+        path = path.withDefaultPrefix(prefix);
+        return root.getFieldType(path);
     }
 
     public String toString() {
@@ -185,6 +223,12 @@ public class RecDef {
             path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
             RecDefNode node = recDefTree.getRecDefNode(path);
             if (node == null) throw new RuntimeException("Cannot find path " + path);
+            if (name == null) throw new RuntimeException("Field marker must have a name: " + path);
+            for (String[] translation : BACKWARDS_COMPATIBILITY_REFRERENCE) {
+                if (translation[0].equals(name)) {
+                    name = translation[1];
+                }
+            }
             node.addFieldMarker(this);
         }
     }
@@ -264,6 +308,10 @@ public class RecDef {
 
         public String toString() {
             return tag.toString();
+        }
+
+        public String getFieldType() {
+            return fieldType != null ? fieldType : DEFAULT_FIELD_TYPE;
         }
     }
 
@@ -377,6 +425,22 @@ public class RecDef {
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
+        }
+
+        String getFieldType() {
+            return fieldType != null ? fieldType : DEFAULT_FIELD_TYPE;
+        }
+
+        private String getFieldType(Path path) {
+            if (path.getTag(0).equals(tag)) {
+                if (path.parent() == Path.ROOT) return getFieldType();
+                Path subPath = path.withRootRemoved();
+                for (Elem sub : elemList) {
+                    String fieldType = sub.getFieldType(subPath);
+                    if (fieldType != null) return fieldType;
+                }
+            }
+            return null;
         }
     }
 

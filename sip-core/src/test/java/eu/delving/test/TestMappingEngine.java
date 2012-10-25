@@ -25,10 +25,7 @@ import eu.delving.MappingEngine;
 import eu.delving.MappingResult;
 import eu.delving.PluginBinding;
 import eu.delving.groovy.MappingException;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.RecDef;
-import eu.delving.metadata.RecDefModel;
-import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.*;
 import eu.delving.plugin.MediaFiles;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaType;
@@ -66,7 +63,7 @@ public class TestMappingEngine {
 
     @Before
     public void initRepo() throws IOException {
-        schemaRepo = new SchemaRepository(new FileSystemFetcher());
+        schemaRepo = new SchemaRepository(new FileSystemFetcher(true));
     }
 
     @Test
@@ -76,7 +73,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = engine(namespaces, "lido");
 //        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute(input("lido"));
+        MappingResult result = mappingEngine.execute("validateTreeNode", input("lido"));
 //        System.out.println(result);
         Source source = new DOMSource(result.root());
         validator(new SchemaVersion("lido", "1.0.0")).validate(source);
@@ -90,7 +87,7 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/"
         );
         MappingEngine mappingEngine = engine(namespaces, "ese");
-        MappingResult result = mappingEngine.execute(input("ese"));
+        MappingResult result = mappingEngine.execute("validateESENode", input("ese"));
         System.out.println(result.toXml());
         System.out.println(result.toXmlAugmented());
         Source source = new DOMSource(result.root());
@@ -107,11 +104,11 @@ public class TestMappingEngine {
                 "icn", "http://www.icn.nl/schemas/icn/"
         );
         MappingEngine mappingEngine = engine(namespaces, "icn");
-        MappingResult result = mappingEngine.execute(input("icn"));
+        MappingResult result = mappingEngine.execute("validateFlatNode", input("icn"));
         System.out.println(result.toXml());
         System.out.println(result.toXmlAugmented());
-        Source source = new DOMSource(result.rootAugmented());
-        Validator validator = validator(new SchemaVersion("icn", "1.0.1"));
+        Source source = new DOMSource(result.root());
+        Validator validator = validator(new SchemaVersion("icn", "1.0.2"));
         validator.validate(source);
     }
 
@@ -124,8 +121,8 @@ public class TestMappingEngine {
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "icn", "http://www.icn.nl/schemas/icn/"
         );
-        MappingEngine mappingEngine = new MappingEngine(classLoader(), namespaces);
-        MappingResult result = mappingEngine.execute(input("icn"));
+        MappingEngine mappingEngine = new MappingEngineImpl(classLoader(), namespaces, new MockRecDefModel(), null, null);
+        MappingResult result = mappingEngine.execute("rawNode", input("icn"));
         System.out.println(result.toXml());
     }
 
@@ -138,7 +135,7 @@ public class TestMappingEngine {
                 "tib", "http://thuisinbrabant.nl"
         );
         MappingEngine mappingEngine = engine(namespaces, "tib");
-        MappingResult result = mappingEngine.execute(input("tib"));
+        MappingResult result = mappingEngine.execute("validateTIBNode", input("tib"));
         String augmented = result.toXmlAugmented();
         Matcher matcher = Pattern.compile("<delving:thumbnail>").matcher(augmented);
         Assert.assertTrue("first one not found", matcher.find());
@@ -156,7 +153,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = engine(namespaces, "aff");
         System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute(input("aff"));
+        MappingResult result = mappingEngine.execute("mediaMatchingAFF", input("aff"));
         String xml = result.toXml();
         System.out.println(result);
         Assert.assertTrue("media file not matched", xml.indexOf("4F8EF966FF32B363C1E611A9EAE3370A") > 0);
@@ -169,7 +166,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = engine(namespaces, "aff");
 //        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute(input("aff"));
+        MappingResult result = mappingEngine.execute("indexDocumentAFF", input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
         Map<String, List<String>> allFields = result.fields();
 //        System.out.println(allFields);
@@ -177,7 +174,7 @@ public class TestMappingEngine {
     }
 
     private MappingEngine engine(Map<String, String> namespaces, String prefix) throws FileNotFoundException, MetadataException {
-        return new MappingEngine(
+        return new MappingEngineImpl(
                 classLoader(),
                 namespaces,
                 new MockRecDefModel(),

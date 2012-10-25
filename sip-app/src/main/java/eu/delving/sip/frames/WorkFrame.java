@@ -48,8 +48,8 @@ public class WorkFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
     private JList fullList, miniList;
 
-    public WorkFrame(JDesktopPane desktop, final SipModel sipModel) {
-        super(Which.WORK, desktop, sipModel, "Work");
+    public WorkFrame(final SipModel sipModel) {
+        super(Which.WORK, sipModel, "Work");
         this.miniList = new JList(sipModel.getWorkModel().getListModel());
         this.miniList.setFont(MONOSPACED);
         this.miniList.setCellRenderer(new MiniCellRenderer());
