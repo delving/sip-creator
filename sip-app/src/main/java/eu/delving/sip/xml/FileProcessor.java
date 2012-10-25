@@ -77,6 +77,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private int maxUniqueValueLength;
     private String problemXML;
     private String problemMessage;
+    private SipModel sipModel;
 
     public interface Listener {
 
@@ -95,7 +96,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             GroovyCodeResource groovyCodeResource,
             Listener listener
     ) {
-        sipModel.getMappingModel().setLocked(true);
+        this.sipModel = sipModel;
+        this.sipModel.getMappingModel().setLocked(true);
         this.maxUniqueValueLength = maxUniqueValueLength;
         this.recordCount = recordCount;
         this.feedback = sipModel.getFeedback();
@@ -169,6 +171,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             validator = createValidator();
             mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
             parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
+            parser.setProgressListener(new FakeProgressListener());
             reportWriter = getDataSet().openReportWriter(recMapping.getPrefix());
             if (outputDirectory != null) xmlOutput = createXmlOutput();
         }
@@ -372,6 +375,26 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
         else {
             return NextStep.ABORT;
+        }
+    }
+
+    private class FakeProgressListener implements ProgressListener {
+
+        @Override
+        public void setProgressMessage(String message) {
+        }
+
+        @Override
+        public void prepareFor(int total) {
+        }
+
+        @Override
+        public void setProgress(int progress) throws CancelException {
+        }
+
+        @Override
+        public Feedback getFeedback() {
+            return sipModel.getFeedback();
         }
     }
 }
