@@ -22,10 +22,7 @@
 package eu.delving.sip.actions;
 
 import eu.delving.metadata.Hasher;
-import eu.delving.sip.base.MediaFiles;
-import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.Work;
+import eu.delving.sip.base.*;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -152,6 +149,9 @@ public class MediaImportAction extends AbstractAction {
             catch (IOException e) {
                 sipModel.getFeedback().alert("Problem while scanning directories for media", e);
             }
+            catch (CancelException e) {
+                sipModel.getFeedback().alert("Cancelled", e);
+            }
             finally {
                 sipModel.exec(new Swing() {
                     @Override
@@ -162,7 +162,7 @@ public class MediaImportAction extends AbstractAction {
             }
         }
 
-        private void scanDirectories() throws IOException {
+        private void scanDirectories() throws IOException, CancelException {
             gatherFilesFrom(sourceDirectory);
             progressListener.prepareFor(fileList.size());
             targetDirectory.mkdirs();

@@ -22,18 +22,27 @@
 package eu.delving.sip;
 
 import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefModel;
+import eu.delving.metadata.RecMapping;
+import eu.delving.schema.SchemaVersion;
+import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.SourceConverter;
+import eu.delving.stats.Stats;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.TreeMap;
+import javax.xml.validation.Validator;
+import java.io.*;
+import java.util.*;
+
+import static eu.delving.sip.files.Storage.*;
 
 /**
  * Make sure the source converter works as expected
@@ -92,14 +101,21 @@ public class TestSourceConverter {
         namespaces.put("c", "http://c");
     }
 
-    private SourceConverter converter = new SourceConverter(null, ROOT, 2, UNIQ, 100, UNIQUE_CONVERTER, namespaces);
+    private SourceConverter converter = new SourceConverter(new MockDataSet(), null);
+    //ROOT, 2, UNIQ, 100, UNIQUE_CONVERTER, namespaces
+
+    @Before
+    public void setSourceConverter() throws StorageException {
+        converter.setProgressListener(new MockProgressListener());
+        converter.interpretHints();
+    }
 
     @Test
     public void runThrough() throws IOException, XMLStreamException {
         String inputString = StringUtils.join(INPUT, "\n");
         InputStream in = new ByteArrayInputStream(inputString.getBytes("UTF-8"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        converter.parse(in, out);
+        converter.parse(in, out, namespaces);
         String outputString = out.toString("UTF-8");
         String[] lines = outputString.split("\n");
         for (String line : lines) {
@@ -137,7 +153,7 @@ public class TestSourceConverter {
         System.setProperty("anonymousRecords", "10");
         InputStream in = new ByteArrayInputStream(inputString.getBytes("UTF-8"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        converter.parse(in, out);
+        converter.parse(in, out, namespaces);
         String outputString = out.toString("UTF-8");
         String[] lines = outputString.split("\n");
         for (String line : lines) {
@@ -186,7 +202,188 @@ public class TestSourceConverter {
                 "</the-root>";
         InputStream in = new ByteArrayInputStream(input.getBytes("UTF-8"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        converter.parse(in, out);
+        converter.parse(in, out, namespaces);
         Assert.assertEquals("Too many lines!", 6, new String(out.toByteArray()).split("\n").length);
+    }
+
+    private class MockDataSet implements DataSet {
+
+        @Override
+        public String getSpec() {
+            return "spek";
+        }
+
+        @Override
+        public String getOrganization() {
+            return "orgy";
+        }
+
+        @Override
+        public File getMediaDirectory() {
+            return null;
+        }
+
+        @Override
+        public List<SchemaVersion> getSchemaVersions() {
+            return null;
+        }
+
+        @Override
+        public RecDef getRecDef(String prefix) throws StorageException {
+            return null;
+        }
+
+        @Override
+        public Validator newValidator(String prefix) throws StorageException {
+            return null;
+        }
+
+        @Override
+        public boolean isValidated(String prefix) throws StorageException {
+            return false;
+        }
+
+        @Override
+        public DataSetState getState(String prefix) {
+            return null;
+        }
+
+        @Override
+        public Map<String, String> getDataSetFacts() {
+            return null;
+        }
+
+        @Override
+        public Map<String, String> getHints() {
+            Map<String,String> hints = new HashMap<String, String>();
+            hints.put(RECORD_ROOT_PATH, ROOT.toString());
+            hints.put(UNIQUE_ELEMENT_PATH, UNIQ.toString());
+            hints.put(UNIQUE_VALUE_CONVERTER, UNIQUE_CONVERTER);
+            hints.put(RECORD_COUNT, "2");
+            return hints;
+        }
+
+        @Override
+        public void setHints(Map<String, String> hints) throws StorageException {
+        }
+
+        @Override
+        public boolean isRecentlyImported() {
+            return false;
+        }
+
+        @Override
+        public void deleteConverted() throws StorageException {
+        }
+
+        @Override
+        public boolean deleteValidation(String prefix) throws StorageException {
+            return false;
+        }
+
+        @Override
+        public void deleteAllValidations() throws StorageException {
+        }
+
+        @Override
+        public File importedOutput() {
+            return null;
+        }
+
+        @Override
+        public InputStream openImportedInputStream() throws StorageException {
+            return null;
+        }
+
+        @Override
+        public File sourceOutput() {
+            return null;
+        }
+
+        @Override
+        public InputStream openSourceInputStream() throws StorageException {
+            return null;
+        }
+
+        @Override
+        public File renameInvalidSource() throws StorageException {
+            return null;
+        }
+
+        @Override
+        public File renameInvalidImport() throws StorageException {
+            return null;
+        }
+
+        @Override
+        public Stats getLatestStats() {
+            return null;
+        }
+
+        @Override
+        public Stats getStats(boolean sourceFormat, String prefix) {
+            return null;
+        }
+
+        @Override
+        public void setStats(Stats stats, boolean sourceFormat, String prefix) throws StorageException {
+          
+        }
+
+        @Override
+        public RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException {
+            return null;
+        }
+
+        @Override
+        public RecMapping revertRecMapping(File previousMappingFile, RecDefModel recDefModel) throws StorageException {
+            return null;
+        }
+
+        @Override
+        public void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException {
+          
+        }
+
+        @Override
+        public List<File> getRecMappingFiles(String prefix) throws StorageException {
+            return null;
+        }
+
+        @Override
+        public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException {
+          
+        }
+
+        @Override
+        public PrintWriter openReportWriter(String prefix) throws StorageException {
+            return null;
+        }
+
+        @Override
+        public List<String> getReport(String prefix) throws StorageException {
+            return null;
+        }
+
+        @Override
+        public void deleteSource() throws StorageException {
+            throw new StorageException("what?");
+          
+        }
+
+        @Override
+        public List<File> getUploadFiles() throws StorageException {
+            return null;
+        }
+
+        @Override
+        public void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws IOException, StorageException {
+          
+        }
+
+        @Override
+        public void remove() throws StorageException {
+          
+        }
     }
 }

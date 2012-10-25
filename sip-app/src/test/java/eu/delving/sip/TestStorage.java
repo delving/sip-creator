@@ -21,10 +21,8 @@
 
 package eu.delving.sip;
 
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
-import eu.delving.sip.files.StorageImpl;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.*;
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -43,8 +41,9 @@ public class TestStorage {
         Storage storage = new StorageImpl(storageDir, null, null);
         File zip = new File(getClass().getResource("/zip/ZipImport.xml.zip").getFile());
         DataSet dataSet = storage.createDataSet("spek", "orgy");
-        dataSet.externalToImported(zip, null);
-        File importedFile = new File(((StorageImpl.DataSetImpl)dataSet).getHere(), "imported.xml.gz");
-        Assert.assertTrue("imported file not created", importedFile.exists());
+        Work.LongTermWork importer = new FileImporter(zip, dataSet, null);
+        importer.setProgressListener(new MockProgressListener());
+        importer.run();
+        Assert.assertNotNull(dataSet.openImportedInputStream());
     }
 }

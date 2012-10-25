@@ -28,10 +28,10 @@ import eu.delving.schema.SchemaVersion;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static eu.delving.sip.files.Storage.*;
 import static eu.delving.sip.files.Storage.FileType.*;
@@ -63,13 +63,13 @@ public class StorageHelper {
         return directory.getName().substring(underscore + 1);
     }
 
-    static Path getRecordRoot(Map<String, String> hints) throws StorageException {
+    public static Path getRecordRoot(Map<String, String> hints) throws StorageException {
         String recordRoot = hints.get(RECORD_ROOT_PATH);
         if (recordRoot == null) throw new StorageException("Must have record root path");
         return Path.create(recordRoot);
     }
 
-    static int getRecordCount(Map<String, String> hints) throws StorageException {
+    public static int getRecordCount(Map<String, String> hints) throws StorageException {
         String recordCount = hints.get(RECORD_COUNT);
         int count = 0;
         try {
@@ -80,18 +80,18 @@ public class StorageHelper {
         return count;
     }
 
-    static Path getUniqueElement(Map<String, String> hints) throws StorageException {
+    public static Path getUniqueElement(Map<String, String> hints) throws StorageException {
         String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
         if (uniqueElement == null) throw new StorageException("Must have unique element path");
         return Path.create(uniqueElement);
     }
 
-    static int getMaxUniqueValueLength(Map<String, String> hints) {
+    public static int getMaxUniqueValueLength(Map<String, String> hints) {
         String max = hints.get(MAX_UNIQUE_VALUE_LENGTH);
         return max == null ? Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH : Integer.parseInt(max);
     }
 
-    static String getUniqueValueConverter(Map<String, String> hints) {
+    public static String getUniqueValueConverter(Map<String, String> hints) {
         return hints.get(UNIQUE_VALUE_CONVERTER);
     }
 
@@ -165,11 +165,29 @@ public class StorageHelper {
         return dir.listFiles(new PrefixFileFilter(VALIDATION));
     }
 
+    static InputStream zipIn(File file) throws StorageException {
+        try {
+            return new GZIPInputStream(new FileInputStream(file));
+        }
+        catch (IOException e) {
+            throw new StorageException(String.format("Unable to create input stream from %s", file.getAbsolutePath()), e);
+        }
+    }
+
+    public static OutputStream zipOut(File file) throws StorageException {
+        try {
+            return new GZIPOutputStream(new FileOutputStream(file));
+        }
+        catch (IOException e) {
+            throw new StorageException(String.format("Unable to create output stream from %s", file.getAbsolutePath()), e);
+        }
+    }
+
     static File reportFile(File dir, String prefix) {
         return new File(dir, REPORT.getName(prefix));
     }
 
-    static File statsFile(File dir, boolean sourceFormat, String prefix) {
+    public static File statsFile(File dir, boolean sourceFormat, String prefix) {
         if (prefix == null) {
             return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
         }
@@ -310,15 +328,13 @@ public class StorageHelper {
         }
     }
 
-    static void delete(File file) throws StorageException {
+    static void delete(File file) {
         if (file.exists()) {
             if (file.isDirectory()) {
                 File[] files = file.listFiles();
                 if (files != null) for (File sub : files) delete(sub);
             }
-            if (!file.delete()) {
-                throw new StorageException(String.format("Unable to delete %s", file.getAbsolutePath()));
-            }
+            FileUtils.deleteQuietly(file);
         }
     }
 
