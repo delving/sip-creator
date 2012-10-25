@@ -67,8 +67,9 @@ public class OptList {
     public void resolve(RecDef recDef) {
         for (Opt opt : opts) opt.parent = this;
         if (path == null) throw new RuntimeException("No path for OptList: " + opts);
-        if (path.peek().isAttribute())
+        if (path.peek().isAttribute()) {
             throw new RuntimeException("An option list may not be connected to an attribute: " + path);
+        }
         path = path.withDefaultPrefix(recDef.prefix);
         key = resolveTag(key, recDef);
         value = resolveTag(value, recDef);
