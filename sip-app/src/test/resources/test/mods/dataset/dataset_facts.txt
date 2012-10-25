@@ -1,0 +1,10 @@
+name=MODS Test
+provider=Testmeister
+country=Norway
+dataProvider=Sourcie
+language=no
+rights=http://creativecommons.org/publicdomain/mark/1.0/
+type=IMAGE
+spec=modsy
+schemaVersions=mods_3.4.0
+

@@ -38,7 +38,10 @@ import org.w3c.dom.Node;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Validator;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +56,8 @@ import java.util.TreeMap;
 
 public class Mockery {
     private static final String ORG = "organization";
-    private File root, target, dataSetDir;
+    private File root;
+    private File dataSetDir;
     private Storage storage;
     private DataSetModel dataSetModel = new DataSetModel();
     private RecMapping recMapping;
@@ -61,8 +65,7 @@ public class Mockery {
     private String prefix;
 
     public Mockery() throws StorageException, MetadataException {
-        this.target = getTargetDirectory();
-        root = new File(target, "storage");
+        root = new File(getTargetDirectory(), "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
         storage = new StorageImpl(root, new FileSystemFetcher(true), new DefaultHttpClient());
@@ -79,7 +82,7 @@ public class Mockery {
         if (!factsSourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
         dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()), prefix);
-        recMapping = dataSetModel.getDataSet().getRecMapping(prefix, dataSetModel);
+        recMapping = dataSetModel.getMappingModel().getRecMapping();
     }
 
     public Storage storage() {
@@ -92,10 +95,6 @@ public class Mockery {
 
     public Validator validator() throws StorageException {
         return dataSetModel.getDataSet().newValidator(prefix);
-    }
-
-    public void createMapping() throws IOException, MetadataException {
-        recMapping = RecMapping.read(mappingInputStream(), dataSetModel);
     }
 
     public String mapping() throws UnsupportedEncodingException {
@@ -149,10 +148,6 @@ public class Mockery {
 
     private URL sampleResource() {
         return getClass().getResource(String.format("/test/%s/example-input.xml", prefix));
-    }
-
-    private InputStream mappingInputStream() throws IOException {
-        return getClass().getResource(String.format("/test/%s/mapping_%s.xml", prefix, prefix)).openStream();
     }
 
     public File sampleInputFile() throws IOException {
