@@ -22,6 +22,7 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
@@ -67,6 +68,18 @@ public class TestMappingValidation {
     @After
     public void deleteStorage() {
         mock.delete();
+    }
+
+    @Ignore
+    // todo: puzzling  cvc-complex-type.3.2.2: Attribute 'mods:type' is not allowed to appear in element 'mods:titleInfo'.
+    @Test
+    public void testMods() throws Exception {
+        mock.prepareDataset(
+                "mods",
+                "/example-dublin-core/copied",
+                "/example-dublin-core/copied/dc:identifier"
+        );
+        runFullCycle(1);
     }
 
     @Ignore
@@ -143,42 +156,45 @@ public class TestMappingValidation {
     }
 
     private void runFullCycle(int expectedRecords) throws Exception {
-        assertEquals(String.valueOf(Arrays.asList(mock.files())), 1, mock.fileCount());
+        assertEquals(String.valueOf(Arrays.asList(mock.files())), 2, mock.fileCount());
         dataSet().externalToImported(mock.sampleInputFile(), null);
-        assertEquals(2, mock.fileCount());
+        assertEquals(3, mock.fileCount());
         assertEquals(IMPORTED, state());
 
         performAnalysis();
-        assertEquals(3, mock.fileCount());
+        assertEquals(4, mock.fileCount());
         assertEquals(ANALYZED_IMPORT, state());
 
         assertEquals(String.valueOf(expectedRecords), mock.hints().get(Storage.RECORD_COUNT));
         dataSet().setHints(mock.hints());
-        assertEquals(4, mock.fileCount());
+        assertEquals(5, mock.fileCount());
         assertEquals(DELIMITED, state());
 
         assertFalse(dataSet().getLatestStats().sourceFormat);
         dataSet().importedToSource(null, null);
-        assertEquals(5, mock.fileCount());
+        assertEquals(6, mock.fileCount());
         assertEquals(SOURCED, state());
 
         performAnalysis();
-        assertEquals(6, mock.fileCount());
+        assertEquals(7, mock.fileCount());
         Stats stats = dataSet().getLatestStats();
         assertTrue(stats.sourceFormat);
         SourceTreeNode tree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
         assertEquals(Tag.element(Storage.ENVELOPE_TAG), tree.getTag());
-        assertEquals(ANALYZED_SOURCE, state());
+        assertEquals(MAPPING, state());
 
-        mock.createMapping();
 //        System.out.println(mock.mapping());
 //        System.out.println();
 
         MetadataParser parser = mock.parser();
         MetadataRecord record = parser.nextRecord();
+
 //        System.out.println(XmlNodePrinter.toXml(record.getRootNode()));
 
         Node node = mock.runMapping(record);
+
+        System.out.println(new XmlSerializer().toXml(node, true));
+
         Source source = new DOMSource(node);
         try {
             mock.validator().validate(source);

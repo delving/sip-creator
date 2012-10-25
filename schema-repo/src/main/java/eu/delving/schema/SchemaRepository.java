@@ -76,7 +76,7 @@ public class SchemaRepository {
         }
         if (hash == null) return null;
         String schema = fetcher.fetchSchema(schemaVersion, schemaType);
-        if (fetcher.isValidating()) {
+        if (fetcher.isValidating() && !hash.isEmpty()) {
             String foundHash = getHashString(schema.trim());
             if (!hash.equals(foundHash)) {
                 throw new IllegalStateException(schemaVersion.getFullFileName(schemaType) + ": expected hash " + foundHash);
