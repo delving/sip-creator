@@ -46,40 +46,12 @@
     </entry>
   </facts>
   <node-mappings>
-
-      <!--<dc:format>text</dc:format>-->
-      <!--<dc:subject>Environmental sciences</dc:subject>-->
-      <!--<dc:subject>Geology</dc:subject>-->
-      <!--<dc:subject>Agriculture</dc:subject>-->
-      <!--<dc:type>Collection</dc:type>-->
-      <!--<dc:type>Text</dc:type>-->
-      <!--<dc:description>Florida Environments Online contains both digital full text materials and research bibliographies about the ecology and environment of Florida. Digitized materials include more than 200 seminal texts on species and ecosystems selected by scientific experts throughout the state of Florida and digitized specifically for the Linking Florida's Natural Heritage project. They also include the publications of the Florida Geological Society, and agricultural documents created by the Agricultural Experiment Station/Extension Service (IFAS) and the Florida Department of Agriculture and Consumer Affairs, as well as engineering documents created by the UF Engineering and Industrial Experiment Station.</dc:description>-->
-      <!--<dc:contributor>Florida Geological Society</dc:contributor>-->
-      <!--<dc:contributor>Florida Department of Agriculture and Consumer Affairs</dc:contributor>-->
-      <!--<dc:contributor>Agricultural Experiment Station/Extension Service (IFAS)</dc:contributor>-->
-      <!--<dc:contributor>University of Florida Engineering and Industrial Experiment Station</dc:contributor>-->
-      <!--<dc:language>en</dc:language>-->
-      <!--<dc:identifier>http://palmm.fcla.edu/feol/</dc:identifier>-->
-      <!--<dc:language>en</dc:language>-->
-
-      <!--<mods:name><mods:namePart>Florida Geological Society</mods:namePart></mods:name>-->
-      <!--<mods:name ><mods:namePart>Florida. Department of Agriculture and Consumer Affairs</mods:namePart></mods:name>-->
-      <!--<mods:name><mods:namePart>Agricultural Experiment Station/Extension Service (IFAS) </mods:namePart></mods:name>-->
-      <!--<mods:name><mods:namePart>University of Florida. Engineering and Industrial Experiment Station</mods:namePart></mods:name>-->
-      <!--<mods:typeOfResource"collection="yes">text</mods:typeOfResource>-->
-    <!--<mods:language>en</mods:language>-->
-    <!--<mods:physicalDescription><mods:form>text/html</mods:form></mods:physicalDescription>-->
-    <!--<mods:note>Florida Environments Online contains both digital full text materials and research bibliographies about the ecology and environment of Florida. Digitized materials include more than 200 seminal texts on species and ecosystems selected by scientific experts throughout the state of Florida and digitized specifically for the Linking Florida's Natural Heritage project. They also include the publications of the Florida Geological Society, and agricultural documents created by the Agricultural Experiment Station/Extension Service (IFAS) and the Florida Department of Agriculture and Consumer Affairs, as well as engineering documents created by the UF Engineering and Industrial Experiment Station</mods:note>-->
-    <!--<mods:subject><mods:topic>Environmental sciences</mods:topic></mods:subject>-->
-    <!--<mods:subject><mods:topic>Geology</mods:topic></mods:subject>-->
-    <!--<mods:subject><mods:topic>Agriculture</mods:topic></mods:subject>-->
-    <!--<mods:identifier type="uri">http://palmm.fcla.edu/feol/</mods:identifier>-->
-    <!--<mods:location><mods:url>http://palmm.fcla.edu/feol/</mods:url></mods:location>-->
-    <!--<mods:recordInfo><mods:recordContentSource>My favorite Library</mods:recordContentSource>-->
-        <!--<mods:recordCreationDate encoding="iso8601">20030331</mods:recordCreationDate> <mods:recordIdentifier>12345</mods:recordIdentifier></mods:recordInfo>-->
-
-
-    <node-mapping inputPath="/input/dc:title" outputPath="/mods/titleInfo[enumerated]/title"/>
+    <node-mapping inputPath="/input/dc:title" outputPath="/mods/titleInfo[alternative]/title"/>
     <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name/namePart"/>
+    <node-mapping inputPath="/input/dc:format" outputPath="/mods/typeOfResource"/>
+    <node-mapping inputPath="/input/dc:language" outputPath="/mods/language/languageTerm"/>
+    <node-mapping inputPath="/input/dc:identifier" outputPath="/mods/location/url"/>
+    <node-mapping inputPath="/input/dc:description" outputPath="/mods/note"/>
+    <node-mapping inputPath="/input/dc:subject" outputPath="/mods/subject/topic"/>
   </node-mappings>
 </rec-mapping>

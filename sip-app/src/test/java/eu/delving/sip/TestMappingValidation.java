@@ -70,6 +70,18 @@ public class TestMappingValidation {
     }
 
     @Ignore
+    // todo: puzzling  cvc-complex-type.3.2.2: Attribute 'mods:type' is not allowed to appear in element 'mods:titleInfo'.
+    @Test
+    public void testMods() throws Exception {
+        mock.prepareDataset(
+                "mods",
+                "/example-dublin-core/copied",
+                "/example-dublin-core/copied/dc:identifier"
+        );
+        runFullCycle(1);
+    }
+
+    @Ignore
     @Test
     public void testAbc() throws Exception {
         mock.prepareDataset(
