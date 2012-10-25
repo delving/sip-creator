@@ -613,7 +613,7 @@ public class CultureHubClient {
 
         @Override
         public void writeTo(OutputStream outputStream) throws IOException {
-            if (progressListener != null) progressListener.prepareFor((int) (getContentLength() / BLOCK_SIZE));
+            progressListener.prepareFor((int) (getContentLength() / BLOCK_SIZE));
             InputStream inputStream = new FileInputStream(this.file);
             try {
                 byte[] buffer = new byte[BLOCK_SIZE];
@@ -624,10 +624,13 @@ public class CultureHubClient {
                     int blocks = (int) (bytesSent / BLOCK_SIZE);
                     if (blocks > blocksReported) {
                         blocksReported = blocks;
-                        if (progressListener != null && !progressListener.setProgress(blocksReported)) abort = true;
+                        progressListener.setProgress(blocksReported);
                     }
                 }
                 outputStream.flush();
+            }
+            catch (CancelException e) {
+                outputStream.close();
             }
             finally {
                 inputStream.close();

@@ -24,6 +24,7 @@ package eu.delving.sip.xml;
 import eu.delving.MappingResult;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -76,6 +77,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private int maxUniqueValueLength;
     private String problemXML;
     private String problemMessage;
+    private SipModel sipModel;
 
     public interface Listener {
 
@@ -94,7 +96,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             GroovyCodeResource groovyCodeResource,
             Listener listener
     ) {
-        sipModel.getMappingModel().setLocked(true);
+        this.sipModel = sipModel;
+        this.sipModel.getMappingModel().setLocked(true);
         this.maxUniqueValueLength = maxUniqueValueLength;
         this.recordCount = recordCount;
         this.feedback = sipModel.getFeedback();
@@ -168,6 +171,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             validator = createValidator();
             mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
             parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
+            parser.setProgressListener(new FakeProgressListener());
             reportWriter = getDataSet().openReportWriter(recMapping.getPrefix());
             if (outputDirectory != null) xmlOutput = createXmlOutput();
         }
@@ -180,10 +184,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             while (!done) {
                 MetadataRecord record = parser.nextRecord();
                 if (record == null) break;
-                if (!progressListener.setProgress(record.getRecordNumber())) {
-                    done = true;
-                    break;
-                }
+                progressListener.setProgress(record.getRecordNumber());
                 this.recordNumber = record.getRecordNumber();
                 try {
                     Node node = mappingRunner.runMapping(record);
@@ -238,8 +239,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 }
             }
         }
-        catch (MetadataParser.AbortException e) {
-            done = true;
+        catch (CancelException e) {
+            listener.aborted(this);
         }
         catch (Exception e) {
             feedback.alert("File processing problem", e);
@@ -374,6 +375,26 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
         else {
             return NextStep.ABORT;
+        }
+    }
+
+    private class FakeProgressListener implements ProgressListener {
+
+        @Override
+        public void setProgressMessage(String message) {
+        }
+
+        @Override
+        public void prepareFor(int total) {
+        }
+
+        @Override
+        public void setProgress(int progress) throws CancelException {
+        }
+
+        @Override
+        public Feedback getFeedback() {
+            return sipModel.getFeedback();
         }
     }
 }

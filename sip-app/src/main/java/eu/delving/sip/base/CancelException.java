@@ -21,22 +21,14 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.sip.model.Feedback;
-
 /**
- * Allows for progress reporting from a long term process to the work model
+ * ProgressListener cancellation
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface ProgressListener {
-
-    void setProgressMessage(String message);
-
-    void prepareFor(int total);
-
-    void setProgress(int progress) throws CancelException;
-
-    Feedback getFeedback();
-
+public class CancelException extends Exception {
+    public CancelException() {
+        super("Cancelled");
+    }
 }
