@@ -38,7 +38,7 @@ import java.util.*;
 /**
  * Custom node builder which executes closures if they are found as attribute values, or if
  * an element closure returns a String or GString.
- *
+ * <p/>
  * This class is actually core to the transformation process because it gives the "Builder Pattern"
  * a very different character by executing closures for values.
  *
@@ -51,14 +51,11 @@ public class DOMBuilder extends BuilderSupport {
     private Document document;
     private DocumentBuilder documentBuilder;
     private Map<String, String> namespaces = new TreeMap<String, String>();
+    private RecDef recDef;
 
-    public static DOMBuilder newInstance(List<RecDef.Namespace> namespaces) {
+    public static DOMBuilder newInstance(RecDef recDef) {
         try {
-            DOMBuilder instance = new DOMBuilder();
-            instance.namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
-            for (RecDef.Namespace ns : namespaces) {
-                instance.namespaces.put(ns.prefix, ns.uri);
-            }
+            DOMBuilder instance = new DOMBuilder(recDef);
             DocumentBuilderFactory factory = FactorySupport.createDocumentBuilderFactory();
             factory.setNamespaceAware(true);
             instance.documentBuilder = factory.newDocumentBuilder();
@@ -66,6 +63,19 @@ public class DOMBuilder extends BuilderSupport {
         }
         catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public DOMBuilder(RecDef recDef) {
+        this.recDef = recDef;
+        namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
+        for (RecDef.Namespace ns : this.recDef.namespaces) {
+            if (ns.prefix.equals(recDef.prefix) && !recDef.elementFormDefaultQualified) {
+                namespaces.put("", ns.uri);
+            }
+            else {
+                namespaces.put(ns.prefix, ns.uri);
+            }
         }
     }
 
@@ -79,8 +89,13 @@ public class DOMBuilder extends BuilderSupport {
     @Override
     protected Object createNode(Object name) {
         if (document == null) document = documentBuilder.newDocument();
-        String uri = getNamespace(name.toString());
-        return uri != null ? document.createElementNS(uri, name.toString()) : document.createElement(name.toString());
+        TagValue tagValue = new TagValue(name.toString(), false);
+        if (tagValue.isNamespaceAdded()) {
+            return document.createElementNS(tagValue.uri, tagValue.toString());
+        }
+        else {
+            return document.createElement(tagValue.localPart);
+        }
     }
 
     @Override
@@ -117,12 +132,12 @@ public class DOMBuilder extends BuilderSupport {
             else {
                 valueString = entry.getValue().toString();
             }
-            String uri = getNamespace(entry.getKey().toString());
-            if (uri != null) {
-                element.setAttributeNS(uri, attrName, valueString);
+            TagValue tagValue = new TagValue(attrName, true);
+            if (tagValue.isNamespaceAdded()) {
+                element.setAttributeNS(tagValue.uri, tagValue.toString(), valueString);
             }
             else {
-                element.setAttribute(attrName, valueString);
+                element.setAttribute(tagValue.localPart, valueString);
             }
         }
         return element;
@@ -311,17 +326,6 @@ public class DOMBuilder extends BuilderSupport {
         }
     }
 
-    private String getNamespace(String name) {
-        int colon = name.indexOf(':');
-        if (colon > 0) {
-            String prefix = name.substring(0, colon);
-            String uri = namespaces.get(prefix);
-            if (uri == null) throw new RuntimeException("Namespace not found for prefix: " + prefix);
-            return uri;
-        }
-        return colon > 0 ? namespaces.get(name.substring(0, colon)) : null;
-    }
-
     private void makeSibling(Node node, Node sibling) {
         Node parent = node.getParentNode();
         if (parent == null) throw new RuntimeException("Node has no parent: " + node);
@@ -357,6 +361,42 @@ public class DOMBuilder extends BuilderSupport {
                 parent.appendChild(document.createCDATASection(cdata));
                 text = text.substring(cdata.length() + CDATA_AFTER.length());
             }
+        }
+    }
+
+    private class TagValue {
+        final String prefix;
+        final String uri;
+        final String localPart;
+        final boolean attribute;
+
+        public TagValue(String name, boolean attribute) {
+            int colon = name.indexOf(':');
+            if (colon > 0) {
+                this.prefix = name.substring(0, colon);
+                this.uri = namespaces.get(this.prefix);
+                this.localPart = name.substring(colon + 1);
+            }
+            else {
+                this.prefix = null;
+                this.uri = null;
+                this.localPart = name;
+            }
+            this.attribute = attribute;
+        }
+
+        public boolean isNamespaceAdded() {
+            if (prefix != null && !prefix.equals(recDef.prefix)) return true;
+            if (attribute) {
+                return recDef.attributeFormDefaultQualified;
+            }
+            else {
+                return recDef.elementFormDefaultQualified;
+            }
+        }
+
+        public String toString() {
+            return prefix == null ? localPart : prefix + ":" + localPart;
         }
     }
 }
