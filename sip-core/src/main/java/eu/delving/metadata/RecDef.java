@@ -114,6 +114,12 @@ public class RecDef {
     @XStreamAsAttribute
     public boolean flat;
 
+    @XStreamAsAttribute
+    public boolean elementFormDefaultQualified = true;
+
+    @XStreamAsAttribute
+    public boolean attributeFormDefaultQualified = true;
+
     public List<Namespace> namespaces;
 
     public List<MappingFunction> functions;
