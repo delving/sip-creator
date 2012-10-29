@@ -169,13 +169,15 @@ public class XmlSerializer {
         List<Attribute> attributes = new ArrayList<Attribute>();
         for (int walk = 0; walk < nodeAttributes.getLength(); walk++) {
             Node attrItem = nodeAttributes.item(walk);
-            if (attrItem.getPrefix() == null || attrItem.getLocalName() == null) {
-                continue;
+            if (attrItem.getPrefix() == null || attrItem.getPrefix().isEmpty()) {
+                attributes.add(eventFactory.createAttribute(attrItem.getNodeName(),attrItem.getNodeValue()));
             }
-            attributes.add(eventFactory.createAttribute(
-                    attrItem.getPrefix(), attrItem.getNamespaceURI(), attrItem.getLocalName(),
-                    attrItem.getNodeValue()
-            ));
+            else {
+                attributes.add(eventFactory.createAttribute(
+                        attrItem.getPrefix(), attrItem.getNamespaceURI(), attrItem.getLocalName(),
+                        attrItem.getNodeValue()
+                ));
+            }
         }
         return attributes;
     }
