@@ -451,9 +451,11 @@ public class RecDef {
                 attrGroups = null;
             }
             if (elems != null) {
+                List<Elem> elemRefs = new ArrayList<Elem>();
                 for (String localName : elems.split(DELIM)) {
-                    elemList.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
+                    elemRefs.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
                 }
+                elemList.addAll(0, elemRefs);
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
