@@ -85,11 +85,11 @@ class OptBox {
         if (opt != null) {
             switch (role) {
                 case ROOT:
-                    return opt.value;
+                    return opt.value == null ? opt.key : opt.value;
                 case KEY:
                     return opt.key;
                 case VALUE:
-                    return opt.value;
+                    return opt.value == null ? opt.key : opt.value;
                 case SCHEMA:
                     return opt.schema;
                 case SCHEMA_URI:
