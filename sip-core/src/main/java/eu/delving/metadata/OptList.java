@@ -71,10 +71,10 @@ public class OptList {
             throw new RuntimeException("An option list may not be connected to an attribute: " + path);
         }
         path = path.withDefaultPrefix(recDef.prefix);
-        key = resolveTag(key, recDef);
-        value = resolveTag(value, recDef);
-        schema = resolveTag(schema, recDef);
-        schemaUri = resolveTag(schemaUri, recDef);
+        key = resolveTag(path, key, recDef);
+        value = resolveTag(path, value, recDef);
+        schema = resolveTag(path, schema, recDef);
+        schemaUri = resolveTag(path, schemaUri, recDef);
         RecDef.Elem elem = recDef.findElem(path);
         elem.optList = this;
         if (dictionary != null) {
@@ -84,8 +84,17 @@ public class OptList {
         }
     }
 
-    private static Tag resolveTag(Tag tag, RecDef recDef) {
-        return tag != null ? tag.defaultPrefix(recDef.prefix) : null;
+    private Tag resolveTag(Path path, Tag tag, RecDef recDef) {
+        if (tag == null) return null;
+        tag = tag.defaultPrefix(recDef.prefix);
+        path = path.child(tag); // validate that it exists
+        if (tag.isAttribute()) {
+            recDef.findAttr(path);
+        }
+        else {
+            recDef.findElem(path);
+        }
+        return tag;
     }
 
     public List<String> getValues() {

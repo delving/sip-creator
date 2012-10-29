@@ -212,6 +212,12 @@ public class RecDef {
         paths.add(path);
     }
 
+    Attr findAttr(Path path) {
+        Attr found = root.findAttr(path, 0);
+        if (found == null) throw new RuntimeException("No attribute found for path " + path);
+        return found;
+    }
+
     Elem findElem(Path path) {
         Elem found = root.findElem(path, 0);
         if (found == null) throw new RuntimeException("No element found for path " + path);
