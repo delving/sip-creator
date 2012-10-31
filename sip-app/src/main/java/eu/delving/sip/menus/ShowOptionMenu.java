@@ -26,7 +26,8 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JMenu;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class ShowOptionMenu extends JMenu implements MappingModel.SetListener {
         private OptList.Opt opt;
 
         private OptAction(OptList.Opt opt) {
-            super(opt.value);
+            super(opt.value == null ? opt.key : opt.value);
             this.opt = opt;
         }
 

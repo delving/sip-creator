@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<example-dublin-core xmlns:dc="http://purl.org/dc/elements/1.1/">
+<example-dublin-core xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:europeana="http://www.europeana.eu/schemas/ese/">
     <copied>
         <!--snagged from http://www.loc.gov/standards/mods/dcsimple-mods.html-->
         <dc:title>Florida Environments Online</dc:title>
@@ -16,5 +16,8 @@
         <dc:contributor>University of Florida Engineering and Industrial Experiment Station</dc:contributor>
         <dc:language>en</dc:language>
         <dc:identifier>http://palmm.fcla.edu/feol/</dc:identifier>
+        <europeana:isShownBy>http://www.sffarkiv.no/webdb/fileStream.aspx?fileName=dbatlas_leks\OFdf-113702\kvalitet4\OFdf-113702.84080.wmv</europeana:isShownBy>
+        <europeana:isShownAt>http://www.digitaltfortalt.no/show_single.aspx?art_id=113702</europeana:isShownAt>
+        <europeana:object>http://www.sffarkiv.no/webdb/fileStream.aspx?fileName=dbatlas_leks\HOdf-113824\kvalitet2\HOdf-113824.86901.jpg</europeana:object>
     </copied>
 </example-dublin-core>
