@@ -192,7 +192,7 @@ public class RecDef {
 
     private void resolve() {
         if (prefix == null || version == null) throw new RuntimeException("Prefix and/or version missing");
-        if (attrs != null) for (Attr attr: attrs) attr.tag = attr.tag.defaultPrefix(prefix);
+        if (attrs != null) for (Attr attr : attrs) attr.tag = attr.tag.defaultPrefix(prefix);
         if (attrGroups != null) for (AttrGroup attrGroup : attrGroups) attrGroup.resolve(this);
         if (elems != null) for (Elem elem : elems) elem.tag = elem.tag.defaultPrefix(prefix);
         root.resolve(Path.create(), this);
@@ -210,6 +210,12 @@ public class RecDef {
     private void collectPaths(Attr attr, Path path, List<Path> paths) {
         path = path.child(attr.tag);
         paths.add(path);
+    }
+
+    Attr findAttr(Path path) {
+        Attr found = root.findAttr(path, 0);
+        if (found == null) throw new RuntimeException("No attribute found for path " + path);
+        return found;
     }
 
     Elem findElem(Path path) {
@@ -451,9 +457,11 @@ public class RecDef {
                 attrGroups = null;
             }
             if (elems != null) {
+                List<Elem> elemRefs = new ArrayList<Elem>();
                 for (String localName : elems.split(DELIM)) {
-                    elemList.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
+                    elemRefs.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
                 }
+                elemList.addAll(0, elemRefs);
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
@@ -479,6 +487,7 @@ public class RecDef {
             try {
                 Elem clone = (Elem) this.clone();
                 clone.attrList = new ArrayList<Attr>();
+                clone.elemList = new ArrayList<Elem>();
                 return clone;
             }
             catch (CloneNotSupportedException e) {

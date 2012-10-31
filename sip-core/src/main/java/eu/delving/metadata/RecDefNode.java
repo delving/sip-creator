@@ -23,6 +23,7 @@ package eu.delving.metadata;
 
 import java.util.*;
 
+import static eu.delving.metadata.OptRole.ABSENT;
 import static eu.delving.metadata.StringUtil.*;
 
 /**
@@ -70,35 +71,60 @@ public class RecDefNode implements Comparable<RecDefNode> {
         this.elem = elem;
         this.attr = attr;
         this.defaultPrefix = defaultPrefix;
-        OptBox childOptBox = null;
+        OptRole optRole = ABSENT;
         if (optBox != null) {
+            optRole = optBox.role;
             switch (optBox.role) {
                 case ROOT:
                     this.optBox = optBox;
-                    childOptBox = optBox.createChild();
                     break;
-                case CHILD:
-                    this.optBox = optBox.inRoleFor(getTag());
+                case DESCENDANT:
+                    this.optBox = optBox.inRoleFor(getPath());
+                    if (this.optBox != null) optRole = this.optBox.role;
                     break;
             }
         }
         if (elem != null) {
-            for (RecDef.Attr sub : elem.attrList) {
-                children.add(new RecDefNode(listener, this, null, sub, defaultPrefix, childOptBox)); // child  optBox
-            }
-            for (RecDef.Elem sub : elem.elemList) {
-                if (sub.optList != null) {
-                    if (sub.optList.dictionary != null) {
-                        children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, OptBox.asRoot(sub.optList)));
-                    }
-                    else {
-                        for (OptList.Opt subOpt : sub.optList.opts) { // a child for each option (introducing the OptBox instances)
-                            children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, OptBox.asRoot(subOpt)));
+            for (RecDef.Attr attribute : elem.attrList) {
+                switch (optRole) {
+                    case ROOT:
+                        if (optBox == null) {
+                            throw new RuntimeException("No OptBox");
                         }
+                        children.add(subNode(attribute, optBox.createDescendant()));
+                        break;
+                    case DESCENDANT:
+                        children.add(subNode(attribute, optBox)); // percolate deeper
+                        break;
+                    default:
+                        children.add(subNode(attribute, null));
+                        break;
+                }
+            }
+            for (RecDef.Elem element : elem.elemList) {
+                if (element.optList == null) {
+                    switch (optRole) {
+                        case ROOT:
+                            if (optBox == null) {
+                                throw new RuntimeException("No OptBox");
+                            }
+                            children.add(subNode(element, optBox.createDescendant()));
+                            break;
+                        case DESCENDANT:
+                            children.add(subNode(element, optBox)); // percolate deeper
+                            break;
+                        default:
+                            children.add(subNode(element, null));
+                            break;
                     }
                 }
+                else if (element.optList.dictionary != null) {
+                    children.add(subNode(element, OptBox.asRoot(element.optList)));
+                }
                 else {
-                    children.add(new RecDefNode(listener, this, sub, null, defaultPrefix, childOptBox)); // child OptBox
+                    for (OptList.Opt opt : element.optList.opts) { // a child for each option (introducing the OptBox instances)
+                        children.add(subNode(element, OptBox.asRoot(opt)));
+                    }
                 }
             }
             if (elem.nodeMapping != null) {
@@ -107,6 +133,14 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 elem.nodeMapping.outputPath = getPath();
             }
         }
+    }
+
+    private RecDefNode subNode(RecDef.Attr attr, OptBox box) {
+        return new RecDefNode(listener, this, null, attr, defaultPrefix, box);
+    }
+
+    private RecDefNode subNode(RecDef.Elem elem, OptBox box) {
+        return new RecDefNode(listener, this, elem, null, defaultPrefix, box);
     }
 
     public OptBox getDictionaryOptBox() {
@@ -118,7 +152,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public String getFieldType() {
-        return elem != null ?elem.getFieldType() : attr.getFieldType();
+        return elem != null ? elem.getFieldType() : attr.getFieldType();
     }
 
     public boolean isAttr() {
@@ -196,7 +230,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean hasDescendentNodeMappings() {
-        if (!nodeMappings.isEmpty()) return true;
+        if (!nodeMappings.isEmpty() || hasConstant()) return true;
         for (RecDefNode sub : children) if (sub.hasDescendentNodeMappings()) return true;
         return false;
     }
@@ -264,7 +298,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (nodeMappings.isEmpty()) {
             if (isRootOpt()) {
                 Set<Path> siblingPaths = getSiblingInputPathsOfChildren();
-                if (siblingPaths != null) {
+                if (siblingPaths != null && !siblingPaths.isEmpty()) {
                     NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
                     nodeMapping.recDefNode = this;
                     codeOut.start(nodeMapping);
@@ -282,7 +316,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                 codeOut._line("} // R0");
             }
         }
-        else if (editPath != null) {
+        else if (editPath != null && editPath.getNodeMapping().recDefNode == this) {
             NodeMapping nodeMapping = editPath.getNodeMapping();
             codeOut.line("_absent_ = true");
             codeOut.start(nodeMapping);

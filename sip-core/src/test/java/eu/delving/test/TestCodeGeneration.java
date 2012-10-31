@@ -117,7 +117,7 @@ public class TestCodeGeneration {
 
         String xml = new XmlSerializer().toXml(node, true);
         System.out.println(xml);
-        Assert.assertEquals(EXPECT, xml);
+        Assert.assertEquals("Unexpected xml", EXPECT, xml);
     }
 
     private void printWithLineNumbers(String code) {

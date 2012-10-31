@@ -49,7 +49,7 @@ public class DictionaryHelper {
         if (stats == null || stats.values == null) return false;
         Set<String> values = stats.values.counterMap.keySet();
         OptList optList = nodeMapping.recDefNode.getOptList();
-        return values != null && optList != null && nodeMapping.dictionary == null;
+        return values != null && optList != null && optList.dictionary != null && nodeMapping.dictionary == null;
     }
 
     public static boolean refreshDictionary(NodeMapping nodeMapping) {

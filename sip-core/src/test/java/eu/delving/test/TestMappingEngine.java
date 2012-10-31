@@ -36,6 +36,7 @@ import eu.delving.schema.util.FileSystemFetcher;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -152,6 +153,7 @@ public class TestMappingEngine {
         validator(new SchemaVersion("tib", "1.0.0")).validate(source);
     }
 
+    @Ignore
     @Test
     public void tryAff() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         Map<String, String> namespaces = createNamespaces(
@@ -163,6 +165,7 @@ public class TestMappingEngine {
 //        System.out.println(serializer.toXml(result.root()));
     }
 
+    @Ignore
     @Test
     public void indexDocumentFromAFF() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         Map<String, String> namespaces = createNamespaces(

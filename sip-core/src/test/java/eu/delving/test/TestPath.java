@@ -98,4 +98,11 @@ public class TestPath {
         assertTrue(optC.compareTo(optD) < 0);
         assertTrue(optD.compareTo(optC) > 0);
     }
+
+    @Test
+    public void extend() {
+        Path a = Path.create("/one/two");
+        Path b = Path.create("three/four");
+        assertTrue(a.descendant(b).equals(Path.create("/one/two/three/four")));
+    }
 }

@@ -154,7 +154,9 @@ public class NodeMapping {
     }
 
     public NodeMapping setInputPaths(Collection<Path> inputPaths) {
-        if (inputPaths.isEmpty()) throw new RuntimeException();
+        if (inputPaths.isEmpty()) {
+            throw new RuntimeException("Trying to set input paths but there are none!");
+        }
         Path parent = null;
         for (Path input : inputPaths) {
             if (parent == null) {
