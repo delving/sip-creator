@@ -25,6 +25,7 @@ import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaVersion;
 import junit.framework.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
@@ -68,6 +69,7 @@ public class TestCodeGeneration {
         }
     }
 
+    @Ignore
     @Test
     public void cornucopia() throws MappingException {
         recMapping.setFact("dogExists", "true");
