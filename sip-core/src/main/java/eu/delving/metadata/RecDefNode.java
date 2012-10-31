@@ -230,7 +230,19 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean hasDescendentNodeMappings() {
-        if (!nodeMappings.isEmpty() || hasConstant()) return true;
+        if (!nodeMappings.isEmpty()) return true;
+        if (hasConstant()) {
+            RecDefNode ancestor = this;
+            while (ancestor.parent != null) {
+                Path optListRoot = optBox.opt.parent.path;
+                Path cleanPath = ancestor.getPath().parent().child(ancestor.getPath().peek().withOpt(null));
+                if (cleanPath.equals(optListRoot)) {
+                    if (!ancestor.nodeMappings.isEmpty()) return true;
+                    break;
+                }
+                ancestor = ancestor.parent;
+            }
+        }
         for (RecDefNode sub : children) if (sub.hasDescendentNodeMappings()) return true;
         return false;
     }

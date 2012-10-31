@@ -47,7 +47,8 @@
   </facts>
   <node-mappings>
     <node-mapping inputPath="/input/dc:title" outputPath="/mods/titleInfo[alternative]/title"/>
-      <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name/namePart"/>
+      <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name[contributor]"/>
+      <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name[contributor]/namePart"/>
       <node-mapping inputPath="/constant" outputPath="/mods/mods:typeOfResource">
           <groovy-code>
               <string>&apos;text&apos;</string>
