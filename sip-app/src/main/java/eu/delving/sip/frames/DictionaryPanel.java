@@ -332,7 +332,7 @@ public class DictionaryPanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (((String) value).trim().isEmpty()) value = COPY_VERBATIM;
+            if (value == null || ((String) value).trim().isEmpty()) value = COPY_VERBATIM;
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
 
