@@ -93,7 +93,11 @@ public class XmlOutput {
         NamedNodeMap namedNodeMap = element.getAttributes();
         for (int walk = 0; walk < namedNodeMap.getLength(); walk++) {
             Node node = namedNodeMap.item(walk);
-            attributes.add(eventFactory.createAttribute(node.getPrefix(), node.getNamespaceURI(), node.getLocalName(), node.getNodeValue()));
+            final String prefix = node.getPrefix() == null ? "" : node.getPrefix();
+            final String namespaceURI = node.getNamespaceURI() == null ? "" : node.getNamespaceURI();
+            final String localName = node.getLocalName() == null ? node.getNodeName() : node.getLocalName();
+            final String nodeValue = node.getNodeValue();
+            attributes.add(eventFactory.createAttribute(prefix, namespaceURI, localName, nodeValue));
         }
         out.add(eventFactory.createCharacters("\n"));
         indent(depth);
