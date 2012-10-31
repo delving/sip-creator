@@ -192,7 +192,7 @@ public class RecDef {
 
     private void resolve() {
         if (prefix == null || version == null) throw new RuntimeException("Prefix and/or version missing");
-        if (attrs != null) for (Attr attr: attrs) attr.tag = attr.tag.defaultPrefix(prefix);
+        if (attrs != null) for (Attr attr : attrs) attr.tag = attr.tag.defaultPrefix(prefix);
         if (attrGroups != null) for (AttrGroup attrGroup : attrGroups) attrGroup.resolve(this);
         if (elems != null) for (Elem elem : elems) elem.tag = elem.tag.defaultPrefix(prefix);
         root.resolve(Path.create(), this);
@@ -487,6 +487,7 @@ public class RecDef {
             try {
                 Elem clone = (Elem) this.clone();
                 clone.attrList = new ArrayList<Attr>();
+                clone.elemList = new ArrayList<Elem>();
                 return clone;
             }
             catch (CloneNotSupportedException e) {

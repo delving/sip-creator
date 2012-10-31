@@ -50,19 +50,44 @@ public class OptList {
     public Path path;
 
     @XStreamAsAttribute
-    public Tag key;
+    public Path key;
 
     @XStreamAsAttribute
-    public Tag value;
+    public Path value;
 
     @XStreamAsAttribute
-    public Tag schema;
+    public Path schema;
 
     @XStreamAsAttribute
-    public Tag schemaUri;
+    public Path schemaUri;
 
     @XStreamImplicit
     public List<Opt> opts;
+
+    public Path keyPath(Opt opt) {
+        return optPath(opt == null ? null : opt.key, key);
+    }
+
+    public Path valuePath(Opt opt) {
+        return optPath(opt == null ? null : opt.value, value);
+    }
+
+    public Path schemaPath(Opt opt) {
+        return optPath(opt == null ? null : opt.schema, schema);
+    }
+
+    public Path schemaUriPath(Opt opt) {
+        return optPath(opt == null ? null : opt.schemaUri, schemaUri);
+    }
+
+    private Path optPath(String optField, Path fieldPath) {
+        if (optField == null) {
+            return path.descendant(fieldPath);
+        }
+        else {
+            return path.parent().child(path.peek().withOpt(optField)).descendant(fieldPath);
+        }
+    }
 
     public void resolve(RecDef recDef) {
         for (Opt opt : opts) opt.parent = this;
@@ -84,17 +109,17 @@ public class OptList {
         }
     }
 
-    private Tag resolveTag(Path path, Tag tag, RecDef recDef) {
-        if (tag == null) return null;
-        tag = tag.defaultPrefix(recDef.prefix);
-        path = path.child(tag); // validate that it exists
-        if (tag.isAttribute()) {
+    private Path resolveTag(Path path, Path pathX, RecDef recDef) {
+        if (pathX == null) return null;
+        pathX = pathX.withDefaultPrefix(recDef.prefix);
+        path = path.descendant(pathX);
+        if (path.peek().isAttribute()) {
             recDef.findAttr(path);
         }
         else {
             recDef.findElem(path);
         }
-        return tag;
+        return pathX;
     }
 
     public List<String> getValues() {
@@ -127,7 +152,7 @@ public class OptList {
         public OptList parent;
 
         public String toString() {
-            return value;
+            return value == null ? key : value;
         }
     }
 

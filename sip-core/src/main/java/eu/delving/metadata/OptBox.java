@@ -49,20 +49,28 @@ class OptBox {
         this.opt = opt;
     }
 
-    OptBox inRoleFor(Tag tag) {
-        if (role == CHILD) {
+    OptBox inRoleFor(Path path) {
+        if (role == DESCENDANT) {
             OptList list = optList != null ? optList : opt.parent;
-            if (list.key != null && list.key.equals(tag)) return new OptBox(KEY, optList, opt);
-            if (list.value != null && list.value.equals(tag)) return new OptBox(VALUE, optList, opt);
-            if (list.schema != null && list.schema.equals(tag)) return new OptBox(SCHEMA, optList, opt);
-            if (list.schemaUri != null && list.schemaUri.equals(tag)) return new OptBox(SCHEMA_URI, optList, opt);
+            if (list.key != null && list.keyPath(opt).equals(path)) {
+                return new OptBox(KEY, optList, opt);
+            }
+            if (list.value != null && list.valuePath(opt).equals(path)) {
+                return new OptBox(VALUE, optList, opt);
+            }
+            if (list.schema != null && list.schemaPath(opt).equals(path)) {
+                return new OptBox(SCHEMA, optList, opt);
+            }
+            if (list.schemaUri != null && list.schemaUriPath(opt).equals(path)) {
+                return new OptBox(SCHEMA_URI, optList, opt);
+            }
         }
         return null;
     }
 
-    OptBox createChild() {
+    OptBox createDescendant() {
         if (role != ROOT) throw new RuntimeException();
-        return new OptBox(CHILD, optList, opt);
+        return new OptBox(DESCENDANT, optList, opt);
     }
 
     public boolean isDictionary() {
