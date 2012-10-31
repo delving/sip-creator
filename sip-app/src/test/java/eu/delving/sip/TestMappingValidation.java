@@ -69,7 +69,6 @@ public class TestMappingValidation {
         mock.delete();
     }
 
-    @Ignore
     @Test
     public void testMods() throws Exception {
         mock.prepareDataset(
