@@ -234,11 +234,13 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (hasConstant()) {
             RecDefNode ancestor = this;
             while (ancestor.parent != null) {
-                Path optListRoot = optBox.opt.parent.path;
-                Path cleanPath = ancestor.getPath().parent().child(ancestor.getPath().peek().withOpt(null));
-                if (cleanPath.equals(optListRoot)) {
-                    if (!ancestor.nodeMappings.isEmpty()) return true;
-                    break;
+                if (optBox.opt != null) {
+                    Path optListRoot = optBox.opt.parent.path;
+                    Path cleanPath = ancestor.getPath().parent().child(ancestor.getPath().peek().withOpt(null));
+                    if (cleanPath.equals(optListRoot)) {
+                        if (!ancestor.nodeMappings.isEmpty()) return true;
+                        break;
+                    }
                 }
                 ancestor = ancestor.parent;
             }
