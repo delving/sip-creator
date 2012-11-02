@@ -130,6 +130,11 @@ public class Path implements Comparable<Path>, Serializable {
         }
     }
 
+    public Path withoutOpts() {
+        if (this == ROOT) return this;
+        return this.parent().withoutOpts().child(tag.withOpt(null));
+    }
+
     public Path extendAncestor(Path ancestor) {
         if (equals(ancestor)) {
             return create().child(ancestor.peek());

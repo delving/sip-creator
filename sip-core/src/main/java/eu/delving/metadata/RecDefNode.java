@@ -236,7 +236,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             while (ancestor.parent != null) {
                 if (optBox.opt != null) {
                     Path optListRoot = optBox.opt.parent.path;
-                    Path cleanPath = ancestor.getPath().parent().child(ancestor.getPath().peek().withOpt(null));
+                    Path cleanPath = ancestor.getPath().withoutOpts();
                     if (cleanPath.equals(optListRoot)) {
                         if (!ancestor.nodeMappings.isEmpty()) return true;
                         break;
