@@ -21,11 +21,8 @@
 
 package eu.delving;
 
-import eu.delving.groovy.MappingException;
-import org.xml.sax.SAXException;
-
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
+import eu.delving.metadata.MetadataException;
+import eu.delving.schema.SchemaVersion;
 
 /**
  * Provide a mapping service to take text XML.
@@ -36,18 +33,29 @@ import java.io.IOException;
 public interface MappingEngine {
 
     /**
-     * Take the XML record and execute the mapping, with a result that has various ways of accessing
-     * the mapped record data.
+     * Add a mapping runner for a given schemaVersion
      *
-     * @param id the record id
-     * @param recordXML what gets parsed and mapped
-     * @return a result with
-     * @throws XMLStreamException
-     * @throws MappingException
-     * @throws IOException
-     * @throws SAXException
+     * @param schemaVersion what this runner will run
+     * @param mapping the XML string representing the mapping
      */
 
-    MappingResult execute(String id, String recordXML) throws XMLStreamException, MappingException, IOException, SAXException;
+    void addMappingRunner(SchemaVersion schemaVersion, String mapping) throws MetadataException;
 
+    /**
+     * Initiate the asynchronous mapping of a record
+     *
+     * @param index a number to be returned in the call to completion
+     * @param recordId the unique identifier of the record
+     * @param recordXML the XML of the record
+     * @param schemaVersions which mappings are to take place
+     * @param completion the callback when the job is done
+     */
+
+    void mapRecord(
+            int index,
+            String recordId,
+            String recordXML,
+            SchemaVersion[] schemaVersions,
+            MappingCompletion completion
+    );
 }

@@ -30,8 +30,9 @@ import java.util.regex.Pattern;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class SchemaVersion {
+public class SchemaVersion implements Comparable<SchemaVersion> {
     private static final Pattern PATTERN = Pattern.compile("([a-z]{3,6})_([0-9][.][0-9][.][0-9]+)");
+    public static final SchemaVersion RAW = new SchemaVersion("raw", "0.0.0");
     private String prefix;
     private String version;
 
@@ -70,7 +71,30 @@ public class SchemaVersion {
         );
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SchemaVersion that = (SchemaVersion) o;
+        return prefix.equals(that.prefix) && version.equals(that.version);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = prefix.hashCode();
+        result = 31 * result + version.hashCode();
+        return result;
+    }
+
     public String toString() {
         return prefix + "_" + version;
+    }
+
+    @Override
+    public int compareTo(SchemaVersion o) {
+        int compare = prefix.compareTo(o.prefix);
+        if (compare != 0) return compare;
+        return version.compareTo(o.version);
     }
 }
