@@ -51,21 +51,18 @@ class OptBox {
 
     OptBox inRoleFor(Path path) {
         if (role == DESCENDANT) {
+            path = path.withoutOpts(); // the list has paths without opts so this compares properly
             OptList list = optList != null ? optList : opt.parent;
-            if (list.key != null && list.keyPath(opt).equals(path)) {
-                return new OptBox(KEY, optList, opt);
-            }
-            if (list.value != null && list.valuePath(opt).equals(path)) {
-                return new OptBox(VALUE, optList, opt);
-            }
-            if (list.schema != null && list.schemaPath(opt).equals(path)) {
-                return new OptBox(SCHEMA, optList, opt);
-            }
-            if (list.schemaUri != null && list.schemaUriPath(opt).equals(path)) {
-                return new OptBox(SCHEMA_URI, optList, opt);
-            }
+            if (pathMatch(list.key, path)) return new OptBox(KEY, optList, opt);
+            if (pathMatch(list.value, path)) return new OptBox(VALUE, optList, opt);
+            if (pathMatch(list.schema, path)) return new OptBox(SCHEMA, optList, opt);
+            if (pathMatch(list.schemaUri, path)) return new OptBox(SCHEMA_URI, optList, opt);
         }
         return null;
+    }
+
+    private boolean pathMatch(Path listPath, Path testPath) {
+        return listPath != null && listPath.equals(testPath);
     }
 
     OptBox createDescendant() {

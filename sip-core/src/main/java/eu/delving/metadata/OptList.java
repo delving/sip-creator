@@ -64,31 +64,6 @@ public class OptList {
     @XStreamImplicit
     public List<Opt> opts;
 
-    public Path keyPath(Opt opt) {
-        return optPath(opt == null ? null : opt.key, key);
-    }
-
-    public Path valuePath(Opt opt) {
-        return optPath(opt == null ? null : opt.value, value);
-    }
-
-    public Path schemaPath(Opt opt) {
-        return optPath(opt == null ? null : opt.schema, schema);
-    }
-
-    public Path schemaUriPath(Opt opt) {
-        return optPath(opt == null ? null : opt.schemaUri, schemaUri);
-    }
-
-    private Path optPath(String optField, Path fieldPath) {
-        if (optField == null) {
-            return path.descendant(fieldPath);
-        }
-        else {
-            return path.parent().child(path.peek().withOpt(optField)).descendant(fieldPath);
-        }
-    }
-
     public void resolve(RecDef recDef) {
         for (Opt opt : opts) opt.parent = this;
         if (path == null) throw new RuntimeException("No path for OptList: " + opts);
@@ -119,7 +94,7 @@ public class OptList {
         else {
             recDef.findElem(path);
         }
-        return pathX;
+        return path;
     }
 
     public List<String> getValues() {
