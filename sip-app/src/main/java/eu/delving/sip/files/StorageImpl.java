@@ -476,7 +476,7 @@ public class StorageImpl implements Storage {
         public PrintWriter openReportWriter(String prefix) throws StorageException {
             File file = new File(here, FileType.REPORT.getName(prefix));
             try {
-                return new PrintWriter(file);
+                return new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")));
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
