@@ -75,6 +75,12 @@ public class RecDefTree implements RecDefNodeListener {
         return root.getNode(path);
     }
 
+    public List<Path> collectPaths() {
+        List<Path> paths = new ArrayList<Path>();
+        collectPaths(root, Path.create(), paths);
+        return paths;
+    }
+
     public RecDefNode getFirstRecDefNode(Tag tag) {
         return root.getFirstNode(tag);
     }
@@ -152,6 +158,12 @@ public class RecDefTree implements RecDefNodeListener {
     @Override
     public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
         if (listener != null) listener.nodeMappingRemoved(recDefNode, nodeMapping);
+    }
+
+    private void collectPaths(RecDefNode node, Path path, List<Path> paths) {
+        path = path.child(node.getTag());
+        paths.add(path);
+        for (RecDefNode child : node.getChildren()) collectPaths(child, path, paths);
     }
 
     private void resolve() {
