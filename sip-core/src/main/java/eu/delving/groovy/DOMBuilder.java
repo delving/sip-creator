@@ -48,9 +48,12 @@ import java.util.*;
 public class DOMBuilder extends BuilderSupport {
     public static final String CDATA_BEFORE = "<![CDATA[";
     public static final String CDATA_AFTER = "]]>";
+    private static final String SCHEMA_LOCATION_ATTR = "xsi:schemaLocation";
+    private static final RecDef.Namespace XML_NAMESPACE = new RecDef.Namespace("xml", "http://www.w3.org/XML/1998/namespace", null);
+    private static final RecDef.Namespace XSI_NAMESPACE = new RecDef.Namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance", null);
     private Document document;
     private DocumentBuilder documentBuilder;
-    private Map<String, String> namespaces = new TreeMap<String, String>();
+    private Map<String, RecDef.Namespace> namespaces = new TreeMap<String, RecDef.Namespace>();
     private RecDef recDef;
 
     public static DOMBuilder newInstance(RecDef recDef) {
@@ -68,15 +71,15 @@ public class DOMBuilder extends BuilderSupport {
 
     public DOMBuilder(RecDef recDef) {
         this.recDef = recDef;
-        namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
-        for (RecDef.Namespace ns : this.recDef.namespaces) {
-            if (ns.prefix.equals(recDef.prefix) && !recDef.elementFormDefaultQualified) {
-                namespaces.put("", ns.uri);
+        for (RecDef.Namespace namespace : this.recDef.namespaces) {
+            if (namespace.prefix.equals(recDef.prefix) && !recDef.elementFormDefaultQualified) {
+                namespaces.put("", namespace);
             }
             else {
-                namespaces.put(ns.prefix, ns.uri);
+                namespaces.put(namespace.prefix, namespace);
             }
         }
+        ensureNamespace(XML_NAMESPACE);
     }
 
     @Override
@@ -88,10 +91,27 @@ public class DOMBuilder extends BuilderSupport {
 
     @Override
     protected Object createNode(Object name) {
-        if (document == null) document = documentBuilder.newDocument();
+        boolean rootNode = false;
+        if (document == null) {
+            document = documentBuilder.newDocument();
+            rootNode = true;
+        }
         TagValue tagValue = new TagValue(name.toString(), false);
         if (tagValue.isNamespaceAdded()) {
-            return document.createElementNS(tagValue.uri, tagValue.toString());
+            Element element = document.createElementNS(tagValue.uri, tagValue.toString());
+            if (rootNode) {
+                StringBuilder schemaLocation = new StringBuilder();
+                for (RecDef.Namespace namespace : namespaces.values()) {
+                    if (namespace.schema == null) continue;
+                    if (schemaLocation.length() > 0) schemaLocation.append(' ');
+                    schemaLocation.append(namespace.uri).append(' ').append(namespace.schema);
+                }
+                if (schemaLocation.length() > 0) {
+                    ensureNamespace(XSI_NAMESPACE);
+                    element.setAttributeNS(XSI_NAMESPACE.uri, SCHEMA_LOCATION_ATTR, schemaLocation.toString());
+                }
+            }
+            return element;
         }
         else {
             return document.createElement(tagValue.localPart);
@@ -207,6 +227,12 @@ public class DOMBuilder extends BuilderSupport {
             }
         }
         return node;
+    }
+
+    private void ensureNamespace(RecDef.Namespace namespace) {
+        if (!namespaces.containsKey(namespace.prefix)) {
+            namespaces.put(namespace.prefix, namespace);
+        }
     }
 
     private void setValuesFromClosure(Node node, Closure closure) {
@@ -374,7 +400,9 @@ public class DOMBuilder extends BuilderSupport {
             int colon = name.indexOf(':');
             if (colon > 0) {
                 this.prefix = name.substring(0, colon);
-                this.uri = namespaces.get(this.prefix);
+                RecDef.Namespace namespace = namespaces.get(this.prefix);
+                if (namespace == null) throw new RuntimeException("No namespace for " + prefix);
+                this.uri = namespace.uri;
                 this.localPart = name.substring(colon + 1);
             }
             else {
