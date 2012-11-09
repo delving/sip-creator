@@ -45,6 +45,9 @@
       <string>europe</string>
     </entry>
   </facts>
+  <dyn-opts>
+      <dyn-opt path="/mods:mods/mods:subject" value="divine"/>
+  </dyn-opts>
   <node-mappings>
     <node-mapping inputPath="/input/dc:title" outputPath="/mods/titleInfo[alternative]/title"/>
       <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name[contributor]"/>
@@ -57,7 +60,7 @@
       <node-mapping inputPath="/input/dc:language" outputPath="/mods/language"/>
       <node-mapping inputPath="/input/dc:identifier" outputPath="/mods/location/url"/>
       <node-mapping inputPath="/input/dc:description" outputPath="/mods/note"/>
-      <node-mapping inputPath="/input/dc:subject" outputPath="/mods/subject/topic"/>
+      <node-mapping inputPath="/input/dc:subject" outputPath="/mods/subject[divine]/topic"/>
       <node-mapping inputPath="/input/europeana:object" outputPath="/mods:mods/mods:location/mods:url[preview]"/>
       <node-mapping inputPath="/input/europeana:isShownBy" outputPath="/mods:mods/mods:location/mods:url[raw object]"/>
       <node-mapping inputPath="/input/europeana:isShownAt" outputPath="/mods:mods/mods:location/mods:url[object in context]"/>
