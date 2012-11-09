@@ -355,18 +355,27 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     private NextStep askHowToProceed(int recordNumber) {
-        JCheckBox investigate = new JCheckBox(String.format(
+        JRadioButton continueButton = new JRadioButton(String.format(
+                "<html><b>Continue</b> - Continue the %s mapping of data set %s, discarding invalid record %d",
+                getPrefix(), getSpec(), recordNumber
+        ));
+        JRadioButton investigateButton = new JRadioButton(String.format(
                 "<html><b>Investigate</b> - Stop and fix the %s mapping of data set %s, with invalid record %d in view",
                 getPrefix(), getSpec(), recordNumber
         ));
-        JCheckBox ignore = new JCheckBox(
+        JRadioButton ignoreButton = new JRadioButton(
                 "<html><b>Ignore</b> - Accept this record as invalid and ignore subsequent invalid records"
         );
-        if (feedback.form("Continue?", investigate, ignore)) {
-            if (investigate.isSelected()) {
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(continueButton);
+        continueButton.setSelected(true);
+        bg.add(investigateButton);
+        bg.add(ignoreButton);
+        if (feedback.form("Invalid Record! How to proceed?", continueButton, investigateButton, ignoreButton)) {
+            if (investigateButton.isSelected()) {
                 return NextStep.INVESTIGATE;
             }
-            else if (ignore.isSelected()) {
+            else if (ignoreButton.isSelected()) {
                 return NextStep.IGNORE;
             }
             else {

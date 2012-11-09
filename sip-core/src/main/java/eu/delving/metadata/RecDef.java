@@ -310,11 +310,23 @@ public class RecDef {
     @XStreamAlias("namespace")
     public static class Namespace {
 
+        public Namespace(String prefix, String uri, String schema) {
+            this.prefix = prefix;
+            this.uri = uri;
+            this.schema = schema;
+        }
+
+        public Namespace() {
+        }
+
         @XStreamAsAttribute
         public String prefix;
 
         @XStreamAsAttribute
         public String uri;
+
+        @XStreamAsAttribute
+        public String schema;
     }
 
     @XStreamAlias("attr")
