@@ -116,8 +116,8 @@ public class CreateModel {
         Tag discriminator = recDefTreeNode.getRecDefNode().getDiscriminatorAttr();
         if (discriminator != null) {
             String answer = sipModel.getFeedback().ask(String.format(
-                    "Please enter the value for %s discriminator of element %s",
-                    recDefTreeNode.getRecDefNode().getTag().getLocalName(), discriminator.getLocalName()
+                    "Please enter a value for \"%s\" attribute of \"%s\" element. Cancel to use no discriminator",
+                    discriminator.getLocalName(), recDefTreeNode.getRecDefNode().getTag().getLocalName()
             ));
             if (answer != null && !answer.trim().isEmpty()) {
                 DynOpt dynOpt = new DynOpt();
