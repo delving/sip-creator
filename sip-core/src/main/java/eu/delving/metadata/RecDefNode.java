@@ -296,7 +296,14 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public void collectDynOpts(List<DynOpt> dynOpts) {
-        if (optBox != null && optBox.dynOpt != null) dynOpts.add(optBox.dynOpt);
+        if (optBox != null && optBox.dynOpt != null) {
+            boolean childMappings = false;
+            for (RecDefNode sub : children) {
+                if (sub.getTag().equals(elem.discriminator)) continue;
+                if (sub.hasDescendantNodeMappings()) childMappings = true;
+            }
+            if (nodeMappings.size() > 1 || childMappings) dynOpts.add(optBox.dynOpt);
+        }
         for (RecDefNode sub : children) sub.collectDynOpts(dynOpts);
     }
 

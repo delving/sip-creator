@@ -116,7 +116,7 @@ public class CreateModel {
         Tag discriminator = recDefTreeNode.getRecDefNode().getDiscriminatorAttr();
         if (discriminator != null) {
             String answer = sipModel.getFeedback().ask(String.format(
-                    "Please enter a value for \"%s\" attribute of \"%s\" element. Cancel to use no discriminator",
+                    "Please enter a value for \"%s\" attribute of \"%s\" element. Cancel to use no discriminator.",
                     discriminator.getLocalName(), recDefTreeNode.getRecDefNode().getTag().getLocalName()
             ));
             if (answer != null && !answer.trim().isEmpty()) {
