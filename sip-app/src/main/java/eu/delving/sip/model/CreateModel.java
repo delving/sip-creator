@@ -21,8 +21,10 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.metadata.DynOpt;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.Tag;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSetState;
@@ -111,6 +113,19 @@ public class CreateModel {
 
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
+        Tag discriminator = recDefTreeNode.getRecDefNode().getDiscriminatorAttr();
+        if (discriminator != null) {
+            String answer = sipModel.getFeedback().ask(String.format(
+                    "Please enter the value for %s discriminator of element %s",
+                    recDefTreeNode.getRecDefNode().getTag().getLocalName(), discriminator.getLocalName()
+            ));
+            if (answer != null && !answer.trim().isEmpty()) {
+                DynOpt dynOpt = new DynOpt();
+                dynOpt.path = recDefTreeNode.getRecDefPath().getTagPath();
+                dynOpt.value = answer.trim();
+                recDefTreeNode = recDefTreeNode.createDynOptSibling(dynOpt);
+            }
+        }
         NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
         created.recDefNode = recDefTreeNode.getRecDefNode();
         SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);

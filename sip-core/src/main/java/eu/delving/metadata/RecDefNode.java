@@ -162,8 +162,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return optBox != null && optBox.isDictionary() ? optBox : null;
     }
 
-    public boolean isHiddenOpt(OptList.Opt shown) {
-        return isRootOpt() && optBox.opt != shown && optBox.opt.hidden;
+    public boolean isHiddenOpt(OptList.Opt shownOpt) {
+        return isRootOpt() && optBox.opt != shownOpt && optBox.opt.hidden;
     }
 
     public String getFieldType() {
@@ -298,6 +298,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
     public void collectDynOpts(List<DynOpt> dynOpts) {
         if (optBox != null && optBox.dynOpt != null) dynOpts.add(optBox.dynOpt);
         for (RecDefNode sub : children) sub.collectDynOpts(dynOpts);
+    }
+
+    public Tag getDiscriminatorAttr() {
+        if (optBox != null) return null;
+        return isAttr() ? null : elem.discriminator;
     }
 
     public Map<Path, NodeMapping> getNodeMappings() {
@@ -606,8 +611,15 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public String toString() {
         String name = isAttr() ? attr.tag.toString(defaultPrefix) : elem.tag.toString(defaultPrefix);
-        if (isRootOpt() || isDynOpt()) name += String.format("[%s]", optBox);
-        if (isChildOpt()) name += "{Constant}";
+        if (isRootOpt() || isDynOpt()) {
+            name += String.format("[%s]", optBox);
+        }
+        else if (isChildOpt()) {
+            name += "{Constant}";
+        }
+        else if (getDiscriminatorAttr() != null) {
+            name += String.format("[@%s]", getDiscriminatorAttr().getLocalName());
+        }
         return name;
     }
 

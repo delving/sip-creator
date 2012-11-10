@@ -38,6 +38,7 @@ import java.util.List;
  */
 
 public class FilterTreeModel implements TreeModel {
+    private String patternString = "";
     private EventListenerList listeners = new EventListenerList();
     private FilterNode root;
 
@@ -47,6 +48,11 @@ public class FilterTreeModel implements TreeModel {
     }
 
     public void setFilter(String patternString) {
+        this.patternString = patternString;
+        refresh();
+    }
+
+    public void refresh() {
         node(getRoot()).filter(patternString);
         refreshTree();
     }
