@@ -21,36 +21,22 @@
 
 package eu.delving.metadata;
 
-import org.apache.commons.lang.WordUtils;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- * What roles can an opt play in the tree of RecDefNodes
+ * A dynamic opt, with similar function to the opts in the record definition
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public enum OptRole {
-    ABSENT,
-    ROOT,
-    DYNAMIC,
-    UNASSIGNED_CHILD,
-    KEY,
-    VALUE,
-    SCHEMA,
-    SCHEMA_URI;
+@XStreamAlias("dyn-opt")
+public class DynOpt {
 
-    private final String fieldName;
+    @XStreamAsAttribute
+    public Path path;
 
-    private OptRole() {
-        String caps = WordUtils.capitalizeFully(toString(), new char[]{'_'}).replaceAll("_", "");
-        this.fieldName = Character.toLowerCase(caps.charAt(0)) + caps.substring(1);
-    }
+    @XStreamAsAttribute
+    public String value;
 
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public static OptRole[] getFields() {
-        return new OptRole[]{KEY, VALUE, SCHEMA, SCHEMA_URI};
-    }
 }
