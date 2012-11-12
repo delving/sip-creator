@@ -29,12 +29,10 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.SwingHelper;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.JTree;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -78,6 +76,10 @@ public class RecDefTreeNode extends FilterNode {
 
     @Override
     public Object getParent() {
+        return parent;
+    }
+
+    public RecDefTreeNode getParentNode() {
         return parent;
     }
 

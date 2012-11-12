@@ -402,10 +402,6 @@ public class RecDef {
         public boolean unmappable;
 
         @XStreamAsAttribute
-        @XStreamConverter(Tag.AttributeConverter.class)
-        public Tag discriminator;
-
-        @XStreamAsAttribute
         public String fieldType;
 
         @XStreamAsAttribute
@@ -428,9 +424,6 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
-
-        @XStreamOmitField
-        public Attr discriminatorAttr;
 
         @Override
         public String toString() {
@@ -484,14 +477,6 @@ public class RecDef {
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
-            if (discriminator != null) {
-                if (!discriminator.isAttribute()) throw new RuntimeException("Discriminator must be an attribute");
-                discriminator = discriminator.defaultPrefix(recDef.prefix);
-                for (Attr attr : attrList) {
-                    if (attr.tag.equals(discriminator)) discriminatorAttr = attr;
-                }
-                if (discriminatorAttr == null) throw new RuntimeException("Discriminator attribute "+discriminator+" not found");
-            }
         }
 
         String getFieldType() {

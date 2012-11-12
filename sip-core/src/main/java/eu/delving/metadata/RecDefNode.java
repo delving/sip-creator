@@ -24,6 +24,7 @@ package eu.delving.metadata;
 import java.util.*;
 
 import static eu.delving.metadata.OptRole.ABSENT;
+import static eu.delving.metadata.OptRole.DYNAMIC;
 import static eu.delving.metadata.StringUtil.*;
 
 /**
@@ -76,9 +77,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
             optRole = optBox.role;
             switch (optBox.role) {
                 case ROOT:
+                case DYNAMIC:
                     this.optBox = optBox;
                     break;
-                case DESCENDANT:
+                case UNASSIGNED_CHILD:
                     this.optBox = optBox.inRoleFor(getPath());
                     if (this.optBox != null) optRole = this.optBox.role;
                     break;
@@ -88,12 +90,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
             for (RecDef.Attr attribute : elem.attrList) {
                 switch (optRole) {
                     case ROOT:
-                        if (optBox == null) {
-                            throw new RuntimeException("No OptBox");
-                        }
-                        addSubNode(attribute, optBox.createDescendant());
+                        if (optBox != null) addSubNode(attribute, optBox.createDescendant());
                         break;
-                    case DESCENDANT:
+                    case DYNAMIC:
+                        addSubNode(attribute, null);
+                        break;
+                    case UNASSIGNED_CHILD:
                         addSubNode(attribute, optBox); // percolate deeper
                         break;
                     default:
@@ -110,7 +112,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
                             }
                             addSubNode(element, optBox.createDescendant());
                             break;
-                        case DESCENDANT:
+                        case UNASSIGNED_CHILD:
                             addSubNode(element, optBox); // percolate deeper
                             break;
                         default:
@@ -154,16 +156,23 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public RecDefNode addSibling(DynOpt dynOpt) {
-        if (elem.discriminatorAttr == null) throw new RuntimeException("discriminator missing!");
-        return parent.addSubNodeAfter(this, elem, OptBox.asRoot(dynOpt));
+        return parent.addSubNodeAfter(this, elem, OptBox.asDynamic(dynOpt));
     }
 
     public OptBox getDictionaryOptBox() {
         return optBox != null && optBox.isDictionary() ? optBox : null;
     }
 
+    public boolean isDuplicatePossible() {
+        return parent != null && !isLeafElem() && !isAttr() && (optBox == null || optBox.role == DYNAMIC);
+    }
+
     public boolean isHiddenOpt(OptList.Opt shownOpt) {
         return isRootOpt() && optBox.opt != shownOpt && optBox.opt.hidden;
+    }
+
+    public DynOpt getDynOpt() {
+        return optBox == null ? null : optBox.dynOpt == null ? null : optBox.dynOpt;
     }
 
     public String getFieldType() {
@@ -299,17 +308,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (optBox != null && optBox.dynOpt != null) {
             boolean childMappings = false;
             for (RecDefNode sub : children) {
-                if (sub.getTag().equals(elem.discriminator)) continue;
                 if (sub.hasDescendantNodeMappings()) childMappings = true;
             }
             if (nodeMappings.size() > 1 || childMappings) dynOpts.add(optBox.dynOpt);
         }
         for (RecDefNode sub : children) sub.collectDynOpts(dynOpts);
-    }
-
-    public Tag getDiscriminatorAttr() {
-        if (optBox != null) return null;
-        return isAttr() ? null : elem.discriminator;
     }
 
     public Map<Path, NodeMapping> getNodeMappings() {
@@ -482,10 +485,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         startBuilderCall(codeOut, false, "R8", groovyParams, editPath);
         for (RecDefNode sub : children) {
             if (sub.isAttr()) continue;
-            if (sub.isDynOpt()) {
-                sub.toElementCode(codeOut, groovyParams, editPath); // todo: a little weird
-            }
-            else if (sub.isChildOpt()) {
+            if (sub.isChildOpt()) {
                 codeOut.line(
                         "%s '%s' // R9",
                         sub.getTag().toBuilderCall(), sub.optBox
@@ -538,15 +538,15 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     private boolean isRootOpt() {
-        return elem != null && optBox != null && optBox.role == OptRole.ROOT && optBox.optList != null && !optBox.isDictionary();
+        return elem != null && optBox != null && optBox.role == OptRole.ROOT && !optBox.isDictionary();
     }
 
     private boolean isChildOpt() {
-        return optBox != null && optBox.role != OptRole.ROOT && optBox.opt != null;
+        return optBox != null && optBox.role != OptRole.ROOT;
     }
 
     private boolean isDynOpt() {
-        return optBox != null && optBox.dynOpt != null;
+        return optBox != null && optBox.role == DYNAMIC;
     }
 
     private void startBuilderCall(CodeOut codeOut, boolean absentFalse, String comment, Stack<String> groovyParams, EditPath editPath) {
@@ -554,17 +554,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
             Tag tag = getTag();
             codeOut.line_(
                     "%s ( // %s%s",
-                    tag.toBuilderCall(), comment, isRootOpt() ? "(opt)" : isDynOpt() ? "(dyn-opt)" : ""
+                    tag.toBuilderCall(), comment, isRootOpt() ? "(opt)" : ""
             );
             boolean comma = false;
             for (RecDefNode sub : children) {
                 if (!sub.isAttr()) continue;
-                if (isDynOpt() && sub.getTag().equals(elem.discriminator)) {
-                    if (comma) codeOut.line(",");
-                    codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), optBox, comment);
-                    comma = true;
-                }
-                else if (sub.isChildOpt()) {
+                if (sub.isChildOpt()) {
                     if (comma) codeOut.line(",");
                     OptBox dictionaryOptBox = sub.getDictionaryOptBox();
                     if (dictionaryOptBox != null) {
@@ -623,9 +618,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
         else if (isChildOpt()) {
             name += "{Constant}";
-        }
-        else if (getDiscriminatorAttr() != null) {
-            name += String.format("[@%s]", getDiscriminatorAttr().getLocalName());
         }
         return name;
     }

@@ -44,8 +44,8 @@ class OptBox {
         return new OptBox(ROOT, optList, null, null);
     }
 
-    public static OptBox asRoot(DynOpt dynOpt) {
-        return new OptBox(ROOT, null, null, dynOpt);
+    public static OptBox asDynamic(DynOpt dynOpt) {
+        return new OptBox(DYNAMIC, null, null, dynOpt);
     }
 
     private OptBox(OptRole role, OptList optList, OptList.Opt opt, DynOpt dynOpt) {
@@ -56,11 +56,11 @@ class OptBox {
     }
 
     OptBox inRoleFor(Path path) {
-        if (role == DESCENDANT) {
+        if (role == UNASSIGNED_CHILD) {
             path = path.withoutOpts(); // the list has paths without opts so this compares properly
             OptList list = optList;
             if (list == null && opt != null) list = opt.parent;
-            if (list == null) return null;
+            if (list == null) throw new RuntimeException("Unassigned child with no list to refer to");
             if (pathMatch(list.key, path)) return new OptBox(KEY, optList, opt, null);
             if (pathMatch(list.value, path)) return new OptBox(VALUE, optList, opt, null);
             if (pathMatch(list.schema, path)) return new OptBox(SCHEMA, optList, opt, null);
@@ -75,7 +75,7 @@ class OptBox {
 
     OptBox createDescendant() {
         if (role != ROOT) throw new RuntimeException();
-        return new OptBox(DESCENDANT, optList, opt, dynOpt);
+        return new OptBox(UNASSIGNED_CHILD, optList, opt, dynOpt);
     }
 
     public boolean isDictionary() {
@@ -83,15 +83,18 @@ class OptBox {
     }
 
     public boolean isChild() {
-        return role != ROOT;
+        switch (role) {
+            case ABSENT:
+            case ROOT:
+            case DYNAMIC:
+                return false;
+            default:
+                return true;
+        }
     }
 
     public String getDictionaryName() {
         return optList.dictionary;
-    }
-
-    public String getFieldName() {
-        return role.getFieldName();
     }
 
     public String toString() {
@@ -99,6 +102,8 @@ class OptBox {
             switch (role) {
                 case ROOT:
                     return opt.value == null ? opt.key : opt.value;
+                case DYNAMIC:
+                    return dynOpt.value;
                 case KEY:
                     return opt.key;
                 case VALUE:
