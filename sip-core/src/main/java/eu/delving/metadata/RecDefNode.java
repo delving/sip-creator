@@ -542,7 +542,14 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     private boolean isChildOpt() {
-        return optBox != null && optBox.role != OptRole.ROOT;
+        if (optBox == null) return false;
+        switch (optBox.role) {
+            case ROOT:
+            case DYNAMIC:
+                return false;
+            default:
+                return true;
+        }
     }
 
     private boolean isDynOpt() {
