@@ -55,6 +55,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private List<RecDef.FieldMarker> fieldMarkers = new ArrayList<RecDef.FieldMarker>();
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
+    private boolean populated;
     private RecDefNodeListener listener;
 
     @Override
@@ -159,6 +160,36 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return parent.addSubNodeAfter(this, elem, OptBox.asDynamic(dynOpt));
     }
 
+    public boolean isPopulated() {
+        return populated;
+    }
+
+    public boolean checkPopulated() {
+        boolean populatedNow = (!nodeMappings.isEmpty() || isDynOpt());
+        if (!populatedNow && isChildOpt()) {
+            RecDefNode ancestor = this;
+            while (ancestor.parent != null) {
+                if (optBox.opt != null) {
+                    Path optListRoot = optBox.opt.parent.path;
+                    Path cleanPath = ancestor.getPath().withoutOpts();
+                    if (cleanPath.equals(optListRoot)) {
+                        if (!ancestor.nodeMappings.isEmpty()) return true;
+                        break;
+                    }
+                }
+                ancestor = ancestor.parent;
+            }
+        }
+        for (RecDefNode sub : children) {
+            sub.checkPopulated();
+            if (sub.isPopulated()) populatedNow = true;
+        }
+        if (populated == populatedNow) return false;
+        populated = populatedNow;
+        listener.populationChanged(this);
+        return true;
+    }
+
     public OptBox getDictionaryOptBox() {
         return optBox != null && optBox.isDictionary() ? optBox : null;
     }
@@ -261,28 +292,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return null;
     }
 
-    public boolean hasDescendantNodeMappings() {
-        if (!nodeMappings.isEmpty()) return true;
-        if (isDynOpt()) return true;
-        if (isChildOpt()) {
-            RecDefNode ancestor = this;
-            while (ancestor.parent != null) {
-                if (optBox.opt != null) {
-                    Path optListRoot = optBox.opt.parent.path;
-                    Path cleanPath = ancestor.getPath().withoutOpts();
-                    if (cleanPath.equals(optListRoot)) {
-                        if (!ancestor.nodeMappings.isEmpty()) return true;
-                        break;
-                    }
-                }
-                ancestor = ancestor.parent;
-            }
-        }
-        for (RecDefNode sub : children) if (sub.hasDescendantNodeMappings()) return true;
-        return false;
-    }
-
-
     public boolean hasFunction() {
         return !isAttr() && elem.function != null;
     }
@@ -306,11 +315,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public void collectDynOpts(List<DynOpt> dynOpts) {
         if (optBox != null && optBox.dynOpt != null) {
-            boolean childMappings = false;
+            boolean childrenPopulated = false;
             for (RecDefNode sub : children) {
-                if (sub.hasDescendantNodeMappings()) childMappings = true;
+                if (sub.populated) childrenPopulated = true;
             }
-            if (nodeMappings.size() > 1 || childMappings) dynOpts.add(optBox.dynOpt);
+            if (nodeMappings.size() > 1 || childrenPopulated) dynOpts.add(optBox.dynOpt);
         }
         for (RecDefNode sub : children) sub.collectDynOpts(dynOpts);
     }
@@ -348,7 +357,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public void toElementCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        if (isAttr() || !hasDescendantNodeMappings()) return;
+        if (isAttr() || !populated) return;
         if (editPath != null && !path.isFamilyOf(editPath.getNodeMapping().outputPath)) return;
         if (nodeMappings.isEmpty()) {
             if (isRootOpt()) {
@@ -613,7 +622,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private boolean hasActiveAttributes() {
         if (isDynOpt()) return true;
         for (RecDefNode sub : children) {
-            if (sub.isAttr() && (sub.hasDescendantNodeMappings() || sub.isChildOpt())) return true;
+            if (sub.isAttr() && (!sub.nodeMappings.isEmpty() || sub.isChildOpt())) return true;
         }
         return false;
     }

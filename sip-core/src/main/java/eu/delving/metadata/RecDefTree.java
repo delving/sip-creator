@@ -135,20 +135,16 @@ public class RecDefTree implements RecDefNodeListener {
         codeOut.line_("input * { _input ->");
         codeOut.line("_uniqueIdentifier = _input._id[0].toString()");
         codeOut.line("outputNode = output.");
-        if (root.hasDescendantNodeMappings()) {
+        if (root.isPopulated()) {
             root.toElementCode(codeOut, new Stack<String>(), editPath);
         }
         else {
-            codeOut.line("'no' { 'mapping' }");
+            codeOut.line("no 'mapping'");
         }
         codeOut._line("}");
         codeOut.line("outputNode");
         codeOut._line("}");
         codeOut.line("// ----------------------------------");
-    }
-
-    public List<RecDef.Namespace> getNamespaces() {
-        return recDef.namespaces;
     }
 
     @Override
@@ -159,11 +155,18 @@ public class RecDefTree implements RecDefNodeListener {
     @Override
     public void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping) {
         if (listener != null) listener.nodeMappingAdded(recDefNode, nodeMapping);
+        root.checkPopulated();
     }
 
     @Override
     public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
         if (listener != null) listener.nodeMappingRemoved(recDefNode, nodeMapping);
+        root.checkPopulated();
+    }
+
+    @Override
+    public void populationChanged(RecDefNode recDefNode) {
+        if (listener != null) listener.populationChanged(recDefNode);
     }
 
     private void collectPaths(RecDefNode node, Path path, List<Path> paths) {
@@ -190,5 +193,6 @@ public class RecDefTree implements RecDefNodeListener {
                     recDef.getSchemaVersion(), REQUIRED_FIELDS[index]
             ));
         }
+        root.checkPopulated();
     }
 }

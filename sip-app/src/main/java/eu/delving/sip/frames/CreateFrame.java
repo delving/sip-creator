@@ -35,10 +35,7 @@ import eu.delving.sip.panels.HtmlPanel;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.SortedSet;
 
@@ -133,6 +130,10 @@ public class CreateFrame extends FrameBase {
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
         mappingHintsList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {

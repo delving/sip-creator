@@ -278,6 +278,10 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+            }
         });
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
