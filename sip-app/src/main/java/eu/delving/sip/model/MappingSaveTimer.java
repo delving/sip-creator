@@ -153,6 +153,10 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
         kick(false);
     }
 
+    @Override
+    public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+    }
+
     private void kick(boolean freeze) {
         this.freezeMode = freeze;
         triggerTimer.restart();

@@ -61,6 +61,11 @@ public class TestCodeGeneration {
                 public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
                     System.out.println("Mapping removed: " + recDefNode);
                 }
+
+                @Override
+                public void populationChanged(RecDefNode recDefNode) {
+                    System.out.println("Population changed: " + recDefNode);
+                }
             });
         }
         catch (MetadataException e) {

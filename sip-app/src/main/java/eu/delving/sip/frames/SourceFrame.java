@@ -34,9 +34,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -180,6 +178,10 @@ public class SourceFrame extends FrameBase {
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
         sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {

@@ -159,6 +159,10 @@ public class Application {
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+            }
         });
         importAction = new ImportAction(desktop, sipModel);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));

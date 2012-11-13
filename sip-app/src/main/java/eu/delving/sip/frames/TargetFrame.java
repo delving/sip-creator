@@ -255,6 +255,11 @@ public class TargetFrame extends FrameBase {
                 refreshRecDefTreeNode(mappingModel, node);
             }
 
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+                mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node).fireChanged();
+            }
+
             private void refreshRecDefTreeNode(final MappingModel mappingModel, final RecDefNode node) {
                 mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node).fireChanged();
             }
@@ -264,7 +269,7 @@ public class TargetFrame extends FrameBase {
     private class ExpandRootAction extends AbstractAction {
 
         private ExpandRootAction() {
-            super("Expand All");
+            super("Expand what is mapped");
             putValue(
                     Action.ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -274,8 +279,28 @@ public class TargetFrame extends FrameBase {
         @Override
         public void actionPerformed(ActionEvent e) {
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
-            if (root != null) showPath(root);
+            if (root != null) showPopulated(root);
         }
+
+        public void showPopulated(final RecDefTreeNode node) {
+            Timer timer = new Timer(30, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    boolean pathShouldShow = node.getRecDefNode().isPopulated();
+                    if (pathShouldShow) {
+                        if (!recDefTree.isExpanded(node.getRecDefPath())) recDefTree.expandPath(node.getRecDefPath());
+                    }
+                    else if (!recDefTree.isCollapsed(node.getRecDefPath())) {
+                        recDefTree.collapsePath(node.getRecDefPath());
+                    }
+                    for (RecDefTreeNode sub : node.getChildren()) if (!sub.getRecDefNode().isAttr()) showPopulated(sub);
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }
+
+
     }
 
     private class DuplicateElementAction extends AbstractAction implements Work {

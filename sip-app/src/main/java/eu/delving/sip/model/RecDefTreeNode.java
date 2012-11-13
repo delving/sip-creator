@@ -106,7 +106,7 @@ public class RecDefTreeNode extends FilterNode {
     public boolean passesFilter() {
         RecDefTreeModel recDefTreeModel = (RecDefTreeModel) filterModel;
         if (recDefTreeModel.isAttributesHidden() && isAttr()) return false;
-        if (recDefNode.isHiddenOpt(recDefTreeModel.getSelectedOpt()) && !recDefNode.hasDescendantNodeMappings())
+        if (recDefNode.isHiddenOpt(recDefTreeModel.getSelectedOpt()) && !recDefNode.isPopulated())
             return false;
         return super.passesFilter();
     }
@@ -208,7 +208,6 @@ public class RecDefTreeNode extends FilterNode {
     }
 
     public static class Renderer extends DefaultTreeCellRenderer {
-
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             setOpaque(false);
@@ -228,6 +227,9 @@ public class RecDefTreeNode extends FilterNode {
                 else {
                     setIcon(SwingHelper.ICON_VALUE);
                 }
+                if (node.recDefNode.isPopulated()) {
+                    setColor(sel, node);
+                }
                 if (!node.recDefNode.getNodeMappings().isEmpty()) {
                     markNodeMappings(sel, node);
                 }
@@ -238,7 +240,7 @@ public class RecDefTreeNode extends FilterNode {
             return component;
         }
 
-        private void markNodeMappings(boolean selected, RecDefTreeNode node) {
+        private void setColor(boolean selected, RecDefTreeNode node) {
             Color color = node.isHighlighted() ? HILIGHTED_COLOR : MAPPED_COLOR;
             if (selected) {
                 setOpaque(false);
@@ -250,6 +252,9 @@ public class RecDefTreeNode extends FilterNode {
                 setBackground(color);
                 setForeground(Color.BLACK);
             }
+        }
+
+        private void markNodeMappings(boolean selected, RecDefTreeNode node) {
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node)));
         }
 

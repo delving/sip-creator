@@ -139,5 +139,9 @@ public class MappingHintsModel {
         public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             if (sourceTree != null) refresh();
         }
+
+        @Override
+        public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+        }
     }
 }
