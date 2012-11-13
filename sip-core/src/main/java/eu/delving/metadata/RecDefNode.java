@@ -195,7 +195,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean isDuplicatePossible() {
-        return parent != null && !isLeafElem() && !isAttr() && (optBox == null || optBox.role == DYNAMIC);
+        return parent != null && !isAttr() && (optBox == null || optBox.role == DYNAMIC);
     }
 
     public boolean isHiddenOpt(OptList.Opt shownOpt) {
