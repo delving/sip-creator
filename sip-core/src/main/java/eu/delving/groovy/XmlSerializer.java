@@ -62,6 +62,8 @@ public class XmlSerializer {
                 if (entry.getValue().trim().isEmpty()) continue;
                 nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
             }
+            // add xsi declaration
+            nslist.add(eventFactory.createNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance"));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             out.add(eventFactory.createStartDocument());

@@ -62,6 +62,7 @@ public class XmlOutput {
         for (Map.Entry<String, String> entry : namespaces.entrySet()) {
             namespaceList.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
         }
+        namespaceList.add(eventFactory.createNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance"));
         out.add(eventFactory.createStartElement("", "", OUTPUT_TAG, null, namespaceList.iterator()));
     }
 
