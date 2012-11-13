@@ -135,6 +135,10 @@ public class SipModel {
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
                 clearValidation();
             }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+            }
         });
 
 // todo: on changes in create model?..  clearValidation(recordMapping);

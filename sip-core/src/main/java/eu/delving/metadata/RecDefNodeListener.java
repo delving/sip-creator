@@ -34,4 +34,6 @@ public interface RecDefNodeListener {
     void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping);
 
     void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping);
+
+    void populationChanged(RecDefNode recDefNode);
 }

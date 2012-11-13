@@ -267,6 +267,10 @@ public class FunctionFrame extends FrameBase {
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+            }
         });
         sipModel.getFunctionCompileModel().addListener(modelStateListener);
     }
