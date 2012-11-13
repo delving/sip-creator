@@ -77,7 +77,10 @@ public class CachingResourceResolver implements LSResourceResolver {
         HttpResponse response = httpClient.execute(get);
         StatusLine line = response.getStatusLine();
         if (line.getStatusCode() != HttpStatus.SC_OK) {
-            throw new IOException("HTTP Error " + line.getStatusCode() + " " + line.getReasonPhrase());
+            throw new IOException(String.format(
+                    "HTTP Error %s (%s) on %s",
+                    line.getStatusCode(), line.getReasonPhrase(), url
+            ));
         }
         return EntityUtils.toString(response.getEntity());
     }

@@ -45,6 +45,7 @@ public interface Work extends Runnable {
         REMOVE_DICTIONARY(SILENT),
         UNLOCK_MAPPING(SILENT),
         SELECT_ANOTHER_MAPPING(SILENT),
+        DUPLICATE_ELEMENT(SILENT),
 
         READ_FRAME_ARRANGEMENTS(SILENT),
 

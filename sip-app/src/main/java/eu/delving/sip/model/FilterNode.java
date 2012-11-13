@@ -53,6 +53,16 @@ public abstract class FilterNode {
         });
     }
 
+    public final void refresh() {
+        if (filterModel == null) throw new RuntimeException("Tree model must be set");
+        Swing.Exec.later(new Swing() {
+            @Override
+            public void run() {
+                filterModel.refresh();
+            }
+        });
+    }
+
     public final void filter(String patternString) {
         List<Pattern> patterns = createPatternsFromString(patternString);
         setPassesFilter(patterns.size() > 1);
@@ -131,6 +141,8 @@ public abstract class FilterNode {
         }
         return patterns;
     }
+
+
 
     private static class MessageNode extends FilterNode {
         private String message;

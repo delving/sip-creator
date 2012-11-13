@@ -91,6 +91,12 @@ public class RecDefTree implements RecDefNodeListener {
         return nodeMappings;
     }
 
+    public List<DynOpt> getDynOpts() {
+        List<DynOpt> dynOpts = new ArrayList<DynOpt>();
+        root.collectDynOpts(dynOpts);
+        return dynOpts;
+    }
+
     public void toCode(CodeOut codeOut, Set<MappingFunction> mappingFunctions, Map<String, String> facts, EditPath editPath) {
         codeOut.line("// SIP-Creator Generated Mapping Code");
         codeOut.line("// ----------------------------------");
@@ -129,7 +135,7 @@ public class RecDefTree implements RecDefNodeListener {
         codeOut.line_("input * { _input ->");
         codeOut.line("_uniqueIdentifier = _input._id[0].toString()");
         codeOut.line("outputNode = output.");
-        if (root.hasDescendentNodeMappings()) {
+        if (root.hasDescendantNodeMappings()) {
             root.toElementCode(codeOut, new Stack<String>(), editPath);
         }
         else {
