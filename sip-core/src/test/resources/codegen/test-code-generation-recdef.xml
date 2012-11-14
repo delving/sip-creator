@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <record-definition prefix="lido" version="0.1.0">
     <namespaces>
-        <namespace prefix="lido" uri="http://www.lido-schema.org"/>
+        <namespace prefix="lido" uri="http://www.lido-schema.org" schema="http://www.lido-schema.org/fakelido.xsd"/>
     </namespaces>
 
     <attrs>

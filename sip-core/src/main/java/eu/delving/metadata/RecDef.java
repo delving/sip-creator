@@ -62,6 +62,8 @@ import java.util.*;
 public class RecDef {
 
     private static final String DELIM = "[ ,]+";
+    public static final RecDef.Namespace XML_NAMESPACE = new RecDef.Namespace("xml", "http://www.w3.org/XML/1998/namespace", null);
+    public static final RecDef.Namespace XSI_NAMESPACE = new RecDef.Namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance", null);
 
     public static final String DEFAULT_FIELD_TYPE = "text";
     public static final String DELVING_NAMESPACE_URI = "http://schemas.delving.eu/";
@@ -150,10 +152,12 @@ public class RecDef {
         return new SchemaVersion(prefix, version);
     }
 
-    public Map<String, String> getNamespacesMap() {
-        Map<String, String> ns = new HashMap<String, String>();
-        if (namespaces != null) for (Namespace namespace : namespaces) ns.put(namespace.prefix, namespace.uri);
-        return ns;
+    public Map<String, Namespace> getNamespaceMap() {
+        Map<String, Namespace> namespaces = new HashMap<String, Namespace>();
+        if (this.namespaces != null) for (Namespace namespace : this.namespaces) namespaces.put(namespace.prefix, namespace);
+        namespaces.put(XML_NAMESPACE.prefix, XML_NAMESPACE);
+        namespaces.put(XSI_NAMESPACE.prefix, XSI_NAMESPACE);
+        return namespaces;
     }
 
     public Attr attr(Tag tag, String where) {

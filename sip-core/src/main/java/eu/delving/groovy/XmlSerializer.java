@@ -21,7 +21,7 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.RecDef;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -63,11 +63,6 @@ public class XmlSerializer {
                 if (entry.getValue().trim().isEmpty()) continue;
                 nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
             }
-            // TODO find out why they are not added by the DOMBuilder
-            final RecDef.Namespace xsiNamespace = DOMBuilder.XSI_NAMESPACE;
-            final RecDef.Namespace xmlNamespace = DOMBuilder.XML_NAMESPACE;
-            nslist.add(eventFactory.createNamespace(xsiNamespace.prefix, xsiNamespace.uri));
-            nslist.add(eventFactory.createNamespace(xmlNamespace.prefix, xmlNamespace.uri));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             out.add(eventFactory.createStartDocument());
@@ -176,7 +171,7 @@ public class XmlSerializer {
         for (int walk = 0; walk < nodeAttributes.getLength(); walk++) {
             Node attrItem = nodeAttributes.item(walk);
             if (attrItem.getPrefix() == null || attrItem.getPrefix().isEmpty()) {
-                attributes.add(eventFactory.createAttribute(attrItem.getNodeName(),attrItem.getNodeValue()));
+                attributes.add(eventFactory.createAttribute(attrItem.getNodeName(), attrItem.getNodeValue()));
             }
             else {
                 attributes.add(eventFactory.createAttribute(
@@ -202,6 +197,14 @@ public class XmlSerializer {
     private void gatherNamespaces(Node node, Map<String, String> namespaces) {
         if (node.getPrefix() != null && node.getNamespaceURI() != null) {
             namespaces.put(node.getPrefix(), node.getNamespaceURI());
+        }
+        if (node instanceof Element) {
+            Element element = (Element) node;
+            NamedNodeMap attrs = element.getAttributes();
+            for (int walk = 0; walk < attrs.getLength(); walk++) {
+                if (attrs.item(walk).getPrefix() == null) continue;
+                namespaces.put(attrs.item(walk).getPrefix(), attrs.item(walk).getNamespaceURI());
+            }
         }
         NodeList list = node.getChildNodes();
         for (int walk = 0; walk < list.getLength(); walk++) {
