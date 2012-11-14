@@ -21,6 +21,8 @@
 
 package eu.delving.sip.xml;
 
+import eu.delving.groovy.DOMBuilder;
+import eu.delving.metadata.RecDef;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -62,6 +64,11 @@ public class XmlOutput {
         for (Map.Entry<String, String> entry : namespaces.entrySet()) {
             namespaceList.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
         }
+        // TODO find out why they are not added by the DOMBuilder
+        final RecDef.Namespace xsiNamespace = DOMBuilder.XSI_NAMESPACE;
+        final RecDef.Namespace xmlNamespace = DOMBuilder.XML_NAMESPACE;
+        namespaceList.add(eventFactory.createNamespace(xsiNamespace.prefix, xsiNamespace.uri));
+        namespaceList.add(eventFactory.createNamespace(xmlNamespace.prefix, xmlNamespace.uri));
         out.add(eventFactory.createStartElement("", "", OUTPUT_TAG, null, namespaceList.iterator()));
     }
 
