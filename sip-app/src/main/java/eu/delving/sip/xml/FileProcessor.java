@@ -38,7 +38,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -276,7 +277,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         String fileName = String.format("%s-%s.xml", getDataSet().getSpec(), recMapping.getPrefix());
         File outputFile = new File(outputDirectory, fileName);
         OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
-        return new XmlOutput(outputStream, recDef().getNamespacesMap());
+        return new XmlOutput(outputStream, recDef().getNamespaceMap());
     }
 
     private RecDef recDef() {

@@ -49,8 +49,6 @@ public class DOMBuilder extends BuilderSupport {
     public static final String CDATA_BEFORE = "<![CDATA[";
     public static final String CDATA_AFTER = "]]>";
     private static final String SCHEMA_LOCATION_ATTR = "xsi:schemaLocation";
-    public static final RecDef.Namespace XML_NAMESPACE = new RecDef.Namespace("xml", "http://www.w3.org/XML/1998/namespace", null);
-    public static final RecDef.Namespace XSI_NAMESPACE = new RecDef.Namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance", null);
     private Document document;
     private DocumentBuilder documentBuilder;
     private Map<String, RecDef.Namespace> namespaces = new TreeMap<String, RecDef.Namespace>();
@@ -71,15 +69,10 @@ public class DOMBuilder extends BuilderSupport {
 
     public DOMBuilder(RecDef recDef) {
         this.recDef = recDef;
-        for (RecDef.Namespace namespace : this.recDef.namespaces) {
-            if (namespace.prefix.equals(recDef.prefix) && !recDef.elementFormDefaultQualified) {
-                namespaces.put("", namespace);
-            }
-            else {
-                namespaces.put(namespace.prefix, namespace);
-            }
+        this.namespaces = recDef.getNamespaceMap();
+        if (!recDef.elementFormDefaultQualified) {
+            namespaces.remove(recDef.prefix);
         }
-        ensureNamespace(XML_NAMESPACE);
     }
 
     @Override
@@ -107,8 +100,7 @@ public class DOMBuilder extends BuilderSupport {
                     schemaLocation.append(namespace.uri).append(' ').append(namespace.schema);
                 }
                 if (schemaLocation.length() > 0) {
-                    ensureNamespace(XSI_NAMESPACE);
-                    element.setAttributeNS(XSI_NAMESPACE.uri, SCHEMA_LOCATION_ATTR, schemaLocation.toString());
+                    element.setAttributeNS(RecDef.XSI_NAMESPACE.uri, SCHEMA_LOCATION_ATTR, schemaLocation.toString());
                 }
             }
             return element;
@@ -227,12 +219,6 @@ public class DOMBuilder extends BuilderSupport {
             }
         }
         return node;
-    }
-
-    private void ensureNamespace(RecDef.Namespace namespace) {
-        if (!namespaces.containsKey(namespace.prefix)) {
-            namespaces.put(namespace.prefix, namespace);
-        }
     }
 
     private void setValuesFromClosure(Node node, Closure closure) {

@@ -25,7 +25,6 @@ import eu.delving.groovy.*;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaVersion;
 import junit.framework.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
@@ -74,7 +73,6 @@ public class TestCodeGeneration {
         }
     }
 
-    @Ignore
     @Test
     public void cornucopia() throws MappingException {
         recMapping.setFact("dogExists", "true");
@@ -161,7 +159,8 @@ public class TestCodeGeneration {
 
     private static final String EXPECT =
             "<?xml version='1.0' encoding='UTF-8'?>\n" +
-                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"thisaway\">\n" +
+                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" lido:sortorder=\"thisaway\" xsi:schemaLocation=\"http://www.lido-schema.org http://www.lido-schema.org/fakelido.xsd\">\n" +
+//                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"thisaway\">\n" +
                     "    <lido:descriptiveMetadata>\n" +
                     "        <lido:objectClassificationWrap>\n" +
                     "            <lido:classificationWrap>\n" +
