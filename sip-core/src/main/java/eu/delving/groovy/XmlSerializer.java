@@ -21,6 +21,7 @@
 
 package eu.delving.groovy;
 
+import eu.delving.metadata.RecDef;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -62,8 +63,11 @@ public class XmlSerializer {
                 if (entry.getValue().trim().isEmpty()) continue;
                 nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
             }
-            // add xsi declaration
-            nslist.add(eventFactory.createNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance"));
+            // TODO find out why they are not added by the DOMBuilder
+            final RecDef.Namespace xsiNamespace = DOMBuilder.XSI_NAMESPACE;
+            final RecDef.Namespace xmlNamespace = DOMBuilder.XML_NAMESPACE;
+            nslist.add(eventFactory.createNamespace(xsiNamespace.prefix, xsiNamespace.uri));
+            nslist.add(eventFactory.createNamespace(xmlNamespace.prefix, xmlNamespace.uri));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             out.add(eventFactory.createStartDocument());

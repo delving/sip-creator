@@ -49,8 +49,8 @@ public class DOMBuilder extends BuilderSupport {
     public static final String CDATA_BEFORE = "<![CDATA[";
     public static final String CDATA_AFTER = "]]>";
     private static final String SCHEMA_LOCATION_ATTR = "xsi:schemaLocation";
-    private static final RecDef.Namespace XML_NAMESPACE = new RecDef.Namespace("xml", "http://www.w3.org/XML/1998/namespace", null);
-    private static final RecDef.Namespace XSI_NAMESPACE = new RecDef.Namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance", null);
+    public static final RecDef.Namespace XML_NAMESPACE = new RecDef.Namespace("xml", "http://www.w3.org/XML/1998/namespace", null);
+    public static final RecDef.Namespace XSI_NAMESPACE = new RecDef.Namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance", null);
     private Document document;
     private DocumentBuilder documentBuilder;
     private Map<String, RecDef.Namespace> namespaces = new TreeMap<String, RecDef.Namespace>();
