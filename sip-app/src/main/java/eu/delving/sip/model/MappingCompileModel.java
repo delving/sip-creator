@@ -33,7 +33,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -60,6 +60,7 @@ public class MappingCompileModel {
     public final static int RUN_DELAY = 100;
     public final static int COMPILE_DELAY = 500;
     private XmlSerializer serializer = new XmlSerializer();
+    private CodeGenerator codeGenerator = new CodeGenerator();
     private RecMapping recMapping;
     private NodeMapping nodeMapping;
     private MetadataRecord metadataRecord;
@@ -182,7 +183,7 @@ public class MappingCompileModel {
     private String getCode(EditPath editPath) {
         switch (type) {
             case RECORD:
-                return recMapping == null ? "" : recMapping.toCode();
+                return recMapping == null ? "" : codeGenerator.toCode(recMapping);
             case FIELD:
                 return nodeMapping == null || recMapping == null ? "" : nodeMapping.getCode(editPath, recMapping);
             default:

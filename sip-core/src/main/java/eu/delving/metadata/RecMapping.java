@@ -155,16 +155,6 @@ public class RecMapping {
         return recDefTree;
     }
 
-    public String toCode() {
-        CodeOut codeOut = CodeOut.create();
-        toCode(codeOut, null);
-        return codeOut.toString();
-    }
-
-    public void toCode(CodeOut codeOut, EditPath editPath) {
-        recDefTree.toCode(codeOut, functions, facts, editPath);
-    }
-
     public String toString() {
         return stream().toXML(this);
     }

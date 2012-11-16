@@ -21,10 +21,7 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.CodeOut;
-import eu.delving.metadata.EditPath;
-import eu.delving.metadata.RecDefTree;
-import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.*;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
@@ -71,7 +68,7 @@ public class MappingRunner {
         this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
         CodeOut codeOut = CodeOut.create();
-        recMapping.toCode(codeOut, editPath);
+        new CodeGenerator().toCode(recMapping, codeOut, editPath);
         code = codeOut.toString();
         script = groovyCodeResource.createMappingScript(code);
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
