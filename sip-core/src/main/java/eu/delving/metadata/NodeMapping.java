@@ -188,25 +188,19 @@ public class NodeMapping {
         return this;
     }
 
-    public boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
-        if (codeString == null) return false;
-        List<String> list = Arrays.asList(getCode(getGeneratorEditPath(), recMapping).split("\n"));
-        Iterator<String> walk = list.iterator();
-        return isSimilar(codeString, walk);
-    }
-
     public boolean codeLooksLike(String codeString) {
         return groovyCode == null || isSimilar(codeString, groovyCode.iterator());
     }
 
-    public String getCode(EditPath editPath, RecMapping recMapping) {
-        CodeOut codeOut = CodeOut.create(this);
-        new CodeGenerator().toCode(recMapping, codeOut, editPath);
-        return codeOut.getNodeMappingCode();
-    }
-
     public void revertToGenerated() {
         setGroovyCode(null, null);
+    }
+
+    private boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
+        if (codeString == null) return false;
+        List<String> list = Arrays.asList(new CodeGenerator(recMapping).toCode(getGeneratorEditPath()).split("\n"));
+        Iterator<String> walk = list.iterator();
+        return isSimilar(codeString, walk);
     }
 
     public void setGroovyCode(String codeString, RecMapping recMapping) {

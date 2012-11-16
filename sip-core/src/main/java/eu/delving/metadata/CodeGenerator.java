@@ -31,14 +31,31 @@ import static eu.delving.metadata.StringUtil.*;
 
 public class CodeGenerator {
     public static final String ABSENT_IS_FALSE = "_absent_ = false";
+    private RecMapping recMapping;
 
-    public String toCode(RecMapping recMapping) {
+    public CodeGenerator(RecMapping recMapping) {
+        this.recMapping = recMapping;
+    }
+
+    public String toCode() {
         CodeOut codeOut = CodeOut.create();
-        toCode(recMapping, codeOut, null);
+        toCode(codeOut, null);
         return codeOut.toString();
     }
 
-    public void toCode(RecMapping recMapping, CodeOut codeOut, EditPath editPath) {
+    public String toCode(EditPath editPath) {
+        CodeOut codeOut = CodeOut.create();
+        toCode(codeOut, editPath);
+        return codeOut.toString();
+    }
+
+    public String toCode(NodeMapping nodeMapping, EditPath editPath) {
+        CodeOut codeOut = CodeOut.create(nodeMapping);
+        toCode(codeOut, editPath);
+        return codeOut.getNodeMappingCode();
+    }
+
+    private void toCode(CodeOut codeOut, EditPath editPath) {
         toCode(recMapping.getRecDefTree(), codeOut, recMapping.getFunctions(), recMapping.getFacts(), editPath);
     }
 
