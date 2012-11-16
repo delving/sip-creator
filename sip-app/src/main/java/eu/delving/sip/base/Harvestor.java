@@ -168,7 +168,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
             switch (event.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     StartElement start = event.asStartElement();
-                    path = path.child(Tag.element(start.getName()));
+                    path = path.child(Tag.element(start.getName().getLocalPart()));
                     if (!recordEvents.isEmpty()) {
                         recordEvents.add(event);
                     }
