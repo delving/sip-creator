@@ -113,7 +113,7 @@ public class FileImporter implements Work.DataSetWork, Work.LongTermWork {
             progressListener.getFeedback().alert("Cancelled", e);
         }
         catch (IOException e) {
-            progressListener.getFeedback().alert("Unable to import", e);
+            progressListener.getFeedback().alert("Unable to import: "+e.getMessage(), e);
         }
     }
 
@@ -180,8 +180,9 @@ public class FileImporter implements Work.DataSetWork, Work.LongTermWork {
         int bytesRead;
         while (-1 != (bytesRead = inputStream.read(buffer))) {
             if (!headerFound) {
-                String chunk = new String(buffer, 0, XML_HEADER.length(), "UTF-8");
-                if (!XML_HEADER.equals(chunk)) throw new IOException(String.format("Not an XML File. Must begin with '%s...'.", XML_HEADER));
+                String chunk = new String(buffer, 0, buffer.length, "UTF-8");
+                if (chunk.indexOf('<') > 0) chunk = chunk.substring(chunk.indexOf('<'));
+                if (!chunk.startsWith(XML_HEADER)) throw new IOException(String.format("Not an XML File. Must begin with '%s...'.", XML_HEADER));
                 headerFound = true;
             }
             outputStream.write(buffer, 0, bytesRead);
