@@ -73,8 +73,10 @@ import static eu.delving.sip.files.DataSetState.*;
 public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
+    private File storageDirectory;
     private SipModel sipModel;
-    private Action importAction, uploadAction, validateAction;
+    private Action importAction;
+    private Action validateAction;
     private JFrame home;
     private JDesktopPane desktop;
     private AllFrames allFrames;
@@ -86,7 +88,8 @@ public class Application {
     private UnlockMappingAction unlockMappingAction;
     private SelectAnotherMappingAction selectAnotherMappingAction;
 
-    private Application(final File storageDirectory) throws StorageException {
+    private Application(final File storageDir) throws StorageException {
+        this.storageDirectory = storageDir;
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -167,7 +170,6 @@ public class Application {
         importAction = new ImportAction(desktop, sipModel);
         attachAccelerator(importAction, home);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
-        uploadAction = allFrames.getUploadAction();
         unlockMappingAction = new UnlockMappingAction(sipModel);
         attachAccelerator(unlockMappingAction, home);
         selectAnotherMappingAction = new SelectAnotherMappingAction(sipModel);
@@ -220,18 +222,6 @@ public class Application {
                 }
             }
         });
-    }
-
-    private boolean quit() {
-        if (!sipModel.getWorkModel().isEmpty()) {
-            boolean exitAnyway = feedback.confirm(
-                    "Busy",
-                    "There are jobs busy, are you sure you want to exit?"
-            );
-            if (exitAnyway) return false;
-        }
-        System.exit(0);
-        return true;
     }
 
     private JPanel createStatePanel() {
@@ -350,22 +340,58 @@ public class Application {
         return new DefaultHttpClient(threaded, httpParams);
     }
 
-    public static void main(final String[] args) throws StorageException {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final File storageDirectory = StorageFinder.getStorageDirectory(args);
-                if (storageDirectory == null) return;
-                try {
-                    Application application = new Application(storageDirectory);
-                    application.home.setVisible(true);
-                    application.allFrames.initiate();
-                }
-                catch (StorageException e) {
-                    JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
-                    e.printStackTrace();
-                }
+    private void quit() {
+        if (!sipModel.getWorkModel().isEmpty()) {
+            boolean exitAnyway = feedback.confirm(
+                    "Busy",
+                    "There are jobs busy, are you sure you want to exit?"
+            );
+            if (exitAnyway) return;
+        }
+        EventQueue.invokeLater(LAUNCH);
+    }
+
+    private void destroy() {
+        sipModel.shutdown();
+        resizeTimer.stop();
+        home.setVisible(false);
+        home.dispose();
+    }
+
+    private static StorageFinder storageFinder = new StorageFinder();
+
+    private static class LaunchAction implements Runnable {
+        private Application application;
+
+        @Override
+        public void run() {
+            File storageDirectory;
+            if (application != null) {
+                application.destroy();
+                storageDirectory = storageFinder.getStorageDirectory(application.storageDirectory);
             }
-        });
+            else {
+                storageDirectory = storageFinder.getStorageDirectory(null);
+            }
+            if (storageDirectory == null) {
+                System.exit(0);
+            }
+            try {
+                application = new Application(storageDirectory);
+                application.home.setVisible(true);
+                application.allFrames.initiate();
+            }
+            catch (StorageException e) {
+                JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static LaunchAction LAUNCH = new LaunchAction();
+
+    public static void main(final String[] args) throws StorageException {
+        storageFinder.setArgs(args);
+        EventQueue.invokeLater(LAUNCH);
     }
 }

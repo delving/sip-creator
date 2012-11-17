@@ -24,16 +24,21 @@ package eu.delving.sip.files;
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import java.awt.GridLayout;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static javax.swing.JOptionPane.*;
 
 /**
  * Locate the workspace and make sure the user has chosen a storage directory
@@ -45,9 +50,11 @@ public class StorageFinder {
     private static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "DelvingSIPCreator");
     private static final Pattern HPU_HUMAN = Pattern.compile("([A-Za-z0-9.-]+):([0-9]+)/([A-Za-z0-9]+)");
     private static final Pattern HPU_DIRECTORY = Pattern.compile("([A-Za-z0-9_-]+)__([0-9]+)___([A-Za-z0-9]+)");
-    public static final String CHOSEN_DIRECTORY = "chosenDirectory";
+    private static final String CHOSEN_DIRECTORY = "chosenDirectory";
+    private String [] args;
+    private List<File> storageDirs;
 
-    public static File getStorageDirectory(String[] args) {
+    public StorageFinder() {
         if (!WORKSPACE_DIR.exists()) {
             if (!WORKSPACE_DIR.mkdirs()) {
                 throw new RuntimeException(String.format("Unable to create %s", WORKSPACE_DIR.getAbsolutePath()));
@@ -56,19 +63,26 @@ public class StorageFinder {
         else if (!WORKSPACE_DIR.isDirectory()) {
             throw new RuntimeException(String.format("Expected directory but %s is a file", WORKSPACE_DIR.getAbsolutePath()));
         }
-        File[] files = WORKSPACE_DIR.listFiles(new FileFilter() {
+        storageDirs = Arrays.asList(WORKSPACE_DIR.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return file.isDirectory() && HPU_DIRECTORY.matcher(file.getName()).matches();
             }
-        });
-        switch (files.length) {
+        }));
+    }
+
+    public void setArgs(String[] args) {
+        this.args = args;
+    }
+
+    public File getStorageDirectory(File unwanted) {
+        switch (storageDirs.size()) {
             case 0:
                 return createHostPortDirectory(args);
             case 1:
-                return files[0];
+                return storageDirs.get(0);
             default:
-                return chooseDirectory(files);
+                return chooseDirectory(storageDirs, unwanted);
         }
     }
 
@@ -91,6 +105,18 @@ public class StorageFinder {
         Matcher matcher = getDirectoryMatcher(file);
         return String.format("%s:%s/%s", getHostName(matcher), matcher.group(2), matcher.group(3));
     }
+
+    public static URL getCodebase() {
+        try {
+            BasicService bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
+            return bs.getCodeBase();
+        }
+        catch (UnavailableServiceException ue) {
+            throw new RuntimeException("Unable to use JNLP service", ue);
+        }
+    }
+
+    // ======== private
 
     private static String getHostName(Matcher matcher) {
         return matcher.group(1).replace("_", ".");
@@ -125,7 +151,7 @@ public class StorageFinder {
     }
 
     private static File createHostPortDirectory(String[] args) {
-        if (args.length > 0) {
+        if (args != null && args.length > 0) {
             String user = args[0].trim();
             URL codebase = getCodebase();
             String host = codebase.getHost();
@@ -134,7 +160,7 @@ public class StorageFinder {
             return createDirectory(host, String.valueOf(port), user);
         }
         else while (true) {
-            String answer = JOptionPane.showInputDialog(null, "<html>Please enter host:port/user for your Culture Hub connection");
+            String answer = showInputDialog(null, "<html>Please enter host:port/user for your Culture Hub connection");
             if (answer == null) {
                 throw new RuntimeException("No host:port/user, so stopping");
             }
@@ -142,16 +168,17 @@ public class StorageFinder {
             if (matcher.matches()) {
                 return createDirectory(matcher.group(1), matcher.group(2), matcher.group(3));
             }
-            int okCancel = JOptionPane.showConfirmDialog(null, "<html>Value does not match \"host:port/user\" pattern. Try again.", "Sorry", JOptionPane.OK_CANCEL_OPTION);
-            if (okCancel == JOptionPane.CANCEL_OPTION) {
+            int okCancel = showConfirmDialog(null, "<html>Value does not match \"host:port/user\" pattern. Try again.", "Sorry", OK_CANCEL_OPTION);
+            if (okCancel == CANCEL_OPTION) {
                 throw new RuntimeException("No directory created");
             }
         }
     }
 
-    private static File chooseDirectory(File[] directories) {
+    private static File chooseDirectory(List<File> directories, File unwanted) {
         List<String> selectable = new ArrayList<String>();
         for (File directory : directories) {
+            if (unwanted != null && directory.getName().equals(unwanted.getName())) continue;
             if (!HPU_DIRECTORY.matcher(directory.getName()).find()) continue;
             selectable.add(getHostPortUser(directory));
         }
@@ -165,20 +192,10 @@ public class StorageFinder {
             buttonGroup.add(b);
             buttonPanel.add(b);
         }
-        int okCancel = JOptionPane.showConfirmDialog(null, buttonPanel, "Choose server", JOptionPane.OK_CANCEL_OPTION);
-        if (okCancel == JOptionPane.CANCEL_OPTION) return null;
+        int okCancel = showConfirmDialog(null, buttonPanel, "Choose server", OK_CANCEL_OPTION);
+        if (okCancel != OK_OPTION) return null;
         String hostPort = buttonGroup.getSelection().getActionCommand();
         Preferences.userRoot().put(CHOSEN_DIRECTORY, hostPort);
         return createDirectory(hostPort);
-    }
-
-    public static URL getCodebase() {
-        try {
-            BasicService bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
-            return bs.getCodeBase();
-        }
-        catch (UnavailableServiceException ue) {
-            throw new RuntimeException("Unable to use JNLP service", ue);
-        }
     }
 }

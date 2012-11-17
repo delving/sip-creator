@@ -28,7 +28,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -86,7 +86,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        sipModel.exec(this);
+        if (triggerTimer.isRunning()) sipModel.exec(this);
     }
 
     @Override
@@ -155,6 +155,10 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+    }
+
+    public void shutdown() {
+        triggerTimer.stop();
     }
 
     private void kick(boolean freeze) {
