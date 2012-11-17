@@ -342,7 +342,13 @@ public class AllFrames {
 
         Arrangement(XArrangement source, int viewIndex) {
             super(source.view.getHtml());
-            int keyCode = (viewIndex <= 9 ? KeyEvent.VK_0 : KeyEvent.VK_A - 10) + viewIndex;
+            int keyCode;
+            if (viewIndex < 9) {
+                keyCode = KeyEvent.VK_1 + viewIndex; // 1..9
+            }
+            else {
+                keyCode = KeyEvent.VK_A + (viewIndex - 9);
+            }
             putValue(
                     Action.ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(keyCode, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
