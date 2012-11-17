@@ -36,7 +36,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
@@ -85,10 +88,6 @@ public class DataSetFrame extends FrameBase {
             }
         });
         tableModel.setStateCheckDelay(500);
-        getAction().putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
         editAction.checkEnabled();
         downloadAction.checkEnabled();
         releaseAction.checkEnabled();
@@ -106,6 +105,7 @@ public class DataSetFrame extends FrameBase {
         p.add(button(refreshAction));
         p.add(createFilter());
         p.add(button(editAction));
+        SwingHelper.addSpaceAction(editAction, (JComponent) getContentPane());
         p.add(button(downloadAction));
         p.add(button(releaseAction));
         return p;
@@ -138,7 +138,7 @@ public class DataSetFrame extends FrameBase {
     private class RefreshAction extends AbstractAction {
 
         private RefreshAction() {
-            super("Refresh the list of data sets from the culture hub");
+            super("Refresh list from the culture hub");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_FETCH_LIST);
         }
 
@@ -168,7 +168,7 @@ public class DataSetFrame extends FrameBase {
     private class EditAction extends AbstractAction {
 
         private EditAction() {
-            super("Select a mapping of this data set for editing");
+            super("Select this data set for editing");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_EDIT);
         }
 
@@ -218,7 +218,7 @@ public class DataSetFrame extends FrameBase {
     private class DownloadAction extends AbstractAction {
 
         private DownloadAction() {
-            super("Download from the culture hub for editing locally");
+            super("Download from culture hub");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_DOWNLOAD);
         }
 
@@ -251,7 +251,7 @@ public class DataSetFrame extends FrameBase {
     public class ReleaseAction extends AbstractAction {
 
         public ReleaseAction() {
-            super("Release your ownership of this data set");
+            super("Release ownership of this data set");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_EMPTY);
         }
 
@@ -334,6 +334,11 @@ public class DataSetFrame extends FrameBase {
                     for (Row entry : rows) {
                         if (entry.hasStateChanged()) fireTableRowsUpdated(row, row);
                         row++;
+                    }
+                    ListSelectionModel selection = dataSetTable.getSelectionModel();
+                    if (tableModel.getRowCount() > 0 && selection.isSelectionEmpty()) {
+                        selection.setSelectionInterval(0, 0);
+                        dataSetTable.requestFocus();
                     }
                 }
             });

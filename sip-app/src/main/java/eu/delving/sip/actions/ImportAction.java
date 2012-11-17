@@ -23,7 +23,6 @@ package eu.delving.sip.actions;
 
 import eu.delving.sip.base.Harvestor;
 import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -36,12 +35,12 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import static eu.delving.sip.base.SwingHelper.*;
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
 /**
@@ -60,12 +59,7 @@ public class ImportAction extends AbstractAction {
     private JFileChooser chooser = new JFileChooser("XML Metadata Source File");
 
     public ImportAction(JDesktopPane parent, SipModel sipModel) {
-        super("Import new source data");
-        putValue(Action.SMALL_ICON, SwingHelper.ICON_IMPORT);
-        putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
+        configAction(this, "Import new source data", ICON_IMPORT, MENU_I);
         this.parent = parent;
         this.sipModel = sipModel;
         this.dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "Input Source", Dialog.ModalityType.APPLICATION_MODAL);

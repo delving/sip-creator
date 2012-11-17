@@ -60,7 +60,7 @@ import java.io.File;
 import java.net.*;
 import java.util.prefs.Preferences;
 
-import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
+import static eu.delving.sip.base.SwingHelper.*;
 import static eu.delving.sip.files.DataSetState.*;
 
 /**
@@ -165,10 +165,13 @@ public class Application {
             }
         });
         importAction = new ImportAction(desktop, sipModel);
+        attachAccelerator(importAction, home);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         uploadAction = allFrames.getUploadAction();
         unlockMappingAction = new UnlockMappingAction(sipModel);
+        attachAccelerator(unlockMappingAction, home);
         selectAnotherMappingAction = new SelectAnotherMappingAction(sipModel);
+        attachAccelerator(selectAnotherMappingAction, home);
         home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
         home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -274,7 +277,7 @@ public class Application {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting() || workFrame.getMiniList().isSelectionEmpty()) return;
-                workFrame.getAction().actionPerformed(null);
+                workFrame.openFrame();
             }
         });
         return workPanel;
@@ -291,7 +294,7 @@ public class Application {
     private JMenu createHelpMenu() {
         JMenu menu = new JMenu("Help");
         final JCheckBoxMenuItem item = new JCheckBoxMenuItem("Show Help Panel");
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK));
+        item.setAccelerator(MENU_H);
         item.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {

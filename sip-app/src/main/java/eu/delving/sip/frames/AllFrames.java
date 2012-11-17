@@ -25,7 +25,10 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
@@ -34,12 +37,12 @@ import org.apache.commons.lang.WordUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static eu.delving.sip.base.FrameBase.INSETS;
+import static eu.delving.sip.base.SwingHelper.*;
 import static eu.delving.sip.frames.AllFrames.View.*;
 
 /**
@@ -115,11 +118,12 @@ public class AllFrames {
         MappingCodeFrame mappingCodeFrame = new MappingCodeFrame(sipModel);
         StatsFrame statsFrame = new StatsFrame(sipModel);
         CreateFrame create = new CreateFrame(sipModel);
-        addSpaceBarCreate(create, create);
+        Action createAction = create.getCreateMappingAction();
+        addSpaceAction(createAction, create);
         FrameBase source = new SourceFrame(sipModel);
-        addSpaceBarCreate(create, source);
+        addSpaceAction(createAction, source);
         TargetFrame target = new TargetFrame(sipModel);
-        addSpaceBarCreate(create, target);
+        addSpaceAction(createAction, target);
         FrameBase input = new InputFrame(sipModel);
         FrameBase recMapping = new RecMappingFrame(sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(sipModel);
@@ -257,7 +261,7 @@ public class AllFrames {
         arrangements.add(Box.createVerticalGlue());
         JPanel p = new JPanel(new BorderLayout());
         p.add(arrangements, BorderLayout.CENTER);
-        return SwingHelper.scrollV(p);
+        return scrollV(p);
     }
 
     public static JComponent miniScrollV(String title, JComponent content) {
@@ -269,12 +273,6 @@ public class AllFrames {
         scroll.setPreferredSize(new Dimension(200, 80));
         p.add(scroll);
         return p;
-    }
-
-    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
-        final String CREATE = "create";
-        analysis.getActionMap().put(CREATE, create.getCreateMappingAction());
-        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
     private FrameBase frame(FrameBase.Which which) {
@@ -342,17 +340,9 @@ public class AllFrames {
 
         Arrangement(XArrangement source, int viewIndex) {
             super(source.view.getHtml());
-            int keyCode;
             if (viewIndex < 9) {
-                keyCode = KeyEvent.VK_1 + viewIndex; // 1..9
+                putValue(ACCELERATOR_KEY, menuDigit(viewIndex + 1));
             }
-            else {
-                keyCode = KeyEvent.VK_A + (viewIndex - 9);
-            }
-            putValue(
-                    Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(keyCode, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-            );
             icon = new ViewIcon(this, LARGE_ICON_SIZE);
             putValue(Action.LARGE_ICON_KEY, icon);
         }
