@@ -25,7 +25,10 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
@@ -34,12 +37,12 @@ import org.apache.commons.lang.WordUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static eu.delving.sip.base.FrameBase.INSETS;
+import static eu.delving.sip.base.SwingHelper.*;
 import static eu.delving.sip.frames.AllFrames.View.*;
 
 /**
@@ -53,6 +56,7 @@ import static eu.delving.sip.frames.AllFrames.View.*;
 
 public class AllFrames {
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
+    private JPanel content;
     private FrameBase[] frames;
     private DataSetFrame dataSetFrame;
     private WorkFrame workFrame;
@@ -105,21 +109,23 @@ public class AllFrames {
         void refreshView();
     }
 
-    public AllFrames(final SipModel sipModel, final CultureHubClient cultureHubClient) {
+    public AllFrames(final SipModel sipModel, final CultureHubClient cultureHubClient, JPanel content) {
         this.sipModel = sipModel;
         sipModel.setViewSelector(viewSelector);
         workFrame = new WorkFrame(sipModel);
         dataSetFrame = new DataSetFrame(sipModel, cultureHubClient);
         reportFrame = new ReportFrame(sipModel, cultureHubClient);
+        this.content = content;
         FunctionFrame functionFrame = new FunctionFrame(sipModel);
         MappingCodeFrame mappingCodeFrame = new MappingCodeFrame(sipModel);
         StatsFrame statsFrame = new StatsFrame(sipModel);
         CreateFrame create = new CreateFrame(sipModel);
-        addSpaceBarCreate(create, create);
+        Action createAction = create.getCreateMappingAction();
+        addKeyboardAction(createAction, SPACE, create);
         FrameBase source = new SourceFrame(sipModel);
-        addSpaceBarCreate(create, source);
+        addKeyboardAction(createAction, SPACE, source);
         TargetFrame target = new TargetFrame(sipModel);
-        addSpaceBarCreate(create, target);
+        addKeyboardAction(createAction, SPACE, target);
         FrameBase input = new InputFrame(sipModel);
         FrameBase recMapping = new RecMappingFrame(sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(sipModel);
@@ -257,7 +263,7 @@ public class AllFrames {
         arrangements.add(Box.createVerticalGlue());
         JPanel p = new JPanel(new BorderLayout());
         p.add(arrangements, BorderLayout.CENTER);
-        return SwingHelper.scrollV(p);
+        return scrollV(p);
     }
 
     public static JComponent miniScrollV(String title, JComponent content) {
@@ -269,12 +275,6 @@ public class AllFrames {
         scroll.setPreferredSize(new Dimension(200, 80));
         p.add(scroll);
         return p;
-    }
-
-    private void addSpaceBarCreate(CreateFrame create, FrameBase analysis) {
-        final String CREATE = "create";
-        analysis.getActionMap().put(CREATE, create.getCreateMappingAction());
-        analysis.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(' '), CREATE);
     }
 
     private FrameBase frame(FrameBase.Which which) {
@@ -342,11 +342,9 @@ public class AllFrames {
 
         Arrangement(XArrangement source, int viewIndex) {
             super(source.view.getHtml());
-            int keyCode = (viewIndex <= 9 ? KeyEvent.VK_0 : KeyEvent.VK_A - 10) + viewIndex;
-            putValue(
-                    Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(keyCode, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-            );
+            if (viewIndex < 9) {
+                putValue(ACCELERATOR_KEY, menuDigit(viewIndex + 1));
+            }
             icon = new ViewIcon(this, LARGE_ICON_SIZE);
             putValue(Action.LARGE_ICON_KEY, icon);
         }
@@ -367,6 +365,7 @@ public class AllFrames {
             for (Block block : blocks) block.frame.openFrame();
             for (FrameBase base : frames) base.setArrangementSource(source, this);
             currentView = source.view;
+            content.requestFocus();
         }
 
         public String toString() {
