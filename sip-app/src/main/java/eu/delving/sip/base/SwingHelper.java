@@ -30,9 +30,7 @@ import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.net.URL;
 
@@ -76,14 +74,13 @@ public class SwingHelper {
     public static final Icon ICON_FETCH_LIST = icon("fetch-list");
     public static final Icon ICON_EDIT = icon("edit");
 
-    public static final KeyStroke MENU_D = menuKeystroke(KeyEvent.VK_D);
+    public static final KeyStroke SPACE = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
+    public static final KeyStroke MENU_G = menuKeystroke(KeyEvent.VK_G);
     public static final KeyStroke MENU_E = menuKeystroke(KeyEvent.VK_E);
     public static final KeyStroke MENU_H = menuKeystroke(KeyEvent.VK_H);
     public static final KeyStroke MENU_I = menuKeystroke(KeyEvent.VK_I);
-    public static final KeyStroke MENU_M = menuKeystroke(KeyEvent.VK_M);
     public static final KeyStroke MENU_S = menuKeystroke(KeyEvent.VK_S);
     public static final KeyStroke MENU_U = menuKeystroke(KeyEvent.VK_U);
-    public static final KeyStroke MENU_V = menuKeystroke(KeyEvent.VK_V);
     public static final KeyStroke MENU_Z = menuKeystroke(KeyEvent.VK_Z);
     public static final KeyStroke SH_MENU_Z = menuShiftKeystroke(KeyEvent.VK_Z);
     public static KeyStroke menuDigit(int digit) {
@@ -121,10 +118,10 @@ public class SwingHelper {
         action.putValue(Action.NAME, name);
     }
 
-    public static void addSpaceAction(Action action, JComponent component) {
+    public static void addKeyboardAction(Action action, KeyStroke keyStroke, JComponent component) {
         String name = (String) action.getValue(Action.NAME);
         component.getActionMap().put(name, action);
-        component.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), name);
+        component.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(keyStroke, name);
     }
 
     private static KeyStroke menuKeystroke(int virtualKey) {

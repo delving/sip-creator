@@ -123,7 +123,6 @@ public class Application {
         Storage storage = new StorageImpl(storageDirectory, fetcher, httpClient);
         sipModel = new SipModel(desktop ,storage, groovyCodeResource, feedback, preferences);
         CultureHubClient cultureHubClient = new CultureHubClient(sipModel, httpClient);
-        allFrames = new AllFrames(sipModel, cultureHubClient);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
@@ -133,9 +132,12 @@ public class Application {
                 allFrames.getViewSelector().refreshView();
             }
         });
+        JPanel content = (JPanel) home.getContentPane();
+        content.setFocusable(true);
+        allFrames = new AllFrames(sipModel, cultureHubClient, content);
         desktop.setBackground(new Color(190, 190, 200));
         helpPanel = new HelpPanel(sipModel, httpClient);
-        home.getContentPane().add(desktop, BorderLayout.CENTER);
+        content.add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void lockChanged(MappingModel mappingModel, final boolean locked) {
@@ -174,8 +176,8 @@ public class Application {
         attachAccelerator(unlockMappingAction, home);
         selectAnotherMappingAction = new SelectAnotherMappingAction(sipModel);
         attachAccelerator(selectAnotherMappingAction, home);
-        home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
-        home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
+        content.add(createStatePanel(), BorderLayout.SOUTH);
+        content.add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         screen.height -= 30;
         home.setSize(screen);
@@ -190,6 +192,7 @@ public class Application {
             }
         });
         home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        addKeyboardAction(statusPanel.getButtonAction(), MENU_G, (JComponent) home.getContentPane());
         sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {

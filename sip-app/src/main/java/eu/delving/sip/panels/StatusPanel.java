@@ -46,6 +46,7 @@ import static eu.delving.sip.files.DataSetState.values;
 public class StatusPanel extends JPanel {
 
     private static final Border DEFAULT_BORDER = BorderFactory.createTitledBorder("Actions");
+    private ActionBridge actionBridge = new ActionBridge();
     private List<StateAction> actions = new ArrayList<StateAction>();
     private JButton button = new JButton();
 
@@ -90,6 +91,21 @@ public class StatusPanel extends JPanel {
 
     public void setReaction(DataSetState state, Action action) {
         for (StateAction stateAction : actions) if (stateAction.state == state) stateAction.setAction(action);
+    }
+
+    public Action getButtonAction() {
+        return actionBridge;
+    }
+
+    private class ActionBridge extends AbstractAction {
+        private ActionBridge() {
+            super("press!");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            button.doClick();
+        }
     }
 
     private class StateAction extends AbstractAction {

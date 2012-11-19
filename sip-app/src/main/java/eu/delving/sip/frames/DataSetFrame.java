@@ -105,7 +105,7 @@ public class DataSetFrame extends FrameBase {
         p.add(button(refreshAction));
         p.add(createFilter());
         p.add(button(editAction));
-        SwingHelper.addSpaceAction(editAction, (JComponent) getContentPane());
+        addKeyboardAction(editAction, SPACE, (JComponent) getContentPane());
         p.add(button(downloadAction));
         p.add(button(releaseAction));
         return p;

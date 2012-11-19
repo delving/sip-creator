@@ -56,6 +56,7 @@ import static eu.delving.sip.frames.AllFrames.View.*;
 
 public class AllFrames {
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
+    private JPanel content;
     private FrameBase[] frames;
     private DataSetFrame dataSetFrame;
     private WorkFrame workFrame;
@@ -108,22 +109,23 @@ public class AllFrames {
         void refreshView();
     }
 
-    public AllFrames(final SipModel sipModel, final CultureHubClient cultureHubClient) {
+    public AllFrames(final SipModel sipModel, final CultureHubClient cultureHubClient, JPanel content) {
         this.sipModel = sipModel;
         sipModel.setViewSelector(viewSelector);
         workFrame = new WorkFrame(sipModel);
         dataSetFrame = new DataSetFrame(sipModel, cultureHubClient);
         reportFrame = new ReportFrame(sipModel, cultureHubClient);
+        this.content = content;
         FunctionFrame functionFrame = new FunctionFrame(sipModel);
         MappingCodeFrame mappingCodeFrame = new MappingCodeFrame(sipModel);
         StatsFrame statsFrame = new StatsFrame(sipModel);
         CreateFrame create = new CreateFrame(sipModel);
         Action createAction = create.getCreateMappingAction();
-        addSpaceAction(createAction, create);
+        addKeyboardAction(createAction, SPACE, create);
         FrameBase source = new SourceFrame(sipModel);
-        addSpaceAction(createAction, source);
+        addKeyboardAction(createAction, SPACE, source);
         TargetFrame target = new TargetFrame(sipModel);
-        addSpaceAction(createAction, target);
+        addKeyboardAction(createAction, SPACE, target);
         FrameBase input = new InputFrame(sipModel);
         FrameBase recMapping = new RecMappingFrame(sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(sipModel);
@@ -363,6 +365,7 @@ public class AllFrames {
             for (Block block : blocks) block.frame.openFrame();
             for (FrameBase base : frames) base.setArrangementSource(source, this);
             currentView = source.view;
+            content.requestFocus();
         }
 
         public String toString() {
