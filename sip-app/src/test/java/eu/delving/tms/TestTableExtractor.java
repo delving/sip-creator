@@ -43,14 +43,14 @@ public class TestTableExtractor {
     @Test
     public void testIntrospection() throws SQLException, IOException {
         RelationalProfile profile = RelationalProfile.createProfile(connection);
-        FileWriter out = new FileWriter("/tmp/tms-liberator-profile.xml");
+        FileWriter out = new FileWriter("/tmp/tms-rdbms-profile.xml");
         RelationalProfile.stream().toXML(profile, out);
         out.close();
     }
 
     @Test
     public void testDumpTMS() throws ClassNotFoundException, SQLException, XMLStreamException, IOException, UnsupportedEncodingException {
-        URL resource = getClass().getResource("/liberator/tms-liberator-profile.xml");
+        URL resource = getClass().getResource("/extractor/tms-rdbms-profile.xml");
         RelationalProfile profile = (RelationalProfile) RelationalProfile.stream().fromXML(resource);
         profile.resolve();
         TableExtractor tableExtractor = new TableExtractor(connection, profile);
