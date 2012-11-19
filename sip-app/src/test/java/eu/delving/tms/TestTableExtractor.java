@@ -48,6 +48,7 @@ public class TestTableExtractor {
         out.close();
     }
 
+    @Ignore
     @Test
     public void testDumpTMS() throws ClassNotFoundException, SQLException, XMLStreamException, IOException, UnsupportedEncodingException {
         URL resource = getClass().getResource("/extractor/tms-rdbms-profile.xml");
