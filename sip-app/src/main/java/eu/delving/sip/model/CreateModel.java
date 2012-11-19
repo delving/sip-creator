@@ -117,7 +117,7 @@ public class CreateModel {
         recDefTreeNode.addNodeMapping(created);
         if (created.hasOneSourceTreeNode() && created.inputPath.equals(Storage.CONSTANT_PATH)) {
             String answer = sipModel.getFeedback().ask("Please enter the constant value");
-            created.setGroovyCode(String.format("'%s'", answer), sipModel.getMappingModel().getRecMapping());
+            created.setGroovyCode(String.format("'%s'", answer));
         }
         setNodeMappingInternal(created);
         adjustHighlights();

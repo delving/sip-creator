@@ -38,6 +38,23 @@ public class StringUtil {
 
     private static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
 
+    public static boolean isSimilarCode(String codeString, List<String> codeLines) {
+        if (codeLines == null) return codeString.trim().isEmpty();
+        Iterator<String> walk = codeLines.iterator();
+        for (String line : codeString.split("\n")) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+            if (!walk.hasNext()) return false;
+            while (walk.hasNext()) {
+                String otherLine = walk.next().trim();
+                if (otherLine.isEmpty()) continue;
+                if (!otherLine.equals(line)) return false;
+                break;
+            }
+        }
+        return !walk.hasNext();
+    }
+
     public static String csvEscapeXML(String value) {
         StringBuilder tag = new StringBuilder();
         for (char c : value.toCharArray()) {

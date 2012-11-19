@@ -107,8 +107,7 @@ public class TestCodeGeneration {
                 "   return _name.split(' ');\n" +
                 "} else {\n" +
                 "   return _name.text();\n" +
-                "}",
-                recMapping
+                "}"
         );
 
         RecDefNode oneTwoTarget = node("/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/conceptID");

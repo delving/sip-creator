@@ -155,16 +155,6 @@ public class RecMapping {
         return recDefTree;
     }
 
-    public String toCode() {
-        CodeOut codeOut = CodeOut.create();
-        toCode(codeOut, null);
-        return codeOut.toString();
-    }
-
-    public void toCode(CodeOut codeOut, EditPath editPath) {
-        recDefTree.toCode(codeOut, functions, facts, editPath);
-    }
-
     public String toString() {
         return stream().toXML(this);
     }
@@ -207,6 +197,7 @@ public class RecMapping {
                 }
             }
         }
+        new CodeGenerator(this).onlyGenerated().toString(); // set generatedCode in all NodeMapping instances
     }
 
     public static RecMapping create(RecDefTree recDefTree) throws MetadataException {
