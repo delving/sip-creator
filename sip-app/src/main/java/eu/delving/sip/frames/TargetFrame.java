@@ -24,7 +24,6 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.ShowOptionMenu;
 import eu.delving.sip.model.*;
@@ -36,8 +35,13 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.*;
+
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * Render the record definition as a tree, with a filter function for navigating in large trees.  There are also
@@ -71,7 +75,7 @@ public class TargetFrame extends FrameBase {
         timer.setRepeats(false);
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
-        treePanel.add(SwingHelper.scrollVH("Record Definition", recDefTree));
+        treePanel.add(scrollVH("Record Definition", recDefTree));
         ShowOptionMenu showOptionMenu = new ShowOptionMenu(sipModel, new ShowOptionMenu.Listener() {
             @Override
             public void optSelected(OptList.Opt opt) {
@@ -269,11 +273,7 @@ public class TargetFrame extends FrameBase {
     private class ExpandRootAction extends AbstractAction {
 
         private ExpandRootAction() {
-            super("Expand what is mapped");
-            putValue(
-                    Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-            );
+            configAction(this, "Expand what is mapped", null, MENU_E);
         }
 
         @Override
@@ -375,7 +375,7 @@ public class TargetFrame extends FrameBase {
                 recDefTree.setModel(new RecDefTreeModel(EMPTY_NODE));
             }
             treePanel.removeAll();
-            treePanel.add(SwingHelper.scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
+            treePanel.add(scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
             treePanel.validate();
         }
     }

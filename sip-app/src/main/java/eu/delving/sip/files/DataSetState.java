@@ -21,6 +21,11 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.sip.base.SwingHelper;
+
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+
 /**
  * The different states that a data set can be in.
  *
@@ -38,6 +43,7 @@ public enum DataSetState {
     MAPPING("Validate", "There is a mapping", "Transform and validate all of the data"),
     VALIDATED("Upload", "Dataset has been validated", "Initiate upload to CultureHub");
 
+    private static final KeyStroke KEY = SwingHelper.MENU_G;
     private String[] description;
 
     DataSetState(String... description) {
@@ -52,8 +58,8 @@ public enum DataSetState {
         return String.format(
                 "<html><center><b>&quot;%s&quot;</b><br>" +
                         "Status is now : %s<br>" +
-                        "Press here to : %s<br>",
-                description[0], description[1], description[2]
+                        "Click here or %s to : %s<br>",
+                description[0], description[1], KeyEvent.getKeyModifiersText(KEY.getModifiers()) + KeyEvent.getKeyText(KEY.getKeyCode()), description[2]
         );
     }
 }

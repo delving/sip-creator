@@ -30,12 +30,12 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.Action;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
@@ -74,10 +74,6 @@ public class MappingCodeFrame extends FrameBase {
                 return new Dimension(sipModel.getDesktop().getSize().width - MARG * 2, sipModel.getDesktop().getSize().height - MARG * 2);
             }
         });
-        getAction().putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
     }
 
     @Override

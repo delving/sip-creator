@@ -52,7 +52,6 @@ public abstract class FrameBase extends JInternalFrame {
     protected FrameBase childFrame;
     protected JComponent focusOwner;
     protected SipModel sipModel;
-    protected PopupAction action;
     private boolean initialized;
     private Timer positionTimer;
     private AllFrames.XArrangement arrangement;
@@ -103,7 +102,6 @@ public abstract class FrameBase extends JInternalFrame {
             throw new RuntimeException(e);
         }
         this.sipModel = sipModel;
-        this.action = new PopupAction(title);
         for (int pos = 0; pos < 4; pos++) {
             adjustActions.add(new AdjustAction(pos, 1));
             adjustActions.add(new AdjustAction(pos, -1));
@@ -177,13 +175,6 @@ public abstract class FrameBase extends JInternalFrame {
     protected void onOpen(boolean opened) {
     }
 
-    public void setAccelerator(int number) {
-        action.putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_0 + number, KeyEvent.CTRL_MASK)
-        );
-    }
-
     public void setPlacement(Placement placement) {
         this.placement = placement;
     }
@@ -196,27 +187,6 @@ public abstract class FrameBase extends JInternalFrame {
             content.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
             buildContent(content);
             initialized = true;
-        }
-    }
-
-    public Action getAction() {
-        return action;
-    }
-
-    private class PopupAction extends AbstractAction {
-
-        public PopupAction(String title) {
-            super(title);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            if (isShowing()) {
-                closeFrame();
-            }
-            else {
-                openFrame();
-            }
         }
     }
 
@@ -410,7 +380,7 @@ public abstract class FrameBase extends JInternalFrame {
         public InternalGlassPane(final FrameBase frame) {
             setToolTipText(
                     "<html><b>Mapping is locked<b><br>" +
-                    "<p>You can unlock it from the Data Sets menu.</p>"
+                            "<p>You can unlock it from the Data Sets menu.</p>"
             );
             setFocusable(true);
             addComponentListener(new ComponentListener() {

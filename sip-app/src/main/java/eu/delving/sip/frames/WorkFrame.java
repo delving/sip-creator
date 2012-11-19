@@ -22,19 +22,24 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.WorkModel;
 import org.apache.commons.lang.WordUtils;
 
-import javax.swing.*;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * Show the live work model in detail, and pop up a cancellation dialog when one is selected.  The full list
@@ -73,10 +78,6 @@ public class WorkFrame extends FrameBase {
                 }
             }
         });
-        getAction().putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
     }
 
     public JList getMiniList() {
@@ -85,7 +86,7 @@ public class WorkFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(SwingHelper.scrollV("Work happening in the background", fullList), BorderLayout.CENTER);
+        content.add(scrollV("Work happening in the background", fullList), BorderLayout.CENTER);
     }
 
     private class JobContextCellRenderer extends DefaultListCellRenderer {
@@ -121,10 +122,10 @@ public class WorkFrame extends FrameBase {
             String show = progress == null ? jobName : String.format("%s: %s", jobName, progress.getString(false));
             Component component = super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
             if (jobContext.getWork() instanceof Work.LongTermWork) {
-                component.setBackground(SwingHelper.LONG_TERM_JOB_COLOR);
+                component.setBackground(LONG_TERM_JOB_COLOR);
             }
             else {
-                component.setBackground(SwingHelper.NORMAL_JOB_COLOR);
+                component.setBackground(NORMAL_JOB_COLOR);
             }
             return component;
         }
