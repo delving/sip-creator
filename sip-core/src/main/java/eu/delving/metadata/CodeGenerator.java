@@ -32,34 +32,34 @@ import static eu.delving.metadata.StringUtil.*;
 public class CodeGenerator {
     public static final String ABSENT_IS_FALSE = "_absent_ = false";
     private RecMapping recMapping;
+    private boolean onlyGeneratedCode;
+    private EditPath editPath;
 
     public CodeGenerator(RecMapping recMapping) {
         this.recMapping = recMapping;
     }
 
-    public String toCode() {
+    public CodeGenerator onlyGenerated() {
+        onlyGeneratedCode = true;
+        return this;
+    }
+
+    public CodeGenerator withEditPath(EditPath editPath) {
+        this.editPath = editPath;
+        return this;
+    }
+
+    public String toString() {
         CodeOut codeOut = CodeOut.create();
-        toCode(codeOut, null);
+        toCode(codeOut);
         return codeOut.toString();
     }
 
-    public String toCode(EditPath editPath) {
-        CodeOut codeOut = CodeOut.create();
-        toCode(codeOut, editPath);
-        return codeOut.toString();
+    private void toCode(CodeOut codeOut) {
+        toCode(recMapping.getRecDefTree(), codeOut, recMapping.getFunctions(), recMapping.getFacts());
     }
 
-    public String toCode(NodeMapping nodeMapping, EditPath editPath) {
-        CodeOut codeOut = CodeOut.create(nodeMapping);
-        toCode(codeOut, editPath);
-        return codeOut.getNodeMappingCode();
-    }
-
-    private void toCode(CodeOut codeOut, EditPath editPath) {
-        toCode(recMapping.getRecDefTree(), codeOut, recMapping.getFunctions(), recMapping.getFacts(), editPath);
-    }
-
-    private void toCode(RecDefTree recDefTree, CodeOut codeOut, Set<MappingFunction> mappingFunctions, Map<String, String> facts, EditPath editPath) {
+    private void toCode(RecDefTree recDefTree, CodeOut codeOut, Set<MappingFunction> mappingFunctions, Map<String, String> facts) {
         codeOut.line("// SIP-Creator Generated Mapping Code");
         codeOut.line("// ----------------------------------");
         codeOut.line("// Discarding:");
@@ -98,7 +98,7 @@ public class CodeGenerator {
         codeOut.line("_uniqueIdentifier = _input._id[0].toString()");
         codeOut.line("outputNode = output.");
         if (recDefTree.getRoot().isPopulated()) {
-            toElementCode(recDefTree.getRoot(), codeOut, new Stack<String>(), editPath);
+            toElementCode(recDefTree.getRoot(), codeOut, new Stack<String>());
         }
         else {
             codeOut.line("no 'mapping'");
@@ -110,7 +110,7 @@ public class CodeGenerator {
     }
 
 
-    private void toElementCode(RecDefNode recDefNode, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+    private void toElementCode(RecDefNode recDefNode, CodeOut codeOut, Stack<String> groovyParams) {
         if (recDefNode.isAttr() || !recDefNode.isPopulated()) return;
         if (editPath != null && !recDefNode.getPath().isFamilyOf(editPath.getNodeMapping().outputPath)) return;
         if (recDefNode.getNodeMappings().isEmpty()) {
@@ -120,16 +120,16 @@ public class CodeGenerator {
                     NodeMapping nodeMapping = new NodeMapping().setOutputPath(recDefNode.getPath()).setInputPaths(siblingPaths);
                     nodeMapping.recDefNode = recDefNode;
                     codeOut.start(nodeMapping);
-                    toNodeMappingLoop(recDefNode, codeOut, nodeMapping, getLocalPath(nodeMapping), groovyParams, editPath);
+                    toNodeMappingLoop(recDefNode, codeOut, nodeMapping, getLocalPath(nodeMapping), groovyParams);
                     codeOut.end(nodeMapping);
                     return;
                 }
             }
             if (!recDefNode.isLeafElem()) {
-                toBranchCode(recDefNode, codeOut, groovyParams, editPath);
+                toBranchCode(recDefNode, codeOut, groovyParams);
             }
             else if (recDefNode.hasActiveAttributes()) {
-                startBuilderCall(recDefNode, codeOut, false, "R0", groovyParams, editPath);
+                startBuilderCall(recDefNode, codeOut, false, "R0", groovyParams);
                 codeOut.line("// no node mappings");
                 codeOut._line("} // R0");
             }
@@ -138,22 +138,22 @@ public class CodeGenerator {
             NodeMapping nodeMapping = editPath.getNodeMapping();
             codeOut.line("_absent_ = true");
             codeOut.start(nodeMapping);
-            toNodeMappingLoop(recDefNode, codeOut, nodeMapping, getLocalPath(nodeMapping), groovyParams, editPath);
+            toNodeMappingLoop(recDefNode, codeOut, nodeMapping, getLocalPath(nodeMapping), groovyParams);
             codeOut.end(nodeMapping);
-            addIfAbsentCode(recDefNode, codeOut, nodeMapping, groovyParams, editPath);
+            addIfAbsentCode(recDefNode, codeOut, nodeMapping, groovyParams);
         }
         else {
             for (NodeMapping nodeMapping : recDefNode.getNodeMappings().values()) {
                 codeOut.line("_absent_ = true");
                 codeOut.start(nodeMapping);
-                toNodeMappingLoop(recDefNode, codeOut, nodeMapping, getLocalPath(nodeMapping), groovyParams, editPath);
+                toNodeMappingLoop(recDefNode, codeOut, nodeMapping, getLocalPath(nodeMapping), groovyParams);
                 codeOut.end(nodeMapping);
-                addIfAbsentCode(recDefNode, codeOut, nodeMapping, groovyParams, editPath);
+                addIfAbsentCode(recDefNode, codeOut, nodeMapping, groovyParams);
             }
         }
     }
 
-    private void addIfAbsentCode(RecDefNode recDefNode, CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams, EditPath editPath) {
+    private void addIfAbsentCode(RecDefNode recDefNode, CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams) {
         List<String> groovyCode = nodeMapping.groovyCode;
         if (editPath != null) {
             if (!editPath.isGeneratedCode()) {
@@ -164,26 +164,26 @@ public class CodeGenerator {
         List<String> ifAbsentCode = StringUtil.getIfAbsentCode(groovyCode);
         if (ifAbsentCode != null) {
             codeOut.line_("if (_absent_) {");
-            startBuilderCall(recDefNode, codeOut, false, "R0a", groovyParams, editPath);
+            startBuilderCall(recDefNode, codeOut, false, "R0a", groovyParams);
             indentCode(ifAbsentCode, codeOut);
             codeOut._line("} // R0a");
             codeOut._line("}");
         }
     }
 
-    private void toNodeMappingLoop(RecDefNode recDefNode, CodeOut codeOut, NodeMapping nodeMapping, Path path, Stack<String> groovyParams, EditPath editPath) {
+    private void toNodeMappingLoop(RecDefNode recDefNode, CodeOut codeOut, NodeMapping nodeMapping, Path path, Stack<String> groovyParams) {
         if (path.isEmpty()) throw new RuntimeException("Empty path");
         if (path.size() == 1) {
             if (recDefNode.isLeafElem()) {
-                toLeafCode(recDefNode, codeOut, nodeMapping, groovyParams, editPath);
+                toLeafCode(recDefNode, codeOut, nodeMapping, groovyParams);
             }
             else {
-                toBranchCode(recDefNode, codeOut, groovyParams, editPath);
+                toBranchCode(recDefNode, codeOut, groovyParams);
             }
         }
         else if (nodeMapping.hasMap() && path.size() == 2) {
             if (groovyParams.contains(getMapName(nodeMapping))) {
-                toMapNodeMapping(recDefNode, codeOut, nodeMapping, groovyParams, editPath);
+                toMapNodeMapping(recDefNode, codeOut, nodeMapping, groovyParams);
             }
             else {
                 codeOut.line_(
@@ -191,7 +191,7 @@ public class CodeGenerator {
                         toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
                 );
                 groovyParams.push(getMapName(nodeMapping));
-                toMapNodeMapping(recDefNode, codeOut, nodeMapping, groovyParams, editPath);
+                toMapNodeMapping(recDefNode, codeOut, nodeMapping, groovyParams);
                 groovyParams.pop();
                 codeOut._line("} // R1");
             }
@@ -201,7 +201,7 @@ public class CodeGenerator {
             if (path.size() > 2 && operator != Operator.FIRST) operator = Operator.ALL;
             String param = toLoopGroovyParam(path);
             if (groovyParams.contains(param)) {
-                toNodeMappingLoop(recDefNode, codeOut, nodeMapping, path.withRootRemoved(), groovyParams, editPath);
+                toNodeMappingLoop(recDefNode, codeOut, nodeMapping, path.withRootRemoved(), groovyParams);
             }
             else {
                 codeOut.line_(
@@ -209,23 +209,23 @@ public class CodeGenerator {
                         toLoopRef(path), operator.getCodeString(), param
                 );
                 groovyParams.push(param);
-                toNodeMappingLoop(recDefNode, codeOut, nodeMapping, path.withRootRemoved(), groovyParams, editPath);
+                toNodeMappingLoop(recDefNode, codeOut, nodeMapping, path.withRootRemoved(), groovyParams);
                 groovyParams.pop();
                 codeOut._line("} // R6");
             }
         }
     }
 
-    private void toMapNodeMapping(RecDefNode recDefNode, CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams, EditPath editPath) {
+    private void toMapNodeMapping(RecDefNode recDefNode, CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams) {
         if (recDefNode.isLeafElem()) {
-            startBuilderCall(recDefNode, codeOut, true, "R3", groovyParams, editPath);
+            startBuilderCall(recDefNode, codeOut, true, "R3", groovyParams);
             codeOut.start(nodeMapping);
-            toLeafElementCode(nodeMapping, codeOut, groovyParams, editPath);
+            toLeafElementCode(nodeMapping, codeOut, groovyParams);
             codeOut.end(nodeMapping);
             codeOut._line("} // R3");
         }
         else {
-            startBuilderCall(recDefNode, codeOut, true, "R4", groovyParams, editPath);
+            startBuilderCall(recDefNode, codeOut, true, "R4", groovyParams);
             codeOut.start(nodeMapping);
             for (RecDefNode sub : recDefNode.getChildren()) {
                 if (sub.isAttr()) continue;
@@ -236,7 +236,7 @@ public class CodeGenerator {
                     );
                 }
                 else {
-                    toElementCode(sub, codeOut, groovyParams, editPath);
+                    toElementCode(sub, codeOut, groovyParams);
                 }
             }
             codeOut.end(nodeMapping);
@@ -244,8 +244,8 @@ public class CodeGenerator {
         }
     }
 
-    private void toBranchCode(RecDefNode recDefNode, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        startBuilderCall(recDefNode, codeOut, false, "R8", groovyParams, editPath);
+    private void toBranchCode(RecDefNode recDefNode, CodeOut codeOut, Stack<String> groovyParams) {
+        startBuilderCall(recDefNode, codeOut, false, "R8", groovyParams);
         for (RecDefNode sub : recDefNode.getChildren()) {
             if (sub.isAttr()) continue;
             if (sub.isChildOpt()) {
@@ -255,35 +255,35 @@ public class CodeGenerator {
                 );
             }
             else {
-                toElementCode(sub, codeOut, groovyParams, editPath);
+                toElementCode(sub, codeOut, groovyParams);
             }
         }
         codeOut._line("} // R8");
     }
 
-    private void toLeafCode(RecDefNode recDefNode, CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams, EditPath editPath) {
+    private void toLeafCode(RecDefNode recDefNode, CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams) {
         if (nodeMapping.hasMap()) {
             codeOut.line_(
                     "%s %s { %s -> // R10",
                     toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
             );
-            startBuilderCall(recDefNode, codeOut, true, "R11", groovyParams, editPath);
+            startBuilderCall(recDefNode, codeOut, true, "R11", groovyParams);
             codeOut.start(nodeMapping);
-            toLeafElementCode(nodeMapping, codeOut, groovyParams, editPath);
+            toLeafElementCode(nodeMapping, codeOut, groovyParams);
             codeOut.end(nodeMapping);
             codeOut._line("} // R11");
             codeOut._line("} // R10");
         }
         else {
-            startBuilderCall(recDefNode, codeOut, true, "R12", groovyParams, editPath);
+            startBuilderCall(recDefNode, codeOut, true, "R12", groovyParams);
             codeOut.start(nodeMapping);
-            toLeafElementCode(nodeMapping, codeOut, groovyParams, editPath);
+            toLeafElementCode(nodeMapping, codeOut, groovyParams);
             codeOut.end(nodeMapping);
             codeOut._line("} // R12");
         }
     }
 
-    private void startBuilderCall(RecDefNode recDefNode, CodeOut codeOut, boolean absentFalse, String comment, Stack<String> groovyParams, EditPath editPath) {
+    private void startBuilderCall(RecDefNode recDefNode, CodeOut codeOut, boolean absentFalse, String comment, Stack<String> groovyParams) {
         if (recDefNode.hasActiveAttributes()) {
             Tag tag = recDefNode.getTag();
             codeOut.line_(
@@ -317,7 +317,7 @@ public class CodeGenerator {
                         if (comma) codeOut.line(",");
                         codeOut.line_("%s : {", sub.getTag().toBuilderCall());
                         codeOut.start(nodeMapping);
-                        toAttributeCode(nodeMapping, codeOut, groovyParams, editPath);
+                        toAttributeCode(nodeMapping, codeOut, groovyParams);
                         codeOut.end(nodeMapping);
                         codeOut._line("}");
                         comma = true;
@@ -337,7 +337,7 @@ public class CodeGenerator {
         }
     }
 
-    private void toUserCode(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+    private void toUserCode(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams) {
         if (editPath != null) {
             if (!editPath.isGeneratedCode()) {
                 String editedCode = editPath.getEditedCode(nodeMapping.recDefNode.getPath());
@@ -351,7 +351,7 @@ public class CodeGenerator {
                 }
             }
         }
-        else if (nodeMapping.groovyCode != null) {
+        else if (nodeMapping.groovyCode != null && !onlyGeneratedCode) {
             indentCode(nodeMapping.groovyCode, codeOut);
             return;
         }
@@ -432,14 +432,14 @@ public class CodeGenerator {
         return String.format("_M%d", nodeMapping.inputPath.size());
     }
 
-    private void toAttributeCode(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+    private void toAttributeCode(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams) {
         if (!nodeMapping.recDefNode.isAttr()) return;
-        toUserCode(nodeMapping, codeOut, groovyParams, editPath);
+        toUserCode(nodeMapping, codeOut, groovyParams);
     }
 
-    private void toLeafElementCode(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
+    private void toLeafElementCode(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams) {
         if (nodeMapping.recDefNode.isAttr() || !nodeMapping.recDefNode.isLeafElem()) return;
-        toUserCode(nodeMapping, codeOut, groovyParams, editPath);
+        toUserCode(nodeMapping, codeOut, groovyParams);
     }
 
     private void toDictionaryCode(NodeMapping nodeMapping, CodeOut codeOut, Stack<String> groovyParams, OptRole optRole) {

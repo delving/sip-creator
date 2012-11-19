@@ -29,8 +29,7 @@ import java.util.*;
 
 import static eu.delving.metadata.NodeMappingChange.CODE;
 import static eu.delving.metadata.NodeMappingChange.DOCUMENTATION;
-import static eu.delving.metadata.StringUtil.linesToString;
-import static eu.delving.metadata.StringUtil.stringToLines;
+import static eu.delving.metadata.StringUtil.*;
 
 /**
  * This class describes how one node is transformed into another, which is part of mapping
@@ -74,6 +73,9 @@ public class NodeMapping {
     @XStreamOmitField
     private SortedSet sourceTreeNodes;
 
+    @XStreamOmitField
+    public List<String> generatedCode;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -86,6 +88,10 @@ public class NodeMapping {
     @Override
     public int hashCode() {
         return inputPath.hashCode() + outputPath.hashCode();
+    }
+
+    public String getCode() {
+        return groovyCode != null ? linesToString(groovyCode) : linesToString(generatedCode);
     }
 
     public String getDocumentation() {
@@ -189,50 +195,37 @@ public class NodeMapping {
     }
 
     public boolean codeLooksLike(String codeString) {
-        return groovyCode == null || isSimilar(codeString, groovyCode.iterator());
+        if (groovyCode != null) {
+            return isSimilarCode(codeString, groovyCode);
+        }
+        else {
+            return isSimilarCode(codeString, generatedCode);
+        }
     }
 
     public void revertToGenerated() {
-        setGroovyCode(null, null);
+        groovyCode = new ArrayList<String>();
+        groovyCode.addAll(generatedCode);
+        notifyChanged(CODE);
     }
 
-    private boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
-        if (codeString == null) return false;
-        List<String> list = Arrays.asList(new CodeGenerator(recMapping).toCode(getGeneratorEditPath()).split("\n"));
-        Iterator<String> walk = list.iterator();
-        return isSimilar(codeString, walk);
-    }
-
-    public void setGroovyCode(String codeString, RecMapping recMapping) {
-        if (codeString == null || generatedCodeLooksLike(codeString, recMapping)) {
+    public void setGroovyCode(String codeString) {
+        if (codeString != null) {
+            if (groovyCode == null || !isSimilarCode(codeString, groovyCode)) {
+                groovyCode = stringToLines(codeString);
+                notifyChanged(CODE);
+            }
+        }
+        else {
             if (groovyCode != null) {
                 groovyCode = null;
                 notifyChanged(CODE);
             }
         }
-        else if (groovyCode == null || !codeLooksLike(codeString)) {
-            groovyCode = stringToLines(codeString);
-            notifyChanged(CODE);
-        }
     }
 
     public boolean isUserCodeEditable() {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
-    }
-
-    private boolean isSimilar(String codeString, Iterator<String> walk) {
-        for (String line : codeString.split("\n")) {
-            line = line.trim();
-            if (line.isEmpty()) continue;
-            if (!walk.hasNext()) return false;
-            while (walk.hasNext()) {
-                String otherLine = walk.next().trim();
-                if (otherLine.isEmpty()) continue;
-                if (!otherLine.equals(line)) return false;
-                break;
-            }
-        }
-        return !walk.hasNext();
     }
 
     public String toString() {
@@ -250,10 +243,5 @@ public class NodeMapping {
         String wrap = groovyCode == null ? "p" : "b";
         return String.format("<html><%s>%s &rarr; %s</%s>", wrap, input, recDefNode.toString(), wrap);
     }
-
-    private EditPath getGeneratorEditPath() {
-        return new EditPath(this);
-    }
-
 }
 

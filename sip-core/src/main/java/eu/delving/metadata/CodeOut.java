@@ -21,6 +21,8 @@
 
 package eu.delving.metadata;
 
+import java.util.Stack;
+
 /**
  * Easy indenting output to a string builder, which has a special facility for collecting the code associated
  * with one particular node mapping, so that each can be edited individually
@@ -31,38 +33,24 @@ package eu.delving.metadata;
 public class CodeOut {
     private static final String INDENT = "   ";
     private int indentLevel;
-    private NodeMapping nodeMapping;
     private StringBuilder code = new StringBuilder();
-    private CodeOut nodeMappingCodeOut;
-    private String nodeMappingCode;
-
-    public static CodeOut create(NodeMapping nodeMapping) {
-        return new CodeOut(nodeMapping);
-    }
+    private Stack<Frame> stack = new Stack<Frame>();
 
     public static CodeOut create() {
-        return new CodeOut(null);
-    }
-
-    private CodeOut(NodeMapping nodeMapping) {
-        this.nodeMapping = nodeMapping;
+        return new CodeOut();
     }
 
     public void start(NodeMapping nodeMapping) {
-        if (this.nodeMapping == nodeMapping && nodeMappingCode == null) {
-            nodeMappingCodeOut = new CodeOut(null);
-        }
+        if (nodeMapping.generatedCode == null) stack.push(new Frame(nodeMapping));
     }
 
     public void end(NodeMapping nodeMapping) {
-        if (this.nodeMapping == nodeMapping && nodeMappingCodeOut != null) {
-            nodeMappingCode = nodeMappingCodeOut.toString();
-            nodeMappingCodeOut = null;
-        }
+        if (stack.isEmpty()) return;
+        if (stack.peek().nodeMapping == nodeMapping && nodeMapping.generatedCode == null) stack.pop().finish();
     }
 
     public CodeOut line(String string, Object... params) {
-        if (nodeMappingCodeOut != null) nodeMappingCodeOut.line(string, params);
+        for (Frame frame : stack) frame.codeOut.line(string, params);
         for (int walk = 0; walk < indentLevel; walk++) code.append(INDENT);
         if (params.length == 0) {
             code.append(string).append('\n');
@@ -82,23 +70,32 @@ public class CodeOut {
     }
 
     public CodeOut in() {
-        if (nodeMappingCodeOut != null) nodeMappingCodeOut.in();
+        for (Frame frame : stack) frame.codeOut.in();
         indentLevel++;
         return this;
     }
 
     public CodeOut out() {
-        if (nodeMappingCodeOut != null) nodeMappingCodeOut.out();
+        for (Frame frame : stack) frame.codeOut.out();
         indentLevel--;
         return this;
-    }
-
-    public String getNodeMappingCode() {
-        return nodeMappingCode;
     }
 
     @Override
     public String toString() {
         return code.toString();
+    }
+
+    private static class Frame {
+        private NodeMapping nodeMapping;
+        private CodeOut codeOut = new CodeOut();
+
+        private Frame(NodeMapping nodeMapping) {
+            this.nodeMapping = nodeMapping;
+        }
+
+        void finish() {
+            nodeMapping.generatedCode = StringUtil.stringToLines(codeOut.toString());
+        }
     }
 }

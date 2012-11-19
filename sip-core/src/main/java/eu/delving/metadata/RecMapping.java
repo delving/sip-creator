@@ -197,6 +197,7 @@ public class RecMapping {
                 }
             }
         }
+        new CodeGenerator(this).onlyGenerated().toString(); // set generatedCode in all NodeMapping instances
     }
 
     public static RecMapping create(RecDefTree recDefTree) throws MetadataException {
