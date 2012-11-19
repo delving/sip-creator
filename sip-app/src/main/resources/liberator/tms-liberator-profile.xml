@@ -1,0 +1,851 @@
+<delving-rdbms-profile>
+    <table name="Objects" parentTable="">
+        <column name="ObjectID" type="INTEGER"/>
+        <column name="ObjectNumber" type="CHAR"/>
+        <column name="SortNumber" type="CHAR"/>
+        <column name="ObjectCount" type="INTEGER"/>
+        <!--<column name="DepartmentID" type="INTEGER"/> not used-->
+        <column name="ObjectStatusID" type="INTEGER"/>
+        <column name="ClassificationID" type="INTEGER"/>
+        <column name="SubClassID" type="INTEGER"/>
+        <column name="Type" type="INTEGER"/>
+        <column name="LoanClassID" type="INTEGER"/>
+        <column name="DateBegin" type="INTEGER"/>
+        <column name="DateEnd" type="INTEGER"/>
+        <column name="ObjectName" type="VARCHAR"/>
+        <column name="Dated" type="VARCHAR"/>
+        <column name="Title" type="VARCHAR"/>
+        <column name="Medium" type="LONGVARCHAR"/>
+        <column name="Dimensions" type="LONGVARCHAR"/>
+        <column name="Signed" type="LONGVARCHAR"/>
+        <column name="Inscribed" type="LONGVARCHAR"/>
+        <column name="Markings" type="LONGVARCHAR"/>
+        <column name="CreditLine" type="LONGVARCHAR"/>
+        <column name="Chat" type="LONGVARCHAR"/>
+        <column name="DimensionRemarks" type="LONGVARCHAR"/>
+        <column name="Description" type="LONGVARCHAR"/>
+        <column name="Exhibitions" type="LONGVARCHAR"/>
+        <column name="Provenance" type="LONGVARCHAR"/>
+        <column name="PubReferences" type="LONGVARCHAR"/>
+        <column name="Notes" type="LONGVARCHAR"/>
+        <column name="CuratorialRemarks" type="LONGVARCHAR"/>
+        <column name="RelatedWorks" type="LONGVARCHAR"/>
+        <column name="Portfolio" type="LONGVARCHAR"/>
+        <column name="ObjectHeightCMOLD" type="DECIMAL"/>
+        <column name="ObjectWidthCMOLD" type="DECIMAL"/>
+        <column name="ObjectDepthCMOLD" type="DECIMAL"/>
+        <column name="ObjectDiameterCMOLD" type="DECIMAL"/>
+        <column name="ObjectWeightKGOLD" type="DECIMAL"/>
+        <column name="PublicAccess" type="SMALLINT"/>
+        <column name="CuratorApproved" type="SMALLINT"/>
+        <column name="OnView" type="SMALLINT"/>
+        <column name="TextSearchID" type="INTEGER"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="Accountability" type="SMALLINT"/>
+        <column name="PaperFileRef" type="VARCHAR"/>
+        <column name="ObjectLevelID" type="INTEGER"/>
+        <!--<column name="ObjectTypeID" type="INTEGER"/> not used-->
+        <column name="ObjectScreenID" type="INTEGER"/>
+        <column name="UserNumber1" type="VARCHAR"/>
+        <column name="UserNumber2" type="VARCHAR"/>
+        <column name="UserNumber3" type="VARCHAR"/>
+        <column name="UserNumber4" type="VARCHAR"/>
+        <!--<column name="ObjectNameID" type="INTEGER"/> not used-->
+        <!--<column name="ObjectNameAltID" type="INTEGER"/>-->
+        <column name="UserDate1" type="TIMESTAMP"/>
+        <column name="UserDate2" type="TIMESTAMP"/>
+        <column name="UserDate3" type="TIMESTAMP"/>
+        <column name="UserDate4" type="TIMESTAMP"/>
+        <column name="State" type="VARCHAR"/>
+        <column name="CatRais" type="VARCHAR"/>
+        <column name="HistAttributions" type="LONGVARCHAR"/>
+        <column name="Bibliography" type="LONGVARCHAR"/>
+        <column name="Negative" type="VARCHAR"/>
+        <column name="LoanClass" type="VARCHAR"/>
+        <column name="Edition" type="LONGVARCHAR"/>
+        <column name="Cataloguer" type="VARCHAR"/>
+        <column name="CatalogueDateOld" type="TIMESTAMP"/>
+        <column name="Curator" type="VARCHAR"/>
+        <column name="CuratorRevDateOld" type="TIMESTAMP"/>
+        <column name="PaperSupport" type="VARCHAR"/>
+        <column name="ObjectDiamCMOLD" type="DECIMAL"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="IsVirtual" type="TINYINT"/>
+        <column name="CatalogueISODate" type="VARCHAR"/>
+        <column name="CuratorRevISODate" type="VARCHAR"/>
+        <column name="IsTemplate" type="TINYINT"/>
+        <column name="ObjectNumber2" type="VARCHAR"/>
+    </table>
+    <table name="ObjContext" parentTable="Objects">
+        <column name="ObjContextID" type="INTEGER"/>
+        <column name="ObjectID" type="INTEGER" key="true"/>
+        <column name="Culture" type="VARCHAR"/>
+        <column name="Style" type="VARCHAR"/>
+        <column name="Reign" type="VARCHAR"/>
+        <column name="Dynasty" type="VARCHAR"/>
+        <column name="Period" type="VARCHAR"/>
+        <column name="Movement" type="VARCHAR"/>
+        <column name="Nationality" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="School" type="VARCHAR"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="ShortText1" type="VARCHAR"/>
+        <column name="ShortText2" type="VARCHAR"/>
+        <column name="ShortText3" type="VARCHAR"/>
+        <column name="ShortText4" type="VARCHAR"/>
+        <column name="LongText1" type="LONGVARCHAR"/>
+        <column name="LongText2" type="LONGVARCHAR"/>
+        <column name="LongText3" type="LONGVARCHAR"/>
+        <column name="LongText4" type="LONGVARCHAR"/>
+        <column name="LongText5" type="LONGVARCHAR"/>
+        <column name="LongText6" type="LONGVARCHAR"/>
+        <column name="N_Name" type="LONGNVARCHAR"/>
+        <column name="N_Title" type="LONGNVARCHAR"/>
+        <column name="N_Description" type="LONGNVARCHAR"/>
+        <column name="N_Signed" type="LONGNVARCHAR"/>
+        <column name="N_Markings" type="LONGNVARCHAR"/>
+        <column name="N_Inscription" type="LONGNVARCHAR"/>
+        <column name="N_Notes" type="LONGNVARCHAR"/>
+        <column name="N_CuratorRemarks" type="LONGNVARCHAR"/>
+        <column name="Flag1" type="TINYINT"/>
+        <column name="Flag2" type="TINYINT"/>
+        <column name="Flag3" type="TINYINT"/>
+        <column name="Flag4" type="TINYINT"/>
+        <column name="Flag5" type="TINYINT"/>
+        <column name="Flag6" type="TINYINT"/>
+        <column name="Flag7" type="TINYINT"/>
+        <column name="Flag8" type="TINYINT"/>
+        <column name="Flag9" type="TINYINT"/>
+        <column name="Flag10" type="TINYINT"/>
+        <column name="ISODate1" type="VARCHAR"/>
+        <column name="ISODate2" type="VARCHAR"/>
+        <column name="ISODate3" type="VARCHAR"/>
+        <column name="ISODate4" type="VARCHAR"/>
+        <column name="ISODate5" type="VARCHAR"/>
+        <column name="ISODate6" type="VARCHAR"/>
+        <column name="ISODate7" type="VARCHAR"/>
+        <column name="ISODate8" type="VARCHAR"/>
+        <column name="ISODate9" type="VARCHAR"/>
+        <column name="ISODate10" type="VARCHAR"/>
+        <column name="Integer1" type="INTEGER"/>
+        <column name="Integer2" type="INTEGER"/>
+        <column name="Integer3" type="INTEGER"/>
+        <column name="Integer4" type="INTEGER"/>
+        <column name="Flag11" type="TINYINT"/>
+        <column name="Flag12" type="TINYINT"/>
+        <column name="Flag13" type="TINYINT"/>
+        <column name="Flag14" type="TINYINT"/>
+        <column name="Flag15" type="TINYINT"/>
+        <column name="Flag16" type="TINYINT"/>
+        <column name="Flag17" type="TINYINT"/>
+        <column name="Flag18" type="TINYINT"/>
+        <column name="Flag19" type="TINYINT"/>
+        <column name="Flag20" type="TINYINT"/>
+        <column name="LongText7" type="LONGVARCHAR"/>
+        <column name="LongText8" type="LONGVARCHAR"/>
+        <column name="LongText9" type="LONGVARCHAR"/>
+        <column name="LongText10" type="LONGVARCHAR"/>
+        <column name="ShortText5" type="VARCHAR"/>
+        <column name="ShortText6" type="VARCHAR"/>
+        <column name="ShortText7" type="VARCHAR"/>
+        <column name="ShortText8" type="VARCHAR"/>
+        <column name="ShortText9" type="VARCHAR"/>
+        <column name="ShortText10" type="VARCHAR"/>
+    </table>
+    <table name="ObjectLevels" parentTable="Objects" cached="true">
+        <column name="ObjectLevelID" type="INTEGER" key="true"/>
+        <column name="ObjectLevel" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="ObjectStatuses" parentTable="Objects" cached="true">
+        <column name="ObjectStatusID" type="INTEGER" key="true"/>
+        <column name="ObjectStatus" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="Classifications" parentTable="Objects" cached="true">
+        <column name="ClassificationID" type="INTEGER" key="true"/>
+        <column name="Classification" type="VARCHAR"/>
+        <column name="AATID" type="INTEGER"/>
+        <column name="AATCN" type="VARCHAR"/>
+        <column name="SourceID" type="INTEGER"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="SubClassification" type="VARCHAR"/>
+        <column name="SubClassification2" type="VARCHAR"/>
+        <column name="SubClassification3" type="VARCHAR"/>
+    </table>
+    <table name="StatusFlags" parentTable="Objects">
+        <column name="StatusFlagID" type="INTEGER"/>
+        <column name="ObjectID" type="INTEGER" key="true"/>
+        <column name="FlagID" type="INTEGER"/>
+        <column name="OnOff" type="SMALLINT"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="ObjTitles" parentTable="Objects">
+        <column name="TitleID" type="INTEGER"/>
+        <column name="ObjectID" type="INTEGER" key="true"/>
+        <column name="TitleTypeID" type="INTEGER"/>
+        <column name="Title" type="VARCHAR"/>
+        <column name="Remarks" type="VARCHAR"/>
+        <column name="Active" type="SMALLINT"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="DisplayOrder" type="SMALLINT"/>
+        <column name="Displayed" type="TINYINT"/>
+        <column name="LanguageID" type="INTEGER"/>
+    </table>
+    <table name="Languages" parentTable="ObjTitles" cached="true">
+        <column name="LanguageID" type="INTEGER" key="true"/>
+        <column name="Language" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="ObjPkgList" parentTable="Objects">
+        <column name="ObjPkgListID" type="INTEGER"/>
+        <column name="ObjectPackageID" type="INTEGER"/>
+        <column name="ObjectID" type="INTEGER" key="true"/>
+        <column name="ObjectNumber" type="CHAR"/>
+        <column name="OrderPos" type="INTEGER"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="Notes" type="VARCHAR"/>
+    </table>
+    <table name="ObjectPackages" parentTable="ObjPkgList" cached="true">
+        <column name="ObjectPackageID" type="INTEGER" key="True"/>
+        <column name="Name" type="VARCHAR"/>
+        <column name="Notes" type="VARCHAR"/>
+        <column name="Owner" type="VARCHAR"/>
+        <column name="ObjPkgType" type="SMALLINT"/>
+        <column name="Global" type="SMALLINT"/>
+        <column name="Locked" type="SMALLINT"/>
+        <column name="BitmapName" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="PublicAccess" type="SMALLINT"/>
+        <column name="MoveAssistant" type="SMALLINT"/>
+    </table>
+    <table name="ObjAccession" parentTable="Objects">
+        <column name="ObjectID" type="INTEGER" key="true"/>
+        <column name="AcquisitionLot" type="VARCHAR"/>
+        <column name="AcquisitionNumber" type="VARCHAR"/>
+        <column name="AccessionMethodID" type="INTEGER"/>
+        <column name="AccessionValue" type="DECIMAL"/>
+        <column name="CurrencyAmount" type="DECIMAL"/>
+        <column name="CurrencyID" type="INTEGER"/>
+        <column name="CurrencyRate" type="DECIMAL"/>
+        <column name="LocalAmount" type="DECIMAL"/>
+        <column name="Initiator" type="VARCHAR"/>
+        <column name="InitDate" type="TIMESTAMP"/>
+        <column name="Authorizer" type="VARCHAR"/>
+        <column name="AuthDate" type="TIMESTAMP"/>
+        <column name="AccessionMinutes1" type="TIMESTAMP"/>
+        <column name="AccessionMinutes2" type="TIMESTAMP"/>
+        <column name="AccessionDateOLD" type="TIMESTAMP"/>
+        <column name="DeedOfGiftSentOld" type="TIMESTAMP"/>
+        <column name="DeedOfGiftReceivedOld" type="TIMESTAMP"/>
+        <column name="AcqJustification" type="LONGVARCHAR"/>
+        <column name="AcquisitionTerms" type="LONGVARCHAR"/>
+        <column name="ValuationNotes" type="LONGVARCHAR"/>
+        <column name="Source" type="LONGVARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="Budget" type="DECIMAL"/>
+        <column name="OriginalEntityID" type="INTEGER"/>
+        <column name="CurrentEntityID" type="INTEGER"/>
+        <column name="CapitalProgram" type="VARCHAR"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="ApprovalISODate1" type="VARCHAR"/>
+        <column name="ApprovalISODate2" type="VARCHAR"/>
+        <column name="AccessionISODate" type="VARCHAR"/>
+        <column name="DeedOfGiftSentISO" type="VARCHAR"/>
+    </table>
+    <table name="AccessionMethods" parentTable="ObjAccession" cached="true">
+        <column name="AccessionMethodID" type="INTEGER" key="true"/>
+        <column name="AccessionMethod" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="Currencies" parentTable="ObjAccession" cached="true">
+        <column name="CurrencyID" type="INTEGER" key="true"/>
+        <column name="Currency" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="LocaleID" type="INTEGER"/>
+        <column name="CurrencyCode" type="VARCHAR"/>
+        <column name="IsEuro" type="BIT"/>
+    </table>
+    <table name="ObjComponents" parentTable="Objects">
+        <column name="ComponentID" type="INTEGER"/>
+        <column name="ComponentNumber" type="VARCHAR"/>
+        <column name="ComponentName" type="VARCHAR"/>
+        <column name="ObjectID" type="INTEGER" key="true"/>
+        <column name="StorageMethodID" type="INTEGER"/>
+        <column name="StorageFormatID" type="INTEGER"/>
+        <column name="HeightCMOLD" type="NUMERIC"/>
+        <column name="WidthCMOLD" type="NUMERIC"/>
+        <column name="DepthCMOLD" type="NUMERIC"/>
+        <column name="WeightKGOLD" type="NUMERIC"/>
+        <column name="StorageHeightCMOLD" type="NUMERIC"/>
+        <column name="StorageWidthCMOLD" type="NUMERIC"/>
+        <column name="StorageDepthCMOLD" type="NUMERIC"/>
+        <column name="HomeLocationID" type="INTEGER"/>
+        <column name="HomeLevel" type="SMALLINT"/>
+        <column name="SearchHomeContainer" type="VARCHAR"/>
+        <column name="CurrentObjLocID" type="INTEGER"/>
+        <column name="ToBeCombined" type="SMALLINT"/>
+        <column name="ReadyStorage" type="SMALLINT"/>
+        <column name="ReadyExhibit" type="SMALLINT"/>
+        <column name="StorageComments" type="LONGVARCHAR"/>
+        <column name="InstallComments" type="LONGVARCHAR"/>
+        <column name="PrepComments" type="LONGVARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="PhysDesc" type="VARCHAR"/>
+        <column name="ComponentType" type="TINYINT"/>
+        <column name="ObjCompStatusID" type="INTEGER"/>
+        <column name="CostMethodID" type="INTEGER"/>
+        <column name="SortNumber" type="CHAR"/>
+        <column name="CompCount" type="INTEGER"/>
+        <column name="ReceivedDate" type="TIMESTAMP"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="Inactive" type="TINYINT"/>
+        <column name="HomeCrateID" type="INTEGER"/>
+    </table>
+    <table name="CostMethods" parentTable="ObjComponents" cached="true">
+        <column name="CostMethodID" type="INTEGER" key="true"/>
+        <column name="CostMethod" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="DefaultAccountID" type="INTEGER"/>
+        <column name="Mnemonic" type="VARCHAR"/>
+    </table>
+    <table name="Locations" parentTable="ObjComponents">
+        <column name="LocationID" type="INTEGER" key="true" linkColumn="HomeLocationID"/>
+        <column name="UnitType" type="VARCHAR"/>
+        <column name="UnitSizeCode" type="VARCHAR"/>
+        <column name="UnitNumberOld" type="SMALLINT"/>
+        <column name="UnitMaxLevels" type="SMALLINT"/>
+        <column name="UnitConfig" type="VARCHAR"/>
+        <column name="UnitHeightCM" type="NUMERIC"/>
+        <column name="UnitWidthCM" type="NUMERIC"/>
+        <column name="UnitDepthCM" type="NUMERIC"/>
+        <column name="SecurityCode" type="SMALLINT"/>
+        <column name="BitmapName" type="VARCHAR"/>
+        <column name="XCoord" type="SMALLINT"/>
+        <column name="YCoord" type="SMALLINT"/>
+        <column name="Description" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="Site" type="VARCHAR"/>
+        <column name="Room" type="VARCHAR"/>
+        <column name="Active" type="TINYINT"/>
+        <column name="UnitPosition" type="VARCHAR"/>
+        <column name="PublicAccess" type="TINYINT"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="UnitNumber" type="VARCHAR"/>
+    </table>
+    <table name="ObjLocations" parentTable="ObjComponents">
+        <column name="ObjLocationID" type="INTEGER"/>
+        <column name="ComponentID" type="INTEGER" key="true"/>
+        <column name="LocationID" type="INTEGER"/>
+        <column name="LocLevel" type="SMALLINT"/>
+        <column name="SearchContainer" type="VARCHAR"/>
+        <column name="TransCodeID" type="INTEGER"/>
+        <column name="TransDate" type="TIMESTAMP"/>
+        <column name="TransStatusID" type="INTEGER"/>
+        <column name="Handler" type="VARCHAR"/>
+        <column name="LocPurposeID" type="INTEGER"/>
+        <column name="TempFlag" type="SMALLINT"/>
+        <column name="TempText" type="VARCHAR"/>
+        <column name="TempTicklerDate" type="TIMESTAMP"/>
+        <column name="RequestedBy" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="Approver" type="VARCHAR"/>
+        <column name="DateOut" type="TIMESTAMP"/>
+        <column name="PrevObjLocID" type="INTEGER"/>
+        <column name="NextObjLocID" type="INTEGER"/>
+        <column name="SchedObjLocID" type="INTEGER"/>
+        <column name="ShipmentID" type="INTEGER"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="AnticipEndDate" type="VARCHAR"/>
+        <column name="Inactive" type="BIT"/>
+        <column name="CrateID" type="INTEGER"/>
+    </table>
+    <table name="ObjPrep" parentTable="ObjComponents">
+        <column name="ObjPrepID" type="INTEGER"/>
+        <column name="ComponentID" type="INTEGER" key="true"/>
+        <column name="ReceivedDate" type="TIMESTAMP"/>
+        <column name="ReceivedBy" type="VARCHAR"/>
+        <column name="Curator" type="VARCHAR"/>
+        <column name="SendingDeptID" type="INTEGER"/>
+        <column name="ObjectGroupID" type="INTEGER"/>
+        <column name="GroupTypeID" type="INTEGER"/>
+        <column name="GroupTypePlace" type="VARCHAR"/>
+        <column name="RTCGrouping" type="VARCHAR"/>
+        <column name="LotNumber" type="VARCHAR"/>
+        <column name="PackageNumber" type="VARCHAR"/>
+        <column name="BoxNumber" type="VARCHAR"/>
+        <column name="MountWith" type="VARCHAR"/>
+        <column name="MountWithComments" type="VARCHAR"/>
+        <column name="StoragePrepPerm" type="SMALLINT"/>
+        <column name="Fumigation" type="SMALLINT"/>
+        <column name="FumigationComments" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+
+    <!-- a link table between Objects and Constituents-->
+    <table name="ConXrefs" parentTable="Objects">
+        <column name="ConXrefID" type="INTEGER"/>
+        <column name="ID" type="INTEGER" key="true" linkColumn="ObjectID"/>
+        <column name="ConstituentID" type="INTEGER"/>
+        <column name="RoleID" type="INTEGER"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="DateBegin" type="INTEGER"/>
+        <column name="DateEnd" type="INTEGER"/>
+        <column name="Remarks" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="ConStatement" type="LONGVARCHAR"/>
+        <column name="DisplayOrder" type="TINYINT"/>
+        <column name="Displayed" type="TINYINT"/>
+        <column name="Active" type="TINYINT"/>
+        <column name="Prefix" type="VARCHAR"/>
+        <column name="Suffix" type="VARCHAR"/>
+        <column name="Amount" type="VARCHAR"/>
+        <column name="DisplayDate" type="VARCHAR"/>
+    </table>
+    <table name="Constituents" parentTable="ConXrefs">
+        <column name="ConstituentID" type="INTEGER" key="true"/>
+        <column name="ConstituentTypeID" type="INTEGER"/>
+        <column name="Active" type="SMALLINT"/>
+        <column name="AlphaSort" type="VARCHAR"/>
+        <column name="LastName" type="VARCHAR"/>
+        <column name="FirstName" type="VARCHAR"/>
+        <column name="NameTitle" type="VARCHAR"/>
+        <column name="Institution" type="VARCHAR"/>
+        <column name="LastSoundEx" type="CHAR"/>
+        <column name="FirstSoundEx" type="CHAR"/>
+        <column name="InstitutionSoundEx" type="CHAR"/>
+        <column name="DisplayName" type="VARCHAR"/>
+        <column name="BeginDate" type="INTEGER"/>
+        <column name="EndDate" type="INTEGER"/>
+        <column name="DisplayDate" type="VARCHAR"/>
+        <column name="Biography" type="LONGVARCHAR"/>
+        <column name="Code" type="VARCHAR"/>
+        <column name="Nationality" type="VARCHAR"/>
+        <column name="School" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="PublicAccess" type="SMALLINT"/>
+        <column name="Remarks" type="LONGVARCHAR"/>
+        <column name="Position" type="VARCHAR"/>
+        <column name="MiddleName" type="VARCHAR"/>
+        <column name="Suffix" type="VARCHAR"/>
+        <column name="CultureGroup" type="VARCHAR"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="N_DisplayName" type="LONGNVARCHAR"/>
+        <column name="N_DisplayDate" type="LONGNVARCHAR"/>
+    </table>
+    <table name="ConTypes" parentTable="Constituents" cached="true">
+        <column name="ConstituentTypeID" type="INTEGER" key="true"/>
+        <column name="ConstituentType" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="ConAddress" parentTable="Constituents">
+        <column name="ConAddressID" type="INTEGER"/>
+        <column name="ConstituentID" type="INTEGER" key="true"/>
+        <column name="StreetLine1" type="VARCHAR"/>
+        <column name="StreetLine2" type="VARCHAR"/>
+        <column name="StreetLine3" type="VARCHAR"/>
+        <column name="City" type="VARCHAR"/>
+        <column name="State" type="VARCHAR"/>
+        <column name="ZipCode" type="VARCHAR"/>
+        <column name="CountryOld" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="Active" type="SMALLINT"/>
+        <column name="AddressTypeID" type="INTEGER"/>
+        <column name="DefaultShipping" type="TINYINT"/>
+        <column name="DefaultBilling" type="TINYINT"/>
+        <column name="DefaultMailing" type="TINYINT"/>
+        <column name="DisplayName1" type="VARCHAR"/>
+        <column name="DisplayName2" type="VARCHAR"/>
+        <column name="BeginDate" type="VARCHAR"/>
+        <column name="EndDate" type="VARCHAR"/>
+        <column name="Rank" type="TINYINT"/>
+        <column name="Remarks" type="VARCHAR"/>
+        <column name="LastSalesTaxID" type="INTEGER"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+        <column name="CountryID" type="INTEGER"/>
+        <column name="AddressFormatID" type="INTEGER"/>
+    </table>
+
+    <table name="MediaXrefs" parentTable="Objects">
+        <column name="MediaXrefID" type="INTEGER"/>
+        <column name="MediaMasterID" type="INTEGER"/>
+        <column name="ID" type="INTEGER" key="true" linkColumn="ObjectID"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="Rank" type="INTEGER"/>
+        <column name="PrimaryDisplay" type="SMALLINT"/>
+        <column name="Remarks" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="MediaMaster" parentTable="MediaXrefs">
+        <column name="MediaMasterID" type="INTEGER" key="true"/>
+        <column name="DisplayRendID" type="INTEGER"/>
+        <column name="PrimaryRendID" type="INTEGER"/>
+        <column name="MediaView" type="VARCHAR"/>
+        <column name="Description" type="LONGVARCHAR"/>
+        <column name="PublicAccess" type="SMALLINT"/>
+        <column name="PublicCaption" type="LONGVARCHAR"/>
+        <column name="Remarks" type="LONGVARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="Copyright" type="VARCHAR"/>
+        <column name="Restrictions" type="VARCHAR"/>
+        <column name="AgreementSignedDate" type="VARCHAR"/>
+    </table>
+    <table name="MediaRenditions" parentTable="MediaMaster">
+        <column name="RenditionID" type="INTEGER"/>
+        <column name="MediaMasterID" type="INTEGER" key="true"/>
+        <column name="PrimaryFileID" type="INTEGER"/>
+        <column name="ParentRendID" type="INTEGER"/>
+        <column name="MediaTypeID" type="INTEGER"/>
+        <column name="MediaStatusID" type="INTEGER"/>
+        <column name="MediaStatusDate" type="VARCHAR"/>
+        <column name="RenditionNumber" type="VARCHAR"/>
+        <column name="SortNumber" type="VARCHAR"/>
+        <column name="RenditionDate" type="VARCHAR"/>
+        <column name="MediaSizeID" type="INTEGER"/>
+        <column name="Technique" type="VARCHAR"/>
+        <column name="Duration" type="INTEGER"/>
+        <column name="IsColor" type="TINYINT"/>
+        <column name="Quality" type="VARCHAR"/>
+        <column name="QualityDate" type="VARCHAR"/>
+        <column name="QualityConID" type="INTEGER"/>
+        <column name="Remarks" type="LONGVARCHAR"/>
+        <!--<column name="ThumbBLOB" type="LONGVARBINARY"/> todo: this is an interesting one!-->
+        <column name="ThumbPathID" type="INTEGER"/>
+        <column name="ThumbFileName" type="VARCHAR"/>
+        <column name="ThumbExtensionID" type="INTEGER"/>
+        <column name="ThumbBlobSize" type="INTEGER"/>
+        <column name="LocTermID" type="INTEGER"/>
+        <column name="QuantityMade" type="INTEGER"/>
+        <column name="QuantityAvailable" type="INTEGER"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="MediaFiles" parentTable="MediaRenditions">
+        <column name="FileID" type="INTEGER"/>
+        <column name="RenditionID" type="INTEGER" key="true"/>
+        <column name="PathID" type="INTEGER"/>
+        <column name="FileName" type="VARCHAR"/>
+        <column name="FormatID" type="INTEGER"/>
+        <column name="PixelH" type="INTEGER"/>
+        <column name="PixelW" type="INTEGER"/>
+        <column name="ColorDepthID" type="INTEGER"/>
+        <column name="Duration" type="INTEGER"/>
+        <column name="FileSize" type="INTEGER"/>
+        <column name="MemorySize" type="INTEGER"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="FileDate" type="TIMESTAMP"/>
+        <column name="ArchTypeID" type="INTEGER"/>
+        <column name="ArchIDNum" type="VARCHAR"/>
+        <column name="ArchCatNum" type="VARCHAR"/>
+        <column name="ArchVolName" type="VARCHAR"/>
+        <column name="ArchSubDir" type="VARCHAR"/>
+    </table>
+    <table name="MediaFormats" parentTable="MediaFiles" cached="true">
+        <column name="FormatID" type="INTEGER" key="true"/>
+        <column name="MediaTypeID" type="INTEGER"/>
+        <column name="Format" type="VARCHAR"/>
+        <column name="ViewerID" type="TINYINT"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="MediaExtensions" parentTable="MediaFormats" cached="true">
+        <column name="ExtensionID" type="INTEGER"/>
+        <column name="FormatID" type="INTEGER" key="true"/>
+        <column name="Extension" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="MediaColorDepths" parentTable="MediaFiles" cached="true">
+        <column name="ColorDepthID" type="INTEGER" key="true"/>
+        <column name="ColorDepth" type="VARCHAR"/>
+        <column name="NumberOfBits" type="SMALLINT"/>
+        <column name="IsColor" type="BIT"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="MediaTypes" parentTable="MediaFormats" cached="true">
+        <column name="MediaTypeID" type="INTEGER" key="true"/>
+        <column name="MediaType" type="VARCHAR"/>
+        <column name="IsDigital" type="BIT"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+
+    <!--============================================================================-->
+
+    <table name="AltNums">
+        <column name="AltNumID" type="INTEGER"/>
+        <column name="ID" type="INTEGER"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="AltNum" type="VARCHAR"/>
+        <column name="Description" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="Associations">
+        <column name="AssociationID" type="INTEGER"/>
+        <column name="ID1" type="INTEGER"/>
+        <column name="ID2" type="INTEGER"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="RelationshipID" type="INTEGER"/>
+        <column name="Remarks" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="DisplayDate" type="VARCHAR"/>
+        <column name="DateBegin" type="INTEGER"/>
+        <column name="DateEnd" type="INTEGER"/>
+    </table>
+    <table name="DefaultSorts">
+        <column name="DefaultSortID" type="INTEGER"/>
+        <column name="ModuleID" type="INTEGER"/>
+        <column name="HierarchyID" type="INTEGER"/>
+        <column name="ColumnID" type="INTEGER"/>
+        <column name="Ascending" type="BIT"/>
+        <column name="Rank" type="SMALLINT"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="DimElemTypeXrefs">
+        <column name="DimElemTypeXrefID" type="INTEGER"/>
+        <column name="ElementID" type="INTEGER"/>
+        <column name="DimensionTypeID" type="INTEGER"/>
+        <column name="PrimaryUnitID" type="INTEGER"/>
+        <column name="SecondaryUnitID" type="INTEGER"/>
+        <column name="Displayed" type="BIT"/>
+        <column name="Rank" type="TINYINT"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="DimensionElements">
+        <column name="ElementID" type="INTEGER"/>
+        <column name="Element" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="Displayed" type="TINYINT"/>
+        <column name="ShowElementName" type="TINYINT"/>
+        <column name="ShowDescription" type="TINYINT"/>
+        <column name="Position" type="SMALLINT"/>
+    </table>
+    <table name="DimensionMethods">
+        <column name="MethodID" type="INTEGER"/>
+        <column name="Method" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="Dimensions">
+        <column name="DimensionID" type="INTEGER"/>
+        <column name="DimItemElemXrefID" type="INTEGER"/>
+        <column name="DimensionTypeID" type="INTEGER"/>
+        <column name="PrimaryUnitID" type="INTEGER"/>
+        <column name="SecondaryUnitID" type="INTEGER"/>
+        <column name="Dimension" type="DECIMAL"/>
+        <column name="Displayed" type="BIT"/>
+        <column name="Rank" type="TINYINT"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="DimensionTypes">
+        <column name="DimensionTypeID" type="INTEGER"/>
+        <column name="DimensionType" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="UnitTypeID" type="TINYINT"/>
+        <column name="PrimaryUnitID" type="INTEGER"/>
+        <column name="SecondaryUnitID" type="INTEGER"/>
+        <column name="System" type="TINYINT"/>
+    </table>
+    <table name="DimensionUnits">
+        <column name="UnitID" type="INTEGER"/>
+        <column name="UnitName" type="VARCHAR"/>
+        <column name="ConversionFactor" type="DECIMAL"/>
+        <column name="UnitTypeID" type="TINYINT"/>
+        <column name="UnitLabelAtEnd" type="BIT"/>
+        <column name="IsFractional" type="BIT"/>
+        <column name="BaseDenominator" type="TINYINT"/>
+        <column name="DecimalPlaces" type="TINYINT"/>
+        <column name="UnitCutoff" type="SMALLINT"/>
+        <column name="UnitsPerSuperUnit" type="SMALLINT"/>
+        <column name="UnitLabel" type="VARCHAR"/>
+        <column name="SuperUnitLabel" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="DimUnitTypes">
+        <column name="UnitTypeID" type="INTEGER"/>
+        <column name="UnitType" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="DispositionMethods">
+        <column name="DispMethodID" type="INTEGER"/>
+        <column name="DispositionMethod" type="VARCHAR"/>
+        <column name="LoginId" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="Entities">
+        <column name="EntityID" type="INTEGER"/>
+        <column name="EntityName" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="GeoCodes">
+        <column name="GeoCodeID" type="INTEGER"/>
+        <column name="GeoCode" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="RefFormats">
+        <column name="FormatID" type="INTEGER"/>
+        <column name="Format" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="Relationships">
+        <column name="RelationshipID" type="INTEGER"/>
+        <column name="Relation1" type="VARCHAR"/>
+        <column name="Relation2" type="VARCHAR"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="Description" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="RelationshipTypeID" type="TINYINT"/>
+        <column name="Relation1Plural" type="VARCHAR"/>
+        <column name="Relation2Plural" type="VARCHAR"/>
+        <column name="Rel1Prep" type="VARCHAR"/>
+        <column name="Rel1PluralPrep" type="VARCHAR"/>
+        <column name="Rel2Prep" type="VARCHAR"/>
+    </table>
+    <table name="Roles">
+        <column name="RoleID" type="INTEGER"/>
+        <column name="RoleTypeID" type="INTEGER"/>
+        <column name="Role" type="VARCHAR"/>
+        <column name="Prepositional" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="RoleTypes">
+        <column name="RoleTypeID" type="INTEGER"/>
+        <column name="RoleType" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="DefaultRoleID" type="INTEGER"/>
+    </table>
+    <table name="StopWords">
+        <column name="StopWordID" type="INTEGER"/>
+        <column name="StopWord" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="StorageFormats">
+        <column name="StorageFormatID" type="INTEGER"/>
+        <column name="StorageFormat" type="VARCHAR"/>
+        <column name="BitmapName" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="StorageMethods">
+        <column name="StorageMethodID" type="INTEGER"/>
+        <column name="StorageMethod" type="VARCHAR"/>
+        <column name="BitmapName" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="SurveyAttrTypes">
+        <column name="AttributeTypeID" type="INTEGER"/>
+        <column name="AttributeType" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="SurveyTypes">
+        <column name="SurveyTypeID" type="INTEGER"/>
+        <column name="SurveyType" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="TermSearch">
+        <column name="TermSearchID" type="INTEGER"/>
+        <column name="ColumnID" type="INTEGER"/>
+        <column name="ID" type="INTEGER"/>
+        <column name="KeyWord" type="VARCHAR"/>
+        <column name="KeySoundEx" type="CHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="SysTimeStamp" type="BINARY"/>
+    </table>
+    <table name="TextEntries">
+        <column name="TextEntryID" type="INTEGER"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="ID" type="INTEGER"/>
+        <column name="TextTypeID" type="INTEGER"/>
+        <column name="TextStatusID" type="INTEGER"/>
+        <column name="Purpose" type="VARCHAR"/>
+        <column name="TextEntry" type="LONGVARCHAR"/>
+        <column name="TextDate" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="TextStatuses">
+        <column name="TextStatusID" type="INTEGER"/>
+        <column name="TextStatus" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="TextTypes">
+        <column name="TextTypeID" type="INTEGER"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="TextType" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="ThesXrefs">
+        <column name="ThesXrefID" type="INTEGER"/>
+        <column name="ThesXrefTypeID" type="INTEGER"/>
+        <column name="ID" type="INTEGER"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="TermID" type="INTEGER"/>
+        <column name="ThesXrefTableID" type="INTEGER"/>
+        <column name="DisplayOrder" type="INTEGER"/>
+        <column name="Remarks" type="VARCHAR"/>
+        <column name="Active" type="BIT"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+        <column name="RemovedLoginID" type="VARCHAR"/>
+    </table>
+    <table name="ThesXrefTypes">
+        <column name="ThesXrefTypeID" type="INTEGER"/>
+        <column name="ThesXrefType" type="VARCHAR"/>
+        <column name="TableID" type="INTEGER"/>
+        <column name="ThesXrefTableID" type="INTEGER"/>
+        <column name="MultiSelect" type="BIT"/>
+        <column name="ArchiveDeletes" type="BIT"/>
+        <column name="TermMasterID" type="INTEGER"/>
+        <column name="ShowGuideTerms" type="BIT"/>
+        <column name="BroadestTermFirst" type="BIT"/>
+        <column name="NumLevels" type="SMALLINT"/>
+        <column name="LoginID" type="VARCHAR"/>
+    </table>
+    <table name="TitleTypes">
+        <column name="TitleTypeID" type="INTEGER"/>
+        <column name="TitleType" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+    <table name="TMSGroups">
+        <column name="GroupID" type="INTEGER"/>
+        <column name="GroupName" type="VARCHAR"/>
+        <column name="Remarks" type="VARCHAR"/>
+        <column name="LoginID" type="VARCHAR"/>
+        <column name="EnteredDate" type="TIMESTAMP"/>
+    </table>
+</delving-rdbms-profile>
