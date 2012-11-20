@@ -31,7 +31,11 @@ import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.net.URL;
+
+import static javax.swing.Action.*;
+import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
 /**
  * Gathering together a number of things that are done with the Swing library from many parts of the code.
@@ -69,6 +73,64 @@ public class SwingHelper {
     public static final Icon ICON_HUH = icon("huh");
     public static final Icon ICON_FETCH_LIST = icon("fetch-list");
     public static final Icon ICON_EDIT = icon("edit");
+
+    public static final KeyStroke SPACE = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
+    public static final KeyStroke MENU_G = menuKeystroke(KeyEvent.VK_G);
+    public static final KeyStroke MENU_E = menuKeystroke(KeyEvent.VK_E);
+    public static final KeyStroke MENU_H = menuKeystroke(KeyEvent.VK_H);
+    public static final KeyStroke MENU_I = menuKeystroke(KeyEvent.VK_I);
+    public static final KeyStroke MENU_S = menuKeystroke(KeyEvent.VK_S);
+    public static final KeyStroke MENU_U = menuKeystroke(KeyEvent.VK_U);
+    public static final KeyStroke MENU_Z = menuKeystroke(KeyEvent.VK_Z);
+    public static final KeyStroke SH_MENU_Z = menuShiftKeystroke(KeyEvent.VK_Z);
+    public static KeyStroke menuDigit(int digit) {
+        if (digit < 0 || digit > 9) throw new IllegalArgumentException("Not a digit: "+digit);
+        return menuKeystroke(KeyEvent.VK_0 + digit);
+    }
+
+    public static void configAction(Action action, String text, Icon icon, KeyStroke keyStroke) {
+        action.putValue(NAME, text);
+        action.putValue(SMALL_ICON, icon);
+        action.putValue(ACCELERATOR_KEY, keyStroke);
+    }
+
+    public static void attachAccelerator(Action action, JFrame frame) {
+        KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        String name = (String) action.getValue(Action.NAME);
+        JComponent component = (JComponent) frame.getContentPane();
+        component.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(stroke, name);
+        component.getActionMap().put(name, action);
+        addStrokeToName(action);
+    }
+
+    public static void attachAccelerator(Action action, JComponent component) {
+        KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        String name = (String) action.getValue(Action.NAME);
+        component.getInputMap(JComponent.WHEN_FOCUSED).put(stroke, name);
+        component.getActionMap().put(name, action);
+        addStrokeToName(action);
+    }
+
+    public static void addStrokeToName(Action action) {
+        KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        String name = (String) action.getValue(Action.NAME);
+        name += " - " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + KeyEvent.getKeyText(stroke.getKeyCode());
+        action.putValue(Action.NAME, name);
+    }
+
+    public static void addKeyboardAction(Action action, KeyStroke keyStroke, JComponent component) {
+        String name = (String) action.getValue(Action.NAME);
+        component.getActionMap().put(name, action);
+        component.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(keyStroke, name);
+    }
+
+    private static KeyStroke menuKeystroke(int virtualKey) {
+        return KeyStroke.getKeyStroke(virtualKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    }
+
+    private static KeyStroke menuShiftKeystroke(int virtualKey) {
+        return KeyStroke.getKeyStroke(virtualKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK);
+    }
 
     private static Icon icon(String resource) {
         String name = "/icons/"+ resource + ".png";

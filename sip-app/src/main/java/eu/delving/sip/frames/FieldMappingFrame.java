@@ -33,7 +33,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -86,16 +89,11 @@ public class FieldMappingFrame extends FrameBase {
         mainTab.addTab("Code", createCodeOutputPanel());
         mainTab.addTab("Dictionary", dictionaryPanel);
         mainTab.addTab("Documentation", scrollVH(docArea));
-        attachAction(UNDO_ACTION);
-        attachAction(REDO_ACTION);
+        attachAccelerator(UNDO_ACTION, codeArea);
+        attachAccelerator(REDO_ACTION, codeArea);
         new URLLauncher(sipModel, outputArea, sipModel.getFeedback());
         wireUp();
         handleEnablement();
-    }
-
-    private void attachAction(Action action) {
-        codeArea.getInputMap().put((KeyStroke) action.getValue(Action.ACCELERATOR_KEY), action.getValue(Action.NAME));
-        codeArea.getActionMap().put(action.getValue(Action.NAME), action);
     }
 
     private void handleEnablement() {
@@ -408,8 +406,7 @@ public class FieldMappingFrame extends FrameBase {
 
     private class UndoAction extends AbstractAction {
         private UndoAction() {
-            super("Undo");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            configAction(this, "Undo", null, MENU_Z);
         }
 
         @Override
@@ -420,8 +417,7 @@ public class FieldMappingFrame extends FrameBase {
 
     private class RedoAction extends AbstractAction {
         private RedoAction() {
-            super("Redo");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK));
+            configAction(this, "Redo", null, SH_MENU_Z);
         }
 
         @Override
