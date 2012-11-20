@@ -34,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static eu.delving.sip.base.KeystrokeHelper.MENU_G;
 import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.DataSetState.values;
 
@@ -100,6 +101,7 @@ public class StatusPanel extends JPanel {
     private class ActionBridge extends AbstractAction {
         private ActionBridge() {
             super("press!");
+            putValue(ACCELERATOR_KEY, MENU_G);
         }
 
         @Override
