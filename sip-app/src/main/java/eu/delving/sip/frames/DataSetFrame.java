@@ -43,6 +43,8 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
+import static eu.delving.sip.base.KeystrokeHelper.SPACE;
+import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**

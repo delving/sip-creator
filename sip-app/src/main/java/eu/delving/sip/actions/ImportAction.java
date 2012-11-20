@@ -40,7 +40,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.MENU_I;
+import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.SwingHelper.ICON_IMPORT;
 import static eu.delving.sip.files.DataSetState.ABSENT;
 
 /**
