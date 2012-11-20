@@ -42,10 +42,12 @@ public class KeystrokeHelper {
     public static final KeyStroke MENU_I = menuKeystroke(KeyEvent.VK_I);
     public static final KeyStroke MENU_S = menuKeystroke(KeyEvent.VK_S);
     public static final KeyStroke MENU_U = menuKeystroke(KeyEvent.VK_U);
+    public static final KeyStroke MENU_W = menuKeystroke(KeyEvent.VK_W);
     public static final KeyStroke MENU_Z = menuKeystroke(KeyEvent.VK_Z);
     public static final KeyStroke SH_MENU_Z = menuShiftKeystroke(KeyEvent.VK_Z);
+
     public static KeyStroke menuDigit(int digit) {
-        if (digit < 0 || digit > 9) throw new IllegalArgumentException("Not a digit: "+digit);
+        if (digit < 0 || digit > 9) throw new IllegalArgumentException("Not a digit: " + digit);
         return menuKeystroke(KeyEvent.VK_0 + digit);
     }
 
@@ -59,7 +61,7 @@ public class KeystrokeHelper {
         KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
         String name = (String) action.getValue(Action.NAME);
         JComponent component = (JComponent) frame.getContentPane();
-        component.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(stroke, name);
+        component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(stroke, name);
         component.getActionMap().put(name, action);
         addStrokeToName(action);
     }
@@ -74,8 +76,11 @@ public class KeystrokeHelper {
 
     public static void addStrokeToName(Action action) {
         KeyStroke stroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-        String name = (String) action.getValue(Action.NAME);
-        name += " - " + KeyEvent.getKeyModifiersText(stroke.getModifiers()) + KeyEvent.getKeyText(stroke.getKeyCode());
+        if (stroke == null) return;
+        String name = String.format(
+                "%s%s - %s",
+                KeyEvent.getKeyModifiersText(stroke.getModifiers()), KeyEvent.getKeyText(stroke.getKeyCode()), action.getValue(Action.NAME)
+        );
         action.putValue(Action.NAME, name);
     }
 

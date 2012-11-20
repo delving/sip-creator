@@ -96,6 +96,16 @@ public class DataSetFrame extends FrameBase {
     }
 
     @Override
+    protected void onOpen(boolean opened) {
+        if (opened) Swing.Exec.later(new Swing() {
+            @Override
+            public void run() {
+                dataSetTable.requestFocus();
+            }
+        });
+    }
+
+    @Override
     protected void buildContent(Container content) {
         content.add(SwingHelper.scrollV("Data Sets", dataSetTable), BorderLayout.CENTER);
         content.add(createSouth(), BorderLayout.SOUTH);
