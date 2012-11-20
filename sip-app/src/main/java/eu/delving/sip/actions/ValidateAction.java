@@ -29,11 +29,11 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
 
-import javax.swing.AbstractAction;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 
+import static eu.delving.sip.base.KeystrokeHelper.configAction;
 import static eu.delving.sip.base.SwingHelper.ICON_VALIDATE;
-import static eu.delving.sip.base.SwingHelper.configAction;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 
 /**

@@ -28,12 +28,13 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.*;
+import static eu.delving.sip.base.SwingHelper.ICON_SELECT_ANOTHER;
 
 /**
  * Select another mapping for the same dataset

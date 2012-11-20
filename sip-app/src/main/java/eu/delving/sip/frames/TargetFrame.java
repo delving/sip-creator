@@ -35,13 +35,12 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.*;
 
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.MENU_E;
+import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
  * Render the record definition as a tree, with a filter function for navigating in large trees.  There are also
