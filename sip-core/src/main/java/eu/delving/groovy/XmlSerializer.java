@@ -112,7 +112,7 @@ public class XmlSerializer {
             if (fromMapping) out.add(eventFactory.createCharacters("\n"));
             out.add(eventFactory.createEndDocument());
             out.flush();
-            return new String(outputStream.toByteArray());
+            return new String(outputStream.toByteArray(), "UTF-8");
         }
         catch (XMLStreamException e) {
             throw new RuntimeException(e);
