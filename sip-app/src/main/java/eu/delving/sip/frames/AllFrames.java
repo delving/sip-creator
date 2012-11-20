@@ -42,7 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static eu.delving.sip.base.FrameBase.INSETS;
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.*;
+import static eu.delving.sip.base.SwingHelper.scrollV;
 import static eu.delving.sip.frames.AllFrames.View.*;
 
 /**

@@ -60,7 +60,8 @@ import java.io.File;
 import java.net.*;
 import java.util.prefs.Preferences;
 
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.*;
+import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
 import static eu.delving.sip.files.DataSetState.*;
 
 /**

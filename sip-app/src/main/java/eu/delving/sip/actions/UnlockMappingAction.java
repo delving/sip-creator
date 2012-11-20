@@ -25,10 +25,12 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.AbstractAction;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.MENU_U;
+import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.SwingHelper.ICON_UNLOCK;
 
 /**
  * Unlock this mapping

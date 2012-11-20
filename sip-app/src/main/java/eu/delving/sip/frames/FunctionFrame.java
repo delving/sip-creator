@@ -36,10 +36,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.undo.UndoManager;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -51,6 +48,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.regex.Pattern;
 
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
