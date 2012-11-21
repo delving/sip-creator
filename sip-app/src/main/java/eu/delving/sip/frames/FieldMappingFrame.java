@@ -33,10 +33,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +42,7 @@ import java.util.List;
 import static eu.delving.metadata.NodeMappingChange.OPERATOR;
 import static eu.delving.metadata.StringUtil.toGroovyFirstIdentifier;
 import static eu.delving.metadata.StringUtil.toGroovyIdentifier;
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**

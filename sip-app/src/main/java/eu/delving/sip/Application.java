@@ -60,7 +60,8 @@ import java.io.File;
 import java.net.*;
 import java.util.prefs.Preferences;
 
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.*;
+import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
 import static eu.delving.sip.files.DataSetState.*;
 
 /**
@@ -191,8 +192,7 @@ public class Application {
                 quit();
             }
         });
-        home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        addKeyboardAction(statusPanel.getButtonAction(), MENU_G, (JComponent) home.getContentPane());
+        home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
@@ -225,6 +225,8 @@ public class Application {
                 }
             }
         });
+        attachAccelerator(new QuitAction(), home);
+        attachAccelerator(statusPanel.getButtonAction(), home);
     }
 
     private JPanel createStatePanel() {
@@ -359,6 +361,19 @@ public class Application {
         resizeTimer.stop();
         home.setVisible(false);
         home.dispose();
+    }
+
+    private class QuitAction extends AbstractAction {
+
+        private QuitAction() {
+            super("Quit");
+            putValue(Action.ACCELERATOR_KEY, MENU_W);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            quit();
+        }
     }
 
     private static StorageFinder storageFinder = new StorageFinder();

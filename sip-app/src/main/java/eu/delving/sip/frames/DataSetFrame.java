@@ -43,6 +43,8 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
+import static eu.delving.sip.base.KeystrokeHelper.SPACE;
+import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
@@ -91,6 +93,16 @@ public class DataSetFrame extends FrameBase {
         editAction.checkEnabled();
         downloadAction.checkEnabled();
         releaseAction.checkEnabled();
+    }
+
+    @Override
+    protected void onOpen(boolean opened) {
+        if (opened) Swing.Exec.later(new Swing() {
+            @Override
+            public void run() {
+                dataSetTable.requestFocus();
+            }
+        });
     }
 
     @Override

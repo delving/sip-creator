@@ -46,6 +46,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     private Timer triggerTimer = new Timer(200, this);
     private ListReceiver listReceiver;
     private boolean freezeMode;
+    private boolean running = true;
 
     @Override
     public Job getJob() {
@@ -86,11 +87,12 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (triggerTimer.isRunning()) sipModel.exec(this);
+        sipModel.exec(this);
     }
 
     @Override
     public void run() {
+        if (!running) return;
         try {
             final RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping != null) {
@@ -158,6 +160,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     }
 
     public void shutdown() {
+        running = false;
         triggerTimer.stop();
     }
 
