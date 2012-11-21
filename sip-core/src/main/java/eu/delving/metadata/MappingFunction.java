@@ -87,7 +87,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public String getUserCode(String editedCode) {
-        CodeOut codeOut = CodeOut.create();
+        CodeOut codeOut = new CodeOut();
         toUserCode(codeOut, editedCode);
         return codeOut.toString();
     }
@@ -97,7 +97,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public String toCode(String editedCode) {
-        CodeOut codeOut = CodeOut.create();
+        CodeOut codeOut = new CodeOut();
         toCode(codeOut, editedCode);
         return codeOut.toString();
     }
