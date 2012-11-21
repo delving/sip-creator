@@ -53,6 +53,7 @@ public class TestSchemaRepository {
         fetchTest(new FileSystemFetcher(true));
     }
 
+    @Ignore
     @Test
     public void testSchemasDelvingEU() throws IOException {
         System.out.println("from schemas.delving.eu:");
