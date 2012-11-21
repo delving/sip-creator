@@ -393,7 +393,7 @@ public class CodeGenerator {
                 needLoop = !groovyParams.contains(getMapName(nodeMapping));
                 if (needLoop) {
                     codeOut.line_(
-                            "%s %s { %s -> // N0a",
+                            "%s %s { %s ->",
                             toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
                     );
                 }
@@ -403,13 +403,13 @@ public class CodeGenerator {
                 needLoop = !groovyParams.contains(param);
                 if (needLoop) {
                     codeOut.line_(
-                            "%s %s { %s -> // N0b",
+                            "%s %s { %s ->",
                             toLoopRef(path), nodeMapping.getOperator().getCodeString(), param
                     );
                 }
             }
             toInnerLoop(nodeMapping, path.withRootRemoved(), groovyParams, optRole);
-            if (needLoop) codeOut._line("} // N0");
+            if (needLoop) codeOut._line("}");
         }
     }
 
@@ -436,7 +436,7 @@ public class CodeGenerator {
     }
 
     private void toLeafElementCode(NodeMapping nodeMapping, Stack<String> groovyParams) {
-        if (nodeMapping.recDefNode.isAttr() || !nodeMapping.recDefNode.isLeafElem()) return;
+        if (nodeMapping.recDefNode.isAttr() || !nodeMapping.recDefNode.isLeafElem()) throw new IllegalStateException("Not a leaf element!");
         toUserCode(nodeMapping, groovyParams);
     }
 
