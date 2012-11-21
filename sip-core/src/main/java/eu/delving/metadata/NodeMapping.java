@@ -88,6 +88,10 @@ public class NodeMapping {
         return inputPath.hashCode() + outputPath.hashCode();
     }
 
+    public String getGroovyCode() {
+        return groovyCode == null ? null : linesToString(groovyCode);
+    }
+
     public String getDocumentation() {
         return linesToString(documentation);
     }
@@ -198,7 +202,8 @@ public class NodeMapping {
 
     private boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
         if (codeString == null) return false;
-        List<String> list = Arrays.asList(new CodeGenerator(recMapping).toCode(getGeneratorEditPath()).split("\n"));
+        CodeGenerator codeGenerator = new CodeGenerator(recMapping).withEditPath(getGeneratorEditPath());
+        List<String> list = Arrays.asList(codeGenerator.toRecordMappingCode().split("\n"));
         Iterator<String> walk = list.iterator();
         return isSimilar(codeString, walk);
     }
@@ -252,7 +257,7 @@ public class NodeMapping {
     }
 
     private EditPath getGeneratorEditPath() {
-        return new EditPath(this);
+        return new EditPath(this, null);
     }
 
 }
