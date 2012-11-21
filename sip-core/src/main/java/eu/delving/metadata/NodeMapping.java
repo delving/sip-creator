@@ -195,26 +195,18 @@ public class NodeMapping {
         return groovyCode == null || isSimilarCode(codeString, groovyCode);
     }
 
-    public void revertToGenerated() {
-        setGroovyCode(null, null);
-    }
-
-    private boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
-        if (codeString == null) return false;
-        CodeGenerator codeGenerator = new CodeGenerator(recMapping).withEditPath(new EditPath(this, null));
-        return isSimilarCode(codeString, codeGenerator.toNodeMappingCode());
-    }
-
-    public void setGroovyCode(String codeString, RecMapping recMapping) {
-        if (codeString == null || generatedCodeLooksLike(codeString, recMapping)) {
+    public void setGroovyCode(String codeString) {
+        if (codeString == null || codeString.trim().isEmpty()) {
             if (groovyCode != null) {
                 groovyCode = null;
                 notifyChanged(CODE);
             }
         }
-        else if (groovyCode == null || !codeLooksLike(codeString)) {
-            groovyCode = stringToLines(codeString);
-            notifyChanged(CODE);
+        else {
+            if (groovyCode == null || !codeLooksLike(codeString)) {
+                groovyCode = stringToLines(codeString);
+                notifyChanged(CODE);
+            }
         }
     }
 

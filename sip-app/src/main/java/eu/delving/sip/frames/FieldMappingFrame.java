@@ -390,7 +390,7 @@ public class FieldMappingFrame extends FrameBase {
                     @Override
                     public void run() {
                         if (sipModel.getCreateModel().hasNodeMapping()) {
-                            sipModel.getCreateModel().getNodeMapping().revertToGenerated();
+                            sipModel.getCreateModel().getNodeMapping().setGroovyCode(null);
                         }
                         sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
                     }

@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static eu.delving.metadata.StringUtil.documentToString;
+import static eu.delving.metadata.StringUtil.isSimilarCode;
 import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
 
 /**
@@ -320,8 +321,16 @@ public class MappingCompileModel {
         private void setMappingCode() {
             if (nodeMapping != null && nodeMapping.isUserCodeEditable() && !recMapping.isLocked()) {
                 String editedCode = documentToString(codeDocument);
-                nodeMapping.setGroovyCode(editedCode, recMapping);
-                notifyStateChange(nodeMapping.groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);
+                CodeGenerator codeGenerator = new CodeGenerator(recMapping).withEditPath(new EditPath(nodeMapping, null));
+                String generatedCode = codeGenerator.toNodeMappingCode();
+                if (isSimilarCode(editedCode, generatedCode)) {
+                    nodeMapping.setGroovyCode(null);
+                    notifyStateChange(CompileState.ORIGINAL);
+                }
+                else {
+                    nodeMapping.setGroovyCode(editedCode);
+                    notifyStateChange(CompileState.SAVED);
+                }
             }
         }
 
@@ -508,6 +517,7 @@ public class MappingCompileModel {
 
     public interface Listener {
         void stateChanged(CompileState state);
+
         void codeCompiled(Type type, String code);
     }
 
