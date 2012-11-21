@@ -56,10 +56,6 @@ public class CodeGenerator {
     }
 
     private void generate() {
-        toCode(recMapping.getRecDefTree(), recMapping.getFunctions(), recMapping.getFacts());
-    }
-
-    private void toCode(RecDefTree recDefTree, Set<MappingFunction> mappingFunctions, Map<String, String> facts) {
         codeOut.line("// SIP-Creator Generated Mapping Code");
         codeOut.line("// ----------------------------------");
         codeOut.line("// Discarding:");
@@ -68,19 +64,21 @@ public class CodeGenerator {
         codeOut.line("def discardIf = { thing, reason ->  if (thing) throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("def discardIfNot = { thing, reason ->  if (!thing) throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("// Facts:");
-        for (Map.Entry<String, String> entry : facts.entrySet()) {
+        for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
         codeOut.line("// Functions from Mapping:");
         Set<String> names = new TreeSet<String>();
-        for (MappingFunction function : mappingFunctions) {
+        for (MappingFunction function : recMapping.getFunctions()) {
             function.toCode(codeOut);
             names.add(function.name);
         }
-        if (recDefTree.getRecDef().functions != null) {
+        RecDefTree recDefTree = recMapping.getRecDefTree();
+        RecDef recDef = recDefTree.getRecDef();
+        if (recDef.functions != null) {
             codeOut.line("// Functions from Record Definition:");
-            for (MappingFunction function : recDefTree.getRecDef().functions) {
+            for (MappingFunction function : recDef.functions) {
                 if (names.contains(function.name)) continue;
                 function.toCode(codeOut);
                 names.add(function.name);

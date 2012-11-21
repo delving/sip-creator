@@ -29,8 +29,7 @@ import java.util.*;
 
 import static eu.delving.metadata.NodeMappingChange.CODE;
 import static eu.delving.metadata.NodeMappingChange.DOCUMENTATION;
-import static eu.delving.metadata.StringUtil.linesToString;
-import static eu.delving.metadata.StringUtil.stringToLines;
+import static eu.delving.metadata.StringUtil.*;
 
 /**
  * This class describes how one node is transformed into another, which is part of mapping
@@ -193,7 +192,7 @@ public class NodeMapping {
     }
 
     public boolean codeLooksLike(String codeString) {
-        return groovyCode == null || isSimilar(codeString, groovyCode.iterator());
+        return groovyCode == null || isSimilarCode(codeString, groovyCode);
     }
 
     public void revertToGenerated() {
@@ -202,10 +201,8 @@ public class NodeMapping {
 
     private boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
         if (codeString == null) return false;
-        CodeGenerator codeGenerator = new CodeGenerator(recMapping).withEditPath(getGeneratorEditPath());
-        List<String> list = Arrays.asList(codeGenerator.toRecordMappingCode().split("\n"));
-        Iterator<String> walk = list.iterator();
-        return isSimilar(codeString, walk);
+        CodeGenerator codeGenerator = new CodeGenerator(recMapping).withEditPath(new EditPath(this, null));
+        return isSimilarCode(codeString, codeGenerator.toNodeMappingCode());
     }
 
     public void setGroovyCode(String codeString, RecMapping recMapping) {
@@ -225,21 +222,6 @@ public class NodeMapping {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
 
-    private boolean isSimilar(String codeString, Iterator<String> walk) {
-        for (String line : codeString.split("\n")) {
-            line = line.trim();
-            if (line.isEmpty()) continue;
-            if (!walk.hasNext()) return false;
-            while (walk.hasNext()) {
-                String otherLine = walk.next().trim();
-                if (otherLine.isEmpty()) continue;
-                if (!otherLine.equals(line)) return false;
-                break;
-            }
-        }
-        return !walk.hasNext();
-    }
-
     public String toString() {
         if (recDefNode == null) return "No RecDefNode";
         String input = inputPath.getTail();
@@ -255,10 +237,5 @@ public class NodeMapping {
         String wrap = groovyCode == null ? "p" : "b";
         return String.format("<html><%s>%s &rarr; %s</%s>", wrap, input, recDefNode.toString(), wrap);
     }
-
-    private EditPath getGeneratorEditPath() {
-        return new EditPath(this, null);
-    }
-
 }
 
