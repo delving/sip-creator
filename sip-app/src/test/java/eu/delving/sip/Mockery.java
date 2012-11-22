@@ -33,7 +33,6 @@ import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.xml.MetadataParser;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Node;
 
 import javax.xml.stream.XMLStreamException;
@@ -68,7 +67,7 @@ public class Mockery {
         root = new File(getTargetDirectory(), "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
-        storage = new StorageImpl(root, new FileSystemFetcher(true), new DefaultHttpClient());
+        storage = new StorageImpl(root, new FileSystemFetcher(true), new CachedResourceResolver());
     }
 
     public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {
@@ -125,7 +124,7 @@ public class Mockery {
 
     public Node runMapping(MetadataRecord record) throws MappingException {
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
-        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
+        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null, true);
         System.out.println(mappingRunner.getCode());
         return mappingRunner.runMapping(record);
     }

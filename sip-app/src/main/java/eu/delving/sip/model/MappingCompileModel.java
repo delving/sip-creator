@@ -79,6 +79,7 @@ public class MappingCompileModel {
     private MappingRunner mappingRunner;
     private MappingModelEar mappingModelEar = new MappingModelEar();
     private SipModel sipModel;
+    private boolean trace;
 
     public enum Type {
         RECORD("record mapping"),
@@ -119,6 +120,11 @@ public class MappingCompileModel {
         triggerCompile();
     }
 
+    public void setTrace(boolean trace) {
+        this.trace = trace;
+        triggerCompile();
+    }
+
     public void setNodeMapping(final NodeMapping nodeMapping) {
         sipModel.exec(new DocumentSetter(docDocument, "", true));
         sipModel.exec(new DocumentSetter(codeDocument, "", true));
@@ -131,14 +137,14 @@ public class MappingCompileModel {
                     String code;
                     switch (type) {
                         case RECORD:
-                            code = new CodeGenerator(recMapping).toRecordMappingCode();
+                            code = new CodeGenerator(recMapping).withTrace(trace).toRecordMappingCode();
                             break;
                         case FIELD:
                             EditPath editPath = new EditPath(
                                     nodeMapping,
                                     nodeMapping.getGroovyCode()
                             );
-                            code = new CodeGenerator(recMapping).withEditPath(editPath).toNodeMappingCode();
+                            code = new CodeGenerator(recMapping).withTrace(trace).withEditPath(editPath).toNodeMappingCode();
                             break;
                         default:
                             throw new RuntimeException();
@@ -273,7 +279,7 @@ public class MappingCompileModel {
             compiling = true;
             try {
                 if (mappingRunner == null) {
-                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath);
+                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath, trace);
                     notifyCodeCompiled(mappingRunner.getCode());
                 }
                 try {
