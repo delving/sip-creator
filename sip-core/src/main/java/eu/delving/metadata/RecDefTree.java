@@ -21,7 +21,8 @@
 
 package eu.delving.metadata;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static eu.delving.metadata.RecDef.REQUIRED_FIELDS;
 
@@ -95,56 +96,6 @@ public class RecDefTree implements RecDefNodeListener {
         List<DynOpt> dynOpts = new ArrayList<DynOpt>();
         root.collectDynOpts(dynOpts);
         return dynOpts;
-    }
-
-    public void toCode(CodeOut codeOut, Set<MappingFunction> mappingFunctions, Map<String, String> facts, EditPath editPath) {
-        codeOut.line("// SIP-Creator Generated Mapping Code");
-        codeOut.line("// ----------------------------------");
-        codeOut.line("// Discarding:");
-        codeOut.line("import eu.delving.groovy.DiscardRecordException");
-        codeOut.line("def discard = { reason -> throw new DiscardRecordException(reason.toString()) }");
-        codeOut.line("def discardIf = { thing, reason ->  if (thing) throw new DiscardRecordException(reason.toString()) }");
-        codeOut.line("def discardIfNot = { thing, reason ->  if (!thing) throw new DiscardRecordException(reason.toString()) }");
-        codeOut.line("// Facts:");
-        for (Map.Entry<String, String> entry : facts.entrySet()) {
-            codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
-        }
-        codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
-        codeOut.line("// Functions from Mapping:");
-        Set<String> names = new TreeSet<String>();
-        for (MappingFunction function : mappingFunctions) {
-            function.toCode(codeOut);
-            names.add(function.name);
-        }
-        if (recDef.functions != null) {
-            codeOut.line("// Functions from Record Definition:");
-            for (MappingFunction function : recDef.functions) {
-                if (names.contains(function.name)) continue;
-                function.toCode(codeOut);
-                names.add(function.name);
-            }
-        }
-        codeOut.line("// Dictionaries:");
-        for (NodeMapping nodeMapping : getNodeMappings()) {
-            StringUtil.toDictionaryCode(nodeMapping, codeOut);
-        }
-        codeOut.line("// DSL Category wraps Builder call:");
-        codeOut.line("boolean _absent_");
-        codeOut.line("org.w3c.dom.Node outputNode");
-        codeOut.line_("use (MappingCategory) {");
-        codeOut.line_("input * { _input ->");
-        codeOut.line("_uniqueIdentifier = _input._id[0].toString()");
-        codeOut.line("outputNode = output.");
-        if (root.isPopulated()) {
-            root.toElementCode(codeOut, new Stack<String>(), editPath);
-        }
-        else {
-            codeOut.line("no 'mapping'");
-        }
-        codeOut._line("}");
-        codeOut.line("outputNode");
-        codeOut._line("}");
-        codeOut.line("// ----------------------------------");
     }
 
     @Override

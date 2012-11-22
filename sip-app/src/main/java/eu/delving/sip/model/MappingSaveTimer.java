@@ -87,7 +87,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        sipModel.exec(this);
+        if (running) sipModel.exec(this);
     }
 
     @Override

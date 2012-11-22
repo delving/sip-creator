@@ -25,7 +25,6 @@ import java.util.*;
 
 import static eu.delving.metadata.OptRole.ABSENT;
 import static eu.delving.metadata.OptRole.DYNAMIC;
-import static eu.delving.metadata.StringUtil.*;
 
 /**
  * The RecDefNode is the node element of a RecDefTree which stores the whole
@@ -45,7 +44,6 @@ import static eu.delving.metadata.StringUtil.*;
  */
 
 public class RecDefNode implements Comparable<RecDefNode> {
-    public static final String ABSENT_IS_FALSE = "_absent_ = false";
     private RecDefNode parent;
     private Path path;
     private RecDef.Elem elem;
@@ -356,201 +354,15 @@ public class RecDefNode implements Comparable<RecDefNode> {
         listener.nodeMappingChanged(this, nodeMapping, change);
     }
 
-    public void toElementCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        if (isAttr() || !populated) return;
-        if (editPath != null && !path.isFamilyOf(editPath.getNodeMapping().outputPath)) return;
-        if (nodeMappings.isEmpty()) {
-            if (isRootOpt()) {
-                Set<Path> siblingPaths = getSiblingInputPathsOfChildren();
-                if (siblingPaths != null && !siblingPaths.isEmpty()) {
-                    NodeMapping nodeMapping = new NodeMapping().setOutputPath(path).setInputPaths(siblingPaths);
-                    nodeMapping.recDefNode = this;
-                    codeOut.start(nodeMapping);
-                    toNodeMappingLoop(codeOut, nodeMapping, nodeMapping.getLocalPath(), groovyParams, editPath);
-                    codeOut.end(nodeMapping);
-                    return;
-                }
-            }
-            if (!isLeafElem()) {
-                toBranchCode(codeOut, groovyParams, editPath);
-            }
-            else if (hasActiveAttributes()) {
-                startBuilderCall(codeOut, false, "R0", groovyParams, editPath);
-                codeOut.line("// no node mappings");
-                codeOut._line("} // R0");
-            }
-        }
-        else if (editPath != null && editPath.getNodeMapping().recDefNode == this) {
-            NodeMapping nodeMapping = editPath.getNodeMapping();
-            codeOut.line("_absent_ = true");
-            codeOut.start(nodeMapping);
-            toNodeMappingLoop(codeOut, nodeMapping, nodeMapping.getLocalPath(), groovyParams, editPath);
-            codeOut.end(nodeMapping);
-            addIfAbsentCode(codeOut, nodeMapping, groovyParams, editPath);
-        }
-        else {
-            for (NodeMapping nodeMapping : nodeMappings.values()) {
-                codeOut.line("_absent_ = true");
-                codeOut.start(nodeMapping);
-                toNodeMappingLoop(codeOut, nodeMapping, nodeMapping.getLocalPath(), groovyParams, editPath);
-                codeOut.end(nodeMapping);
-                addIfAbsentCode(codeOut, nodeMapping, groovyParams, editPath);
-            }
-        }
+    public OptBox getOptBox() {
+        return optBox;
     }
 
-    private void addIfAbsentCode(CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams, EditPath editPath) {
-        List<String> groovyCode = nodeMapping.groovyCode;
-        if (editPath != null) {
-            if (!editPath.isGeneratedCode()) {
-                String editedCode = editPath.getEditedCode(getPath());
-                if (editedCode != null) groovyCode = StringUtil.stringToLines(editedCode);
-            }
-        }
-        List<String> ifAbsentCode = StringUtil.getIfAbsentCode(groovyCode);
-        if (ifAbsentCode != null) {
-            codeOut.line_("if (_absent_) {");
-            startBuilderCall(codeOut, false, "R0a", groovyParams, editPath);
-            indentCode(ifAbsentCode, codeOut);
-            codeOut._line("} // R0a");
-            codeOut._line("}");
-        }
-    }
-
-    private void toNodeMappingLoop(CodeOut codeOut, NodeMapping nodeMapping, Path path, Stack<String> groovyParams, EditPath editPath) {
-        if (path.isEmpty()) throw new RuntimeException("Empty path");
-        if (path.size() == 1) {
-            if (isLeafElem()) {
-                toLeafCode(codeOut, nodeMapping, groovyParams, editPath);
-            }
-            else {
-                toBranchCode(codeOut, groovyParams, editPath);
-            }
-        }
-        else if (nodeMapping.hasMap() && path.size() == 2) {
-            if (groovyParams.contains(nodeMapping.getMapName())) {
-                toMapNodeMapping(codeOut, nodeMapping, groovyParams, editPath);
-            }
-            else {
-                codeOut.line_(
-                        "%s %s { %s -> // R1",
-                        toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), nodeMapping.getMapName()
-                );
-                groovyParams.push(nodeMapping.getMapName());
-                toMapNodeMapping(codeOut, nodeMapping, groovyParams, editPath);
-                groovyParams.pop();
-                codeOut._line("} // R1");
-            }
-        }
-        else { // path should never be empty
-            Operator operator = nodeMapping.getOperator();
-            if (path.size() > 2 && operator != Operator.FIRST) operator = Operator.ALL;
-            String param = toLoopGroovyParam(path);
-            if (groovyParams.contains(param)) {
-                toNodeMappingLoop(codeOut, nodeMapping, path.withRootRemoved(), groovyParams, editPath);
-            }
-            else {
-                codeOut.line_(
-                        "%s %s { %s -> // R6",
-                        toLoopRef(path), operator.getCodeString(), param
-                );
-                groovyParams.push(param);
-                toNodeMappingLoop(codeOut, nodeMapping, path.withRootRemoved(), groovyParams, editPath);
-                groovyParams.pop();
-                codeOut._line("} // R6");
-            }
-        }
-    }
-
-    private void toMapNodeMapping(CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams, EditPath editPath) {
-        if (isLeafElem()) {
-            startBuilderCall(codeOut, true, "R3", groovyParams, editPath);
-            codeOut.start(nodeMapping);
-            nodeMapping.toLeafElementCode(codeOut, groovyParams, editPath);
-            codeOut.end(nodeMapping);
-            codeOut._line("} // R3");
-        }
-        else {
-            startBuilderCall(codeOut, true, "R4", groovyParams, editPath);
-            codeOut.start(nodeMapping);
-            for (RecDefNode sub : children) {
-                if (sub.isAttr()) continue;
-                if (sub.isChildOpt()) {
-                    codeOut.line(
-                            "%s '%s' // R5",
-                            sub.getTag().toBuilderCall(), sub.optBox
-                    );
-                }
-                else {
-                    sub.toElementCode(codeOut, groovyParams, editPath);
-                }
-            }
-            codeOut.end(nodeMapping);
-            codeOut._line("} // R4");
-        }
-    }
-
-    private void toBranchCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        startBuilderCall(codeOut, false, "R8", groovyParams, editPath);
-        for (RecDefNode sub : children) {
-            if (sub.isAttr()) continue;
-            if (sub.isChildOpt()) {
-                codeOut.line(
-                        "%s '%s' // R9",
-                        sub.getTag().toBuilderCall(), sub.optBox
-                );
-            }
-            else {
-                sub.toElementCode(codeOut, groovyParams, editPath);
-            }
-        }
-        codeOut._line("} // R8");
-    }
-
-    private void toLeafCode(CodeOut codeOut, NodeMapping nodeMapping, Stack<String> groovyParams, EditPath editPath) {
-        if (nodeMapping.hasMap()) {
-            codeOut.line_(
-                    "%s %s { %s -> // R10",
-                    toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), nodeMapping.getMapName()
-            );
-            startBuilderCall(codeOut, true, "R11", groovyParams, editPath);
-            codeOut.start(nodeMapping);
-            nodeMapping.toLeafElementCode(codeOut, groovyParams, editPath);
-            codeOut.end(nodeMapping);
-            codeOut._line("} // R11");
-            codeOut._line("} // R10");
-        }
-        else {
-            startBuilderCall(codeOut, true, "R12", groovyParams, editPath);
-            codeOut.start(nodeMapping);
-            nodeMapping.toLeafElementCode(codeOut, groovyParams, editPath);
-            codeOut.end(nodeMapping);
-            codeOut._line("} // R12");
-        }
-    }
-
-    public Set<Path> getSiblingInputPathsOfChildren() {
-        List<NodeMapping> subMappings = new ArrayList<NodeMapping>();
-        for (RecDefNode sub : children) sub.collectNodeMappings(subMappings);
-        Set<Path> inputPaths = new TreeSet<Path>();
-        Path parent = null;
-        for (NodeMapping subMapping : subMappings) {
-            if (parent == null) {
-                parent = subMapping.inputPath.parent();
-            }
-            else {
-                if (!subMapping.inputPath.parent().equals(parent)) return null; // different parents
-            }
-            inputPaths.addAll(subMapping.getInputPaths());
-        }
-        return inputPaths;
-    }
-
-    private boolean isRootOpt() {
+    public boolean isRootOpt() {
         return elem != null && optBox != null && optBox.role == OptRole.ROOT && !optBox.isDictionary();
     }
 
-    private boolean isChildOpt() {
+    public boolean isChildOpt() {
         if (optBox == null) return false;
         switch (optBox.role) {
             case ROOT:
@@ -561,65 +373,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
     }
 
-    private boolean isDynOpt() {
+    public boolean isDynOpt() {
         return optBox != null && optBox.role == DYNAMIC;
     }
 
-    private void startBuilderCall(CodeOut codeOut, boolean absentFalse, String comment, Stack<String> groovyParams, EditPath editPath) {
-        if (hasActiveAttributes()) {
-            Tag tag = getTag();
-            codeOut.line_(
-                    "%s ( // %s%s",
-                    tag.toBuilderCall(), comment, isRootOpt() ? "(opt)" : ""
-            );
-            boolean comma = false;
-            for (RecDefNode sub : children) {
-                if (!sub.isAttr()) continue;
-                if (sub.isChildOpt()) {
-                    if (comma) codeOut.line(",");
-                    OptBox dictionaryOptBox = sub.getDictionaryOptBox();
-                    if (dictionaryOptBox != null) {
-                        if (nodeMappings.size() == 1) {
-                            NodeMapping nodeMapping = nodeMappings.values().iterator().next();
-                            codeOut.line_("%s : {", sub.getTag().toBuilderCall());
-                            nodeMapping.toDictionaryCode(codeOut, groovyParams, sub.optBox.role);
-                            codeOut._line("}");
-                        }
-                        else { // this is actually a kind of error:
-                            codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
-                        }
-                    }
-                    else {
-                        codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.optBox, comment);
-                    }
-                    comma = true;
-                }
-                else {
-                    for (NodeMapping nodeMapping : sub.nodeMappings.values()) {
-                        if (comma) codeOut.line(",");
-                        codeOut.line_("%s : {", sub.getTag().toBuilderCall());
-                        codeOut.start(nodeMapping);
-                        nodeMapping.toAttributeCode(codeOut, groovyParams, editPath);
-                        codeOut.end(nodeMapping);
-                        codeOut._line("}");
-                        comma = true;
-                    }
-                }
-            }
-            codeOut._line(
-                    ") { %s",
-                    absentFalse ? ABSENT_IS_FALSE : ""
-            ).in();
-        }
-        else {
-            codeOut.line_(
-                    "%s { %s // %s%s",
-                    getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : "", comment, isRootOpt() ? "(opt)" : ""
-            );
-        }
-    }
-
-    private boolean hasActiveAttributes() {
+    public boolean hasActiveAttributes() {
         if (isDynOpt()) return true;
         for (RecDefNode sub : children) {
             if (sub.isAttr() && (!sub.nodeMappings.isEmpty() || sub.isChildOpt())) return true;

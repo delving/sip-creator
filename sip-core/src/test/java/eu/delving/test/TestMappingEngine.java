@@ -208,6 +208,7 @@ public class TestMappingEngine {
     private Validator validator(SchemaVersion schemaVersion) {
         try {
             SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+// todo:           factory.setResourceResolver(new CachingResourceResolver);
             String validationXsd = schemaRepo.getSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA);
             if (validationXsd == null) throw new RuntimeException("Unable to find validation schema "+schemaVersion);
             Schema schema = factory.newSchema(new StreamSource(new StringReader(validationXsd)));

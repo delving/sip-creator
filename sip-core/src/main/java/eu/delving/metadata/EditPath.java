@@ -31,16 +31,10 @@ package eu.delving.metadata;
 public class EditPath {
     private NodeMapping nodeMapping;
     private String editedCode;
-    private boolean generatedCode;
 
     public EditPath(NodeMapping nodeMapping, String editedCode) {
         this.nodeMapping = nodeMapping;
         this.editedCode = editedCode;
-    }
-
-    public EditPath(NodeMapping nodeMapping) {
-        this.nodeMapping = nodeMapping;
-        this.generatedCode = true;
     }
 
     public NodeMapping getNodeMapping() {
@@ -48,7 +42,7 @@ public class EditPath {
     }
 
     public boolean isGeneratedCode() {
-        return generatedCode;
+        return editedCode == null;
     }
 
     public String getEditedCode(Path path) {

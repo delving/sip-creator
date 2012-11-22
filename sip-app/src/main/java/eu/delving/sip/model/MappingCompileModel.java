@@ -33,7 +33,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -46,6 +46,8 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static eu.delving.metadata.StringUtil.documentToString;
+import static eu.delving.metadata.StringUtil.isSimilarCode;
 import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
 
 /**
@@ -107,7 +109,7 @@ public class MappingCompileModel {
             @Override
             public void later() {
                 if (nodeMapping == null) return;
-                nodeMapping.setDocumentation(StringUtil.documentToString(docDocument));
+                nodeMapping.setDocumentation(documentToString(docDocument));
             }
         });
     }
@@ -117,16 +119,30 @@ public class MappingCompileModel {
         triggerCompile();
     }
 
-    public void setNodeMapping(NodeMapping nodeMapping) {
+    public void setNodeMapping(final NodeMapping nodeMapping) {
         sipModel.exec(new DocumentSetter(docDocument, "", true));
         sipModel.exec(new DocumentSetter(codeDocument, "", true));
         sipModel.exec(new DocumentSetter(outputDocument, "", true));
-        if ((this.nodeMapping = nodeMapping) != null) {
+        if (recMapping != null && (this.nodeMapping = nodeMapping) != null) {
             sipModel.exec(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
             sipModel.exec(new Swing() {
                 @Override
                 public void run() {
-                    String code = getCode(getEditPath(false));
+                    String code;
+                    switch (type) {
+                        case RECORD:
+                            code = new CodeGenerator(recMapping).toRecordMappingCode();
+                            break;
+                        case FIELD:
+                            EditPath editPath = new EditPath(
+                                    nodeMapping,
+                                    nodeMapping.getGroovyCode()
+                            );
+                            code = new CodeGenerator(recMapping).withEditPath(editPath).toNodeMappingCode();
+                            break;
+                        default:
+                            throw new RuntimeException();
+                    }
                     new DocumentSetter(codeDocument, code, false).run();
                 }
             });
@@ -179,29 +195,6 @@ public class MappingCompileModel {
         triggerTimer.triggerSoon(RUN_DELAY);
     }
 
-    private String getCode(EditPath editPath) {
-        switch (type) {
-            case RECORD:
-                return recMapping == null ? "" : recMapping.toCode();
-            case FIELD:
-                return nodeMapping == null || recMapping == null ? "" : nodeMapping.getCode(editPath, recMapping);
-            default:
-                throw new RuntimeException();
-        }
-    }
-
-    private EditPath getEditPath(final boolean fromCodeDocument) {
-        if (nodeMapping == null) return null;
-        String editedCode = null;
-        if (fromCodeDocument) {
-            editedCode = StringUtil.documentToString(codeDocument);
-        }
-        else if (nodeMapping.groovyCode != null) {
-            editedCode = StringUtil.linesToString(nodeMapping.groovyCode);
-        }
-        return new EditPath(nodeMapping, editedCode);
-    }
-
     private class ParseEar implements SipModel.ParseListener {
 
         @Override
@@ -238,7 +231,7 @@ public class MappingCompileModel {
         public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
             switch (change) {
                 case CODE:
-                    if (nodeMapping.codeLooksLike(StringUtil.documentToString(codeDocument))) break;
+                    if (nodeMapping.codeLooksLike(documentToString(codeDocument))) break;
                 case OPERATOR:
                 case DICTIONARY:
                     triggerCompile();
@@ -327,9 +320,17 @@ public class MappingCompileModel {
 
         private void setMappingCode() {
             if (nodeMapping != null && nodeMapping.isUserCodeEditable() && !recMapping.isLocked()) {
-                String editedCode = StringUtil.documentToString(codeDocument);
-                nodeMapping.setGroovyCode(editedCode, recMapping);
-                notifyStateChange(nodeMapping.groovyCode == null ? CompileState.ORIGINAL : CompileState.SAVED);
+                String editedCode = documentToString(codeDocument);
+                CodeGenerator codeGenerator = new CodeGenerator(recMapping).withEditPath(new EditPath(nodeMapping, null));
+                String generatedCode = codeGenerator.toNodeMappingCode();
+                if (isSimilarCode(editedCode, generatedCode)) {
+                    nodeMapping.setGroovyCode(null);
+                    notifyStateChange(CompileState.ORIGINAL);
+                }
+                else {
+                    nodeMapping.setGroovyCode(editedCode);
+                    notifyStateChange(CompileState.SAVED);
+                }
             }
         }
 
@@ -404,7 +405,11 @@ public class MappingCompileModel {
                     throw new RuntimeException(e);
                 }
             }
-            sipModel.exec(new MappingJob(getEditPath(true)));
+            EditPath editPath = null;
+            if (nodeMapping != null) {
+                editPath = new EditPath(nodeMapping, documentToString(codeDocument));
+            }
+            sipModel.exec(new MappingJob(editPath));
         }
 
         public void triggerSoon(int delay) {
@@ -512,6 +517,7 @@ public class MappingCompileModel {
 
     public interface Listener {
         void stateChanged(CompileState state);
+
         void codeCompiled(Type type, String code);
     }
 
