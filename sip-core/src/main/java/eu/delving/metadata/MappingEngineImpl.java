@@ -49,7 +49,7 @@ public class MappingEngineImpl implements MappingEngine {
         if (mapping != null) {
             RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
             GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
-            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
         }
     }
 

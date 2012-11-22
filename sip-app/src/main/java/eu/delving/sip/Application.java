@@ -22,10 +22,7 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.*;
 import eu.delving.schema.Fetcher;
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.actions.ImportAction;
@@ -43,13 +40,18 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -57,6 +59,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.*;
 import java.util.prefs.Preferences;
 
@@ -117,12 +120,15 @@ public class Application {
                 resizeTimer.restart();
             }
         });
-        Preferences preferences =   Preferences.userNodeForPackage(SipModel.class);
+        Preferences preferences = Preferences.userNodeForPackage(SipModel.class);
         feedback = new VisualFeedback(home, desktop, preferences);
         HttpClient httpClient = createHttpClient(String.format("http://%s", StorageFinder.getHostPort(storageDirectory)));
         Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
-        Storage storage = new StorageImpl(storageDirectory, fetcher, httpClient);
-        sipModel = new SipModel(desktop ,storage, groovyCodeResource, feedback, preferences);
+        ResolverContext context = new ResolverContext();
+        Storage storage = new StorageImpl(storageDirectory, fetcher, new CachedResourceResolver(context));
+        context.setStorage(storage);
+        context.setHttpClient(httpClient);
+        sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
         CultureHubClient cultureHubClient = new CultureHubClient(sipModel, httpClient);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
@@ -361,6 +367,43 @@ public class Application {
         resizeTimer.stop();
         home.setVisible(false);
         home.dispose();
+    }
+
+    private class ResolverContext implements CachedResourceResolver.Context {
+        private Storage storage;
+        private HttpClient httpClient;
+
+        public void setStorage(Storage storage) {
+            this.storage = storage;
+        }
+
+        public void setHttpClient(HttpClient httpClient) {
+            this.httpClient = httpClient;
+        }
+
+        @Override
+        public String get(String url) {
+            try {
+                HttpGet get = new HttpGet(url);
+                HttpResponse response = httpClient.execute(get);
+                StatusLine line = response.getStatusLine();
+                if (line.getStatusCode() != HttpStatus.SC_OK) {
+                    throw new IOException(String.format(
+                            "HTTP Error %s (%s) on %s",
+                            line.getStatusCode(), line.getReasonPhrase(), url
+                    ));
+                }
+                return EntityUtils.toString(response.getEntity());
+            }
+            catch (Exception e) {
+                throw new RuntimeException("Fetching problem: "+url, e);
+            }
+        }
+
+        @Override
+        public File file(String systemId) {
+            return storage.cache(systemId.replaceAll("[/:]", "_"));
+        }
     }
 
     private class QuitAction extends AbstractAction {

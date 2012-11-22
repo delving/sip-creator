@@ -170,7 +170,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         Validator validator;
         try {
             validator = createValidator();
-            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null);
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
             parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
             parser.setProgressListener(new FakeProgressListener());
             reportWriter = getDataSet().openReportWriter(recMapping.getPrefix());

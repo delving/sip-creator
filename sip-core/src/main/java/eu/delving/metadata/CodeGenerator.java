@@ -34,6 +34,7 @@ public class CodeGenerator {
     private RecMapping recMapping;
     private EditPath editPath;
     private CodeOut codeOut = new CodeOut();
+    private boolean trace;
 
     public CodeGenerator(RecMapping recMapping) {
         this.recMapping = recMapping;
@@ -41,6 +42,11 @@ public class CodeGenerator {
 
     public CodeGenerator withEditPath(EditPath editPath) {
         this.editPath = editPath;
+        return this;
+    }
+
+    public CodeGenerator withTrace(boolean trace) {
+        this.trace = trace;
         return this;
     }
 
@@ -127,9 +133,9 @@ public class CodeGenerator {
                 toBranchCode(recDefNode, groovyParams);
             }
             else if (recDefNode.hasActiveAttributes()) {
-                startBuilderCall(recDefNode, false, "R0", groovyParams);
+                startBuilderCall(recDefNode, false, groovyParams);
                 codeOut.line("// no node mappings");
-                codeOut._line("} // R0");
+                codeOut._line("}");
             }
         }
         else if (editPath != null && editPath.getNodeMapping().recDefNode == recDefNode) {
@@ -162,9 +168,9 @@ public class CodeGenerator {
         List<String> ifAbsentCode = StringUtil.getIfAbsentCode(groovyCode);
         if (ifAbsentCode != null) {
             codeOut.line_("if (_absent_) {");
-            startBuilderCall(recDefNode, false, "R0a", groovyParams);
+            startBuilderCall(recDefNode, false, groovyParams);
             indentCode(ifAbsentCode, codeOut);
-            codeOut._line("} // R0a");
+            codeOut._line("}");
             codeOut._line("}");
         }
     }
@@ -184,14 +190,15 @@ public class CodeGenerator {
                 toMapNodeMapping(recDefNode, nodeMapping, groovyParams);
             }
             else {
+                trace();
                 codeOut.line_(
-                        "%s %s { %s -> // R1",
+                        "%s %s { %s ->",
                         toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
                 );
                 groovyParams.push(getMapName(nodeMapping));
                 toMapNodeMapping(recDefNode, nodeMapping, groovyParams);
                 groovyParams.pop();
-                codeOut._line("} // R1");
+                codeOut._line("}");
             }
         }
         else { // path should never be empty
@@ -202,34 +209,36 @@ public class CodeGenerator {
                 toNodeMappingLoop(recDefNode, nodeMapping, path.withRootRemoved(), groovyParams);
             }
             else {
+                trace();
                 codeOut.line_(
-                        "%s %s { %s -> // R6",
+                        "%s %s { %s ->",
                         toLoopRef(path), operator.getCodeString(), param
                 );
                 groovyParams.push(param);
                 toNodeMappingLoop(recDefNode, nodeMapping, path.withRootRemoved(), groovyParams);
                 groovyParams.pop();
-                codeOut._line("} // R6");
+                codeOut._line("}");
             }
         }
     }
 
     private void toMapNodeMapping(RecDefNode recDefNode, NodeMapping nodeMapping, Stack<String> groovyParams) {
         if (recDefNode.isLeafElem()) {
-            startBuilderCall(recDefNode, true, "R3", groovyParams);
+            startBuilderCall(recDefNode, true, groovyParams);
             codeOut.start(nodeMapping);
             toLeafElementCode(nodeMapping, groovyParams);
             codeOut.end(nodeMapping);
-            codeOut._line("} // R3");
+            codeOut._line("}");
         }
         else {
-            startBuilderCall(recDefNode, true, "R4", groovyParams);
+            startBuilderCall(recDefNode, true, groovyParams);
             codeOut.start(nodeMapping);
             for (RecDefNode sub : recDefNode.getChildren()) {
                 if (sub.isAttr()) continue;
                 if (sub.isChildOpt()) {
+                    trace();
                     codeOut.line(
-                            "%s '%s' // R5",
+                            "%s '%s'",
                             sub.getTag().toBuilderCall(), sub.getOptBox()
                     );
                 }
@@ -238,17 +247,18 @@ public class CodeGenerator {
                 }
             }
             codeOut.end(nodeMapping);
-            codeOut._line("} // R4");
+            codeOut._line("}");
         }
     }
 
     private void toBranchCode(RecDefNode recDefNode, Stack<String> groovyParams) {
-        startBuilderCall(recDefNode, false, "R8", groovyParams);
+        startBuilderCall(recDefNode, false, groovyParams);
         for (RecDefNode sub : recDefNode.getChildren()) {
             if (sub.isAttr()) continue;
             if (sub.isChildOpt()) {
+                trace();
                 codeOut.line(
-                        "%s '%s' // R9",
+                        "%s '%s'",
                         sub.getTag().toBuilderCall(), sub.getOptBox()
                 );
             }
@@ -256,38 +266,37 @@ public class CodeGenerator {
                 toElementCode(sub, groovyParams);
             }
         }
-        codeOut._line("} // R8");
+        codeOut._line("}");
     }
 
     private void toLeafCode(RecDefNode recDefNode, NodeMapping nodeMapping, Stack<String> groovyParams) {
         if (nodeMapping.hasMap()) {
+            trace();
             codeOut.line_(
-                    "%s %s { %s -> // R10",
+                    "%s %s { %s ->",
                     toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
             );
-            startBuilderCall(recDefNode, true, "R11", groovyParams);
+            startBuilderCall(recDefNode, true, groovyParams);
             codeOut.start(nodeMapping);
             toLeafElementCode(nodeMapping, groovyParams);
             codeOut.end(nodeMapping);
-            codeOut._line("} // R11");
-            codeOut._line("} // R10");
+            codeOut._line("}");
+            codeOut._line("}");
         }
         else {
-            startBuilderCall(recDefNode, true, "R12", groovyParams);
+            startBuilderCall(recDefNode, true, groovyParams);
             codeOut.start(nodeMapping);
             toLeafElementCode(nodeMapping, groovyParams);
             codeOut.end(nodeMapping);
-            codeOut._line("} // R12");
+            codeOut._line("}");
         }
     }
 
-    private void startBuilderCall(RecDefNode recDefNode, boolean absentFalse, String comment, Stack<String> groovyParams) {
+    private void startBuilderCall(RecDefNode recDefNode, boolean absentFalse, Stack<String> groovyParams) {
         if (recDefNode.hasActiveAttributes()) {
             Tag tag = recDefNode.getTag();
-            codeOut.line_(
-                    "%s ( // %s%s",
-                    tag.toBuilderCall(), comment, recDefNode.isRootOpt() ? "(opt)" : ""
-            );
+            trace();
+            codeOut.line_("%s (", tag.toBuilderCall());
             boolean comma = false;
             for (RecDefNode sub : recDefNode.getChildren()) {
                 if (!sub.isAttr()) continue;
@@ -297,22 +306,26 @@ public class CodeGenerator {
                     if (dictionaryOptBox != null) {
                         if (recDefNode.getNodeMappings().size() == 1) {
                             NodeMapping nodeMapping = recDefNode.getNodeMappings().values().iterator().next();
+                            trace();
                             codeOut.line_("%s : {", sub.getTag().toBuilderCall());
                             toDictionaryCode(nodeMapping, groovyParams, sub.getOptBox().role);
                             codeOut._line("}");
                         }
                         else { // this is actually a kind of error:
-                            codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.getOptBox(), comment);
+                            trace();
+                            codeOut.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.getOptBox());
                         }
                     }
                     else {
-                        codeOut.line("%s : '%s' // %sc", sub.getTag().toBuilderCall(), sub.getOptBox(), comment);
+                        trace();
+                        codeOut.line("%s : '%s'", sub.getTag().toBuilderCall(), sub.getOptBox());
                     }
                     comma = true;
                 }
                 else {
                     for (NodeMapping nodeMapping : sub.getNodeMappings().values()) {
                         if (comma) codeOut.line(",");
+                        trace();
                         codeOut.line_("%s : {", sub.getTag().toBuilderCall());
                         codeOut.start(nodeMapping);
                         toAttributeCode(nodeMapping, groovyParams);
@@ -329,8 +342,8 @@ public class CodeGenerator {
         }
         else {
             codeOut.line_(
-                    "%s { %s // %s%s",
-                    recDefNode.getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : "", comment, recDefNode.isRootOpt() ? "(opt)" : ""
+                    "%s { %s",
+                    recDefNode.getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : ""
             );
         }
     }
@@ -392,6 +405,7 @@ public class CodeGenerator {
             if (nodeMapping.hasMap()) {
                 needLoop = !groovyParams.contains(getMapName(nodeMapping));
                 if (needLoop) {
+                    trace();
                     codeOut.line_(
                             "%s %s { %s ->",
                             toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
@@ -402,6 +416,7 @@ public class CodeGenerator {
                 String param = toLoopGroovyParam(path);
                 needLoop = !groovyParams.contains(param);
                 if (needLoop) {
+                    trace();
                     codeOut.line_(
                             "%s %s { %s ->",
                             toLoopRef(path), nodeMapping.getOperator().getCodeString(), param
@@ -436,7 +451,8 @@ public class CodeGenerator {
     }
 
     private void toLeafElementCode(NodeMapping nodeMapping, Stack<String> groovyParams) {
-        if (nodeMapping.recDefNode.isAttr() || !nodeMapping.recDefNode.isLeafElem()) throw new IllegalStateException("Not a leaf element!");
+        if (nodeMapping.recDefNode.isAttr() || !nodeMapping.recDefNode.isLeafElem())
+            throw new IllegalStateException("Not a leaf element!");
         toUserCode(nodeMapping, groovyParams);
     }
 
@@ -480,4 +496,16 @@ public class CodeGenerator {
         return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(nodeMapping.outputPath.takeFirst());
     }
 
+    private void trace() {
+        if (!trace) return;
+        StringBuilder out = new StringBuilder("// CodeGenerator.java trace: ");
+        Iterator<StackTraceElement> stack = Arrays.asList(Thread.currentThread().getStackTrace()).iterator();
+        stack.next();
+        while (stack.hasNext()) {
+            StackTraceElement element = stack.next();
+            if (!"CodeGenerator.java".equals(element.getFileName())) continue;
+            out.append(' ').append(String.valueOf(element.getLineNumber()));
+        }
+        codeOut.line(out.toString());
+    }
 }
