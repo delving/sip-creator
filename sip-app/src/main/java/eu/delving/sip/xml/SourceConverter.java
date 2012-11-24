@@ -22,11 +22,16 @@
 package eu.delving.sip.xml;
 
 import com.ctc.wstx.stax.WstxInputFactory;
+import eu.delving.metadata.Hasher;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
-import eu.delving.sip.model.Feedback;
+import eu.delving.sip.files.StorageException;
+import eu.delving.stats.Stats;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -34,15 +39,17 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.security.DigestOutputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
+import static eu.delving.sip.files.Storage.FileType.SOURCE;
 import static eu.delving.sip.files.Storage.RECORD_TAG;
+import static eu.delving.sip.files.StorageHelper.*;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.FileUtils.moveFile;
 
 /**
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
@@ -52,18 +59,16 @@ import static eu.delving.sip.files.Storage.RECORD_TAG;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class SourceConverter {
+public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     public static final String CONVERTER_DELIMITER = ":::";
     public static final String ANONYMOUS_RECORDS_PROPERTY = "anonymousRecords";
     private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
-    private Feedback feedback;
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
     private Path recordRootPath;
     private Path uniqueElementPath;
-    private Map<String, String> namespaces;
     private int recordCount, totalRecords, anonymousRecords;
     private ProgressListener progressListener;
     private String unique;
@@ -77,14 +82,59 @@ public class SourceConverter {
     private String converterReplacement;
     private int uniqueRepeatCount;
     private int maxUniqueValueLength;
+    private DataSet dataSet;
+    private Runnable work;
 
-    public SourceConverter(Feedback feedback, Path recordRootPath, int totalRecords, Path uniqueElementPath, int maxUniqueValueLength, String uniqueConverter, Map<String, String> namespaces) {
-        this.feedback = feedback;
-        this.recordRootPath = recordRootPath;
-        this.totalRecords = totalRecords;
-        this.uniqueElementPath = uniqueElementPath;
-        this.maxUniqueValueLength = maxUniqueValueLength;
-        this.namespaces = namespaces;
+    public SourceConverter(DataSet dataSet, Runnable finished){
+        this.dataSet = dataSet;
+        this.work = finished;
+    }
+
+    @Override
+    public DataSet getDataSet() {
+        return dataSet;
+    }
+
+    @Override
+    public Job getJob() {
+        return Job.CONVERT_SOURCE;
+    }
+
+    @Override
+    public void run() {
+        try {
+            interpretHints();
+            if (!dataSet.isRecentlyImported()) {
+                throw new StorageException("Import to source would be redundant, since source is newer");
+            }
+            Stats stats = dataSet.getStats(false, null);
+            if (stats == null) {
+                throw new StorageException("No analysis stats so conversion doesn't trust the record count");
+            }
+            Hasher hasher = new Hasher();
+            DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(dataSet.sourceOutput()));
+            parse(dataSet.openImportedInputStream(), digestOut, stats.namespaces); // streams closed within parse()
+            File hashedSource = new File(dataSet.sourceOutput().getParentFile(), hasher.prefixFileName(SOURCE.getName()));
+            if (hashedSource.exists()) deleteQuietly(hashedSource);
+            moveFile(dataSet.sourceOutput(), hashedSource);
+            deleteQuietly(statsFile(dataSet.sourceOutput().getParentFile(), true, null));
+        }
+        catch (Exception e) {
+            deleteQuietly(dataSet.sourceOutput());
+            progressListener.getFeedback().alert("Conversion failed", e);
+        }
+        finally {
+            if (work != null) work.run();
+        }
+    }
+
+    public void interpretHints() throws StorageException {
+        Map<String, String> hints = dataSet.getHints();
+        this.recordRootPath = getRecordRoot(hints);
+        this.totalRecords = getRecordCount(hints);
+        this.uniqueElementPath = getUniqueElement(hints);
+        this.maxUniqueValueLength = getMaxUniqueValueLength(hints);
+        String uniqueConverter = getUniqueValueConverter(hints);
         if (uniqueConverter != null) {
             int divider = uniqueConverter.indexOf(CONVERTER_DELIMITER);
             if (divider > 0) {
@@ -94,17 +144,23 @@ public class SourceConverter {
         }
     }
 
+    @Override
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
+        this.progressListener.setProgressMessage(String.format(
+                "Converting source data of '%s' to standard form",
+                dataSet.getSpec()
+        ));
     }
 
-    public void parse(InputStream inputStream, OutputStream outputStream) throws XMLStreamException, IOException {
-        if (progressListener != null) progressListener.prepareFor(totalRecords);
+    public void parse(InputStream inputStream, OutputStream outputStream, Map<String,String> namespaces) throws XMLStreamException, IOException {
+        progressListener.prepareFor(totalRecords);
         anonymousRecords = Integer.parseInt(System.getProperty(ANONYMOUS_RECORDS_PROPERTY, "0"));
         Path path = Path.create();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         try {
+            processEvents:
             while (!finished) {
                 XMLEvent event = in.nextEvent();
                 switch (event.getEventType()) {
@@ -125,7 +181,7 @@ public class SourceConverter {
                         start = event.asStartElement();
                         path = path.child(Tag.element(start.getName()));
                         handleStartElement(path, followsStart);
-                        if (progressListener != null) progressListener.setProgress(recordCount);
+                        progressListener.setProgress(recordCount);
                         break;
                     case XMLEvent.END_ELEMENT:
                         EndElement end = event.asEndElement();
@@ -175,8 +231,7 @@ public class SourceConverter {
                         out.add(eventFactory.createCharacters("\n"));
                         out.add(eventFactory.createEndDocument());
                         out.flush();
-                        finished = true;
-                        break;
+                        break processEvents;
                     case XMLEvent.CHARACTERS:
                     case XMLEvent.CDATA:
                         if (recordEvents) extractLines(event.asCharacters().getData());
@@ -184,9 +239,12 @@ public class SourceConverter {
                 }
             }
         }
+        catch (CancelException e) {
+            progressListener.getFeedback().alert("Conversion cancelled");
+        }
         finally {
-            if (feedback != null && uniqueRepeatCount > 0) {
-                feedback.alert(String.format("Uniqueness violations : " + uniqueRepeatCount));
+            if (uniqueRepeatCount > 0) {
+                progressListener.getFeedback().alert(String.format("Uniqueness violations : " + uniqueRepeatCount));
             }
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
@@ -332,4 +390,5 @@ public class SourceConverter {
         recordEvents = false;
         eventBuffer.clear();
     }
+
 }

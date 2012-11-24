@@ -88,6 +88,15 @@ public class Path implements Comparable<Path>, Serializable {
         return new Path(this, newTag);
     }
 
+    public Path descendant(Path path) {
+        Path extended = this;
+        for (int walk = 0; walk<path.size(); walk++) {
+            Tag tag = path.getTag(walk);
+            extended = extended.child(tag);
+        }
+        return extended;
+    }
+
     public Path parent() {
         return parent;
     }
@@ -119,6 +128,11 @@ public class Path implements Comparable<Path>, Serializable {
         else {
             return parent.withRootRemoved().child(tag);
         }
+    }
+
+    public Path withoutOpts() {
+        if (this == ROOT) return this;
+        return this.parent().withoutOpts().child(tag.withOpt(null));
     }
 
     public Path extendAncestor(Path ancestor) {

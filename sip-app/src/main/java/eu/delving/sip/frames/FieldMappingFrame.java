@@ -33,7 +33,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +45,7 @@ import java.util.List;
 import static eu.delving.metadata.NodeMappingChange.OPERATOR;
 import static eu.delving.metadata.StringUtil.toGroovyFirstIdentifier;
 import static eu.delving.metadata.StringUtil.toGroovyIdentifier;
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
@@ -86,16 +90,11 @@ public class FieldMappingFrame extends FrameBase {
         mainTab.addTab("Code", createCodeOutputPanel());
         mainTab.addTab("Dictionary", dictionaryPanel);
         mainTab.addTab("Documentation", scrollVH(docArea));
-        attachAction(UNDO_ACTION);
-        attachAction(REDO_ACTION);
+        attachAccelerator(UNDO_ACTION, codeArea);
+        attachAccelerator(REDO_ACTION, codeArea);
         new URLLauncher(sipModel, outputArea, sipModel.getFeedback());
         wireUp();
         handleEnablement();
-    }
-
-    private void attachAction(Action action) {
-        codeArea.getInputMap().put((KeyStroke) action.getValue(Action.ACCELERATOR_KEY), action.getValue(Action.NAME));
-        codeArea.getActionMap().put(action.getValue(Action.NAME), action);
     }
 
     private void handleEnablement() {
@@ -278,6 +277,10 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+            }
         });
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -388,7 +391,7 @@ public class FieldMappingFrame extends FrameBase {
                     @Override
                     public void run() {
                         if (sipModel.getCreateModel().hasNodeMapping()) {
-                            sipModel.getCreateModel().getNodeMapping().revertToGenerated();
+                            sipModel.getCreateModel().getNodeMapping().setGroovyCode(null);
                         }
                         sipModel.getFieldCompileModel().setNodeMapping(sipModel.getCreateModel().getNodeMapping());
                     }
@@ -404,8 +407,7 @@ public class FieldMappingFrame extends FrameBase {
 
     private class UndoAction extends AbstractAction {
         private UndoAction() {
-            super("Undo");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            configAction(this, "Undo", null, MENU_Z);
         }
 
         @Override
@@ -416,8 +418,7 @@ public class FieldMappingFrame extends FrameBase {
 
     private class RedoAction extends AbstractAction {
         private RedoAction() {
-            super("Redo");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK));
+            configAction(this, "Redo", null, SH_MENU_Z);
         }
 
         @Override

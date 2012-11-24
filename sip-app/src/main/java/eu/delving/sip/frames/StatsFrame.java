@@ -39,8 +39,9 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -67,10 +68,6 @@ public class StatsFrame extends FrameBase {
     public StatsFrame(SipModel sipModel) {
         super(Which.STATISTICS, sipModel, "Stats");
         wireUp();
-        getAction().putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
     }
 
     @Override

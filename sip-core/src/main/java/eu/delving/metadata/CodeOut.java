@@ -36,21 +36,13 @@ public class CodeOut {
     private CodeOut nodeMappingCodeOut;
     private String nodeMappingCode;
 
-    public static CodeOut create(NodeMapping nodeMapping) {
-        return new CodeOut(nodeMapping);
-    }
-
-    public static CodeOut create() {
-        return new CodeOut(null);
-    }
-
-    private CodeOut(NodeMapping nodeMapping) {
+    public void setNodeMapping(NodeMapping nodeMapping) {
         this.nodeMapping = nodeMapping;
     }
 
     public void start(NodeMapping nodeMapping) {
         if (this.nodeMapping == nodeMapping && nodeMappingCode == null) {
-            nodeMappingCodeOut = new CodeOut(null);
+            nodeMappingCodeOut = new CodeOut();
         }
     }
 

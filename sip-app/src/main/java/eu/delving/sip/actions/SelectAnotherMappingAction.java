@@ -23,16 +23,18 @@ package eu.delving.sip.actions;
 
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import static eu.delving.sip.base.KeystrokeHelper.*;
+import static eu.delving.sip.base.SwingHelper.ICON_SELECT_ANOTHER;
 
 /**
  * Select another mapping for the same dataset
@@ -41,13 +43,13 @@ import java.util.List;
  */
 
 public class SelectAnotherMappingAction extends AbstractAction implements Work {
-    public static final String DEFAULT_STRING = "Select another schema";
-    public static final String SINGLE_SELECTION_HTML = "Select the %s schema";
+    public static final String DEFAULT_STRING = "Select other schema";
+    public static final String SINGLE_SELECTION_STRING = "Select the %s schema";
     private SipModel sipModel;
     private List<SchemaVersion> choices = new ArrayList<SchemaVersion>();
 
     public SelectAnotherMappingAction(final SipModel sipModel) {
-        super(DEFAULT_STRING);
+        configAction(this, DEFAULT_STRING, ICON_SELECT_ANOTHER, MENU_S);
         this.sipModel = sipModel;
         sipModel.getMappingModel().addSetListener(new MappingModel.SetListener() {
             @Override
@@ -65,20 +67,20 @@ public class SelectAnotherMappingAction extends AbstractAction implements Work {
                             switch (choices.size()) {
                                 case 1:
                                     setEnabled(true);
-                                    putValue(Action.NAME, String.format(SINGLE_SELECTION_HTML, choices.get(0).getPrefix().toUpperCase()));
+                                    putValue(Action.NAME, String.format(SINGLE_SELECTION_STRING, choices.get(0).getPrefix().toUpperCase()));
                                     break;
                                 default: // 0 or 2 or more
                                     setEnabled(!choices.isEmpty());
                                     putValue(Action.NAME, DEFAULT_STRING);
                                     break;
                             }
+                            addStrokeToName(SelectAnotherMappingAction.this);
                         }
                     });
                 }
             }
         });
         setEnabled(false);
-        putValue(Action.SMALL_ICON, SwingHelper.ICON_SELECT_ANOTHER);
     }
 
     @Override

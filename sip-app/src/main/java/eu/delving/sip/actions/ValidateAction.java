@@ -22,7 +22,6 @@
 package eu.delving.sip.actions;
 
 import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
@@ -30,11 +29,11 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
+import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.SwingHelper.ICON_VALIDATE;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 
 /**
@@ -50,13 +49,10 @@ public class ValidateAction extends AbstractAction {
     private Swing investigate;
 
     public ValidateAction(SipModel sipModel, Swing investigate) {
-        super("<html><b>Map and validate all records</b>");
+        configAction(this, "<html><b>Map and validate all records</b>", ICON_VALIDATE, null);
         this.sipModel = sipModel;
         this.investigate = investigate;
         setEnabled(false);
-        putValue(Action.SMALL_ICON, SwingHelper.ICON_VALIDATE);
-        KeyStroke keyStrokeV = KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-        putValue(Action.ACCELERATOR_KEY, keyStrokeV);
         this.sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {

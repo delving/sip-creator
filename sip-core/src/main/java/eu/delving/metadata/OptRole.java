@@ -30,8 +30,10 @@ import org.apache.commons.lang.WordUtils;
  */
 
 public enum OptRole {
+    ABSENT,
     ROOT,
-    CHILD,
+    DYNAMIC,
+    UNASSIGNED_CHILD,
     KEY,
     VALUE,
     SCHEMA,

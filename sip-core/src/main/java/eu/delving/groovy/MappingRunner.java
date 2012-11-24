@@ -70,10 +70,8 @@ public class MappingRunner {
         this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
         this.pluginBinding = pluginBinding;
-        CodeOut codeOut = CodeOut.create();
-        recMapping.toCode(codeOut, editPath);
-        code = codeOut.toString();
-        script = groovyCodeResource.createMappingScript(code);
+        this.code = new CodeGenerator(recMapping).withEditPath(editPath).toRecordMappingCode();
+        this.script = groovyCodeResource.createMappingScript(code);
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());
         }
@@ -97,9 +95,8 @@ public class MappingRunner {
         counter += 1;
         try {
             Binding binding = new Binding();
-            DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getNamespaces());
-            RecDef recDef = recMapping.getRecDefTree().getRecDef();
-            binding.setVariable("_optLookup", recDef.optLookup);
+            DOMBuilder builder = DOMBuilder.newInstance(recMapping.getRecDefTree().getRecDef());
+            binding.setVariable("_optLookup", recMapping.getRecDefTree().getRecDef().optLookup);
             binding.setVariable("output", builder);
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));

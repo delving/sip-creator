@@ -28,7 +28,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -46,6 +46,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     private Timer triggerTimer = new Timer(200, this);
     private ListReceiver listReceiver;
     private boolean freezeMode;
+    private boolean running = true;
 
     @Override
     public Job getJob() {
@@ -86,11 +87,12 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        sipModel.exec(this);
+        if (running) sipModel.exec(this);
     }
 
     @Override
     public void run() {
+        if (!running) return;
         try {
             final RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping != null) {
@@ -151,6 +153,15 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
     @Override
     public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
         kick(false);
+    }
+
+    @Override
+    public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+    }
+
+    public void shutdown() {
+        running = false;
+        triggerTimer.stop();
     }
 
     private void kick(boolean freeze) {

@@ -36,7 +36,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -330,7 +332,7 @@ public class DictionaryPanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (((String) value).trim().isEmpty()) value = COPY_VERBATIM;
+            if (value == null || ((String) value).trim().isEmpty()) value = COPY_VERBATIM;
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
 

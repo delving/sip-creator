@@ -30,7 +30,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -53,6 +53,7 @@ public class DataSetModel implements RecDefModel, PluginBinding {
     private DataSet dataSet;
     private DataSetState currentState = ABSENT;
     private MappingModel mappingModel;
+    private StateCheckTimer stateCheckTimer;
 
     public DataSetModel() { // test only
         this.mappingModel = new MappingModel();
@@ -60,7 +61,11 @@ public class DataSetModel implements RecDefModel, PluginBinding {
 
     public DataSetModel(SipModel sipModel) {
         this.mappingModel = new MappingModel(sipModel);
-        new StateCheckTimer(sipModel);
+        stateCheckTimer = new StateCheckTimer(sipModel);
+    }
+
+    public void shutdown() {
+        stateCheckTimer.shutdown();
     }
 
     public MappingModel getMappingModel() {
@@ -169,7 +174,7 @@ public class DataSetModel implements RecDefModel, PluginBinding {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            sipModel.exec(this);
+            if (timer.isRunning()) sipModel.exec(this);
         }
 
         @Override
@@ -181,6 +186,10 @@ public class DataSetModel implements RecDefModel, PluginBinding {
         public DataSet getDataSet() {
             if (sipModel.getDataSetModel().isEmpty()) return null;
             return sipModel.getDataSetModel().getDataSet();
+        }
+
+        public void shutdown() {
+            timer.stop();
         }
     }
 

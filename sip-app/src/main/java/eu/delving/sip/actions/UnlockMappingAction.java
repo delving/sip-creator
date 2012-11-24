@@ -21,13 +21,16 @@
 
 package eu.delving.sip.actions;
 
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
+
+import static eu.delving.sip.base.KeystrokeHelper.MENU_U;
+import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.SwingHelper.ICON_UNLOCK;
 
 /**
  * Unlock this mapping
@@ -40,10 +43,9 @@ public class UnlockMappingAction extends AbstractAction implements Work {
     private SipModel sipModel;
 
     public UnlockMappingAction(SipModel sipModel) {
-        super("Unlock mapping for editing");
+        configAction(this, "Unlock mapping for editing", ICON_UNLOCK, MENU_U);
         this.sipModel = sipModel;
         setEnabled(false);
-        putValue(Action.SMALL_ICON, SwingHelper.ICON_UNLOCK);
     }
 
     @Override

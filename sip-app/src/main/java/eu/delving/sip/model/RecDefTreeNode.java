@@ -22,16 +22,19 @@
 
 package eu.delving.sip.model;
 
+import eu.delving.metadata.DynOpt;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.SwingHelper;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.*;
+import javax.swing.JTree;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -78,6 +81,10 @@ public class RecDefTreeNode extends FilterNode {
         return parent;
     }
 
+    public RecDefTreeNode getParentNode() {
+        return parent;
+    }
+
     @Override
     public boolean isLeaf() {
         return recDefNode.getChildren().isEmpty();
@@ -101,7 +108,8 @@ public class RecDefTreeNode extends FilterNode {
     public boolean passesFilter() {
         RecDefTreeModel recDefTreeModel = (RecDefTreeModel) filterModel;
         if (recDefTreeModel.isAttributesHidden() && isAttr()) return false;
-        if (recDefNode.isHiddenOpt(recDefTreeModel.getSelectedOpt()) && !recDefNode.hasDescendentNodeMappings()) return false;
+        if (recDefNode.isHiddenOpt(recDefTreeModel.getSelectedOpt()) && !recDefNode.isPopulated())
+            return false;
         return super.passesFilter();
     }
 
@@ -169,6 +177,18 @@ public class RecDefTreeNode extends FilterNode {
         return null;
     }
 
+    public RecDefTreeNode createDynOptSibling(DynOpt dynOpt) {
+        RecDefNode sibling = recDefNode.addSibling(dynOpt);
+        int index = parent.children.indexOf(this);
+        if (index < 0) throw new RuntimeException("Unable to find self among children of parent");
+        RecDefTreeNode siblingTreeNode = create(sibling);
+        siblingTreeNode.parent = parent;
+        siblingTreeNode.setFilterModel(filterModel);
+        parent.children.add(index + 1, siblingTreeNode);
+        refresh();
+        return siblingTreeNode;
+    }
+
     public static class RecDefPath extends TreePath {
 
         RecDefPath(RecDefTreeNode elemNode) {
@@ -190,7 +210,6 @@ public class RecDefTreeNode extends FilterNode {
     }
 
     public static class Renderer extends DefaultTreeCellRenderer {
-
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             setOpaque(false);
@@ -210,6 +229,9 @@ public class RecDefTreeNode extends FilterNode {
                 else {
                     setIcon(SwingHelper.ICON_VALUE);
                 }
+                if (node.recDefNode.isPopulated()) {
+                    setColor(sel, node);
+                }
                 if (!node.recDefNode.getNodeMappings().isEmpty()) {
                     markNodeMappings(sel, node);
                 }
@@ -220,7 +242,7 @@ public class RecDefTreeNode extends FilterNode {
             return component;
         }
 
-        private void markNodeMappings(boolean selected, RecDefTreeNode node) {
+        private void setColor(boolean selected, RecDefTreeNode node) {
             Color color = node.isHighlighted() ? HILIGHTED_COLOR : MAPPED_COLOR;
             if (selected) {
                 setOpaque(false);
@@ -232,7 +254,9 @@ public class RecDefTreeNode extends FilterNode {
                 setBackground(color);
                 setForeground(Color.BLACK);
             }
-//            setBorder(BorderFactory.createEtchedBorder());
+        }
+
+        private void markNodeMappings(boolean selected, RecDefTreeNode node) {
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node)));
         }
 

@@ -28,7 +28,9 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Swing;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -126,6 +128,10 @@ public class NodeMappingListModel extends AbstractListModel {
                         fireIntervalRemoved(this, index, index);
                     }
                 });
+            }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         };
     }

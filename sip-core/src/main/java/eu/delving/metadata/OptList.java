@@ -50,16 +50,16 @@ public class OptList {
     public Path path;
 
     @XStreamAsAttribute
-    public Tag key;
+    public Path key;
 
     @XStreamAsAttribute
-    public Tag value;
+    public Path value;
 
     @XStreamAsAttribute
-    public Tag schema;
+    public Path schema;
 
     @XStreamAsAttribute
-    public Tag schemaUri;
+    public Path schemaUri;
 
     @XStreamImplicit
     public List<Opt> opts;
@@ -71,10 +71,10 @@ public class OptList {
             throw new RuntimeException("An option list may not be connected to an attribute: " + path);
         }
         path = path.withDefaultPrefix(recDef.prefix);
-        key = resolveTag(key, recDef);
-        value = resolveTag(value, recDef);
-        schema = resolveTag(schema, recDef);
-        schemaUri = resolveTag(schemaUri, recDef);
+        key = resolveTag(path, key, recDef);
+        value = resolveTag(path, value, recDef);
+        schema = resolveTag(path, schema, recDef);
+        schemaUri = resolveTag(path, schemaUri, recDef);
         RecDef.Elem elem = recDef.findElem(path);
         elem.optList = this;
         if (dictionary != null) {
@@ -84,8 +84,17 @@ public class OptList {
         }
     }
 
-    private static Tag resolveTag(Tag tag, RecDef recDef) {
-        return tag != null ? tag.defaultPrefix(recDef.prefix) : null;
+    private Path resolveTag(Path path, Path pathX, RecDef recDef) {
+        if (pathX == null) return null;
+        pathX = pathX.withDefaultPrefix(recDef.prefix);
+        path = path.descendant(pathX);
+        if (path.peek().isAttribute()) {
+            recDef.findAttr(path);
+        }
+        else {
+            recDef.findElem(path);
+        }
+        return path;
     }
 
     public List<String> getValues() {
@@ -118,7 +127,7 @@ public class OptList {
         public OptList parent;
 
         public String toString() {
-            return value;
+            return value == null ? key : value;
         }
     }
 

@@ -21,14 +21,17 @@
 
 package eu.delving.sip.base;
 
+import org.antlr.stringtemplate.AttributeRenderer;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.net.URL;
 
 /**
@@ -76,6 +79,10 @@ public class SwingHelper {
     }
 
     private static final StringTemplateGroup STRING_TEMPLATE = new StringTemplateGroup("Templates");
+
+    static {
+        STRING_TEMPLATE.registerRenderer(String.class, new HtmlEncodedRenderer());
+    }
 
     public static StringTemplate getTemplate(String name) {
         return STRING_TEMPLATE.getInstanceOf("st/" + name);
@@ -143,6 +150,31 @@ public class SwingHelper {
         }
         catch (UnavailableServiceException ue) {
             return true;
+        }
+    }
+
+    private static class HtmlEncodedRenderer implements AttributeRenderer {
+        @Override
+        public String toString(Object o) {
+            StringBuilder out = new StringBuilder();
+            for (String line : o.toString().split("\n")) {
+                line = StringEscapeUtils.escapeHtml(line);
+                boolean nonSpace = false;
+                for (char c : line.toCharArray()) {
+                    if (nonSpace) {
+                        out.append(c);
+                    }
+                    else if (c == ' ') {
+                        out.append("&nbsp;");
+                    }
+                    else {
+                        nonSpace = true;
+                        out.append(c);
+                    }
+                }
+                out.append("<br>\n");
+            }
+            return out.toString();
         }
     }
 }

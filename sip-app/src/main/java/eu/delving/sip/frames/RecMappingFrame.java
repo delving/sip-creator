@@ -32,11 +32,15 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.RevertMappingMenu;
 import eu.delving.sip.model.*;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JMenuBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 
 /**
@@ -94,6 +98,10 @@ public class RecMappingFrame extends FrameBase {
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
     }

@@ -29,11 +29,12 @@ import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static eu.delving.sip.base.KeystrokeHelper.MENU_G;
 import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.DataSetState.values;
 
@@ -46,6 +47,7 @@ import static eu.delving.sip.files.DataSetState.values;
 public class StatusPanel extends JPanel {
 
     private static final Border DEFAULT_BORDER = BorderFactory.createTitledBorder("Actions");
+    private ActionBridge actionBridge = new ActionBridge();
     private List<StateAction> actions = new ArrayList<StateAction>();
     private JButton button = new JButton();
 
@@ -90,6 +92,22 @@ public class StatusPanel extends JPanel {
 
     public void setReaction(DataSetState state, Action action) {
         for (StateAction stateAction : actions) if (stateAction.state == state) stateAction.setAction(action);
+    }
+
+    public Action getButtonAction() {
+        return actionBridge;
+    }
+
+    private class ActionBridge extends AbstractAction {
+        private ActionBridge() {
+            super("press!");
+            putValue(ACCELERATOR_KEY, MENU_G);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            button.doClick();
+        }
     }
 
     private class StateAction extends AbstractAction {

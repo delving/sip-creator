@@ -25,6 +25,7 @@ import eu.delving.MappingResult;
 import eu.delving.PluginBinding;
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -38,7 +39,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -78,6 +80,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private int maxUniqueValueLength;
     private String problemXML;
     private String problemMessage;
+    private SipModel sipModel;
 
     public interface Listener {
 
@@ -96,7 +99,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             GroovyCodeResource groovyCodeResource,
             Listener listener
     ) {
-        sipModel.getMappingModel().setLocked(true);
+        this.sipModel = sipModel;
+        this.sipModel.getMappingModel().setLocked(true);
         this.maxUniqueValueLength = maxUniqueValueLength;
         this.recordCount = recordCount;
         this.feedback = sipModel.getFeedback();
@@ -171,6 +175,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             validator = createValidator();
             mappingRunner = new MappingRunner(groovyCodeResource, recMapping, pluginBinding, null);
             parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
+            parser.setProgressListener(new FakeProgressListener());
             reportWriter = getDataSet().openReportWriter(recMapping.getPrefix());
             if (outputDirectory != null) xmlOutput = createXmlOutput();
         }
@@ -183,10 +188,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             while (!done) {
                 MetadataRecord record = parser.nextRecord();
                 if (record == null) break;
-                if (!progressListener.setProgress(record.getRecordNumber())) {
-                    done = true;
-                    break;
-                }
+                progressListener.setProgress(record.getRecordNumber());
                 this.recordNumber = record.getRecordNumber();
                 try {
                     Node node = mappingRunner.runMapping(record);
@@ -241,8 +243,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 }
             }
         }
-        catch (MetadataParser.AbortException e) {
-            done = true;
+        catch (CancelException e) {
+            listener.aborted(this);
         }
         catch (Exception e) {
             feedback.alert("File processing problem", e);
@@ -278,7 +280,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         String fileName = String.format("%s-%s.xml", getDataSet().getSpec(), recMapping.getPrefix());
         File outputFile = new File(outputDirectory, fileName);
         OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
-        return new XmlOutput(outputStream, recDef().getNamespacesMap());
+        return new XmlOutput(outputStream, recDef().getNamespaceMap());
     }
 
     private RecDef recDef() {
@@ -357,18 +359,27 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     private NextStep askHowToProceed(int recordNumber) {
-        JCheckBox investigate = new JCheckBox(String.format(
+        JRadioButton continueButton = new JRadioButton(String.format(
+                "<html><b>Continue</b> - Continue the %s mapping of data set %s, discarding invalid record %d",
+                getPrefix(), getSpec(), recordNumber
+        ));
+        JRadioButton investigateButton = new JRadioButton(String.format(
                 "<html><b>Investigate</b> - Stop and fix the %s mapping of data set %s, with invalid record %d in view",
                 getPrefix(), getSpec(), recordNumber
         ));
-        JCheckBox ignore = new JCheckBox(
+        JRadioButton ignoreButton = new JRadioButton(
                 "<html><b>Ignore</b> - Accept this record as invalid and ignore subsequent invalid records"
         );
-        if (feedback.form("Continue?", investigate, ignore)) {
-            if (investigate.isSelected()) {
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(continueButton);
+        continueButton.setSelected(true);
+        bg.add(investigateButton);
+        bg.add(ignoreButton);
+        if (feedback.form("Invalid Record! How to proceed?", continueButton, investigateButton, ignoreButton)) {
+            if (investigateButton.isSelected()) {
                 return NextStep.INVESTIGATE;
             }
-            else if (ignore.isSelected()) {
+            else if (ignoreButton.isSelected()) {
                 return NextStep.IGNORE;
             }
             else {
@@ -377,6 +388,26 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
         else {
             return NextStep.ABORT;
+        }
+    }
+
+    private class FakeProgressListener implements ProgressListener {
+
+        @Override
+        public void setProgressMessage(String message) {
+        }
+
+        @Override
+        public void prepareFor(int total) {
+        }
+
+        @Override
+        public void setProgress(int progress) throws CancelException {
+        }
+
+        @Override
+        public Feedback getFeedback() {
+            return sipModel.getFeedback();
         }
     }
 }

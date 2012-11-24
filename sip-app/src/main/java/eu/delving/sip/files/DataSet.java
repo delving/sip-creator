@@ -26,7 +26,6 @@ import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.model.Feedback;
 import eu.delving.stats.Stats;
 
 import javax.xml.validation.Validator;
@@ -82,6 +81,8 @@ public interface DataSet {
 
     InputStream openImportedInputStream() throws StorageException;
 
+    File sourceOutput();
+
     InputStream openSourceInputStream() throws StorageException;
 
     File renameInvalidSource() throws StorageException;
@@ -107,10 +108,6 @@ public interface DataSet {
     PrintWriter openReportWriter(String prefix) throws StorageException;
 
     List<String> getReport(String prefix) throws StorageException;
-
-    void externalToImported(File inputFile, ProgressListener progressListener) throws StorageException;
-
-    void importedToSource(Feedback feedback, ProgressListener progressListener) throws StorageException;
 
     void deleteSource() throws StorageException;
 

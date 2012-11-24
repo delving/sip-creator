@@ -26,15 +26,13 @@ import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.*;
 import eu.delving.sip.model.FilterTreeModel;
 import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.MetadataParser;
+import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 import org.junit.*;
@@ -56,6 +54,7 @@ import static org.junit.Assert.*;
  */
 
 public class TestMappingValidation {
+    private static final MockProgressListener PROGRESS_LISTENER = new MockProgressListener();
     private Logger log = Logger.getLogger(getClass());
     private Mockery mock;
     private SourceTreeNode sourceTree;
@@ -70,8 +69,6 @@ public class TestMappingValidation {
         mock.delete();
     }
 
-    @Ignore
-    // todo: puzzling  cvc-complex-type.3.2.2: Attribute 'mods:type' is not allowed to appear in element 'mods:titleInfo'.
     @Test
     public void testMods() throws Exception {
         mock.prepareDataset(
@@ -157,7 +154,11 @@ public class TestMappingValidation {
 
     private void runFullCycle(int expectedRecords) throws Exception {
         assertEquals(String.valueOf(Arrays.asList(mock.files())), 2, mock.fileCount());
-        dataSet().externalToImported(mock.sampleInputFile(), null);
+
+        Work.LongTermWork importer = new FileImporter(mock.sampleInputFile(), dataSet(), null);
+        importer.setProgressListener(PROGRESS_LISTENER);
+        importer.run();
+
         assertEquals(3, mock.fileCount());
         assertEquals(IMPORTED, state());
 
@@ -171,7 +172,9 @@ public class TestMappingValidation {
         assertEquals(DELIMITED, state());
 
         assertFalse(dataSet().getLatestStats().sourceFormat);
-        dataSet().importedToSource(null, null);
+        Work.LongTermWork sourceImporter = new SourceConverter(dataSet(), null);
+        sourceImporter.setProgressListener(PROGRESS_LISTENER);
+        sourceImporter.run();
         assertEquals(6, mock.fileCount());
         assertEquals(SOURCED, state());
 
@@ -187,6 +190,8 @@ public class TestMappingValidation {
 //        System.out.println();
 
         MetadataParser parser = mock.parser();
+        parser.setProgressListener(PROGRESS_LISTENER);
+
         MetadataRecord record = parser.nextRecord();
 
 //        System.out.println(XmlNodePrinter.toXml(record.getRootNode()));
@@ -236,28 +241,8 @@ public class TestMappingValidation {
                 throw new RuntimeException(message, exception);
             }
         });
-        analysisParser.setProgressListener(progressListener());
+        analysisParser.setProgressListener(PROGRESS_LISTENER);
         analysisParser.run();
-    }
-
-    private ProgressListener progressListener() {
-        return new ProgressListener() {
-            @Override
-            public void setProgressMessage(String message) {
-                System.out.println("message = "+message);
-            }
-
-            @Override
-            public void prepareFor(int total) {
-                System.out.println("prepareFor = "+total);
-            }
-
-            @Override
-            public boolean setProgress(int progress) {
-                System.out.println("progress = "+progress);
-                return false;  // todo: implement
-            }
-        };
     }
 
     private DataSet dataSet() {

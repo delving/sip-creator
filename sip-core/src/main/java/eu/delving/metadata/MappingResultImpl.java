@@ -198,7 +198,7 @@ public class MappingResultImpl implements MappingResult {
     }
 
     private boolean isRecDefDelvingAware() {
-        return recDefTree.getRecDef().getNamespacesMap().containsKey(DELVING_PREFIX);
+        return recDefTree.getRecDef().getNamespaceMap().containsKey(DELVING_PREFIX);
     }
 
     private void resolveAFFRecord() {
@@ -302,7 +302,9 @@ public class MappingResultImpl implements MappingResult {
             path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), key));
         }
         RecDefNode recDefNode = recDefTree.getRecDefNode(path);
-        if (recDefNode == null) throw new RuntimeException("No recdef node for " + path);
+        if (recDefNode == null) {
+            throw new RuntimeException("No recdef node for " + path);
+        }
         return recDefNode;
     }
 

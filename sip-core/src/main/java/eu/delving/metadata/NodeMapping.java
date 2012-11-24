@@ -78,14 +78,17 @@ public class NodeMapping {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NodeMapping that = (NodeMapping) o;
-        if (inputPath != null ? !inputPath.equals(that.inputPath) : that.inputPath != null) return false;
-        if (outputPath != null ? !outputPath.equals(that.outputPath) : that.outputPath != null) return false;
-        return true;
+        return !(inputPath != null ? !inputPath.equals(that.inputPath) : that.inputPath != null)
+                && !(outputPath != null ? !outputPath.equals(that.outputPath) : that.outputPath != null);
     }
 
     @Override
     public int hashCode() {
         return inputPath.hashCode() + outputPath.hashCode();
+    }
+
+    public String getGroovyCode() {
+        return groovyCode == null ? null : linesToString(groovyCode);
     }
 
     public String getDocumentation() {
@@ -154,7 +157,9 @@ public class NodeMapping {
     }
 
     public NodeMapping setInputPaths(Collection<Path> inputPaths) {
-        if (inputPaths.isEmpty()) throw new RuntimeException();
+        if (inputPaths.isEmpty()) {
+            throw new RuntimeException("Trying to set input paths but there are none!");
+        }
         Path parent = null;
         for (Path input : inputPaths) {
             if (parent == null) {
@@ -186,175 +191,27 @@ public class NodeMapping {
         return this;
     }
 
-    public boolean generatedCodeLooksLike(String codeString, RecMapping recMapping) {
-        if (codeString == null) return false;
-        List<String> list = Arrays.asList(getCode(getGeneratorEditPath(), recMapping).split("\n"));
-        Iterator<String> walk = list.iterator();
-        return isSimilar(codeString, walk);
-    }
-
     public boolean codeLooksLike(String codeString) {
-        return groovyCode == null || isSimilar(codeString, groovyCode.iterator());
+        return groovyCode == null || isSimilarCode(codeString, groovyCode);
     }
 
-    public String getCode(EditPath editPath, RecMapping recMapping) {
-        CodeOut codeOut = CodeOut.create(this);
-        recMapping.toCode(codeOut, editPath);
-        return codeOut.getNodeMappingCode();
-    }
-
-    public void revertToGenerated() {
-        setGroovyCode(null, null);
-    }
-
-    public void setGroovyCode(String codeString, RecMapping recMapping) {
-        if (codeString == null || generatedCodeLooksLike(codeString, recMapping)) {
+    public void setGroovyCode(String codeString) {
+        if (codeString == null || codeString.trim().isEmpty()) {
             if (groovyCode != null) {
                 groovyCode = null;
                 notifyChanged(CODE);
             }
         }
-        else if (groovyCode == null || !codeLooksLike(codeString)) {
-            groovyCode = stringToLines(codeString);
-            notifyChanged(CODE);
+        else {
+            if (groovyCode == null || !codeLooksLike(codeString)) {
+                groovyCode = stringToLines(codeString);
+                notifyChanged(CODE);
+            }
         }
-    }
-
-    public void toAttributeCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        if (!recDefNode.isAttr()) return;
-        toUserCode(codeOut, groovyParams, editPath);
-    }
-
-    public void toLeafElementCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        if (recDefNode.isAttr() || !recDefNode.isLeafElem()) return;
-        toUserCode(codeOut, groovyParams, editPath);
-    }
-
-    public void toDictionaryCode(CodeOut codeOut, Stack<String> groovyParams, OptRole optRole) {
-        toInnerLoop(codeOut, getLocalPath(), groovyParams, optRole);
     }
 
     public boolean isUserCodeEditable() {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
-    }
-
-    private boolean isSimilar(String codeString, Iterator<String> walk) {
-        for (String line : codeString.split("\n")) {
-            line = line.trim();
-            if (line.isEmpty()) continue;
-            if (!walk.hasNext()) return false;
-            while (walk.hasNext()) {
-                String otherLine = walk.next().trim();
-                if (otherLine.isEmpty()) continue;
-                if (!otherLine.equals(line)) return false;
-                break;
-            }
-        }
-        return !walk.hasNext();
-    }
-
-    public void toUserCode(CodeOut codeOut, Stack<String> groovyParams, EditPath editPath) {
-        if (editPath != null) {
-            if (!editPath.isGeneratedCode()) {
-                String editedCode = editPath.getEditedCode(recDefNode.getPath());
-                if (editedCode != null) {
-                    indentCode(editedCode, codeOut);
-                    return;
-                }
-                else if (groovyCode != null) {
-                    indentCode(groovyCode, codeOut);
-                    return;
-                }
-            }
-        }
-        else if (groovyCode != null) {
-            indentCode(groovyCode, codeOut);
-            return;
-        }
-        toInnerLoop(codeOut, getLocalPath(), groovyParams, OptRole.ROOT);
-    }
-
-    private void toInnerLoop(CodeOut codeOut, Path path, Stack<String> groovyParams, OptRole optRole) {
-        if (path.isEmpty()) throw new RuntimeException();
-        if (path.size() == 1) {
-            OptBox dictionaryOptBox = recDefNode.getDictionaryOptBox();
-            optRole = optRole == OptRole.ROOT ? OptRole.VALUE : optRole;
-            if (dictionaryOptBox != null) {
-                codeOut.line(
-                        "lookup%s_%s(%s)",
-                        dictionaryOptBox.getDictionaryName(), optRole.getFieldName(), toLeafGroovyParam(path)
-                );
-            }
-            else if (hasMap()) {
-                codeOut.line(getMapUsage());
-            }
-            else {
-                String sanitize = recDefNode.getFieldType().equalsIgnoreCase("link") ? ".sanitizeURI()" : "";
-                if (path.peek().getLocalName().equals("constant")) {
-                    codeOut.line("'CONSTANT'");
-                }
-                else if (recDefNode.hasFunction()) {
-                    codeOut.line("\"${%s(%s)%s}\"", recDefNode.getFunction(), toLeafGroovyParam(path), sanitize);
-                }
-                else {
-                    codeOut.line("\"${%s%s}\"", toLeafGroovyParam(path), sanitize);
-                }
-            }
-        }
-        else if (recDefNode.isLeafElem()) {
-            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams, optRole);
-        }
-        else {
-            boolean needLoop;
-            if (hasMap()) {
-                needLoop = !groovyParams.contains(getMapName());
-                if (needLoop) {
-                    codeOut.line_(
-                            "%s %s { %s -> // N0a",
-                            toMapExpression(this), getOperator().getCodeString(), getMapName()
-                    );
-                }
-            }
-            else {
-                String param = toLoopGroovyParam(path);
-                needLoop = !groovyParams.contains(param);
-                if (needLoop) {
-                    codeOut.line_(
-                            "%s %s { %s -> // N0b",
-                            toLoopRef(path), getOperator().getCodeString(), param
-                    );
-                }
-            }
-            toInnerLoop(codeOut, path.withRootRemoved(), groovyParams, optRole);
-            if (needLoop) codeOut._line("} // N0");
-        }
-    }
-
-    public Path getLocalPath() {
-        NodeMapping ancestor = getAncestorNodeMapping(inputPath);
-        if (ancestor.inputPath.isAncestorOf(inputPath)) {
-            return inputPath.extendAncestor(ancestor.inputPath);
-        }
-        else {
-            return inputPath;
-        }
-    }
-
-    private String getMapUsage() {
-        if (!hasMap()) return null;
-        StringBuilder usage = new StringBuilder("\"");
-        Iterator<Path> walk = getInputPaths().iterator();
-        while (walk.hasNext()) {
-            Path path = walk.next();
-            usage.append(String.format("${%s['%s']}", getMapName(), path.peek().toMapKey()));
-            if (walk.hasNext()) usage.append(" ");
-        }
-        usage.append("\"");
-        return usage.toString();
-    }
-
-    public String getMapName() {
-        return String.format("_M%d", inputPath.size());
     }
 
     public String toString() {
@@ -372,19 +229,5 @@ public class NodeMapping {
         String wrap = groovyCode == null ? "p" : "b";
         return String.format("<html><%s>%s &rarr; %s</%s>", wrap, input, recDefNode.toString(), wrap);
     }
-
-    private NodeMapping getAncestorNodeMapping(Path path) {
-        for (RecDefNode ancestor = recDefNode.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
-            for (NodeMapping nodeMapping : ancestor.getNodeMappings().values()) {
-                if (nodeMapping.inputPath.isAncestorOf(path)) return nodeMapping;
-            }
-        }
-        return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(outputPath.takeFirst());
-    }
-
-    private EditPath getGeneratorEditPath() {
-        return new EditPath(this);
-    }
-
 }
 

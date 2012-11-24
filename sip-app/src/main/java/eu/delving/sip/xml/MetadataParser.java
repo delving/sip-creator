@@ -26,6 +26,7 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
 import org.codehaus.stax2.XMLInputFactory2;
@@ -69,13 +70,11 @@ public class MetadataParser {
 
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
-        if (progressListener != null) {
-            progressListener.prepareFor(recordCount);
-        }
+        progressListener.prepareFor(recordCount);
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, AbortException {
+    public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, CancelException {
         MetadataRecord metadataRecord = null;
         GroovyNode node = null;
         StringBuilder value = new StringBuilder();
@@ -125,9 +124,7 @@ public class MetadataParser {
                         if (path.equals(Storage.RECORD_ROOT)) {
                             if (node.parent() != null) throw new RuntimeException("Expected to be at root node");
                             metadataRecord = factory.fromGroovyNode(node, recordIndex++, recordCount);
-                            if (progressListener != null && !progressListener.setProgress(recordIndex)) {
-                                throw new AbortException();
-                            }
+                            progressListener.setProgress(recordIndex);
                             node = null;
                         }
                         else {
@@ -155,12 +152,6 @@ public class MetadataParser {
         }
         catch (XMLStreamException e) {
             e.printStackTrace(); // should never happen
-        }
-    }
-
-    public static class AbortException extends Exception {
-        public AbortException() {
-            super("Metadata parsing aborted");
         }
     }
 }

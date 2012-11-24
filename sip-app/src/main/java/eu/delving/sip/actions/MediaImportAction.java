@@ -23,6 +23,7 @@ package eu.delving.sip.actions;
 
 import eu.delving.metadata.Hasher;
 import eu.delving.plugin.MediaFiles;
+import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -33,7 +34,9 @@ import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.io.*;
@@ -152,6 +155,9 @@ public class MediaImportAction extends AbstractAction {
             catch (IOException e) {
                 sipModel.getFeedback().alert("Problem while scanning directories for media", e);
             }
+            catch (CancelException e) {
+                sipModel.getFeedback().alert("Cancelled", e);
+            }
             finally {
                 sipModel.exec(new Swing() {
                     @Override
@@ -162,7 +168,7 @@ public class MediaImportAction extends AbstractAction {
             }
         }
 
-        private void scanDirectories() throws IOException {
+        private void scanDirectories() throws IOException, CancelException {
             gatherFilesFrom(sourceDirectory);
             progressListener.prepareFor(fileList.size());
             targetDirectory.mkdirs();

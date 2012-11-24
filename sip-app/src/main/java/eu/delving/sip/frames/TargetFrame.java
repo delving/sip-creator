@@ -24,7 +24,6 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.ShowOptionMenu;
 import eu.delving.sip.model.*;
@@ -36,8 +35,15 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.*;
+
+import static eu.delving.sip.base.KeystrokeHelper.MENU_E;
+import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
  * Render the record definition as a tree, with a filter function for navigating in large trees.  There are also
@@ -71,7 +77,7 @@ public class TargetFrame extends FrameBase {
         timer.setRepeats(false);
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
-        treePanel.add(SwingHelper.scrollVH("Record Definition", recDefTree));
+        treePanel.add(scrollVH("Record Definition", recDefTree));
         ShowOptionMenu showOptionMenu = new ShowOptionMenu(sipModel, new ShowOptionMenu.Listener() {
             @Override
             public void optSelected(OptList.Opt opt) {
@@ -164,27 +170,45 @@ public class TargetFrame extends FrameBase {
                 }
             }
         });
+        recDefTree.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (!SwingUtilities.isRightMouseButton(e)) return;
+                TreePath path = recDefTree.getPathForLocation(e.getX(), e.getY());
+                if (path == null) return;
+                if (!path.equals(recDefTree.getSelectionPath())) {
+                    recDefTree.setSelectionPath(path);
+                }
+                RecDefTreeNode node = (RecDefTreeNode) recDefTree.getSelectionPath().getLastPathComponent();
+                if (!node.getRecDefNode().isDuplicatePossible()) return;
+                Rectangle rect = recDefTree.getUI().getPathBounds(recDefTree, path);
+                if (rect != null && rect.contains(e.getX(), e.getY())) {
+                    JPopupMenu menu = new JPopupMenu();
+                    menu.add(new DuplicateElementAction());
+                    menu.show(recDefTree, rect.x + rect.width, rect.y + rect.height / 2);
+                }
+            }
+        });
     }
 
     private class RecDefSelection implements TreeSelectionListener, Work {
 
-        private Object nodeObject;
+        private RecDefTreeNode recDefTreeNode;
 
         @Override
         public void valueChanged(TreeSelectionEvent event) {
             TreePath path = recDefTree.getSelectionPath();
-            nodeObject = path != null ? path.getLastPathComponent() : null;
-            exec(this);
+            if (path == null) return;
+            if (path.getLastPathComponent() instanceof RecDefTreeNode) {
+                recDefTreeNode = (RecDefTreeNode) path.getLastPathComponent();
+                exec(this);
+            }
         }
 
         @Override
         public void run() {
-            if (nodeObject != null && nodeObject instanceof RecDefTreeNode) {
-                RecDefTreeNode node = (RecDefTreeNode) nodeObject;
-                if (autoFold.isSelected()) showPath(node);
-                if (node.getRecDefNode().isUnmappable()) return;
-                sipModel.getCreateModel().setTarget(node);
-            }
+            if (autoFold.isSelected()) showPath(recDefTreeNode);
+            if (recDefTreeNode.getRecDefNode().isUnmappable()) return;
+            sipModel.getCreateModel().setTarget(recDefTreeNode);
         }
 
         @Override
@@ -237,6 +261,11 @@ public class TargetFrame extends FrameBase {
                 refreshRecDefTreeNode(mappingModel, node);
             }
 
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+                mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node).fireChanged();
+            }
+
             private void refreshRecDefTreeNode(final MappingModel mappingModel, final RecDefNode node) {
                 mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node).fireChanged();
             }
@@ -246,17 +275,86 @@ public class TargetFrame extends FrameBase {
     private class ExpandRootAction extends AbstractAction {
 
         private ExpandRootAction() {
-            super("Expand All");
-            putValue(
-                    Action.ACCELERATOR_KEY,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-            );
+            configAction(this, "Expand what is mapped", null, MENU_E);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
-            if (root != null) showPath(root);
+            if (root != null) showPopulated(root);
+        }
+
+        public void showPopulated(final RecDefTreeNode node) {
+            Timer timer = new Timer(30, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    boolean pathShouldShow = node.getRecDefNode().isPopulated();
+                    if (pathShouldShow) {
+                        if (!recDefTree.isExpanded(node.getRecDefPath())) recDefTree.expandPath(node.getRecDefPath());
+                    }
+                    else if (!recDefTree.isCollapsed(node.getRecDefPath())) {
+                        recDefTree.collapsePath(node.getRecDefPath());
+                    }
+                    for (RecDefTreeNode sub : node.getChildren()) if (!sub.getRecDefNode().isAttr()) showPopulated(sub);
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }
+
+
+    }
+
+    private class DuplicateElementAction extends AbstractAction implements Work {
+
+        private RecDefTreeNode recDefTreeNode;
+        private DynOpt dynOpt;
+
+        private DuplicateElementAction() {
+            super("Create duplicate element");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            TreePath path = recDefTree.getSelectionPath();
+            if (path == null) return;
+            if (path.getLastPathComponent() instanceof RecDefTreeNode) {
+                recDefTreeNode = (RecDefTreeNode) path.getLastPathComponent();
+                if (!recDefTreeNode.getRecDefNode().isDuplicatePossible()) return;
+                String answer = sipModel.getFeedback().ask("Please enter a discriminator for the new element");
+                if (answer == null) return;
+                answer = answer.trim();
+                for (RecDefTreeNode node : recDefTreeNode.getParentNode().getChildren()) {
+                    if (!node.getRecDefNode().getTag().withOpt(null).equals(recDefTreeNode.getRecDefNode().getTag().withOpt(null))) continue;
+                    DynOpt existingDynOpt = node.getRecDefNode().getDynOpt();
+                    if (existingDynOpt == null) continue;
+                    if (answer.equals(existingDynOpt.value)) {
+                        sipModel.getFeedback().alert(String.format("The name '%s' already exists", answer));
+                        return;
+                    }
+                }
+                dynOpt = new DynOpt();
+                dynOpt.path = recDefTreeNode.getRecDefPath().getTagPath();
+                dynOpt.value = answer;
+                exec(this);
+            }
+        }
+
+        @Override
+        public void run() {
+            recDefTreeNode = recDefTreeNode.createDynOptSibling(dynOpt);
+            sipModel.exec(new Swing() {
+                @Override
+                public void run() {
+                    recDefTree.setSelectionPath(recDefTreeNode.getRecDefPath());
+                    showPath(recDefTreeNode);
+                }
+            });
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.DUPLICATE_ELEMENT;
         }
     }
 
@@ -279,7 +377,7 @@ public class TargetFrame extends FrameBase {
                 recDefTree.setModel(new RecDefTreeModel(EMPTY_NODE));
             }
             treePanel.removeAll();
-            treePanel.add(SwingHelper.scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
+            treePanel.add(scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
             treePanel.validate();
         }
     }

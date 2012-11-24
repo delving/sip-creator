@@ -34,7 +34,6 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
 
 import javax.xml.stream.*;
 import javax.xml.stream.events.Namespace;
@@ -42,10 +41,8 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
@@ -61,23 +58,17 @@ import static org.apache.http.HttpStatus.*;
 
 public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     private static final int CONNECTION_TIMEOUT = 1000 * 60 * 5;
-    private static final int TALK_DELAY = 1000 * 15;
     private static final Path RECORD_ROOT = Path.create("/OAI-PMH/ListRecords/record");
     private static final Path ERROR = Path.create("/OAI-PMH/error");
     private static final Path RESUMPTION_TOKEN = Path.create("/OAI-PMH/ListRecords/resumptionToken");
-    private Logger log = Logger.getLogger(Harvestor.class);
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
     private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
     private DefaultHttpClient httpClient;
-    private OutputStream outputStream;
-    private XMLEventWriter out;
     private NamespaceCollector namespaceCollector = new NamespaceCollector();
     private Context context;
     private int recordCount;
-    private boolean cancelled;
     private DataSet dataSet;
-    private File tempFile;
     private ProgressListener progressListener;
 
     public interface Context {
@@ -98,10 +89,6 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
         httpClient = new DefaultHttpClient(timeoutParams);
     }
 
-    public int getRecordCount() {
-        return recordCount;
-    }
-
     @Override
     public Job getJob() {
         return Job.HARVEST;
@@ -120,46 +107,46 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
 
     @Override
     public void run() {
-        if (!okURL(context.harvestUrl(), "Harvest Base URL")) return;
-        if (!okValue(context.harvestPrefix(), "Harvest Metadata Prefix")) return;
-        if (!prepareOutput()) return;
         try {
+            if (context.harvestPrefix() == null || context.harvestPrefix().trim().isEmpty()) {
+                throw new IllegalArgumentException("Harvest prefix missing");
+            }
+            new URL(context.harvestUrl()); // throws MalformedUrlException if it is
+            OutputStream outputStream = new GZIPOutputStream(new FileOutputStream(dataSet.importedOutput()));
+            XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            out.add(eventFactory.createStartDocument());
+            out.add(eventFactory.createCharacters("\n"));
             progressListener.setProgress(recordCount);
             HttpEntity fetchedRecords = fetchFirstEntity();
             String resumptionToken = saveRecords(fetchedRecords, out);
-            long time = System.currentTimeMillis();
-            while (isValidResumptionToken(resumptionToken) && recordCount > 0 && !cancelled) {
+            while (isValidResumptionToken(resumptionToken) && recordCount > 0) {
                 EntityUtils.consume(fetchedRecords);
                 progressListener.setProgress(recordCount);
                 fetchedRecords = fetchNextEntity(resumptionToken);
                 resumptionToken = saveRecords(fetchedRecords, out);
-                if (System.currentTimeMillis() - time > TALK_DELAY) {
-                    time = System.currentTimeMillis();
-                }
-                if (!isValidResumptionToken(resumptionToken) && recordCount > 0) {
-                    EntityUtils.consume(fetchedRecords);
-                }
+                if (!isValidResumptionToken(resumptionToken) && recordCount > 0) EntityUtils.consume(fetchedRecords);
             }
             if (recordCount > 0) {
-                finishOutput(cancelled);
-//                listener.tellUser(cancelled ? "Cancelled!" : String.format("Harvest complete, %d records", recordCount));
+                out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
+                out.add(eventFactory.createCharacters("\n"));
+                out.add(eventFactory.createEndDocument());
+                out.flush();
+                outputStream.close();
+                progressListener.getFeedback().alert(String.format(
+                        "Harvest of %s successfully fetched %d records",
+                        context.harvestUrl(), recordCount
+                ));
             }
             else {
                 outputStream.close();
-                if (!tempFile.delete()) {
-//                    listener.tellUser("Unable to delete output file");
-                }
-//                listener.finished(cancelled);
+                FileUtils.deleteQuietly(dataSet.importedOutput());
             }
         }
-        catch (UnknownHostException e) {
-            log.error(String.format("Error opening '%s' : %s", context.harvestUrl(), e.getMessage()), e);
+        catch (CancelException e) {
+            progressListener.getFeedback().alert("Cancelled harvest of "+context.harvestUrl(), e);
         }
-        catch (IOException e) {
-            log.error(String.format("Unable to complete harvest of %s because of a streaming problem", context.harvestUrl()), e);
-        }
-        catch (XMLStreamException e) {
-            log.error(String.format("Unable to complete harvest of %s because of an xml problem", context.harvestUrl()), e);
+        catch (Exception e) {
+            progressListener.getFeedback().alert(String.format("Unable to complete harvest of %s because of an error", context.harvestUrl()), e);
         }
     }
 
@@ -181,7 +168,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
             switch (event.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     StartElement start = event.asStartElement();
-                    path = path.child(Tag.element(start.getName()));
+                    path = path.child(Tag.element(start.getName().getLocalPart()));
                     if (!recordEvents.isEmpty()) {
                         recordEvents.add(event);
                     }
@@ -228,7 +215,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
                         tokenBuilder = null;
                     }
                     else if (path.equals(ERROR) && errorBuilder != null) {
-//                        listener.failed(String.format("OAI-PMH Error: %s", errorBuilder), null);
+                        throw new IOException("OAI-PMH Error: "+errorBuilder);
                     }
                     path = path.parent();
                     break;
@@ -271,7 +258,6 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
         if (context.harvestSpec() != null && !context.harvestSpec().isEmpty()) {
             url += String.format("&set=%s", context.harvestSpec());
         }
-        log.info(String.format("Harvesting from '%s'", url));
         return doGet(url);
     }
 
@@ -301,52 +287,6 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
                 throw new IOException("OAI-PMH Server Unknown response:" + response.getStatusLine());
         }
         return response.getEntity();
-    }
-
-    private boolean prepareOutput() {
-        try {
-            tempFile = File.createTempFile("sip-creator-harvest", ".tmp");
-            log.info(String.format("Opening temporary output file '%s'", tempFile));
-            outputStream = new GZIPOutputStream(new FileOutputStream(tempFile));
-            out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-            out.add(eventFactory.createStartDocument());
-            out.add(eventFactory.createCharacters("\n"));
-            return true;
-        }
-        catch (FileNotFoundException e) {
-            log.error("Unable to create file to receive harvested data", e);
-            return false;
-        }
-        catch (XMLStreamException e) {
-            log.error("Unable to stream to file to receive harvested data", e);
-            return false;
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        catch (IOException e) {
-            log.error(String.format("Error creating temp file '%s'%n", tempFile), e);
-            return false;
-        }
-    }
-
-    private void finishOutput(boolean cancelled) throws XMLStreamException, IOException {
-        tempFile.deleteOnExit();
-        out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
-        out.add(eventFactory.createCharacters("\n"));
-        out.add(eventFactory.createEndDocument());
-        out.flush();
-        outputStream.close();
-        if (cancelled) {
-//            listener.finished(true);
-            return;
-        }
-        File outputFile = dataSet.importedOutput();
-        String message = String.format("Moving temp file %s to %s", tempFile, outputFile);
-        log.info(message);
-        FileUtils.deleteQuietly(outputFile);
-        FileUtils.moveFile(tempFile, outputFile);
-//        listener.finished(false);
     }
 
     private class NamespaceCollector {
@@ -388,37 +328,6 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
         }
     }
 
-    private boolean okValue(String string, String description) {
-        boolean ok = string != null && !string.trim().isEmpty();
-        if (!ok) {
-//            listener.tellUser("Missing value for " + description);
-        }
-        return ok;
-    }
-
-    private boolean okURL(String url, String description) {
-        if (!okValue(url, description)) {
-            return false;
-        }
-        try {
-            new URL(url);
-            return true;
-        }
-        catch (MalformedURLException e) {
-//            listener.tellUser("Malformed URL: " + url);
-            return false;
-        }
-    }
-
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-        progressListener.setProgress(recordCount);
-    }
-
-    public String getDataSetSpec() {
-        return dataSet.getSpec();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -434,6 +343,6 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
 
     @Override
     public String toString() {
-        return String.format("%s %s - %s:%s (%d records)", cancelled ? "CANCELLED!" : "", dataSet.getSpec(), context.harvestUrl(), context.harvestPrefix(), getRecordCount());
+        return String.format("%s - %s:%s (%d records)", dataSet.getSpec(), context.harvestUrl(), context.harvestPrefix(), recordCount);
     }
 }

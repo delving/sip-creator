@@ -62,6 +62,8 @@ import java.util.*;
 public class RecDef {
 
     private static final String DELIM = "[ ,]+";
+    public static final RecDef.Namespace XML_NAMESPACE = new RecDef.Namespace("xml", "http://www.w3.org/XML/1998/namespace", null);
+    public static final RecDef.Namespace XSI_NAMESPACE = new RecDef.Namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance", null);
 
     public static final String DEFAULT_FIELD_TYPE = "text";
     public static final String DELVING_NAMESPACE_URI = "http://schemas.delving.eu/";
@@ -114,6 +116,12 @@ public class RecDef {
     @XStreamAsAttribute
     public boolean flat;
 
+    @XStreamAsAttribute
+    public boolean elementFormDefaultQualified = true;
+
+    @XStreamAsAttribute
+    public boolean attributeFormDefaultQualified = true;
+
     public List<Namespace> namespaces;
 
     public List<MappingFunction> functions;
@@ -144,10 +152,12 @@ public class RecDef {
         return new SchemaVersion(prefix, version);
     }
 
-    public Map<String, String> getNamespacesMap() {
-        Map<String, String> ns = new HashMap<String, String>();
-        if (namespaces != null) for (Namespace namespace : namespaces) ns.put(namespace.prefix, namespace.uri);
-        return ns;
+    public Map<String, Namespace> getNamespaceMap() {
+        Map<String, Namespace> namespaces = new HashMap<String, Namespace>();
+        if (this.namespaces != null) for (Namespace namespace : this.namespaces) namespaces.put(namespace.prefix, namespace);
+        namespaces.put(XML_NAMESPACE.prefix, XML_NAMESPACE);
+        namespaces.put(XSI_NAMESPACE.prefix, XSI_NAMESPACE);
+        return namespaces;
     }
 
     public Attr attr(Tag tag, String where) {
@@ -186,7 +196,7 @@ public class RecDef {
 
     private void resolve() {
         if (prefix == null || version == null) throw new RuntimeException("Prefix and/or version missing");
-        if (attrs != null) for (Attr attr: attrs) attr.tag = attr.tag.defaultPrefix(prefix);
+        if (attrs != null) for (Attr attr : attrs) attr.tag = attr.tag.defaultPrefix(prefix);
         if (attrGroups != null) for (AttrGroup attrGroup : attrGroups) attrGroup.resolve(this);
         if (elems != null) for (Elem elem : elems) elem.tag = elem.tag.defaultPrefix(prefix);
         root.resolve(Path.create(), this);
@@ -204,6 +214,12 @@ public class RecDef {
     private void collectPaths(Attr attr, Path path, List<Path> paths) {
         path = path.child(attr.tag);
         paths.add(path);
+    }
+
+    Attr findAttr(Path path) {
+        Attr found = root.findAttr(path, 0);
+        if (found == null) throw new RuntimeException("No attribute found for path " + path);
+        return found;
     }
 
     Elem findElem(Path path) {
@@ -298,11 +314,23 @@ public class RecDef {
     @XStreamAlias("namespace")
     public static class Namespace {
 
+        public Namespace(String prefix, String uri, String schema) {
+            this.prefix = prefix;
+            this.uri = uri;
+            this.schema = schema;
+        }
+
+        public Namespace() {
+        }
+
         @XStreamAsAttribute
         public String prefix;
 
         @XStreamAsAttribute
         public String uri;
+
+        @XStreamAsAttribute
+        public String schema;
     }
 
     @XStreamAlias("attr")
@@ -445,9 +473,11 @@ public class RecDef {
                 attrGroups = null;
             }
             if (elems != null) {
+                List<Elem> elemRefs = new ArrayList<Elem>();
                 for (String localName : elems.split(DELIM)) {
-                    elemList.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
+                    elemRefs.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
                 }
+                elemList.addAll(0, elemRefs);
                 elems = null;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
@@ -473,6 +503,7 @@ public class RecDef {
             try {
                 Elem clone = (Elem) this.clone();
                 clone.attrList = new ArrayList<Attr>();
+                clone.elemList = new ArrayList<Elem>();
                 return clone;
             }
             catch (CloneNotSupportedException e) {

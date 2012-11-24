@@ -19,33 +19,16 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.metadata;
+package eu.delving.sip.base;
 
 /**
- * Combines a path in the RecDefTree with the edited code for that path so
- * that editing of code can be done for only one part of the tree at a time.
+ * ProgressListener cancellation
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class EditPath {
-    private NodeMapping nodeMapping;
-    private String editedCode;
-
-    public EditPath(NodeMapping nodeMapping, String editedCode) {
-        this.nodeMapping = nodeMapping;
-        this.editedCode = editedCode;
-    }
-
-    public NodeMapping getNodeMapping() {
-        return nodeMapping;
-    }
-
-    public boolean isGeneratedCode() {
-        return editedCode == null;
-    }
-
-    public String getEditedCode(Path path) {
-        return nodeMapping.recDefNode.getPath().equals(path) ? editedCode : null;
+public class CancelException extends Exception {
+    public CancelException() {
+        super("Cancelled");
     }
 }

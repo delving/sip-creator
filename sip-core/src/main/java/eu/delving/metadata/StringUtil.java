@@ -176,6 +176,27 @@ public class StringUtil {
         return tag.isAttribute() ? String.format("['@%s']", tag.toString()) : "." + tagToVariable(tag.toString());
     }
 
+    public static boolean isSimilarCode(String codeA, String codeB) {
+        return isSimilarCode(codeA, Arrays.asList(codeB.split("\n")));
+    }
+
+    public static boolean isSimilarCode(String codeA, List<String> codeB) {
+        if (codeB == null) return false;
+        Iterator<String> walk = codeB.iterator();
+        for (String line : codeA.split("\n")) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+            if (!walk.hasNext()) return false;
+            while (walk.hasNext()) {
+                String otherLine = walk.next().trim();
+                if (otherLine.isEmpty()) continue;
+                if (!otherLine.equals(line)) return false;
+                break;
+            }
+        }
+        return !walk.hasNext();
+    }
+
     public static String documentToString(Document document) {
         try {
             int length = document.getLength();

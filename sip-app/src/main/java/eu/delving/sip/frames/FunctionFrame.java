@@ -36,7 +36,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.undo.UndoManager;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -48,6 +51,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.regex.Pattern;
 
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
@@ -94,17 +98,8 @@ public class FunctionFrame extends FrameBase {
         libraryList.setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
         functionList.setFont(MONOSPACED);
         wireUp();
-        getAction().putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
-        attachAction(UNDO_ACTION);
-        attachAction(REDO_ACTION);
-    }
-
-    private void attachAction(Action action) {
-        codeArea.getInputMap().put((KeyStroke) action.getValue(Action.ACCELERATOR_KEY), action.getValue(Action.NAME));
-        codeArea.getActionMap().put(action.getValue(Action.NAME), action);
+        attachAccelerator(UNDO_ACTION, codeArea);
+        attachAccelerator(REDO_ACTION, codeArea);
     }
 
     @Override
@@ -266,6 +261,10 @@ public class FunctionFrame extends FrameBase {
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
+            }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
         sipModel.getFunctionCompileModel().addListener(modelStateListener);
@@ -433,8 +432,7 @@ public class FunctionFrame extends FrameBase {
 
     private class UndoAction extends AbstractAction {
         private UndoAction() {
-            super("Undo");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            configAction(this, "Undo", null, MENU_Z);
         }
 
         @Override
@@ -445,8 +443,7 @@ public class FunctionFrame extends FrameBase {
 
     private class RedoAction extends AbstractAction {
         private RedoAction() {
-            super("Redo");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK));
+            configAction(this, "Redo", null, SH_MENU_Z);
         }
 
         @Override

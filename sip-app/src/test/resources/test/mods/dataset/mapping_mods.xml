@@ -45,13 +45,35 @@
       <string>europe</string>
     </entry>
   </facts>
+  <dyn-opts>
+      <dyn-opt path="/mods:mods/mods:subject" value="gumby"/>
+  </dyn-opts>
   <node-mappings>
     <node-mapping inputPath="/input/dc:title" outputPath="/mods/titleInfo[alternative]/title"/>
-    <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name/namePart"/>
-    <node-mapping inputPath="/input/dc:format" outputPath="/mods/typeOfResource"/>
-    <node-mapping inputPath="/input/dc:language" outputPath="/mods/language/languageTerm"/>
-    <node-mapping inputPath="/input/dc:identifier" outputPath="/mods/location/url"/>
-    <node-mapping inputPath="/input/dc:description" outputPath="/mods/note"/>
-    <node-mapping inputPath="/input/dc:subject" outputPath="/mods/subject/topic"/>
+      <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name[contributor]"/>
+      <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name[contributor]/namePart"/>
+      <node-mapping inputPath="/constant" outputPath="/mods/mods:typeOfResource">
+          <groovy-code>
+              <string>&apos;text&apos;</string>
+          </groovy-code>
+      </node-mapping>
+      <node-mapping inputPath="/input/dc:language" outputPath="/mods/language"/>
+      <node-mapping inputPath="/input/dc:identifier" outputPath="/mods/location/url"/>
+      <node-mapping inputPath="/input/dc:description" outputPath="/mods/note"/>
+      <node-mapping inputPath="/input/dc:type" outputPath="/mods/subject/topic"/>
+      <node-mapping inputPath="/constant" outputPath="/mods/mods:subject/@authority">
+          <groovy-code>
+              <string>&apos;dubious&apos;</string>
+          </groovy-code>
+      </node-mapping>
+      <node-mapping inputPath="/input/dc:subject" outputPath="/mods/subject[gumby]/topic"/>
+      <node-mapping inputPath="/constant" outputPath="/mods/mods:subject[gumby]/@authority">
+          <groovy-code>
+              <string>&apos;divine&apos;</string>
+          </groovy-code>
+      </node-mapping>
+      <node-mapping inputPath="/input/europeana:object" outputPath="/mods:mods/mods:location/mods:url[preview]"/>
+      <node-mapping inputPath="/input/europeana:isShownBy" outputPath="/mods:mods/mods:location/mods:url[raw object]"/>
+      <node-mapping inputPath="/input/europeana:isShownAt" outputPath="/mods:mods/mods:location/mods:url[object in context]"/>
   </node-mappings>
 </rec-mapping>
