@@ -115,7 +115,7 @@ public class TestCodeGeneration {
         oneTwoTarget.addNodeMapping(mapping("/input/leadup/record/fromTwo"));
 
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
-        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
+        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null, true);
         printWithLineNumbers(mappingRunner.getCode());
         Node node = mappingRunner.runMapping(createInputRecord());
 

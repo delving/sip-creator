@@ -32,7 +32,6 @@ import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
-import org.apache.http.client.HttpClient;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
@@ -63,9 +62,9 @@ public class StorageImpl implements Storage {
     private SchemaRepository schemaRepository;
     private LSResourceResolver resolver;
 
-    public StorageImpl(File home, Fetcher fetcher, HttpClient httpClient) throws StorageException {
+    public StorageImpl(File home, Fetcher fetcher, LSResourceResolver resolver) throws StorageException {
         this.home = home;
-        if (httpClient != null) this.resolver = new CachingResourceResolver(this, httpClient);
+        this.resolver = resolver;
         try {
             if (fetcher != null) this.schemaRepository = new SchemaRepository(fetcher);
         }
@@ -633,7 +632,7 @@ public class StorageImpl implements Storage {
             return schemaFactory().newSchema(file).newValidator();
         }
         catch (SAXException e) {
-            throw new StorageException("Unable to create a validator", e);
+            throw new StorageException("Unable to create a validator: "+schemaVersion, e);
         }
         catch (IOException e) {
             throw new StorageException("Unable to load " + fileName, e);
