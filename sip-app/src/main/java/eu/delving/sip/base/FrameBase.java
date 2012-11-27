@@ -175,6 +175,10 @@ public abstract class FrameBase extends JInternalFrame {
     protected void onOpen(boolean opened) {
     }
 
+    // override this
+    public void refresh() {
+    }
+
     public void setPlacement(Placement placement) {
         this.placement = placement;
     }

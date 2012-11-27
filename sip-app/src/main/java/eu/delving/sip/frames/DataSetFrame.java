@@ -138,7 +138,8 @@ public class DataSetFrame extends FrameBase {
         return p;
     }
 
-    public void fireRefresh() {
+    @Override
+    public void refresh() {
         if (SwingHelper.isDevelopmentMode()) {
             tableModel.setHubEntries(null);
         }

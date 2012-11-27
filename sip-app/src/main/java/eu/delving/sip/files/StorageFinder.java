@@ -38,6 +38,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static eu.delving.sip.files.Storage.STANDALONE_DIR;
 import static javax.swing.JOptionPane.*;
 
 /**
@@ -94,6 +95,10 @@ public class StorageFinder {
         else {
             return String.format("%s:%s", getHostName(matcher), matcher.group(2));
         }
+    }
+
+    public static boolean isStandalone(File file) {
+        return file.getName().equals(STANDALONE_DIR);
     }
 
     public static String getUser(File file) {
