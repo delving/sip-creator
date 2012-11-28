@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <frame-arrangements>
     <arrangement view="DATA_SETS">
-        <frame where="0011" which="DATA_SET"/>
+        <frame where="0031" which="DATA_SET"/>
+        <frame where="3011" which="FACTS"/>
     </arrangement>
     <arrangement view="QUICK_MAPPING">
         <frame where="0013" which="SOURCE"/>

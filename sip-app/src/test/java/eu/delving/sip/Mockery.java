@@ -26,6 +26,7 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.metadata.*;
+import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -63,11 +64,12 @@ public class Mockery {
     private Map<String, String> hints = new TreeMap<String, String>();
     private String prefix;
 
-    public Mockery() throws StorageException, MetadataException {
+    public Mockery() throws StorageException, MetadataException, IOException {
         root = new File(getTargetDirectory(), "storage");
         if (root.exists()) delete(root);
         if (!root.mkdirs()) throw new RuntimeException("Unable to create directory " + root.getAbsolutePath());
-        storage = new StorageImpl(root, new FileSystemFetcher(true), new CachedResourceResolver());
+        SchemaRepository repo = new SchemaRepository(new FileSystemFetcher(true));
+        storage = new StorageImpl(root, repo, new CachedResourceResolver());
     }
 
     public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {

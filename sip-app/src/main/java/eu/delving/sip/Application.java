@@ -24,12 +24,14 @@ package eu.delving.sip;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.*;
 import eu.delving.schema.Fetcher;
+import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.actions.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.DataSetFrame;
+import eu.delving.sip.frames.FactsFrame;
 import eu.delving.sip.frames.WorkFrame;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
@@ -71,6 +73,7 @@ public class Application {
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private File storageDirectory;
     private SipModel sipModel;
+    private SchemaRepository schemaRepository;
     private Action importAction;
     private Action validateAction;
     private JFrame home;
@@ -116,9 +119,15 @@ public class Application {
         Preferences preferences = Preferences.userNodeForPackage(SipModel.class);
         feedback = new VisualFeedback(home, desktop, preferences);
         HttpClient httpClient = createHttpClient(storageDirectory);
-        Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
+        try {
+            Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
+            this.schemaRepository = new SchemaRepository(fetcher);
+        }
+        catch (IOException e) {
+            throw new StorageException("Unable to create Schema Repository", e);
+        }
         ResolverContext context = new ResolverContext();
-        Storage storage = new StorageImpl(storageDirectory, fetcher, new CachedResourceResolver(context));
+        Storage storage = new StorageImpl(storageDirectory, schemaRepository, new CachedResourceResolver(context));
         context.setStorage(storage);
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
@@ -136,7 +145,8 @@ public class Application {
         JPanel content = (JPanel) home.getContentPane();
         content.setFocusable(true);
         FrameBase dataSetFrame = new DataSetFrame(sipModel, cultureHubClient);
-        allFrames = new AllFrames(sipModel, content, dataSetFrame);
+        FrameBase factsFrame = new FactsFrame(sipModel, schemaRepository);
+        allFrames = new AllFrames(sipModel, content, dataSetFrame, factsFrame);
         desktop.setBackground(new Color(190, 190, 200));
         helpPanel = new HelpPanel(sipModel, httpClient);
         content.add(desktop, BorderLayout.CENTER);

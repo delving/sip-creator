@@ -77,6 +77,7 @@ public abstract class FrameBase extends JInternalFrame {
         FUNCTIONS,
         QUESTION,
         MESSAGE,
+        FACTS
     }
 
     public interface Placement {
