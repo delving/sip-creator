@@ -28,12 +28,8 @@ import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.scrollV;
@@ -57,10 +53,6 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         this.cultureHubClient = cultureHubClient;
         center.add(EMPTY_LABEL);
         sipModel.getReportFileModel().setListener(this);
-        getAction().putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
     }
 
     public Action getUploadAction() {

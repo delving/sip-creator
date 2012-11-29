@@ -78,6 +78,10 @@ public class WorkModel {
         });
     }
 
+    public void shutdown() {
+        executor.shutdown();
+    }
+
     public boolean isEmpty() {
         return jobContexts.isEmpty();
     }

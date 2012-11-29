@@ -61,6 +61,11 @@ public class TestCodeGeneration {
                 public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
                     System.out.println("Mapping removed: " + recDefNode);
                 }
+
+                @Override
+                public void populationChanged(RecDefNode recDefNode) {
+                    System.out.println("Population changed: " + recDefNode);
+                }
             });
         }
         catch (MetadataException e) {
@@ -102,8 +107,7 @@ public class TestCodeGeneration {
                 "   return _name.split(' ');\n" +
                 "} else {\n" +
                 "   return _name.text();\n" +
-                "}",
-                recMapping
+                "}"
         );
 
         RecDefNode oneTwoTarget = node("/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/conceptID");
@@ -111,7 +115,7 @@ public class TestCodeGeneration {
         oneTwoTarget.addNodeMapping(mapping("/input/leadup/record/fromTwo"));
 
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
-        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null);
+        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null, true);
         printWithLineNumbers(mappingRunner.getCode());
         Node node = mappingRunner.runMapping(createInputRecord());
 
@@ -154,7 +158,8 @@ public class TestCodeGeneration {
 
     private static final String EXPECT =
             "<?xml version='1.0' encoding='UTF-8'?>\n" +
-                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"thisaway\">\n" +
+                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" lido:sortorder=\"thisaway\" xsi:schemaLocation=\"http://www.lido-schema.org http://www.lido-schema.org/fakelido.xsd\">\n" +
+//                    "<lido:lido xmlns:lido=\"http://www.lido-schema.org\" lido:sortorder=\"thisaway\">\n" +
                     "    <lido:descriptiveMetadata>\n" +
                     "        <lido:objectClassificationWrap>\n" +
                     "            <lido:classificationWrap>\n" +

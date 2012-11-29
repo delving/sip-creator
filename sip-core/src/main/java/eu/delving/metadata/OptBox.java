@@ -34,29 +34,37 @@ class OptBox {
     final OptRole role;
     final OptList optList;
     final OptList.Opt opt;
+    final DynOpt dynOpt;
 
     public static OptBox asRoot(OptList.Opt opt) {
-        return new OptBox(ROOT, null, opt);
+        return new OptBox(ROOT, null, opt, null);
     }
 
     public static OptBox asRoot(OptList optList) {
-        return new OptBox(ROOT, optList, null);
+        return new OptBox(ROOT, optList, null, null);
     }
 
-    private OptBox(OptRole role, OptList optList, OptList.Opt opt) {
+    public static OptBox asDynamic(DynOpt dynOpt) {
+        return new OptBox(DYNAMIC, null, null, dynOpt);
+    }
+
+    private OptBox(OptRole role, OptList optList, OptList.Opt opt, DynOpt dynOpt) {
         this.role = role;
         this.optList = optList;
         this.opt = opt;
+        this.dynOpt = dynOpt;
     }
 
     OptBox inRoleFor(Path path) {
-        if (role == DESCENDANT) {
+        if (role == UNASSIGNED_CHILD) {
             path = path.withoutOpts(); // the list has paths without opts so this compares properly
-            OptList list = optList != null ? optList : opt.parent;
-            if (pathMatch(list.key, path)) return new OptBox(KEY, optList, opt);
-            if (pathMatch(list.value, path)) return new OptBox(VALUE, optList, opt);
-            if (pathMatch(list.schema, path)) return new OptBox(SCHEMA, optList, opt);
-            if (pathMatch(list.schemaUri, path)) return new OptBox(SCHEMA_URI, optList, opt);
+            OptList list = optList;
+            if (list == null && opt != null) list = opt.parent;
+            if (list == null) throw new RuntimeException("Unassigned child with no list to refer to");
+            if (pathMatch(list.key, path)) return new OptBox(KEY, optList, opt, null);
+            if (pathMatch(list.value, path)) return new OptBox(VALUE, optList, opt, null);
+            if (pathMatch(list.schema, path)) return new OptBox(SCHEMA, optList, opt, null);
+            if (pathMatch(list.schemaUri, path)) return new OptBox(SCHEMA_URI, optList, opt, null);
         }
         return null;
     }
@@ -67,7 +75,7 @@ class OptBox {
 
     OptBox createDescendant() {
         if (role != ROOT) throw new RuntimeException();
-        return new OptBox(DESCENDANT, optList, opt);
+        return new OptBox(UNASSIGNED_CHILD, optList, opt, dynOpt);
     }
 
     public boolean isDictionary() {
@@ -75,15 +83,18 @@ class OptBox {
     }
 
     public boolean isChild() {
-        return role != ROOT;
+        switch (role) {
+            case ABSENT:
+            case ROOT:
+            case DYNAMIC:
+                return false;
+            default:
+                return true;
+        }
     }
 
     public String getDictionaryName() {
         return optList.dictionary;
-    }
-
-    public String getFieldName() {
-        return role.getFieldName();
     }
 
     public String toString() {
@@ -91,6 +102,8 @@ class OptBox {
             switch (role) {
                 case ROOT:
                     return opt.value == null ? opt.key : opt.value;
+                case DYNAMIC:
+                    return dynOpt.value;
                 case KEY:
                     return opt.key;
                 case VALUE:
@@ -102,6 +115,9 @@ class OptBox {
                 default:
                     return "OPT";
             }
+        }
+        else if (dynOpt != null) {
+            return dynOpt.value;
         }
         else {
             return String.format("Dictionary %s", optList.dictionary);

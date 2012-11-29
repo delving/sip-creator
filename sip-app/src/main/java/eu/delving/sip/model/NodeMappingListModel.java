@@ -127,6 +127,10 @@ public class NodeMappingListModel extends AbstractListModel {
                     }
                 });
             }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+            }
         };
     }
 

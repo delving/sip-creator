@@ -65,6 +65,9 @@ public class RecMapping {
     @XStreamAlias("functions")
     SortedSet<MappingFunction> functions = new TreeSet<MappingFunction>();
 
+    @XStreamAlias("dyn-opts")
+    List<DynOpt> dynOpts = new ArrayList<DynOpt>();
+
     @XStreamAlias("node-mappings")
     List<NodeMapping> nodeMappings = new ArrayList<NodeMapping>();
 
@@ -87,7 +90,7 @@ public class RecMapping {
     public SchemaVersion getSchemaVersion() {
         if (prefix == null) throw new IllegalArgumentException("Mapping lacks prefix");
         if (schemaVersion == null) {
-            for (String [] hint : HACK_VERSION_HINTS) if (hint[0].equals(prefix)) schemaVersion = hint[1];
+            for (String[] hint : HACK_VERSION_HINTS) if (hint[0].equals(prefix)) schemaVersion = hint[1];
         }
         if (schemaVersion == null) throw new IllegalStateException("Mapping lacks schemaVersion missing");
         return new SchemaVersion(prefix, schemaVersion);
@@ -135,7 +138,7 @@ public class RecMapping {
         functions.add(function);
         return function;
     }
-    
+
     public void addFunction(MappingFunction function) {
         functions.add(function);
     }
@@ -152,16 +155,6 @@ public class RecMapping {
         return recDefTree;
     }
 
-    public String toCode() {
-        CodeOut codeOut = CodeOut.create();
-        toCode(codeOut, null);
-        return codeOut.toString();
-    }
-
-    public void toCode(CodeOut codeOut, EditPath editPath) {
-        recDefTree.toCode(codeOut, functions, facts, editPath);
-    }
-
     public String toString() {
         return stream().toXML(this);
     }
@@ -172,6 +165,11 @@ public class RecMapping {
     }
 
     private void resolve() {
+        for (DynOpt dynOpt : dynOpts) {
+            RecDefNode recDefNode = recDefTree.getRecDefNode(dynOpt.path);
+            if (recDefNode == null) throw new RuntimeException("Cannot find dyn-opt path " + dynOpt.path);
+            recDefNode.addSibling(dynOpt);
+        }
         if (nodeMappings.isEmpty()) {
             List<RecDef.FieldMarker> fieldMarkers = recDefTree.getRecDef().fieldMarkers;
             if (fieldMarkers != null) for (RecDef.FieldMarker marker : fieldMarkers) {
@@ -240,7 +238,7 @@ public class RecMapping {
 
     public static RecMapping upgrade(RecMapping previousVersion, String version, RecDefModel recDefModel) throws MetadataException {
         SchemaVersion schemaVersion = new SchemaVersion(previousVersion.getPrefix(), version);
-        RecDefTree recDefTree =  recDefModel.createRecDefTree(schemaVersion);
+        RecDefTree recDefTree = recDefModel.createRecDefTree(schemaVersion);
         RecMapping recMapping = new RecMapping(recDefTree);
         // todo: copy stuff carefully
         return recMapping;
@@ -263,6 +261,7 @@ public class RecMapping {
     public static void write(OutputStream os, RecMapping recMapping) {
         try {
             Writer osWriter = new OutputStreamWriter(os, "UTF-8");
+            recMapping.dynOpts = recMapping.getRecDefTree().getDynOpts();
             recMapping.nodeMappings = recMapping.getRecDefTree().getNodeMappings();
             stream().toXML(recMapping, osWriter);
         }

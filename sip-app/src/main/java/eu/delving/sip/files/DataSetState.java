@@ -52,7 +52,7 @@ public enum DataSetState {
         return String.format(
                 "<html><center><b>&quot;%s&quot;</b><br>" +
                         "Status is now : %s<br>" +
-                        "Press here to : %s<br>",
+                        "Click here to : %s<br>",
                 description[0], description[1], description[2]
         );
     }

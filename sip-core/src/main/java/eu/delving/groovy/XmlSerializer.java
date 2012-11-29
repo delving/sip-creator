@@ -21,6 +21,7 @@
 
 package eu.delving.groovy;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -111,7 +112,7 @@ public class XmlSerializer {
             if (fromMapping) out.add(eventFactory.createCharacters("\n"));
             out.add(eventFactory.createEndDocument());
             out.flush();
-            return new String(outputStream.toByteArray());
+            return new String(outputStream.toByteArray(), "UTF-8");
         }
         catch (XMLStreamException e) {
             throw new RuntimeException(e);
@@ -170,7 +171,7 @@ public class XmlSerializer {
         for (int walk = 0; walk < nodeAttributes.getLength(); walk++) {
             Node attrItem = nodeAttributes.item(walk);
             if (attrItem.getPrefix() == null || attrItem.getPrefix().isEmpty()) {
-                attributes.add(eventFactory.createAttribute(attrItem.getNodeName(),attrItem.getNodeValue()));
+                attributes.add(eventFactory.createAttribute(attrItem.getNodeName(), attrItem.getNodeValue()));
             }
             else {
                 attributes.add(eventFactory.createAttribute(
@@ -196,6 +197,14 @@ public class XmlSerializer {
     private void gatherNamespaces(Node node, Map<String, String> namespaces) {
         if (node.getPrefix() != null && node.getNamespaceURI() != null) {
             namespaces.put(node.getPrefix(), node.getNamespaceURI());
+        }
+        if (node instanceof Element) {
+            Element element = (Element) node;
+            NamedNodeMap attrs = element.getAttributes();
+            for (int walk = 0; walk < attrs.getLength(); walk++) {
+                if (attrs.item(walk).getPrefix() == null) continue;
+                namespaces.put(attrs.item(walk).getPrefix(), attrs.item(walk).getNamespaceURI());
+            }
         }
         NodeList list = node.getChildNodes();
         for (int walk = 0; walk < list.getLength(); walk++) {

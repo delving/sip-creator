@@ -137,6 +137,13 @@ public class MappingModel implements RecDefNodeListener {
         }
     }
 
+    @Override
+    public void populationChanged(RecDefNode recDefNode) {
+        for (ChangeListener changeListener : changeListeners) {
+            changeListener.populationChanged(this, recDefNode);
+        }
+    }
+
     // observable
 
     public interface SetListener {
@@ -154,6 +161,8 @@ public class MappingModel implements RecDefNodeListener {
         void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
 
         void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping);
+
+        void populationChanged(MappingModel mappingModel, RecDefNode node);
 
     }
 

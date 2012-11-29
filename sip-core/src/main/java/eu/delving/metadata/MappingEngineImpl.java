@@ -57,7 +57,7 @@ public class MappingEngineImpl implements MappingEngine {
     public void addMappingRunner(SchemaVersion schemaVersion, String mapping) throws MetadataException {
         RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
-        mappingRunners.put(schemaVersion, new MappingRunner(groovyCodeResource, recMapping, null));
+        mappingRunners.put(schemaVersion, new MappingRunner(groovyCodeResource, recMapping, null, false));
     }
 
     @Override

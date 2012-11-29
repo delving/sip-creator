@@ -21,31 +21,22 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 /**
- * Combines a path in the RecDefTree with the edited code for that path so
- * that editing of code can be done for only one part of the tree at a time.
+ * A dynamic opt, with similar function to the opts in the record definition
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class EditPath {
-    private NodeMapping nodeMapping;
-    private String editedCode;
+@XStreamAlias("dyn-opt")
+public class DynOpt {
 
-    public EditPath(NodeMapping nodeMapping, String editedCode) {
-        this.nodeMapping = nodeMapping;
-        this.editedCode = editedCode;
-    }
+    @XStreamAsAttribute
+    public Path path;
 
-    public NodeMapping getNodeMapping() {
-        return nodeMapping;
-    }
+    @XStreamAsAttribute
+    public String value;
 
-    public boolean isGeneratedCode() {
-        return editedCode == null;
-    }
-
-    public String getEditedCode(Path path) {
-        return nodeMapping.recDefNode.getPath().equals(path) ? editedCode : null;
-    }
 }

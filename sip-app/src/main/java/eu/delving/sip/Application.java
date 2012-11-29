@@ -22,10 +22,7 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.*;
 import eu.delving.schema.Fetcher;
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.actions.ImportAction;
@@ -43,13 +40,18 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -57,9 +59,11 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.*;
 import java.util.prefs.Preferences;
 
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
 import static eu.delving.sip.files.DataSetState.*;
 
@@ -73,8 +77,10 @@ import static eu.delving.sip.files.DataSetState.*;
 public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
+    private File storageDirectory;
     private SipModel sipModel;
-    private Action importAction, uploadAction, validateAction;
+    private Action importAction;
+    private Action validateAction;
     private JFrame home;
     private JDesktopPane desktop;
     private AllFrames allFrames;
@@ -86,7 +92,8 @@ public class Application {
     private UnlockMappingAction unlockMappingAction;
     private SelectAnotherMappingAction selectAnotherMappingAction;
 
-    private Application(final File storageDirectory) throws StorageException {
+    private Application(final File storageDir) throws StorageException {
+        this.storageDirectory = storageDir;
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -113,14 +120,16 @@ public class Application {
                 resizeTimer.restart();
             }
         });
-        Preferences preferences =   Preferences.userNodeForPackage(SipModel.class);
+        Preferences preferences = Preferences.userNodeForPackage(SipModel.class);
         feedback = new VisualFeedback(home, desktop, preferences);
         HttpClient httpClient = createHttpClient(String.format("http://%s", StorageFinder.getHostPort(storageDirectory)));
         Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
-        Storage storage = new StorageImpl(storageDirectory, fetcher, httpClient);
-        sipModel = new SipModel(desktop ,storage, groovyCodeResource, feedback, preferences);
+        ResolverContext context = new ResolverContext();
+        Storage storage = new StorageImpl(storageDirectory, fetcher, new CachedResourceResolver(context));
+        context.setStorage(storage);
+        context.setHttpClient(httpClient);
+        sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
         CultureHubClient cultureHubClient = new CultureHubClient(sipModel, httpClient);
-        allFrames = new AllFrames(sipModel, cultureHubClient);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
@@ -130,9 +139,12 @@ public class Application {
                 allFrames.getViewSelector().refreshView();
             }
         });
+        JPanel content = (JPanel) home.getContentPane();
+        content.setFocusable(true);
+        allFrames = new AllFrames(sipModel, cultureHubClient, content);
         desktop.setBackground(new Color(190, 190, 200));
         helpPanel = new HelpPanel(sipModel, httpClient);
-        home.getContentPane().add(desktop, BorderLayout.CENTER);
+        content.add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
             public void lockChanged(MappingModel mappingModel, final boolean locked) {
@@ -159,14 +171,20 @@ public class Application {
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             }
+
+            @Override
+            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+            }
         });
         importAction = new ImportAction(desktop, sipModel);
+        attachAccelerator(importAction, home);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
-        uploadAction = allFrames.getUploadAction();
         unlockMappingAction = new UnlockMappingAction(sipModel);
+        attachAccelerator(unlockMappingAction, home);
         selectAnotherMappingAction = new SelectAnotherMappingAction(sipModel);
-        home.getContentPane().add(createStatePanel(), BorderLayout.SOUTH);
-        home.getContentPane().add(allFrames.getSidePanel(), BorderLayout.WEST);
+        attachAccelerator(selectAnotherMappingAction, home);
+        content.add(createStatePanel(), BorderLayout.SOUTH);
+        content.add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         screen.height -= 30;
         home.setSize(screen);
@@ -180,7 +198,7 @@ public class Application {
                 quit();
             }
         });
-        home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
@@ -213,18 +231,8 @@ public class Application {
                 }
             }
         });
-    }
-
-    private boolean quit() {
-        if (!sipModel.getWorkModel().isEmpty()) {
-            boolean exitAnyway = feedback.confirm(
-                    "Busy",
-                    "There are jobs busy, are you sure you want to exit?"
-            );
-            if (exitAnyway) return false;
-        }
-        System.exit(0);
-        return true;
+        attachAccelerator(new QuitAction(), home);
+        attachAccelerator(statusPanel.getButtonAction(), home);
     }
 
     private JPanel createStatePanel() {
@@ -270,7 +278,7 @@ public class Application {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting() || workFrame.getMiniList().isSelectionEmpty()) return;
-                workFrame.getAction().actionPerformed(null);
+                workFrame.openFrame();
             }
         });
         return workPanel;
@@ -287,7 +295,7 @@ public class Application {
     private JMenu createHelpMenu() {
         JMenu menu = new JMenu("Help");
         final JCheckBoxMenuItem item = new JCheckBoxMenuItem("Show Help Panel");
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK));
+        item.setAccelerator(MENU_H);
         item.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -343,22 +351,108 @@ public class Application {
         return new DefaultHttpClient(threaded, httpParams);
     }
 
-    public static void main(final String[] args) throws StorageException {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final File storageDirectory = StorageFinder.getStorageDirectory(args);
-                if (storageDirectory == null) return;
-                try {
-                    Application application = new Application(storageDirectory);
-                    application.home.setVisible(true);
-                    application.allFrames.initiate();
+    private void quit() {
+        if (!sipModel.getWorkModel().isEmpty()) {
+            boolean exitAnyway = feedback.confirm(
+                    "Busy",
+                    "There are jobs busy, are you sure you want to exit?"
+            );
+            if (exitAnyway) return;
+        }
+        EventQueue.invokeLater(LAUNCH);
+    }
+
+    private void destroy() {
+        sipModel.shutdown();
+        resizeTimer.stop();
+        home.setVisible(false);
+        home.dispose();
+    }
+
+    private class ResolverContext implements CachedResourceResolver.Context {
+        private Storage storage;
+        private HttpClient httpClient;
+
+        public void setStorage(Storage storage) {
+            this.storage = storage;
+        }
+
+        public void setHttpClient(HttpClient httpClient) {
+            this.httpClient = httpClient;
+        }
+
+        @Override
+        public String get(String url) {
+            try {
+                HttpGet get = new HttpGet(url);
+                HttpResponse response = httpClient.execute(get);
+                StatusLine line = response.getStatusLine();
+                if (line.getStatusCode() != HttpStatus.SC_OK) {
+                    throw new IOException(String.format(
+                            "HTTP Error %s (%s) on %s",
+                            line.getStatusCode(), line.getReasonPhrase(), url
+                    ));
                 }
-                catch (StorageException e) {
-                    JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
-                    e.printStackTrace();
-                }
+                return EntityUtils.toString(response.getEntity());
             }
-        });
+            catch (Exception e) {
+                throw new RuntimeException("Fetching problem: "+url, e);
+            }
+        }
+
+        @Override
+        public File file(String systemId) {
+            return storage.cache(systemId.replaceAll("[/:]", "_"));
+        }
+    }
+
+    private class QuitAction extends AbstractAction {
+
+        private QuitAction() {
+            super("Quit");
+            putValue(Action.ACCELERATOR_KEY, MENU_W);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            quit();
+        }
+    }
+
+    private static StorageFinder storageFinder = new StorageFinder();
+
+    private static class LaunchAction implements Runnable {
+        private Application application;
+
+        @Override
+        public void run() {
+            File storageDirectory;
+            if (application != null) {
+                application.destroy();
+                storageDirectory = storageFinder.getStorageDirectory(application.storageDirectory);
+            }
+            else {
+                storageDirectory = storageFinder.getStorageDirectory(null);
+            }
+            if (storageDirectory == null) {
+                System.exit(0);
+            }
+            try {
+                application = new Application(storageDirectory);
+                application.home.setVisible(true);
+                application.allFrames.initiate();
+            }
+            catch (StorageException e) {
+                JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static LaunchAction LAUNCH = new LaunchAction();
+
+    public static void main(final String[] args) throws StorageException {
+        storageFinder.setArgs(args);
+        EventQueue.invokeLater(LAUNCH);
     }
 }
