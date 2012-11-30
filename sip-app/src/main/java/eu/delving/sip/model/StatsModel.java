@@ -86,8 +86,8 @@ public class StatsModel {
         setDelimiters(recordRoot, uniqueElement);
     }
 
-    public void set(Map<String, String> hints) {
-        hintsModel.set(hints);
+    public FactModel getHintsModel() {
+        return hintsModel;
     }
 
     public boolean hasRecordRoot() {
@@ -253,6 +253,5 @@ public class StatsModel {
             return sipModel.getDataSetModel().getDataSet();
         }
     }
-
 
 }
