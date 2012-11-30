@@ -38,7 +38,7 @@ import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
-import javax.swing.JDesktopPane;
+import javax.swing.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -331,7 +331,7 @@ public class SipModel {
                     @Override
                     public void run() {
                         dataSetFacts.set(facts);
-                        statsModel.set(hints);
+                        statsModel.getHintsModel().set(hints);
                         statsModel.setStatistics(stats);
                         exec(new Work() {
                             @Override
