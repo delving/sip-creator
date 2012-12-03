@@ -60,7 +60,7 @@ public class MappingEngineImpl implements MappingEngine {
         }
         else {
             Node root = metadataRecordFactory.nodeFromXml(id, recordXML);
-            return new MappingResultImpl(serializer, root, null);
+            return new MappingResultImpl(serializer, root, null).resolve();
         }
     }
 

@@ -118,15 +118,11 @@ public class TestMappingEngine {
     @Test
     public void rawNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         Map<String, String> namespaces = createNamespaces(
-                "", "http://raw.org",
-                "dc", "http://purl.org/dc/elements/1.1/",
-                "dcterms", "http://purl.org/dc/terms/",
-                "europeana", "http://www.europeana.eu/schemas/ese/",
-                "icn", "http://www.icn.nl/schemas/icn/"
+                "", "http://raw.org"
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces);
-        MappingResult result = mappingEngine.execute("rawNode", input("icn"));
-        System.out.println(result.toXml());
+        MappingResult result = mappingEngine.execute("rawNode", input("raw"));
+        System.out.println(result.toXmlAugmented());
     }
 
     @Test
