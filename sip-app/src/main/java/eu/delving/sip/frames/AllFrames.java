@@ -146,11 +146,12 @@ public class AllFrames {
         };
         try {
             File file = frameArrangementsFile();
+            createDefaultFrameArrangements(file);
             try {
                 addFrameArrangements(new FileInputStream(file));
             }
             catch (Exception e) {
-                createDefaultFrameArrangements(file);
+                // when you want to adjust, remove the line above and put it here: createDefaultFrameArrangements(file);
                 addFrameArrangements(new FileInputStream(file));
             }
         }
