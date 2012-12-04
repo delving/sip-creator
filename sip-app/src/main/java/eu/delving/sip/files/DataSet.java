@@ -43,7 +43,7 @@ import java.util.Map;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface DataSet {
+public interface DataSet extends Comparable<DataSet> {
 
     String getSpec();
 

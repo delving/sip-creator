@@ -108,7 +108,7 @@ public class AllFrames {
         void refreshView();
     }
 
-    public AllFrames(final SipModel sipModel, JPanel content, FrameBase dataSetFrame, FrameBase factsFrame) {
+    public AllFrames(final SipModel sipModel, JPanel content, FrameBase dataSetFrame) {
         this.sipModel = sipModel;
         this.content = content;
         this.dataSetFrame = dataSetFrame;
@@ -131,7 +131,6 @@ public class AllFrames {
         FrameBase reportFrame = new ReportFrame(sipModel);
         this.frames = new FrameBase[]{
                 dataSetFrame,
-                factsFrame,
                 source,
                 create,
                 target,

@@ -590,6 +590,11 @@ public class StorageImpl implements Storage {
         public String toString() {
             return getSpec();
         }
+
+        @Override
+        public int compareTo(DataSet dataSet) {
+            return getSpec().compareTo(dataSet.getSpec());
+        }
     }
 
     private SchemaFactory schemaFactory() {

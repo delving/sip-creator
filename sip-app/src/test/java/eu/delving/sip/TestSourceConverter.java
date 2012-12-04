@@ -385,5 +385,10 @@ public class TestSourceConverter {
         public void remove() throws StorageException {
           
         }
+
+        @Override
+        public int compareTo(DataSet dataSet) {
+            return 0;
+        }
     }
 }

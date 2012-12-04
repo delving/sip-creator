@@ -114,7 +114,7 @@ public interface Storage {
     String INDEX_FILE = "media-files.xml";
     String HELP_FILE = "help.html";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
-    String STANDALONE_DIR = "Standalone";
+    String STANDALONE_DIR = "StandaloneDataSets";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", ENVELOPE_TAG, RECORD_TAG, UNIQUE_ATTR));
     Path CONSTANT_PATH = Path.create(String.format("/%s", CONSTANT_TAG));

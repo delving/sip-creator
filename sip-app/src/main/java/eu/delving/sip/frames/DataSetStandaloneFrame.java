@@ -36,16 +36,16 @@ import eu.delving.schema.xml.Schema;
 import eu.delving.schema.xml.Version;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Provide an form interface for creating datasets
@@ -53,7 +53,7 @@ import java.util.TreeMap;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class FactsFrame extends FrameBase {
+public class DataSetStandaloneFrame extends FrameBase {
     private static final String UNSELECTED = "<select>";
     private static final FactDefinition SCHEMA_VERSIONS_FACT = new FactDefinition("schemaVersions", "Schema Versions");
     private static final JLabel EMPTY_LABEL = new JLabel("Fetching...", JLabel.CENTER);
@@ -61,44 +61,21 @@ public class FactsFrame extends FrameBase {
     private SchemaRepository schemaRepository;
     private List<FactDefinition> factDefinitions;
     private Map<String, FieldComponent> fieldComponents = new TreeMap<String, FieldComponent>();
-    private JPanel center = new JPanel();
+    private JList dataSetList = new JList();
+    private JPanel fieldPanel = new JPanel();
 
-    public FactsFrame(SipModel sipModel, SchemaRepository schemaRepository) {
-        super(Which.FACTS, sipModel, "Data set facts");
+    public DataSetStandaloneFrame(SipModel sipModel, SchemaRepository schemaRepository) {
+        super(Which.DATA_SET, sipModel, "Data set facts");
         this.schemaRepository = schemaRepository;
-        center.add(EMPTY_LABEL);
+        fieldPanel.add(EMPTY_LABEL);
         sipModel.exec(createFactDefFetcher());
-    }
-
-    public void setFacts(final Map<String, String> facts) {
-        sipModel.exec(new Swing() {
-            @Override
-            public void run() {
-                if (factDefinitions == null) return;
-                for (FactDefinition factDefinition : factDefinitions) {
-                    FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
-                    if (fieldComponent == null) throw new RuntimeException("No field component for " + factDefinition.name);
-                    String value = facts.get(factDefinition.name);
-                    if (value == null) value = "";
-                    fieldComponent.setValue(value);
-                    fieldComponent.setEditable(false);
-                }
-            }
-        });
-    }
-
-    public Map<String, String> getFacts() {
-        Map<String, String> facts = new TreeMap<String, String>();
-        for (FactDefinition factDefinition : factDefinitions) {
-            FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
-            facts.put(factDefinition.name, fieldComponent.getValue());
-        }
-        return facts;
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.add(center, BorderLayout.CENTER);
+        fieldPanel.setBorder(BorderFactory.createTitledBorder("Facts"));
+        content.add(fieldPanel, BorderLayout.EAST);
+        content.add(SwingHelper.scrollV("Data sets", dataSetList), BorderLayout.CENTER);
         sipModel.exec(createFormBuilder());
     }
 
@@ -132,7 +109,7 @@ public class FactsFrame extends FrameBase {
         return new Swing() {
             @Override
             public void run() {
-                center.removeAll();
+                fieldPanel.removeAll();
                 FormLayout layout = new FormLayout(
                         "right:pref, 3dlu, pref",
                         createRowLayout(factDefinitions)
@@ -158,8 +135,8 @@ public class FactsFrame extends FrameBase {
                     }
                     count += 2;
                 }
-                center.add(pb.getPanel(), BorderLayout.CENTER);
-                center.revalidate();
+                fieldPanel.add(pb.getPanel(), BorderLayout.CENTER);
+                fieldPanel.revalidate();
             }
 
         };
@@ -229,6 +206,32 @@ public class FactsFrame extends FrameBase {
         }
     }
 
+    public void setFacts(final Map<String, String> facts) {
+        sipModel.exec(new Swing() {
+            @Override
+            public void run() {
+                if (factDefinitions == null) return;
+                for (FactDefinition factDefinition : factDefinitions) {
+                    FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
+                    if (fieldComponent == null) throw new RuntimeException("No field component for " + factDefinition.name);
+                    String value = facts.get(factDefinition.name);
+                    if (value == null) value = "";
+                    fieldComponent.setValue(value);
+                    fieldComponent.setEditable(false);
+                }
+            }
+        });
+    }
+
+    public Map<String, String> getFacts() {
+        Map<String, String> facts = new TreeMap<String, String>();
+        for (FactDefinition factDefinition : factDefinitions) {
+            FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
+            facts.put(factDefinition.name, fieldComponent.getValue());
+        }
+        return facts;
+    }
+
     @XStreamAlias("fact-definition-list")
     public static class FactDefinitionList {
         @XStreamImplicit
@@ -259,6 +262,33 @@ public class FactsFrame extends FrameBase {
             array[index++] = UNSELECTED;
             for (String option : options) array[index++] = option;
             return array;
+        }
+    }
+    
+    private class DataSetListModel extends AbstractListModel {
+        private List<DataSet> dataSets;
+
+        public void refresh() {
+            List<DataSet> freshDataSets = new ArrayList<DataSet>();
+            freshDataSets.addAll(sipModel.getStorage().getDataSets().values());
+            Collections.sort(freshDataSets);
+            if (getSize() > 0) {
+                int sizeWas = getSize();
+                dataSets = null;
+                fireIntervalRemoved(this, 0, sizeWas);
+            }
+            dataSets = freshDataSets;
+            fireIntervalAdded(this, 0, getSize());
+        }
+
+        @Override
+        public int getSize() {
+            return dataSets == null ? 0 : dataSets.size();
+        }
+
+        @Override
+        public Object getElementAt(int i) {
+            return dataSets == null ? null : dataSets.get(i);
         }
     }
 }
