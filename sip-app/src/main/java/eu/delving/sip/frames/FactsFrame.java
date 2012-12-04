@@ -44,6 +44,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Provide an form interface for creating datasets
@@ -58,49 +60,72 @@ public class FactsFrame extends FrameBase {
     private static final String FACTS_PREFIX = "facts";
     private SchemaRepository schemaRepository;
     private List<FactDefinition> factDefinitions;
-    private boolean fetching;
+    private Map<String, FieldComponent> fieldComponents = new TreeMap<String, FieldComponent>();
     private JPanel center = new JPanel();
 
     public FactsFrame(SipModel sipModel, SchemaRepository schemaRepository) {
         super(Which.FACTS, sipModel, "Data set facts");
         this.schemaRepository = schemaRepository;
+        center.add(EMPTY_LABEL);
+        sipModel.exec(createFactDefFetcher());
+    }
+
+    public void setFacts(final Map<String, String> facts) {
+        sipModel.exec(new Swing() {
+            @Override
+            public void run() {
+                if (factDefinitions == null) return;
+                for (FactDefinition factDefinition : factDefinitions) {
+                    FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
+                    if (fieldComponent == null) throw new RuntimeException("No field component for " + factDefinition.name);
+                    String value = facts.get(factDefinition.name);
+                    if (value == null) value = "";
+                    fieldComponent.setValue(value);
+                    fieldComponent.setEditable(false);
+                }
+            }
+        });
+    }
+
+    public Map<String, String> getFacts() {
+        Map<String, String> facts = new TreeMap<String, String>();
+        for (FactDefinition factDefinition : factDefinitions) {
+            FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
+            facts.put(factDefinition.name, fieldComponent.getValue());
+        }
+        return facts;
     }
 
     @Override
     protected void buildContent(Container content) {
-        center.add(EMPTY_LABEL);
         content.add(center, BorderLayout.CENTER);
+        sipModel.exec(createFormBuilder());
     }
 
-    @Override
-    protected void onOpen(boolean opened) {
-        if (!fetching) {
-            fetching = true;
-            sipModel.exec(new Work() {
+    private Work createFactDefFetcher() {
+        return new Work() {
 
-                @Override
-                public Job getJob() {
-                    return Job.FETCH_FACTS_DEF;
-                }
+            @Override
+            public Job getJob() {
+                return Job.FETCH_FACTS_DEF;
+            }
 
-                @Override
-                public void run() {
-                    try {
-                        String factsString = schemaRepository.getSchema(new SchemaVersion(FACTS_PREFIX, "1.0.0"), SchemaType.FACT_DEFINITIONS);
-                        final XStream xstream = new XStream();
-                        xstream.processAnnotations(FactDefinitionList.class);
-                        FactDefinitionList factDefinitionList = (FactDefinitionList) xstream.fromXML(factsString);
-                        factDefinitions = new ArrayList<FactDefinition>();
-                        factDefinitions.addAll(factDefinitionList.definitions);
-                        factDefinitions.add(SCHEMA_VERSIONS_FACT);
-                        sipModel.exec(createFormBuilder());
-                    }
-                    catch (IOException e) {
-                        sipModel.getFeedback().alert("Unable to fetch dataset facts", e);
-                    }
+            @Override
+            public void run() {
+                try {
+                    String factsString = schemaRepository.getSchema(new SchemaVersion(FACTS_PREFIX, "1.0.0"), SchemaType.FACT_DEFINITIONS);
+                    final XStream xstream = new XStream();
+                    xstream.processAnnotations(FactDefinitionList.class);
+                    FactDefinitionList factDefinitionList = (FactDefinitionList) xstream.fromXML(factsString);
+                    factDefinitions = new ArrayList<FactDefinition>();
+                    factDefinitions.addAll(factDefinitionList.definitions);
+                    factDefinitions.add(SCHEMA_VERSIONS_FACT);
                 }
-            });
-        }
+                catch (IOException e) {
+                    sipModel.getFeedback().alert("Unable to fetch dataset facts", e);
+                }
+            }
+        };
     }
 
     private Swing createFormBuilder() {
@@ -124,10 +149,12 @@ public class FactsFrame extends FrameBase {
                         if (factDefinition == SCHEMA_VERSIONS_FACT) {
                             field.setToolTipText(createSchemaVersionToolTip());
                         }
+                        fieldComponents.put(factDefinition.name, new FieldComponent(field));
                     }
                     else {
-                        JComboBox box = new JComboBox(factDefinition.getOptions());
-                        pb.add(box, cc.xy(3, count));
+                        JComboBox comboBox = new JComboBox(factDefinition.getOptions());
+                        pb.add(comboBox, cc.xy(3, count));
+                        fieldComponents.put(factDefinition.name, new FieldComponent(comboBox));
                     }
                     count += 2;
                 }
@@ -158,9 +185,48 @@ public class FactsFrame extends FrameBase {
 
     private String createRowLayout(List<FactDefinition> factDefinitions) {
         StringBuilder out = new StringBuilder("3dlu");
-        int size = factDefinitions.size() + 1; // +1 for schema field
+        int size = factDefinitions.size();
         while (size-- > 0) out.append(", pref, 3dlu");
         return out.toString();
+    }
+
+    private class FieldComponent {
+        private JTextField textField;
+        private JComboBox comboBox;
+
+        private FieldComponent(JTextField textField) {
+            this.textField = textField;
+        }
+
+        private FieldComponent(JComboBox comboBox) {
+            this.comboBox = comboBox;
+        }
+
+        public boolean isTextField() {
+            return textField != null;
+        }
+
+        public String getValue() {
+            return isTextField() ? textField.getText() : (String) comboBox.getSelectedItem();
+        }
+
+        public void setValue(String value) {
+            if (isTextField()) {
+                textField.setText(value);
+            }
+            else {
+                comboBox.setSelectedItem(value);
+            }
+        }
+
+        public void setEditable(boolean editable) {
+            if (isTextField()) {
+                textField.setEditable(editable);
+            }
+            else {
+                comboBox.setEditable(editable);
+            }
+        }
     }
 
     @XStreamAlias("fact-definition-list")
@@ -187,8 +253,8 @@ public class FactsFrame extends FrameBase {
             this.prompt = prompt;
         }
 
-        public String [] getOptions() {
-            String [] array = new String[options.size() + 1];
+        public String[] getOptions() {
+            String[] array = new String[options.size() + 1];
             int index = 0;
             array[index++] = UNSELECTED;
             for (String option : options) array[index++] = option;

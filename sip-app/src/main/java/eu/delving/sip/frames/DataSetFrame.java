@@ -54,18 +54,20 @@ import static eu.delving.sip.base.SwingHelper.*;
  */
 
 public class DataSetFrame extends FrameBase {
+    private CultureHubClient cultureHubClient;
+    private FactsFrame factsFrame;
     private DataSetTableModel tableModel = new DataSetTableModel();
     private JTable dataSetTable;
-    private CultureHubClient cultureHubClient;
     private EditAction editAction = new EditAction();
     private DownloadAction downloadAction = new DownloadAction();
     private ReleaseAction releaseAction = new ReleaseAction();
     private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
     private JTextField patternField = new JTextField(6);
 
-    public DataSetFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
+    public DataSetFrame(final SipModel sipModel, CultureHubClient cultureHubClient, FactsFrame factsFrame) {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.cultureHubClient = cultureHubClient;
+        this.factsFrame = factsFrame;
         this.dataSetTable = new JTable(tableModel, tableModel.getColumnModel());
         this.dataSetTable.setFont(this.dataSetTable.getFont().deriveFont(Font.PLAIN, 14));
         this.dataSetTable.setRowHeight(25);
@@ -78,6 +80,7 @@ public class DataSetFrame extends FrameBase {
                 downloadAction.checkEnabled();
                 editAction.checkEnabled();
                 releaseAction.checkEnabled();
+                setFacts();
             }
         });
         this.dataSetTable.addMouseListener(new MouseAdapter() {
@@ -93,6 +96,13 @@ public class DataSetFrame extends FrameBase {
         editAction.checkEnabled();
         downloadAction.checkEnabled();
         releaseAction.checkEnabled();
+    }
+
+    private void setFacts() {
+        Row selected = getSelectedRow();
+        if (selected == null) return;
+        DataSet dataSet = selected.getDataSet();
+        factsFrame.setFacts(dataSet.getDataSetFacts());
     }
 
     @Override
@@ -352,6 +362,7 @@ public class DataSetFrame extends FrameBase {
                     if (tableModel.getRowCount() > 0 && selection.isSelectionEmpty()) {
                         selection.setSelectionInterval(0, 0);
                         dataSetTable.requestFocus();
+                        openFrame();
                     }
                 }
             });

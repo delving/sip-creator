@@ -144,8 +144,8 @@ public class Application {
         });
         JPanel content = (JPanel) home.getContentPane();
         content.setFocusable(true);
-        FrameBase dataSetFrame = new DataSetFrame(sipModel, cultureHubClient);
-        FrameBase factsFrame = new FactsFrame(sipModel, schemaRepository);
+        FactsFrame factsFrame = new FactsFrame(sipModel, schemaRepository);
+        FrameBase dataSetFrame = new DataSetFrame(sipModel, cultureHubClient, factsFrame);
         allFrames = new AllFrames(sipModel, content, dataSetFrame, factsFrame);
         desktop.setBackground(new Color(190, 190, 200));
         helpPanel = new HelpPanel(sipModel, httpClient);
