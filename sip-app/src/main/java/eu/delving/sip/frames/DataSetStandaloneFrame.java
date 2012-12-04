@@ -39,13 +39,20 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import static eu.delving.sip.base.SwingHelper.scrollV;
 
 /**
  * Provide an form interface for creating datasets
@@ -54,6 +61,8 @@ import java.util.List;
  */
 
 public class DataSetStandaloneFrame extends FrameBase {
+    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 26);
+    private static final Pattern SPEC_PATTERN = Pattern.compile("[A-Za-z0-9]+");
     private static final String UNSELECTED = "<select>";
     private static final FactDefinition SCHEMA_VERSIONS_FACT = new FactDefinition("schemaVersions", "Schema Versions");
     private static final JLabel EMPTY_LABEL = new JLabel("Fetching...", JLabel.CENTER);
@@ -61,22 +70,51 @@ public class DataSetStandaloneFrame extends FrameBase {
     private SchemaRepository schemaRepository;
     private List<FactDefinition> factDefinitions;
     private Map<String, FieldComponent> fieldComponents = new TreeMap<String, FieldComponent>();
-    private JList dataSetList = new JList();
+    private DataSetListModel listModel = new DataSetListModel();
+    private JList dataSetList = new JList(listModel);
     private JPanel fieldPanel = new JPanel();
+    private EditAction editAction = new EditAction();
 
     public DataSetStandaloneFrame(SipModel sipModel, SchemaRepository schemaRepository) {
         super(Which.DATA_SET, sipModel, "Data set facts");
         this.schemaRepository = schemaRepository;
         fieldPanel.add(EMPTY_LABEL);
         sipModel.exec(createFactDefFetcher());
+        dataSetList.setFont(MONOSPACED);
+        dataSetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        dataSetList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                if (listSelectionEvent.getValueIsAdjusting()) return;
+                DataSet dataSet = (DataSet) dataSetList.getSelectedValue();
+                Map<String,String> facts = dataSet == null ? null : dataSet.getDataSetFacts();
+                setFacts(facts);
+                editAction.setEnabled(dataSet != null);
+            }
+        });
     }
 
     @Override
     protected void buildContent(Container content) {
         fieldPanel.setBorder(BorderFactory.createTitledBorder("Facts"));
-        content.add(fieldPanel, BorderLayout.EAST);
-        content.add(SwingHelper.scrollV("Data sets", dataSetList), BorderLayout.CENTER);
+        content.add(createRight(), BorderLayout.EAST);
+        content.add(createCenter(), BorderLayout.CENTER);
         sipModel.exec(createFormBuilder());
+        listModel.refresh();
+    }
+
+    private JPanel createCenter() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(scrollV("Data sets", dataSetList), BorderLayout.CENTER);
+        p.add(new JButton(editAction), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createRight() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(fieldPanel, BorderLayout.CENTER);
+        p.add(new JButton(new CreateAction()), BorderLayout.SOUTH);
+        return p;
     }
 
     private Work createFactDefFetcher() {
@@ -173,10 +211,12 @@ public class DataSetStandaloneFrame extends FrameBase {
 
         private FieldComponent(JTextField textField) {
             this.textField = textField;
+            this.textField.setEnabled(false);
         }
 
         private FieldComponent(JComboBox comboBox) {
             this.comboBox = comboBox;
+            this.comboBox.setEnabled(false);
         }
 
         public boolean isTextField() {
@@ -184,7 +224,7 @@ public class DataSetStandaloneFrame extends FrameBase {
         }
 
         public String getValue() {
-            return isTextField() ? textField.getText() : (String) comboBox.getSelectedItem();
+            return isTextField() ? textField.getText().trim() : (String) comboBox.getSelectedItem();
         }
 
         public void setValue(String value) {
@@ -192,44 +232,74 @@ public class DataSetStandaloneFrame extends FrameBase {
                 textField.setText(value);
             }
             else {
+                if (value.isEmpty()) value = UNSELECTED;
                 comboBox.setSelectedItem(value);
             }
         }
 
-        public void setEditable(boolean editable) {
+        public void setEnabled(boolean enabled) {
             if (isTextField()) {
-                textField.setEditable(editable);
+                textField.setEnabled(enabled);
             }
             else {
-                comboBox.setEditable(editable);
+                comboBox.setEnabled(enabled);
+            }
+        }
+
+        public boolean isValid() {
+            if (isTextField()) {
+                return !getValue().isEmpty();
+            }
+            else {
+                return !getValue().equals(UNSELECTED);
+            }
+        }
+
+        public void requestFocus() {
+            if (isTextField()) {
+                textField.requestFocus();
+            }
+            else {
+                comboBox.requestFocus();
             }
         }
     }
 
-    public void setFacts(final Map<String, String> facts) {
-        sipModel.exec(new Swing() {
-            @Override
-            public void run() {
-                if (factDefinitions == null) return;
-                for (FactDefinition factDefinition : factDefinitions) {
-                    FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
-                    if (fieldComponent == null) throw new RuntimeException("No field component for " + factDefinition.name);
-                    String value = facts.get(factDefinition.name);
-                    if (value == null) value = "";
-                    fieldComponent.setValue(value);
-                    fieldComponent.setEditable(false);
-                }
-            }
-        });
-    }
-
-    public Map<String, String> getFacts() {
+    private Map<String, String> getFacts() {
         Map<String, String> facts = new TreeMap<String, String>();
         for (FactDefinition factDefinition : factDefinitions) {
             FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
-            facts.put(factDefinition.name, fieldComponent.getValue());
+            if (fieldComponent.isValid()) {
+                facts.put(factDefinition.name, fieldComponent.getValue());
+            }
+            else {
+                sipModel.getFeedback().alert(String.format(
+                        "Field '%s' contains invalid value '%s'", factDefinition.prompt, fieldComponent.getValue()
+                ));
+                return null;
+            }
         }
         return facts;
+    }
+
+    private void clearFacts(String spec) {
+        setFacts(null);
+        fieldComponents.get("spec").setValue(spec);
+        fieldComponents.get(factDefinitions.get(1).name).requestFocus();
+    }
+
+    private void setFacts(Map<String, String> facts) {
+        if (factDefinitions == null) return;
+        boolean first = true;
+        for (FactDefinition factDefinition : factDefinitions) {
+            FieldComponent fieldComponent = fieldComponents.get(factDefinition.name);
+            if (fieldComponent == null) throw new RuntimeException("No field component for " + factDefinition.name);
+            String value = facts == null ? "" : facts.get(factDefinition.name);
+            if (value == null) value = "";
+            fieldComponent.setValue(value);
+            fieldComponent.setEnabled(facts == null && !first);
+            first = false;
+        }
     }
 
     @XStreamAlias("fact-definition-list")
@@ -264,7 +334,7 @@ public class DataSetStandaloneFrame extends FrameBase {
             return array;
         }
     }
-    
+
     private class DataSetListModel extends AbstractListModel {
         private List<DataSet> dataSets;
 
@@ -281,6 +351,13 @@ public class DataSetStandaloneFrame extends FrameBase {
             fireIntervalAdded(this, 0, getSize());
         }
 
+        public boolean exists(String spec) {
+            if (dataSets != null) for (DataSet dataSet : dataSets) {
+                if (spec.equals(dataSet.getSpec())) return true;
+            }
+            return false;
+        }
+
         @Override
         public int getSize() {
             return dataSets == null ? 0 : dataSets.size();
@@ -290,5 +367,117 @@ public class DataSetStandaloneFrame extends FrameBase {
         public Object getElementAt(int i) {
             return dataSets == null ? null : dataSets.get(i);
         }
+
+        public int indexOf(DataSet dataSet) {
+            int index = 0;
+            if (dataSets != null) for (DataSet member : dataSets) {
+                if (dataSet.getSpec().equals(member.getSpec())) return index;
+                index++;
+            }
+            return -1;
+        }
     }
+
+    private class CreateAction extends AbstractAction {
+        private String spec;
+
+        private CreateAction() {
+            refresh();
+        }
+
+        public void refresh() {
+            if (spec == null) {
+                putValue(Action.NAME, "<html><h2>Create new data set</h2>");
+            }
+            else {
+                putValue(Action.NAME, String.format("<html><h2>Save data set '%s'</h2>", spec));
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (spec == null) {
+                String chosenSpec = sipModel.getFeedback().ask("Please enter a spec for the new data set. Use only letters and numbers.");
+                if (chosenSpec != null) {
+                    if (!SPEC_PATTERN.matcher(chosenSpec).find()) {
+                        sipModel.getFeedback().alert(String.format(
+                                "The spec '%s' is not acceptable, since it must be made up of only letters and numbers.", chosenSpec
+                        ));
+                        return;
+                    }
+                    if (listModel.exists(chosenSpec)) {
+                        sipModel.getFeedback().alert(String.format("The spec '%s' already exists.", chosenSpec));
+                        return;
+                    }
+                    spec = chosenSpec;
+                    clearFacts(spec);
+                    refresh();
+                }
+            }
+            else {
+                try {
+                    DataSet dataSet = sipModel.getStorage().createDataSet(spec, "standalone");
+                    Map<String, String> facts = getFacts();
+                    if (facts == null) return;
+                    dataSet.setDataSetFacts(facts);
+                    listModel.refresh();
+                    int index = listModel.indexOf(dataSet);
+                    dataSetList.setSelectedIndex(index);
+                    spec = null;
+                    refresh();
+                }
+                catch (StorageException e) {
+                    sipModel.getFeedback().alert(String.format("Unable to create data set with spec '%s'.", spec));
+                }
+            }
+        }
+    }
+
+    private class EditAction extends AbstractAction {
+
+        private EditAction() {
+            super("Select this data set for editing");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_EDIT);
+            setEnabled(false);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            DataSet dataSet = (DataSet) dataSetList.getSelectedValue();
+            if (dataSet == null) return;
+            List<SchemaVersion> schemaVersions = dataSet.getSchemaVersions();
+            if (schemaVersions == null || schemaVersions.isEmpty()) return;
+            setEnabled(false);
+            String prefix;
+            if (schemaVersions.size() == 1) {
+                prefix = schemaVersions.get(0).getPrefix();
+            }
+            else {
+                prefix = askForPrefix(schemaVersions);
+                if (prefix == null) return;
+            }
+            sipModel.setDataSetPrefix(dataSet, prefix, new Swing() {
+                @Override
+                public void run() {
+                    setEnabled(true);
+                    sipModel.getViewSelector().selectView(AllFrames.View.QUICK_MAPPING);
+                }
+            });
+        }
+
+        private String askForPrefix(List<SchemaVersion> schemaVersions) {
+            JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
+            ButtonGroup buttonGroup = new ButtonGroup();
+            for (SchemaVersion schemaVersion : schemaVersions) {
+                JRadioButton b = new JRadioButton(schemaVersion.getPrefix() + " mapping");
+                if (buttonGroup.getButtonCount() == 0) b.setSelected(true);
+                b.setActionCommand(schemaVersion.getPrefix());
+                buttonGroup.add(b);
+                buttonPanel.add(b);
+            }
+            return sipModel.getFeedback().form("Choose Schema", buttonPanel) ? buttonGroup.getSelection().getActionCommand() : null;
+        }
+    }
+
+
 }

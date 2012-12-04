@@ -62,13 +62,13 @@ public class StorageFinder {
         else if (!WORKSPACE_DIR.isDirectory()) {
             throw new RuntimeException(String.format("Expected directory but %s is a file", WORKSPACE_DIR.getAbsolutePath()));
         }
+        storageDirs.add(new File(WORKSPACE_DIR, STANDALONE_DIR));
         storageDirs.addAll(Arrays.asList(WORKSPACE_DIR.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return file.isDirectory() && HPU_DIRECTORY.matcher(file.getName()).matches();
             }
         })));
-        storageDirs.add(new File(WORKSPACE_DIR, STANDALONE_DIR));
     }
 
     public void setArgs(String[] args) {
@@ -76,6 +76,9 @@ public class StorageFinder {
     }
 
     public File getStorageDirectory(File unwanted) {
+        if (args.length == 1 && args[0].equals(STANDALONE_DIR)) {
+            return storageDirs.get(0);
+        }
         switch (storageDirs.size()) {
             case 0:
                 return createHostPortDirectory(args);

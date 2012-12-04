@@ -63,6 +63,8 @@ public interface DataSet extends Comparable<DataSet> {
 
     Map<String, String> getDataSetFacts();
 
+    void setDataSetFacts(Map<String, String> dataSetFacts) throws StorageException;
+
     Map<String, String> getHints();
 
     void setHints(Map<String, String> hints) throws StorageException;

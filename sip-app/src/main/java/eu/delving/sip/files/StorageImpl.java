@@ -237,6 +237,17 @@ public class StorageImpl implements Storage {
         }
 
         @Override
+        public void setDataSetFacts(Map<String, String> dataSetFacts) throws StorageException {
+            File factsFile = new File(here, FileType.FACTS.getName());
+            try {
+                writeFacts(factsFile, dataSetFacts);
+            }
+            catch (IOException e) {
+                throw new StorageException("Unable to set hints", e);
+            }
+        }
+
+        @Override
         public Map<String, String> getHints() {
             try {
                 return readFacts(hintsFile(here));
