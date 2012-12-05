@@ -25,8 +25,8 @@ import eu.delving.sip.base.Harvestor;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
+import eu.delving.sip.model.FactModel;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.lang.StringUtils;
 
@@ -38,7 +38,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 import static eu.delving.sip.base.KeystrokeHelper.MENU_I;
 import static eu.delving.sip.base.KeystrokeHelper.configAction;
@@ -178,7 +177,7 @@ public class ImportAction extends AbstractAction {
         public void actionPerformed(ActionEvent actionEvent) {
             dialog.setVisible(false);
             if (sipModel.getDataSetModel().isEmpty()) return;
-            Map<String, String> hints = sipModel.getDataSetModel().getDataSet().getHints();
+            FactModel hints = sipModel.getStatsModel().getHintsModel();
             String url = hints.get(Storage.HARVEST_URL);
             String prefix = hints.get(Storage.HARVEST_PREFIX);
             String spec = hints.get(Storage.HARVEST_SPEC);
@@ -191,17 +190,13 @@ public class ImportAction extends AbstractAction {
             if (!StringUtils.isEmpty(harvestUrl.getText())) {
                 try {
                     new URL(harvestUrl.getText());
-                    hints.put(Storage.HARVEST_URL, harvestUrl.getText());
-                    hints.put(Storage.HARVEST_PREFIX, harvestPrefix.getText());
-                    hints.put(Storage.HARVEST_SPEC, harvestSpec.getText());
-                    sipModel.getDataSetModel().getDataSet().setHints(hints);
+                    hints.set(Storage.HARVEST_URL, harvestUrl.getText());
+                    hints.set(Storage.HARVEST_PREFIX, harvestPrefix.getText());
+                    hints.set(Storage.HARVEST_SPEC, harvestSpec.getText());
                     performHarvest(harvestUrl.getText(), harvestPrefix.getText(), harvestSpec.getText());
                 }
                 catch (MalformedURLException e) {
                     sipModel.getFeedback().alert("Malformed URL: " + harvestUrl);
-                }
-                catch (StorageException e) {
-                    sipModel.getFeedback().alert("Unable to save URL to hints");
                 }
             }
         }

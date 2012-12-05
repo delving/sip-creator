@@ -152,6 +152,7 @@ public class StorageImpl implements Storage {
             else {
                 for (String sv : fact.split(" *, *")) schemaVersions.add(new SchemaVersion(sv));
             }
+            Collections.sort(schemaVersions);
             return schemaVersions;
         }
 

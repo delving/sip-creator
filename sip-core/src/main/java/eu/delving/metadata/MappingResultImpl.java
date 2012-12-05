@@ -52,7 +52,7 @@ public class MappingResultImpl implements MappingResult {
     public MappingResultImpl(XmlSerializer serializer, Node root, RecDefTree recDefTree) {
         this.serializer = serializer;
         this.root = root;
-        this.recDefTree = recDefTree; // todo: if null!!
+        this.recDefTree = recDefTree;
     }
 
     @Override
@@ -111,15 +111,17 @@ public class MappingResultImpl implements MappingResult {
 
     @Override
     public String toXmlAugmented() {
-        return serializer.toXml(rootAugmented, true);
+        return serializer.toXml(rootAugmented, recDefTree != null);
     }
 
     public MappingResult resolve() {
-        if (recDefTree.getRecDef().flat) {
-            resolveFlatRecord();
-        }
-        else if (recDefTree.getRecDef().prefix.equals("aff")) {
-            resolveAFFRecord();
+        if (recDefTree != null) {
+            if (recDefTree.getRecDef().flat) {
+                resolveFlatRecord();
+            }
+            else if (recDefTree.getRecDef().prefix.equals("aff")) {
+                resolveAFFRecord();
+            }
         }
         if (isRecDefDelvingAware()) {
             rootAugmented = root.cloneNode(true);
@@ -162,7 +164,7 @@ public class MappingResultImpl implements MappingResult {
     }
 
     private boolean isRecDefDelvingAware() {
-        return recDefTree.getRecDef().getNamespaceMap().containsKey(DELVING_PREFIX);
+        return recDefTree != null && recDefTree.getRecDef().getNamespaceMap().containsKey(DELVING_PREFIX);
     }
 
     private void resolveAFFRecord() {
