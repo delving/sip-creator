@@ -23,6 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.DataSetModel;
@@ -40,10 +41,13 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.scrollV;
 
@@ -249,11 +253,13 @@ public class StatsFrame extends FrameBase {
         HistogramModel histogramModel = new HistogramModel();
         histogramModel.setHistogram(values);
         JList list = new JList(histogramModel);
+        list.setCellRenderer(new HistogramCellRenderer());
+        list.setTransferHandler(new ListTransferHandler());
         return scrollV(list);
     }
 
     private static class HistogramModel extends AbstractListModel {
-        private java.util.List<Stats.Counter> list = new ArrayList<Stats.Counter>();
+        private List<Stats.Counter> list = new ArrayList<Stats.Counter>();
 
         public void setHistogram(Stats.Histogram histogram) {
             int size = getSize();
@@ -273,9 +279,29 @@ public class StatsFrame extends FrameBase {
 
         @Override
         public Object getElementAt(int i) {
-            Stats.Counter counter = list.get(i);
-            return String.format("   %d (%s) : '%s'", counter.count, counter.percentage, counter.value);
+            return list.get(i);
         }
     }
 
+    private class HistogramCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Stats.Counter counter = (Stats.Counter) value;
+            String show = String.format("   %d (%s) : '%s'", counter.count, counter.percentage, counter.value);
+            return super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
+        }
+    }
+
+    private static class ListTransferHandler extends TransferHandler {
+        protected Transferable createTransferable(JComponent c) {
+            JList list = (JList) c;
+            Stats.Counter counter = (Stats.Counter) list.getSelectedValue();
+            if (counter == null) return null;
+            return new SwingHelper.StringTransferable(counter.value);
+        }
+
+        public int getSourceActions(JComponent c) {
+            return COPY;
+        }
+    }
 }

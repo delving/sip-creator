@@ -35,16 +35,14 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridLayout;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static eu.delving.sip.base.SwingHelper.StringTransferable;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
@@ -391,31 +389,6 @@ public class InputFrame extends FrameBase {
 
         public int getSourceActions(JComponent c) {
             return COPY;
-        }
-    }
-
-    private static class StringTransferable implements Transferable {
-        private String string;
-
-        private static final DataFlavor[] flavors = {DataFlavor.stringFlavor};
-
-        private StringTransferable(String string) {
-            this.string = string;
-        }
-
-        @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            return flavors;
-        }
-
-        @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            return flavor.equals(flavors[0]);
-        }
-
-        @Override
-        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-            return string;
         }
     }
 }
