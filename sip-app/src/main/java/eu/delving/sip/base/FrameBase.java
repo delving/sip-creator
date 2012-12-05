@@ -76,7 +76,7 @@ public abstract class FrameBase extends JInternalFrame {
         MAPPING_HINTS,
         FUNCTIONS,
         QUESTION,
-        MESSAGE,
+        MESSAGE
     }
 
     public interface Placement {
@@ -173,6 +173,10 @@ public abstract class FrameBase extends JInternalFrame {
 
     // override this
     protected void onOpen(boolean opened) {
+    }
+
+    // override this
+    public void refresh() {
     }
 
     public void setPlacement(Placement placement) {

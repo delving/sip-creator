@@ -53,17 +53,17 @@ import static eu.delving.sip.base.SwingHelper.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class DataSetFrame extends FrameBase {
+public class DataSetHubFrame extends FrameBase {
+    private CultureHubClient cultureHubClient;
     private DataSetTableModel tableModel = new DataSetTableModel();
     private JTable dataSetTable;
-    private CultureHubClient cultureHubClient;
     private EditAction editAction = new EditAction();
     private DownloadAction downloadAction = new DownloadAction();
     private ReleaseAction releaseAction = new ReleaseAction();
-    private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
+    private DataSetHubFrame.RefreshAction refreshAction = new RefreshAction();
     private JTextField patternField = new JTextField(6);
 
-    public DataSetFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
+    public DataSetHubFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.cultureHubClient = cultureHubClient;
         this.dataSetTable = new JTable(tableModel, tableModel.getColumnModel());
@@ -138,7 +138,8 @@ public class DataSetFrame extends FrameBase {
         return p;
     }
 
-    public void fireRefresh() {
+    @Override
+    public void refresh() {
         if (SwingHelper.isDevelopmentMode()) {
             tableModel.setHubEntries(null);
         }
@@ -351,6 +352,7 @@ public class DataSetFrame extends FrameBase {
                     if (tableModel.getRowCount() > 0 && selection.isSelectionEmpty()) {
                         selection.setSelectionInterval(0, 0);
                         dataSetTable.requestFocus();
+                        openFrame();
                     }
                 }
             });

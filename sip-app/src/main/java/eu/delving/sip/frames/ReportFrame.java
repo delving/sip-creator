@@ -21,17 +21,16 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.*;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.StorageException;
+import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
 import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.scrollV;
@@ -46,27 +45,16 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
 public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     public static final JLabel EMPTY_LABEL = new JLabel("No reports available", JLabel.CENTER);
     private JPanel center = new JPanel(new BorderLayout());
-    private CultureHubClient cultureHubClient;
-    private UploadAction uploadAction = new UploadAction();
-    private JButton uploadButton = new JButton(uploadAction);
 
-    public ReportFrame(SipModel sipModel, CultureHubClient cultureHubClient) {
+    public ReportFrame(SipModel sipModel) {
         super(Which.REPORT, sipModel, "Report");
-        this.cultureHubClient = cultureHubClient;
         center.add(EMPTY_LABEL);
         sipModel.getReportFileModel().setListener(this);
-    }
-
-    public Action getUploadAction() {
-        return uploadAction;
     }
 
     @Override
     protected void buildContent(Container content) {
         content.add(center, BorderLayout.CENTER);
-        JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        south.add(uploadButton);
-        content.add(south, BorderLayout.SOUTH);
     }
 
     @Override
@@ -98,76 +86,6 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         p.add(scrollV("Summary", summary), BorderLayout.NORTH);
         p.add(scrollV("Invalid Records", invalid), BorderLayout.CENTER);
         return p;
-    }
-
-    private class UploadAction extends AbstractAction {
-
-        private UploadAction() {
-            super("Upload");
-            putValue(Action.SMALL_ICON, SwingHelper.ICON_UPLOAD);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            setEnabled(false);
-            DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-            final InvalidPrefixesFetcher fetcher = new InvalidPrefixesFetcher(dataSet);
-            fetcher.swing = new Swing() {
-                @Override
-                public void run() {
-                    if (fetcher.invalidPrefixes.isEmpty()) {
-                        try {
-                            cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new Swing() {
-                                @Override
-                                public void run() {
-                                    setEnabled(true);
-                                }
-                            });
-                        }
-                        catch (final StorageException e) {
-                            sipModel.getFeedback().alert("Unable to complete uploading", e);
-                            setEnabled(true);
-                        }
-                    }
-                    else {
-                        sipModel.getFeedback().alert(String.format("Upload not permitted until all mappings are validated. Still missing: %s.", fetcher.invalidPrefixes));
-                        setEnabled(true);
-                    }
-                }
-            };
-            sipModel.exec(fetcher);
-        }
-    }
-
-    private class InvalidPrefixesFetcher implements Work.DataSetWork {
-        private DataSet dataSet;
-        private Swing swing;
-        private List<String> invalidPrefixes;
-
-        private InvalidPrefixesFetcher(DataSet dataSet) {
-            this.dataSet = dataSet;
-        }
-
-        @Override
-        public void run() {
-            try {
-                invalidPrefixes = sipModel.getDataSetModel().getInvalidPrefixes();
-                sipModel.exec(swing);
-            }
-            catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to fetch invalid prefixes", e);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.FIND_INVALID_PREFIXES;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
-        }
     }
 
 
