@@ -22,7 +22,6 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.*;
-import eu.delving.schema.Fetcher;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.CancelException;
@@ -62,15 +61,10 @@ public class StorageImpl implements Storage {
     private SchemaRepository schemaRepository;
     private LSResourceResolver resolver;
 
-    public StorageImpl(File home, Fetcher fetcher, LSResourceResolver resolver) throws StorageException {
+    public StorageImpl(File home, SchemaRepository schemaRepository, LSResourceResolver resolver) throws StorageException {
         this.home = home;
+        this.schemaRepository = schemaRepository;
         this.resolver = resolver;
-        try {
-            if (fetcher != null) this.schemaRepository = new SchemaRepository(fetcher);
-        }
-        catch (IOException e) {
-            throw new StorageException("Unable to create Schema Repository", e);
-        }
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new StorageException(String.format("Unable to create storage directory in %s", home.getAbsolutePath()));
@@ -240,6 +234,17 @@ public class StorageImpl implements Storage {
             }
             catch (IOException e) {
                 return new TreeMap<String, String>();
+            }
+        }
+
+        @Override
+        public void setDataSetFacts(Map<String, String> dataSetFacts) throws StorageException {
+            File factsFile = new File(here, FileType.FACTS.getName());
+            try {
+                writeFacts(factsFile, dataSetFacts);
+            }
+            catch (IOException e) {
+                throw new StorageException("Unable to set hints", e);
             }
         }
 
@@ -596,6 +601,11 @@ public class StorageImpl implements Storage {
         @Override
         public String toString() {
             return getSpec();
+        }
+
+        @Override
+        public int compareTo(DataSet dataSet) {
+            return getSpec().compareTo(dataSet.getSpec());
         }
     }
 
