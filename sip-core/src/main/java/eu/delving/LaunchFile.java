@@ -107,7 +107,7 @@ public class LaunchFile {
             "  <jar href=\"asm-1.5.3.jar\"/>",
             "</resources>",
             "<application-desc main-class=\"eu.delving.sip.Application\">",
-            "  <argument>" + USER + "<argument>",
+            "  <argument>" + USER + "</argument>",
             "</application-desc>",
             "</jnlp>",
     };
