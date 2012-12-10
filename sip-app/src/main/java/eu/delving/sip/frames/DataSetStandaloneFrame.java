@@ -45,11 +45,13 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import static eu.delving.sip.base.SwingHelper.scrollV;
@@ -62,7 +64,7 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
 
 public class DataSetStandaloneFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 26);
-    private static final Pattern SPEC_PATTERN = Pattern.compile("[A-Za-z0-9]+");
+    private static final Pattern SPEC_PATTERN = Pattern.compile("[A-Za-z0-9-]{3,40}");
     private static final String UNSELECTED = "<select>";
     private static final FactDefinition SCHEMA_VERSIONS_FACT = new FactDefinition("schemaVersions", "Schema Versions");
     private static final JLabel EMPTY_LABEL = new JLabel("Fetching...", JLabel.CENTER);
@@ -399,9 +401,10 @@ public class DataSetStandaloneFrame extends FrameBase {
             if (spec == null) {
                 String chosenSpec = sipModel.getFeedback().ask("Please enter a spec for the new data set. Use only letters and numbers.");
                 if (chosenSpec != null) {
-                    if (!SPEC_PATTERN.matcher(chosenSpec).find()) {
+                    if (!SPEC_PATTERN.matcher(chosenSpec).matches()) {
                         sipModel.getFeedback().alert(String.format(
-                                "The spec '%s' is not acceptable, since it must be made up of only letters and numbers.", chosenSpec
+                                "The spec '%s' is not acceptable, since it must match the regular expression /%s/.",
+                                chosenSpec, SPEC_PATTERN
                         ));
                         return;
                     }

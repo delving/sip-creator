@@ -24,8 +24,10 @@ package eu.delving.sip.files;
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import java.awt.GridLayout;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
@@ -62,7 +64,6 @@ public class StorageFinder {
         else if (!WORKSPACE_DIR.isDirectory()) {
             throw new RuntimeException(String.format("Expected directory but %s is a file", WORKSPACE_DIR.getAbsolutePath()));
         }
-        storageDirs.add(new File(WORKSPACE_DIR, STANDALONE_DIR));
         storageDirs.addAll(Arrays.asList(WORKSPACE_DIR.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
@@ -77,7 +78,7 @@ public class StorageFinder {
 
     public File getStorageDirectory(File unwanted) {
         if (args.length == 1 && args[0].equals(STANDALONE_DIR)) {
-            return storageDirs.get(0);
+            return new File(WORKSPACE_DIR, STANDALONE_DIR);
         }
         switch (storageDirs.size()) {
             case 0:
