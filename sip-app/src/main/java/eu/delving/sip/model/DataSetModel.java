@@ -29,7 +29,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -145,10 +145,11 @@ public class DataSetModel implements RecDefModel {
     private class StateCheckTimer implements Work, ActionListener, Work.DataSetWork {
         private SipModel sipModel;
         private Timer timer = new Timer(1000, this);
+        private boolean running = true;
 
         private StateCheckTimer(SipModel sipModel) {
             this.sipModel = sipModel;
-            timer.setRepeats(true);
+            timer.setRepeats(false);
             timer.start();
         }
 
@@ -164,11 +165,12 @@ public class DataSetModel implements RecDefModel {
                     }
                 });
             }
+            if (running) timer.restart();
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (timer.isRunning()) sipModel.exec(this);
+            sipModel.exec(this);
         }
 
         @Override
@@ -183,7 +185,7 @@ public class DataSetModel implements RecDefModel {
         }
 
         public void shutdown() {
-            timer.stop();
+            running = false;
         }
     }
 

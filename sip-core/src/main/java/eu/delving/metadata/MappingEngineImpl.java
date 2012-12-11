@@ -101,7 +101,7 @@ public class MappingEngineImpl implements MappingEngine {
                     MappingResult mappingResult;
                     if (schemaVersion.equals(SchemaVersion.RAW)) {
                         Node root = metadataRecordFactory.nodeFromXml(recordId, recordXML);
-                        mappingResult = new MappingResultImpl(serializer, root, null);
+                        mappingResult = new MappingResultImpl(serializer, root, null).resolve();
                     }
                     else {
                         MappingRunner runner = mappingRunners.get(schemaVersion);
@@ -111,7 +111,7 @@ public class MappingEngineImpl implements MappingEngine {
                         Node node = runner.runMapping(metadataRecord);
                         mappingResult = new MappingResultImpl(serializer, node, runner.getRecDefTree()).resolve();
                     }
-                    resultMap.put(schemaVersion,mappingResult);
+                    resultMap.put(schemaVersion, mappingResult);
                 }
                 completion.onSuccess(index, resultMap);
             }

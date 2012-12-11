@@ -119,14 +119,10 @@ public class TestMappingEngine {
     @Test
     public void rawNode() throws Throwable {
         MappingEngine engine = createEngine(
-                "", "http://raw.org",
-                "dc", "http://purl.org/dc/elements/1.1/",
-                "dcterms", "http://purl.org/dc/terms/",
-                "europeana", "http://www.europeana.eu/schemas/ese/",
-                "icn", "http://www.icn.nl/schemas/icn/"
+                "", "http://raw.org"
         );
-        MappingResult result = execute(engine, SchemaVersion.RAW, input("icn"));
-        System.out.println(result.toXml());
+        MappingResult result = execute(engine, SchemaVersion.RAW, input("raw"));
+        System.out.println(result.toXmlAugmented());
     }
 
     @Test

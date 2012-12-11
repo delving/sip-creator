@@ -254,6 +254,10 @@ public class TestSourceConverter {
         }
 
         @Override
+        public void setDataSetFacts(Map<String, String> dataSetFacts) throws StorageException {
+        }
+
+        @Override
         public Map<String, String> getHints() {
             Map<String,String> hints = new HashMap<String, String>();
             hints.put(RECORD_ROOT_PATH, ROOT.toString());
@@ -384,6 +388,11 @@ public class TestSourceConverter {
         @Override
         public void remove() throws StorageException {
           
+        }
+
+        @Override
+        public int compareTo(DataSet dataSet) {
+            return 0;
         }
     }
 }

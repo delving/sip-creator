@@ -25,7 +25,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -59,9 +58,8 @@ public class AllFrames {
     private Dimension LARGE_ICON_SIZE = new Dimension(80, 50);
     private JPanel content;
     private FrameBase[] frames;
-    private DataSetFrame dataSetFrame;
+    private FrameBase dataSetFrame;
     private WorkFrame workFrame;
-    private ReportFrame reportFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private View currentView = CLEAR;
@@ -110,13 +108,12 @@ public class AllFrames {
         void refreshView();
     }
 
-    public AllFrames(final SipModel sipModel, final CultureHubClient cultureHubClient, JPanel content) {
+    public AllFrames(final SipModel sipModel, JPanel content, FrameBase dataSetFrame) {
         this.sipModel = sipModel;
+        this.content = content;
+        this.dataSetFrame = dataSetFrame;
         sipModel.setViewSelector(viewSelector);
         workFrame = new WorkFrame(sipModel);
-        dataSetFrame = new DataSetFrame(sipModel, cultureHubClient);
-        reportFrame = new ReportFrame(sipModel, cultureHubClient);
-        this.content = content;
         FunctionFrame functionFrame = new FunctionFrame(sipModel);
         MappingCodeFrame mappingCodeFrame = new MappingCodeFrame(sipModel);
         StatsFrame statsFrame = new StatsFrame(sipModel);
@@ -131,6 +128,7 @@ public class AllFrames {
         FrameBase recMapping = new RecMappingFrame(sipModel);
         FrameBase fieldMapping = new FieldMappingFrame(sipModel);
         FrameBase output = new OutputFrame(sipModel);
+        FrameBase reportFrame = new ReportFrame(sipModel);
         this.frames = new FrameBase[]{
                 dataSetFrame,
                 source,
@@ -147,11 +145,12 @@ public class AllFrames {
         };
         try {
             File file = frameArrangementsFile();
+            createDefaultFrameArrangements(file);
             try {
                 addFrameArrangements(new FileInputStream(file));
             }
             catch (Exception e) {
-                createDefaultFrameArrangements(file);
+                // when you want to adjust, remove the line above and put it here: createDefaultFrameArrangements(file);
                 addFrameArrangements(new FileInputStream(file));
             }
         }
@@ -231,17 +230,13 @@ public class AllFrames {
             @Override
             public void run() {
                 viewSelector.selectView(DATA_SETS);
-                dataSetFrame.fireRefresh();
+                dataSetFrame.refresh();
             }
         });
     }
 
     public WorkFrame getWorkFrame() {
         return workFrame;
-    }
-
-    public Action getUploadAction() {
-        return reportFrame.getUploadAction();
     }
 
     public JMenu getViewMenu() {

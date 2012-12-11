@@ -52,13 +52,11 @@ import java.io.File;
 
 public class ExpertMenu extends JMenu {
     private SipModel sipModel;
-    private CultureHubClient cultureHubClient;
     private AllFrames allFrames;
 
     public ExpertMenu(JDesktopPane desktop, final SipModel sipModel, CultureHubClient cultureHubClient, AllFrames allFrames) {
         super("Expert");
         this.sipModel = sipModel;
-        this.cultureHubClient = cultureHubClient;
         this.allFrames = allFrames;
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
@@ -66,7 +64,7 @@ public class ExpertMenu extends JMenu {
         add(new ReloadMappingAction());
         add(new ToggleFrameArrangements());
 //        add(new MediaImportAction(desktop, sipModel));
-//        add(new UploadMediaAction());
+//        if (cultureHubClient != null) add(new UploadMediaAction(cultureHubClient));
         int anonRecords = Integer.parseInt(System.getProperty(SourceConverter.ANONYMOUS_RECORDS_PROPERTY, "0"));
         if (anonRecords > 0) add(new CreateSampleDataSetAction());
     }
@@ -176,8 +174,11 @@ public class ExpertMenu extends JMenu {
     }
 
     private class UploadMediaAction extends AbstractAction {
-        private UploadMediaAction() {
+        private CultureHubClient cultureHubClient;
+
+        private UploadMediaAction(CultureHubClient cultureHubClient) {
             super("Upload media files");
+            this.cultureHubClient = cultureHubClient;
         }
 
         @Override
