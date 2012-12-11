@@ -184,10 +184,12 @@ public class MappingResultImpl implements MappingResult {
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
-                    String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
-                    String value = getTextFromChildren(kid);
-                    put(name, value);
-                    handleMarkedField(recDefNode, value);
+                    if (recDefNode != null) {
+                        String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
+                        String value = getTextFromChildren(kid);
+                        put(name, value);
+                        handleMarkedField(recDefNode, value);
+                    }
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
@@ -208,7 +210,7 @@ public class MappingResultImpl implements MappingResult {
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
-                    if (recDefNode.isLeafElem()) {
+                    if (recDefNode != null && recDefNode.isLeafElem()) {
                         String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
                         String value = getTextFromChildren(kid);
                         put(name, value);
@@ -267,11 +269,7 @@ public class MappingResultImpl implements MappingResult {
             if (el.getLocalName() == null) break;
             path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), key));
         }
-        RecDefNode recDefNode = recDefTree.getRecDefNode(path);
-        if (recDefNode == null) {
-            throw new RuntimeException("No recdef node for " + path);
-        }
-        return recDefNode;
+        return recDefTree.getRecDefNode(path);
     }
 
     private String getTextFromChildren(Node parent) {

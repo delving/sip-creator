@@ -23,8 +23,7 @@ package eu.delving.metadata;
 
 import java.util.*;
 
-import static eu.delving.metadata.OptRole.ABSENT;
-import static eu.delving.metadata.OptRole.DYNAMIC;
+import static eu.delving.metadata.OptRole.*;
 
 /**
  * The RecDefNode is the node element of a RecDefTree which stores the whole
@@ -148,14 +147,20 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     private RecDefNode addSubNodeAfter(RecDefNode child, RecDef.Elem elem, OptBox box) {
         RecDefNode node = new RecDefNode(listener, this, elem, null, defaultPrefix, box);
-        int before = children.indexOf(child);
-        if (before < 0) throw new RuntimeException("Cannot find child");
-        children.add(before + 1, node);
+        if (child != null) {
+            int before = children.indexOf(child);
+            if (before < 0) throw new RuntimeException("Cannot find child");
+            children.add(before + 1, node);
+        }
+        else {
+            children.add(node);
+        }
         return node;
     }
 
     public RecDefNode addSibling(DynOpt dynOpt) {
-        return parent.addSubNodeAfter(this, elem, OptBox.asDynamic(dynOpt));
+        RecDefNode before = optBox != null && optBox.role == ROOT ? null : this;
+        return parent.addSubNodeAfter(before, elem, OptBox.asDynamic(dynOpt));
     }
 
     public boolean isPopulated() {
@@ -193,7 +198,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean isDuplicatePossible() {
-        return parent != null && !isAttr() && (optBox == null || optBox.role == DYNAMIC);
+        return parent != null && !isAttr() && (optBox == null || optBox.role == DYNAMIC || optBox.role == ROOT);
     }
 
     public boolean isHiddenOpt(OptList.Opt shownOpt) {
