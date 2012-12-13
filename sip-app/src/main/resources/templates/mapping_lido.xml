@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="lido">
+    <node-mappings>
+        <node-mapping inputPath="/input/Museumsnummer" outputPath="/lido:lido/lido:lidoRecID"/>
+        <node-mapping inputPath="/constant" outputPath="/lido:lido/lido:lidoRecID/@lido:type">
+            <groovy-code>
+                <string>&apos;local&apos;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/constant" outputPath="/lido:lido/lido:category/lido:term">
+            <groovy-code>
+                <string>&apos;Man made object&apos;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/facts/language" outputPath="/lido:lido/lido:descriptiveMetadata/@xml:lang"/>
+        <node-mapping inputPath="/input/ObjektType"
+                      outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectClassificationWrap/lido:objectWorkTypeWrap/lido:objectWorkType/lido:term"/>
+        <node-mapping inputPath="/input/Tittel/Tekst"
+                      outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue"/>
+        <node-mapping inputPath="/input/Museumsnummer" outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID"/>
+        <node-mapping inputPath="/constant" outputPath="/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID/@lido:type">
+            <groovy-code>
+                <string>&apos;inventory number&apos;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/facts/language" outputPath="/lido:lido/lido:administrativeMetadata/@xml:lang"/>
+        <node-mapping inputPath="/input/ObjektID" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordID"/>
+        <node-mapping inputPath="/constant" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordID/@lido:type">
+            <groovy-code>
+                <string>&apos;local&apos;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/constant" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordType/lido:term">
+            <groovy-code>
+                <string>&apos;single object&apos;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/constant" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordSource/lido:legalBodyID">
+            <groovy-code>
+                <string>&apos;YOUR MUSEUM LEGAL ID&apos;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/constant" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordSource/lido:legalBodyID/@lido:type">
+            <groovy-code>
+                <string>&apos;URL&apos;</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/facts/name" outputPath="/lido:lido/lido:administrativeMetadata/lido:recordWrap/lido:recordSource/lido:legalBodyName/lido:appellationValue"/>
+    </node-mappings>
+</rec-mapping>

@@ -345,7 +345,16 @@ public class Application {
             );
             if (exitAnyway) return;
         }
-        EventQueue.invokeLater(LAUNCH);
+        boolean restart = feedback.confirm(
+                "Exit",
+                "Would you like to restart?"
+        );
+        if (restart) {
+            EventQueue.invokeLater(LAUNCH);
+        }
+        else {
+            System.exit(0);
+        }
     }
 
     private void destroy() {
