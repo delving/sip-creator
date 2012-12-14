@@ -50,10 +50,14 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static eu.delving.sip.base.KeystrokeHelper.SPACE;
+import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
 import static eu.delving.sip.base.SwingHelper.scrollV;
 
 /**
@@ -89,11 +93,21 @@ public class DataSetStandaloneFrame extends FrameBase {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (listSelectionEvent.getValueIsAdjusting()) return;
                 DataSet dataSet = (DataSet) dataSetList.getSelectedValue();
-                Map<String,String> facts = dataSet == null ? null : dataSet.getDataSetFacts();
+                Map<String, String> facts = dataSet == null ? null : dataSet.getDataSetFacts();
                 setFacts(facts);
                 editAction.setEnabled(dataSet != null);
             }
         });
+        dataSetList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() > 1 && editAction.isEnabled()) {
+                    if (dataSetList.getSelectedIndex() != dataSetList.locationToIndex(e.getPoint())) return;
+                    editAction.actionPerformed(null);
+                }
+            }
+        });
+        addKeyboardAction(editAction, SPACE, (JComponent) getContentPane());
     }
 
     @Override
