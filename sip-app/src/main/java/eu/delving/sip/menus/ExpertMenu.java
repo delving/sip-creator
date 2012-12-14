@@ -65,8 +65,8 @@ public class ExpertMenu extends JMenu {
         add(new ToggleFrameArrangements());
 //        add(new MediaImportAction(desktop, sipModel));
 //        if (cultureHubClient != null) add(new UploadMediaAction(cultureHubClient));
-        int anonRecords = Integer.parseInt(System.getProperty(SourceConverter.ANONYMOUS_RECORDS_PROPERTY, "0"));
-        if (anonRecords > 0) add(new CreateSampleDataSetAction());
+//        int anonRecords = Integer.parseInt(System.getProperty(SourceConverter.ANONYMOUS_RECORDS_PROPERTY, "0"));
+//        if (anonRecords > 0) add(new CreateSampleDataSetAction());
     }
 
     private class MaxUniqueValueLengthAction extends AbstractAction {
