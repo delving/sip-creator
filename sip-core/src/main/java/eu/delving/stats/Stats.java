@@ -21,16 +21,15 @@
 
 package eu.delving.stats;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.Tag;
 
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
+
+import static eu.delving.XStreamFactory.getStreamFor;
 
 /**
  * Gather all the statistics together, identifying whether they are from imported or source.  Also convert one
@@ -54,7 +53,7 @@ public class Stats {
     public static Stats read(InputStream in) {
         try {
             Reader inReader = new InputStreamReader(in, "UTF-8");
-            Stats stats = (Stats) stream().fromXML(inReader);
+            Stats stats = (Stats) getStreamFor(Stats.class).fromXML(inReader);
             stats.finish();
             return stats;
         }
@@ -66,7 +65,7 @@ public class Stats {
     public static void write(Stats stats, OutputStream out) {
         try {
             Writer outWriter = new OutputStreamWriter(out, "UTF-8");
-            stream().toXML(stats, outWriter);
+            getStreamFor(Stats.class).toXML(stats, outWriter);
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
@@ -184,7 +183,7 @@ public class Stats {
         private Uniqueness uniqueness;
 
         @XStreamOmitField
-        private boolean histogramExploded;
+        private boolean histogramTrimmed;
 
         public void recordOccurrence() {
             total++;
@@ -198,10 +197,10 @@ public class Stats {
             int wordCount = 0;
             for (StringTokenizer token = new StringTokenizer(value); token.hasMoreTokens(); token.nextToken()) wordCount++;
             wordCounts.recordValue(String.valueOf(wordCount));
-            if (!histogramExploded) {
+            if (!histogramTrimmed) {
                 if (values == null) values = new Histogram();
-                if (!values.recordValue(value)) histogramExploded = true;
-                if (values.trimmed) histogramExploded = true;
+                values.recordValue(value);
+                if (values.isTrimmed()) histogramTrimmed = true;
             }
             if (unique == null || unique) {
                 if (uniqueness == null) uniqueness = new Uniqueness(maxUniqueValueLength);
@@ -289,16 +288,16 @@ public class Stats {
         @XStreamAsAttribute
         public int absent;
 
+        @XStreamAsAttribute
+        private boolean trimmed;
+
         @XStreamImplicit
         public Map<String, Counter> counterMap = new HashMap<String, Counter>((int) (HISTOGRAM_MAX_SIZE * HISTOGRAM_OVERSAMPLING));
 
         @XStreamOmitField
         private int storageSize;
 
-        @XStreamOmitField
-        private boolean trimmed;
-
-        public boolean recordValue(String value) {
+        public void recordValue(String value) {
             Counter counter = counterMap.get(value);
             if (counter == null) {
                 counterMap.put(value, counter = new Counter());
@@ -306,23 +305,23 @@ public class Stats {
             }
             storageSize += value.length();
             counter.count++;
-            trimIfNecessary();
-            return storageSize <= HISTOGRAM_MAX_STORAGE;
+            if (counterMap.size() > HISTOGRAM_MAX_SIZE * 2) {
+                List<Counter> counters = new ArrayList<Counter>(counterMap.values());
+                Collections.sort(counters);
+                counterMap.clear();
+                int countDown = HISTOGRAM_MAX_SIZE;
+                storageSize = 0;
+                for (Counter c : counters) {
+                    if (countDown-- == 0) break;
+                    counterMap.put(c.value, c);
+                    storageSize += c.value.length();
+                }
+                trimmed = true;
+            }
         }
 
-        private void trimIfNecessary() {
-            if (counterMap.size() <= HISTOGRAM_MAX_SIZE) return;
-            trimmed = true;
-            List<Counter> counters = new ArrayList<Counter>(counterMap.values());
-            Collections.sort(counters);
-            counterMap.clear();
-            int countDown = HISTOGRAM_MAX_SIZE;
-            storageSize = 0;
-            for (Counter counter : counters) {
-                if (countDown-- == 0) break;
-                counterMap.put(counter.value, counter);
-                storageSize += counter.value.length();
-            }
+        public boolean isTrimmed() {
+            return trimmed;
         }
 
         public void finish(int total) {
@@ -348,7 +347,6 @@ public class Stats {
             Collections.sort(counters);
             return counters.size() <= size ? counters : counters.subList(0, size);
         }
-
     }
 
     @XStreamAlias("count")
@@ -388,14 +386,6 @@ public class Stats {
             fresh.value = value;
             return fresh;
         }
-    }
-
-    private static XStream stream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.registerConverter(new Tag.Converter());
-        stream.registerConverter(new Path.Converter());
-        stream.processAnnotations(Stats.class);
-        return stream;
     }
 
 }

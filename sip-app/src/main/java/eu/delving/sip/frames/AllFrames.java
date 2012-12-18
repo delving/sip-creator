@@ -21,10 +21,10 @@
 
 package eu.delving.sip.frames;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import eu.delving.XStreamFactory;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -169,9 +169,7 @@ public class AllFrames {
     }
 
     private void addFrameArrangements(InputStream inputStream) {
-        XStream stream = new XStream();
-        stream.processAnnotations(FrameArrangements.class);
-        frameArrangements = (FrameArrangements) stream.fromXML(inputStream);
+        frameArrangements = (FrameArrangements) XStreamFactory.getStreamFor(FrameArrangements.class).fromXML(inputStream);
         int viewIndex = 0;
         for (XArrangement view : frameArrangements.arrangements) {
             Arrangement arrangement = new Arrangement(view, viewIndex++);
@@ -374,10 +372,8 @@ public class AllFrames {
             sipModel.exec(new Work() {
                 @Override
                 public void run() {
-                    XStream stream = new XStream();
-                    stream.processAnnotations(FrameArrangements.class);
                     try {
-                        stream.toXML(frameArrangements, new FileOutputStream(frameArrangementsFile()));
+                        XStreamFactory.getStreamFor(FrameArrangements.class).toXML(frameArrangements, new FileOutputStream(frameArrangementsFile()));
                     }
                     catch (FileNotFoundException e) {
                         // eat it.

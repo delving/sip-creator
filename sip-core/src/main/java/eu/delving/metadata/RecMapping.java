@@ -21,16 +21,16 @@
 
 package eu.delving.metadata;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.schema.SchemaVersion;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.*;
+
+import static eu.delving.XStreamFactory.getStreamFor;
 
 /**
  * A record mapping describes how an input format is transformed into an output format in the form of a Groovy builder,
@@ -156,7 +156,7 @@ public class RecMapping {
     }
 
     public String toString() {
-        return stream().toXML(this);
+        return getStreamFor(RecMapping.class).toXML(this);
     }
 
     private MappingFunction fetch(String name) {
@@ -230,7 +230,7 @@ public class RecMapping {
     }
 
     public static RecMapping read(Reader reader, RecDefModel recDefModel) throws MetadataException {
-        RecMapping recMapping = (RecMapping) stream().fromXML(reader);
+        RecMapping recMapping = (RecMapping) getStreamFor(RecMapping.class).fromXML(reader);
         recMapping.recDefTree = recDefModel.createRecDefTree(recMapping.getSchemaVersion());
         recMapping.resolve();
         return recMapping;
@@ -263,19 +263,11 @@ public class RecMapping {
             Writer osWriter = new OutputStreamWriter(os, "UTF-8");
             recMapping.dynOpts = recMapping.getRecDefTree().getDynOpts();
             recMapping.nodeMappings = recMapping.getRecDefTree().getNodeMappings();
-            stream().toXML(recMapping, osWriter);
+            getStreamFor(RecMapping.class).toXML(recMapping, osWriter);
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static XStream stream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.registerConverter(new Tag.Converter());
-        stream.registerConverter(new Path.Converter());
-        stream.processAnnotations(RecMapping.class);
-        return stream;
     }
 
     public static final String[][] HACK_VERSION_HINTS = {
