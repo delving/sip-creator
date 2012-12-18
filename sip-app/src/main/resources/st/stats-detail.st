@@ -15,7 +15,7 @@ $if (stats.values)$
     <tr><td>
     <table>
         $stats.values.details:{ counter |
-        <tr><td>$counter$</td></tr>
+            <tr><td>$counter$</td></tr>
         }$
     </table>
 $endif$
@@ -26,7 +26,7 @@ $if (stats.sample)$
     <tr><td>
     <table>
         $stats.sample.details:{ value |
-        <tr><td>"$value$"</td></tr>
+            <tr><td>$value$</td></tr>
         }$
     </table>
     </td></tr>

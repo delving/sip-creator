@@ -25,10 +25,10 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import eu.delving.XStreamFactory;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaType;
 import eu.delving.schema.SchemaVersion;
@@ -145,9 +145,7 @@ public class DataSetStandaloneFrame extends FrameBase {
             public void run() {
                 try {
                     String factsString = schemaRepository.getSchema(new SchemaVersion(FACTS_PREFIX, "1.0.0"), SchemaType.FACT_DEFINITIONS);
-                    final XStream xstream = new XStream();
-                    xstream.processAnnotations(FactDefinitionList.class);
-                    FactDefinitionList factDefinitionList = (FactDefinitionList) xstream.fromXML(factsString);
+                    FactDefinitionList factDefinitionList = (FactDefinitionList) XStreamFactory.getStreamFor(FactDefinitionList.class).fromXML(factsString);
                     factDefinitions = new ArrayList<FactDefinition>();
                     factDefinitions.addAll(factDefinitionList.definitions);
                     factDefinitions.add(SCHEMA_VERSIONS_FACT);

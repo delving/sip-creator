@@ -21,18 +21,18 @@
 
 package eu.delving.sip.base;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
+import static eu.delving.XStreamFactory.getStreamFor;
 
 /**
  * XStream stuff for media-files.xml in the Media subdir of a dataset
@@ -44,17 +44,13 @@ import java.util.*;
 public class MediaFiles {
 
     public static void write(MediaFiles mediaFiles, File indexFile) throws IOException {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(MediaFiles.class);
         FileOutputStream out = new FileOutputStream(indexFile);
-        stream.toXML(mediaFiles, out);
+        getStreamFor(MediaFiles.class).toXML(mediaFiles, out);
         out.close();
     }
 
     public static MediaFiles read(InputStream inputStream) {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(MediaFiles.class);
-        MediaFiles mediaFiles = (MediaFiles) stream.fromXML(inputStream);
+        MediaFiles mediaFiles = (MediaFiles) getStreamFor(MediaFiles.class).fromXML(inputStream);
         mediaFiles.resolve();
         return mediaFiles;
     }

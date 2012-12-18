@@ -15,6 +15,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import static eu.delving.XStreamFactory.getStreamFor;
+
 /**
  * Test the TableExtractor
  *
@@ -44,7 +46,7 @@ public class TestTableExtractor {
     public void testIntrospection() throws SQLException, IOException {
         RelationalProfile profile = RelationalProfile.createProfile(connection);
         FileWriter out = new FileWriter("/tmp/tms-rdbms-profile.xml");
-        RelationalProfile.stream().toXML(profile, out);
+        getStreamFor(RelationalProfile.class).toXML(profile, out);
         out.close();
     }
 
@@ -52,7 +54,7 @@ public class TestTableExtractor {
     @Test
     public void testDumpTMS() throws ClassNotFoundException, SQLException, XMLStreamException, IOException, UnsupportedEncodingException {
         URL resource = getClass().getResource("/extractor/tms-rdbms-profile.xml");
-        RelationalProfile profile = (RelationalProfile) RelationalProfile.stream().fromXML(resource);
+        RelationalProfile profile = (RelationalProfile) getStreamFor(RelationalProfile.class).fromXML(resource);
         profile.resolve();
         TableExtractor tableExtractor = new TableExtractor(connection, profile);
         tableExtractor.setMaxRows(100); // todo: just for testing
