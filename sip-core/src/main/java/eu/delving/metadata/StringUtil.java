@@ -72,7 +72,10 @@ public class StringUtil {
             char ch = line.charAt(walk);
             switch (ch) {
                 case ',':
-                    if (!inQuotes) {
+                    if (inQuotes) {
+                        field.append(ch);
+                    }
+                    else {
                         strings.add(field.toString());
                         field.setLength(0);
                     }
