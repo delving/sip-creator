@@ -111,6 +111,16 @@ public class DataSetStandaloneFrame extends FrameBase {
     }
 
     @Override
+    protected void onOpen(boolean opened) {
+        if (opened) Swing.Exec.later(new Swing() {
+            @Override
+            public void run() {
+                dataSetList.requestFocus();
+            }
+        });
+    }
+
+    @Override
     protected void buildContent(Container content) {
         fieldPanel.setBorder(BorderFactory.createTitledBorder("Facts"));
         content.add(createRight(), BorderLayout.EAST);
