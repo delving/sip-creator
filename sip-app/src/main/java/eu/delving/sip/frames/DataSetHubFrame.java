@@ -43,8 +43,7 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
-import static eu.delving.sip.base.KeystrokeHelper.SPACE;
-import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
@@ -118,6 +117,8 @@ public class DataSetHubFrame extends FrameBase {
         p.add(createFilter());
         p.add(button(editAction));
         addKeyboardAction(editAction, SPACE, (JComponent) getContentPane());
+        addKeyboardAction(new UpDownAction(false), UP, (JComponent) getContentPane());
+        addKeyboardAction(new UpDownAction(true), DOWN, (JComponent) getContentPane());
         p.add(button(downloadAction));
         p.add(button(releaseAction));
         return p;
@@ -134,6 +135,8 @@ public class DataSetHubFrame extends FrameBase {
         label.setLabelFor(patternField);
         JPanel p = new JPanel(new BorderLayout());
         p.add(label, BorderLayout.WEST);
+        attachAccelerator(new UpDownAction(true), patternField);
+        attachAccelerator(new UpDownAction(false), patternField);
         p.add(patternField, BorderLayout.CENTER);
         return p;
     }
@@ -145,6 +148,28 @@ public class DataSetHubFrame extends FrameBase {
         }
         else {
             refreshAction.actionPerformed(null);
+        }
+    }
+
+    private class UpDownAction extends AbstractAction {
+        private boolean down = false;
+
+        private UpDownAction(boolean down) {
+            super(down ? "Down" : "Up");
+            this.down = down;
+            putValue(Action.ACCELERATOR_KEY, down ? DOWN : UP);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ListSelectionModel selection = dataSetTable.getSelectionModel();
+            if (tableModel.getRowCount() > 0 && dataSetTable.getSelectionModel().isSelectionEmpty()) {
+                int row = down ? 0 : tableModel.getRowCount() - 1;
+                selection.setSelectionInterval(row, row);
+                dataSetTable.requestFocus();
+                Rectangle cellRect = dataSetTable.getCellRect(row, 0, false);
+                if (cellRect != null) dataSetTable.scrollRectToVisible(cellRect);
+            }
         }
     }
 
@@ -348,12 +373,6 @@ public class DataSetHubFrame extends FrameBase {
                         if (entry.hasStateChanged()) fireTableRowsUpdated(row, row);
                         row++;
                     }
-                    ListSelectionModel selection = dataSetTable.getSelectionModel();
-                    if (tableModel.getRowCount() > 0 && selection.isSelectionEmpty()) {
-                        selection.setSelectionInterval(0, 0);
-                        dataSetTable.requestFocus();
-                        openFrame();
-                    }
                 }
             });
             timer.setRepeats(true);
@@ -437,7 +456,8 @@ public class DataSetHubFrame extends FrameBase {
                     JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                     String spec = (String) value;
                     DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-                    if (dataSet != null && dataSet.getSpec().equals(spec)) label.setFont(label.getFont().deriveFont(Font.BOLD, 18));
+                    if (dataSet != null && dataSet.getSpec().equals(spec))
+                        label.setFont(label.getFont().deriveFont(Font.BOLD, 18));
                     return label;
                 }
             });
