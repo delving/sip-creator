@@ -21,10 +21,10 @@
 
 package eu.delving.test;
 
+import eu.delving.MappingCompletion;
 import eu.delving.MappingEngine;
 import eu.delving.MappingEngineFactory;
 import eu.delving.MappingResult;
-import eu.delving.groovy.MappingException;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaType;
@@ -34,9 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -50,6 +48,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +59,11 @@ import java.util.regex.Pattern;
  */
 
 public class TestMappingEngine {
-
+    public static final SchemaVersion LIDO_SCHEMA = new SchemaVersion("lido", "1.0.0");
+    public static final SchemaVersion ESE_SCHEMA = new SchemaVersion("ese", "3.4.0");
+    public static final SchemaVersion ABM_SCHEMA = new SchemaVersion("abm", "1.0.5");
+    public static final SchemaVersion TIB_SCHEMA = new SchemaVersion("tib", "1.0.0");
+    public static final SchemaVersion AFF_SCHEMA = new SchemaVersion("aff", "0.1.0");
     private SchemaRepository schemaRepo;
 
     @Before
@@ -69,111 +72,144 @@ public class TestMappingEngine {
     }
 
     @Test
-    public void validateTreeNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namespaces = createNamespaces(
+    public void validateTreeNode() throws Throwable {
+        MappingEngine engine = createEngine(
                 "lido", "http://www.lido-schema.org"
         );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("lido"));
-//        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute("validateTreeNode", input("lido"));
-//        System.out.println(result);
+        engine.addMappingRunner(LIDO_SCHEMA, mapping("lido"));
+        MappingResult result = execute(engine, LIDO_SCHEMA, input("lido"));
         Source source = new DOMSource(result.root());
-        validator(new SchemaVersion("lido", "1.0.0")).validate(source);
+        validator(LIDO_SCHEMA).validate(source);
     }
 
     @Test
-    public void validateESENode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namespaces = createNamespaces(
+    public void validateESENode() throws Throwable {
+        MappingEngine engine = createEngine(
                 "dc", "http://purl.org/dc/elements/1.1/",
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/"
         );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("ese"));
-        MappingResult result = mappingEngine.execute("validateESENode", input("ese"));
+        engine.addMappingRunner(ESE_SCHEMA, mapping("ese"));
+        MappingResult result = execute(engine, ESE_SCHEMA, input("ese"));
         System.out.println(result.toXml());
         System.out.println(result.toXmlAugmented());
         Source source = new DOMSource(result.root());
-        validator(new SchemaVersion("ese", "3.4.0")).validate(source);
+        validator(ESE_SCHEMA).validate(source);
     }
 
     @Test
-    public void validateABMNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namespaces = createNamespaces(
+    public void validateABMNode() throws Throwable {
+        MappingEngine engine = createEngine(
                 "dc", "http://purl.org/dc/elements/1.1/",
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "delving", "http://schemas.delving.eu/",
                 "abm", "http://abmu.org/abm"
         );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("abm"));
-        MappingResult result = mappingEngine.execute("validateABMNode", input("abm"));
+        engine.addMappingRunner(ABM_SCHEMA, mapping("abm"));
+        MappingResult result = execute(engine, ABM_SCHEMA, input("abm"));
         System.out.println(result.toXml());
         Source source = new DOMSource(result.root());
-        Validator validator = validator(new SchemaVersion("abm", "1.0.5"));
+        Validator validator = validator(ABM_SCHEMA);
         validator.validate(source);
         System.out.println("SystemFields:");
         System.out.println(result.copyFields());
     }
 
     @Test
-    public void rawNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namespaces = createNamespaces(
+    public void rawNode() throws Throwable {
+        MappingEngine engine = createEngine(
                 "", "http://raw.org"
         );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces);
-        MappingResult result = mappingEngine.execute("rawNode", input("raw"));
+        MappingResult result = execute(engine, SchemaVersion.RAW, input("raw"));
         System.out.println(result.toXmlAugmented());
     }
 
     @Test
-    public void validateTIBNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namspaces = createNamespaces(
+    public void validateTIBNode() throws Throwable {
+        MappingEngine engine = createEngine(
                 "dc", "http://purl.org/dc/elements/1.1/",
                 "dcterms", "http://purl.org/dc/terms/",
                 "europeana", "http://www.europeana.eu/schemas/ese/",
                 "tib", "http://thuisinbrabant.nl"
         );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namspaces, new MockRecDefModel(), mapping("tib"));
-        MappingResult result = mappingEngine.execute("validateTIBNode", input("tib"));
+        engine.addMappingRunner(TIB_SCHEMA, mapping("tib"));
+        MappingResult result = execute(engine, TIB_SCHEMA, input("tib"));
         String augmented = result.toXmlAugmented();
         Matcher matcher = Pattern.compile("<delving:thumbnail>").matcher(augmented);
         Assert.assertTrue("first one not found", matcher.find());
         Assert.assertFalse("second one should not be found", matcher.find());
-//        System.out.println(matcher.find() + " - "+matcher.find());
-//        System.out.println(augmented);
         Source source = new DOMSource(result.root());
-        validator(new SchemaVersion("tib", "1.0.0")).validate(source);
+        validator(TIB_SCHEMA).validate(source);
     }
 
     @Test
-    public void tryAff() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namespaces = createNamespaces(
+    public void tryAff() throws Throwable {
+        MappingEngine engine = createEngine(
                 "lido", "http://www.lido-schema.org"
         );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
-//        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute("tryAff", input("aff"));
-//        System.out.println(serializer.toXml(result.root()));
+        engine.addMappingRunner(AFF_SCHEMA, mapping("aff"));
+        execute(engine, AFF_SCHEMA, input("aff"));
     }
 
     @Test
-    public void indexDocumentFromAFF() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namespaces = createNamespaces(
+    public void indexDocumentFromAFF() throws Throwable {
+        MappingEngine engine = createEngine(
                 "lido", "http://www.lido-schema.org"
         );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
-//        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute("indexDocumentFromAFF", input("aff"));
+        engine.addMappingRunner(AFF_SCHEMA, mapping("aff"));
+        MappingResult result = execute(engine, AFF_SCHEMA, input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
         Map<String, List<String>> allFields = result.fields();
 //        System.out.println(allFields);
         Assert.assertFalse(allFields.isEmpty());
     }
 
-    private Map<String, String> createNamespaces(String... arg) {
-        Map<String, String> map = new TreeMap<String, String>();
-        for (int walk = 0; walk < arg.length; walk += 2) map.put(arg[walk], arg[walk + 1]);
-        return map;
+    // private stuff
+
+    private MappingEngine createEngine(String... arg) {
+        Map<String, String> namespaces = new TreeMap<String, String>();
+        for (int walk = 0; walk < arg.length; walk += 2) namespaces.put(arg[walk], arg[walk + 1]);
+        MappingEngineFactory factory = new MappingEngineFactory(getClass().getClassLoader(), new Immediate(), new MockRecDefModel());
+        return factory.createEngine(namespaces);
+    }
+
+    private class Immediate implements Executor {
+        @Override
+        public void execute(Runnable command) {
+            command.run();
+        }
+    }
+
+    private MappingResult execute(MappingEngine engine, final SchemaVersion schemaVersion, String recordXML) throws Throwable {
+        SchemaVersion[] sv = new SchemaVersion[]{schemaVersion};
+        Done done = new Done(schemaVersion);
+        engine.mapRecord(1, String.format("RecordOf(%s)", schemaVersion), recordXML, sv, done);
+        return done.getResult();
+    }
+
+    private class Done implements MappingCompletion {
+        private SchemaVersion schemaVersion;
+        private MappingResult result;
+        private Throwable throwable;
+
+        private Done(SchemaVersion schemaVersion) {
+            this.schemaVersion = schemaVersion;
+        }
+
+        @Override
+        public void onSuccess(int index, Map<SchemaVersion, MappingResult> results) {
+            this.result = results.get(schemaVersion);
+        }
+
+        @Override
+        public void onFailure(int index, Throwable throwable) {
+            this.throwable = throwable;
+        }
+
+        public MappingResult getResult() throws Throwable {
+            return result;
+        }
     }
 
     private String input(String prefix) {
@@ -189,7 +225,8 @@ public class TestMappingEngine {
         public RecDefTree createRecDefTree(SchemaVersion schemaVersion) throws MetadataException {
             try {
                 String recDefString = schemaRepo.getSchema(schemaVersion, SchemaType.RECORD_DEFINITION);
-                if (recDefString == null) throw new RuntimeException("Unable to find record definition "+schemaVersion);
+                if (recDefString == null)
+                    throw new RuntimeException("Unable to find record definition " + schemaVersion);
                 return RecDefTree.create(RecDef.read(new ByteArrayInputStream(recDefString.getBytes("UTF-8"))));
             }
             catch (IOException e) {
@@ -203,7 +240,7 @@ public class TestMappingEngine {
             SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
             factory.setResourceResolver(new CachedResourceResolver());
             String validationXsd = schemaRepo.getSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA);
-            if (validationXsd == null) throw new RuntimeException("Unable to find validation schema "+schemaVersion);
+            if (validationXsd == null) throw new RuntimeException("Unable to find validation schema " + schemaVersion);
             Schema schema = factory.newSchema(new StreamSource(new StringReader(validationXsd)));
             return schema.newValidator();
         }
@@ -227,7 +264,7 @@ public class TestMappingEngine {
 
     private InputStream stream(String resourcePath) {
         InputStream resource = getClass().getResourceAsStream(resourcePath);
-        if (resource == null) throw new RuntimeException("Resource not found: "+resourcePath);
+        if (resource == null) throw new RuntimeException("Resource not found: " + resourcePath);
         return resource;
     }
 

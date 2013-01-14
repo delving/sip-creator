@@ -27,15 +27,10 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.WorkModel;
 import org.apache.commons.lang.WordUtils;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Font;
+import java.awt.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 

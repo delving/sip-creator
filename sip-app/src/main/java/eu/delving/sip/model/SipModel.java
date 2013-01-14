@@ -38,7 +38,7 @@ import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
+import javax.swing.JDesktopPane;
 import java.io.File;
 import java.util.List;
 import java.util.Map;

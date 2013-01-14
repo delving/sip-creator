@@ -30,13 +30,8 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
