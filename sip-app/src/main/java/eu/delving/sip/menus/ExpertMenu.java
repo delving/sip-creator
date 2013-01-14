@@ -37,7 +37,9 @@ import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JDesktopPane;
+import javax.swing.JMenu;
 import java.awt.event.ActionEvent;
 import java.io.File;
 

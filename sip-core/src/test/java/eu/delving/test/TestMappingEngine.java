@@ -22,13 +22,12 @@
 package eu.delving.test;
 
 import eu.delving.MappingEngine;
+import eu.delving.MappingEngineFactory;
 import eu.delving.MappingResult;
 import eu.delving.PluginBinding;
 import eu.delving.groovy.MappingException;
-import eu.delving.metadata.MetadataException;
-import eu.delving.metadata.RecDef;
-import eu.delving.metadata.RecDefModel;
-import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.*;
+import eu.delving.plugin.MediaFiles;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaType;
 import eu.delving.schema.SchemaVersion;
