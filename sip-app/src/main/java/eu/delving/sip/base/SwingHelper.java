@@ -32,6 +32,10 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -177,4 +181,30 @@ public class SwingHelper {
             return out.toString();
         }
     }
+
+    public static class StringTransferable implements Transferable {
+        private String string;
+
+        private static final DataFlavor[] flavors = {DataFlavor.stringFlavor};
+
+        public StringTransferable(String string) {
+            this.string = string;
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            return flavors;
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            return flavor.equals(flavors[0]);
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            return string;
+        }
+    }
+
 }

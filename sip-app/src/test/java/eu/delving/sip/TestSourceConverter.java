@@ -35,6 +35,7 @@ import eu.delving.stats.Stats;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.stream.XMLStreamException;
@@ -147,6 +148,7 @@ public class TestSourceConverter {
         Assert.assertEquals("Unexpected output", StringUtils.join(expect, '\n'), StringUtils.join(lines, '\n'));
     }
 
+    @Ignore
     @Test
     public void runThroughAnon() throws IOException, XMLStreamException {
         String inputString = StringUtils.join(INPUT, "\n");
@@ -256,6 +258,10 @@ public class TestSourceConverter {
         @Override
         public Map<String, String> getDataSetFacts() {
             return null;
+        }
+
+        @Override
+        public void setDataSetFacts(Map<String, String> dataSetFacts) throws StorageException {
         }
 
         @Override
@@ -389,6 +395,11 @@ public class TestSourceConverter {
         @Override
         public void remove() throws StorageException {
           
+        }
+
+        @Override
+        public int compareTo(DataSet dataSet) {
+            return 0;
         }
     }
 }

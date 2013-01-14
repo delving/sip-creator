@@ -52,7 +52,7 @@ public class MappingResultImpl implements MappingResult {
     public MappingResultImpl(XmlSerializer serializer, Node root, RecDefTree recDefTree) {
         this.serializer = serializer;
         this.root = root;
-        this.recDefTree = recDefTree; // todo: if null!!
+        this.recDefTree = recDefTree;
     }
 
     @Override
@@ -111,16 +111,18 @@ public class MappingResultImpl implements MappingResult {
 
     @Override
     public String toXmlAugmented() {
-        return serializer.toXml(rootAugmented, true);
+        return serializer.toXml(rootAugmented, recDefTree != null);
     }
 
     public MappingResult resolve() {
         elementHasContent((Element) root);
-        if (recDefTree.getRecDef().flat) {
-            resolveFlatRecord();
-        }
-        else if (recDefTree.getRecDef().prefix.equals("aff")) {
-            resolveAFFRecord();
+        if (recDefTree != null) {
+            if (recDefTree.getRecDef().flat) {
+                resolveFlatRecord();
+            }
+            else if (recDefTree.getRecDef().prefix.equals("aff")) {
+                resolveAFFRecord();
+            }
         }
         if (isRecDefDelvingAware()) {
             rootAugmented = root.cloneNode(true);
@@ -198,7 +200,7 @@ public class MappingResultImpl implements MappingResult {
     }
 
     private boolean isRecDefDelvingAware() {
-        return recDefTree.getRecDef().getNamespaceMap().containsKey(DELVING_PREFIX);
+        return recDefTree != null && recDefTree.getRecDef().getNamespaceMap().containsKey(DELVING_PREFIX);
     }
 
     private void resolveAFFRecord() {
@@ -218,10 +220,12 @@ public class MappingResultImpl implements MappingResult {
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
-                    String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
-                    String value = getTextFromChildren(kid);
-                    put(name, value);
-                    handleMarkedField(recDefNode, value);
+                    if (recDefNode != null) {
+                        String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
+                        String value = getTextFromChildren(kid);
+                        put(name, value);
+                        handleMarkedField(recDefNode, value);
+                    }
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
@@ -242,7 +246,7 @@ public class MappingResultImpl implements MappingResult {
                     break;
                 case Node.ELEMENT_NODE:
                     RecDefNode recDefNode = getRecDefNode((Element) kid);
-                    if (recDefNode.isLeafElem()) {
+                    if (recDefNode != null && recDefNode.isLeafElem()) {
                         String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
                         String value = getTextFromChildren(kid);
                         put(name, value);
@@ -301,11 +305,7 @@ public class MappingResultImpl implements MappingResult {
             if (el.getLocalName() == null) break;
             path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), key));
         }
-        RecDefNode recDefNode = recDefTree.getRecDefNode(path);
-        if (recDefNode == null) {
-            throw new RuntimeException("No recdef node for " + path);
-        }
-        return recDefNode;
+        return recDefTree.getRecDefNode(path);
     }
 
     private String getTextFromChildren(Node parent) {

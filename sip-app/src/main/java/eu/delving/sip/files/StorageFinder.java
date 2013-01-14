@@ -38,6 +38,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static eu.delving.sip.files.Storage.STANDALONE_DIR;
 import static javax.swing.JOptionPane.*;
 
 /**
@@ -51,8 +52,8 @@ public class StorageFinder {
     private static final Pattern HPU_HUMAN = Pattern.compile("([A-Za-z0-9.-]+):([0-9]+)/([A-Za-z0-9]+)");
     private static final Pattern HPU_DIRECTORY = Pattern.compile("([A-Za-z0-9_-]+)__([0-9]+)___([A-Za-z0-9]+)");
     private static final String CHOSEN_DIRECTORY = "chosenDirectory";
-    private String [] args;
-    private List<File> storageDirs;
+    private String[] args;
+    private List<File> storageDirs = new ArrayList<File>();
 
     public StorageFinder() {
         if (!WORKSPACE_DIR.exists()) {
@@ -63,12 +64,12 @@ public class StorageFinder {
         else if (!WORKSPACE_DIR.isDirectory()) {
             throw new RuntimeException(String.format("Expected directory but %s is a file", WORKSPACE_DIR.getAbsolutePath()));
         }
-        storageDirs = Arrays.asList(WORKSPACE_DIR.listFiles(new FileFilter() {
+        storageDirs.addAll(Arrays.asList(WORKSPACE_DIR.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return file.isDirectory() && HPU_DIRECTORY.matcher(file.getName()).matches();
             }
-        }));
+        })));
     }
 
     public void setArgs(String[] args) {
@@ -76,6 +77,9 @@ public class StorageFinder {
     }
 
     public File getStorageDirectory(File unwanted) {
+        if (args.length == 1 && args[0].equals(STANDALONE_DIR)) {
+            return new File(WORKSPACE_DIR, STANDALONE_DIR);
+        }
         switch (storageDirs.size()) {
             case 0:
                 return createHostPortDirectory(args);
@@ -96,13 +100,17 @@ public class StorageFinder {
         }
     }
 
+    public static boolean isStandalone(File file) {
+        return file.getName().equals(STANDALONE_DIR);
+    }
+
     public static String getUser(File file) {
         Matcher matcher = getDirectoryMatcher(file);
         return matcher.group(3);
     }
 
-    public static String getHostPortUser(File file) {
-        Matcher matcher = getDirectoryMatcher(file);
+    public static String getHostPortUser(String fileName) {
+        Matcher matcher = getDirectoryMatcher(fileName);
         return String.format("%s:%s/%s", getHostName(matcher), matcher.group(2), matcher.group(3));
     }
 
@@ -123,9 +131,13 @@ public class StorageFinder {
     }
 
     private static Matcher getDirectoryMatcher(File file) {
-        Matcher matcher = HPU_DIRECTORY.matcher(file.getName());
+        return getDirectoryMatcher(file.getName());
+    }
+
+    private static Matcher getDirectoryMatcher(String fileName) {
+        Matcher matcher = HPU_DIRECTORY.matcher(fileName);
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("Directory name is incorrect " + file.getName());
+            throw new IllegalArgumentException("Directory name is incorrect " + fileName);
         }
         return matcher;
     }
@@ -140,13 +152,22 @@ public class StorageFinder {
         return directory;
     }
 
-    private static File createDirectory(String hostPortUser) {
-        Matcher matcher = HPU_HUMAN.matcher(hostPortUser);
-        if (matcher.matches()) {
-            return createDirectory(matcher.group(1), matcher.group(2), matcher.group(3));
+    private static File createDirectory(String directoryName) {
+        if (STANDALONE_DIR.equals(directoryName)) {
+            File directory = new File(WORKSPACE_DIR, directoryName);
+            if (!directory.exists() && !directory.mkdirs()) {
+                throw new RuntimeException("Unable to create " + directory.getAbsolutePath());
+            }
+            return directory;
         }
         else {
-            throw new RuntimeException("Expected host:port/user but got " + hostPortUser);
+            Matcher matcher = HPU_HUMAN.matcher(getHostPortUser(directoryName));
+            if (matcher.matches()) {
+                return createDirectory(matcher.group(1), matcher.group(2), matcher.group(3));
+            }
+            else {
+                throw new RuntimeException("Expected host:port/user but got " + directoryName);
+            }
         }
     }
 
@@ -179,8 +200,8 @@ public class StorageFinder {
         List<String> selectable = new ArrayList<String>();
         for (File directory : directories) {
             if (unwanted != null && directory.getName().equals(unwanted.getName())) continue;
-            if (!HPU_DIRECTORY.matcher(directory.getName()).find()) continue;
-            selectable.add(getHostPortUser(directory));
+            if (!(STANDALONE_DIR.equals(directory.getName()) || HPU_DIRECTORY.matcher(directory.getName()).find())) continue;
+            selectable.add(directory.getName());
         }
         String preference = Preferences.userRoot().get(CHOSEN_DIRECTORY, "");
         JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
@@ -194,8 +215,8 @@ public class StorageFinder {
         }
         int okCancel = showConfirmDialog(null, buttonPanel, "Choose server", OK_CANCEL_OPTION);
         if (okCancel != OK_OPTION) return null;
-        String hostPort = buttonGroup.getSelection().getActionCommand();
-        Preferences.userRoot().put(CHOSEN_DIRECTORY, hostPort);
-        return createDirectory(hostPort);
+        String directoryChoice = buttonGroup.getSelection().getActionCommand();
+        Preferences.userRoot().put(CHOSEN_DIRECTORY, directoryChoice);
+        return createDirectory(directoryChoice);
     }
 }

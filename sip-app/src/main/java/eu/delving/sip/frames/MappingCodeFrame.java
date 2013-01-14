@@ -56,6 +56,7 @@ public class MappingCodeFrame extends FrameBase {
     private JTextArea fieldArea = new JTextArea();
     private JCheckBox docuBox = new JCheckBox("Include Documentation");
     private JCheckBox codeBox = new JCheckBox("Include Groovy Code");
+    private JCheckBox traceBox = new JCheckBox("Include Line Number Traces");
 
     public MappingCodeFrame(final SipModel sipModel) {
         super(Which.MAPPING_CODE, sipModel, "Mapping Code");
@@ -78,9 +79,28 @@ public class MappingCodeFrame extends FrameBase {
     protected void buildContent(Container content) {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Mapping Text", createListPanel());
-        tabs.addTab("Whole Record Code", scrollVH(recordArea));
+        tabs.addTab("Whole Record Code", createWholeRecord());
         tabs.addTab("Current Node Mapping Code", scrollVH(fieldArea));
         content.add(tabs);
+    }
+
+    private JPanel createWholeRecord() {
+        JPanel p = new JPanel(new BorderLayout(10, 10));
+        p.add(scrollVH(recordArea), BorderLayout.CENTER);
+        p.add(createCheckbox(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createCheckbox() {
+        JPanel p = new JPanel();
+        p.add(traceBox);
+        traceBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sipModel.getRecordCompileModel().setTrace(traceBox.isSelected());
+            }
+        });
+        return p;
     }
 
     private JPanel createListPanel() {

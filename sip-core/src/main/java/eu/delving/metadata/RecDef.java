@@ -21,10 +21,9 @@
 
 package eu.delving.metadata;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import eu.delving.XStreamFactory;
 import eu.delving.schema.SchemaVersion;
 
 import java.io.InputStream;
@@ -95,7 +94,7 @@ public class RecDef {
     public static RecDef read(InputStream in) {
         try {
             Reader inReader = new InputStreamReader(in, "UTF-8");
-            RecDef recDef = (RecDef) stream().fromXML(inReader);
+            RecDef recDef = (RecDef) XStreamFactory.getStreamFor(RecDef.class).fromXML(inReader);
             recDef.resolve();
             return recDef;
         }
@@ -510,13 +509,5 @@ public class RecDef {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    private static XStream stream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.registerConverter(new Tag.Converter());
-        stream.registerConverter(new Path.Converter());
-        stream.processAnnotations(RecDef.class);
-        return stream;
     }
 }

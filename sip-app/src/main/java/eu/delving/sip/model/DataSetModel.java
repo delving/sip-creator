@@ -151,15 +151,17 @@ public class DataSetModel implements RecDefModel, PluginBinding {
     private class StateCheckTimer implements Work, ActionListener, Work.DataSetWork {
         private SipModel sipModel;
         private Timer timer = new Timer(1000, this);
+        private boolean running = true;
 
         private StateCheckTimer(SipModel sipModel) {
             this.sipModel = sipModel;
-            timer.setRepeats(true);
+            timer.setRepeats(false);
             timer.start();
         }
 
         @Override
         public void run() {
+            if (!running) return;
             final DataSetState freshState = getDataSetState();
             if (freshState != currentState) {
                 currentState = freshState;
@@ -170,11 +172,12 @@ public class DataSetModel implements RecDefModel, PluginBinding {
                     }
                 });
             }
+            timer.restart();
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (timer.isRunning()) sipModel.exec(this);
+            sipModel.exec(this);
         }
 
         @Override
@@ -189,7 +192,7 @@ public class DataSetModel implements RecDefModel, PluginBinding {
         }
 
         public void shutdown() {
-            timer.stop();
+            running = false;
         }
     }
 

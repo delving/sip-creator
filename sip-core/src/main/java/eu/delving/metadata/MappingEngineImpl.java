@@ -50,7 +50,7 @@ public class MappingEngineImpl implements MappingEngine {
         if (mapping != null) {
             RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
             GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
-            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, pluginBinding, null);
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, pluginBinding, null, false);
         }
     }
 
@@ -61,7 +61,7 @@ public class MappingEngineImpl implements MappingEngine {
         }
         else {
             Node root = metadataRecordFactory.nodeFromXml(id, recordXML);
-            return new MappingResultImpl(serializer, root, null);
+            return new MappingResultImpl(serializer, root, null).resolve();
         }
     }
 

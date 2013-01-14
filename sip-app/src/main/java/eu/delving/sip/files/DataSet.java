@@ -43,7 +43,7 @@ import java.util.Map;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public interface DataSet {
+public interface DataSet extends Comparable<DataSet> {
 
     String getSpec();
 
@@ -64,6 +64,8 @@ public interface DataSet {
     DataSetState getState(String prefix);
 
     Map<String, String> getDataSetFacts();
+
+    void setDataSetFacts(Map<String, String> dataSetFacts) throws StorageException;
 
     Map<String, String> getHints();
 

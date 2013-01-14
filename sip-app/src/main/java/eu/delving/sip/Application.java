@@ -22,19 +22,16 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.*;
 import eu.delving.schema.Fetcher;
+import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.util.FileSystemFetcher;
-import eu.delving.sip.actions.ImportAction;
-import eu.delving.sip.actions.SelectAnotherMappingAction;
-import eu.delving.sip.actions.UnlockMappingAction;
-import eu.delving.sip.actions.ValidateAction;
+import eu.delving.sip.actions.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
+import eu.delving.sip.frames.DataSetHubFrame;
+import eu.delving.sip.frames.DataSetStandaloneFrame;
 import eu.delving.sip.frames.WorkFrame;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
@@ -42,14 +39,12 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
-import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.params.ConnRouteParams;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -57,12 +52,14 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.net.*;
+import java.io.IOException;
 import java.util.prefs.Preferences;
 
+import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
 import static eu.delving.sip.files.DataSetState.*;
+import static eu.delving.sip.files.StorageFinder.isStandalone;
 
 /**
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
@@ -76,6 +73,7 @@ public class Application {
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private File storageDirectory;
     private SipModel sipModel;
+    private SchemaRepository schemaRepository;
     private Action importAction;
     private Action validateAction;
     private JFrame home;
@@ -86,6 +84,7 @@ public class Application {
     private HelpPanel helpPanel;
     private Timer resizeTimer;
     private ExpertMenu expertMenu;
+    private UploadAction uploadAction;
     private UnlockMappingAction unlockMappingAction;
     private SelectAnotherMappingAction selectAnotherMappingAction;
 
@@ -117,13 +116,23 @@ public class Application {
                 resizeTimer.restart();
             }
         });
-        Preferences preferences =   Preferences.userNodeForPackage(SipModel.class);
+        Preferences preferences = Preferences.userNodeForPackage(SipModel.class);
         feedback = new VisualFeedback(home, desktop, preferences);
-        HttpClient httpClient = createHttpClient(String.format("http://%s", StorageFinder.getHostPort(storageDirectory)));
-        Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
-        Storage storage = new StorageImpl(storageDirectory, fetcher, httpClient);
-        sipModel = new SipModel(desktop ,storage, groovyCodeResource, feedback, preferences);
-        CultureHubClient cultureHubClient = new CultureHubClient(sipModel, httpClient);
+        HttpClient httpClient = createHttpClient(storageDirectory);
+        try {
+            Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
+            this.schemaRepository = new SchemaRepository(fetcher);
+        }
+        catch (IOException e) {
+            throw new StorageException("Unable to create Schema Repository", e);
+        }
+        ResolverContext context = new ResolverContext();
+        Storage storage = new StorageImpl(storageDirectory, schemaRepository, new CachedResourceResolver(context));
+        context.setStorage(storage);
+        context.setHttpClient(httpClient);
+        sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
+        CultureHubClient cultureHubClient = isStandalone(storageDir) ? null : new CultureHubClient(sipModel, httpClient);
+        if (cultureHubClient != null) uploadAction = new UploadAction(sipModel, cultureHubClient);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame("Delving SIP Creator");
@@ -135,7 +144,8 @@ public class Application {
         });
         JPanel content = (JPanel) home.getContentPane();
         content.setFocusable(true);
-        allFrames = new AllFrames(sipModel, cultureHubClient, content);
+        FrameBase dataSetFrame = cultureHubClient != null ? new DataSetHubFrame(sipModel, cultureHubClient) : new DataSetStandaloneFrame(sipModel, schemaRepository);
+        allFrames = new AllFrames(sipModel, content, dataSetFrame);
         desktop.setBackground(new Color(190, 190, 200));
         helpPanel = new HelpPanel(sipModel, httpClient);
         content.add(desktop, BorderLayout.CENTER);
@@ -238,7 +248,12 @@ public class Application {
         statusPanel.setReaction(SOURCED, new InputAnalyzer());
         statusPanel.setReaction(ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(MAPPING, validateAction);
-        statusPanel.setReaction(VALIDATED, allFrames.getUploadAction());
+        if (uploadAction == null) {
+            statusPanel.setReaction(VALIDATED, allFrames.prepareForNothing());
+        }
+        else {
+            statusPanel.setReaction(VALIDATED, uploadAction);
+        }
         JPanel p = new JPanel(new GridLayout(1, 0, 6, 6));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
@@ -322,29 +337,6 @@ public class Application {
         }
     }
 
-    private HttpClient createHttpClient(String serverUrl) {
-        final int CONNECTION_TIMEOUT = 1000 * 60 * 30;
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setSoTimeout(httpParams, CONNECTION_TIMEOUT);
-        HttpConnectionParams.setConnectionTimeout(httpParams, CONNECTION_TIMEOUT);
-        try {
-            java.util.List<Proxy> proxies = ProxySelector.getDefault().select(new URI(serverUrl));
-            for (Proxy proxy : proxies) {
-                if (proxy.type() != Proxy.Type.HTTP) continue;
-                InetSocketAddress addr = (InetSocketAddress) proxy.address();
-                String host = addr.getHostName();
-                int port = addr.getPort();
-                HttpHost httpHost = new HttpHost(host, port);
-                ConnRouteParams.setDefaultProxy(httpParams, httpHost);
-            }
-        }
-        catch (URISyntaxException e) {
-            throw new RuntimeException("Bad address: " + serverUrl, e);
-        }
-        ThreadSafeClientConnManager threaded = new ThreadSafeClientConnManager();
-        return new DefaultHttpClient(threaded, httpParams);
-    }
-
     private void quit() {
         if (!sipModel.getWorkModel().isEmpty()) {
             boolean exitAnyway = feedback.confirm(
@@ -353,7 +345,16 @@ public class Application {
             );
             if (exitAnyway) return;
         }
-        EventQueue.invokeLater(LAUNCH);
+        boolean restart = feedback.confirm(
+                "Exit",
+                "Would you like to restart?"
+        );
+        if (restart) {
+            EventQueue.invokeLater(LAUNCH);
+        }
+        else {
+            System.exit(0);
+        }
     }
 
     private void destroy() {
@@ -361,6 +362,43 @@ public class Application {
         resizeTimer.stop();
         home.setVisible(false);
         home.dispose();
+    }
+
+    private class ResolverContext implements CachedResourceResolver.Context {
+        private Storage storage;
+        private HttpClient httpClient;
+
+        public void setStorage(Storage storage) {
+            this.storage = storage;
+        }
+
+        public void setHttpClient(HttpClient httpClient) {
+            this.httpClient = httpClient;
+        }
+
+        @Override
+        public String get(String url) {
+            try {
+                HttpGet get = new HttpGet(url);
+                HttpResponse response = httpClient.execute(get);
+                StatusLine line = response.getStatusLine();
+                if (line.getStatusCode() != HttpStatus.SC_OK) {
+                    throw new IOException(String.format(
+                            "HTTP Error %s (%s) on %s",
+                            line.getStatusCode(), line.getReasonPhrase(), url
+                    ));
+                }
+                return EntityUtils.toString(response.getEntity());
+            }
+            catch (Exception e) {
+                throw new RuntimeException("Fetching problem: " + url, e);
+            }
+        }
+
+        @Override
+        public File file(String systemId) {
+            return storage.cache(systemId.replaceAll("[/:]", "_"));
+        }
     }
 
     private class QuitAction extends AbstractAction {

@@ -21,12 +21,10 @@
 
 package eu.delving.sip.xml;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -244,12 +242,6 @@ public class RelationalProfile {
             }
             throw new RuntimeException("No ColumnType for " + typeInt);
         }
-    }
-
-    public static XStream stream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(RelationalProfile.class);
-        return stream;
     }
 
     public static RelationalProfile createProfile(Connection connection) throws SQLException {

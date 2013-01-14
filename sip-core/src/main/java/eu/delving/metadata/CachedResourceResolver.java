@@ -19,19 +19,14 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.sip.files;
+package eu.delving.metadata;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import java.io.*;
+import java.net.URL;
 
 /**
  * Fetch XML resources using HTTP and cache them locally in a subdirectory beside all of the directories for
@@ -40,18 +35,42 @@ import java.io.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class CachingResourceResolver implements LSResourceResolver {
-    private Storage storage;
-    private HttpClient httpClient;
+public class CachedResourceResolver implements LSResourceResolver {
+    private Context context;
 
-    public CachingResourceResolver(Storage storage, HttpClient httpClient) {
-        this.storage = storage;
-        this.httpClient = httpClient;
+    public interface Context {
+        String get(String url);
+        File file(String systemId);
+    }
+
+    public CachedResourceResolver(Context context) {
+        this.context = context;
+    }
+
+    public CachedResourceResolver() {
+        this.context = new Context() {
+            @Override
+            public String get(String urlString) {
+                try {
+                    URL url = new URL(urlString);
+                    return IOUtils.toString(url.openStream(), "UTF-8");
+                }
+                catch (Exception e) {
+                    throw new RuntimeException("Problem fetching", e);
+                }
+            }
+
+            @Override
+            public File file(String systemId) {
+                File cache = new File("/tmp");
+                return new File(cache, systemId.replaceAll("[/:]", "_"));
+            }
+        };
     }
 
     @Override
     public LSInput resolveResource(String type, final String namespaceUri, final String publicId, final String systemId, final String baseUri) {
-        File resourceFile = createResourceFile(systemId, baseUri);
+        File resourceFile = context.file(systemId);
         if (!resourceFile.exists()) {
             try {
                 String schemaText = fetchResource(systemId, baseUri);
@@ -60,40 +79,20 @@ public class CachingResourceResolver implements LSResourceResolver {
                 IOUtils.closeQuietly(fileOutputStream);
             }
             catch (Exception e) {
-                throw new RuntimeException("Unable to fetch and store resource", e);
+                throw new RuntimeException("Unable to fetch and store resource: " + resourceFile, e);
             }
         }
         return new FileBasedInput(publicId, systemId, baseUri, resourceFile);
     }
 
     private String fetchResource(String systemId, String baseUri) throws IOException {
-        String url = systemId;
-        if (!url.startsWith("http:")) {
+        String urlString = systemId;
+        if (!urlString.startsWith("http:")) {
             if (!baseUri.startsWith("http:")) throw new IOException("No URL found");
             String baseURL = baseUri.substring(0, baseUri.lastIndexOf('/') + 1);
-            url = baseURL + systemId;
+            urlString = baseURL + systemId;
         }
-        HttpGet get = new HttpGet(url);
-        HttpResponse response = httpClient.execute(get);
-        StatusLine line = response.getStatusLine();
-        if (line.getStatusCode() != HttpStatus.SC_OK) {
-            throw new IOException(String.format(
-                    "HTTP Error %s (%s) on %s",
-                    line.getStatusCode(), line.getReasonPhrase(), url
-            ));
-        }
-        return EntityUtils.toString(response.getEntity());
-    }
-
-    private File createResourceFile(String systemId, String baseUri) {
-        int lastSlash = systemId.lastIndexOf("/");
-        if (lastSlash < 0) {
-            return storage.cache(systemId);
-        }
-        else {
-            String schemaName = systemId.substring(lastSlash + 1);
-            return storage.cache(schemaName);
-        }
+        return context.get(urlString);
     }
 
     private static class FileBasedInput implements LSInput {

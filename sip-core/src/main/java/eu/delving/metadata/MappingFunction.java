@@ -21,11 +21,10 @@
 
 package eu.delving.metadata;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import eu.delving.XStreamFactory;
 
 import java.io.InputStream;
 import java.util.List;
@@ -153,14 +152,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
     
     public static FunctionList read(InputStream inputStream) {
-        return (FunctionList) stream().fromXML(inputStream);
+        return (FunctionList) XStreamFactory.getStreamFor(FunctionList.class).fromXML(inputStream);
     }
-
-    private static XStream stream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(FunctionList.class);
-        return stream;
-    }
-
 }
 

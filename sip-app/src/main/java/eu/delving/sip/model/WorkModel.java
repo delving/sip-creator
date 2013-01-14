@@ -214,6 +214,7 @@ public class WorkModel {
         }
 
         public boolean isDone() {
+            if (executor.isShutdown()) return true;
             if (isEmpty()) return true;
             if (!future.isDone()) return false;
 //          todo:  future.isCancelled()
@@ -267,6 +268,7 @@ public class WorkModel {
         }
 
         private void launch() {
+            if (executor.isShutdown()) return;
             if (getWork() instanceof Work.LongTermWork) {
                 ((Work.LongTermWork) getWork()).setProgressListener(progressImpl = new ProgressImpl(feedback));
             }

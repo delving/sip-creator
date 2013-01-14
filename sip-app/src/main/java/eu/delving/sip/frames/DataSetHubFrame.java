@@ -43,8 +43,7 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
-import static eu.delving.sip.base.KeystrokeHelper.SPACE;
-import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
@@ -53,17 +52,17 @@ import static eu.delving.sip.base.SwingHelper.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class DataSetFrame extends FrameBase {
+public class DataSetHubFrame extends FrameBase {
+    private CultureHubClient cultureHubClient;
     private DataSetTableModel tableModel = new DataSetTableModel();
     private JTable dataSetTable;
-    private CultureHubClient cultureHubClient;
     private EditAction editAction = new EditAction();
     private DownloadAction downloadAction = new DownloadAction();
     private ReleaseAction releaseAction = new ReleaseAction();
-    private DataSetFrame.RefreshAction refreshAction = new RefreshAction();
+    private DataSetHubFrame.RefreshAction refreshAction = new RefreshAction();
     private JTextField patternField = new JTextField(6);
 
-    public DataSetFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
+    public DataSetHubFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.cultureHubClient = cultureHubClient;
         this.dataSetTable = new JTable(tableModel, tableModel.getColumnModel());
@@ -118,6 +117,8 @@ public class DataSetFrame extends FrameBase {
         p.add(createFilter());
         p.add(button(editAction));
         addKeyboardAction(editAction, SPACE, (JComponent) getContentPane());
+        addKeyboardAction(new UpDownAction(false), UP, (JComponent) getContentPane());
+        addKeyboardAction(new UpDownAction(true), DOWN, (JComponent) getContentPane());
         p.add(button(downloadAction));
         p.add(button(releaseAction));
         return p;
@@ -134,16 +135,41 @@ public class DataSetFrame extends FrameBase {
         label.setLabelFor(patternField);
         JPanel p = new JPanel(new BorderLayout());
         p.add(label, BorderLayout.WEST);
+        attachAccelerator(new UpDownAction(true), patternField);
+        attachAccelerator(new UpDownAction(false), patternField);
         p.add(patternField, BorderLayout.CENTER);
         return p;
     }
 
-    public void fireRefresh() {
+    @Override
+    public void refresh() {
         if (SwingHelper.isDevelopmentMode()) {
             tableModel.setHubEntries(null);
         }
         else {
             refreshAction.actionPerformed(null);
+        }
+    }
+
+    private class UpDownAction extends AbstractAction {
+        private boolean down = false;
+
+        private UpDownAction(boolean down) {
+            super(down ? "Down" : "Up");
+            this.down = down;
+            putValue(Action.ACCELERATOR_KEY, down ? DOWN : UP);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ListSelectionModel selection = dataSetTable.getSelectionModel();
+            if (tableModel.getRowCount() > 0 && dataSetTable.getSelectionModel().isSelectionEmpty()) {
+                int row = down ? 0 : tableModel.getRowCount() - 1;
+                selection.setSelectionInterval(row, row);
+                dataSetTable.requestFocus();
+                Rectangle cellRect = dataSetTable.getCellRect(row, 0, false);
+                if (cellRect != null) dataSetTable.scrollRectToVisible(cellRect);
+            }
         }
     }
 
@@ -347,11 +373,6 @@ public class DataSetFrame extends FrameBase {
                         if (entry.hasStateChanged()) fireTableRowsUpdated(row, row);
                         row++;
                     }
-                    ListSelectionModel selection = dataSetTable.getSelectionModel();
-                    if (tableModel.getRowCount() > 0 && selection.isSelectionEmpty()) {
-                        selection.setSelectionInterval(0, 0);
-                        dataSetTable.requestFocus();
-                    }
                 }
             });
             timer.setRepeats(true);
@@ -427,23 +448,23 @@ public class DataSetFrame extends FrameBase {
             return false;
         }
 
-        private TableColumn createSpecColumn() {
-            TableColumn tc = column("Spec", 0, "how long can a spec name actually be?");
+        private void createSpecColumn() {
+            TableColumn tc = addColumn("Spec", "how long can a spec name actually be?");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                     String spec = (String) value;
                     DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-                    if (dataSet != null && dataSet.getSpec().equals(spec)) label.setFont(label.getFont().deriveFont(Font.BOLD, 18));
+                    if (dataSet != null && dataSet.getSpec().equals(spec))
+                        label.setFont(label.getFont().deriveFont(Font.BOLD, 18));
                     return label;
                 }
             });
-            return tc;
         }
 
-        private TableColumn createStateColumn() {
-            TableColumn tc = column("State", 1, State.NEEDS_FETCH.string + "extra");
+        private void createStateColumn() {
+            TableColumn tc = addColumn("State", State.NEEDS_FETCH.string + "extra");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -456,11 +477,10 @@ public class DataSetFrame extends FrameBase {
             });
             tc.setHeaderValue("State");
             tc.setMinWidth(100);
-            return tc;
         }
 
-        private TableColumn createRecordCountColumn() {
-            TableColumn tc = column("Record Count", 2, "   manyrecords   ");
+        private void createRecordCountColumn() {
+            TableColumn tc = addColumn("Record Count", "   manyrecords   ");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -469,28 +489,38 @@ public class DataSetFrame extends FrameBase {
                     return label;
                 }
             });
-            return tc;
         }
 
-        private TableColumn createOwnedColumn() {
-            return column("Owner", 3, "Somebody's long name <andtheirbig@email.address>");
+        private void createOwnedColumn() {
+            addColumn("Owner", "Somebody's long name <andtheirbig@email.address>");
         }
 
-        private TableColumn column(String title, int index, String prototype) {
+        private void createSchemaVersionsColumn() {
+            addColumn("Schemas", "seve_ralsc, schm_versions");
+        }
+
+        private void createNameColumn() {
+            addColumn("Name", "This is a very long dataset name");
+        }
+
+        private TableColumn addColumn(String title, String prototype) {
             JLabel label = new JLabel(prototype);
             int width = label.getPreferredSize().width;
-            TableColumn tableColumn = new TableColumn(index, width);
+            TableColumn tableColumn = new TableColumn(columnModel.getColumnCount(), width);
             tableColumn.setHeaderValue(title);
             tableColumn.setMaxWidth(width * 2);
             tableColumn.setMinWidth(width * 3 / 4);
+            columnModel.addColumn(tableColumn);
             return tableColumn;
         }
 
         private void createColumnModel() {
-            columnModel.addColumn(createSpecColumn());
-            columnModel.addColumn(createStateColumn());
-            columnModel.addColumn(createRecordCountColumn());
-            columnModel.addColumn(createOwnedColumn());
+            createSpecColumn();
+            createNameColumn();
+            createStateColumn();
+            createSchemaVersionsColumn();
+            createRecordCountColumn();
+            createOwnedColumn();
         }
 
         @Override
@@ -502,13 +532,29 @@ public class DataSetFrame extends FrameBase {
                 case 0:
                     return row.getSpec();
                 case 1:
-                    return state;
+                    return row.getDataSetName();
                 case 2:
-                    return entry == null ? "" : String.format("   %11d   ", entry.recordCount);
+                    return state;
                 case 3:
+                    return toString(row.getSchemaVersions());
+                case 4:
+                    return entry == null ? "" : String.format("   %11d   ", entry.recordCount);
+                case 5:
                     return entry == null || entry.lockedBy == null ? "" : entry.lockedBy;
             }
             throw new RuntimeException();
+        }
+
+        private String toString(List<SchemaVersion> schemaVersions) {
+            if (schemaVersions == null) return "?";
+            StringBuilder out = new StringBuilder();
+            Iterator<SchemaVersion> walk = schemaVersions.iterator();
+            while (walk.hasNext()) {
+                SchemaVersion schemaVersion = walk.next();
+                out.append(schemaVersion.toString());
+                if (walk.hasNext()) out.append(", ");
+            }
+            return out.toString();
         }
     }
 
@@ -537,6 +583,13 @@ public class DataSetFrame extends FrameBase {
 
         public DataSet getDataSet() {
             return dataSet;
+        }
+
+        public String getDataSetName() {
+            if (dataSet == null) return "";
+            String name = dataSet.getDataSetFacts().get("name");
+            if (name == null) name = "";
+            return name;
         }
 
         public List<SchemaVersion> getSchemaVersions() {

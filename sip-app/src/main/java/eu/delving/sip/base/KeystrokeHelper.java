@@ -36,6 +36,8 @@ import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
 public class KeystrokeHelper {
     public static final KeyStroke SPACE = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
+    public static final KeyStroke UP = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0);
+    public static final KeyStroke DOWN = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0);
     public static final KeyStroke MENU_G = menuKeystroke(KeyEvent.VK_G);
     public static final KeyStroke MENU_E = menuKeystroke(KeyEvent.VK_E);
     public static final KeyStroke MENU_H = menuKeystroke(KeyEvent.VK_H);

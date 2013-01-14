@@ -21,7 +21,7 @@
 
 package eu.delving.schema;
 
-import com.thoughtworks.xstream.XStream;
+import eu.delving.schema.util.XStreamFactory;
 import eu.delving.schema.xml.Schema;
 import eu.delving.schema.xml.SchemaFile;
 import eu.delving.schema.xml.Schemas;
@@ -46,9 +46,7 @@ public class SchemaRepository {
 
     public SchemaRepository(Fetcher fetcher) throws IOException {
         this.fetcher = fetcher;
-        XStream xstream = new XStream();
-        xstream.processAnnotations(Schemas.class);
-        this.schemas = (Schemas) xstream.fromXML(fetcher.fetchList());
+        this.schemas = (Schemas) XStreamFactory.getSchemasStream().fromXML(fetcher.fetchList());
         try {
             this.messageDigest = MessageDigest.getInstance("MD5");
         }
@@ -106,5 +104,4 @@ public class SchemaRepository {
         }
         return hex.toString();
     }
-
 }

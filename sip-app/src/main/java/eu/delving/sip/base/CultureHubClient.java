@@ -21,10 +21,9 @@
 
 package eu.delving.sip.base;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import eu.delving.XStreamFactory;
 import eu.delving.metadata.Hasher;
 import eu.delving.plugin.MediaFiles;
 import eu.delving.sip.files.DataSet;
@@ -181,7 +180,7 @@ public class CultureHubClient {
                 if (entity != null) {
                     switch (code) {
                         case OK:
-                            DataSetList dataSetList = (DataSetList) listStream().fromXML(entity.getContent());
+                            DataSetList dataSetList = (DataSetList) XStreamFactory.getStreamFor(DataSetList.class).fromXML(entity.getContent());
                             listReceiveListener.listReceived(dataSetList.list);
                             break;
                         case UNAUTHORIZED:
@@ -647,12 +646,6 @@ public class CultureHubClient {
         public Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
-    }
-
-    private XStream listStream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(DataSetList.class);
-        return stream;
     }
 
     private HttpGet createListRequest() throws OAuthSystemException, OAuthProblemException {

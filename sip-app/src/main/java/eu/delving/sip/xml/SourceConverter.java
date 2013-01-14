@@ -61,7 +61,7 @@ import static org.apache.commons.io.FileUtils.moveFile;
 
 public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     public static final String CONVERTER_DELIMITER = ":::";
-    public static final String ANONYMOUS_RECORDS_PROPERTY = "anonymousRecords";
+//    public static final String ANONYMOUS_RECORDS_PROPERTY = "anonymousRecords";
     private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
     private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
@@ -69,7 +69,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
     private Path recordRootPath;
     private Path uniqueElementPath;
-    private int recordCount, totalRecords, anonymousRecords;
+    private int recordCount, totalRecords;//, anonymousRecords;
     private ProgressListener progressListener;
     private String unique;
     private StartElement start;
@@ -155,7 +155,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
 
     public void parse(InputStream inputStream, OutputStream outputStream, Map<String,String> namespaces) throws XMLStreamException, IOException {
         progressListener.prepareFor(totalRecords);
-        anonymousRecords = Integer.parseInt(System.getProperty(ANONYMOUS_RECORDS_PROPERTY, "0"));
+//        anonymousRecords = Integer.parseInt(System.getProperty(ANONYMOUS_RECORDS_PROPERTY, "0"));
         Path path = Path.create();
         XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
         XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
@@ -252,7 +252,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     }
 
     private void outputRecord(XMLEventWriter out) throws XMLStreamException {
-        if (anonymousRecords == 0 || recordCount < anonymousRecords) {
+//        if (anonymousRecords == 0 || recordCount < anonymousRecords) {
             String uniqueValue = getUniqueValue();
             if (!uniqueValue.isEmpty()) {
                 if (uniqueness.contains(uniqueValue)) {
@@ -270,7 +270,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                     out.add(eventFactory.createCharacters("\n"));
                 }
             }
-        }
+//        }
         clearEvents();
     }
 
@@ -332,7 +332,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
             StringBuilder out = new StringBuilder(line.length());
             for (char c : line.toCharArray()) out.append(Character.isWhitespace(c) ? ' ' : c);
             String clean = out.toString().replaceAll(" +", " ").trim();
-            if (anonymousRecords > 0) clean = anonymize(clean);
+//            if (anonymousRecords > 0) clean = anonymize(clean);
             if (!clean.isEmpty()) lines.add(clean);
         }
     }
