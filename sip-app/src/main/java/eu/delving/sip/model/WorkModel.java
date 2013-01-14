@@ -270,7 +270,8 @@ public class WorkModel {
         private void launch() {
             if (executor.isShutdown()) return;
             if (getWork() instanceof Work.LongTermWork) {
-                ((Work.LongTermWork) getWork()).setProgressListener(progressImpl = new ProgressImpl(feedback));
+                progressImpl = new ProgressImpl(feedback);
+                ((Work.LongTermWork) getWork()).setProgressListener(progressImpl);
             }
             else {
                 progressImpl = null;
@@ -291,13 +292,25 @@ public class WorkModel {
             return queue.peek();
         }
 
-        private boolean isEmpty() {
+        public boolean isEmpty() {
             return queue.isEmpty();
         }
 
         @Override
         public String toString() {
-            return isEmpty() ? "empty" : job().toString();
+            if (isEmpty()) return "empty";
+            Work work = getWork();
+            if (work instanceof Work.DataSetPrefixWork) {
+                Work.DataSetPrefixWork dsp = (Work.DataSetPrefixWork) work;
+                return String.format("%s [%s/%s]", work.getJob(), dsp.getDataSet(), dsp.getPrefix());
+            }
+            else if (work instanceof Work.DataSetWork) {
+                Work.DataSetWork ds = (Work.DataSetWork) work;
+                return String.format("%s [%s]", work.getJob(), ds.getDataSet());
+            }
+            else {
+                return work.getJob().toString();
+            }
         }
     }
 
