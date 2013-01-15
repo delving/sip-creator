@@ -25,7 +25,6 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.WorkModel;
-import org.apache.commons.lang.WordUtils;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -99,6 +98,7 @@ public class WorkFrame extends FrameBase {
     }
 
     private String toFullString(WorkModel.JobContext jobContext) {
+        if (jobContext.isEmpty()) return "empty";
         String date = TIMESTAMP_FORMAT.format(jobContext.getStart());
         String job = jobContext.getJob().toString();
         String dataSetSpec = jobContext.getDataSet();
@@ -118,7 +118,7 @@ public class WorkFrame extends FrameBase {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             WorkModel.JobContext jobContext = (WorkModel.JobContext) value;
             WorkModel.ProgressIndicator progress = jobContext.getProgressIndicator();
-            String jobName = jobContext.isDone() ? "done" : WordUtils.capitalizeFully(jobContext.getJob().toString(), new char[]{'_'});
+            String jobName = jobContext.isDone() ? "done" : jobContext.toString();
             String show = progress == null ? jobName : String.format("%s: %s", jobName, progress.getString(false));
             Component component = super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
             if (jobContext.getWork() instanceof Work.LongTermWork) {
