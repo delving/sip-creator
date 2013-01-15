@@ -69,9 +69,10 @@ public class CodeGenerator {
         codeOut.line("def discard = { reason -> throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("def discardIf = { thing, reason ->  if (thing) throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("def discardIfNot = { thing, reason ->  if (!thing) throw new DiscardRecordException(reason.toString()) }");
+        codeOut.line("def matchMediaFile = { it -> %s.match(it.text()) }", RecMapping.MEDIA_INDEX);
         codeOut.line("// Facts:");
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
-            codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
+            codeOut.line("String %s = '''%s'''", entry.getKey(), entry.getValue());
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
         codeOut.line("// Functions from Mapping:");

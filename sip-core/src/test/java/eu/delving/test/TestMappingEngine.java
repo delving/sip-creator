@@ -24,10 +24,8 @@ package eu.delving.test;
 import eu.delving.MappingEngine;
 import eu.delving.MappingEngineFactory;
 import eu.delving.MappingResult;
-import eu.delving.PluginBinding;
 import eu.delving.groovy.MappingException;
 import eu.delving.metadata.*;
-import eu.delving.plugin.MediaFiles;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaType;
 import eu.delving.schema.SchemaVersion;
@@ -174,8 +172,7 @@ public class TestMappingEngine {
         return new MappingEngineImpl(
                 classLoader(),
                 namespaces,
-                new MockRecDefModel(),
-                new MockPluginBinding(prefix),
+                new MockRecDefModel(prefix),
                 mapping(prefix)
         );
     }
@@ -195,41 +192,38 @@ public class TestMappingEngine {
     }
 
     private String mediaFilesResource(String prefix) {
-        return String.format("/%s/media-files.xml", prefix);
-    }
-
-    private class MockPluginBinding implements PluginBinding {
-        private MediaFiles mediaFiles;
-
-        private MockPluginBinding(String prefix) {
-            URL resource = this.getClass().getResource(mediaFilesResource(prefix));
-            if (resource != null) {
-                try {
-                    this.mediaFiles = MediaFiles.read(resource.openStream());
-                }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        @Override
-        public Object getFunctionBinding(String functionName) throws MetadataException {
-            if (!"matchMediaFile".equals(functionName) || mediaFiles == null) return null;
-            return mediaFiles;
-        }
+        return String.format("/%s/media-index.xml", prefix);
     }
 
     private class MockRecDefModel implements RecDefModel {
+        private String prefix;
+
+        private MockRecDefModel(String prefix) {
+            this.prefix = prefix;
+        }
+
         @Override
         public RecDefTree createRecDefTree(SchemaVersion schemaVersion) throws MetadataException {
             try {
                 String recDefString = schemaRepo.getSchema(schemaVersion, SchemaType.RECORD_DEFINITION);
-                if (recDefString == null) throw new RuntimeException("Unable to find record definition "+schemaVersion);
+                if (recDefString == null) {
+                    throw new RuntimeException("Unable to find record definition " + schemaVersion);
+                }
                 return RecDefTree.create(RecDef.read(new ByteArrayInputStream(recDefString.getBytes("UTF-8"))));
             }
             catch (IOException e) {
                 throw new RuntimeException("Unable to fetch record definition", e);
+            }
+        }
+
+        @Override
+        public MediaIndex readMediaIndex() throws MetadataException {
+            URL resource = this.getClass().getResource(mediaFilesResource(prefix));
+            try {
+                return resource != null ? MediaIndex.read(resource.openStream()) : null;
+            }
+            catch (IOException e) {
+                throw new MetadataException("Unable to read media index", e);
             }
         }
     }
@@ -239,7 +233,7 @@ public class TestMappingEngine {
             SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
             factory.setResourceResolver(new CachedResourceResolver());
             String validationXsd = schemaRepo.getSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA);
-            if (validationXsd == null) throw new RuntimeException("Unable to find validation schema "+schemaVersion);
+            if (validationXsd == null) throw new RuntimeException("Unable to find validation schema " + schemaVersion);
             Schema schema = factory.newSchema(new StreamSource(new StringReader(validationXsd)));
             return schema.newValidator();
         }
@@ -257,7 +251,7 @@ public class TestMappingEngine {
             return IOUtils.toString(stream(resourcePath), "UTF-8");
         }
         catch (Exception e) {
-            throw new RuntimeException("Resource fetch failed:" + resourcePath,e);
+            throw new RuntimeException("Resource fetch failed:" + resourcePath, e);
         }
     }
 

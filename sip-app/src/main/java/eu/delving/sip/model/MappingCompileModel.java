@@ -279,7 +279,7 @@ public class MappingCompileModel {
             compiling = true;
             try {
                 if (mappingRunner == null) {
-                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, sipModel.getDataSetModel(), editPath, trace);
+                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath, trace);
                     notifyCodeCompiled(mappingRunner.getCode());
                 }
                 try {

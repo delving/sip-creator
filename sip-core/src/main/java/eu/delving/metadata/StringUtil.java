@@ -114,11 +114,11 @@ public class StringUtil {
         Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
         while (walk.hasNext()) {
             Map.Entry<String, String> entry = walk.next();
-            codeOut.line(String.format("'''%s''':'''%s'''%s",
+            codeOut.line("'''%s''':'''%s'''%s",
                     StringUtil.sanitizeGroovy(entry.getKey()),
                     StringUtil.sanitizeGroovy(entry.getValue()),
                     walk.hasNext() ? "," : ""
-            ));
+            );
         }
         codeOut._line("]");
         for (OptRole field : OptRole.getFields())

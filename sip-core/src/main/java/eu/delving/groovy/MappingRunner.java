@@ -21,7 +21,6 @@
 
 package eu.delving.groovy;
 
-import eu.delving.PluginBinding;
 import eu.delving.metadata.*;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
@@ -61,15 +60,13 @@ public class MappingRunner {
     private Script script;
     private GroovyCodeResource groovyCodeResource;
     private RecMapping recMapping;
-    private PluginBinding pluginBinding;
     private GroovyNode factsNode = new GroovyNode(null, "facts");
     private String code;
     private int counter = 0;
 
-    public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, PluginBinding pluginBinding, EditPath editPath, boolean trace) {
+    public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath, boolean trace) {
         this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
-        this.pluginBinding = pluginBinding;
         this.code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode();
         this.script = groovyCodeResource.createMappingScript(code);
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
@@ -100,12 +97,8 @@ public class MappingRunner {
             binding.setVariable("output", builder);
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));
-            if (pluginBinding != null) {
-                for (MappingFunction function : gatherFunctions()) {
-                    Object functionBinding = pluginBinding.getFunctionBinding(function.name);
-                    if (functionBinding == null) continue;
-                    binding.setVariable(String.format("_%s_", function.name), functionBinding);
-                }
+            for (Map.Entry<String, Object> entry : getRecDefTree().getBindings().entrySet()) {
+                binding.setVariable(entry.getKey(), entry.getValue());
             }
             script.setBinding(binding);
             return stripEmptyElements(script.run());

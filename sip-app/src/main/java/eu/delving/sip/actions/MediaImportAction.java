@@ -22,7 +22,7 @@
 package eu.delving.sip.actions;
 
 import eu.delving.metadata.Hasher;
-import eu.delving.plugin.MediaFiles;
+import eu.delving.metadata.MediaIndex;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
@@ -128,7 +128,7 @@ public class MediaImportAction extends AbstractAction {
         private List<File> fileList = new ArrayList<File>();
         private ProgressListener progressListener;
         private DataSet dataSet;
-        private MediaFiles mediaFiles;
+        private MediaIndex mediaIndex;
 
         private DirectoryScanner(DataSet dataSet, File sourceDirectory) {
             this.dataSet = dataSet;
@@ -172,7 +172,7 @@ public class MediaImportAction extends AbstractAction {
             gatherFilesFrom(sourceDirectory);
             progressListener.prepareFor(fileList.size());
             targetDirectory.mkdirs();
-            mediaFiles = mediaIndexFile.exists() ? MediaFiles.read(new FileInputStream(mediaIndexFile)) : MediaFiles.create();
+            mediaIndex = mediaIndexFile.exists() ? MediaIndex.read(new FileInputStream(mediaIndexFile)) : MediaIndex.create();
             Set<String> fileNames = new HashSet<String>();
             File[] files = targetDirectory.listFiles();
             if (files != null) {
@@ -181,19 +181,19 @@ public class MediaImportAction extends AbstractAction {
                     fileNames.add(mediaFile.getName());
                 }
             }
-            mediaFiles.removeExcess(fileNames);
+            mediaIndex.removeExcess(fileNames);
             int walk = 0;
             for (File file : fileList) {
                 progressListener.setProgress(walk++);
                 handleSourceFile(file);
             }
-            MediaFiles.write(mediaFiles, mediaIndexFile);
+            MediaIndex.write(mediaIndex, mediaIndexFile);
         }
 
         private void handleSourceFile(File file) throws IOException {
             if (!isMediaFile(file)) return;
             String quickHash = Hasher.quickHash(file);
-            MediaFiles.MediaFile mediaFile = mediaFiles.getQuick(quickHash);
+            MediaIndex.MediaFile mediaFile = mediaIndex.getQuick(quickHash);
             if (mediaFile == null || !mediaFile.matchesSourceFile(file)) {
                 File destinationFile = new File(targetDirectory, "COPY_IN_PROGRESS");
                 OutputStream outputStream = hasher.createDigestOutputStream(new FileOutputStream(destinationFile));
@@ -209,7 +209,7 @@ public class MediaImportAction extends AbstractAction {
                 if (!destinationFile.renameTo(hashedFile)) {
                     throw new IOException("Unable to rename " + destinationFile + " to " + hashedFile);
                 }
-                mediaFiles.add(file, hashedFile, quickHash);
+                mediaIndex.add(file, hashedFile, quickHash);
             }
         }
 

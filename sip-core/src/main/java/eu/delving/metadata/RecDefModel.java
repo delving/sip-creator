@@ -35,4 +35,6 @@ import eu.delving.schema.SchemaVersion;
 public interface RecDefModel {
 
     RecDefTree createRecDefTree(SchemaVersion schemaVersion) throws MetadataException;
+
+    MediaIndex readMediaIndex() throws MetadataException;
 }

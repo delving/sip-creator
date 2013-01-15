@@ -21,7 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.PluginBinding;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
@@ -34,6 +33,9 @@ import javax.swing.Timer;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -49,7 +51,7 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class DataSetModel implements RecDefModel, PluginBinding {
+public class DataSetModel implements RecDefModel {
     private DataSet dataSet;
     private DataSetState currentState = ABSENT;
     private MappingModel mappingModel;
@@ -124,8 +126,14 @@ public class DataSetModel implements RecDefModel, PluginBinding {
     }
 
     @Override
-    public Object getFunctionBinding(String functionName) throws MetadataException {
-        return null; // todo: generally, how to fix?
+    public MediaIndex readMediaIndex() {
+        File mediaIndexFile = dataSet.getMediaIndexFile();
+        try {
+            return mediaIndexFile.exists() ? MediaIndex.read(new FileInputStream(mediaIndexFile)) : MediaIndex.create();
+        }
+        catch (FileNotFoundException e) {
+            return MediaIndex.create();
+        }
     }
 
     public void setDataSet(final DataSet dataSet, String prefix) throws StorageException {

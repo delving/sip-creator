@@ -49,6 +49,7 @@ import static eu.delving.XStreamFactory.getStreamFor;
 
 @XStreamAlias("rec-mapping")
 public class RecMapping {
+    public static final String MEDIA_INDEX = "_mediaIndex_";
 
     @XStreamAsAttribute
     String prefix;
@@ -232,6 +233,7 @@ public class RecMapping {
     public static RecMapping read(Reader reader, RecDefModel recDefModel) throws MetadataException {
         RecMapping recMapping = (RecMapping) getStreamFor(RecMapping.class).fromXML(reader);
         recMapping.recDefTree = recDefModel.createRecDefTree(recMapping.getSchemaVersion());
+        recMapping.recDefTree.bind(MEDIA_INDEX, recDefModel.readMediaIndex());
         recMapping.resolve();
         return recMapping;
     }
@@ -239,6 +241,7 @@ public class RecMapping {
     public static RecMapping upgrade(RecMapping previousVersion, String version, RecDefModel recDefModel) throws MetadataException {
         SchemaVersion schemaVersion = new SchemaVersion(previousVersion.getPrefix(), version);
         RecDefTree recDefTree = recDefModel.createRecDefTree(schemaVersion);
+        recDefTree.bind(MEDIA_INDEX, recDefModel.readMediaIndex());
         RecMapping recMapping = new RecMapping(recDefTree);
         // todo: copy stuff carefully
         return recMapping;

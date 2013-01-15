@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package eu.delving.plugin;
+package eu.delving.metadata;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -41,32 +41,32 @@ import java.util.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-@XStreamAlias("media-files")
-public class MediaFiles {
+@XStreamAlias("media-index")
+public class MediaIndex {
 
     public static final String IGNORE_CHARACTERS = "/:;\\";
 
-    public static void write(MediaFiles mediaFiles, File indexFile) throws IOException {
-        mediaFiles.resolve();
+    public static void write(MediaIndex mediaIndex, File indexFile) throws IOException {
+        mediaIndex.resolve();
         XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(MediaFiles.class);
+        stream.processAnnotations(MediaIndex.class);
         FileOutputStream out = new FileOutputStream(indexFile);
-        stream.toXML(mediaFiles, out);
+        stream.toXML(mediaIndex, out);
         out.close();
     }
 
-    public static MediaFiles read(InputStream inputStream) {
+    public static MediaIndex read(InputStream inputStream) {
         XStream stream = new XStream(new PureJavaReflectionProvider());
-        stream.processAnnotations(MediaFiles.class);
-        MediaFiles mediaFiles = (MediaFiles) stream.fromXML(inputStream);
-        mediaFiles.resolve();
-        return mediaFiles;
+        stream.processAnnotations(MediaIndex.class);
+        MediaIndex mediaIndex = (MediaIndex) stream.fromXML(inputStream);
+        mediaIndex.resolve();
+        return mediaIndex;
     }
 
-    public static MediaFiles create() {
-        MediaFiles mediaFiles = new MediaFiles();
-        mediaFiles.resolve();
-        return mediaFiles;
+    public static MediaIndex create() {
+        MediaIndex mediaIndex = new MediaIndex();
+        mediaIndex.resolve();
+        return mediaIndex;
     }
 
     @XStreamAsAttribute

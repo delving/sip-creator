@@ -23,6 +23,8 @@ package eu.delving.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static eu.delving.metadata.RecDef.REQUIRED_FIELDS;
 
@@ -48,6 +50,7 @@ public class RecDefTree implements RecDefNodeListener {
     private RecDef recDef;
     private RecDefNode root;
     private RecDefNodeListener listener;
+    private Map<String, Object> bindings = new TreeMap<String, Object>();
 
     public static RecDefTree create(RecDef recDef) {
         RecDefTree tree = new RecDefTree(recDef);
@@ -62,6 +65,14 @@ public class RecDefTree implements RecDefNodeListener {
 
     public void setListener(RecDefNodeListener listener) {
         this.listener = listener;
+    }
+
+    public void bind(String key, Object value) {
+        bindings.put(key, value);
+    }
+
+    public Map<String, Object> getBindings() {
+        return bindings;
     }
 
     public RecDef getRecDef() {

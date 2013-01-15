@@ -17,16 +17,15 @@ public class MappingEngineFactory {
             ClassLoader classLoader,
             Map<String, String> namespaces
     ) throws FileNotFoundException, MetadataException {
-        return new MappingEngineImpl(classLoader, namespaces, null, null, null);
+        return new MappingEngineImpl(classLoader, namespaces, null, null);
     }
 
     public static MappingEngine newInstance(
             ClassLoader classLoader,
             Map<String, String> namespaces,
             RecDefModel recDefModel,
-            PluginBinding pluginBinding,
             String mapping
     ) throws FileNotFoundException, MetadataException {
-        return new MappingEngineImpl(classLoader, namespaces, recDefModel, pluginBinding, mapping);
+        return new MappingEngineImpl(classLoader, namespaces, recDefModel, mapping);
     }
 }

@@ -23,7 +23,6 @@ package eu.delving.metadata;
 
 import eu.delving.MappingEngine;
 import eu.delving.MappingResult;
-import eu.delving.PluginBinding;
 import eu.delving.groovy.*;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -45,12 +44,12 @@ public class MappingEngineImpl implements MappingEngine {
     private MetadataRecordFactory metadataRecordFactory;
     private MappingRunner mappingRunner;
 
-    public MappingEngineImpl(ClassLoader classLoader, Map<String, String> namespaces, RecDefModel recDefModel, PluginBinding pluginBinding, String mapping) throws FileNotFoundException, MetadataException {
+    public MappingEngineImpl(ClassLoader classLoader, Map<String, String> namespaces, RecDefModel recDefModel, String mapping) throws FileNotFoundException, MetadataException {
         metadataRecordFactory = new MetadataRecordFactory(namespaces);
         if (mapping != null) {
             RecMapping recMapping = RecMapping.read(new StringReader(mapping), recDefModel);
             GroovyCodeResource groovyCodeResource = new GroovyCodeResource(classLoader);
-            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, pluginBinding, null, false);
+            mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
         }
     }
 

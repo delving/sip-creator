@@ -43,15 +43,6 @@
                 </string>
             </groovy-code>
         </mapping-function>
-        <!--todo: nomally this function would be found in the record definition-->
-        <mapping-function name="matchMediaFile">
-            <sample-input>
-                <string>..\..\..\Images PH\04512-01.tif</string>
-            </sample-input>
-            <groovy-code>
-                <string>_matchMediaFile_.match(it.text())</string>
-            </groovy-code>
-        </mapping-function>
     </functions>
     <node-mappings>
     <node-mapping inputPath="/facts/dataProvider" outputPath="/aff:record/aff:admin/aff:displayDataProvider"/>

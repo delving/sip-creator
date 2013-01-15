@@ -21,7 +21,7 @@
 
 package eu.delving.test;
 
-import eu.delving.plugin.MediaFiles;
+import eu.delving.metadata.MediaIndex;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -35,16 +35,16 @@ import static junit.framework.Assert.assertEquals;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class TestMediaFiles {
+public class TestMediaIndex {
 
     @Test
     public void read() throws IOException {
-        URL resource = MediaFiles.class.getResource("/aff/media-files.xml");
-        MediaFiles mediaFiles = MediaFiles.read(resource.openStream());
+        URL resource = MediaIndex.class.getResource("/aff/media-index.xml");
+        MediaIndex mediaIndex = MediaIndex.read(resource.openStream());
 //        mediaFiles.printMatchTree();
-        String fileName = mediaFiles.match("D:\\whatever\\we\\encounter\\16513-01.tif");
+        String fileName = mediaIndex.match("D:\\whatever\\we\\encounter\\16513-01.tif");
         assertEquals("mismatch", "3FDD9FF7D732B16C9F2DE2DBB19D5975.tif", fileName);
-        fileName = mediaFiles.match("16513-01");
+        fileName = mediaIndex.match("16513-01");
         assertEquals("mismatch", "3FDD9FF7D732B16C9F2DE2DBB19D5975.tif", fileName);
     }
 }

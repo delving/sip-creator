@@ -25,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.XStreamFactory;
 import eu.delving.metadata.Hasher;
-import eu.delving.plugin.MediaFiles;
+import eu.delving.metadata.MediaIndex;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
@@ -469,9 +469,9 @@ public class CultureHubClient {
         public void run() {
             try {
                 FileInputStream inputStream = new FileInputStream(new File(dataSet.getMediaDirectory(), Storage.MEDIA_INDEX));
-                MediaFiles mediaFiles = MediaFiles.read(inputStream);
+                MediaIndex mediaIndex = MediaIndex.read(inputStream);
                 inputStream.close();
-                HttpPost listRequest = createSubmitRequest(dataSet, mediaFiles);
+                HttpPost listRequest = createSubmitRequest(dataSet, mediaIndex);
                 HttpResponse listResponse = httpClient.execute(listRequest);
                 HttpEntity listEntity = listResponse.getEntity();
                 if (listEntity != null) {
@@ -481,7 +481,7 @@ public class CultureHubClient {
                             String listString = EntityUtils.toString(listEntity);
                             Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
                             List<File> uploadFiles = new ArrayList<File>();
-                            for (MediaFiles.MediaFile file : mediaFiles.mediaFiles) {
+                            for (MediaIndex.MediaFile file : mediaIndex.mediaFiles) {
                                 if (!requestedFiles.contains(file.name)) continue;
                                 uploadFiles.add(new File(dataSet.getMediaDirectory(), file.name));
                             }
@@ -671,13 +671,13 @@ public class CultureHubClient {
         return post;
     }
 
-    private HttpPost createSubmitRequest(DataSet dataSet, MediaFiles mediaFiles) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
+    private HttpPost createSubmitRequest(DataSet dataSet, MediaIndex mediaIndex) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
         HttpPost post = createPost(String.format(
                 "submit/%s/%s",
                 dataSet.getOrganization(), dataSet.getSpec()
         ));
         List<String> names = new ArrayList<String>();
-        for (MediaFiles.MediaFile file : mediaFiles.mediaFiles) names.add(file.name);
+        for (MediaIndex.MediaFile file : mediaIndex.mediaFiles) names.add(file.name);
         post.setEntity(createListEntityStrings(names));
         post.setHeader("Accept", "text/plain");
         return post;

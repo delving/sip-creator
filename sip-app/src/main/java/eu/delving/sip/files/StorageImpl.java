@@ -415,8 +415,9 @@ public class StorageImpl implements Storage {
             else {
                 try {
                     for (SchemaVersion schemaVersion : getSchemaVersions()) {
-                        if (prefix.equals(schemaVersion.getPrefix()))
+                        if (prefix.equals(schemaVersion.getPrefix())) {
                             return RecMapping.create(recDefModel.createRecDefTree(schemaVersion));
+                        }
                     }
                     throw new StorageException("Unable to find version for " + prefix);
                 }

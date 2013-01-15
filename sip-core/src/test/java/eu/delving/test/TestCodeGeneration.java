@@ -115,7 +115,7 @@ public class TestCodeGeneration {
         oneTwoTarget.addNodeMapping(mapping("/input/leadup/record/fromTwo"));
 
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
-        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null, null, true);
+        MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null, true);
         printWithLineNumbers(mappingRunner.getCode());
         Node node = mappingRunner.runMapping(createInputRecord());
 
@@ -236,6 +236,11 @@ public class TestCodeGeneration {
                 catch (Exception e) {
                     throw new RuntimeException("Unable to load recdef", e);
                 }
+            }
+
+            @Override
+            public MediaIndex readMediaIndex() throws MetadataException {
+                return new MediaIndex();
             }
         };
     }
