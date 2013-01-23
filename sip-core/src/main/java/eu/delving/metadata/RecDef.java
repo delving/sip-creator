@@ -153,7 +153,9 @@ public class RecDef {
 
     public Map<String, Namespace> getNamespaceMap() {
         Map<String, Namespace> namespaces = new HashMap<String, Namespace>();
-        if (this.namespaces != null) for (Namespace namespace : this.namespaces) namespaces.put(namespace.prefix, namespace);
+        if (this.namespaces != null) {
+            for (Namespace namespace : this.namespaces) namespaces.put(namespace.prefix, namespace);
+        }
         namespaces.put(XML_NAMESPACE.prefix, XML_NAMESPACE);
         namespaces.put(XSI_NAMESPACE.prefix, XSI_NAMESPACE);
         return namespaces;
@@ -162,7 +164,7 @@ public class RecDef {
     public Attr attr(Tag tag, String where) {
         for (Attr attr : attrs) {
             attr.tag = attr.tag.defaultPrefix(prefix);
-            if (attr.tag.equals(tag)) return attr;
+            if (attr.tag.equals(tag)) return attr.copy();
         }
         throw new RuntimeException(String.format("No attr [%s] at %s", tag, where));
     }
@@ -341,7 +343,7 @@ public class RecDef {
     }
 
     @XStreamAlias("attr")
-    public static class Attr {
+    public static class Attr implements Cloneable {
 
         @XStreamAsAttribute
         @XStreamConverter(Tag.AttributeConverter.class)
@@ -363,10 +365,19 @@ public class RecDef {
         public String getFieldType() {
             return fieldType != null ? fieldType : DEFAULT_FIELD_TYPE;
         }
+
+        public Attr copy() {
+            try {
+                return (Attr)this.clone();
+            }
+            catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @XStreamAlias("attr-group")
-    public static class AttrGroup {
+    public static class AttrGroup implements Cloneable {
         @XStreamAsAttribute
         public String name;
 
@@ -380,6 +391,18 @@ public class RecDef {
             for (String tagString : tags) {
                 Tag tag = Tag.attribute(tagString).defaultPrefix(recDef.prefix);
                 attrs.add(recDef.attr(tag, "attr-group " + name));
+            }
+        }
+
+        public AttrGroup deepCopy() {
+            try {
+                AttrGroup clone = (AttrGroup) this.clone();
+                clone.attrs = new ArrayList<Attr>();
+                for (Attr attr : attrs) clone.attrs.add(attr.copy());
+                return clone;
+            }
+            catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -478,7 +501,7 @@ public class RecDef {
             }
             if (attrGroups != null) {
                 for (String name : attrGroups.split(DELIM)) {
-                    attrList.addAll(recDef.attrGroup(name, path.toString()).attrs);
+                    attrList.addAll(recDef.attrGroup(name, path.toString()).deepCopy().attrs);
                 }
                 attrGroups = null;
             }
@@ -512,7 +535,7 @@ public class RecDef {
             try {
                 Elem clone = (Elem) this.clone();
                 clone.attrList = new ArrayList<Attr>();
-                clone.attrList.addAll(attrList);
+                for (Attr attr : attrList) clone.attrList.add(attr.copy());
                 clone.elemList = new ArrayList<Elem>();
                 for (Elem elem : elemList) clone.elemList.add(elem.deepCopy());
                 return clone;
