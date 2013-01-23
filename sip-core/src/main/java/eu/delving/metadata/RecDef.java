@@ -175,7 +175,11 @@ public class RecDef {
     }
 
     public Elem elem(Tag tag) {
-        for (Elem elem : elems) if (elem.tag.equals(tag)) return elem.copy();
+        for (Elem elem : elems) {
+            if (elem.tag.equals(tag)) {
+                return elem.deepCopy();
+            }
+        }
         throw new RuntimeException(String.format("No elem [%s]", tag));
     }
 
@@ -217,13 +221,17 @@ public class RecDef {
 
     Attr findAttr(Path path) {
         Attr found = root.findAttr(path, 0);
-        if (found == null) throw new RuntimeException("No attribute found for path " + path);
+        if (found == null) {
+            throw new RuntimeException("No attribute found for path " + path);
+        }
         return found;
     }
 
     Elem findElem(Path path) {
         Elem found = root.findElem(path, 0);
-        if (found == null) throw new RuntimeException("No element found for path " + path);
+        if (found == null) {
+            throw new RuntimeException("No element found for path " + path);
+        }
         return found;
     }
 
@@ -414,7 +422,7 @@ public class RecDef {
         public Operator operator;
 
         @XStreamImplicit
-        public List<Elem> elemList = new ArrayList<Elem>();
+        public List<Elem> subelements = new ArrayList<Elem>();
 
         @XStreamAlias("node-mapping")
         public NodeMapping nodeMapping;
@@ -427,6 +435,9 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
+
+        @XStreamOmitField
+        public List<Elem> elemList = new ArrayList<Elem>();
 
         @Override
         public String toString() {
@@ -472,13 +483,12 @@ public class RecDef {
                 attrGroups = null;
             }
             if (elems != null) {
-                List<Elem> elemRefs = new ArrayList<Elem>();
                 for (String localName : elems.split(DELIM)) {
-                    elemRefs.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
+                    elemList.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
                 }
-                elemList.addAll(0, elemRefs);
                 elems = null;
             }
+            elemList.addAll(subelements);
             for (Elem elem : elemList) elem.resolve(path, recDef);
         }
 
@@ -498,11 +508,13 @@ public class RecDef {
             return null;
         }
 
-        public Elem copy() {
+        public Elem deepCopy() {
             try {
                 Elem clone = (Elem) this.clone();
                 clone.attrList = new ArrayList<Attr>();
+                clone.attrList.addAll(attrList);
                 clone.elemList = new ArrayList<Elem>();
+                for (Elem elem : elemList) clone.elemList.add(elem.deepCopy());
                 return clone;
             }
             catch (CloneNotSupportedException e) {
