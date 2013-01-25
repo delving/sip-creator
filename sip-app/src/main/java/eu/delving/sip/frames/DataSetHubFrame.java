@@ -538,7 +538,17 @@ public class DataSetHubFrame extends FrameBase {
                 case 3:
                     return toString(row.getSchemaVersions());
                 case 4:
-                    return entry == null ? "" : String.format("   %11d   ", entry.recordCount);
+                    int recordCount = 0;
+                    if (entry != null) {
+                        recordCount = entry.recordCount;
+                    }
+                    else {
+                        String recordCountString = row.dataSet.getHints().get("recordCount");
+                        if (recordCountString != null) {
+                            recordCount = Integer.parseInt(recordCountString);
+                        }
+                    }
+                    return String.format("   %11d   ", recordCount);
                 case 5:
                     return entry == null || entry.lockedBy == null ? "" : entry.lockedBy;
             }
@@ -586,8 +596,13 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         public String getDataSetName() {
-            if (dataSet == null) return "";
-            String name = dataSet.getDataSetFacts().get("name");
+            String name;
+            if (dataSet != null) {
+                name = dataSet.getDataSetFacts().get("name");
+            }
+            else {
+                name = dataSetEntry.name;
+            }
             if (name == null) name = "";
             return name;
         }
