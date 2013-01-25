@@ -538,7 +538,17 @@ public class DataSetHubFrame extends FrameBase {
                 case 3:
                     return toString(row.getSchemaVersions());
                 case 4:
-                    return entry == null ? "" : String.format("   %11d   ", entry.recordCount);
+                    int recordCount = 0;
+                    if (entry != null) {
+                        recordCount = entry.recordCount;
+                    }
+                    else {
+                        String recordCountString = row.dataSet.getHints().get("recordCount");
+                        if (recordCountString != null) {
+                            recordCount = Integer.parseInt(recordCountString);
+                        }
+                    }
+                    return String.format("   %11d   ", recordCount);
                 case 5:
                     return entry == null || entry.lockedBy == null ? "" : entry.lockedBy;
             }
@@ -586,14 +596,31 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         public String getDataSetName() {
-            if (dataSet == null) return "";
-            String name = dataSet.getDataSetFacts().get("name");
+            String name;
+            if (dataSet != null) {
+                name = dataSet.getDataSetFacts().get("name");
+            }
+            else {
+                name = dataSetEntry.name;
+            }
             if (name == null) name = "";
             return name;
         }
 
         public List<SchemaVersion> getSchemaVersions() {
-            return dataSet != null ? dataSet.getSchemaVersions() : null;
+            if (dataSet != null) {
+                return dataSet.getSchemaVersions();
+            }
+            else if (dataSetEntry.schemaVersions != null && dataSetEntry.schemaVersions != null) {
+                List<SchemaVersion> list = new ArrayList<SchemaVersion>();
+                for (CultureHubClient.SchemaVersionTag schemaVersionTag : dataSetEntry.schemaVersions) {
+                    list.add(new SchemaVersion(schemaVersionTag.prefix, schemaVersionTag.version));
+                }
+                return list;
+            }
+            else {
+                return null;
+            }
         }
 
         public State getState() {

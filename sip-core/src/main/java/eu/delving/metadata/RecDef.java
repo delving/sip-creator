@@ -153,7 +153,9 @@ public class RecDef {
 
     public Map<String, Namespace> getNamespaceMap() {
         Map<String, Namespace> namespaces = new HashMap<String, Namespace>();
-        if (this.namespaces != null) for (Namespace namespace : this.namespaces) namespaces.put(namespace.prefix, namespace);
+        if (this.namespaces != null) {
+            for (Namespace namespace : this.namespaces) namespaces.put(namespace.prefix, namespace);
+        }
         namespaces.put(XML_NAMESPACE.prefix, XML_NAMESPACE);
         namespaces.put(XSI_NAMESPACE.prefix, XSI_NAMESPACE);
         return namespaces;
@@ -162,7 +164,7 @@ public class RecDef {
     public Attr attr(Tag tag, String where) {
         for (Attr attr : attrs) {
             attr.tag = attr.tag.defaultPrefix(prefix);
-            if (attr.tag.equals(tag)) return attr;
+            if (attr.tag.equals(tag)) return attr.copy();
         }
         throw new RuntimeException(String.format("No attr [%s] at %s", tag, where));
     }
@@ -175,7 +177,11 @@ public class RecDef {
     }
 
     public Elem elem(Tag tag) {
-        for (Elem elem : elems) if (elem.tag.equals(tag)) return elem.copy();
+        for (Elem elem : elems) {
+            if (elem.tag.equals(tag)) {
+                return elem.deepCopy();
+            }
+        }
         throw new RuntimeException(String.format("No elem [%s]", tag));
     }
 
@@ -217,13 +223,17 @@ public class RecDef {
 
     Attr findAttr(Path path) {
         Attr found = root.findAttr(path, 0);
-        if (found == null) throw new RuntimeException("No attribute found for path " + path);
+        if (found == null) {
+            throw new RuntimeException("No attribute found for path " + path);
+        }
         return found;
     }
 
     Elem findElem(Path path) {
         Elem found = root.findElem(path, 0);
-        if (found == null) throw new RuntimeException("No element found for path " + path);
+        if (found == null) {
+            throw new RuntimeException("No element found for path " + path);
+        }
         return found;
     }
 
@@ -333,7 +343,7 @@ public class RecDef {
     }
 
     @XStreamAlias("attr")
-    public static class Attr {
+    public static class Attr implements Cloneable {
 
         @XStreamAsAttribute
         @XStreamConverter(Tag.AttributeConverter.class)
@@ -355,10 +365,19 @@ public class RecDef {
         public String getFieldType() {
             return fieldType != null ? fieldType : DEFAULT_FIELD_TYPE;
         }
+
+        public Attr copy() {
+            try {
+                return (Attr)this.clone();
+            }
+            catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @XStreamAlias("attr-group")
-    public static class AttrGroup {
+    public static class AttrGroup implements Cloneable {
         @XStreamAsAttribute
         public String name;
 
@@ -372,6 +391,18 @@ public class RecDef {
             for (String tagString : tags) {
                 Tag tag = Tag.attribute(tagString).defaultPrefix(recDef.prefix);
                 attrs.add(recDef.attr(tag, "attr-group " + name));
+            }
+        }
+
+        public AttrGroup deepCopy() {
+            try {
+                AttrGroup clone = (AttrGroup) this.clone();
+                clone.attrs = new ArrayList<Attr>();
+                for (Attr attr : attrs) clone.attrs.add(attr.copy());
+                return clone;
+            }
+            catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -414,7 +445,7 @@ public class RecDef {
         public Operator operator;
 
         @XStreamImplicit
-        public List<Elem> elemList = new ArrayList<Elem>();
+        public List<Elem> subelements = new ArrayList<Elem>();
 
         @XStreamAlias("node-mapping")
         public NodeMapping nodeMapping;
@@ -427,6 +458,9 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Attr> attrList = new ArrayList<Attr>();
+
+        @XStreamOmitField
+        public List<Elem> elemList = new ArrayList<Elem>();
 
         @Override
         public String toString() {
@@ -467,18 +501,17 @@ public class RecDef {
             }
             if (attrGroups != null) {
                 for (String name : attrGroups.split(DELIM)) {
-                    attrList.addAll(recDef.attrGroup(name, path.toString()).attrs);
+                    attrList.addAll(recDef.attrGroup(name, path.toString()).deepCopy().attrs);
                 }
                 attrGroups = null;
             }
             if (elems != null) {
-                List<Elem> elemRefs = new ArrayList<Elem>();
                 for (String localName : elems.split(DELIM)) {
-                    elemRefs.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
+                    elemList.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
                 }
-                elemList.addAll(0, elemRefs);
                 elems = null;
             }
+            elemList.addAll(subelements);
             for (Elem elem : elemList) elem.resolve(path, recDef);
         }
 
@@ -498,11 +531,13 @@ public class RecDef {
             return null;
         }
 
-        public Elem copy() {
+        public Elem deepCopy() {
             try {
                 Elem clone = (Elem) this.clone();
                 clone.attrList = new ArrayList<Attr>();
+                for (Attr attr : attrList) clone.attrList.add(attr.copy());
                 clone.elemList = new ArrayList<Elem>();
+                for (Elem elem : elemList) clone.elemList.add(elem.deepCopy());
                 return clone;
             }
             catch (CloneNotSupportedException e) {

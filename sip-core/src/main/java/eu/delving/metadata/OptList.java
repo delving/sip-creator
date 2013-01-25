@@ -67,20 +67,22 @@ public class OptList {
     public void resolve(RecDef recDef) {
         for (Opt opt : opts) opt.parent = this;
         if (path == null) throw new RuntimeException("No path for OptList: " + opts);
-        if (path.peek().isAttribute()) {
-            throw new RuntimeException("An option list may not be connected to an attribute: " + path);
-        }
         path = path.withDefaultPrefix(recDef.prefix);
         key = resolveTag(path, key, recDef);
         value = resolveTag(path, value, recDef);
         schema = resolveTag(path, schema, recDef);
         schemaUri = resolveTag(path, schemaUri, recDef);
-        RecDef.Elem elem = recDef.findElem(path);
-        elem.optList = this;
-        if (dictionary != null) {
-            Map<String, Opt> lookup = new TreeMap<String, Opt>();
-            for (Opt opt : opts) lookup.put(opt.value, opt);
-            recDef.optLookup.put(dictionary, lookup);
+        if (path.peek().isAttribute()) {
+            throw new RuntimeException("An option list may not be connected to an attribute: " + path);
+        }
+        else {
+            RecDef.Elem elem = recDef.findElem(path);
+            elem.optList = this;
+            if (dictionary != null) {
+                Map<String, Opt> lookup = new TreeMap<String, Opt>();
+                for (Opt opt : opts) lookup.put(opt.value, opt);
+                recDef.optLookup.put(dictionary, lookup);
+            }
         }
     }
 
