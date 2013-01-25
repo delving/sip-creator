@@ -739,7 +739,7 @@ public class CultureHubClient {
     @XStreamAlias("data-set-list")
     public static class DataSetList {
         @XStreamImplicit
-        List<DataSetEntry> list;
+        public List<DataSetEntry> list;
 
         public String toString() {
             StringBuilder out = new StringBuilder("data-set-list");
@@ -767,6 +767,7 @@ public class CultureHubClient {
         public int recordCount;
         public LockedBy lockedBy;
         public CreatedBy createdBy;
+        public List<SchemaVersionTag> schemaVersions;
 
         public String getDirectoryName() {
             return String.format("%s_%s", spec, orgId);
@@ -829,5 +830,11 @@ public class CultureHubClient {
         public String getEmail() {
             return email;
         }
+    }
+
+    @XStreamAlias("schemaVersion")
+    public static class SchemaVersionTag {
+        public String prefix;
+        public String version;
     }
 }

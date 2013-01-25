@@ -593,7 +593,19 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         public List<SchemaVersion> getSchemaVersions() {
-            return dataSet != null ? dataSet.getSchemaVersions() : null;
+            if (dataSet != null) {
+                return dataSet.getSchemaVersions();
+            }
+            else if (dataSetEntry.schemaVersions != null && dataSetEntry.schemaVersions != null) {
+                List<SchemaVersion> list = new ArrayList<SchemaVersion>();
+                for (CultureHubClient.SchemaVersionTag schemaVersionTag : dataSetEntry.schemaVersions) {
+                    list.add(new SchemaVersion(schemaVersionTag.prefix, schemaVersionTag.version));
+                }
+                return list;
+            }
+            else {
+                return null;
+            }
         }
 
         public State getState() {
