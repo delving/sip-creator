@@ -65,7 +65,13 @@
     <node-mapping inputPath="/input/Materiale/Tekst" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/E57.Material]/aff:displayConcept"/>
     <node-mapping inputPath="/input/Teknikk/Tekst" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/P32F_used_general_technique]/aff:displayConcept"/>
     <node-mapping inputPath="/input/Hendelse" outputPath="/aff:record/aff:events/aff:event"/>
-    <node-mapping inputPath="/input/Hendelse/Type" outputPath="/aff:record/aff:events/aff:event/@aff:type"/>
+    <node-mapping inputPath="/input/Hendelse/Type" outputPath="/aff:record/aff:events/aff:event/@aff:key">
+        <groovy-code>
+            <string>_Hendelse.Type * { _Type -&gt;</string>
+            <string>&quot;${_Type}&quot;</string>
+            <string>}</string>
+        </groovy-code>
+    </node-mapping>
     <node-mapping inputPath="/input/Hendelse/Datering/Fradato" outputPath="/aff:record/aff:events/aff:event/aff:date/aff:earliestDate"/>
     <node-mapping inputPath="/input/Hendelse/Datering/Tildato" outputPath="/aff:record/aff:events/aff:event/aff:date/aff:latestDate"/>
     <node-mapping inputPath="/input/Hendelse/Datering/Fradato" outputPath="/aff:record/aff:events/aff:event/aff:displayDate">

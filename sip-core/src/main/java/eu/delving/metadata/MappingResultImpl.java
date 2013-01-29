@@ -216,9 +216,8 @@ public class MappingResultImpl implements MappingResult {
                         // todo: we have the recDefNode!
 //                        0/event/PRODUCTION
 //                        1/event/PRODUCTION/date/earliestDate/1978
-                        String name = String.format("%s_%s", path.toIndexString(), recDefNode.getFieldType());
                         String value = getTextFromChildren(kid);
-                        put(name, value);
+                        put("facet_category_string", String.format("%s=%s", path.toIndexString(), value));
                         handleMarkedField(recDefNode, value);
                     }
                     else {
