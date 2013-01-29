@@ -172,6 +172,7 @@ public class TestMappingEngine {
                 System.out.println("    "+value);
             }
         }
+        System.out.println(result.toXml());
         Assert.assertFalse(allFields.isEmpty());
     }
 

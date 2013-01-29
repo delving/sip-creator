@@ -76,7 +76,11 @@
     <node-mapping inputPath="/input/Hendelse/Beskrivelse" outputPath="/aff:record/aff:events/aff:event/aff:displayDescription" operator="COMMA_DELIM"/>
     <node-mapping inputPath="/input/Hendelse/Person" outputPath="/aff:record/aff:events/aff:event/aff:eventActor"/>
     <node-mapping inputPath="/input/Hendelse/Person/Rolle/Beskrivelse" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:displayRoleInEvent"/>
-    <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/Navn" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:displayActor"/>
+    <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/Navn" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:displayActor">
+        <groovy-code>
+            <string>&quot;${_Navn}&lt;![CDATA[&lt;and something extra&gt;]]&gt;&quot;</string>
+        </groovy-code>
+    </node-mapping>
     <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/Nasjonalitet" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:displayNationality"/>
     <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/FoedtAar" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:relatedEvent[crm_e67]/aff:displayDate"/>
     <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/DoedAar" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:relatedEvent[crm_e69]/aff:displayDate"/>
