@@ -278,6 +278,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public RecDefNode getNode(Path soughtPath) {
+        // todo: should be comparing tags
         if (getPath().equals(soughtPath)) return this;
         for (RecDefNode sub : children) {
             RecDefNode found = sub.getNode(soughtPath);

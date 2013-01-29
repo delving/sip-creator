@@ -1,4 +1,4 @@
-<rec-mapping prefix="aff">
+<rec-mapping prefix="aff" schemaVersion="0.1.0" locked="false">
   <facts>
     <entry>
       <string>spec</string>
@@ -9,7 +9,15 @@
       <string>Princessehof</string>
     </entry>
     <entry>
+      <string>schemaVersions</string>
+      <string>aff_0.1.0</string>
+    </entry>
+    <entry>
       <string>name</string>
+      <string>Princessehof</string>
+    </entry>
+    <entry>
+      <string>owner</string>
       <string>Princessehof</string>
     </entry>
     <entry>
@@ -33,111 +41,53 @@
       <string>netherlands</string>
     </entry>
   </facts>
-  <functions>
-    <mapping-function name="cleanUri">
-      <sample-input>
-        <string>abc-12 [01]</string>
-      </sample-input>
-      <groovy-code>
-        <string>it.replaceAll(&quot; &quot;, &quot;_&quot;).replaceAll(&quot;-&quot;, &quot;_&quot;).replaceAll(&quot;\\[&quot;, &quot;%5B&quot;).replaceAll(&quot;]&quot;, &quot;%5D&quot;)</string>
-      </groovy-code>
-    </mapping-function>
-  </functions>
+  <functions/>
+  <dyn-opts/>
   <node-mappings>
     <node-mapping inputPath="/facts/dataProvider" outputPath="/aff:record/aff:admin/aff:displayDataProvider"/>
     <node-mapping inputPath="/facts/country" outputPath="/aff:record/aff:admin/aff:displayDataProviderCountry"/>
     <node-mapping inputPath="/facts/provider" outputPath="/aff:record/aff:admin/aff:displayProvider"/>
-    <node-mapping inputPath="/facts/language" outputPath="/aff:record/aff:admin/aff:defaultLang"/>
-    <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:uri"/>
-    <node-mapping inputPath="/input/catty" outputPath="/aff:record/aff:thing/aff:category">
-        <!--todo: here we need a dictionary-->
-        <dictionary>
-            <entry>
-                <string>Whatever</string>
-                <string>Thing</string>
-            </entry>
-        </dictionary>
-    </node-mapping>
-    <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:thing/aff:displayIdentification"/>
-    <node-mapping inputPath="/input/title" outputPath="/aff:record/aff:thing/aff:displayTitle"/>
-    <node-mapping inputPath="/input/description" outputPath="/aff:record/aff:thing/aff:displayDescription" operator="COMMA_DELIM"/>
-    <node-mapping inputPath="/input/inscription.content" outputPath="/aff:record/aff:thing/aff:displayInscription" operator="COMMA_DELIM"/>
-    <node-mapping inputPath="/input/dimension.type" outputPath="/aff:record/aff:thing/aff:dimensions/aff:displayDimension">
+    <node-mapping inputPath="/input/Museumsnummer" outputPath="/aff:record/aff:thing/aff:uri"/>
+    <node-mapping inputPath="/input/ObjektType" outputPath="/aff:record/aff:thing/aff:category"/>
+    <node-mapping inputPath="/input/Museumsnummer" outputPath="/aff:record/aff:thing/aff:displayIdentification"/>
+    <node-mapping inputPath="/input/Tittel/Tekst" outputPath="/aff:record/aff:thing/aff:displayTitle" operator="FIRST"/>
+    <node-mapping inputPath="/input/Beskrivelse" outputPath="/aff:record/aff:thing/aff:displayDescription"/>
+    <node-mapping inputPath="/input/Innskrift/Tekst" outputPath="/aff:record/aff:thing/aff:displayInscription">
       <siblings>
-        <path>/input/dimension.unit</path>
-        <path>/input/dimension.value</path>
+        <path>/input/Innskrift/Type</path>
       </siblings>
     </node-mapping>
-    <node-mapping inputPath="/input/production.date.end" outputPath="/aff:record/aff:thing/aff:years/aff:year"/>
-    <node-mapping inputPath="/input/production.date.start" outputPath="/aff:record/aff:thing/aff:years/aff:year"/>
-    <node-mapping inputPath="/facts/rights" outputPath="/aff:record/aff:thing/aff:displayRights">
-      <documentation>
-        <string>bla bla</string>
-      </documentation>
-    </node-mapping>
-    <node-mapping inputPath="/input/object_name" outputPath="/aff:record/aff:concepts/aff:concept[http://id.culturecloud.eu/concepts/#objectName]"/>
-    <node-mapping inputPath="/input/object_name" outputPath="/aff:record/aff:concepts/aff:concept[http://id.culturecloud.eu/concepts/#objectName]/aff:displayConcept"/>
-    <node-mapping inputPath="/input/content.subject" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/P129B.is_subject_of]"/>
-    <node-mapping inputPath="/input/content.subject" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/P129B.is_subject_of]/aff:displayConcept"/>
-    <node-mapping inputPath="/input/material" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/E57.Material]"/>
-    <node-mapping inputPath="/input/material" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/E57.Material]/aff:displayConcept"/>
-    <node-mapping inputPath="/input/technique" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/P32F_used_general_technique]"/>
-    <node-mapping inputPath="/input/technique" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/P32F_used_general_technique]/aff:displayConcept"/>
-    <node-mapping inputPath="/input/production.date.start" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:displayDate" operator="COMMA_DELIM"/>
-    <node-mapping inputPath="/input/production.period" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:displayPeriod" operator="COMMA_DELIM"/>
-    <node-mapping inputPath="/input/creator" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventActor">
+    <node-mapping inputPath="/input/Klassifikasjon/Beskrivelse" outputPath="/aff:record/aff:concepts/aff:concept[http://id.culturecloud.eu/concepts/#classification]/aff:displayConcept"/>
+    <node-mapping inputPath="/input/Klassifikasjon/Kode" outputPath="/aff:record/aff:concepts/aff:concept[http://id.culturecloud.eu/concepts/#classification]/aff:displayConcept/@aff:conceptType"/>
+    <node-mapping inputPath="/input/Klassifikasjon/System" outputPath="/aff:record/aff:concepts/aff:concept[http://id.culturecloud.eu/concepts/#classification]/aff:displayConcept/@aff:schema"/>
+    <node-mapping inputPath="/input/AvbildetSted/Sted/Stedsnavn" outputPath="/aff:record/aff:concepts/aff:concept[subjectPlace]/aff:displayConcept"/>
+    <node-mapping inputPath="/input/AvbildetPerson/JuridiskPerson/Navn" outputPath="/aff:record/aff:concepts/aff:concept[subjectActor]/aff:displayConcept"/>
+    <node-mapping inputPath="/input/Materiale/Tekst" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/E57.Material]/aff:displayConcept"/>
+    <node-mapping inputPath="/input/Teknikk/Tekst" outputPath="/aff:record/aff:concepts/aff:concept[http://www.cidoc-crm.org/rdfs/P32F_used_general_technique]/aff:displayConcept"/>
+    <node-mapping inputPath="/input/Hendelse" outputPath="/aff:record/aff:events/aff:event"/>
+    <node-mapping inputPath="/input/Hendelse/Type" outputPath="/aff:record/aff:events/aff:event/@aff:type"/>
+    <node-mapping inputPath="/input/Hendelse/Datering/Fradato" outputPath="/aff:record/aff:events/aff:event/aff:date/aff:earliestDate"/>
+    <node-mapping inputPath="/input/Hendelse/Datering/Tildato" outputPath="/aff:record/aff:events/aff:event/aff:date/aff:latestDate"/>
+    <node-mapping inputPath="/input/Hendelse/Datering/Fradato" outputPath="/aff:record/aff:events/aff:event/aff:displayDate">
       <siblings>
-        <path>/input/creator.date_of_birth</path>
-        <path>/input/creator.date_of_death</path>
-        <path>/input/creator.history</path>
-        <path>/input/creator.role</path>
+        <path>/input/Hendelse/Datering/Tildato</path>
       </siblings>
     </node-mapping>
-    <node-mapping inputPath="/input/creator" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventActor/aff:displayRoleInEvent">
-      <siblings>
-        <path>/input/creator.role</path>
-      </siblings>
+    <node-mapping inputPath="/input/Hendelse/Beskrivelse" outputPath="/aff:record/aff:events/aff:event/aff:displayDescription" operator="COMMA_DELIM"/>
+    <node-mapping inputPath="/input/Hendelse/Person" outputPath="/aff:record/aff:events/aff:event/aff:eventActor"/>
+    <node-mapping inputPath="/input/Hendelse/Person/Rolle/Beskrivelse" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:displayRoleInEvent"/>
+    <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/Navn" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:displayActor"/>
+    <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/Nasjonalitet" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:displayNationality"/>
+    <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/FoedtAar" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:relatedEvent[crm_e67]/aff:displayDate"/>
+    <node-mapping inputPath="/input/Hendelse/Person/JuridiskPerson/DoedAar" outputPath="/aff:record/aff:events/aff:event/aff:eventActor/aff:relatedEvent[crm_e69]/aff:displayDate"/>
+    <node-mapping inputPath="/input/Hendelse/Sted" outputPath="/aff:record/aff:events/aff:event/aff:eventPlace"/>
+    <node-mapping inputPath="/input/Hendelse/Sted/Rolle/Beskrivelse" outputPath="/aff:record/aff:events/aff:event/aff:eventPlace/aff:displayRoleInEvent"/>
+    <node-mapping inputPath="/input/Hendelse/Sted/Sted/Stedsnavn" outputPath="/aff:record/aff:events/aff:event/aff:eventPlace/aff:displayPlace"/>
+    <node-mapping inputPath="/input/Hendelse/Sted/Sted/Land" outputPath="/aff:record/aff:events/aff:event/aff:eventPlace/aff:partOfPlace[http://www.geonames.org/#countryCode]/aff:displayPlace"/>
+    <node-mapping inputPath="/input/@id" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#thumbnail]/aff:resourceUrl">
       <groovy-code>
-        <string>&quot;${_M2[&apos;creatorrole&apos;]}&quot;</string>
+        <string>&quot;http://www.something.no/${_id}&quot;</string>
       </groovy-code>
     </node-mapping>
-    <node-mapping inputPath="/input/creator" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventActor/aff:displayActor">
-      <siblings>
-        <path>/input/creator.role</path>
-      </siblings>
-      <groovy-code>
-        <string>&quot;${_M2[&apos;creator&apos;]}&quot;</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/input/creator.history" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventActor/aff:displayDescription" operator="COMMA_DELIM"/>
-    <node-mapping inputPath="/input/creator" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventActor/aff:relatedEvent[crm_e67]">
-      <siblings>
-        <path>/input/creator.date_of_birth</path>
-      </siblings>
-    </node-mapping>
-    <node-mapping inputPath="/input/creator" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventActor/aff:relatedEvent[crm_e67]/aff:displayDate">
-      <siblings>
-        <path>/input/creator.date_of_birth</path>
-      </siblings>
-    </node-mapping>
-    <node-mapping inputPath="/input/creator" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventActor/aff:relatedEvent[crm_e69]">
-      <siblings>
-        <path>/input/creator.date_of_death</path>
-      </siblings>
-    </node-mapping>
-    <node-mapping inputPath="/input/creator" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventActor/aff:relatedEvent[crm_e69]/aff:displayDate">
-      <siblings>
-        <path>/input/creator.date_of_death</path>
-      </siblings>
-    </node-mapping>
-    <node-mapping inputPath="/input/production.place" outputPath="/aff:record/aff:events/aff:event[crm_e12]/aff:eventPlace/aff:displayPlace" operator="COMMA_DELIM"/>
-    <node-mapping inputPath="/input/acquisition.date" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:displayDate"/>
-    <node-mapping inputPath="/input/acquisition.method" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:displayMethod" operator="COMMA_DELIM"/>
-    <node-mapping inputPath="/input/acquisition.source" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventActor"/>
-    <node-mapping inputPath="/input/acquisition.source" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventActor/aff:displayActor"/>
-    <node-mapping inputPath="/input/acquisition.place" outputPath="/aff:record/aff:events/aff:event[crm_e8]/aff:eventPlace/aff:displayPlace"/>
-    <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#thumbnail]/aff:resourceUrl"/>
-    <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#fullImage]/aff:resourceUrl"/>
-    <node-mapping inputPath="/input/object_number" outputPath="/aff:record/aff:resources/aff:resource[http://id.culturecloud.eu/concepts/#landingPage]/aff:resourceUrl"/>
   </node-mappings>
 </rec-mapping>

@@ -183,7 +183,8 @@ public class MappingResultImpl implements MappingResult {
                 case Node.CDATA_SECTION_NODE:
                     break;
                 case Node.ELEMENT_NODE:
-                    RecDefNode recDefNode = getRecDefNode((Element) kid);
+                    Path path = getPath((Element) kid, false);
+                    RecDefNode recDefNode = recDefTree.getRecDefNode(path);
                     if (recDefNode != null) {
                         String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
                         String value = getTextFromChildren(kid);
@@ -209,9 +210,13 @@ public class MappingResultImpl implements MappingResult {
                 case Node.CDATA_SECTION_NODE:
                     break;
                 case Node.ELEMENT_NODE:
-                    RecDefNode recDefNode = getRecDefNode((Element) kid);
+                    Path path = getPath((Element) kid, true);
+                    RecDefNode recDefNode = recDefTree.getRecDefNode(path);
                     if (recDefNode != null && recDefNode.isLeafElem()) {
-                        String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
+                        // todo: we have the recDefNode!
+//                        0/event/PRODUCTION
+//                        1/event/PRODUCTION/date/earliestDate/1978
+                        String name = String.format("%s_%s", path.toIndexString(), recDefNode.getFieldType());
                         String value = getTextFromChildren(kid);
                         put(name, value);
                         handleMarkedField(recDefNode, value);
@@ -257,19 +262,20 @@ public class MappingResultImpl implements MappingResult {
         list.add(value);
     }
 
-    private RecDefNode getRecDefNode(Element element) {
-        Path path = Path.create().child(recDefTree.getRecDef().root.tag);
+    private Path getPath(Element element, boolean includeAFFKeys) {
         List<Element> elements = new ArrayList<Element>();
         while (element.getParentNode() != null) {
-            elements.add(0, element);
+            elements.add(element);
             element = (Element) element.getParentNode();
         }
+        Path path = Path.create().child(recDefTree.getRecDef().root.tag);
+        Collections.reverse(elements);
         for (Element el : elements) {
-            String key = el.getAttribute("aff:key");
+            String key = includeAFFKeys ? el.getAttribute("aff:key") : null;
             if (el.getLocalName() == null) break;
             path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), key));
         }
-        return recDefTree.getRecDefNode(path);
+        return path;
     }
 
     private String getTextFromChildren(Node parent) {

@@ -246,6 +246,15 @@ public class Tag implements Comparable<Tag>, Serializable {
         }
     }
 
+    public String toIndexString() {
+        if (opt == null) {
+            return localName;
+        }
+        else {
+            return String.format("%s[%s]", localName, opt);
+        }
+    }
+
     public String toString(String defaultPrefix) {
         StringBuilder out = new StringBuilder();
         if (prefix != null && (defaultPrefix == null || !defaultPrefix.equals(prefix))) out.append(prefix).append(':');
