@@ -53,7 +53,6 @@ public interface Work extends Runnable {
         COMPILE_FUNCTION(DATA_SET_PREFIX),
 
         SET_DATASET(DATA_SET_PREFIX),
-        SAVE_HINTS(DATA_SET_PREFIX),
         SAVE_MAPPING(DATA_SET_PREFIX),
         REVERT_MAPPING(DATA_SET_PREFIX),
 
@@ -61,6 +60,7 @@ public interface Work extends Runnable {
         DELETE_SOURCE(DATA_SET),
         CHECK_STATE(DATA_SET),
         SEEK_RESET(DATA_SET),
+        SAVE_HINTS(DATA_SET),
 
         IMPORT_SOURCE(DATA_SET),
         IMPORT_MEDIA(DATA_SET),
