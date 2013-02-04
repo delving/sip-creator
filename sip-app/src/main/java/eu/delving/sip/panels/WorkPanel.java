@@ -73,15 +73,15 @@ public class WorkPanel extends JPanel {
         });
         this.list.setVisibleRowCount(4);
         setBorder(BorderFactory.createTitledBorder("Background Jobs"));
-        this.add(SwingHelper.scrollV(list), BorderLayout.CENTER);
+        this.add(SwingHelper.scrollVH(list), BorderLayout.CENTER);
     }
 
     private String toFullString(WorkModel.JobContext jobContext) {
-        if (jobContext.isEmpty()) return "empty";
+        Work work = jobContext.getWork();
+        if (work == null) return "empty";
         String date = TIMESTAMP_FORMAT.format(jobContext.getStart());
-        String job = jobContext.getJob().toString();
         String dataSetSpec = jobContext.getDataSet();
-        String show = String.format("%s: %s", job, date);
+        String show = String.format("%s: %s", work.getJob(), date);
         if (dataSetSpec != null) {
             String prefix = jobContext.getPrefix();
             if (prefix != null) {
@@ -104,7 +104,8 @@ public class WorkPanel extends JPanel {
             WorkModel.JobContext jobContext = (WorkModel.JobContext) value;
             String show = toFullString(jobContext);
             Component component = super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
-            if (jobContext.getWork() instanceof Work.LongTermWork) {
+            Work work = jobContext.getWork();
+            if (work == null || work instanceof Work.LongTermWork) {
                 component.setBackground(LONG_TERM_JOB_COLOR);
             }
             else {

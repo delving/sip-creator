@@ -91,7 +91,9 @@ public class WorkModel {
         for (JobContext context : jobContexts) {
             String dataSet = context.getDataSet();
             if (dataSet == null) continue;
-            if (!(context.getWork() instanceof Work.LongTermWork)) continue;
+            Work work = context.queue.peek();
+            if (work == null) continue;
+            if (!(work instanceof Work.LongTermWork)) continue;
             if (dataSetSpec.equals(dataSet)) return true;
         }
         return false;
@@ -221,17 +223,17 @@ public class WorkModel {
             launch();
         }
 
-        public Work.Job getJob() {
-            return job();
-        }
-
         public Date getStart() {
             return start;
         }
 
+        public Work getWork() {
+            return queue.peek();
+        }
+
         public boolean isDone() {
             if (executor.isShutdown()) return true;
-            if (isEmpty()) return true;
+            if (queue.isEmpty()) return true;
             if (!future.isDone()) return false;
 //          todo:  future.isCancelled()
             queue.remove();
@@ -241,9 +243,9 @@ public class WorkModel {
         }
 
         public String getDataSet() {
-            final Work work = queue.isEmpty() ? null : queue.peek();
+            final Work work = queue.peek();
             if (work == null) return null;
-            switch (kind()) {
+            switch (work.getJob().getKind()) {
                 case NETWORK_DATA_SET:
                 case DATA_SET:
                 case DATA_SET_PREFIX:
@@ -255,9 +257,9 @@ public class WorkModel {
         }
 
         public String getPrefix() {
-            final Work work = queue.isEmpty() ? null : queue.peek();
+            final Work work = queue.peek();
             if (work == null) return null;
-            switch (kind()) {
+            switch (work.getJob().getKind()) {
                 case DATA_SET_PREFIX:
                     return ((Work.DataSetPrefixWork) work).getPrefix();
                 default:
@@ -266,8 +268,9 @@ public class WorkModel {
         }
 
         public boolean isNetwork() {
-            if (isEmpty()) return false;
-            switch (kind()) {
+            final Work work = queue.peek();
+            if (work == null) return false;
+            switch (work.getJob().getKind()) {
                 case NETWORK:
                     return true;
                 default:
@@ -281,7 +284,9 @@ public class WorkModel {
 
         public void add(Work work) {
             if (work instanceof Work.LongTermWork) {
-                if (!isEmpty() && work.getClass() == getWork().getClass() && !isDone()) {
+                final Work existingWork = queue.peek();
+                if (existingWork == null) return;
+                if (!isEmpty() && work.getClass() == existingWork.getClass() && !isDone()) {
                     feedback.alert(this + " busy");
                     return;
                 }
@@ -296,37 +301,23 @@ public class WorkModel {
 
         private void launch() {
             if (executor.isShutdown()) return;
-            if (getWork() instanceof Work.LongTermWork) {
+            final Work work = queue.peek();
+            if (work == null) return;
+            if (work instanceof Work.LongTermWork) {
                 progressImpl = new ProgressImpl(feedback);
-                ((Work.LongTermWork) getWork()).setProgressListener(progressImpl);
+                ((Work.LongTermWork) work).setProgressListener(progressImpl);
             }
             else {
                 progressImpl = null;
             }
-            this.future = executor.submit(getWork());
+            this.future = executor.submit(work);
             this.start = new Date();
-        }
-
-        private Work.Kind kind() {
-            return job().getKind();
-        }
-
-        private Work.Job job() {
-            return getWork().getJob();
-        }
-
-        public Work getWork() {
-            return queue.peek();
-        }
-
-        public boolean isEmpty() {
-            return queue.isEmpty();
         }
 
         @Override
         public String toString() {
-            if (isEmpty()) return "empty";
-            Work work = getWork();
+            final Work work = queue.peek();
+            if (work == null) return "empty";
             if (work instanceof Work.DataSetPrefixWork) {
                 Work.DataSetPrefixWork dsp = (Work.DataSetPrefixWork) work;
                 return String.format("%s [%s/%s]", work.getJob(), dsp.getDataSet(), dsp.getPrefix());
