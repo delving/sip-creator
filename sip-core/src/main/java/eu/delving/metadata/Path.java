@@ -215,6 +215,11 @@ public class Path implements Comparable<Path>, Serializable {
         return 0;
     }
 
+    public String toIndexString() {
+        if (parent.tag == null) return "";
+        return String.format("%s_%s", parent.toIndexString(), tag.toIndexString());
+    }
+
     public String toString() {
         if (tag == null) return "";
         if (string == null) string = parent.toString() + tag.toPathElement();
