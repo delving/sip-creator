@@ -99,7 +99,7 @@ public class CodeGenerator {
         codeOut.line("org.w3c.dom.Node outputNode");
         codeOut.line_("use (MappingCategory) {");
         codeOut.line_("input * { _input ->");
-        codeOut.line("_uniqueIdentifier = _input._id[0].toString()");
+        codeOut.line("_uniqueIdentifier = _input['@id'][0].toString()");
         codeOut.line("outputNode = output.");
         if (recDefTree.getRoot().isPopulated()) {
             toElementCode(recDefTree.getRoot(), new Stack<String>());
