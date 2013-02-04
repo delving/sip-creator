@@ -29,7 +29,7 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 
 import static eu.delving.sip.base.KeystrokeHelper.configAction;
@@ -95,7 +95,7 @@ public class ValidateAction extends AbstractAction {
             }
 
             @Override
-            public void aborted(FileProcessor fileProcessor) {
+            public void aborted(FileProcessor processor) {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
@@ -103,6 +103,14 @@ public class ValidateAction extends AbstractAction {
                         setEnabled(true);
                     }
                 });
+                DataSet dataSet = processor.getDataSet();
+                try {
+                    dataSet.setStats(null, false, processor.getPrefix());
+                    dataSet.setValidation(processor.getPrefix(),  null, 0);
+                }
+                catch (StorageException e) {
+                    sipModel.getFeedback().alert("Unable to remove validation results", e);
+                }
             }
 
             @Override

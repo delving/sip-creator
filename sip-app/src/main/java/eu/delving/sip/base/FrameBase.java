@@ -69,7 +69,6 @@ public abstract class FrameBase extends JInternalFrame {
         FIELD_MAPPING,
         OUTPUT,
         MAPPING_CODE,
-        WORK,
         DATA_SET,
         REPORT,
         HARVEST,

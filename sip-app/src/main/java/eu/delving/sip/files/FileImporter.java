@@ -71,7 +71,7 @@ public class FileImporter implements Work.DataSetWork, Work.LongTermWork {
     @Override
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
-        progressListener.setProgressMessage(String.format("Storing data for %s", dataSet.getSpec()));
+        progressListener.setProgressMessage("Storing data");
     }
 
     @Override
