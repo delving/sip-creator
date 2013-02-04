@@ -62,6 +62,7 @@ public class ExpertMenu extends JMenu {
         add(new UniqueConverterAction());
         add(new WriteOutputAction());
         add(new ReloadMappingAction());
+        add(new DeleteCachesAction());
         add(new ToggleFrameArrangements());
 //        add(new MediaImportAction(desktop, sipModel));
 //        if (cultureHubClient != null) add(new UploadMediaAction(cultureHubClient));
@@ -292,6 +293,49 @@ public class ExpertMenu extends JMenu {
         }
     }
 
+
+    private class DeleteCachesAction extends AbstractAction {
+        private DeleteCachesAction() {
+            super("Delete cached items in this dataset");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            sipModel.exec(new Work.DataSetPrefixWork() {
+
+                final DataSetModel dsm = sipModel.getDataSetModel();
+
+                @Override
+                public String getPrefix() {
+                    return sipModel.getMappingModel().getPrefix();
+                }
+
+                @Override
+                public DataSet getDataSet() {
+                    return sipModel.getDataSetModel().getDataSet();
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.DELETE_CACHES;
+                }
+
+                @Override
+                public void run() {
+                    try {
+                        DataSet dataSet = dsm.getDataSet();
+                        if (dataSet == null) return;
+                        dataSet.setStats(null, false, getPrefix());
+                        dataSet.setStats(null, true, getPrefix());
+                        dataSet.setValidation(getPrefix(), null, 0);
+                    }
+                    catch (StorageException e) {
+                        sipModel.getFeedback().alert("Cannot delete caches", e);
+                    }
+                }
+            });
+        }
+    }
 
 
 }

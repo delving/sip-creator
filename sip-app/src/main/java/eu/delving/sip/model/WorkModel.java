@@ -238,6 +238,17 @@ public class WorkModel {
             }
         }
 
+        public String getPrefix() {
+            final Work work = queue.isEmpty() ? null : queue.peek();
+            if (work == null) return null;
+            switch (kind()) {
+                case DATA_SET_PREFIX:
+                    return ((Work.DataSetPrefixWork) work).getPrefix();
+                default:
+                    return null;
+            }
+        }
+
         public boolean isNetwork() {
             if (isEmpty()) return false;
             switch (kind()) {
@@ -365,7 +376,7 @@ public class WorkModel {
                     return String.format("%d : %s", current, progressMessage);
                 }
                 else {
-                    return String.format("%d/%d : %s %s", current, maximum, progressMessage, timeEstimator.getMessage(current));
+                    return String.format("%d/%d : %s : %s", current, maximum, progressMessage, timeEstimator.getMessage(current));
                 }
             }
             else {
@@ -373,7 +384,7 @@ public class WorkModel {
                     return String.format("%d", current);
                 }
                 else {
-                    return String.format("%d/%d %s", current, maximum, timeEstimator.getMessage(current));
+                    return String.format("%d/%d : %s", current, maximum, timeEstimator.getMessage(current));
                 }
             }
         }

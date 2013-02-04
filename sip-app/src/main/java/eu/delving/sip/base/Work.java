@@ -70,6 +70,7 @@ public interface Work extends Runnable {
         PROCESS(DATA_SET_PREFIX),
         LOAD_REPORT(DATA_SET_PREFIX),
         RELOAD_MAPPING(DATA_SET_PREFIX),
+        DELETE_CACHES(DATA_SET_PREFIX),
 
         FETCH_LIST(NETWORK),
         FETCH_FACTS_DEF(NETWORK),

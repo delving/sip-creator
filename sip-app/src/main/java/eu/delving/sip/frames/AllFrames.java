@@ -59,7 +59,6 @@ public class AllFrames {
     private JPanel content;
     private FrameBase[] frames;
     private FrameBase dataSetFrame;
-    private WorkFrame workFrame;
     private FrameArrangements frameArrangements;
     private List<Arrangement> arrangements = new ArrayList<Arrangement>();
     private View currentView = CLEAR;
@@ -113,7 +112,6 @@ public class AllFrames {
         this.content = content;
         this.dataSetFrame = dataSetFrame;
         sipModel.setViewSelector(viewSelector);
-        workFrame = new WorkFrame(sipModel);
         FunctionFrame functionFrame = new FunctionFrame(sipModel);
         MappingCodeFrame mappingCodeFrame = new MappingCodeFrame(sipModel);
         StatsFrame statsFrame = new StatsFrame(sipModel);
@@ -231,10 +229,6 @@ public class AllFrames {
                 dataSetFrame.refresh();
             }
         });
-    }
-
-    public WorkFrame getWorkFrame() {
-        return workFrame;
     }
 
     public JMenu getViewMenu() {

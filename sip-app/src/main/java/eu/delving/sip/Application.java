@@ -32,13 +32,13 @@ import eu.delving.sip.files.*;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.DataSetHubFrame;
 import eu.delving.sip.frames.DataSetStandaloneFrame;
-import eu.delving.sip.frames.WorkFrame;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
+import eu.delving.sip.panels.WorkPanel;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -47,8 +47,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -261,7 +259,7 @@ public class Application {
         ));
         p.add(statusPanel);
         JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.add(createWorkPanel(), BorderLayout.CENTER);
+        rightPanel.add(new WorkPanel(sipModel), BorderLayout.CENTER);
         rightPanel.add(createButtonPanel(), BorderLayout.WEST);
         p.add(rightPanel);
         return p;
@@ -277,20 +275,6 @@ public class Application {
         p.add(b = new JButton(importAction));
         b.setHorizontalAlignment(JButton.LEFT);
         return p;
-    }
-
-    private JPanel createWorkPanel() {
-        JPanel workPanel = new JPanel(new BorderLayout());
-        final WorkFrame workFrame = allFrames.getWorkFrame();
-        workPanel.add(AllFrames.miniScrollV("Work", workFrame.getMiniList()));
-        workFrame.getMiniList().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting() || workFrame.getMiniList().isSelectionEmpty()) return;
-                workFrame.openFrame();
-            }
-        });
-        return workPanel;
     }
 
     private JMenuBar createMenuBar() {
