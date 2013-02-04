@@ -147,10 +147,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     @Override
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
-        this.progressListener.setProgressMessage(String.format(
-                "Converting '%s' to standard form",
-                dataSet.getSpec()
-        ));
+        this.progressListener.setProgressMessage("Converting to standard form");
     }
 
     public void parse(InputStream inputStream, OutputStream outputStream, Map<String,String> namespaces) throws XMLStreamException, IOException {

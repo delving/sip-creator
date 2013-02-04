@@ -83,7 +83,13 @@ public class WorkPanel extends JPanel {
         String dataSetSpec = jobContext.getDataSet();
         String show = String.format("%s: %s", job, date);
         if (dataSetSpec != null) {
-            show += String.format(" (%s)", dataSetSpec);
+            String prefix = jobContext.getPrefix();
+            if (prefix != null) {
+                show += String.format(" (%s/%s)", dataSetSpec, prefix);
+            }
+            else {
+                show += String.format(" (%s)", dataSetSpec);
+            }
         }
         WorkModel.ProgressIndicator progress = jobContext.getProgressIndicator();
         if (progress != null) {

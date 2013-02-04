@@ -354,7 +354,7 @@ public class CultureHubClient {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setProgressMessage(String.format("Downloading '%s' from the hub.", dataSet.getSpec()));
+            progressListener.setProgressMessage("Downloading from the hub.");
         }
     }
 
@@ -446,10 +446,7 @@ public class CultureHubClient {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setProgressMessage(String.format(
-                    "Uploading '%s' to the hub",
-                    dataSet.getSpec()
-            ));
+            progressListener.setProgressMessage("Uploading to the hub");
         }
     }
 
@@ -542,10 +539,7 @@ public class CultureHubClient {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setProgressMessage(String.format(
-                    "Uploading '%s' media to hub",
-                    dataSet.getSpec()
-            ));
+            progressListener.setProgressMessage("Uploading media to hub");
         }
     }
 

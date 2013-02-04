@@ -69,7 +69,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private GroovyCodeResource groovyCodeResource;
     private ProgressListener progressListener;
     private Listener listener;
-    private volatile boolean done = false;
+    private volatile boolean aborted = false;
     private boolean allowInvalid;
     private int validCount, invalidCount, recordCount, recordNumber;
     private Stats stats;
@@ -129,14 +129,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         return recordCount;
     }
 
-    public String getProblemXML() {
-        return problemXML;
-    }
-
-    public String getProblemMessage() {
-        return problemMessage;
-    }
-
     @Override
     public Job getJob() {
         return Job.PROCESS;
@@ -155,10 +147,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     @Override
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
-        progressListener.setProgressMessage(String.format(
-                "Map '%s' into '%s' format, validate",
-                dataSet.getSpec(), getPrefix()
-        ));
+        progressListener.setProgressMessage("Map, validate, gather stats");
     }
 
     @Override
@@ -182,7 +171,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
         try {
             progressListener.prepareFor(recordCount);
-            while (!done) {
+            while (!aborted) {
                 MetadataRecord record = parser.nextRecord();
                 if (record == null) break;
                 progressListener.setProgress(record.getRecordNumber());
@@ -205,7 +194,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         if (!allowInvalid) {
                             switch (askHowToProceed(record.getRecordNumber())) {
                                 case ABORT:
-                                    done = true;
+                                    aborted = true;
                                     break;
                                 case CONTINUE:
                                     break;
@@ -213,7 +202,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                     allowInvalid = true;
                                     break;
                                 case INVESTIGATE:
-                                    done = true;
+                                    aborted = true;
                                     problemXML = serializer.toXml(node, true);
                                     problemMessage = e.getMessage();
                                     listener.failed(this);
@@ -232,7 +221,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     reportWriter.println("Mapping exception!");
                     reportWriter.println(XmlNodePrinter.toXml(e.getMetadataRecord().getRootNode()));
                     e.printStackTrace(reportWriter);
-                    done = true;
+                    aborted = true;
                     problemXML = toXml(e.getMetadataRecord().getRootNode());
                     problemMessage = e.getMessage();
                     listener.failed(this);
@@ -241,16 +230,18 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
         }
         catch (CancelException e) {
+            aborted = true;
             listener.aborted(this);
         }
         catch (Exception e) {
+            aborted = true;
             feedback.alert("File processing problem", e);
         }
         finally {
             finishReport();
             if (xmlOutput != null) xmlOutput.finish();
             IOUtils.closeQuietly(reportWriter);
-            if (done) {
+            if (aborted) {
                 listener.aborted(this);
             }
             else {
@@ -261,7 +252,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     private void finishReport() {
         reportWriter.println(ReportFileModel.DIVIDER);
-        if (done) {
+        if (aborted) {
             reportWriter.println("Validation was aborted!");
         }
         else {
