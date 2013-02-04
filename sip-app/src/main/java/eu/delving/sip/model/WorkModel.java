@@ -120,7 +120,22 @@ public class WorkModel {
     }
 
     private void dataSetPrefix(Work work) {
-        dataSet(work); // for now
+        Work.DataSetPrefixWork w = (Work.DataSetPrefixWork) work;
+        DataSet dataSet = w.getDataSet();
+        String prefix = w.getPrefix();
+        if (dataSet != null && prefix == null) {
+            for (JobContext context : jobContexts) {
+                String dataSetSpec = context.getDataSet();
+                String contextPrefix = context.getPrefix();
+                if (dataSetSpec != null && contextPrefix != null &&
+                        dataSetSpec.equals(dataSet.getSpec()) && contextPrefix.equals(prefix)) {
+                    context.add(work);
+                    work = null;
+                    break;
+                }
+            }
+        }
+        justDoIt(work);
     }
 
     private void dataSet(Work work) {
@@ -129,6 +144,7 @@ public class WorkModel {
         if (dataSet != null) {
             for (JobContext context : jobContexts) {
                 String dataSetSpec = context.getDataSet();
+                if (context.getPrefix() != null) continue;
                 if (dataSetSpec != null && dataSetSpec.equals(dataSet.getSpec())) {
                     context.add(work);
                     work = null;
