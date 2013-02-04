@@ -166,7 +166,13 @@ public class TestMappingEngine {
         MappingResult result = mappingEngine.execute("indexDocumentFromAFF", input("aff"));
 //        System.out.println(serializer.toXml(result.root()));
         Map<String, List<String>> allFields = result.fields();
-//        System.out.println(allFields);
+        for (Map.Entry<String, List<String>> entry : allFields.entrySet()) {
+            System.out.println(entry.getKey());
+            for (String value : entry.getValue()) {
+                System.out.println("    "+value);
+            }
+        }
+        System.out.println(result.toXml());
         Assert.assertFalse(allFields.isEmpty());
     }
 

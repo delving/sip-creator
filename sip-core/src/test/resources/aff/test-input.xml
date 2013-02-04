@@ -1,80 +1,224 @@
-<priref>1</priref>
-<catty>Thing</catty>
-<edit.source>collect>intern</edit.source>
-<edit.source>photo</edit.source>
-<edit.source>collect>intern</edit.source>
-<input.source>FileMakerPro</input.source>
-<edit.time>14:54:55</edit.time>
-<edit.time>12:37:39</edit.time>
-<edit.time>16:05:56</edit.time>
-<creator.history/>
-<edit.name>t.kamerling</edit.name>
-<edit.name>alina</edit.name>
-<edit.name>Daniel</edit.name>
-<input.name>Conversie AIS</input.name>
-<creator.date_of_death/>
-<creator.date_of_birth/>
-<edit.date>2011-03-15</edit.date>
-<edit.date>2009-02-19</edit.date>
-<edit.date>2006-11-22</edit.date>
-<input.date>2005-01-14</input.date>
-<dimension.value>24.3</dimension.value>
-<dimension.value>2.6</dimension.value>
-<insurance.value>700.00</insurance.value>
-<acquisition.method>aankoop</acquisition.method>
-<creator>onbekend</creator>
-<acquisition.price.value>592.50</acquisition.price.value>
-<production.place>Engeland</production.place>
-<acquisition.source>Ott, J.B.A.M.</acquisition.source>
-<acquisition.price.currency>NLG</acquisition.price.currency>
-<insurance.value.currency>NLG</insurance.value.currency>
-<technique>gevormd</technique>
-<technique>koperdruk</technique>
-<technique>loodglazuur</technique>
-<title>Bord met zwart decor van cartouche met opschrift</title>
-<condition.notes>schilfers van de rand, ingetrokken vuil.</condition.notes>
-<technique.part>FORM</technique.part>
-<technique.part>DEC</technique.part>
-<technique.part>FIN</technique.part>
-<location>1.12-K10-P05</location>
-<reproduction.creator/>
-<reproduction.type/>
-<reproduction.date/>
-<number_of_parts>1</number_of_parts>
-<acquisition.place>Zutphen</acquisition.place>
-<phys_characteristic.keyword>cartouche</phys_characteristic.keyword>
-<phys_characteristic.keyword>opschrift</phys_characteristic.keyword>
-<phys_characteristic.aspect>creamware</phys_characteristic.aspect>
-<title.type>toegekend</title.type>
-<object_name>bord</object_name>
-<location.default>1.12-K10-P05</location.default>
-<material.notes>scherf crème</material.notes>
-<material>hard aardewerk</material>
-<location_type>DEP</location_type>
-<location_check.date>2007-12-04</location_check.date>
-<location_check.name>AD</location_check.name>
-<object_number>OKS 1989-001</object_number>
-<inscription.notes>geen</inscription.notes>
-<institution.code>0061</institution.code>
-<current_owner>Ottema-Kingma Stichting</current_owner>
-<creator.role>vervaardiger</creator.role>
-<reproduction.reference>OKS 1989-001 [01]</reproduction.reference>
-<reproduction.format/>
-<reproduction.web_exclusion/>
-<dimension.unit>cm</dimension.unit>
-<dimension.unit>cm</dimension.unit>
-<production.date.start>1791</production.date.start>
-<production.date.notes>gedateerd</production.date.notes>
-<dimension.type>diameter</dimension.type>
-<dimension.type>hoogte</dimension.type>
-<production.date.end>1791</production.date.end>
-<institution.place>Leeuwarden</institution.place>
-<description>De geschulpte rand is voorzien van een versiering in zwart in de vorm van bloemtakken. Op het verdiepte middenvlak is een in Louis XV stijl cartouche aangebracht met tekst.(Ingekorte beschrijving).</description>
-<description>Opschrift: Welvaart; Tot desen Huijsen Van; Yan en Yoanna Ver Boom; Ao 1797 den 20. Meij</description>
-<institution.name>Princessehof Leeuwarden</institution.name>
-<reproduction.identifier_URL>..\..\..\Images PH\OKS 1989-001 [01].jpg</reproduction.identifier_URL>
-<administration_name>Europa</administration_name>
-<percentf>1791</percentf>
-<percentH>creamware</percentH>
-<percentD>2.6</percentD>
-<percentC>24.3</percentC>
+<ObjektID>224127</ObjektID>
+<MappeID>4456</MappeID>
+<ObjektType>Billedkunst</ObjektType>
+<ObjektTypeid>1</ObjektTypeid>
+<Museumsnummer>NMK.2008.0107</Museumsnummer>
+<Signatur>MØYFRIDT</Signatur>
+<RegDato>07.01.2009</RegDato>
+<Gruppering>
+<Grupperingstype>
+<Kode>4</Kode>
+<Beskrivelse>Enkeltgjenstand</Beskrivelse>
+</Grupperingstype>
+</Gruppering>
+<Strekkode>no0003162606</Strekkode>
+<Betegnelse>Grafikk</Betegnelse>
+<Innskrift>
+<Tekst>Agnes Mowinckel // Til Rolf Gerhardsen / fra Henrik Sørensen / 1941</Tekst>
+<Kode>Primær</Kode>
+<Type>Påskrift</Type>
+</Innskrift>
+<Historikk>
+<Beskrivendedatering>før 1941</Beskrivendedatering>
+<Ervervelse>Gave fra Atle Gerhardsen 2008</Ervervelse>
+</Historikk>
+<SisteEndring>
+<Signatur>PRIMUS</Signatur>
+<Dato>30.11.2012</Dato>
+</SisteEndring>
+<Hendelse>
+<Type>Produksjon</Type>
+<TypePres>Produsert</TypePres>
+<Datering>
+<Fradato>1882</Fradato>
+<Tildato>1941</Tildato>
+<Grunnlag>1941 eller tidligere (jfr. påskrift)</Grunnlag>
+</Datering>
+<Person>
+<Rolle>
+<Kode>10K</Kode>
+<Beskrivelse>Kunstner</Beskrivelse>
+</Rolle>
+<JuridiskPerson>
+<Jpnr>17512</Jpnr>
+<Navn>Sørensen, Henrik</Navn>
+<Type>9001</Type>
+<Kjonn>Mann</Kjonn>
+<FoedtKode>2</FoedtKode>
+<FoedtAar>1882</FoedtAar>
+<DoedAar>1962</DoedAar>
+<Nasjonalitet>Norge</Nasjonalitet>
+<AndreOppl>Basisopplysning fra Primus5.6.3, fra feltet Skole: Norsk</AndreOppl>
+<AndreOppl>KOMMENTAR:</AndreOppl>
+<AndreOppl>NKL IV,156 ,ff. ATTRIBUTT TIL RELATERT STED: Antatt sikker. STEDRELASJON: Fødested. RELATERT STED: Norge, Värmland, Torsby, Fryksände</AndreOppl>
+<Yrke>
+<Tekst>Billedkunstner</Tekst>
+</Yrke>
+<AltNavn>
+<Tekst>Sørensen, Henrik Ingvar</Tekst>
+<Kommentar>Fullt navn</Kommentar>
+</AltNavn>
+<Sted>
+<Rolle>Dødssted</Rolle>
+<Sted>
+<StedID>170</StedID>
+<Stedsnavn>Oslo (fylke), Oslo (Norge)</Stedsnavn>
+<Land>Norge</Land>
+<FELT2>Oslo</FELT2>
+<FELT7>Oslo (fylke)</FELT7>
+</Sted>
+</Sted>
+<Sted>
+<Rolle>Fødested</Rolle>
+<Sted>
+<StedID>6786</StedID>
+<Stedsnavn>Fryksände, Värmland (Sverige)</Stedsnavn>
+<Land>Sverige</Land>
+<FELT4>Fryksände, Värmland</FELT4>
+</Sted>
+</Sted>
+</JuridiskPerson>
+</Person>
+</Hendelse>
+<Hendelse>
+<Type>Eierskap</Type>
+<TypePres>Eierskap</TypePres>
+<Datering>
+<Tildato>2008</Tildato>
+</Datering>
+<Person>
+<Rolle>
+<Kode>20</Kode>
+<Beskrivelse>Giver/siste eier</Beskrivelse>
+</Rolle>
+<JuridiskPerson>
+<Jpnr>26316</Jpnr>
+<Navn>Gerhardsen, Atle</Navn>
+</JuridiskPerson>
+</Person>
+</Hendelse>
+<Hendelse>
+<Type>Aksesjon</Type>
+<TypePres>Ervervelse</TypePres>
+<Datering>
+<Tildato>2008</Tildato>
+</Datering>
+</Hendelse>
+<Hendelse>
+<Type>Eierskap</Type>
+<TypePres>Eierskap</TypePres>
+<Datering>
+<Fradato>1941</Fradato>
+<Grunnlag>jfr. påskrift</Grunnlag>
+</Datering>
+<Person>
+<Rolle>
+<Kode>40</Kode>
+<Beskrivelse>Tidligere eier</Beskrivelse>
+</Rolle>
+<JuridiskPerson>
+<Jpnr>26317</Jpnr>
+<Navn>Gerhardsen, Rolf</Navn>
+</JuridiskPerson>
+</Person>
+</Hendelse>
+<Teknikk>
+<Tekst>Litografi</Tekst>
+</Teknikk>
+<Materiale>
+<Tekst>Papir</Tekst>
+</Materiale>
+<Klassifikasjon>
+<System>OU</System>
+<Kode>532</Kode>
+<Beskrivelse>Bildende kunst</Beskrivelse>
+</Klassifikasjon>
+<Emneord>Bildende kunst</Emneord>
+<Maal>
+<TypePresisering>Hovedmål</TypePresisering>
+<Type>Bredde</Type>
+<Maal>285</Maal>
+<Enhet>mm</Enhet>
+</Maal>
+<Maal>
+<TypePresisering>Hovedmål</TypePresisering>
+<Type>Høyde</Type>
+<Maal>330</Maal>
+<Enhet>mm</Enhet>
+</Maal>
+<Maaltekst>330 x 285 mm</Maaltekst>
+<Materialetekst>Litografi på papir</Materialetekst>
+<Status>
+<Kode>1</Kode>
+<Beskrivelse>Vanlig tilvekst, høy bevaringsverdighet. Kan ikke byttes eller avhendes</Beskrivelse>
+</Status>
+<Antall>1</Antall>
+<Tittel>
+<Tekst>Agnes Mowinckel</Tekst>
+<Kode>NOR</Kode>
+<Status>2001</Status>
+</Tittel>
+<Rettighet>
+<Rettighettypeid>4</Rettighettypeid>
+<RettighetBeskrivelse>Opphavsrett</RettighetBeskrivelse>
+<RettighetKODE>1</RettighetKODE>
+<Fradato>01.01.2010</Fradato>
+<Tildato>31.12.2032</Tildato>
+<Person>
+<Rolle>
+<Kode>49</Kode>
+<Beskrivelse>Opphavsrettsinnehaver</Beskrivelse>
+</Rolle>
+<JuridiskPerson>
+<Jpnr>17512</Jpnr>
+<Navn>Sørensen, Henrik</Navn>
+<Type>9001</Type>
+<Kjonn>Mann</Kjonn>
+<FoedtKode>2</FoedtKode>
+<FoedtAar>1882</FoedtAar>
+<DoedAar>1962</DoedAar>
+<Nasjonalitet>Norge</Nasjonalitet>
+<AndreOppl>Basisopplysning fra Primus5.6.3, fra feltet Skole: Norsk</AndreOppl>
+<AndreOppl>KOMMENTAR:</AndreOppl>
+<AndreOppl>NKL IV,156 ,ff. ATTRIBUTT TIL RELATERT STED: Antatt sikker. STEDRELASJON: Fødested. RELATERT STED: Norge, Värmland, Torsby, Fryksände</AndreOppl>
+<Yrke>
+<Tekst>Billedkunstner</Tekst>
+</Yrke>
+<AltNavn>
+<Tekst>Sørensen, Henrik Ingvar</Tekst>
+<Kommentar>Fullt navn</Kommentar>
+</AltNavn>
+<Sted>
+<Rolle>Dødssted</Rolle>
+<Sted>
+<StedID>170</StedID>
+<Stedsnavn>Oslo (fylke), Oslo (Norge)</Stedsnavn>
+<Land>Norge</Land>
+<FELT2>Oslo</FELT2>
+<FELT7>Oslo (fylke)</FELT7>
+</Sted>
+</Sted>
+<Sted>
+<Rolle>Fødested</Rolle>
+<Sted>
+<StedID>6786</StedID>
+<Stedsnavn>Fryksände, Värmland (Sverige)</Stedsnavn>
+<Land>Sverige</Land>
+<FELT4>Fryksände, Värmland</FELT4>
+</Sted>
+</Sted>
+</JuridiskPerson>
+</Person>
+<Person>
+<Rolle>
+<Kode>E1</Kode>
+<Beskrivelse>Rettighetsforvalter</Beskrivelse>
+</Rolle>
+<JuridiskPerson>
+<Jpnr>26746</Jpnr>
+<Navn>BONO</Navn>
+<Type>9008</Type>
+<FoedtAar>1992</FoedtAar>
+</JuridiskPerson>
+</Person>
+</Rettighet>

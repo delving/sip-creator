@@ -70,7 +70,11 @@
         <string>&apos;true&apos;</string>
       </groovy-code>
     </node-mapping>
-    <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:title" outputPath="/icn:record/dc:title"/>
+    <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:title" outputPath="/icn:record/dc:title">
+        <groovy-code>
+            <string>&quot;&lt;![CDATA[${_dctitle}]]&gt;&quot;</string>
+        </groovy-code>
+    </node-mapping>
     <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:creator" outputPath="/icn:record/dc:creator"/>
     <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:subject" outputPath="/icn:record/dc:subject"/>
     <node-mapping inputPath="/input/metadata/oai_dc:dc/dc:publisher" outputPath="/icn:record/dc:publisher"/>
