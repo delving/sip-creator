@@ -144,6 +144,7 @@ public class WorkModel {
         if (dataSet != null) {
             for (JobContext context : jobContexts) {
                 String dataSetSpec = context.getDataSet();
+                if (context.getPrefix() != null) continue;
                 if (dataSetSpec != null && dataSetSpec.equals(dataSet.getSpec())) {
                     context.add(work);
                     work = null;
