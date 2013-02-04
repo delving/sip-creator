@@ -148,7 +148,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
         this.progressListener.setProgressMessage(String.format(
-                "Converting source data of '%s' to standard form",
+                "Converting '%s' to standard form",
                 dataSet.getSpec()
         ));
     }

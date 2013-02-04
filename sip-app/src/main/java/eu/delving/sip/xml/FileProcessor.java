@@ -156,7 +156,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
         progressListener.setProgressMessage(String.format(
-                "Mapping raw data of '%s' into '%s' format, validating and gathering statistics",
+                "Map '%s' into '%s' format, validate",
                 dataSet.getSpec(), getPrefix()
         ));
     }
