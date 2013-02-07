@@ -28,7 +28,9 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.MappingSaveTimer;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenu;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -46,7 +48,7 @@ public class RevertMappingMenu extends JMenu implements MappingSaveTimer.ListRec
     private SipModel sipModel;
 
     public RevertMappingMenu(SipModel sipModel) {
-        super("Revert to previous version");
+        super("Revert");
         this.sipModel = sipModel;
     }
 

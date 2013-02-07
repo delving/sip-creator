@@ -214,7 +214,7 @@ public class NodeMapping {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
 
-    public String toString() {
+    public String getHtml(boolean sourceTargetOrdering) {
         if (recDefNode == null) return "No RecDefNode";
         String input = inputPath.getTail();
         if (hasMap()) {
@@ -227,7 +227,17 @@ public class NodeMapping {
             input = out.toString();
         }
         String wrap = groovyCode == null ? "p" : "b";
-        return String.format("<html><%s>%s &rarr; %s</%s>", wrap, input, recDefNode.toString(), wrap);
+        if (sourceTargetOrdering) {
+            return String.format("<html><%s>%s &rarr; %s</%s>", wrap, input, recDefNode.toString(), wrap);
+        }
+        else {
+            return String.format("<html><%s>%s &larr; %s</%s>", wrap, recDefNode.toString(), input, wrap);
+        }
+    }
+
+    public String toString() {
+        if (recDefNode == null) return "No RecDefNode";
+        return recDefNode.toString();
     }
 }
 
