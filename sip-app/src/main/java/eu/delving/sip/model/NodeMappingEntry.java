@@ -35,7 +35,7 @@ import java.awt.Component;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
+public class NodeMappingEntry {
     private int index = -1;
     private NodeMapping nodeMapping;
     private boolean highlighted;
@@ -84,19 +84,17 @@ public class NodeMappingEntry implements Comparable<NodeMappingEntry> {
         return nodeMapping.toString();
     }
 
-    @Override
-    public int compareTo(NodeMappingEntry nodeMappingEntry) {
-        int compare = nodeMapping.inputPath.getTail().compareTo(nodeMappingEntry.getNodeMapping().inputPath.getTail());
-        if (compare != 0) return compare;
-        compare = nodeMapping.inputPath.compareTo(nodeMappingEntry.getNodeMapping().inputPath);
-        if (compare != 0) return compare;
-        return nodeMapping.outputPath.compareTo(nodeMappingEntry.getNodeMapping().outputPath);
-    }
-
     public static class CellRenderer extends DefaultListCellRenderer {
+        private boolean sourceTargetOrdering = true;
+
+        public void setSourceTargetOrdering(boolean sourceTargetOrdering) {
+            this.sourceTargetOrdering = sourceTargetOrdering;
+        }
+
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected, boolean cellHasFocus) {
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, selected, cellHasFocus);
             NodeMappingEntry entry = (NodeMappingEntry) value;
+            String string = entry.nodeMapping.getHtml(sourceTargetOrdering);
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, selected, cellHasFocus);
             if (entry.getNodeMapping().recDefNode.isAttr()) {
                 setIcon(SwingHelper.ICON_ATTRIBUTE);
             }
