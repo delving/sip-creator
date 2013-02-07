@@ -6,7 +6,7 @@ SIP stands for "Submission Information Package", a term from OAIS which refers t
 
 ## Transformation
 
-The job of XML transformation is generally performed by XSLT scripts, but these can be hard to build and maintain due to their verboseness.  Typically, XML transformation amounts to rearranging the structure such that the content segments of the source are rearranged and copied into the target format. In many cases, however, it is not enough to just copy field contents verbatim, but rather some manipulation must take place on the way.  Fields may need to be combined or split, and field contents may need to be changed on the way, such as turning an identifier into a full image or web page URL.
+The job of XML transformation is generally performed by XSLT scripts, but these can be hard to build and maintain due to verbosity.  Typically, XML transformation amounts to rearranging the structure such that the content segments of the source are rearranged and copied into the target format. In many cases, however, it is not enough to just copy field contents verbatim, but rather some manipulation must take place on the way.  Fields may need to be combined or split, and field contents may need to be changed on the way, such as turning an identifier into a full image or web page URL.
 
 ## Groovy
 
@@ -56,7 +56,7 @@ The basic work-flow of ingesting metadata into the CultureHub using the SIP-Crea
 
 * Validate the output of the mapping against the target record structure using the XSD, to ensure that the dataset is ready for using on the CultureHub
 
-* After validation, the dataset can be uploaded to the CultureHub at any time
+* After validation, the dataset can be uploaded to the CultureHub
 
 * Indexing of the dataset for search and navigation is done via the web interface of the CultureHub
 
@@ -75,10 +75,15 @@ This project consists of two modules, because the part of the code responsible f
     * the interactive user interface
     * *live coding*, auto-compilation-execution of Groovy snippets
     * download, import, analysis, mapping, refinement, validation, upload
-    * caches data in `~/SIPCreatorWorkspace` directory
+    * caches data in `~/DelvingSIPCreator` directory
+
+* __schema-repo__ -
+    * used to access the schemas stored at http://schemas.delving.eu
+    * content of the above site stored at https://github.com/delving/schemas.delving.eu
+    * also works with a local clone of the above repository
 
 ## Contact
 
-If you want to know more about the SIP-Creator, contact us at __`<sip-creator@delving.eu>`__
+If you want to know more about the SIP-Creator, contact us at __`sip-creator@delving.eu`__
 
 - - -
