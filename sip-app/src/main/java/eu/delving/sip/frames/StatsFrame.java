@@ -40,10 +40,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -255,7 +252,15 @@ public class StatsFrame extends FrameBase {
         JList list = new JList(histogramModel);
         list.setCellRenderer(new HistogramCellRenderer());
         list.setTransferHandler(new ListTransferHandler());
-        return scrollV(list);
+        JLabel trimLabel = new JLabel("All values present", JLabel.CENTER);
+        if (values.isTrimmed()) {
+            trimLabel.setText("Histogram is incomplete");
+            trimLabel.setForeground(Color.RED);
+        }
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(scrollV(list), BorderLayout.CENTER);
+        p.add(trimLabel, BorderLayout.SOUTH);
+        return p;
     }
 
     private static class HistogramModel extends AbstractListModel {
@@ -292,12 +297,21 @@ public class StatsFrame extends FrameBase {
         }
     }
 
-    private static class ListTransferHandler extends TransferHandler {
+    private class ListTransferHandler extends TransferHandler {
         protected Transferable createTransferable(JComponent c) {
             JList list = (JList) c;
-            Stats.Counter counter = (Stats.Counter) list.getSelectedValue();
-            if (counter == null) return null;
-            return new SwingHelper.StringTransferable(counter.value);
+            StringBuilder out = new StringBuilder();
+            boolean onlyValues = sipModel.getFeedback().confirm("Copy", "Copy only values?");
+            for (int walk = 0; walk < list.getModel().getSize(); walk++) {
+                Stats.Counter counter = (Stats.Counter) list.getModel().getElementAt(walk);
+                if (onlyValues) {
+                    out.append(counter.value).append('\n');
+                }
+                else {
+                    out.append(counter.toString()).append('\n');
+                }
+            }
+            return new SwingHelper.StringTransferable(out.toString());
         }
 
         public int getSourceActions(JComponent c) {
