@@ -21,17 +21,17 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.Swing;
 import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.getTemplate;
@@ -44,6 +44,7 @@ import static eu.delving.sip.base.SwingHelper.getTemplate;
 
 public class NodeMappingListModel extends AbstractListModel {
     private List<NodeMappingEntry> entries = new ArrayList<NodeMappingEntry>();
+    private EntrySorting entrySorting = new EntrySorting(true);
 
     public JList createJList() {
         JList list = new JList(this) {
@@ -148,6 +149,12 @@ public class NodeMappingListModel extends AbstractListModel {
         };
     }
 
+    public void setSorting(boolean sourceTargetSorting) {
+        entrySorting = new EntrySorting(sourceTargetSorting);
+        sortEntries();
+        fireContentsChanged(this, 0, getSize());
+    }
+
     public void setList(List<NodeMapping> freshList) {
         if (!entries.isEmpty()) {
             final int size = getSize();
@@ -168,12 +175,12 @@ public class NodeMappingListModel extends AbstractListModel {
             if (entry.getNodeMapping() == nodeMapping) return index;
             index++;
         }
-        throw new RuntimeException("Node mapping not found: "+nodeMapping);
+        throw new RuntimeException("Node mapping not found: " + nodeMapping);
     }
 
     private int sortEntries() {
         int inserted = -1;
-        Collections.sort(entries);
+        Collections.sort(entries, entrySorting);
         int index = 0;
         for (NodeMappingEntry entry : entries) {
             if (entry.getIndex() < 0) inserted = index;
@@ -184,4 +191,26 @@ public class NodeMappingListModel extends AbstractListModel {
         return inserted;
     }
 
+    private class EntrySorting implements Comparator<NodeMappingEntry> {
+        private boolean sourceTargetOrder;
+
+        private EntrySorting(boolean sourceTargetOrder) {
+            this.sourceTargetOrder = sourceTargetOrder;
+        }
+
+        @Override
+        public int compare(NodeMappingEntry entry1, NodeMappingEntry entry2) {
+            NodeMapping nodeMapping1 = entry1.getNodeMapping();
+            NodeMapping nodeMapping2 = entry2.getNodeMapping();
+            if (sourceTargetOrder) {
+                Path path1 = nodeMapping1.inputPath;
+                Path path2 = nodeMapping2.inputPath;
+                int compare = path1.getTail().toUpperCase().compareTo(path2.getTail().toUpperCase());
+                if (compare != 0) return compare;
+                compare = path1.toString().toUpperCase().compareTo(path2.toString().toUpperCase());
+                if (compare != 0) return compare;
+            }
+            return nodeMapping1.outputPath.toString().toUpperCase().compareTo(nodeMapping2.outputPath.toString().toUpperCase());
+        }
+    }
 }

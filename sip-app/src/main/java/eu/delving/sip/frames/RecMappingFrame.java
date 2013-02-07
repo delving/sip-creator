@@ -36,8 +36,11 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * Render the record mapping as a list of NodeMapping instances, so that an individual NodeMapping can be
@@ -106,7 +109,30 @@ public class RecMappingFrame extends FrameBase {
         JMenuBar bar = new JMenuBar();
         sipModel.getMappingSaveTimer().setListReceiver(revertMappingMenu);
         bar.add(revertMappingMenu);
+        bar.add(createSortingMenu());
         return bar;
+    }
+
+    private JMenu createSortingMenu() {
+        JRadioButtonMenuItem sourceTargetSorting = new JRadioButtonMenuItem("<html>Source &rarr; Target</html>", true);
+        JRadioButtonMenuItem targetSourceSorting = new JRadioButtonMenuItem("<html>Target &larr; Source</html>", false);
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(sourceTargetSorting);
+        bg.add(targetSourceSorting);
+        JMenu menu = new JMenu("Sorting");
+        menu.add(sourceTargetSorting);
+        menu.add(targetSourceSorting);
+        sourceTargetSorting.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                NodeMappingListModel nodeMappingListModel = (NodeMappingListModel) nodeMappingList.getModel();
+                boolean sourceTargetSorting = e.getStateChange() == ItemEvent.SELECTED;
+                nodeMappingListModel.setSorting(sourceTargetSorting);
+                NodeMappingEntry.CellRenderer cellRenderer = (NodeMappingEntry.CellRenderer) nodeMappingList.getCellRenderer();
+                cellRenderer.setSourceTargetOrdering(sourceTargetSorting);
+            }
+        });
+        return menu;
     }
 
     @Override
