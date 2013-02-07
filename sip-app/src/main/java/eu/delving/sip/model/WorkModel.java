@@ -53,7 +53,7 @@ public class WorkModel {
     public interface ProgressIndicator {
         void cancel();
 
-        String getString(boolean full);
+        String getProgressString();
     }
 
     public WorkModel(Feedback feedback) {
@@ -377,23 +377,15 @@ public class WorkModel {
         }
 
         @Override
-        public String getString(boolean full) {
-            if (full) {
-                if (maximum == 0) {
-                    return String.format("%d : %s", current, progressMessage);
-                }
-                else {
-                    return String.format("%d/%d : %s : %s", current, maximum, progressMessage, timeEstimator.getMessage(current));
-                }
+        public String getProgressString() {
+            String progress = String.format("%d", current);
+            if (maximum > 0) {
+                progress += String.format("/%d (%s)", maximum, timeEstimator.getMessage(current));
             }
-            else {
-                if (maximum == 0) {
-                    return String.format("%d", current);
-                }
-                else {
-                    return String.format("%d/%d : %s", current, maximum, timeEstimator.getMessage(current));
-                }
+            if (progressMessage != null) {
+                progress += " "+progressMessage;
             }
+            return progress;
         }
     }
 
@@ -422,7 +414,7 @@ public class WorkModel {
                 long millisElapsed = now - startTime;
                 double perMilli = (double) current / millisElapsed;
                 long totalMills = (long) (maximum / perMilli);
-                return getTimeString(totalMills - millisElapsed) + " to go";
+                return getTimeString(totalMills - millisElapsed);
             }
         }
 
@@ -433,18 +425,18 @@ public class WorkModel {
             long secondMillis = minuteMillis - minutes * ONE_MINUTE;
             int seconds = (int) (secondMillis / ONE_SECOND);
             if (hours > 0) {
-                return String.format("%d hour%s %d minutes", hours, hours > 1 ? "s" : "", minutes);
+                return String.format("%d hr %d min", hours, minutes);
             }
             else if (minutes > 0) {
                 if (minutes > 5) {
-                    return String.format("%d minutes", minutes);
+                    return String.format("%d min", minutes);
                 }
                 else {
-                    return String.format("%d minute%s %d seconds", minutes, minutes > 1 ? "s" : "", seconds);
+                    return String.format("%d min %d sec", minutes, seconds);
                 }
             }
             else if (seconds > 5) {
-                return String.format("%d seconds", seconds);
+                return String.format("%d sec", seconds);
             }
             else {
                 return "a few seconds";

@@ -79,21 +79,20 @@ public class WorkPanel extends JPanel {
     private String toFullString(WorkModel.JobContext jobContext) {
         Work work = jobContext.getWork();
         if (work == null) return "empty";
-        String date = TIMESTAMP_FORMAT.format(jobContext.getStart());
         String dataSetSpec = jobContext.getDataSet();
-        String show = String.format("%s: %s", work.getJob(), date);
+        String show = work.getJob().toString();
         if (dataSetSpec != null) {
             String prefix = jobContext.getPrefix();
             if (prefix != null) {
-                show += String.format(" (%s/%s)", dataSetSpec, prefix);
+                show += String.format("(%s/%s)", dataSetSpec, prefix);
             }
             else {
-                show += String.format(" (%s)", dataSetSpec);
+                show += String.format("(%s)", dataSetSpec);
             }
         }
         WorkModel.ProgressIndicator progress = jobContext.getProgressIndicator();
         if (progress != null) {
-            show += String.format(" - %s", progress.getString(true));
+            show += String.format(" %s", progress.getProgressString());
         }
         return show;
     }
