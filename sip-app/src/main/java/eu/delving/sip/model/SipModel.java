@@ -38,7 +38,7 @@ import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
+import javax.swing.JDesktopPane;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -281,10 +281,9 @@ public class SipModel {
         exec(new DataSetPrefixLoader(dataSet, prefix, success));
     }
 
-    private class DataSetPrefixLoader implements Work.DataSetPrefixWork, Work.LongTermWork {
+    private class DataSetPrefixLoader implements Work.DataSetPrefixWork {
         private DataSet dataSet;
         private String prefix;
-        private ProgressListener progressListener;
         private Swing success;
 
         private DataSetPrefixLoader(DataSet dataSet, String prefix, Swing success) {
@@ -306,11 +305,6 @@ public class SipModel {
         @Override
         public DataSet getDataSet() {
             return dataSet;
-        }
-
-        @Override
-        public void setProgressListener(ProgressListener progressListener) {
-            this.progressListener = progressListener;
         }
 
         @Override
