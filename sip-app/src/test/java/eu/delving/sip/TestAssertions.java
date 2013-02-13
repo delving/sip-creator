@@ -85,7 +85,7 @@ public class TestAssertions {
     public void testGeneratedStructureTests() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
         SchemaRepository repo = new SchemaRepository(new FileSystemFetcher(true));
         RecDef modsRecDef = RecDef.read(new ByteArrayInputStream(repo.getSchema(new SchemaVersion("mods", "3.4.0"), SchemaType.RECORD_DEFINITION).getBytes()));
-        List<StructureTest> structureTests = StructureTest.collectStructureTests(modsRecDef);
+        List<StructureTest> structureTests = StructureTest.listFrom(modsRecDef);
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(mods)) {
                 case NONE:

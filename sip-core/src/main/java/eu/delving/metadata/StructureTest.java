@@ -42,7 +42,7 @@ public class StructureTest {
     private XPathExpression parent;
     private XPathExpression test;
 
-    public static List<StructureTest> collectStructureTests(RecDef recDef) throws XPathFactoryConfigurationException, XPathExpressionException {
+    public static List<StructureTest> listFrom(RecDef recDef) throws XPathFactoryConfigurationException, XPathExpressionException {
         XPathFactory pathFactory = XPathFactory.newInstance(NamespaceConstant.OBJECT_MODEL_SAXON);
         StructureTest.Factory factory = new StructureTest.Factory(pathFactory, new XPathContext(recDef.namespaces));
         List<StructureTest> tests = new ArrayList<StructureTest>();
