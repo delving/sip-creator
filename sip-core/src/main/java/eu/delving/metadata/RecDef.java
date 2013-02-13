@@ -26,10 +26,7 @@ import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import eu.delving.XStreamFactory;
 import eu.delving.schema.SchemaVersion;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -138,6 +135,8 @@ public class RecDef {
 
     public List<OptList> opts;
 
+    public Assertion.AssertionList assertionList;
+
     @XStreamAlias("field-markers")
     public List<FieldMarker> fieldMarkers;
 
@@ -191,12 +190,7 @@ public class RecDef {
     }
 
     public String toString() {
-        List<Path> paths = new ArrayList<Path>();
-        Path path = Path.create();
-        collectPaths(root, path, paths);
-        StringBuilder out = new StringBuilder();
-        for (Path p : paths) out.append(p.toString()).append('\n');
-        return out.toString();
+        return String.format("RecDef(%s/%s)", prefix, version);
     }
 
     private void resolve() {
@@ -207,18 +201,6 @@ public class RecDef {
         root.resolve(Path.create(), this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
-    }
-
-    private void collectPaths(Elem elem, Path path, List<Path> paths) {
-        path = path.child(elem.tag);
-        paths.add(path);
-        for (Attr sub : elem.attrList) collectPaths(sub, path, paths);
-        for (Elem sub : elem.elemList) collectPaths(sub, path, paths);
-    }
-
-    private void collectPaths(Attr attr, Path path, List<Path> paths) {
-        path = path.child(attr.tag);
-        paths.add(path);
     }
 
     Attr findAttr(Path path) {
@@ -368,7 +350,7 @@ public class RecDef {
 
         public Attr copy() {
             try {
-                return (Attr)this.clone();
+                return (Attr) this.clone();
             }
             catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
@@ -443,6 +425,8 @@ public class RecDef {
 
         @XStreamAsAttribute
         public Operator operator;
+
+        public Assertion assertion;
 
         @XStreamImplicit
         public List<Elem> subelements = new ArrayList<Elem>();
@@ -544,5 +528,37 @@ public class RecDef {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private void collectPaths(Elem elem, Path path, List<Path> paths) {
+        path = path.child(elem.tag);
+        paths.add(path);
+        for (Attr sub : elem.attrList) collectPaths(sub, path, paths);
+        for (Elem sub : elem.elemList) collectPaths(sub, path, paths);
+    }
+
+    private void collectPaths(Attr attr, Path path, List<Path> paths) {
+        path = path.child(attr.tag);
+        paths.add(path);
+    }
+
+    private List<Path> collectPaths() {
+        List<Path> paths = new ArrayList<Path>();
+        collectPaths(root, Path.create(), paths);
+        return paths;
+    }
+
+    private String generateEmptyAssertions() {
+        StringBuilder out = new StringBuilder("<assertion-list>\n");
+        for (Path path : collectPaths()) {
+            out.append(String.format("\t<assertion xpath=\"%s\">\n\t</assertion>\n", path));
+        }
+        out.append("</assertion-list>\n");
+        return out.toString();
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        RecDef recDef = RecDef.read(new FileInputStream("/Users/gerald/delving/schemas.delving.eu/mods/mods_3.4.0_record-definition.xml"));
+        System.out.println(recDef.generateEmptyAssertions());
     }
 }

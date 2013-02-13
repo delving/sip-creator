@@ -1,0 +1,25 @@
+<assertion-list>
+    <assert xpath="//mods:namePart/text()">
+        <condition>it =~ /Florida/</condition>
+        <on-fail>No florida found in the string $it</on-fail>
+    </assert>
+    <assert xpath="//mods:namePart/text()">
+        <code>
+            if (!(it =~ /Florida/)) {
+            "No florida found in $it"
+            }
+        </code>
+    </assert>
+    <assert xpath="//mods:topic/text()">
+        <allowed>
+            <string>Text</string>
+            <string>Geology</string>
+        </allowed>
+        <on-fail>Improper value: $it</on-fail>
+    </assert>
+    <assert xpath="/mods:mods/mods:subject/@authority">
+        <condition>it == 'divine'</condition>
+        <on-fail>Authority '$it' is not divine!</on-fail>
+    </assert>
+</assertion-list>
+

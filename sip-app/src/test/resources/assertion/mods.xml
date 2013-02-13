@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+    <mods:name>
+        <mods:namePart>Florida Geological Society</mods:namePart>
+    </mods:name>
+    <mods:name>
+        <mods:namePart>Florida Department of Agriculture and Consumer Affairs</mods:namePart>
+    </mods:name>
+    <mods:name>
+        <mods:namePart>Agricultural Experiment Station/Extension Service (IFAS)</mods:namePart>
+    </mods:name>
+    <mods:name>
+        <mods:namePart>University of Florida Engineering and Industrial Experiment Station</mods:namePart>
+    </mods:name>
+    <mods:typeOfResource>text</mods:typeOfResource>
+    <mods:note>Florida Environments Online contains both digital full text materials and research bibliographies about the ecology and environment of Florida. Digitized materials include more than 200 seminal texts on species and ecosystems selected by scientific experts throughout the state of Florida and digitized specifically for the Linking Florida's Natural Heritage project. They also include the publications of the Florida Geological Society, and agricultural documents created by the Agricultural Experiment Station/Extension Service (IFAS) and the Florida Department of Agriculture and Consumer Affairs, as well as engineering documents created by the UF Engineering and Industrial Experiment Station.</mods:note>
+    <mods:subject authority="dubious">
+        <mods:topic>Collection</mods:topic>
+        <mods:topic>Text</mods:topic>
+    </mods:subject>
+    <mods:subject authority="divine">
+        <mods:topic>Environmental sciences</mods:topic>
+        <mods:topic>Geology</mods:topic>
+        <mods:topic>Agriculture</mods:topic>
+    </mods:subject>
+    <mods:location>
+        <mods:url access="preview">http://www.sffarkiv.no/webdb/fileStream.aspx?fileName=dbatlas_leks\HOdf-113824\kvalitet2\HOdf-113824.86901.jpg</mods:url>
+        <mods:url access="raw object">http://www.sffarkiv.no/webdb/fileStream.aspx?fileName=dbatlas_leks\OFdf-113702\kvalitet4\OFdf-113702.84080.wmv</mods:url>
+        <mods:url access="object in context">http://www.digitaltfortalt.no/show_single.aspx?art_id=113702</mods:url>
+    </mods:location>
+</mods:mods>

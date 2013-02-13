@@ -21,6 +21,7 @@
 
 package eu.delving.groovy;
 
+import eu.delving.metadata.Assertion;
 import eu.delving.metadata.MappingFunction;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
@@ -49,6 +50,11 @@ public class GroovyCodeResource {
 
     public GroovyCodeResource(ClassLoader classLoader) {
         this.classLoader = classLoader;
+    }
+
+    public Script createValidationScript(Assertion assertion) {
+        String script = assertion.getScript();
+        return new GroovyShell(getGroovyClassLoader()).parse(script);
     }
     
     public Script createFunctionScript(MappingFunction function, Map<String,String> facts, String editedCode) {
