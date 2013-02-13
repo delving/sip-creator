@@ -36,9 +36,6 @@ import java.util.List;
 @XStreamAlias("assert")
 public class Assertion {
     @XStreamAsAttribute
-    public String context;
-
-    @XStreamAsAttribute
     public String xpath;
 
     public List<String> allowed;

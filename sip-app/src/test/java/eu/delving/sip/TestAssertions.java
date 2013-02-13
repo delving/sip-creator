@@ -26,6 +26,13 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.Assertion;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.StructureTest;
+import eu.delving.schema.SchemaRepository;
+import eu.delving.schema.SchemaType;
+import eu.delving.schema.SchemaVersion;
+import eu.delving.schema.util.FileSystemFetcher;
 import groovy.lang.Binding;
 import groovy.lang.Script;
 import net.sf.saxon.dom.DOMNodeList;
@@ -41,6 +48,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -56,20 +64,54 @@ public class TestAssertions {
 
     private final XmlSerializer SERIAL = new XmlSerializer();
     private GroovyCodeResource groovyCodeResource;
+    private Document mods;
+    private XPathFactory pathFactory;
+    private DocContext modsContext;
 
     @Before
-    public void prep() {
-        groovyCodeResource = new GroovyCodeResource(ClassLoader.getSystemClassLoader());
-    }
-
-    @Test
-    public void testAssertions() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, XPathFactoryConfigurationException {
+    public void prep() throws ParserConfigurationException, IOException, SAXException, XPathFactoryConfigurationException {
         System.setProperty("javax.xml.xpath.XPathFactory:" + NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+        groovyCodeResource = new GroovyCodeResource(ClassLoader.getSystemClassLoader());
         URL modsResource = getClass().getResource("/assertion/mods.xml");
         File modsFile = new File(modsResource.getFile());
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
-        Document mods = factory.newDocumentBuilder().parse(modsFile);
+        mods = factory.newDocumentBuilder().parse(modsFile);
+        modsContext = new DocContext(mods);
+        pathFactory = XPathFactory.newInstance(NamespaceConstant.OBJECT_MODEL_SAXON);
+    }
+
+    @Test
+    public void testGeneratedStructureTests() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
+        SchemaRepository repo = new SchemaRepository(new FileSystemFetcher(true));
+        RecDef modsRecDef = RecDef.read(new ByteArrayInputStream(repo.getSchema(new SchemaVersion("mods", "3.4.0"), SchemaType.RECORD_DEFINITION).getBytes()));
+        List<StructureTest> structureTests = StructureTest.collectStructureTests(modsRecDef);
+        for (StructureTest structureTest : structureTests) {
+            switch (structureTest.getViolation(mods)) {
+                case NONE:
+                    System.out.println("OK: "+structureTest);
+                    break;
+                case REQUIRED:
+                    System.out.println("Required: "+structureTest);
+                    break;
+                case SINGULAR:
+                    System.out.println("Singular: "+structureTest);
+                    break;
+            }
+        }
+    }
+
+    @Test
+    public void testStructure() throws XPathExpressionException {
+        StructureTest.Factory factory = new StructureTest.Factory(pathFactory, modsContext);
+        StructureTest structureTest = factory.create(Path.create("/mods:mods/mods:name/mods:namePart"), true, true);
+        System.out.println(structureTest + ": " + structureTest.getViolation(mods));
+        structureTest = factory.create(Path.create("/mods:mods/mods:subject/@authority"), true, false);
+        System.out.println(structureTest + ": " + structureTest.getViolation(mods));
+    }
+
+    @Test
+    public void testAssertions() throws XPathExpressionException {
         URL assertionResource = getClass().getResource("/assertion/assertion-list.xml");
         File assertionFile = new File(assertionResource.getFile());
         Assertion.AssertionList assertionList = (Assertion.AssertionList) getStream().fromXML(assertionFile);
@@ -77,7 +119,6 @@ public class TestAssertions {
             Script script = groovyCodeResource.createValidationScript(assertion);
             Binding binding = new Binding();
             script.setBinding(binding);
-            XPathFactory pathFactory = XPathFactory.newInstance(NamespaceConstant.OBJECT_MODEL_SAXON);
             XPath path = pathFactory.newXPath();
             path.setNamespaceContext(new DocContext(mods));
             XPathExpression expression = path.compile(assertion.xpath);
@@ -134,12 +175,20 @@ public class TestAssertions {
         return xstream;
     }
 
-    private class DocContext implements NamespaceContext {
+    /**
+     * @author Gerald de Jong <gerald@delving.eu>
+     */
+
+    public static class DocContext implements NamespaceContext {
         private Map<String, String> prefixUri = new TreeMap<String, String>();
         private Map<String, String> uriPrefix = new TreeMap<String, String>();
 
         public DocContext(Document doc) {
-            gatherNamespacesFrom(doc.getDocumentElement());
+            this(doc.getDocumentElement());
+        }
+
+        public DocContext(Node node) {
+            gatherNamespacesFrom(node);
         }
 
         private void gatherNamespacesFrom(Node node) {
@@ -173,5 +222,4 @@ public class TestAssertions {
             return list.iterator();
         }
     }
-
 }

@@ -26,7 +26,10 @@ import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import eu.delving.XStreamFactory;
 import eu.delving.schema.SchemaVersion;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -332,6 +335,9 @@ public class RecDef {
         public Tag tag;
 
         @XStreamAsAttribute
+        public boolean required;
+
+        @XStreamAsAttribute
         public boolean hidden;
 
         @XStreamAsAttribute
@@ -530,35 +536,4 @@ public class RecDef {
         }
     }
 
-    private void collectPaths(Elem elem, Path path, List<Path> paths) {
-        path = path.child(elem.tag);
-        paths.add(path);
-        for (Attr sub : elem.attrList) collectPaths(sub, path, paths);
-        for (Elem sub : elem.elemList) collectPaths(sub, path, paths);
-    }
-
-    private void collectPaths(Attr attr, Path path, List<Path> paths) {
-        path = path.child(attr.tag);
-        paths.add(path);
-    }
-
-    private List<Path> collectPaths() {
-        List<Path> paths = new ArrayList<Path>();
-        collectPaths(root, Path.create(), paths);
-        return paths;
-    }
-
-    private String generateEmptyAssertions() {
-        StringBuilder out = new StringBuilder("<assertion-list>\n");
-        for (Path path : collectPaths()) {
-            out.append(String.format("\t<assertion xpath=\"%s\">\n\t</assertion>\n", path));
-        }
-        out.append("</assertion-list>\n");
-        return out.toString();
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        RecDef recDef = RecDef.read(new FileInputStream("/Users/gerald/delving/schemas.delving.eu/mods/mods_3.4.0_record-definition.xml"));
-        System.out.println(recDef.generateEmptyAssertions());
-    }
 }
