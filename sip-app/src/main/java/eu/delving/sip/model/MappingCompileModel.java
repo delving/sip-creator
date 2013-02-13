@@ -82,6 +82,7 @@ public class MappingCompileModel {
     private MappingModelEar mappingModelEar = new MappingModelEar();
     private SipModel sipModel;
     private boolean trace;
+    private List<AssertionTest> assertions;
 
     public enum Type {
         RECORD("record mapping"),
@@ -172,6 +173,10 @@ public class MappingCompileModel {
 
     public void setValidator(Validator validator) {
         this.validator = validator;
+    }
+
+    public void setAssertions(List<AssertionTest> assertions) {
+        this.assertions = assertions;
     }
 
     public Document getCodeDocument() {
@@ -304,9 +309,18 @@ public class MappingCompileModel {
                         try {
                             validator.validate(new DOMSource(node));
                             MappingResult result = new MappingResultImpl(serializer, node, recMapping.getRecDefTree()).resolve();
-                            result.checkMissingFields(); // todo: this is the only reason for building the result, should validate elsewhere
-                            // todo: integrate the content validations from recMapping.getRecDefTree().getRecDef().assertionList
-                            compilationComplete(Completion.JUST_FINE, node, null);
+                            result.checkMissingFields(); // todo: replace this kind of validation
+                            StringBuilder out = new StringBuilder();
+                            for (AssertionTest test : assertions) {
+                                String violation = test.getViolation(node);
+                                if (violation != null) out.append(test).append(" : ").append(violation).append('\n');
+                            }
+                            if (out.length() > 0) {
+                                compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
+                            }
+                            else {
+                                compilationComplete(Completion.JUST_FINE, node, null);
+                            }
                         }
                         catch (SAXException e) {
                             structureViolation(node, handler.getError());

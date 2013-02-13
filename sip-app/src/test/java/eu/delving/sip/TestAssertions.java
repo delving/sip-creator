@@ -25,17 +25,11 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.XmlSerializer;
-import eu.delving.metadata.Assertion;
-import eu.delving.metadata.Path;
-import eu.delving.metadata.RecDef;
-import eu.delving.metadata.StructureTest;
+import eu.delving.metadata.*;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaType;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.schema.util.FileSystemFetcher;
-import groovy.lang.Binding;
-import groovy.lang.Script;
-import net.sf.saxon.dom.DOMNodeList;
 import net.sf.saxon.om.NamespaceConstant;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +41,9 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -115,55 +111,13 @@ public class TestAssertions {
         URL assertionResource = getClass().getResource("/assertion/assertion-list.xml");
         File assertionFile = new File(assertionResource.getFile());
         Assertion.AssertionList assertionList = (Assertion.AssertionList) getStream().fromXML(assertionFile);
-        for (Assertion assertion : assertionList.assertions) {
-            Script script = groovyCodeResource.createValidationScript(assertion);
-            Binding binding = new Binding();
-            script.setBinding(binding);
-            XPath path = pathFactory.newXPath();
-            path.setNamespaceContext(new DocContext(mods));
-            XPathExpression expression = path.compile(assertion.xpath);
-            Object response = expression.evaluate(mods, XPathConstants.NODESET);
-            if (response instanceof DOMNodeList) {
-                DOMNodeList nodeList = (DOMNodeList) response;
-                for (int walk = 0; walk < nodeList.getLength(); walk++) {
-                    Node node = nodeList.item(walk);
-                    switch (node.getNodeType()) {
-                        case Node.ATTRIBUTE_NODE:
-                            binding.setProperty("it", node.getNodeValue());
-                            break;
-                        case Node.CDATA_SECTION_NODE:
-                        case Node.TEXT_NODE:
-                            binding.setProperty("it", node.getNodeValue());
-                            break;
-                        case Node.ELEMENT_NODE:
-                        case Node.COMMENT_NODE:
-                        default:
-                            throw new RuntimeException("Node type " + node.getNodeType());
-                    }
-                    Object result = script.run();
-                    if (result != null) {
-                        String string = result.toString().trim();
-                        if (!string.isEmpty()) {
-                            System.out.println(String.format("Assertion Failed (%s):", assertion.xpath));
-//                            System.out.println(assertion.getScript());
-                            System.out.println(String.format("Message: %s", string));
-                            System.out.println();
-                        }
-                    }
-                }
-            }
-            else {
-                throw new RuntimeException("Node list not returned");
-//                Object answer = ((List) response).get(0);
-//                if (answer instanceof Long) {
-//                    System.out.println(String.format("%s is Long %s", assertion.xpath, answer));
-//                }
-//                else if (answer instanceof Boolean) {
-//                    System.out.println(String.format("%s is Boolean %s", assertion.xpath, answer));
-//                }
-//                else {
-//                    throw new RuntimeException("Type? " + answer.getClass());
-//                }
+        AssertionTest.Factory factory = new AssertionTest.Factory(pathFactory, new DocContext(mods), groovyCodeResource);
+        List<AssertionTest> tests = new ArrayList<AssertionTest>();
+        for (Assertion assertion : assertionList.assertions) tests.add(factory.create(assertion));
+        for (AssertionTest test : tests) {
+            String violation = test.getViolation(mods);
+            if (violation != null) {
+                System.out.printf("%s: %s\n", test, violation);
             }
         }
     }
@@ -174,10 +128,6 @@ public class TestAssertions {
         xstream.processAnnotations(Assertion.AssertionList.class);
         return xstream;
     }
-
-    /**
-     * @author Gerald de Jong <gerald@delving.eu>
-     */
 
     public static class DocContext implements NamespaceContext {
         private Map<String, String> prefixUri = new TreeMap<String, String>();

@@ -27,7 +27,8 @@ import org.w3c.dom.Node;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Test required and singular for an xpath
@@ -83,14 +84,14 @@ public class StructureTest {
         String pattern = "ILLEGAL!";
         if (required) {
             if (singular) {
-                pattern = "ExactlyOne(%s)";
+                pattern = "ExactlyOne(\"%s\")";
             }
             else {
-                pattern = "OneOrMore(%s)";
+                pattern = "OneOrMore(\"%s\")";
             }
         }
         else if (singular) {
-            pattern = "ZeroOrOne(%s)";
+            pattern = "ZeroOrOne(\"%s\")";
         }
         return String.format(pattern, path);
     }
@@ -135,37 +136,6 @@ public class StructureTest {
         if (elem.required || elem.singular) tests.add(factory.create(path, elem.required, elem.singular));
         for (RecDef.Attr sub : elem.attrList) collectStructureTests(sub, path, tests, factory);
         for (RecDef.Elem sub : elem.elemList) collectStructureTests(sub, path, tests, factory);
-    }
-
-    public static class XPathContext implements NamespaceContext {
-        private Map<String, String> prefixUri = new TreeMap<String, String>();
-        private Map<String, String> uriPrefix = new TreeMap<String, String>();
-
-        public XPathContext(List<RecDef.Namespace> namespaces) {
-            for (RecDef.Namespace namespace : namespaces) {
-                prefixUri.put(namespace.prefix, namespace.uri);
-                uriPrefix.put(namespace.uri, namespace.prefix);
-            }
-        }
-
-        @Override
-        public String getNamespaceURI(String prefix) {
-            return prefixUri.get(prefix);
-        }
-
-        @Override
-        public String getPrefix(String namespaceURI) {
-            return uriPrefix.get(namespaceURI);
-        }
-
-        @Override
-        public Iterator getPrefixes(String namespaceURI) {
-            String prefix = getPrefix(namespaceURI);
-            if (prefix == null) return null;
-            List<String> list = new ArrayList<String>();
-            list.add(prefix);
-            return list.iterator();
-        }
     }
 
 }
