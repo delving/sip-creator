@@ -308,6 +308,7 @@ public class MappingCompileModel {
                         validator.setErrorHandler(handler);
                         try {
                             validator.validate(new DOMSource(node));
+                            handler.checkErrors();
                             MappingResult result = new MappingResultImpl(serializer, node, recMapping.getRecDefTree()).resolve();
                             result.checkMissingFields(); // todo: replace this kind of validation
                             StringBuilder out = new StringBuilder();
@@ -368,9 +369,11 @@ public class MappingCompileModel {
         }
 
         private void structureViolation(Node node, String handlerError) throws XPathFactoryConfigurationException, XPathExpressionException {
+            System.out.println("structureViolation: "+serializer.toXml(node, true));
             StringBuilder out = new StringBuilder();
             for (StructureTest test : StructureTest.listFrom(recMapping.getRecDefTree().getRecDef())) {
-                switch (test.getViolation(node)) {
+                StructureTest.Violation violation = test.getViolation(node);
+                switch (violation) {
                     case REQUIRED:
                         out.append("Missing piece: ").append(test.toString()).append('\n');
                         break;
@@ -561,6 +564,10 @@ public class MappingCompileModel {
         public String getError() {
             if (error.length() == 0) return null;
             return error.toString();
+        }
+
+        public void checkErrors() throws SAXException {
+            if (error.length() > 0) throw new SAXException(error.toString());
         }
 
         public void reset() {

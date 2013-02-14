@@ -21,11 +21,11 @@
 
 package eu.delving.metadata;
 
+import eu.delving.XMLToolFactory;
 import eu.delving.groovy.GroovyCodeResource;
 import groovy.lang.Binding;
 import groovy.lang.Script;
 import net.sf.saxon.dom.DOMNodeList;
-import net.sf.saxon.om.NamespaceConstant;
 import org.w3c.dom.Node;
 
 import javax.xml.namespace.NamespaceContext;
@@ -48,8 +48,7 @@ public class AssertionTest {
     public static List<AssertionTest> listFrom(RecDef recDef, GroovyCodeResource groovy) throws XPathFactoryConfigurationException, XPathExpressionException {
         List<AssertionTest> tests = new ArrayList<AssertionTest>();
         if (recDef.assertionList == null) return tests;
-        XPathFactory pathFactory = XPathFactory.newInstance(NamespaceConstant.OBJECT_MODEL_SAXON);
-        Factory factory = new Factory(pathFactory, new XPathContext(recDef.namespaces), groovy);
+        Factory factory = new Factory(XMLToolFactory.xpathFactory(), new XPathContext(recDef.namespaces), groovy);
         for (Assertion assertion : recDef.assertionList.assertions) {
             tests.add(factory.create(assertion));
         }

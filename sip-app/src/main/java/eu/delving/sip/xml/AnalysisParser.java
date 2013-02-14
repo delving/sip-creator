@@ -21,6 +21,7 @@
 
 package eu.delving.sip.xml;
 
+import eu.delving.XMLToolFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.CancelException;
@@ -32,7 +33,6 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.IOUtils;
-import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 
 import javax.xml.namespace.QName;
@@ -88,11 +88,7 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
     @Override
     public void run() {
         try {
-            XMLInputFactory2 xmlif = (XMLInputFactory2) XMLInputFactory2.newInstance();
-            xmlif.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-            xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
-            xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
-            xmlif.configureForSpeed();
+            XMLInputFactory xmlif = XMLToolFactory.xmlInputFactory();
             Path path = Path.create();
             boolean running = true;
             InputStream inputStream = null;

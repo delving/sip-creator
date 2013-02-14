@@ -21,6 +21,7 @@
 
 package eu.delving.sip.xml;
 
+import eu.delving.XMLToolFactory;
 import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.MetadataRecordFactory;
@@ -29,12 +30,10 @@ import eu.delving.metadata.Tag;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
-import org.codehaus.stax2.XMLInputFactory2;
-import org.codehaus.stax2.XMLStreamReader2;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +49,7 @@ import java.util.TreeMap;
 
 public class MetadataParser {
     private InputStream inputStream;
-    private XMLStreamReader2 input;
+    private XMLStreamReader input;
     private int recordIndex, recordCount;
     private Map<String, String> namespaces = new TreeMap<String, String>();
     private Path path = Path.create();
@@ -60,12 +59,7 @@ public class MetadataParser {
     public MetadataParser(InputStream inputStream, int recordCount) throws XMLStreamException {
         this.inputStream = inputStream;
         this.recordCount = recordCount;
-        XMLInputFactory2 xmlif = (XMLInputFactory2) XMLInputFactory2.newInstance();
-        xmlif.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-        xmlif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
-        xmlif.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
-        xmlif.configureForSpeed();
-        this.input = (XMLStreamReader2) xmlif.createXMLStreamReader("Metadata", inputStream);
+        this.input = XMLToolFactory.xmlInputFactory().createXMLStreamReader("Metadata", inputStream);
     }
 
     public void setProgressListener(ProgressListener progressListener) {

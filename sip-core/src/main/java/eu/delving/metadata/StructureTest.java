@@ -21,8 +21,8 @@
 
 package eu.delving.metadata;
 
+import eu.delving.XMLToolFactory;
 import net.sf.saxon.dom.DOMNodeList;
-import net.sf.saxon.om.NamespaceConstant;
 import org.w3c.dom.Node;
 
 import javax.xml.namespace.NamespaceContext;
@@ -44,8 +44,7 @@ public class StructureTest {
     private XPathExpression test;
 
     public static List<StructureTest> listFrom(RecDef recDef) throws XPathFactoryConfigurationException, XPathExpressionException {
-        XPathFactory pathFactory = XPathFactory.newInstance(NamespaceConstant.OBJECT_MODEL_SAXON);
-        StructureTest.Factory factory = new StructureTest.Factory(pathFactory, new XPathContext(recDef.namespaces));
+        StructureTest.Factory factory = new StructureTest.Factory(XMLToolFactory.xpathFactory(), new XPathContext(recDef.namespaces));
         List<StructureTest> tests = new ArrayList<StructureTest>();
         collectStructureTests(recDef.root, Path.create(), tests, factory);
         return tests;
@@ -61,8 +60,10 @@ public class StructureTest {
         this.path = path;
         this.required = required;
         this.singular = singular;
-        this.parent = factory.createPath().compile(path.parent().toString());
-        this.test = factory.createPath().compile(getTestPath());
+        String parentPath = path.parent().toString();
+        this.parent = factory.createPath().compile(parentPath);
+        String testPath = getTestPath();
+        this.test = factory.createPath().compile(testPath);
     }
 
     public Violation getViolation(Node root) throws XPathExpressionException {

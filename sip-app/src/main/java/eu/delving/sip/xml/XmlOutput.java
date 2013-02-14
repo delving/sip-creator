@@ -21,6 +21,7 @@
 
 package eu.delving.sip.xml;
 
+import eu.delving.XMLToolFactory;
 import eu.delving.metadata.RecDef;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -29,7 +30,6 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
@@ -50,13 +50,13 @@ import static eu.delving.sip.files.Storage.OUTPUT_TAG;
  */
 
 public class XmlOutput {
-    private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+    private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
     private OutputStream outputStream;
     private XMLEventWriter out;
 
     public XmlOutput(OutputStream outputStream, Map<String, RecDef.Namespace> namespaces) throws UnsupportedEncodingException, XMLStreamException {
         this.outputStream = outputStream;
-        out = XMLOutputFactory.newInstance().createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+        out = XMLToolFactory.xmlOutputFactory().createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         out.add(eventFactory.createStartDocument());
         out.add(eventFactory.createCharacters("\n"));
         List<Namespace> namespaceList = new ArrayList<Namespace>();

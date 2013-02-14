@@ -21,7 +21,7 @@
 
 package eu.delving.sip.xml;
 
-import com.ctc.wstx.stax.WstxInputFactory;
+import eu.delving.XMLToolFactory;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
@@ -64,9 +64,9 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
 //    public static final String ANONYMOUS_RECORDS_PROPERTY = "anonymousRecords";
     private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
-    private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
-    private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-    private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+    private XMLInputFactory inputFactory = XMLToolFactory.xmlInputFactory();
+    private XMLOutputFactory outputFactory = XMLToolFactory.xmlOutputFactory();
+    private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
     private Path recordRootPath;
     private Path uniqueElementPath;
     private int recordCount, totalRecords;//, anonymousRecords;
