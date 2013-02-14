@@ -36,6 +36,9 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.NamespaceContext;
@@ -75,6 +78,32 @@ public class TestAssertions {
         schemaRepository = new SchemaRepository(new FileSystemFetcher(true));
     }
 
+    private void dump(Document document) {
+        dump(document.getDocumentElement(), 0);
+        DOMImplementationLS ls = null;
+        try {
+            ls = (DOMImplementationLS) XMLToolFactory.documentBuilderFactory().newDocumentBuilder().getDOMImplementation();
+        }
+        catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        LSSerializer lss = ls.createLSSerializer();
+        LSOutput lso = ls.createLSOutput();
+        lso.setByteStream(System.out);
+        lss.write(document, lso);
+    }
+
+    private void dump(Node node, int level) {
+        for (int walk = 0; walk < level; walk++) {
+            System.out.print("\t");
+        }
+        System.out.println(String.format("%d: %s:%s {%s}", node.getNodeType(), node.getPrefix(), node.getLocalName(), node.getNamespaceURI()));
+        NodeList kids = node.getChildNodes();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            dump(kids.item(walk), level + 1);
+        }
+    }
+
     @Test
     public void testGeneratedStructureTestsICN() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
         RecDef icnRecDef = RecDef.read(new ByteArrayInputStream(schemaRepository.getSchema(new SchemaVersion("icn", "1.0.3"), SchemaType.RECORD_DEFINITION).getBytes()));
@@ -82,13 +111,13 @@ public class TestAssertions {
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(icnDoc.getDocumentElement())) {
                 case NONE:
-                    System.out.println("OK: "+structureTest);
+                    System.out.println("OK: " + structureTest);
                     break;
                 case REQUIRED:
-                    System.out.println("Required: "+structureTest);
+                    System.out.println("Required: " + structureTest);
                     break;
                 case SINGULAR:
-                    System.out.println("Singular: "+structureTest);
+                    System.out.println("Singular: " + structureTest);
                     break;
             }
         }
@@ -101,13 +130,13 @@ public class TestAssertions {
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(modsDoc)) {
                 case NONE:
-                    System.out.println("OK: "+structureTest);
+                    System.out.println("OK: " + structureTest);
                     break;
                 case REQUIRED:
-                    System.out.println("Required: "+structureTest);
+                    System.out.println("Required: " + structureTest);
                     break;
                 case SINGULAR:
-                    System.out.println("Singular: "+structureTest);
+                    System.out.println("Singular: " + structureTest);
                     break;
             }
         }
@@ -190,7 +219,7 @@ public class TestAssertions {
     }
 
     private Document parseDoc(String fileName) throws SAXException, IOException, ParserConfigurationException {
-        URL modsResource = getClass().getResource("/assertion/"+fileName);
+        URL modsResource = getClass().getResource("/assertion/" + fileName);
         File file = new File(modsResource.getFile());
         return XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(file);
     }

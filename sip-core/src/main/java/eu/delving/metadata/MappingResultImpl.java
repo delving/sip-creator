@@ -265,6 +265,7 @@ public class MappingResultImpl implements MappingResult {
         List<Element> elements = new ArrayList<Element>();
         while (element.getParentNode() != null) {
             elements.add(element);
+            if (element.getParentNode() instanceof Document) break;
             element = (Element) element.getParentNode();
         }
         Path path = Path.create().child(recDefTree.getRecDef().root.tag);

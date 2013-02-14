@@ -369,7 +369,6 @@ public class MappingCompileModel {
         }
 
         private void structureViolation(Node node, String handlerError) throws XPathFactoryConfigurationException, XPathExpressionException {
-            System.out.println("structureViolation: "+serializer.toXml(node, true));
             StringBuilder out = new StringBuilder();
             for (StructureTest test : StructureTest.listFrom(recMapping.getRecDefTree().getRecDef())) {
                 StructureTest.Violation violation = test.getViolation(node);

@@ -81,6 +81,10 @@ public class XmlSerializer {
                 for (int walk = 0; walk < kids.getLength(); walk++) {
                     Node kid = kids.item(walk);
                     switch (kid.getNodeType()) {
+                        case Node.TEXT_NODE:
+                        case Node.CDATA_SECTION_NODE:
+                        case Node.COMMENT_NODE:
+                            break;
                         case Node.ELEMENT_NODE:
                             nodeToXml(out, kid, 1);
                             break;

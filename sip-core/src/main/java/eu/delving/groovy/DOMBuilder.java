@@ -98,6 +98,7 @@ public class DOMBuilder extends BuilderSupport {
                 if (schemaLocation.length() > 0) {
                     element.setAttributeNS(RecDef.XSI_NAMESPACE.uri, SCHEMA_LOCATION_ATTR, schemaLocation.toString());
                 }
+                document.appendChild(element);
             }
             return element;
         }
