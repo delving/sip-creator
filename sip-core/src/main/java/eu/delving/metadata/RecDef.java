@@ -138,6 +138,8 @@ public class RecDef {
 
     public List<OptList> opts;
 
+    public Assertion.AssertionList assertionList;
+
     @XStreamAlias("field-markers")
     public List<FieldMarker> fieldMarkers;
 
@@ -191,12 +193,7 @@ public class RecDef {
     }
 
     public String toString() {
-        List<Path> paths = new ArrayList<Path>();
-        Path path = Path.create();
-        collectPaths(root, path, paths);
-        StringBuilder out = new StringBuilder();
-        for (Path p : paths) out.append(p.toString()).append('\n');
-        return out.toString();
+        return String.format("RecDef(%s/%s)", prefix, version);
     }
 
     private void resolve() {
@@ -207,18 +204,6 @@ public class RecDef {
         root.resolve(Path.create(), this);
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
-    }
-
-    private void collectPaths(Elem elem, Path path, List<Path> paths) {
-        path = path.child(elem.tag);
-        paths.add(path);
-        for (Attr sub : elem.attrList) collectPaths(sub, path, paths);
-        for (Elem sub : elem.elemList) collectPaths(sub, path, paths);
-    }
-
-    private void collectPaths(Attr attr, Path path, List<Path> paths) {
-        path = path.child(attr.tag);
-        paths.add(path);
     }
 
     Attr findAttr(Path path) {
@@ -350,6 +335,9 @@ public class RecDef {
         public Tag tag;
 
         @XStreamAsAttribute
+        public boolean required;
+
+        @XStreamAsAttribute
         public boolean hidden;
 
         @XStreamAsAttribute
@@ -368,7 +356,7 @@ public class RecDef {
 
         public Attr copy() {
             try {
-                return (Attr)this.clone();
+                return (Attr) this.clone();
             }
             catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
@@ -443,6 +431,8 @@ public class RecDef {
 
         @XStreamAsAttribute
         public Operator operator;
+
+        public Assertion assertion;
 
         @XStreamImplicit
         public List<Elem> subelements = new ArrayList<Elem>();
@@ -545,4 +535,5 @@ public class RecDef {
             }
         }
     }
+
 }

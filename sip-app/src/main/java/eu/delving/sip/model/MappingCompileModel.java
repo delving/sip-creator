@@ -41,6 +41,8 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -80,6 +82,7 @@ public class MappingCompileModel {
     private MappingModelEar mappingModelEar = new MappingModelEar();
     private SipModel sipModel;
     private boolean trace;
+    private List<AssertionTest> assertions;
 
     public enum Type {
         RECORD("record mapping"),
@@ -170,6 +173,10 @@ public class MappingCompileModel {
 
     public void setValidator(Validator validator) {
         this.validator = validator;
+    }
+
+    public void setAssertions(List<AssertionTest> assertions) {
+        this.assertions = assertions;
     }
 
     public Document getCodeDocument() {
@@ -265,6 +272,17 @@ public class MappingCompileModel {
         }
     }
 
+    private enum Completion {
+        JUST_FINE,
+        UNVALIDATED,
+        STRUCTURE_VIOLATION,
+        SCHEMA_VIOLATION,
+        CONTENT_VIOLATION,
+        MISSING_FIELD,
+        DISCARDED_RECORD,
+        UNEXPECTED
+    }
+
     private class MappingJob implements Work.DataSetPrefixWork {
 
         private EditPath editPath;
@@ -285,38 +303,48 @@ public class MappingCompileModel {
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
                     if (node == null) return;
-                    String output = serializer.toXml(node, true);
                     if (validator != null) {
                         ForgivingErrorHandler handler = new ForgivingErrorHandler();
                         validator.setErrorHandler(handler);
                         try {
                             validator.validate(new DOMSource(node));
+                            handler.checkErrors();
                             MappingResult result = new MappingResultImpl(serializer, node, recMapping.getRecDefTree()).resolve();
-                            result.checkMissingFields();
-                            compilationComplete(output, handler.getError());
+                            result.checkMissingFields(); // todo: replace this kind of validation
+                            StringBuilder out = new StringBuilder();
+                            for (AssertionTest test : assertions) {
+                                String violation = test.getViolation(node);
+                                if (violation != null) out.append(test).append(" : ").append(violation).append('\n');
+                            }
+                            if (out.length() > 0) {
+                                compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
+                            }
+                            else {
+                                compilationComplete(Completion.JUST_FINE, node, null);
+                            }
                         }
                         catch (SAXException e) {
-                            compilationComplete(output, handler.getError());
+                            structureViolation(node, handler.getError());
                         }
                         catch (MappingResult.MissingFieldsException e) {
-                            compilationComplete(output, e.getMessage());
+                            compilationComplete(Completion.MISSING_FIELD, node, e.getMessage());
                         }
                         finally {
                             handler.reset();
                         }
                     }
                     else {
-                        compilationComplete(output, null);
+                        compilationComplete(Completion.UNVALIDATED, node, null);
                     }
                     setMappingCode();
                 }
                 catch (DiscardRecordException e) {
-                    compilationComplete("Discarded explicitly", e.getMessage());
+                    compilationComplete(Completion.DISCARDED_RECORD, null, e.getMessage());
                     setMappingCode();
                 }
             }
             catch (Exception e) {
-                compilationComplete("No output available", e.getMessage());
+                compilationComplete(Completion.UNEXPECTED, null, e.getMessage());
                 notifyStateChange(CompileState.ERROR);
             }
             finally {
@@ -340,9 +368,38 @@ public class MappingCompileModel {
             }
         }
 
-        private void compilationComplete(String result, String error) {
-            if (error != null) result = String.format("## VALIDATION ERROR! ##\n%s\n\n## OUTPUT ##\n%s", error, result);
-            sipModel.exec(new DocumentSetter(outputDocument, result, false));
+        private void structureViolation(Node node, String handlerError) throws XPathFactoryConfigurationException, XPathExpressionException {
+            StringBuilder out = new StringBuilder();
+            for (StructureTest test : StructureTest.listFrom(recMapping.getRecDefTree().getRecDef())) {
+                StructureTest.Violation violation = test.getViolation(node);
+                switch (violation) {
+                    case REQUIRED:
+                        out.append("\nRequired piece was missing:\n\t").append(test.toString()).append('\n');
+                        break;
+                    case SINGULAR:
+                        out.append("\nToo many sub-elements:\n\t").append(test.toString()).append('\n');
+                        break;
+                }
+            }
+            if (out.length() > 0) {
+                compilationComplete(Completion.STRUCTURE_VIOLATION, node, String.format(
+                        "Record definition structure violations:\n%s\n" +
+                                "Message from XSD validation:\n%s\n",
+                        out, handlerError
+                ));
+            }
+            else {
+                compilationComplete(Completion.SCHEMA_VIOLATION, node, String.format(
+                        "Message from XSD validation:\n%s\n",
+                        handlerError
+                ));
+            }
+        }
+
+        private void compilationComplete(Completion completion, Node node, String error) {
+            String xml = node == null ? "No XML" : serializer.toXml(node, true);
+            if (error != null) xml = String.format("## %s ##\n\n%s\n## OUTPUT ##\n%s", completion, error, xml);
+            sipModel.exec(new DocumentSetter(outputDocument, xml, false));
         }
 
         public String toString() {
@@ -506,6 +563,10 @@ public class MappingCompileModel {
         public String getError() {
             if (error.length() == 0) return null;
             return error.toString();
+        }
+
+        public void checkErrors() throws SAXException {
+            if (error.length() > 0) throw new SAXException(error.toString());
         }
 
         public void reset() {

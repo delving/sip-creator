@@ -261,13 +261,13 @@ public class MappingResultImpl implements MappingResult {
         list.add(value);
     }
 
-    private Path getPath(Element element, boolean includeAFFKeys) {
+    private Path getPath(Node node, boolean includeAFFKeys) {
         List<Element> elements = new ArrayList<Element>();
-        while (element.getParentNode() != null) {
-            elements.add(element);
-            element = (Element) element.getParentNode();
+        while (node.getParentNode() != null) {
+            elements.add((Element) node);
+            node = node.getParentNode();
         }
-        Path path = Path.create().child(recDefTree.getRecDef().root.tag);
+        Path path = Path.create();
         Collections.reverse(elements);
         for (Element el : elements) {
             String key = includeAFFKeys ? el.getAttribute("aff:key") : null;

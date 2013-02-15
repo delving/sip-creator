@@ -321,6 +321,7 @@ public class SipModel {
                 dataSetModel.getMappingModel().setFacts(facts);
                 dataSetModel.getMappingModel().setSchemaVersion(schemaVersions);
                 recordCompileModel.setValidator(dataSetModel.newValidator());
+                recordCompileModel.setAssertions(AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
                 exec(new Swing() {
                     @Override
                     public void run() {
