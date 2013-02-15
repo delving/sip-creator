@@ -21,6 +21,7 @@
 
 package eu.delving.groovy;
 
+import eu.delving.XMLToolFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -48,8 +49,8 @@ import java.util.TreeMap;
 
 public class XmlSerializer {
 
-    private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-    private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+    private XMLOutputFactory outputFactory = XMLToolFactory.xmlOutputFactory();
+    private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
     private List<String> indentStrings = new ArrayList<String>();
 
     public String toXml(Node node, boolean fromMapping) {
@@ -80,6 +81,10 @@ public class XmlSerializer {
                 for (int walk = 0; walk < kids.getLength(); walk++) {
                     Node kid = kids.item(walk);
                     switch (kid.getNodeType()) {
+                        case Node.TEXT_NODE:
+                        case Node.CDATA_SECTION_NODE:
+                        case Node.COMMENT_NODE:
+                            break;
                         case Node.ELEMENT_NODE:
                             nodeToXml(out, kid, 1);
                             break;

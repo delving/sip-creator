@@ -22,7 +22,7 @@
 package eu.delving.groovy;
 
 import com.ctc.wstx.exc.WstxParsingException;
-import org.codehaus.stax2.XMLInputFactory2;
+import eu.delving.XMLToolFactory;
 import org.codehaus.stax2.XMLStreamReader2;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -31,7 +31,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -50,20 +49,14 @@ import java.util.Map;
  */
 
 public class MetadataRecordFactory {
-    private XMLInputFactory2 inputFactory = (XMLInputFactory2) XMLInputFactory2.newInstance();
+    private XMLInputFactory inputFactory = XMLToolFactory.xmlInputFactory();
     private DocumentBuilder documentBuilder;
     private Map<String, String> namespaces;
 
     public MetadataRecordFactory(Map<String, String> namespaces) {
         this.namespaces = namespaces;
-        inputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-        inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
-        inputFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
-        inputFactory.configureForSpeed();
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            documentBuilder = factory.newDocumentBuilder();
+            documentBuilder = XMLToolFactory.documentBuilderFactory().newDocumentBuilder();
         }
         catch (ParserConfigurationException e) {
             throw new RuntimeException("Parser config?",e);

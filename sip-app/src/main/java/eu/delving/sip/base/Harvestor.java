@@ -21,7 +21,7 @@
 
 package eu.delving.sip.base;
 
-import com.ctc.wstx.stax.WstxInputFactory;
+import eu.delving.XMLToolFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.files.DataSet;
@@ -61,9 +61,9 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     private static final Path RECORD_ROOT = Path.create("/OAI-PMH/ListRecords/record");
     private static final Path ERROR = Path.create("/OAI-PMH/error");
     private static final Path RESUMPTION_TOKEN = Path.create("/OAI-PMH/ListRecords/resumptionToken");
-    private XMLInputFactory inputFactory = WstxInputFactory.newInstance();
-    private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-    private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+    private XMLInputFactory inputFactory = XMLToolFactory.xmlInputFactory();
+    private XMLOutputFactory outputFactory = XMLToolFactory.xmlOutputFactory();
+    private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
     private DefaultHttpClient httpClient;
     private NamespaceCollector namespaceCollector = new NamespaceCollector();
     private Context context;

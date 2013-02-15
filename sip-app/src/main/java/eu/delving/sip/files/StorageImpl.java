@@ -21,6 +21,7 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.XMLToolFactory;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaVersion;
@@ -611,7 +612,7 @@ public class StorageImpl implements Storage {
 
     private SchemaFactory schemaFactory() {
         if (schemaFactory == null) {
-            schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+            schemaFactory = XMLToolFactory.schemaFactory();
             if (resolver != null) schemaFactory.setResourceResolver(resolver);
         }
         return schemaFactory;

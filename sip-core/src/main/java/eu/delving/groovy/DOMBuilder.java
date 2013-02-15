@@ -21,17 +21,16 @@
 
 package eu.delving.groovy;
 
+import eu.delving.XMLToolFactory;
 import eu.delving.metadata.RecDef;
 import groovy.lang.Closure;
 import groovy.lang.GString;
 import groovy.lang.MissingMethodException;
 import groovy.util.BuilderSupport;
-import groovy.xml.FactorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.*;
 
@@ -54,25 +53,22 @@ public class DOMBuilder extends BuilderSupport {
     private Map<String, RecDef.Namespace> namespaces = new TreeMap<String, RecDef.Namespace>();
     private RecDef recDef;
 
-    public static DOMBuilder newInstance(RecDef recDef) {
+    public static DOMBuilder createFor(RecDef recDef) {
         try {
-            DOMBuilder instance = new DOMBuilder(recDef);
-            DocumentBuilderFactory factory = FactorySupport.createDocumentBuilderFactory();
-            factory.setNamespaceAware(true);
-            instance.documentBuilder = factory.newDocumentBuilder();
-            return instance;
+            return new DOMBuilder(recDef, XMLToolFactory.documentBuilderFactory().newDocumentBuilder());
         }
         catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public DOMBuilder(RecDef recDef) {
+    private DOMBuilder(RecDef recDef, DocumentBuilder documentBuilder) {
         this.recDef = recDef;
         this.namespaces = recDef.getNamespaceMap();
         if (!recDef.elementFormDefaultQualified) {
             namespaces.remove(recDef.prefix);
         }
+        this.documentBuilder = documentBuilder;
     }
 
     @Override
@@ -102,6 +98,7 @@ public class DOMBuilder extends BuilderSupport {
                 if (schemaLocation.length() > 0) {
                     element.setAttributeNS(RecDef.XSI_NAMESPACE.uri, SCHEMA_LOCATION_ATTR, schemaLocation.toString());
                 }
+                document.appendChild(element);
             }
             return element;
         }

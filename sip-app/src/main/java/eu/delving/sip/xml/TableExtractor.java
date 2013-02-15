@@ -21,6 +21,8 @@
 
 package eu.delving.sip.xml;
 
+import eu.delving.XMLToolFactory;
+
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
@@ -47,8 +49,8 @@ import java.util.TreeMap;
 
 public class TableExtractor {
     private static final String DUMP_ENVELOP_TAG = "delving-db-dump";
-    private XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-    private XMLEventFactory event = XMLEventFactory.newInstance();
+    private XMLOutputFactory outputFactory = XMLToolFactory.xmlOutputFactory();
+    private XMLEventFactory event = XMLToolFactory.xmlEventFactory();
     private Stack<ResultSet> resultSets = new Stack<ResultSet>();
     private XMLEventWriter out;
     private Connection connection;

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<icn:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:delving="http://schemas.delving.eu/"
+            xmlns:europeana="http://www.europeana.eu/schemas/ese/" xmlns:icn="http://www.icn.nl/schemas/icn/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://purl.org/dc/elements/1.1/ http://dublincore.org/schemas/xmls/qdc/dc.xsd http://schemas.delving.eu/ delving-1.2.xsd http://www.icn.nl/schemas/icn/ ICN-V1.0.xsd http://www.europeana.eu/schemas/ese/ http://www.europeana.eu/schemas/ese/ESE-V3.4.xsd">
+    <icn:rijksCollection>true</icn:rijksCollection>
+    <dc:title>Toraschild</dc:title>
+    <dc:creator>onbekend</dc:creator>
+    <dc:subject>toraversierselen</dc:subject>
+    <dc:subject>synagogedienst</dc:subject>
+    <dc:publisher>Joods Historisch Museum</dc:publisher>
+    <dc:date>1860 (ca.)</dc:date>
+    <dc:identifier>00035</dc:identifier>
+    <dc:coverage>Polen (?)</dc:coverage>
+    <europeana:isShownBy>http://www.jhm.nl/collectiebeeld/d025/025B039.jpg</europeana:isShownBy>
+    <europeana:isShownBy>http://www.jhm.nl/collectiebeeld/d025/025B039.jpg</europeana:isShownBy>
+    <europeana:rights>http://creativecommons.org/publicdomain/mark/1.0/</europeana:rights>
+    <europeana:isShownAt>http://www.jhm.nl/collectie/museumstukken/00035</europeana:isShownAt>
+    <europeana:object>http://www.jhm.nl/collectiebeeld/d025/025B039.jpg</europeana:object>
+    <europeana:provider>Air</europeana:provider>
+    <europeana:dataProvider>Gerland</europeana:dataProvider>
+    <europeana:type>SOUND</europeana:type>
+    <europeana:uri>joods/oai:jhm:50000001</europeana:uri>
+    <europeana:language>nl</europeana:language>
+    <europeana:country>netherlands</europeana:country>
+    <europeana:collectionName>joods</europeana:collectionName>
+    <europeana:collectionTitle>Jewish Historical Stuff</europeana:collectionTitle>
+    <delving:thumbnail>http://www.jhm.nl/collectiebeeld/d025/025B039.jpg</delving:thumbnail>
+</icn:record>
