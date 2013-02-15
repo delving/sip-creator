@@ -374,23 +374,23 @@ public class MappingCompileModel {
                 StructureTest.Violation violation = test.getViolation(node);
                 switch (violation) {
                     case REQUIRED:
-                        out.append("Missing piece: ").append(test.toString()).append('\n');
+                        out.append("\nRequired piece was missing:\n\t").append(test.toString()).append('\n');
                         break;
                     case SINGULAR:
-                        out.append("Too many: ").append(test.toString()).append('\n');
+                        out.append("\nToo many sub-elements:\n\t").append(test.toString()).append('\n');
                         break;
                 }
             }
             if (out.length() > 0) {
                 compilationComplete(Completion.STRUCTURE_VIOLATION, node, String.format(
                         "Record definition structure violations:\n%s\n" +
-                                "Cryptic message from XSD validation:\n%s\n",
+                                "Message from XSD validation:\n%s\n",
                         out, handlerError
                 ));
             }
             else {
                 compilationComplete(Completion.SCHEMA_VIOLATION, node, String.format(
-                        "Cryptic message from XSD validation:\n%s\n",
+                        "Message from XSD validation:\n%s\n",
                         handlerError
                 ));
             }
@@ -398,7 +398,7 @@ public class MappingCompileModel {
 
         private void compilationComplete(Completion completion, Node node, String error) {
             String xml = node == null ? "No XML" : serializer.toXml(node, true);
-            if (error != null) xml = String.format("## %s ##\n%s\n\n## OUTPUT ##\n%s", completion, error, xml);
+            if (error != null) xml = String.format("## %s ##\n\n%s\n## OUTPUT ##\n%s", completion, error, xml);
             sipModel.exec(new DocumentSetter(outputDocument, xml, false));
         }
 

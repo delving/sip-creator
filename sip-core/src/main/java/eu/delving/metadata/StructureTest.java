@@ -82,19 +82,19 @@ public class StructureTest {
     }
 
     public String toString() {
-        String pattern = "ILLEGAL!";
+        String pattern = "what? %s %s";
         if (required) {
             if (singular) {
-                pattern = "ExactlyOne(\"%s\")";
+                pattern = "The %s tag should appear exactly once within %s.";
             }
             else {
-                pattern = "OneOrMore(\"%s\")";
+                pattern = "The %s tag should appear at least once within %s.";
             }
         }
         else if (singular) {
-            pattern = "ZeroOrOne(\"%s\")";
+            pattern = "The %s tag should not appear more than once within %s.";
         }
-        return String.format(pattern, path);
+        return String.format(pattern, path.peek(), path.parent());
     }
 
     private String getTestPath() {
