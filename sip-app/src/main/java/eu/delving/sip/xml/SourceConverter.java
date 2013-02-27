@@ -119,9 +119,13 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
             moveFile(dataSet.sourceOutput(), hashedSource);
             deleteQuietly(statsFile(dataSet.sourceOutput().getParentFile(), true, null));
         }
+        catch (StorageException e) {
+            deleteQuietly(dataSet.sourceOutput());
+            progressListener.getFeedback().alert("Conversion failed: "+e.getMessage(), e);
+        }
         catch (Exception e) {
             deleteQuietly(dataSet.sourceOutput());
-            progressListener.getFeedback().alert("Conversion failed", e);
+            progressListener.getFeedback().alert("Conversion failed, unexpected: "+e.getMessage(), e);
         }
         finally {
             if (work != null) work.run();
@@ -239,6 +243,9 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
         catch (CancelException e) {
             progressListener.getFeedback().alert("Conversion cancelled");
         }
+        catch (StorageException e) {
+            progressListener.getFeedback().alert("Conversion failed: "+e.getMessage(), e);
+        }
         finally {
             if (uniqueRepeatCount > 0) {
                 progressListener.getFeedback().alert(String.format("Uniqueness violations : " + uniqueRepeatCount));
@@ -248,7 +255,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
         }
     }
 
-    private void outputRecord(XMLEventWriter out) throws XMLStreamException {
+    private void outputRecord(XMLEventWriter out) throws XMLStreamException, StorageException {
 //        if (anonymousRecords == 0 || recordCount < anonymousRecords) {
             String uniqueValue = getUniqueValue();
             if (!uniqueValue.isEmpty()) {
@@ -271,11 +278,11 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
         clearEvents();
     }
 
-    private String getUniqueValue() {
+    private String getUniqueValue() throws StorageException {
         String trimmed = unique.trim().replaceAll(":", "-");
         String modified = converterPattern != null ? converterPattern.matcher(trimmed).replaceFirst(converterReplacement) : trimmed;
         if (modified.length() > maxUniqueValueLength) {
-            throw new IllegalArgumentException("Unique value too large: " + unique);
+            throw new StorageException("Unique value too large: " + unique);
         }
         return TO_UNDERSCORE.matcher(modified).replaceAll("_");
     }
