@@ -30,10 +30,9 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import static eu.delving.sip.base.SwingHelper.LONG_TERM_JOB_COLOR;
 import static eu.delving.sip.base.SwingHelper.NORMAL_JOB_COLOR;
@@ -45,7 +44,6 @@ import static eu.delving.sip.base.SwingHelper.NORMAL_JOB_COLOR;
  */
 
 public class WorkPanel extends JPanel {
-    private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("hh:mm:ss");
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
     private JList list;
 
@@ -78,7 +76,7 @@ public class WorkPanel extends JPanel {
 
     private String toFullString(WorkModel.JobContext jobContext) {
         Work work = jobContext.getWork();
-        if (work == null) return "empty";
+        if (work == null) return "";
         String dataSetSpec = jobContext.getDataSet();
         String show = work.getJob().toString();
         if (dataSetSpec != null) {
@@ -104,7 +102,10 @@ public class WorkPanel extends JPanel {
             String show = toFullString(jobContext);
             Component component = super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
             Work work = jobContext.getWork();
-            if (work == null || work instanceof Work.LongTermWork) {
+            if (work == null) {
+                component.setBackground(Color.WHITE);
+            }
+            else if (work instanceof Work.LongTermWork) {
                 component.setBackground(LONG_TERM_JOB_COLOR);
             }
             else {

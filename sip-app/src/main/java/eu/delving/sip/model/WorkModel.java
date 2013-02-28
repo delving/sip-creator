@@ -44,7 +44,7 @@ import java.util.concurrent.*;
  */
 
 public class WorkModel {
-    private static final int REFRESH_RATE = 1000;
+    private static final int REFRESH_RATE = 666;
     private ExecutorService executor = Executors.newCachedThreadPool();
     private List<JobContext> jobContexts = new CopyOnWriteArrayList<JobContext>();
     private JobListModel jobListModel = new JobListModel();
@@ -223,21 +223,15 @@ public class WorkModel {
             launch();
         }
 
-        public Date getStart() {
-            return start;
-        }
-
         public Work getWork() {
             return queue.peek();
         }
 
         public boolean isDone() {
-            if (executor.isShutdown()) return true;
-            if (queue.isEmpty()) return true;
-            if (!future.isDone()) return false;
-//          todo:  future.isCancelled()
+            if (executor.isShutdown() || queue.isEmpty()) return true;
+            if (!(future.isDone() || future.isCancelled())) return false;
             queue.remove();
-            if (isEmpty()) return true;
+            if (queue.isEmpty()) return true;
             launch();
             return false;
         }
@@ -286,7 +280,7 @@ public class WorkModel {
             if (work instanceof Work.LongTermWork) {
                 final Work existingWork = queue.peek();
                 if (existingWork == null) return;
-                if (!isEmpty() && work.getClass() == existingWork.getClass() && !isDone()) {
+                if (!queue.isEmpty() && work.getClass() == existingWork.getClass() && !isDone()) {
                     feedback.alert(this + " busy");
                     return;
                 }
