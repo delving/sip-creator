@@ -97,6 +97,10 @@ class OptBox {
         return optList.dictionary;
     }
 
+    public String getDictionaryName(int index) {
+        return optList.dictionary + index;
+    }
+
     public String toString() {
         if (opt != null) {
             switch (role) {

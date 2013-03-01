@@ -110,7 +110,8 @@ public class StringUtil {
         if (!nodeMapping.hasDictionary()) return;
         OptBox optBox = nodeMapping.recDefNode.getDictionaryOptBox();
         if (optBox == null || optBox.isChild()) return;
-        codeOut.line_(String.format("def Dictionary%s = [", optBox.getDictionaryName()));
+        int index = nodeMapping.getIndexWithinNode();
+        codeOut.line_(String.format("def Dictionary%s = [", optBox.getDictionaryName(index)));
         Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
         while (walk.hasNext()) {
             Map.Entry<String, String> entry = walk.next();
@@ -121,19 +122,16 @@ public class StringUtil {
             ));
         }
         codeOut._line("]");
-        for (OptRole field : OptRole.getFields())
-            toLookupClosure(codeOut, optBox.getDictionaryName(), field.getFieldName());
-    }
-
-    private static void toLookupClosure(CodeOut codeOut, String name, String field) {
-        codeOut.line_("def lookup%s_%s = { value ->", name, field);
-        codeOut.line("   if (!value) return ''");
-        codeOut.line("   String optKey = Dictionary%s[value.sanitize()]", name);
-        codeOut.line("   if (!optKey) optKey = value");
-        codeOut.line("   Object opt = _optLookup['%s'][optKey]", name);
-        codeOut.line("   if (!opt) return ''");
-        codeOut.line("   opt.%s", field);
-        codeOut._line("}");
+        for (OptRole field : OptRole.getFields()) {
+            codeOut.line_("def lookup%s_%s = { value ->", optBox.getDictionaryName(index), field.getFieldName());
+            codeOut.line("   if (!value) return ''");
+            codeOut.line("   String optKey = Dictionary%s[value.sanitize()]", optBox.getDictionaryName(index));
+            codeOut.line("   if (!optKey) optKey = value");
+            codeOut.line("   Object opt = _optLookup['%s'][optKey]", optBox.getDictionaryName());
+            codeOut.line("   if (!opt) return ''");
+            codeOut.line("   opt.%s", field);
+            codeOut._line("}");
+        }
     }
 
     public static String toLoopGroovyParam(Path path) {
