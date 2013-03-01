@@ -129,7 +129,7 @@ public class StringUtil {
             codeOut.line("   if (!optKey) optKey = value");
             codeOut.line("   Object opt = _optLookup['%s'][optKey]", optBox.getDictionaryName());
             codeOut.line("   if (!opt) return ''");
-            codeOut.line("   opt.%s", field);
+            codeOut.line("   opt.%s", field.getFieldName());
             codeOut._line("}");
         }
     }
