@@ -87,6 +87,15 @@ public class NodeMapping {
         return inputPath.hashCode() + outputPath.hashCode();
     }
 
+    public int getIndexWithinNode() {
+        int index = 0;
+        for (NodeMapping nodeMapping : recDefNode.getNodeMappings().values()) {
+            if (this == nodeMapping) break;
+            index++;
+        }
+        return index;
+    }
+
     public String getGroovyCode() {
         return groovyCode == null ? null : linesToString(groovyCode);
     }
