@@ -378,7 +378,7 @@ public class CodeGenerator {
             if (dictionaryOptBox != null) {
                 codeOut.line(
                         "lookup%s_%s(%s)",
-                        dictionaryOptBox.getDictionaryName(), optRole.getFieldName(), toLeafGroovyParam(path)
+                        dictionaryOptBox.getDictionaryName(nodeMapping.getIndexWithinNode()), optRole.getFieldName(), toLeafGroovyParam(path)
                 );
             }
             else if (nodeMapping.hasMap()) {
