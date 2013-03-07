@@ -21,10 +21,8 @@
 
 package eu.delving.sip.xml;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.annotations.*;
+import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -88,6 +86,8 @@ public class RelationalProfile {
 
         @XStreamAsAttribute
         public boolean cached;
+
+        public String query;
 
         @XStreamImplicit
         public List<Column> columns = new ArrayList<Column>();
@@ -155,7 +155,7 @@ public class RelationalProfile {
         public String linkColumn;
 
         @XStreamAsAttribute
-        public boolean key;
+        public Boolean key;
 
         @XStreamOmitField
         public Table parent;
@@ -228,6 +228,7 @@ public class RelationalProfile {
         INTEGER(4),
         SMALLINT(5),
         DOUBLE(8),
+        DATE(91),
         TIMESTAMP(93);
 
         private final int typeInt;
@@ -260,6 +261,46 @@ public class RelationalProfile {
             }
         }
         return profile;
+    }
+
+    public static RelationalProfile createProfile(Connection connection, QueryDefinitions queryDefinitions) throws SQLException {
+        RelationalProfile profile = new RelationalProfile();
+        for (Query query : queryDefinitions.queries) {
+            Table table = profile.addTable(query.name);
+            table.parentTable = query.parentTable;
+            table.query = query.content;
+            Statement statement = connection.createStatement();
+            ResultSet columnResults = statement.executeQuery(query.content);
+            ResultSetMetaData meta = columnResults.getMetaData();
+            for (int col = 1; col < meta.getColumnCount(); col++) {
+                String columnName = meta.getColumnName(col);
+                Column column = table.addColumn(columnName);
+                column.type = ColumnType.forTypeInt(meta.getColumnType(col));
+                if (columnName.equals(query.parentKey)) column.key = true;
+            }
+        }
+        return profile;
+    }
+
+    @XStreamAlias("query-definition")
+    public static class QueryDefinitions {
+        @XStreamImplicit
+        List<Query> queries;
+    }
+
+    @XStreamAlias("query")
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"content"})
+    public static class Query {
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamAsAttribute
+        public String parentTable;
+
+        @XStreamAsAttribute
+        public String parentKey;
+
+        public String content;
     }
 
     /*

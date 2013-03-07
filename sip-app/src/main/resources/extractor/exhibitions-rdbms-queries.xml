@@ -2,7 +2,7 @@
 
 <query-definition>
 
-    <query name="Exhibitions>" parentTable="" parentKey="">
+    <query name="Exhibitions" parentTable="" parentKey="">
         SELECT "UTSTILLING"."UTSTILLINGSID",
         	"UTSTILLING"."UUID",
         	"UTSTILLING"."PUBLISERES",
@@ -12,7 +12,7 @@
         FROM "UTSTILLING"
         WHERE "UTSTILLING"."PUBLISERES" LIKE 'X'
     </query>
-    <query name="Titles>" parentTable="Exhibitions" parentKey="UTSTILLINGSID">
+    <query name="Titles" parentTable="Exhibitions" parentKey="UTSTILLINGSID">
         SELECT "UTSTILLING"."UTSTILLINGSID",
         	"UTSTILLING"."PUBLISERES",
         	"UTSTILLING"."STATUS",
@@ -21,7 +21,7 @@
         FROM "UTSTILLING" INNER JOIN "OBJEKT_NAVN" ON "UTSTILLING"."OBJID" = "OBJEKT_NAVN"."OBJID"
         ORDER BY "UTSTILLING"."UTSTILLINGSID" ASC
     </query>
-    <query name="Objects>" parentTable="Exhibitions" parentKey="UTSTILLINGSID">
+    <query name="Objects" parentTable="Exhibitions" parentKey="UTSTILLINGSID">
         SELECT "UTSTILLING"."UTSTILLINGSID",
         	"OBJEKT_UTSTILLING"."NR",
         	"OBJEKT_UTSTILLING"."KATALOGNR",

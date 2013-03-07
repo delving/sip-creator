@@ -29,12 +29,21 @@ public class TestTableExtractor {
 
     @Before
     public void createConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        Class.forName("org.postgresql.Driver");
         Properties props = new Properties();
-        props.setProperty("user", "Delving");
-        props.setProperty("password", "D3lv1ng");
-        connection = DriverManager.getConnection("jdbc:sqlserver://192.168.0.1:1433;databaseName=TMS", props);
+        props.setProperty("user", "gerald");
+        connection = DriverManager.getConnection("jdbc:postgresql:gerald", props);
     }
+
+//    @Before
+//    public void createConnectionTMS() throws ClassNotFoundException, SQLException {
+//        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+//        Properties props = new Properties();
+//        props.setProperty("user", "");
+//        props.setProperty("password", "");
+//        connection = DriverManager.getConnection("jdbc:sqlserver://192.168.0.1:1433;databaseName=TMS", props);
+//    }
+//
 
     @After
     public void closeConnection() throws SQLException {
@@ -43,7 +52,7 @@ public class TestTableExtractor {
 
     @Ignore
     @Test
-    public void testIntrospection() throws SQLException, IOException {
+    public void testIntrospectionTMS() throws SQLException, IOException {
         RelationalProfile profile = RelationalProfile.createProfile(connection);
         FileWriter out = new FileWriter("/tmp/tms-rdbms-profile.xml");
         getStreamFor(RelationalProfile.class).toXML(profile, out);
@@ -63,4 +72,15 @@ public class TestTableExtractor {
         tableExtractor.dumpTo(outputStream);
         outputStream.close();
     }
+
+    @Test
+    public void testIntrospectionPRIMUS() throws SQLException, IOException {
+        URL queryResource = getClass().getResource("/extractor/exhibitions-rdbms-queries.xml");
+        RelationalProfile.QueryDefinitions definitions = (RelationalProfile.QueryDefinitions) getStreamFor(RelationalProfile.QueryDefinitions.class).fromXML(queryResource);
+        RelationalProfile profile = RelationalProfile.createProfile(connection, definitions);
+        FileWriter out = new FileWriter("/tmp/exhibitions-rdbms-profile.xml");
+        getStreamFor(RelationalProfile.class).toXML(profile, out);
+        out.close();
+    }
+
 }
