@@ -8,8 +8,8 @@
         	"UTSTILLING"."FRADATO",
         	"UTSTILLING"."TILDATO"
         FROM "UTSTILLING"
-        WHERE "UTSTILLING"."PUBLISERES" LIKE &apos;X&apos;
     </query>
+      <!--WHERE "UTSTILLING"."PUBLISERES" LIKE &apos;X&apos;-->
     <column name="UTSTILLINGSID" type="VARCHAR"/>
     <column name="UUID" type="VARCHAR"/>
     <column name="PUBLISERES" type="VARCHAR"/>
@@ -49,9 +49,10 @@
         FROM "UTSTILLING" INNER JOIN "OBJEKT_UTSTILLING" ON "UTSTILLING"."OBJID" = "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID"
         	 INNER JOIN "OBJEKT" ON "OBJEKT_UTSTILLING"."OBJID" = "OBJEKT"."OBJID"
         	 INNER JOIN "OBJEKT_NAVN" ON "OBJEKT"."OBJID" = "OBJEKT_NAVN"."OBJID"
-        WHERE "UTSTILLING"."UTSTILLINGSID" = '%s' AND "UTSTILLING"."PUBLISERES" LIKE &apos;X&apos;
+        WHERE "UTSTILLING"."UTSTILLINGSID" = '%s'
         ORDER BY "UTSTILLING"."UTSTILLINGSID" ASC
     </query>
+      <!--WHERE "UTSTILLING"."UTSTILLINGSID" = '%s' AND "UTSTILLING"."PUBLISERES" LIKE &apos;X&apos;-->
     <column name="UTSTILLINGSID" type="VARCHAR" key="true"/>
     <column name="NR" type="INTEGER"/>
     <column name="KATALOGNR" type="VARCHAR"/>

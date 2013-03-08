@@ -110,18 +110,11 @@ public class TableExtractor {
             Statement statement = connection.createStatement();
             if (maxRows > 0) statement.setMaxRows(maxRows);
             String sql = table.toQuery(key);
-            System.out.println(sql);
             resultSets.push(statement.executeQuery(sql));
             int count = 0;
             while (resultSets.peek().next()) {
-                try {
-                    if (resultSets.size() == 1) {
-                        Thread.sleep(1000); // todo: absurd, but worth a try
-                        System.out.println("=== Record "+(++count));
-                    }
-                }
-                catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                if (resultSets.size() == 1) {
+                    System.out.println("=== Record " + (++count));
                 }
                 startWrapper(table.name, indent);
                 for (RelationalProfile.Column column : table.columns) {
