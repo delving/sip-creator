@@ -1,0 +1,67 @@
+<delving-rdbms-profile>
+  <table name="Exhibitions" parentTable="" cached="false">
+    <query>
+        SELECT "UTSTILLING"."UTSTILLINGSID",
+        	"UTSTILLING"."UUID",
+        	"UTSTILLING"."PUBLISERES",
+        	"UTSTILLING"."SAKSNR",
+        	"UTSTILLING"."FRADATO",
+        	"UTSTILLING"."TILDATO"
+        FROM "UTSTILLING"
+        WHERE "UTSTILLING"."PUBLISERES" LIKE &apos;X&apos;
+    </query>
+    <column name="UTSTILLINGSID" type="VARCHAR"/>
+    <column name="UUID" type="VARCHAR"/>
+    <column name="PUBLISERES" type="VARCHAR"/>
+    <column name="SAKSNR" type="VARCHAR"/>
+    <column name="FRADATO" type="DATE"/>
+  </table>
+  <table name="Titles" parentTable="Exhibitions" cached="false">
+    <query>
+        SELECT "UTSTILLING"."UTSTILLINGSID",
+        	"UTSTILLING"."PUBLISERES",
+        	"UTSTILLING"."STATUS",
+        	"OBJEKT_NAVN"."NAVN",
+        	"OBJEKT_NAVN"."KODE"
+        FROM "UTSTILLING" INNER JOIN "OBJEKT_NAVN" ON "UTSTILLING"."OBJID" = "OBJEKT_NAVN"."OBJID"
+        WHERE "UTSTILLING"."UTSTILLINGSID" = '%s'
+        ORDER BY "UTSTILLING"."UTSTILLINGSID" ASC
+    </query>
+    <column name="UTSTILLINGSID" type="VARCHAR" key="true"/>
+    <column name="PUBLISERES" type="VARCHAR"/>
+    <column name="STATUS" type="VARCHAR"/>
+    <column name="NAVN" type="VARCHAR"/>
+  </table>
+  <table name="Objects" parentTable="Exhibitions" cached="false">
+    <query>
+        SELECT "UTSTILLING"."UTSTILLINGSID",
+        	"OBJEKT_UTSTILLING"."NR",
+        	"OBJEKT_UTSTILLING"."KATALOGNR",
+        	"OBJEKT_UTSTILLING"."KOMMENTAR",
+        	"OBJEKT_UTSTILLING"."FRADATO",
+        	"OBJEKT_UTSTILLING"."TILDATO",
+        	"OBJEKT"."URI",
+        	"OBJEKT"."UUID",
+        	"OBJEKT_NAVN"."NAVN",
+        	"OBJEKT"."MUSEUMSNR",
+        	"UTSTILLING"."PUBLISERES",
+        	"UTSTILLING"."STATUS"
+        FROM "UTSTILLING" INNER JOIN "OBJEKT_UTSTILLING" ON "UTSTILLING"."OBJID" = "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID"
+        	 INNER JOIN "OBJEKT" ON "OBJEKT_UTSTILLING"."OBJID" = "OBJEKT"."OBJID"
+        	 INNER JOIN "OBJEKT_NAVN" ON "OBJEKT"."OBJID" = "OBJEKT_NAVN"."OBJID"
+        WHERE "UTSTILLING"."UTSTILLINGSID" = '%s' AND "UTSTILLING"."PUBLISERES" LIKE &apos;X&apos;
+        ORDER BY "UTSTILLING"."UTSTILLINGSID" ASC
+    </query>
+    <column name="UTSTILLINGSID" type="VARCHAR" key="true"/>
+    <column name="NR" type="INTEGER"/>
+    <column name="KATALOGNR" type="VARCHAR"/>
+    <column name="KOMMENTAR" type="VARCHAR"/>
+    <column name="FRADATO" type="DATE"/>
+    <column name="TILDATO" type="DATE"/>
+    <column name="URI" type="VARCHAR"/>
+    <column name="UUID" type="VARCHAR"/>
+    <column name="NAVN" type="VARCHAR"/>
+    <column name="MUSEUMSNR" type="VARCHAR"/>
+    <column name="PUBLISERES" type="VARCHAR"/>
+  </table>
+</delving-rdbms-profile>

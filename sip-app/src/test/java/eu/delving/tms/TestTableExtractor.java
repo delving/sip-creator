@@ -83,4 +83,15 @@ public class TestTableExtractor {
         out.close();
     }
 
+    @Test
+    public void testDumpPRIMUS() throws ClassNotFoundException, SQLException, XMLStreamException, IOException, UnsupportedEncodingException {
+        URL resource = getClass().getResource("/extractor/exhibitions-rdbms-profile.xml");
+        RelationalProfile profile = (RelationalProfile) getStreamFor(RelationalProfile.class).fromXML(resource);
+        profile.resolve();
+        TableExtractor tableExtractor = new TableExtractor(connection, profile);
+        OutputStream outputStream = new FileOutputStream(new File("/tmp/exhibitions-dump.xml"));
+        tableExtractor.dumpTo(outputStream);
+        outputStream.close();
+    }
+
 }

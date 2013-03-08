@@ -116,26 +116,43 @@ public class RelationalProfile {
                     break;
                 }
             }
-            if (parent == null) throw new RuntimeException(String.format("Parent %s of %s not found", parentTable, name));
+            if (parent == null) {
+                throw new RuntimeException(String.format("Parent %s of %s not found", parentTable, name));
+            }
             for (Column column : columns) {
                 try {
                     column.resolve(parent);
                 }
                 catch (RuntimeException e) {
-                    throw new RuntimeException(column + " didn't resolve in "+this, e);
+                    throw new RuntimeException(column + " didn't resolve in " + this, e);
                 }
                 if (column.link != null) {
-                    if (linkColumn != null) throw new RuntimeException("Multiple link columns not permitted in " + name);
+                    if (linkColumn != null) {
+                        throw new RuntimeException("Multiple link columns not permitted in " + name);
+                    }
                     linkColumn = column;
                 }
+            }
+            if (linkColumn == null) {
+                throw new RuntimeException("No link column for table " + name);
             }
         }
 
         public String toQuery(String key) {
-            String query = String.format("select * from %s", name);
-            if (key != null) query += String.format(" where %s='%s'", linkColumn.name, key);
-            System.out.println(query);
-            return query;
+            if (query == null) {
+                String qstring = String.format("select * from %s", name);
+                if (key != null) qstring += String.format(" where %s='%s'", linkColumn.name, key);
+                System.out.println(qstring);
+                return qstring;
+            }
+            else {
+                if (key != null) {
+                    return String.format(query, key);
+                }
+                else {
+                    return query;
+                }
+            }
         }
 
         public String toString() {
@@ -166,13 +183,15 @@ public class RelationalProfile {
         public void resolve(Table parentTable) {
             parent = parentTable;
             if (linkColumn == null) {
-                if (!key) return;
+                if (key == null || !key) return;
                 linkColumn = name;
             }
             for (Column column : parentTable.columns) {
                 if (column.name.equals(linkColumn)) link = column;
             }
-            if (link == null) throw new RuntimeException(String.format("Link column %s not found in %s", linkColumn, parentTable.name));
+            if (link == null) {
+                throw new RuntimeException(String.format("Link column %s not found in %s", linkColumn, parentTable.name));
+            }
         }
 
         public boolean isEmpty(String value) {
@@ -276,7 +295,9 @@ public class RelationalProfile {
                 String columnName = meta.getColumnName(col);
                 Column column = table.addColumn(columnName);
                 column.type = ColumnType.forTypeInt(meta.getColumnType(col));
-                if (columnName.equals(query.parentKey)) column.key = true;
+                if (columnName.equals(query.parentKey)) {
+                    column.key = true;
+                }
             }
         }
         return profile;

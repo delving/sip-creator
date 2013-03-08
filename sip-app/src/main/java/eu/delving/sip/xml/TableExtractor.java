@@ -109,7 +109,9 @@ public class TableExtractor {
         else {
             Statement statement = connection.createStatement();
             if (maxRows > 0) statement.setMaxRows(maxRows);
-            resultSets.push(statement.executeQuery(table.toQuery(key)));
+            String sql = table.toQuery(key);
+            System.out.println(sql);
+            resultSets.push(statement.executeQuery(sql));
             int count = 0;
             while (resultSets.peek().next()) {
                 try {
