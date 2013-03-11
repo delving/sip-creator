@@ -82,6 +82,9 @@ public class RelationalProfile {
         public String name;
 
         @XStreamAsAttribute
+        public String wrap;
+
+        @XStreamAsAttribute
         public String parentTable;
 
         @XStreamAsAttribute
@@ -286,6 +289,7 @@ public class RelationalProfile {
         RelationalProfile profile = new RelationalProfile();
         for (Query query : queryDefinitions.queries) {
             Table table = profile.addTable(query.name);
+            table.wrap = query.wrap;
             table.parentTable = query.parentTable;
             table.query = query.content;
             Statement statement = connection.createStatement();
@@ -314,6 +318,9 @@ public class RelationalProfile {
     public static class Query {
         @XStreamAsAttribute
         public String name;
+
+        @XStreamAsAttribute
+        public String wrap;
 
         @XStreamAsAttribute
         public String parentTable;
