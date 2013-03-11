@@ -16,7 +16,7 @@
     <column name="SAKSNR" type="VARCHAR"/>
     <column name="FRADATO" type="DATE"/>
   </table>
-  <table name="Titles" parentTable="Exhibitions" cached="false">
+  <table name="Title" wrap="Titles" parentTable="Exhibitions" cached="false">
     <query>
         SELECT "UTSTILLING"."UTSTILLINGSID",
         	"UTSTILLING"."PUBLISERES",
@@ -32,7 +32,7 @@
     <column name="STATUS" type="VARCHAR"/>
     <column name="NAVN" type="VARCHAR"/>
   </table>
-  <table name="Objects" parentTable="Exhibitions" cached="false">
+  <table name="Object" wrap="Objects" parentTable="Exhibitions" cached="false">
     <query>
         SELECT "UTSTILLING"."UTSTILLINGSID",
         	"OBJEKT_UTSTILLING"."NR",
