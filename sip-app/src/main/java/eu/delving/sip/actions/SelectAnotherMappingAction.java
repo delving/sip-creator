@@ -28,7 +28,7 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,13 +90,18 @@ public class SelectAnotherMappingAction extends AbstractAction implements Work {
 
     @Override
     public void run() {
-        if (choices.size() == 1) {
-            sipModel.setDataSetPrefix(sipModel.getDataSetModel().getDataSet(), choices.get(0).getPrefix(), null);
-        }
-        else {
-            String prefix = askForPrefix(choices);
-            if (prefix == null) return;
-            sipModel.setDataSetPrefix(sipModel.getDataSetModel().getDataSet(), prefix, null);
+        switch (choices.size()) {
+            case 0:
+                // nothing to do, strange situation in the first place
+                break;
+            case 1:
+                sipModel.setDataSetPrefix(sipModel.getDataSetModel().getDataSet(), choices.get(0).getPrefix(), null);
+                break;
+            default:
+                String prefix = askForPrefix(choices);
+                if (prefix == null) return;
+                sipModel.setDataSetPrefix(sipModel.getDataSetModel().getDataSet(), prefix, null);
+                break;
         }
     }
 
@@ -115,7 +120,14 @@ public class SelectAnotherMappingAction extends AbstractAction implements Work {
             buttonGroup.add(b);
             buttonPanel.add(b);
         }
-        return sipModel.getFeedback().form("Choose Schema", buttonPanel) ? buttonGroup.getSelection().getActionCommand() : null;
+        if (!sipModel.getFeedback().form("Choose Schema", buttonPanel)) {
+            return null;
+        }
+        ButtonModel selection = buttonGroup.getSelection();
+        if (selection == null) {
+            return null;
+        }
+        return selection.getActionCommand();
     }
 
 }

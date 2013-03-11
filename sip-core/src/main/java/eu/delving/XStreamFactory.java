@@ -22,6 +22,7 @@ public class XStreamFactory {
     private static XStream getStream() {
         XStream stream = new XStream(new PureJavaReflectionProvider());
         stream.setMode(XStream.NO_REFERENCES);
+        stream.setMode(XStream.XPATH_ABSOLUTE_REFERENCES);
         stream.registerConverter(new Tag.Converter());
         stream.registerConverter(new Path.Converter());
         return stream;

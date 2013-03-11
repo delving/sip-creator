@@ -406,13 +406,8 @@ public class Application {
         @Override
         public void run() {
             File storageDirectory;
-            if (application != null) {
-                application.destroy();
-                storageDirectory = storageFinder.getStorageDirectory(application.storageDirectory);
-            }
-            else {
-                storageDirectory = storageFinder.getStorageDirectory(null);
-            }
+            if (application != null) application.destroy();
+            storageDirectory = storageFinder.getStorageDirectory();
             if (storageDirectory == null) {
                 System.exit(0);
             }
