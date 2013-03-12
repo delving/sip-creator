@@ -76,7 +76,7 @@ public class StorageFinder {
         this.args = args;
     }
 
-    public File getStorageDirectory(File unwanted) {
+    public File getStorageDirectory() {
         if (args.length == 1 && args[0].equals(STANDALONE_DIR)) {
             return new File(WORKSPACE_DIR, STANDALONE_DIR);
         }
@@ -86,7 +86,7 @@ public class StorageFinder {
             case 1:
                 return storageDirs.get(0);
             default:
-                return chooseDirectory(storageDirs, unwanted);
+                return chooseDirectory(storageDirs);
         }
     }
 
@@ -196,10 +196,9 @@ public class StorageFinder {
         }
     }
 
-    private static File chooseDirectory(List<File> directories, File unwanted) {
+    private static File chooseDirectory(List<File> directories) {
         List<String> selectable = new ArrayList<String>();
         for (File directory : directories) {
-            if (unwanted != null && directory.getName().equals(unwanted.getName())) continue;
             if (!(STANDALONE_DIR.equals(directory.getName()) || HPU_DIRECTORY.matcher(directory.getName()).find())) continue;
             selectable.add(directory.getName());
         }
