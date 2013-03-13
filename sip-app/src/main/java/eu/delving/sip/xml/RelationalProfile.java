@@ -226,6 +226,10 @@ public class RelationalProfile {
                     break;
                 case TIMESTAMP:
                     break;
+                case BIGINT:
+                    break;
+                case DATE:
+                    break;
             }
             return false;
         }
@@ -236,22 +240,23 @@ public class RelationalProfile {
     }
 
     public enum ColumnType {
-        LONGVARCHAR(-1),
-        LONGNVARCHAR(-16),
-        BINARY(-2),
-        LONGVARBINARY(-4),
-        TINYINT(-6),
-        BIT(-7),
-        NVARCHAR(-9),
-        CHAR(1),
-        VARCHAR(12),
-        NUMERIC(2),
-        DECIMAL(3),
-        INTEGER(4),
-        SMALLINT(5),
-        DOUBLE(8),
-        DATE(91),
-        TIMESTAMP(93);
+        LONGVARCHAR(Types.LONGVARCHAR),
+        LONGNVARCHAR(Types.LONGNVARCHAR),
+        BINARY(Types.BINARY),
+        LONGVARBINARY(Types.LONGVARBINARY),
+        TINYINT(Types.TINYINT),
+        BIT(Types.BIT),
+        NVARCHAR(Types.NVARCHAR),
+        CHAR(Types.CHAR),
+        VARCHAR(Types.VARCHAR),
+        NUMERIC(Types.NUMERIC),
+        DECIMAL(Types.DECIMAL),
+        INTEGER(Types.INTEGER),
+        BIGINT(Types.BIGINT),
+        SMALLINT(Types.SMALLINT),
+        DOUBLE(Types.DOUBLE),
+        DATE(Types.DATE),
+        TIMESTAMP(Types.TIMESTAMP);
 
         private final int typeInt;
 
@@ -295,7 +300,7 @@ public class RelationalProfile {
             Statement statement = connection.createStatement();
             ResultSet columnResults = statement.executeQuery(query.content);
             ResultSetMetaData meta = columnResults.getMetaData();
-            for (int col = 1; col < meta.getColumnCount(); col++) {
+            for (int col = 1; col <= meta.getColumnCount(); col++) {
                 String columnName = meta.getColumnName(col);
                 Column column = table.addColumn(columnName);
                 column.type = ColumnType.forTypeInt(meta.getColumnType(col));

@@ -6,7 +6,7 @@
 
         SELECT
             "UTSTILLING"."UTSTILLINGSID",
-        	"UTSTILLING"."OBJID" AS "ParentKey",
+        	"UTSTILLING"."OBJID",
         	"UTSTILLING"."UUID",
         	"UTSTILLING"."PUBLISERES",
         	"UTSTILLING"."SAKSNR",
@@ -19,13 +19,13 @@
 
     </query>
 
-    <query name="Title" wrap="Titles" parentTable="Exhibitions" ParentKey="ParentKey">
+    <query name="Title" wrap="Titles" parentTable="Exhibition" ParentKey="ParentKey">
 
         SELECT
             "OBJEKT_NAVN"."NAVN",
         	"LISTER"."VERDI",
         	"OBJEKT_NAVN"."KODE",
-        	"OBJEKT_NAVN"."STATUS_INT",
+        	"OBJEKT_NAVN"."STATUS",
         	"LISTER"."KODE",
         	"LISTER"."LISTE_TYPE"
         FROM
@@ -34,12 +34,12 @@
         WHERE
         	"OBJEKT_NAVN"."OBJID" = '375373' AND
         	"OBJEKT_NAVN"."OBJID_SISTE" = '375373' AND
-        	"OBJEKT_NAVN"."STATUS_INT" = "LISTER"."KODE" AND
+        	"OBJEKT_NAVN"."STATUS" = "LISTER"."KODE" AND
             "OBJEKT_NAVN"."NAVN" is not null
 
     </query>
 
-    <query name="Image" wrap="Images" parentTable="Exhibitions" ParentKey="ParentKey">
+    <query name="Image" wrap="Images" parentTable="Exhibition" ParentKey="ParentKey">
 
         SELECT
             "UTSTILLING_BILDE"."BILDEID",
@@ -55,7 +55,7 @@
     </query>
 
 
-    <query name="Object" wrap="Objects" parentTable="Exhibitions" parentKey="ParentKey">
+    <query name="Object" wrap="Objects" parentTable="Exhibition" parentKey="ParentKey">
 
         SELECT
             "OBJEKT_UTSTILLING"."OBJID",
