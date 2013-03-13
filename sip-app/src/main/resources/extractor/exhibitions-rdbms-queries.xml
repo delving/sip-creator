@@ -6,7 +6,7 @@
 
         SELECT
             "UTSTILLING"."UTSTILLINGSID",
-        	"UTSTILLING"."OBJID",
+        	"UTSTILLING"."OBJID" AS 'ParentKey',
         	"UTSTILLING"."UUID",
         	"UTSTILLING"."PUBLISERES",
         	"UTSTILLING"."SAKSNR",
@@ -15,8 +15,20 @@
         FROM "UTSTILLING"
         WHERE
             "UTSTILLING"."PUBLISERES" LIKE 'X' AND
-            "UTSTILLING"."OBJID" = '375373'
+            "UTSTILLING"."OBJID" = '337333'
 
+    </query>
+
+    <query name="ExhibitionType" parentTable="Exhibition" ParentKey="ParentKey">
+
+        SELECT
+            "UTSTILLINGSTYPE_L"."BESKRIVELSE"
+        FROM
+            "UTSTILLINGSTYPE_H"
+        INNER JOIN
+            "UTSTILLINGSTYPE_L" ON "UTSTILLINGSTYPE_H"."TYPEID" = "UTSTILLINGSTYPE_L"."TYPEID"
+        WHERE
+            "UTSTILLINGSTYPE_H"."OBJID" = '337333'
     </query>
 
     <query name="Title" wrap="Titles" parentTable="Exhibition" ParentKey="ParentKey">
@@ -32,10 +44,25 @@
         	"LISTER",
         	"OBJEKT_NAVN"
         WHERE
-        	"OBJEKT_NAVN"."OBJID" = '375373' AND
-        	"OBJEKT_NAVN"."OBJID_SISTE" = '375373' AND
+        	"OBJEKT_NAVN"."OBJID" = '337333' AND
+        	"OBJEKT_NAVN"."OBJID_SISTE" = '337333' AND
         	"OBJEKT_NAVN"."STATUS" = "LISTER"."KODE" AND
             "OBJEKT_NAVN"."NAVN" is not null
+
+    </query>
+
+    <query name="Reference" wrap="References" parentTable="Exhibition" ParentKey="ParentKey">
+
+        SELECT
+            "REFERANSE"."REFERANSE",
+        	"REFERANSE"."REF_TYPE",
+        	"REFERANSE"."KOMMENTAR",
+        	"REFERANSE"."DATERING",
+        	"REFERANSE"."URL"
+        FROM
+            "REFERANSE"
+        WHERE
+            "REFERANSE"."OBJID" ='337333'
 
     </query>
 
@@ -50,10 +77,27 @@
         INNER JOIN
             "BILDE" ON "UTSTILLING_BILDE"."BILDEID" = "BILDE"."BILDEID"
         WHERE
-            "UTSTILLING_BILDE"."OBJID" = '375373'
+            "UTSTILLING_BILDE"."OBJID" = '337333'
 
     </query>
 
+    <query name="Actor" wrap="Actors" parentTable="Exhibition" ParentKey="ParentKey">
+
+        SELECT
+            "JURPERSON"."JPNAVN",
+        	"JURPERSON"."UUID",
+        	"ROLLEJP_L"."BESKRIVELSE"
+        FROM "ADM_HENDELSE_PERSON"
+        INNER JOIN
+            "JURPERSON" ON "ADM_HENDELSE_PERSON"."JPNR" = "JURPERSON"."JPNR"
+        INNER JOIN
+            "UTSTILLING" ON "UTSTILLING"."HID" = "ADM_HENDELSE_PERSON"."HID"
+        INNER JOIN
+            "ROLLEJP_L" ON "ADM_HENDELSE_PERSON"."ROLLEID" = "ROLLEJP_L"."ROLLEID"
+        WHERE
+            "UTSTILLING"."OBJID" = '337333'
+
+    </query>
 
     <query name="Object" wrap="Objects" parentTable="Exhibition" parentKey="ParentKey">
 
@@ -71,10 +115,9 @@
         INNER JOIN
             "OBJEKT" ON "OBJEKT_UTSTILLING"."OBJID" = "OBJEKT"."OBJID"
         WHERE
-            "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID" = '375373'
+            "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID" = '337333'
 
-        </query>
-
+    </query>
 
 </query-definition>
 
