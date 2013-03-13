@@ -11,6 +11,8 @@
         	"UTSTILLING"."FRADATO",
         	"UTSTILLING"."TILDATO"
         FROM "UTSTILLING"
+        <!--WHERE-->
+            <!--"UTSTILLING"."PUBLISERES" LIKE 'X'-->
 
     </query>
     <column name="UTSTILLINGSID" type="VARCHAR"/>
@@ -20,6 +22,22 @@
     <column name="SAKSNR" type="VARCHAR"/>
     <column name="FRADATO" type="TIMESTAMP"/>
     <column name="TILDATO" type="TIMESTAMP"/>
+  </table>
+  <table name="ExhibitionType" parentTable="Exhibition" cached="false">
+    <query>
+
+        SELECT
+            "UTSTILLINGSTYPE_H"."OBJID",
+            "UTSTILLINGSTYPE_L"."BESKRIVELSE"
+        FROM
+            "UTSTILLINGSTYPE_H"
+        INNER JOIN
+            "UTSTILLINGSTYPE_L" ON "UTSTILLINGSTYPE_H"."TYPEID" = "UTSTILLINGSTYPE_L"."TYPEID"
+        WHERE
+            "UTSTILLINGSTYPE_H"."OBJID" = %s
+    </query>
+    <column name="OBJID" type="INTEGER" key="true"/>
+    <column name="BESKRIVELSE" type="VARCHAR"/>
   </table>
   <table name="Title" wrap="Titles" parentTable="Exhibition" cached="false">
     <query>
@@ -36,7 +54,7 @@
         	"LISTER",
         	"OBJEKT_NAVN"
         WHERE
-        	"OBJEKT_NAVN"."OBJID" = '%s' AND
+        	"OBJEKT_NAVN"."OBJID" = %s AND
         	"OBJEKT_NAVN"."OBJID_SISTE" = "OBJEKT_NAVN"."OBJID" AND
         	"OBJEKT_NAVN"."STATUS" = "LISTER"."KODE" AND
             "OBJEKT_NAVN"."NAVN" is not null
@@ -49,6 +67,29 @@
     <column name="STATUS" type="BIGINT"/>
     <column name="KODE" type="BIGINT"/>
     <column name="LISTE_TYPE" type="BIGINT"/>
+  </table>
+  <table name="Reference" wrap="References" parentTable="Exhibition" cached="false">
+    <query>
+
+        SELECT
+            "REFERANSE"."OBJID",
+            "REFERANSE"."REFERANSE",
+        	"REFERANSE"."REF_TYPE",
+        	"REFERANSE"."KOMMENTAR",
+        	"REFERANSE"."DATERING",
+        	"REFERANSE"."URL"
+        FROM
+            "REFERANSE"
+        WHERE
+            "REFERANSE"."OBJID" = %s
+
+    </query>
+    <column name="OBJID" type="INTEGER" key="true"/>
+    <column name="REFERANSE" type="VARCHAR"/>
+    <column name="REF_TYPE" type="VARCHAR"/>
+    <column name="KOMMENTAR" type="VARCHAR"/>
+    <column name="DATERING" type="TIMESTAMP"/>
+    <column name="URL" type="VARCHAR"/>
   </table>
   <table name="Image" wrap="Images" parentTable="Exhibition" cached="false">
     <query>
@@ -63,13 +104,37 @@
         INNER JOIN
             "BILDE" ON "UTSTILLING_BILDE"."BILDEID" = "BILDE"."BILDEID"
         WHERE
-            "UTSTILLING_BILDE"."OBJID" = '%s';
+            "UTSTILLING_BILDE"."OBJID" = %s
 
     </query>
     <column name="OBJID" type="INTEGER" key="true"/>
     <column name="BILDEID" type="INTEGER"/>
     <column name="BILDE_KODE" type="VARCHAR"/>
     <column name="REKKEFOLGE" type="SMALLINT"/>
+  </table>
+  <table name="Actor" wrap="Actors" parentTable="Exhibition" cached="false">
+    <query>
+
+        SELECT
+            "UTSTILLING"."OBJID",
+            "JURPERSON"."JPNAVN",
+        	"JURPERSON"."UUID",
+        	"ROLLEJP_L"."BESKRIVELSE"
+        FROM "ADM_HENDELSE_PERSON"
+        INNER JOIN
+            "JURPERSON" ON "ADM_HENDELSE_PERSON"."JPNR" = "JURPERSON"."JPNR"
+        INNER JOIN
+            "UTSTILLING" ON "UTSTILLING"."HID" = "ADM_HENDELSE_PERSON"."HID"
+        INNER JOIN
+            "ROLLEJP_L" ON "ADM_HENDELSE_PERSON"."ROLLEID" = "ROLLEJP_L"."ROLLEID"
+        WHERE
+            "UTSTILLING"."OBJID" = %s
+
+    </query>
+    <column name="OBJID" type="INTEGER" key="true"/>
+    <column name="JPNAVN" type="VARCHAR"/>
+    <column name="UUID" type="VARCHAR"/>
+    <column name="BESKRIVELSE" type="VARCHAR"/>
   </table>
   <table name="Object" wrap="Objects" parentTable="Exhibition" cached="false">
     <query>
@@ -88,9 +153,9 @@
         INNER JOIN
             "OBJEKT" ON "OBJEKT_UTSTILLING"."OBJID" = "OBJEKT"."OBJID"
         WHERE
-            "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID" = '%s';
+            "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID" = %s
 
-        </query>
+    </query>
     <column name="OBJID" type="INTEGER" key="true"/>
     <column name="MUSEUMSNR" type="VARCHAR"/>
     <column name="KATALOGNR" type="VARCHAR"/>
