@@ -15,7 +15,6 @@
         FROM "UTSTILLING"
         WHERE
             "UTSTILLING"."PUBLISERES" LIKE 'X' AND
-            "UTSTILLING"."OBJID" = '337333'
 
     </query>
 
@@ -28,13 +27,12 @@
         INNER JOIN
             "UTSTILLINGSTYPE_L" ON "UTSTILLINGSTYPE_H"."TYPEID" = "UTSTILLINGSTYPE_L"."TYPEID"
         WHERE
-            "UTSTILLINGSTYPE_H"."OBJID" = '337333'
+            "UTSTILLINGSTYPE_H"."OBJID" = '%s'
     </query>
 
     <query name="Title" wrap="Titles" parentTable="Exhibition" ParentKey="ParentKey">
 
-        SELECT
-            "OBJEKT_NAVN"."NAVN",
+        SELECT "OBJEKT_NAVN"."NAVN",
         	"LISTER"."VERDI",
         	"OBJEKT_NAVN"."KODE",
         	"OBJEKT_NAVN"."STATUS",
@@ -44,8 +42,8 @@
         	"LISTER",
         	"OBJEKT_NAVN"
         WHERE
-        	"OBJEKT_NAVN"."OBJID" = '337333' AND
-        	"OBJEKT_NAVN"."OBJID_SISTE" = '337333' AND
+        	"OBJEKT_NAVN"."OBJID" = '375373' AND
+        	"OBJEKT_NAVN"."OBJID_SISTE" = "OBJEKT_NAVN"."OBJID" AND
         	"OBJEKT_NAVN"."STATUS" = "LISTER"."KODE" AND
             "OBJEKT_NAVN"."NAVN" is not null
 
@@ -62,7 +60,7 @@
         FROM
             "REFERANSE"
         WHERE
-            "REFERANSE"."OBJID" ='337333'
+            "REFERANSE"."OBJID" ='%s'
 
     </query>
 
@@ -77,7 +75,7 @@
         INNER JOIN
             "BILDE" ON "UTSTILLING_BILDE"."BILDEID" = "BILDE"."BILDEID"
         WHERE
-            "UTSTILLING_BILDE"."OBJID" = '337333'
+            "UTSTILLING_BILDE"."OBJID" = '%s'
 
     </query>
 
@@ -95,7 +93,7 @@
         INNER JOIN
             "ROLLEJP_L" ON "ADM_HENDELSE_PERSON"."ROLLEID" = "ROLLEJP_L"."ROLLEID"
         WHERE
-            "UTSTILLING"."OBJID" = '337333'
+            "UTSTILLING"."OBJID" = '%s'
 
     </query>
 
@@ -115,7 +113,7 @@
         INNER JOIN
             "OBJEKT" ON "OBJEKT_UTSTILLING"."OBJID" = "OBJEKT"."OBJID"
         WHERE
-            "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID" = '337333'
+            "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID" = '%s'
 
     </query>
 
