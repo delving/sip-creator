@@ -61,7 +61,7 @@ import static org.apache.commons.io.FileUtils.moveFile;
 
 public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     public static final String CONVERTER_DELIMITER = ":::";
-//    public static final String ANONYMOUS_RECORDS_PROPERTY = "anonymousRecords";
+    //    public static final String ANONYMOUS_RECORDS_PROPERTY = "anonymousRecords";
     private static final String XSI_SCHEMA = "http://www.w3.org/2001/XMLSchema-instance";
     private static final Pattern TO_UNDERSCORE = Pattern.compile("[:]");
     private XMLInputFactory inputFactory = XMLToolFactory.xmlInputFactory();
@@ -85,7 +85,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     private DataSet dataSet;
     private Runnable work;
 
-    public SourceConverter(DataSet dataSet, Runnable finished){
+    public SourceConverter(DataSet dataSet, Runnable finished) {
         this.dataSet = dataSet;
         this.work = finished;
     }
@@ -121,11 +121,11 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
         }
         catch (StorageException e) {
             deleteQuietly(dataSet.sourceOutput());
-            progressListener.getFeedback().alert("Conversion failed: "+e.getMessage(), e);
+            progressListener.getFeedback().alert("Conversion failed: " + e.getMessage(), e);
         }
         catch (Exception e) {
             deleteQuietly(dataSet.sourceOutput());
-            progressListener.getFeedback().alert("Conversion failed, unexpected: "+e.getMessage(), e);
+            progressListener.getFeedback().alert("Conversion failed, unexpected: " + e.getMessage(), e);
         }
         finally {
             if (work != null) work.run();
@@ -154,7 +154,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
         this.progressListener.setProgressMessage("Converting to standard form");
     }
 
-    public void parse(InputStream inputStream, OutputStream outputStream, Map<String,String> namespaces) throws XMLStreamException, IOException {
+    public void parse(InputStream inputStream, OutputStream outputStream, Map<String, String> namespaces) throws XMLStreamException, IOException {
         progressListener.prepareFor(totalRecords);
 //        anonymousRecords = Integer.parseInt(System.getProperty(ANONYMOUS_RECORDS_PROPERTY, "0"));
         Path path = Path.create();
@@ -200,8 +200,18 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                                 if (!uniqueElementPath.peek().isAttribute() && path.equals(uniqueElementPath)) {
                                     unique = StringUtils.join(lines, "");
                                 }
+                                Iterator<String> iterator = lines.iterator();
+                                while (iterator.hasNext()) {
+                                    String line = iterator.next();
+                                    if (line.trim().isEmpty()) iterator.remove();
+                                }
+                                boolean addEndTag = true;
                                 switch (lines.size()) {
                                     case 0:
+                                        if (eventBuffer.get(eventBuffer.size() - 1).isStartElement()) {
+                                            eventBuffer.remove(eventBuffer.size() - 1); // remove the start event
+                                            addEndTag = false;
+                                        }
                                         break;
                                     case 1:
                                         eventBuffer.add(eventFactory.createCharacters(lines.get(0)));
@@ -220,8 +230,10 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                                         lines.clear();
                                         break;
                                 }
-                                eventBuffer.add(end);
-                                eventBuffer.add(eventFactory.createCharacters("\n"));
+                                if (addEndTag) {
+                                    eventBuffer.add(end);
+                                    eventBuffer.add(eventFactory.createCharacters("\n"));
+                                }
                             }
                         }
                         start = null;
@@ -244,7 +256,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
             progressListener.getFeedback().alert("Conversion cancelled");
         }
         catch (StorageException e) {
-            progressListener.getFeedback().alert("Conversion failed: "+e.getMessage(), e);
+            progressListener.getFeedback().alert("Conversion failed: " + e.getMessage(), e);
         }
         finally {
             if (uniqueRepeatCount > 0) {
@@ -257,23 +269,23 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
 
     private void outputRecord(XMLEventWriter out) throws XMLStreamException, StorageException {
 //        if (anonymousRecords == 0 || recordCount < anonymousRecords) {
-            String uniqueValue = getUniqueValue();
-            if (!uniqueValue.isEmpty()) {
-                if (uniqueness.contains(uniqueValue)) {
-                    uniqueRepeatCount++;
-                }
-                else {
-                    uniqueness.add(uniqueValue);
-                    Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
-                    unique = null;
-                    List<Attribute> attrs = new ArrayList<Attribute>();
-                    attrs.add(id);
-                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
-                    for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
-                    out.add(eventFactory.createEndElement("", "", RECORD_TAG));
-                    out.add(eventFactory.createCharacters("\n"));
-                }
+        String uniqueValue = getUniqueValue();
+        if (!uniqueValue.isEmpty()) {
+            if (uniqueness.contains(uniqueValue)) {
+                uniqueRepeatCount++;
             }
+            else {
+                uniqueness.add(uniqueValue);
+                Attribute id = eventFactory.createAttribute(Storage.UNIQUE_ATTR, uniqueValue);
+                unique = null;
+                List<Attribute> attrs = new ArrayList<Attribute>();
+                attrs.add(id);
+                out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
+                for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
+                out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                out.add(eventFactory.createCharacters("\n"));
+            }
+        }
 //        }
         clearEvents();
     }
