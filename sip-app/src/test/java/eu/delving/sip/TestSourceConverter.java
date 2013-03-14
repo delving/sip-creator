@@ -77,6 +77,7 @@ public class TestSourceConverter {
             "<b:shh>deathly quiet",
             "</b:shh>",
             "<a:unique>0404040404</a:unique>",
+            "<empty></empty>",
             "<c:long lang=\"stupid\">",
             "this is very much ",
             "a multi-line field ",
