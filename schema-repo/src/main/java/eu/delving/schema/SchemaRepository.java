@@ -58,6 +58,19 @@ public class SchemaRepository {
         }
     }
 
+    public void prefetchAllSchemas() throws IOException {
+        for (Schema schema : schemas.schemas) {
+            for (Version version : schema.versions) {
+                for (SchemaFile file : version.files) {
+                    SchemaType type = SchemaType.forFile(file.name);
+                    if (type != null) {
+                        fetchCachedSchema(new SchemaVersion(schema.prefix, version.number), type);
+                    }
+                }
+            }
+        }
+    }
+
     public List<Schema> getSchemas() {
         return schemas.schemas;
     }
@@ -100,7 +113,7 @@ public class SchemaRepository {
         String schema = cache.get(key);
         if (schema == null) {
             schema = fetcher.fetchSchema(schemaVersion, schemaType);
-            cache.put(key,  schema);
+            cache.put(key, schema);
         }
         return schema;
     }
@@ -127,6 +140,11 @@ public class SchemaRepository {
             int result = schemaVersion.hashCode();
             result = 31 * result + schemaType.hashCode();
             return result;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("SchemaKey(%s, %s)", schemaVersion, schemaType);
         }
     }
 

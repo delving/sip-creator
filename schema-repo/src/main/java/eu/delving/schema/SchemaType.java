@@ -38,4 +38,13 @@ public enum SchemaType {
     SchemaType(String fileName) {
         this.fileName = fileName;
     }
+
+    public static SchemaType forFile(String fileName) {
+        for (SchemaType type : SchemaType.values()) {
+            if (type.fileName.equals(fileName)) {
+                return type;
+            }
+        }
+        return null;
+    }
 }
