@@ -78,4 +78,19 @@ public class SchemaVersion implements Comparable<SchemaVersion> {
     public int compareTo(SchemaVersion schemaVersion) {
         return prefix.compareTo(schemaVersion.prefix);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SchemaVersion that = (SchemaVersion) o;
+        return prefix.equals(that.prefix) && version.equals(that.version);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = prefix.hashCode();
+        result = 31 * result + version.hashCode();
+        return result;
+    }
 }

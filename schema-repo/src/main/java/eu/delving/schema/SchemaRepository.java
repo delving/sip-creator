@@ -31,7 +31,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Try out the ideas
@@ -43,6 +45,7 @@ public class SchemaRepository {
     private MessageDigest messageDigest;
     private Schemas schemas;
     private Fetcher fetcher;
+    private Map<SchemaKey, String> cache = new HashMap<SchemaKey, String>();
 
     public SchemaRepository(Fetcher fetcher) throws IOException {
         this.fetcher = fetcher;
@@ -73,7 +76,7 @@ public class SchemaRepository {
             }
         }
         if (hash == null) return null;
-        String schema = fetcher.fetchSchema(schemaVersion, schemaType);
+        String schema = fetchCachedSchema(schemaVersion, schemaType);
         if (fetcher.isValidating() && !hash.isEmpty()) {
             String foundHash = getHashString(schema.trim());
             if (!hash.equals(foundHash)) {
@@ -89,6 +92,41 @@ public class SchemaRepository {
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private String fetchCachedSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
+        SchemaKey key = new SchemaKey(schemaVersion, schemaType);
+        String schema = cache.get(key);
+        if (schema == null) {
+            schema = fetcher.fetchSchema(schemaVersion, schemaType);
+            cache.put(key,  schema);
+        }
+        return schema;
+    }
+
+    private static class SchemaKey {
+        private SchemaVersion schemaVersion;
+        private SchemaType schemaType;
+
+        private SchemaKey(SchemaVersion schemaVersion, SchemaType schemaType) {
+            this.schemaVersion = schemaVersion;
+            this.schemaType = schemaType;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SchemaKey schemaKey = (SchemaKey) o;
+            return schemaType == schemaKey.schemaType && schemaVersion.equals(schemaKey.schemaVersion);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = schemaVersion.hashCode();
+            result = 31 * result + schemaType.hashCode();
+            return result;
         }
     }
 
