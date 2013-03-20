@@ -126,27 +126,30 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
                 resumptionToken = saveRecords(fetchedRecords, out);
                 if (!isValidResumptionToken(resumptionToken) && recordCount > 0) EntityUtils.consume(fetchedRecords);
             }
+            out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
+            out.add(eventFactory.createCharacters("\n"));
+            out.add(eventFactory.createEndDocument());
+            out.flush();
+            outputStream.close();
+        }
+        catch (CancelException e) {
+            progressListener.getFeedback().alert("Cancelled harvest of " + context.harvestUrl(), e);
+            recordCount = 0;
+        }
+        catch (Exception e) {
+            progressListener.getFeedback().alert(String.format("Unable to complete harvest of %s because of an error", context.harvestUrl()), e);
+            recordCount = 0;
+        }
+        finally {
             if (recordCount > 0) {
-                out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
-                out.add(eventFactory.createCharacters("\n"));
-                out.add(eventFactory.createEndDocument());
-                out.flush();
-                outputStream.close();
                 progressListener.getFeedback().alert(String.format(
                         "Harvest of %s successfully fetched %d records",
                         context.harvestUrl(), recordCount
                 ));
             }
             else {
-                outputStream.close();
                 FileUtils.deleteQuietly(dataSet.importedOutput());
             }
-        }
-        catch (CancelException e) {
-            progressListener.getFeedback().alert("Cancelled harvest of "+context.harvestUrl(), e);
-        }
-        catch (Exception e) {
-            progressListener.getFeedback().alert(String.format("Unable to complete harvest of %s because of an error", context.harvestUrl()), e);
         }
     }
 
@@ -215,7 +218,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
                         tokenBuilder = null;
                     }
                     else if (path.equals(ERROR) && errorBuilder != null) {
-                        throw new IOException("OAI-PMH Error: "+errorBuilder);
+                        throw new IOException("OAI-PMH Error: " + errorBuilder);
                     }
                     path = path.parent();
                     break;
@@ -276,15 +279,9 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
         HttpGet get = new HttpGet(url);
         get.setHeader("Accept", "text/xml");
         HttpResponse response = httpClient.execute(get);
-        switch (Code.from(response)) {
-            case OK:
-                break;
-            case UNAUTHORIZED:
-                throw new IOException("Access not authorized");
-            case SYSTEM_ERROR:
-                throw new IOException("OAI-PMH Server error");
-            case UNKNOWN_RESPONSE:
-                throw new IOException("OAI-PMH Server Unknown response:" + response.getStatusLine());
+        Code code = Code.from(response);
+        if (code != Code.OK) {
+            throw new IOException(code.getMessage());
         }
         return response.getEntity();
     }
@@ -306,15 +303,22 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     }
 
     private enum Code {
-        OK(SC_OK),
-        UNAUTHORIZED(SC_UNAUTHORIZED),
-        SYSTEM_ERROR(SC_INTERNAL_SERVER_ERROR),
-        UNKNOWN_RESPONSE(-1);
+        OK(SC_OK, "Ok"),
+        UNAUTHORIZED(SC_UNAUTHORIZED, "Access unauthorized"),
+        FORBIDDEN(SC_FORBIDDEN, "Access forbidden"),
+        SYSTEM_ERROR(SC_INTERNAL_SERVER_ERROR, "Internal server error"),
+        UNKNOWN_RESPONSE(-1, "Unknown");
 
         private int httpCode;
+        private String message;
 
-        Code(int httpCode) {
+        Code(int httpCode, String message) {
             this.httpCode = httpCode;
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
         }
 
         static Code from(HttpResponse httpResponse) {
