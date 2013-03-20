@@ -73,6 +73,7 @@ public class TestTableExtractor {
         outputStream.close();
     }
 
+    @Ignore
     @Test
     public void testIntrospectionPRIMUS() throws SQLException, IOException {
         URL queryResource = getClass().getResource("/extractor/exhibitions-rdbms-queries.xml");
@@ -83,6 +84,7 @@ public class TestTableExtractor {
         out.close();
     }
 
+    @Ignore
     @Test
     public void testDumpPRIMUS() throws ClassNotFoundException, SQLException, XMLStreamException, IOException, UnsupportedEncodingException {
         URL resource = getClass().getResource("/extractor/exhibitions-rdbms-profile.xml");
