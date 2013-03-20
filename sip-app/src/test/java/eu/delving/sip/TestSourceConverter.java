@@ -113,7 +113,7 @@ public class TestSourceConverter {
     }
 
     @Test
-    public void runThrough() throws IOException, XMLStreamException {
+    public void runThrough() throws IOException, XMLStreamException, StorageException {
         String inputString = StringUtils.join(INPUT, "\n");
         InputStream in = new ByteArrayInputStream(inputString.getBytes("UTF-8"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -151,7 +151,7 @@ public class TestSourceConverter {
 
     @Ignore
     @Test
-    public void runThroughAnon() throws IOException, XMLStreamException {
+    public void runThroughAnon() throws IOException, XMLStreamException, StorageException {
         String inputString = StringUtils.join(INPUT, "\n");
         System.setProperty("anonymousRecords", "10");
         InputStream in = new ByteArrayInputStream(inputString.getBytes("UTF-8"));
