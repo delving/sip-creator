@@ -2,43 +2,125 @@
 
 <query-definition>
 
-    <query name="Exhibitions>" parentTable="" parentKey="">
-        SELECT "UTSTILLING"."UTSTILLINGSID",
+    <query name="Exhibition" parentTable="" parentKey="">
+
+        SELECT
+            "UTSTILLING"."UTSTILLINGSID",
+        	"UTSTILLING"."OBJID",
         	"UTSTILLING"."UUID",
         	"UTSTILLING"."PUBLISERES",
         	"UTSTILLING"."SAKSNR",
         	"UTSTILLING"."FRADATO",
         	"UTSTILLING"."TILDATO"
         FROM "UTSTILLING"
-        WHERE "UTSTILLING"."PUBLISERES" LIKE 'X'
+        WHERE
+            "UTSTILLING"."PUBLISERES" LIKE 'X'
+
     </query>
-    <query name="Titles>" parentTable="Exhibitions" parentKey="UTSTILLINGSID">
-        SELECT "UTSTILLING"."UTSTILLINGSID",
-        	"UTSTILLING"."PUBLISERES",
-        	"UTSTILLING"."STATUS",
-        	"OBJEKT_NAVN"."NAVN",
-        	"OBJEKT_NAVN"."KODE"
-        FROM "UTSTILLING" INNER JOIN "OBJEKT_NAVN" ON "UTSTILLING"."OBJID" = "OBJEKT_NAVN"."OBJID"
-        ORDER BY "UTSTILLING"."UTSTILLINGSID" ASC
+
+    <query name="ExhibitionType" parentTable="Exhibition" parentKey="OBJID">
+
+        SELECT
+            "UTSTILLINGSTYPE_H"."OBJID",
+            "UTSTILLINGSTYPE_L"."BESKRIVELSE"
+        FROM
+            "UTSTILLINGSTYPE_H"
+        INNER JOIN
+            "UTSTILLINGSTYPE_L" ON "UTSTILLINGSTYPE_H"."TYPEID" = "UTSTILLINGSTYPE_L"."TYPEID"
+        WHERE
+            "UTSTILLINGSTYPE_H"."OBJID" = 1
     </query>
-    <query name="Objects>" parentTable="Exhibitions" parentKey="UTSTILLINGSID">
-        SELECT "UTSTILLING"."UTSTILLINGSID",
-        	"OBJEKT_UTSTILLING"."NR",
+
+    <query name="Title" wrap="Titles" parentTable="Exhibition" parentKey="OBJID">
+
+        SELECT
+            "OBJEKT_NAVN"."OBJID",
+            "OBJEKT_NAVN"."NAVN",
+        	"LISTER"."VERDI",
+        	"OBJEKT_NAVN"."KODE",
+        	"OBJEKT_NAVN"."STATUS",
+        	"LISTER"."KODE",
+        	"LISTER"."LISTE_TYPE"
+        FROM
+        	"LISTER",
+        	"OBJEKT_NAVN"
+        WHERE
+        	"OBJEKT_NAVN"."OBJID" = 1 AND
+        	"OBJEKT_NAVN"."OBJID_SISTE" = "OBJEKT_NAVN"."OBJID" AND
+        	"OBJEKT_NAVN"."STATUS" = "LISTER"."KODE" AND
+            "OBJEKT_NAVN"."NAVN" is not null
+
+    </query>
+
+    <query name="Reference" wrap="References" parentTable="Exhibition" parentKey="OBJID">
+
+        SELECT
+            "REFERANSE"."OBJID",
+            "REFERANSE"."REFERANSE",
+        	"REFERANSE"."REF_TYPE",
+        	"REFERANSE"."KOMMENTAR",
+        	"REFERANSE"."DATERING",
+        	"REFERANSE"."URL"
+        FROM
+            "REFERANSE"
+        WHERE
+            "REFERANSE"."OBJID" = 1
+
+    </query>
+
+    <query name="Image" wrap="Images" parentTable="Exhibition" parentKey="OBJID">
+
+        SELECT
+            "UTSTILLING_BILDE"."OBJID",
+            "UTSTILLING_BILDE"."BILDEID",
+        	"UTSTILLING_BILDE"."BILDE_KODE",
+        	"UTSTILLING_BILDE"."REKKEFOLGE"
+        FROM
+            "UTSTILLING_BILDE"
+        INNER JOIN
+            "BILDE" ON "UTSTILLING_BILDE"."BILDEID" = "BILDE"."BILDEID"
+        WHERE
+            "UTSTILLING_BILDE"."OBJID" = 1
+
+    </query>
+
+    <query name="Actor" wrap="Actors" parentTable="Exhibition" parentKey="OBJID">
+
+        SELECT
+            "UTSTILLING"."OBJID",
+            "JURPERSON"."JPNAVN",
+        	"JURPERSON"."UUID",
+        	"ROLLEJP_L"."BESKRIVELSE"
+        FROM "ADM_HENDELSE_PERSON"
+        INNER JOIN
+            "JURPERSON" ON "ADM_HENDELSE_PERSON"."JPNR" = "JURPERSON"."JPNR"
+        INNER JOIN
+            "UTSTILLING" ON "UTSTILLING"."HID" = "ADM_HENDELSE_PERSON"."HID"
+        INNER JOIN
+            "ROLLEJP_L" ON "ADM_HENDELSE_PERSON"."ROLLEID" = "ROLLEJP_L"."ROLLEID"
+        WHERE
+            "UTSTILLING"."OBJID" = 1
+
+    </query>
+
+    <query name="Object" wrap="Objects" parentTable="Exhibition" parentKey="OBJID">
+
+        SELECT
+            "OBJEKT_UTSTILLING"."OBJID",
+        	"OBJEKT"."MUSEUMSNR",
         	"OBJEKT_UTSTILLING"."KATALOGNR",
         	"OBJEKT_UTSTILLING"."KOMMENTAR",
         	"OBJEKT_UTSTILLING"."FRADATO",
         	"OBJEKT_UTSTILLING"."TILDATO",
         	"OBJEKT"."URI",
-        	"OBJEKT"."UUID",
-        	"OBJEKT_NAVN"."NAVN",
-        	"OBJEKT"."MUSEUMSNR",
-        	"UTSTILLING"."PUBLISERES",
-        	"UTSTILLING"."STATUS"
-        FROM "UTSTILLING" INNER JOIN "OBJEKT_UTSTILLING" ON "UTSTILLING"."OBJID" = "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID"
-        	 INNER JOIN "OBJEKT" ON "OBJEKT_UTSTILLING"."OBJID" = "OBJEKT"."OBJID"
-        	 INNER JOIN "OBJEKT_NAVN" ON "OBJEKT"."OBJID" = "OBJEKT_NAVN"."OBJID"
-        WHERE "UTSTILLING"."PUBLISERES" LIKE 'X'
-        ORDER BY "UTSTILLING"."UTSTILLINGSID" ASC
+        	"OBJEKT"."UUID"
+        FROM
+            "OBJEKT_UTSTILLING"
+        INNER JOIN
+            "OBJEKT" ON "OBJEKT_UTSTILLING"."OBJID" = "OBJEKT"."OBJID"
+        WHERE
+            "OBJEKT_UTSTILLING"."BESKRIVENDE_OBJID" = 1
+
     </query>
 
 </query-definition>
