@@ -21,10 +21,8 @@
 
 package eu.delving.sip.xml;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.annotations.*;
+import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -84,10 +82,15 @@ public class RelationalProfile {
         public String name;
 
         @XStreamAsAttribute
+        public String wrap;
+
+        @XStreamAsAttribute
         public String parentTable;
 
         @XStreamAsAttribute
         public boolean cached;
+
+        public String query;
 
         @XStreamImplicit
         public List<Column> columns = new ArrayList<Column>();
@@ -116,26 +119,43 @@ public class RelationalProfile {
                     break;
                 }
             }
-            if (parent == null) throw new RuntimeException(String.format("Parent %s of %s not found", parentTable, name));
+            if (parent == null) {
+                throw new RuntimeException(String.format("Parent %s of %s not found", parentTable, name));
+            }
             for (Column column : columns) {
                 try {
                     column.resolve(parent);
                 }
                 catch (RuntimeException e) {
-                    throw new RuntimeException(column + " didn't resolve in "+this, e);
+                    throw new RuntimeException(column + " didn't resolve in " + this, e);
                 }
                 if (column.link != null) {
-                    if (linkColumn != null) throw new RuntimeException("Multiple link columns not permitted in " + name);
+                    if (linkColumn != null) {
+                        throw new RuntimeException("Multiple link columns not permitted in " + name);
+                    }
                     linkColumn = column;
                 }
+            }
+            if (linkColumn == null) {
+                throw new RuntimeException("No link column for table " + name);
             }
         }
 
         public String toQuery(String key) {
-            String query = String.format("select * from %s", name);
-            if (key != null) query += String.format(" where %s='%s'", linkColumn.name, key);
-            System.out.println(query);
-            return query;
+            if (query == null) {
+                String qstring = String.format("select * from %s", name);
+                if (key != null) qstring += String.format(" where %s='%s'", linkColumn.name, key);
+                System.out.println(qstring);
+                return qstring;
+            }
+            else {
+                if (key != null) {
+                    return String.format(query, key);
+                }
+                else {
+                    return query;
+                }
+            }
         }
 
         public String toString() {
@@ -155,7 +175,7 @@ public class RelationalProfile {
         public String linkColumn;
 
         @XStreamAsAttribute
-        public boolean key;
+        public Boolean key;
 
         @XStreamOmitField
         public Table parent;
@@ -166,13 +186,15 @@ public class RelationalProfile {
         public void resolve(Table parentTable) {
             parent = parentTable;
             if (linkColumn == null) {
-                if (!key) return;
+                if (key == null || !key) return;
                 linkColumn = name;
             }
             for (Column column : parentTable.columns) {
                 if (column.name.equals(linkColumn)) link = column;
             }
-            if (link == null) throw new RuntimeException(String.format("Link column %s not found in %s", linkColumn, parentTable.name));
+            if (link == null) {
+                throw new RuntimeException(String.format("Link column %s not found in %s", linkColumn, parentTable.name));
+            }
         }
 
         public boolean isEmpty(String value) {
@@ -204,6 +226,10 @@ public class RelationalProfile {
                     break;
                 case TIMESTAMP:
                     break;
+                case BIGINT:
+                    break;
+                case DATE:
+                    break;
             }
             return false;
         }
@@ -214,21 +240,23 @@ public class RelationalProfile {
     }
 
     public enum ColumnType {
-        LONGVARCHAR(-1),
-        LONGNVARCHAR(-16),
-        BINARY(-2),
-        LONGVARBINARY(-4),
-        TINYINT(-6),
-        BIT(-7),
-        NVARCHAR(-9),
-        CHAR(1),
-        VARCHAR(12),
-        NUMERIC(2),
-        DECIMAL(3),
-        INTEGER(4),
-        SMALLINT(5),
-        DOUBLE(8),
-        TIMESTAMP(93);
+        LONGVARCHAR(Types.LONGVARCHAR),
+        LONGNVARCHAR(Types.LONGNVARCHAR),
+        BINARY(Types.BINARY),
+        LONGVARBINARY(Types.LONGVARBINARY),
+        TINYINT(Types.TINYINT),
+        BIT(Types.BIT),
+        NVARCHAR(Types.NVARCHAR),
+        CHAR(Types.CHAR),
+        VARCHAR(Types.VARCHAR),
+        NUMERIC(Types.NUMERIC),
+        DECIMAL(Types.DECIMAL),
+        INTEGER(Types.INTEGER),
+        BIGINT(Types.BIGINT),
+        SMALLINT(Types.SMALLINT),
+        DOUBLE(Types.DOUBLE),
+        DATE(Types.DATE),
+        TIMESTAMP(Types.TIMESTAMP);
 
         private final int typeInt;
 
@@ -260,6 +288,52 @@ public class RelationalProfile {
             }
         }
         return profile;
+    }
+
+    public static RelationalProfile createProfile(Connection connection, QueryDefinitions queryDefinitions) throws SQLException {
+        RelationalProfile profile = new RelationalProfile();
+        for (Query query : queryDefinitions.queries) {
+            Table table = profile.addTable(query.name);
+            table.wrap = query.wrap;
+            table.parentTable = query.parentTable;
+            table.query = query.content;
+            Statement statement = connection.createStatement();
+            ResultSet columnResults = statement.executeQuery(query.content);
+            ResultSetMetaData meta = columnResults.getMetaData();
+            for (int col = 1; col <= meta.getColumnCount(); col++) {
+                String columnName = meta.getColumnName(col);
+                Column column = table.addColumn(columnName);
+                column.type = ColumnType.forTypeInt(meta.getColumnType(col));
+                if (columnName.equals(query.parentKey)) {
+                    column.key = true;
+                }
+            }
+        }
+        return profile;
+    }
+
+    @XStreamAlias("query-definition")
+    public static class QueryDefinitions {
+        @XStreamImplicit
+        List<Query> queries;
+    }
+
+    @XStreamAlias("query")
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"content"})
+    public static class Query {
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamAsAttribute
+        public String wrap;
+
+        @XStreamAsAttribute
+        public String parentTable;
+
+        @XStreamAsAttribute
+        public String parentKey;
+
+        public String content;
     }
 
     /*

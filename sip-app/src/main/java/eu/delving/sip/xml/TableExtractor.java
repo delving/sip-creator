@@ -90,12 +90,11 @@ public class TableExtractor {
     public void dumpTo(OutputStream outputStream) throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException, SQLException {
         out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         startDocument();
-        dumpTo(profile.rootTable());
+        dumpTo(profile.rootTable(), 0);
         endDocument();
     }
 
-    private void dumpTo(RelationalProfile.Table table) throws SQLException, XMLStreamException {
-        int indent = resultSets.size() + 1;
+    private void dumpTo(RelationalProfile.Table table, int indent) throws SQLException, XMLStreamException {
         String key = resultSets.isEmpty() ? null : resultSets.peek().getString(table.linkColumn.link.name);
         if (table.cached) {
             if (key == null) return;
@@ -109,24 +108,26 @@ public class TableExtractor {
         else {
             Statement statement = connection.createStatement();
             if (maxRows > 0) statement.setMaxRows(maxRows);
-            resultSets.push(statement.executeQuery(table.toQuery(key)));
+            String sql = table.toQuery(key);
+            resultSets.push(statement.executeQuery(sql));
             int count = 0;
             while (resultSets.peek().next()) {
-                try {
-                    if (resultSets.size() == 1) {
-                        Thread.sleep(1000); // todo: absurd, but worth a try
-                        System.out.println("=== Record "+(++count));
-                    }
-                }
-                catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                if (resultSets.size() == 1) {
+                    System.out.println("=== Record " + (++count));
                 }
                 startWrapper(table.name, indent);
                 for (RelationalProfile.Column column : table.columns) {
                     putValue(column, resultSets.peek(), indent + 1);
                 }
                 for (RelationalProfile.Table childTable : profile.childTables(table)) {
-                    dumpTo(childTable);
+                    if (childTable.wrap != null) {
+                        startWrapper(childTable.wrap, indent + 1);
+                        dumpTo(childTable, indent + 2);
+                        endWrapper(table.name, indent + 1);
+                    }
+                    else {
+                        dumpTo(childTable, indent + 1);
+                    }
                 }
                 endWrapper(table.name, indent);
             }
