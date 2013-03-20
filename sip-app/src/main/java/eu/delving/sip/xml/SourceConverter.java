@@ -111,21 +111,23 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
             if (stats == null) {
                 throw new StorageException("No analysis stats so conversion doesn't trust the record count");
             }
+            File parent = dataSet.sourceOutput().getParentFile();
+            dataSet.deleteSource(); // clean out before the new import
+            deleteQuietly(statsFile(parent, true, null));
             Hasher hasher = new Hasher();
             DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(dataSet.sourceOutput()));
             parse(dataSet.openImportedInputStream(), digestOut, stats.namespaces); // streams closed within parse()
-            File hashedSource = new File(dataSet.sourceOutput().getParentFile(), hasher.prefixFileName(SOURCE.getName()));
-            if (hashedSource.exists()) deleteQuietly(hashedSource);
-            moveFile(dataSet.sourceOutput(), hashedSource);
-            deleteQuietly(statsFile(dataSet.sourceOutput().getParentFile(), true, null));
+            File hashedSource = new File(parent, hasher.prefixFileName(SOURCE.getName()));
+            try {
+                moveFile(dataSet.sourceOutput(), hashedSource);
+            }
+            catch (IOException e) {
+                throw new StorageException("Unable to move file " + dataSet.sourceOutput().getAbsolutePath(), e);
+            }
         }
         catch (StorageException e) {
             deleteQuietly(dataSet.sourceOutput());
             progressListener.getFeedback().alert("Conversion failed: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
-            deleteQuietly(dataSet.sourceOutput());
-            progressListener.getFeedback().alert("Conversion failed, unexpected: " + e.getMessage(), e);
         }
         finally {
             if (work != null) work.run();
@@ -154,13 +156,13 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
         this.progressListener.setProgressMessage("Converting to standard form");
     }
 
-    public void parse(InputStream inputStream, OutputStream outputStream, Map<String, String> namespaces) throws XMLStreamException, IOException {
+    public void parse(InputStream inputStream, OutputStream outputStream, Map<String, String> namespaces) throws StorageException {
         progressListener.prepareFor(totalRecords);
 //        anonymousRecords = Integer.parseInt(System.getProperty(ANONYMOUS_RECORDS_PROPERTY, "0"));
         Path path = Path.create();
-        XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
-        XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         try {
+            XMLEventReader in = inputFactory.createXMLEventReader(new StreamSource(inputStream, "UTF-8"));
+            XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             processEvents:
             while (!finished) {
                 XMLEvent event = in.nextEvent();
@@ -253,10 +255,13 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
             }
         }
         catch (CancelException e) {
-            progressListener.getFeedback().alert("Conversion cancelled");
+            throw new StorageException("Cancelled", e);
         }
         catch (StorageException e) {
-            progressListener.getFeedback().alert("Conversion failed: " + e.getMessage(), e);
+            throw e;
+        }
+        catch (Exception e) {
+            throw new StorageException("Storage problem", e);
         }
         finally {
             if (uniqueRepeatCount > 0) {
@@ -267,7 +272,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
         }
     }
 
-    private void outputRecord(XMLEventWriter out) throws XMLStreamException, StorageException {
+    private void outputRecord(XMLEventWriter out) throws StorageException {
 //        if (anonymousRecords == 0 || recordCount < anonymousRecords) {
         String uniqueValue = getUniqueValue();
         if (!uniqueValue.isEmpty()) {
@@ -280,10 +285,15 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                 unique = null;
                 List<Attribute> attrs = new ArrayList<Attribute>();
                 attrs.add(id);
-                out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
-                for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
-                out.add(eventFactory.createEndElement("", "", RECORD_TAG));
-                out.add(eventFactory.createCharacters("\n"));
+                try {
+                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
+                    for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
+                    out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                    out.add(eventFactory.createCharacters("\n"));
+                }
+                catch (XMLStreamException e) {
+                    throw new StorageException("Problem writing XML", e);
+                }
             }
         }
 //        }
