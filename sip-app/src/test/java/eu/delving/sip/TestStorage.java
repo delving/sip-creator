@@ -21,13 +21,20 @@
 
 package eu.delving.sip;
 
+import eu.delving.schema.SchemaRepository;
+import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.*;
+import eu.delving.sip.model.DataSetModel;
+import eu.delving.sip.xml.AnalysisParser;
+import eu.delving.sip.xml.SourceConverter;
+import eu.delving.stats.Stats;
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Gerald de Jong <gerald@delving.eu>
@@ -35,15 +42,53 @@ import java.io.File;
 
 public class TestStorage {
     @Test
-    public void zipImport() throws StorageException {
+    public void zipImport() throws StorageException, IOException {
         File storageDir = new File(Mockery.getTargetDirectory(), "storage");
         FileUtils.deleteQuietly(storageDir);
-        Storage storage = new StorageImpl(storageDir, null, null);
+        FileSystemFetcher localFetcher = new FileSystemFetcher(true);
+        SchemaRepository repo = new SchemaRepository(localFetcher);
+        Storage storage = new StorageImpl(storageDir, repo, null);
         File zip = new File(getClass().getResource("/zip/ZipImport.xml.zip").getFile());
-        DataSet dataSet = storage.createDataSet("spek", "orgy");
+        final DataSet dataSet = storage.createDataSet("spek", "orgy");
+        FileUtils.write(new File(dataSet.importedOutput().getParent(), "dataset_facts.txt"),
+                "schemaVersions=ese_3.4.0\n"
+        );
+        DataSetModel dataSetModel = new DataSetModel();
+        dataSetModel.setDataSet(dataSet, "ese");
         Work.LongTermWork importer = new FileImporter(zip, dataSet, null);
         importer.setProgressListener(new MockProgressListener());
         importer.run();
         Assert.assertNotNull(dataSet.openImportedInputStream());
+        FileUtils.write(new File(dataSet.importedOutput().getParent(), "hints.txt"),
+                "recordCount=6\n" +
+                        "recordRootPath=/zip-entries/eadgrp/archdescgrp/dscgrp/ead\n" +
+                        "uniqueElementPath=/zip-entries/eadgrp/archdescgrp/dscgrp/ead/eadheader/eadid\n"
+        );
+        AnalysisParser parser = new AnalysisParser(dataSetModel, 60, new AnalysisParser.Listener() {
+            @Override
+            public void success(Stats stats) {
+                try {
+                    dataSet.setStats(stats, false, null);
+                }
+                catch (StorageException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void failure(String message, Exception exception) {
+                throw new RuntimeException(exception);
+            }
+        });
+        parser.run();
+        SourceConverter converter = new SourceConverter(dataSet, new Runnable() {
+            @Override
+            public void run() {
+                Assert.assertEquals("Data set should still be in delimited state", DataSetState.DELIMITED, dataSet.getState(null));
+            }
+        });
+        converter.setProgressListener(new MockProgressListener());
+        // the conversion will fail because of a too-large identifier!
+        converter.run();
     }
 }
