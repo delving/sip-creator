@@ -79,6 +79,7 @@ public class TestSchemaRepository {
 
     private void fetchTest(Fetcher fetcher) throws IOException {
         SchemaRepository repo = new SchemaRepository(fetcher);
+        repo.prefetchAllSchemas();
         for (Schema schema : repo.getSchemas()) {
             for (Version version : schema.versions) {
                 SchemaVersion schemaVersion = new SchemaVersion(schema.prefix, version.number);
