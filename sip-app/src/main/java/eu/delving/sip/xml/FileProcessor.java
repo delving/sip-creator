@@ -46,6 +46,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import java.io.*;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Map;
 
 import static eu.delving.groovy.XmlNodePrinter.toXml;
@@ -157,11 +158,13 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         MappingRunner mappingRunner;
         MetadataParser parser;
         Validator validator;
+        List<AssertionTest> assertionTests = null;
         try {
             validator = createValidator();
             mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
             parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
             parser.setProgressListener(new FakeProgressListener());
+            assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
             reportWriter = getDataSet().openReportWriter(recMapping.getPrefix());
             if (outputDirectory != null) xmlOutput = createXmlOutput();
         }
@@ -183,6 +186,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         validator.validate(source);
                         MappingResult result = new MappingResultImpl(serializer, node, recDefTree()).resolve();
                         result.checkMissingFields();
+                        for (AssertionTest assertionTest : assertionTests) {
+                            String violation = assertionTest.getViolation(result.root());
+                            if (violation != null) throw new Exception(violation);
+                        }
                         validCount++;
                         valid.set(record.getRecordNumber());
                         recordStatistics((Element) node, Path.create());
