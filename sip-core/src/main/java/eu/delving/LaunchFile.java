@@ -106,6 +106,7 @@ public class LaunchFile {
             "  <jar href=\"cglib-2.1_3.jar\"/>",
             "  <jar href=\"asm-1.5.3.jar\"/>",
             "  <jar href=\"Saxon-HE-9.4.0.6.jar\"/>",
+            "  <jar href=\"lucene-spatial-3.1.0.jar\"/>",
             "</resources>",
             "<application-desc main-class=\"eu.delving.sip.Application\">",
             "  <argument>" + USER + "</argument>",

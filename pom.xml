@@ -201,6 +201,21 @@
                 <artifactId>proj4j</artifactId>
                 <version>0.1.0</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-spatial</artifactId>
+                <version>3.1.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.lucene</groupId>
+                        <artifactId>lucene-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.lucene</groupId>
+                        <artifactId>lucene-queriestt</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
