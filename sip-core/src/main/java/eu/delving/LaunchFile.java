@@ -68,7 +68,7 @@ public class LaunchFile {
             "  <property name=\"jnlp.versionEnabled\" value=\"false\"/>",
             "  <jar href=\"sip-app-1.1.1-SNAPSHOT.jar\" main=\"true\"/>",
             "  <jar href=\"sip-core-1.1.1-SNAPSHOT.jar\"/>",
-            "  <jar href=\"schema-repo-1.1.1-SNAPSHOT.jar\"/>",
+            "  <jar href=\"schema-repo-1.1.2-SNAPSHOT.jar\"/>",
             "  <jar href=\"oauth2-client-0.2-SNAPSHOT.jar\"/>",
             "  <jar href=\"oauth2-common-0.2-SNAPSHOT.jar\"/>",
             "  <jar href=\"jettison-1.2.jar\"/>",
