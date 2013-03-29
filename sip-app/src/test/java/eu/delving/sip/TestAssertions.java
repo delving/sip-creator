@@ -106,7 +106,8 @@ public class TestAssertions {
 
     @Test
     public void testGeneratedStructureTestsICN() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        RecDef icnRecDef = RecDef.read(new ByteArrayInputStream(schemaRepository.getSchema(new SchemaVersion("icn", "1.0.3"), SchemaType.RECORD_DEFINITION).getBytes()));
+        SchemaRepository.SchemaResponse response = schemaRepository.getSchema(new SchemaVersion("icn", "1.0.3"), SchemaType.RECORD_DEFINITION);
+        RecDef icnRecDef = RecDef.read(new ByteArrayInputStream(response.getSchemaText().getBytes()));
         List<StructureTest> structureTests = StructureTest.listFrom(icnRecDef);
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(icnDoc.getDocumentElement())) {
@@ -125,7 +126,8 @@ public class TestAssertions {
 
     @Test
     public void testGeneratedStructureTests() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        RecDef modsRecDef = RecDef.read(new ByteArrayInputStream(schemaRepository.getSchema(new SchemaVersion("mods", "3.4.0"), SchemaType.RECORD_DEFINITION).getBytes()));
+        SchemaRepository.SchemaResponse response = schemaRepository.getSchema(new SchemaVersion("mods", "3.4.0"), SchemaType.RECORD_DEFINITION);
+        RecDef modsRecDef = RecDef.read(new ByteArrayInputStream(response.getSchemaText().getBytes()));
         List<StructureTest> structureTests = StructureTest.listFrom(modsRecDef);
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(modsDoc)) {

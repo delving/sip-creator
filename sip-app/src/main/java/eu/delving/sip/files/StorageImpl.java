@@ -27,7 +27,6 @@ import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.base.SwingHelper;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -35,6 +34,7 @@ import org.apache.commons.io.input.CountingInputStream;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
@@ -623,11 +623,19 @@ public class StorageImpl implements Storage {
         String fileName = schemaVersion.getFullFileName(RECORD_DEFINITION);
         try {
             File file = cache(fileName);
-            if (!file.exists() || SwingHelper.isDevelopmentMode()) {
-                String recDefXML = schemaRepository.getSchema(schemaVersion, RECORD_DEFINITION);
-                FileUtils.write(file, recDefXML, "UTF-8");
+            if (!file.exists()) {
+                SchemaRepository.SchemaResponse recDefResponse = schemaRepository.getSchema(schemaVersion, RECORD_DEFINITION);
+                if (recDefResponse == null) {
+                    throw new StorageException("No rec-def found for " + schemaVersion);
+                }
+                if (recDefResponse.isValidated()) {
+                    FileUtils.write(file, recDefResponse.getSchemaText(), "UTF-8");
+                }
+                return RecDef.read(new ByteArrayInputStream(recDefResponse.getSchemaText().getBytes("UTF-8")));
             }
-            return RecDef.read(new FileInputStream(file));
+            else {
+                return RecDef.read(new FileInputStream(file));
+            }
         }
         catch (IOException e) {
             throw new StorageException("Unable to load " + fileName, e);
@@ -638,14 +646,23 @@ public class StorageImpl implements Storage {
         String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
         try {
             File file = cache(fileName);
-            if (!file.exists() || SwingHelper.isDevelopmentMode()) {
-                String valXML = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
-                FileUtils.write(file, valXML, "UTF-8");
+            if (!file.exists()) {
+                SchemaRepository.SchemaResponse valResponse = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
+                if (valResponse == null) {
+                    throw new StorageException("No validation XSD foudn for " + schemaVersion);
+                }
+                if (valResponse.isValidated()) {
+                    FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
+                }
+                StreamSource source = new StreamSource(new StringReader(valResponse.getSchemaText()));
+                return schemaFactory().newSchema(source).newValidator();
             }
-            return schemaFactory().newSchema(file).newValidator();
+            else {
+                return schemaFactory().newSchema(file).newValidator();
+            }
         }
         catch (SAXException e) {
-            throw new StorageException("Unable to create a validator: "+schemaVersion, e);
+            throw new StorageException("Unable to create a validator: " + schemaVersion, e);
         }
         catch (IOException e) {
             throw new StorageException("Unable to load " + fileName, e);
