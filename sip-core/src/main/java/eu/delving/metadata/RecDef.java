@@ -138,6 +138,7 @@ public class RecDef {
 
     public List<OptList> opts;
 
+    @XStreamAlias("assertion-list")
     public Assertion.AssertionList assertionList;
 
     @XStreamAlias("field-markers")

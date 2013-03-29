@@ -152,6 +152,10 @@
             <artifactId>Saxon-HE</artifactId>
             <version>9.4.0.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-spatial</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
