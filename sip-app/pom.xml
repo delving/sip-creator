@@ -73,9 +73,9 @@
         <defaultGoal>compile</defaultGoal>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo.webstart</groupId>
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>webstart-maven-plugin</artifactId>
-                <version>1.0-beta-2</version>
+                <version>1.0-beta-3</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -90,29 +90,16 @@
                         <outputFile>sip-creator.jnlp</outputFile>
                         <mainClass>eu.delving.sip.Application</mainClass>
                     </jnlp>
+                    <sign>
+                        <keystore>${basedir}/src/main/jnlp/snakeoil.keystore</keystore>
+                        <keypass>sip-creator</keypass>
+                        <storepass>sip-creator</storepass>
+                        <alias>sip-creator</alias>
+                        <verify>true</verify>
+                    </sign>
                     <pack200>false</pack200>
                     <gzip>false</gzip>
                     <outputJarVersions>false</outputJarVersions>
-                    <verbose>false</verbose>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jarsigner-plugin</artifactId>
-                <version>1.2</version>
-                <executions>
-                    <execution>
-                        <id>sign</id>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <keystore>${basedir}/src/main/jnlp/snakeoil.keystore</keystore>
-                    <keypass>sip-creator</keypass>
-                    <storepass>sip-creator</storepass>
-                    <alias>sip-creator</alias>
                 </configuration>
             </plugin>
             <plugin>
@@ -133,7 +120,6 @@
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.amber</groupId>
