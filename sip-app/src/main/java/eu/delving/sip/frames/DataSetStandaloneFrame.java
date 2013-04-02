@@ -154,7 +154,7 @@ public class DataSetStandaloneFrame extends FrameBase {
             @Override
             public void run() {
                 try {
-                    String factsString = schemaRepository.getSchema(new SchemaVersion(FACTS_PREFIX, "1.0.0"), SchemaType.FACT_DEFINITIONS);
+                    String factsString = schemaRepository.getSchema(new SchemaVersion(FACTS_PREFIX, "1.0.0"), SchemaType.FACT_DEFINITIONS).getSchemaText();
                     FactDefinitionList factDefinitionList = (FactDefinitionList) XStreamFactory.getStreamFor(FactDefinitionList.class).fromXML(factsString);
                     factDefinitions = new ArrayList<FactDefinition>();
                     factDefinitions.addAll(factDefinitionList.definitions);

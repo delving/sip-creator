@@ -194,7 +194,7 @@ public class TestMappingEngine {
         @Override
         public RecDefTree createRecDefTree(SchemaVersion schemaVersion) throws MetadataException {
             try {
-                String recDefString = schemaRepo.getSchema(schemaVersion, SchemaType.RECORD_DEFINITION);
+                String recDefString = schemaRepo.getSchema(schemaVersion, SchemaType.RECORD_DEFINITION).getSchemaText();
                 if (recDefString == null) throw new RuntimeException("Unable to find record definition "+schemaVersion);
                 return RecDefTree.create(RecDef.read(new ByteArrayInputStream(recDefString.getBytes("UTF-8"))));
             }
@@ -208,7 +208,7 @@ public class TestMappingEngine {
         try {
             SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
             factory.setResourceResolver(new CachedResourceResolver());
-            String validationXsd = schemaRepo.getSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA);
+            String validationXsd = schemaRepo.getSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA).getSchemaText();
             if (validationXsd == null) throw new RuntimeException("Unable to find validation schema "+schemaVersion);
             Schema schema = factory.newSchema(new StreamSource(new StringReader(validationXsd)));
             return schema.newValidator();
