@@ -28,6 +28,7 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaRepository;
+import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaType;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.schema.util.FileSystemFetcher;
@@ -106,7 +107,7 @@ public class TestAssertions {
 
     @Test
     public void testGeneratedStructureTestsICN() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        SchemaRepository.SchemaResponse response = schemaRepository.getSchema(new SchemaVersion("icn", "1.0.3"), SchemaType.RECORD_DEFINITION);
+        SchemaResponse response = schemaRepository.getSchema(new SchemaVersion("icn", "1.0.3"), SchemaType.RECORD_DEFINITION);
         RecDef icnRecDef = RecDef.read(new ByteArrayInputStream(response.getSchemaText().getBytes()));
         List<StructureTest> structureTests = StructureTest.listFrom(icnRecDef);
         for (StructureTest structureTest : structureTests) {
@@ -126,7 +127,7 @@ public class TestAssertions {
 
     @Test
     public void testGeneratedStructureTests() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        SchemaRepository.SchemaResponse response = schemaRepository.getSchema(new SchemaVersion("mods", "3.4.0"), SchemaType.RECORD_DEFINITION);
+        SchemaResponse response = schemaRepository.getSchema(new SchemaVersion("mods", "3.4.0"), SchemaType.RECORD_DEFINITION);
         RecDef modsRecDef = RecDef.read(new ByteArrayInputStream(response.getSchemaText().getBytes()));
         List<StructureTest> structureTests = StructureTest.listFrom(modsRecDef);
         for (StructureTest structureTest : structureTests) {

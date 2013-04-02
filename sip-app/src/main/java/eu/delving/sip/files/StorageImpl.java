@@ -24,6 +24,7 @@ package eu.delving.sip.files;
 import eu.delving.XMLToolFactory;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaRepository;
+import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
@@ -624,7 +625,7 @@ public class StorageImpl implements Storage {
         try {
             File file = cache(fileName);
             if (!file.exists()) {
-                SchemaRepository.SchemaResponse recDefResponse = schemaRepository.getSchema(schemaVersion, RECORD_DEFINITION);
+                SchemaResponse recDefResponse = schemaRepository.getSchema(schemaVersion, RECORD_DEFINITION);
                 if (recDefResponse == null) {
                     throw new StorageException("No rec-def found for " + schemaVersion);
                 }
@@ -647,7 +648,7 @@ public class StorageImpl implements Storage {
         try {
             File file = cache(fileName);
             if (!file.exists()) {
-                SchemaRepository.SchemaResponse valResponse = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
+                SchemaResponse valResponse = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
                 if (valResponse == null) {
                     throw new StorageException("No validation XSD foudn for " + schemaVersion);
                 }

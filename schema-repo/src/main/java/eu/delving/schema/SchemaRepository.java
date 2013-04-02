@@ -106,24 +106,6 @@ public class SchemaRepository {
         return response;
     }
 
-    public class SchemaResponse {
-        private String schemaText;
-        private boolean isValidated;
-
-        public SchemaResponse(String schemaText, boolean isValidated) {
-            this.schemaText = schemaText;
-            this.isValidated = isValidated;
-        }
-
-        public String getSchemaText() {
-            return schemaText;
-        }
-
-        public boolean isValidated() {
-            return isValidated;
-        }
-    }
-
     private String getHashString(String value) {
         try {
             return toHexadecimal(messageDigest.digest(value.getBytes("UTF-8")));
