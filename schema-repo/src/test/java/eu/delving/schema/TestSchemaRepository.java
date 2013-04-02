@@ -84,15 +84,15 @@ public class TestSchemaRepository {
             for (Version version : schema.versions) {
                 SchemaVersion schemaVersion = new SchemaVersion(schema.prefix, version.number);
                 if (schema.prefix.equals("facts")) {
-                    String content = repo.getSchema(schemaVersion, FACT_DEFINITIONS);
+                    String content = repo.getSchema(schemaVersion, FACT_DEFINITIONS).getSchemaText();
                     Assert.assertTrue(content != null);
                     System.out.println(schemaVersion.getFullFileName(FACT_DEFINITIONS) + ": " + lineCount(content) + " lines");
                 }
                 else {
-                    String content = repo.getSchema(schemaVersion, RECORD_DEFINITION);
+                    String content = repo.getSchema(schemaVersion, RECORD_DEFINITION).getSchemaText();
                     Assert.assertTrue(content != null);
                     System.out.println(schemaVersion.getFullFileName(RECORD_DEFINITION) + ": " + lineCount(content) + " lines");
-                    content = repo.getSchema(schemaVersion, VALIDATION_SCHEMA);
+                    content = repo.getSchema(schemaVersion, VALIDATION_SCHEMA).getSchemaText();
                     Assert.assertTrue(content != null);
                     System.out.println(schemaVersion.getFullFileName(VALIDATION_SCHEMA) + ": " + lineCount(content) + " lines");
                 }

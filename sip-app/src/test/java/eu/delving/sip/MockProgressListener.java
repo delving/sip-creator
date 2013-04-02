@@ -67,8 +67,7 @@ public class MockProgressListener implements ProgressListener {
 
         @Override
         public void alert(String message, Exception exception) {
-            System.out.println("alert: " + message);
-            exception.printStackTrace();
+            System.out.println("alert: " + message + " exception:"+exception.toString());
         }
 
         @Override

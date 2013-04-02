@@ -45,7 +45,7 @@ public class SchemaRepository {
     private MessageDigest messageDigest;
     private Schemas schemas;
     private Fetcher fetcher;
-    private Map<SchemaKey, String> cache = new HashMap<SchemaKey, String>();
+    private Map<SchemaKey, SchemaResponse> cache = new HashMap<SchemaKey, SchemaResponse>();
 
     public SchemaRepository(Fetcher fetcher) throws IOException {
         this.fetcher = fetcher;
@@ -63,9 +63,7 @@ public class SchemaRepository {
             for (Version version : schema.versions) {
                 for (SchemaFile file : version.files) {
                     SchemaType type = SchemaType.forFile(file.name);
-                    if (type != null) {
-                        fetchCachedSchema(new SchemaVersion(schema.prefix, version.number), type);
-                    }
+                    if (type != null) getSchema(new SchemaVersion(schema.prefix, version.number), type);
                 }
             }
         }
@@ -75,7 +73,7 @@ public class SchemaRepository {
         return schemas.schemas;
     }
 
-    public String getSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
+    public SchemaResponse getSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
         String hash = null;
         for (Schema schema : schemas.schemas) {
             if (!schema.prefix.equals(schemaVersion.getPrefix())) continue;
@@ -89,14 +87,23 @@ public class SchemaRepository {
             }
         }
         if (hash == null) return null;
-        String schema = fetchCachedSchema(schemaVersion, schemaType);
-        if (fetcher.isValidating() && !hash.isEmpty()) {
-            String foundHash = getHashString(schema.trim());
-            if (!hash.equals(foundHash)) {
-                throw new IllegalStateException(schemaVersion.getFullFileName(schemaType) + ": expected hash " + foundHash);
+        SchemaKey key = new SchemaKey(schemaVersion, schemaType);
+        SchemaResponse response = cache.get(key);
+        if (response == null) {
+            String schemaText = fetcher.fetchSchema(schemaVersion, schemaType);
+            if (schemaText != null) {
+                boolean isValidated = false;
+                if (fetcher.isValidating() && !hash.isEmpty()) {
+                    String foundHash = getHashString(schemaText.trim());
+                    if (!hash.equals(foundHash)) {
+                        throw new IllegalStateException(schemaVersion.getFullFileName(schemaType) + ": expected hash " + foundHash);
+                    }
+                    isValidated = true;
+                }
+                cache.put(key, response = new SchemaResponse(schemaText, isValidated));
             }
         }
-        return schema;
+        return response;
     }
 
     private String getHashString(String value) {
@@ -108,15 +115,15 @@ public class SchemaRepository {
         }
     }
 
-    private String fetchCachedSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
-        SchemaKey key = new SchemaKey(schemaVersion, schemaType);
-        String schema = cache.get(key);
-        if (schema == null) {
-            schema = fetcher.fetchSchema(schemaVersion, schemaType);
-            cache.put(key, schema);
-        }
-        return schema;
-    }
+//    private String fetchCachedSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
+//        SchemaKey key = new SchemaKey(schemaVersion, schemaType);
+//        String schema = cache.get(key);
+//        if (schema == null) {
+//            schema = fetcher.fetchSchema(schemaVersion, schemaType);
+//            cache.put(key, schema);
+//        }
+//        return schema;
+//    }
 
     private static class SchemaKey {
         private SchemaVersion schemaVersion;
