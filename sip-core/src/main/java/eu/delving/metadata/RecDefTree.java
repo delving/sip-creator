@@ -76,6 +76,14 @@ public class RecDefTree implements RecDefNodeListener {
         return root.getNode(path);
     }
 
+    public String getPathsList() {
+        StringBuilder out = new StringBuilder();
+        for (Path path : collectPaths()) {
+            out.append(path.toString()).append('\n');
+        }
+        return out.toString();
+    }
+
     public List<Path> collectPaths() {
         List<Path> paths = new ArrayList<Path>();
         collectPaths(root, Path.create(), paths);

@@ -69,6 +69,17 @@ public class TestMappingValidation {
         mock.delete();
     }
 
+    @Ignore
+    @Test
+    public void testEad() throws Exception {
+        mock.prepareDataset(
+                "ead",
+                "/sample/eag",
+                "/sample/eag/eagheader/eagid"
+        );
+        runFullCycle(1);
+    }
+
     @Test
     public void testMods() throws Exception {
         mock.prepareDataset(
