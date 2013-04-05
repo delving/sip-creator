@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sample>
+<eag xmlns="http://www.ministryculture.es/" audience="external">
+   <eagheader status="draft" langencoding="iso639-2b" scriptencoding="iso15924"
+              dateencoding="iso8601"
+              countryencoding="iso3166-1"
+              repositoryencoding="iso15511">
+      <eagid>SE_HLA</eagid>
+      <mainhist>
+         <mainevent maintype="create">
+            <date calendar="gregorian" era="ce" normal=""/>
+            <respevent>
+                <surnames>Andrén</surnames>
+                <firstname>Peder</firstname>
+            </respevent>
+         </mainevent>
+      </mainhist>
+   </eagheader>
+   <archguide>
+      <identity>
+         <repositorid countrycode="SE" repositorycode="SE"/>
+         <autform>Landsarkivet i Härnösand</autform>
+         <parform>Regional Archives of Härnösand</parform>
+      </identity>
+      <desc>
+         <geogarea>Europe</geogarea>
+         <country>Sweden</country>
+         <municipality>Härnösand</municipality>
+         <street>Rosenbäcksallén</street>
+         <postalcode>87124</postalcode>
+         <telephone>+46104768000</telephone>
+         <email href="landsarkivet@landsarkivet-harnosand.se">Mail to landsarkivet@landsarkivet-harnosand.se</email>
+         <webpage href="http://www.riksarkivet.se/default.aspx?id=2232&amp;refid=1193">Homepage of the institution</webpage>
+         <access question="yes"/>
+         <buildinginfo>
+            <searchroom>
+               <num unit="site">Number of working places in the search room</num>
+            </searchroom>
+            <handicapped question="yes"/>
+         </buildinginfo>
+         <extent>
+            <num unit="linearmetre">Extent of all holdings in linearmetre</num>
+         </extent>
+         <organization>
+            <descunit classcode="" fathercode="" level="fonds">
+               <unitid href="http://www.apenet.eu"/>
+               <unittitle/>
+               <date calendar="gregorian" era="ce" normal="2010"/>
+               <extent>
+                  <num unit="linearmetre"/>
+               </extent>
+            </descunit>
+         </organization>
+         <techservices>
+            <restorationlab question="yes"/>
+            <reproductionser question="yes"/>
+            <library question="yes"/>
+         </techservices>
+         <automation question="yes"/>
+      </desc>
+   </archguide>
+</eag>
+</sample>

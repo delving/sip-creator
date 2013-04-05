@@ -1,0 +1,9 @@
+name=EAD Test
+spec=ead
+country=europe
+dataProvider=Sourcer
+language=nl
+provider=Testmeister
+rights=http://creativecommons.org/publicdomain/mark/1.0/
+type=IMAGE
+schemaVersions=ead_1.2.3
