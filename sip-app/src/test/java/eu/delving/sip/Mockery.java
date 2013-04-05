@@ -84,6 +84,7 @@ public class Mockery {
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
         dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()), prefix);
         recMapping = dataSetModel.getMappingModel().getRecMapping();
+        FileUtils.writeStringToFile(new File("/tmp/EAD-paths.txt"), recMapping.getRecDefTree().getPathsList());
     }
 
     public Storage storage() {

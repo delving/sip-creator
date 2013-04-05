@@ -453,6 +453,9 @@ public class RecDef {
         @XStreamOmitField
         public List<Elem> elemList = new ArrayList<Elem>();
 
+        @XStreamOmitField
+        public boolean subelementsAdded;
+
         @Override
         public String toString() {
             return tag.toString();
@@ -502,7 +505,10 @@ public class RecDef {
                 }
                 elems = null;
             }
-            elemList.addAll(subelements);
+            if (!subelementsAdded) {
+                elemList.addAll(subelements);
+                subelementsAdded = true;
+            }
             for (Elem elem : elemList) elem.resolve(path, recDef);
         }
 
