@@ -27,7 +27,6 @@
         >
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>eu.delving</groupId>
     <artifactId>schema-repo</artifactId>
     <packaging>jar</packaging>
     <name>Schema-Repo</name>

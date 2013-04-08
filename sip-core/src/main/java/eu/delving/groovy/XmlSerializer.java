@@ -69,12 +69,15 @@ public class XmlSerializer {
             out.add(eventFactory.createStartDocument());
             out.add(eventFactory.createCharacters("\n"));
             List<Attribute> attributes = getAttributes(node);
-            out.add(eventFactory.createStartElement(
-                    node.getPrefix() == null ? "" : node.getPrefix(),
-                    node.getNamespaceURI() == null ? "" : node.getNamespaceURI(),
-                    node.getLocalName() == null ? node.getNodeName() : node.getLocalName(),
-                    attributes.iterator(), nslist.iterator()
-            ));
+            String prefix = node.getPrefix();
+            if (prefix == null) prefix = "";
+            String uri = node.getNamespaceURI();
+            if (uri == null) uri = "";
+            String localName = node.getLocalName();
+            if (localName == null) {
+                localName = node.getNodeName();
+            }
+            out.add(eventFactory.createStartElement(prefix, uri, localName, attributes.iterator(), nslist.iterator()));
             if (fromMapping) out.add(eventFactory.createCharacters("\n"));
             NodeList kids = node.getChildNodes();
             if (fromMapping) {
@@ -113,7 +116,7 @@ public class XmlSerializer {
                     }
                 }
             }
-            out.add(eventFactory.createEndElement(node.getPrefix(), node.getNamespaceURI(), node.getLocalName()));
+            out.add(eventFactory.createEndElement(prefix, uri, localName));
             if (fromMapping) out.add(eventFactory.createCharacters("\n"));
             out.add(eventFactory.createEndDocument());
             out.flush();
