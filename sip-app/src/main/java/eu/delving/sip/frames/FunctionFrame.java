@@ -277,9 +277,11 @@ public class FunctionFrame extends FrameBase {
             if (hintFunctions != null) {
                 for (MappingFunction function : hintFunctions) entries.add(new FunctionEntry(function, false));
             }
-            List<MappingFunction> recDefFunctions = sipModel.getMappingModel().getRecMapping().getRecDefTree().getRecDef().functions;
-            if (recDefFunctions != null) {
-                for (MappingFunction function : recDefFunctions) entries.add(new FunctionEntry(function, true));
+            if (sipModel.getMappingModel().hasRecMapping()) {
+                List<MappingFunction> recDefFunctions = sipModel.getMappingModel().getRecMapping().getRecDefTree().getRecDef().functions;
+                if (recDefFunctions != null) {
+                    for (MappingFunction function : recDefFunctions) entries.add(new FunctionEntry(function, true));
+                }
             }
             exec(new Swing() {
                 @Override
