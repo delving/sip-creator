@@ -1,0 +1,66 @@
+<mapping-function name="detectCoordinate">
+    <groovy-code>
+        <!--for the test, the following variable is being given in the binding-->
+        <!--<string>def utmOut = false</string>-->
+        <string>def srid = ~/\s*SRID=(\d+);POINT\((\d+),(\d+)\)/</string>
+        <string>def utm33 = ~/(\d+) V (\d+\.\d+|\d+) *(\d+\.\d+|\d+)/</string>
+        <string>def comma = ~/(\d+\.\d+|\d+), *(\d+\.\d+|\d+)/</string>
+        <string>def sridMatcher = srid.matcher(it)</string>
+        <string>def utm33Matcher = utm33.matcher(it)</string>
+        <string>def commaMatcher = comma.matcher(it)</string>
+        <string>if (sridMatcher.matches()) {</string>
+        <string>def id = sridMatcher[0][1].toInteger()</string>
+        <string>def zone = id % 100</string>
+        <string>def east = sridMatcher[0][2].toDouble()</string>
+        <string>def north = sridMatcher[0][3].toDouble()</string>
+        <string>if (utmOut) {</string>
+        <string>&quot;${it}&quot;</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>uk.me.jstott.jcoord.LatLng latlng = new uk.me.jstott.jcoord.UTMRef(east, north, &apos;V&apos; as char, zone).toLatLng()</string>
+        <string>&quot;${latlng.lat},${latlng.lng}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>else if (utm33Matcher.matches()) {</string>
+        <string>def zone = utm33Matcher[0][1].toInteger()</string>
+        <string>def east = utm33Matcher[0][2].toDouble()</string>
+        <string>def north = utm33Matcher[0][3].toDouble()</string>
+        <string>if (utmOut) {</string>
+        <string>&quot;SRID=326${zone};POINT(${east},${north})&quot;</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>uk.me.jstott.jcoord.LatLng latlng = new uk.me.jstott.jcoord.UTMRef(east, north, &apos;V&apos; as char, zone).toLatLng()</string>
+        <string>&quot;${latlng.lat},${latlng.lng}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>else if (commaMatcher.matches()) {</string>
+        <string>def a = commaMatcher[0][1].toDouble()</string>
+        <string>def b = commaMatcher[0][2].toDouble()</string>
+        <string>if (a &gt;= -90.0 &amp;&amp; a &lt;= 90.0 &amp;&amp; b &gt;= 0 &amp;&amp; b &lt;= 180) {</string>
+        <string>def latitude = a</string>
+        <string>def longitude = b</string>
+        <string>if (utmOut) {</string>
+        <string>uk.me.jstott.jcoord.UTMRef utmValue = new uk.me.jstott.jcoord.LatLng(latitude, longitude).toUTMRef()</string>
+        <string>&quot;SRID=326${utmValue.lngZone};POINT(${utmValue.easting},${utmValue.northing})&quot;</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>&quot;${latitude},${longitude}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>def east = a</string>
+        <string>def north = b</string>
+        <string>if (utmOut) {</string>
+        <string>&quot;SRID=32633;POINT(${east},${north})&quot;</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>uk.me.jstott.jcoord.LatLng latlng = new uk.me.jstott.jcoord.UTMRef(east, north, &apos;V&apos; as char, 33).toLatLng()</string>
+        <string>&quot;${latlng.lat},${latlng.lng}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>&apos;&apos;</string>
+        <string>}</string>
+    </groovy-code>
+</mapping-function>
