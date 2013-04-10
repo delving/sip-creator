@@ -65,17 +65,17 @@ public class TestCodeGeneration {
     public void cornucopia() throws IOException, XMLStreamException, MappingException {
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null, true);
-        printWithLineNumbers(mappingRunner.getCode());
+//        printWithLineNumbers(mappingRunner.getCode());
         MetadataRecord inputRecord = createInputRecord();
         Node node = mappingRunner.runMapping(inputRecord);
         String xml = new XmlSerializer().toXml(node, true);
         Assert.assertEquals("Unexpected xml", expect, xml);
     }
 
-    private void printWithLineNumbers(String code) {
-        int lineNumber = 1;
-        for (String line : code.split("\n")) System.out.println(String.format("%3d: %s", lineNumber++, line));
-    }
+//    private void printWithLineNumbers(String code) {
+//        int lineNumber = 1;
+//        for (String line : code.split("\n")) System.out.println(String.format("%3d: %s", lineNumber++, line));
+//    }
 
     private MetadataRecord createInputRecord() throws IOException, XMLStreamException {
         Map<String, String> ns = new TreeMap<String, String>();

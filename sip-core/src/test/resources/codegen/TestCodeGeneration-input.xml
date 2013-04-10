@@ -5,11 +5,31 @@
                  <name>Gumby Dammit</name>
                  <concept>superhero</concept>
                  <concept>ssavior</concept>
+                 <zig>left</zig>
+                 <zag>right</zag>
+                 <body>
+                     <parts>
+                         <limbs>
+                             <arms>two</arms>
+                             <legs>two</legs>
+                         </limbs>
+                     </parts>
+                 </body>
              </member>
              <member index="45">
                  <name><![CDATA[<]]>O'Po<![CDATA[k]]>ey<![CDATA[>]]></name>
                  <name>McPokey</name>
                  <concept>sidekick</concept>
+                 <zig>top</zig>
+                 <zag>bottom</zag>
+                 <body>
+                     <parts>
+                         <limbs>
+                             <arms>none</arms>
+                             <legs>four</legs>
+                         </limbs>
+                     </parts>
+                 </body>
              </member>
         </list>
         <fromOne>look this up</fromOne>

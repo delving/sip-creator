@@ -29,7 +29,12 @@
         <elem tag="sub-one" attrs="xml:lang" required="true">
             <elem tag="sub-two" elems="abc-link, ab"/>
             <elem tag="events" singular="true" attrs="ordering">
-                <elem tag="event" elems="abc-link, actor" attrs="thekey, thevalue, theschema"/>
+                <elem tag="event" elems="abc-link, actor" attrs="thekey, thevalue, theschema">
+                    <elem tag="combo"/>
+                    <elem tag="do-the">
+                        <elem tag="limbo"/>
+                    </elem>
+                </elem>
             </elem>
         </elem>
     </root>

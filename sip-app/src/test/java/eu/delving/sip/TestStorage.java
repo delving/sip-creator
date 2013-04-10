@@ -56,9 +56,11 @@ public class TestStorage {
         DataSetModel dataSetModel = new DataSetModel();
         dataSetModel.setDataSet(dataSet, "ese");
         Work.LongTermWork importer = new FileImporter(zip, dataSet, null);
-        importer.setProgressListener(new MockProgressListener());
+        MockProgressListener importProgress = new MockProgressListener();
+        importer.setProgressListener(importProgress);
         importer.run();
         Assert.assertNotNull(dataSet.openImportedInputStream());
+        Assert.assertEquals("Alert list size for import wrong", 0, importProgress.getAlerts().size());
         FileUtils.write(new File(dataSet.importedOutput().getParent(), "hints.txt"),
                 "recordCount=6\n" +
                         "recordRootPath=/zip-entries/eadgrp/archdescgrp/dscgrp/ead\n" +
@@ -87,8 +89,10 @@ public class TestStorage {
                 Assert.assertEquals("Data set should still be in delimited state", DataSetState.DELIMITED, dataSet.getState(null));
             }
         });
-        converter.setProgressListener(new MockProgressListener());
+        MockProgressListener convertProgress = new MockProgressListener();
+        converter.setProgressListener(convertProgress);
         // the conversion will fail because of a too-large identifier!
         converter.run();
+        Assert.assertEquals("Alert list size for convert wrong", 1, convertProgress.getAlerts().size());
     }
 }

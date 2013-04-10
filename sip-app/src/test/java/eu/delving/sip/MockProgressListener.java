@@ -24,6 +24,9 @@ package eu.delving.sip;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.model.Feedback;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Pretend to be a progress listener
  *
@@ -33,21 +36,22 @@ import eu.delving.sip.model.Feedback;
 public class MockProgressListener implements ProgressListener {
     private MockFeedback mockFeedback = new MockFeedback();
     private int progress;
+    private List<String> alerts = new ArrayList<String>();
 
     @Override
     public void setProgressMessage(String message) {
-        System.out.println("message = " + message);
+//        System.out.println("message = " + message);
     }
 
     @Override
     public void prepareFor(int total) {
-        System.out.println("prepareFor = " + total);
+//        System.out.println("prepareFor = " + total);
     }
 
     @Override
     public void setProgress(int progress) {
         if (this.progress != progress) {
-            System.out.println("progress = " + progress);
+//            System.out.println("progress = " + progress);
         }
         this.progress = progress;
     }
@@ -57,17 +61,20 @@ public class MockProgressListener implements ProgressListener {
         return mockFeedback;
     }
 
+    public List<String> getAlerts() {
+        return alerts;
+    }
+
     private class MockFeedback implements Feedback {
 
         @Override
         public void alert(String message) {
-            System.out.println("alert: " + message);
-
+            alerts.add(message);
         }
 
         @Override
         public void alert(String message, Exception exception) {
-            System.out.println("alert: " + message + " exception:"+exception.toString());
+            alerts.add(message + " exception:"+exception.toString());
         }
 
         @Override

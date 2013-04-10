@@ -44,7 +44,7 @@ public class TestRecDef {
 
     private static RecDef recDef() {
         try {
-            URL url = TestCodeGeneration.class.getResource("/codegen/test-code-generation-recdef.xml");
+            URL url = TestCodeGeneration.class.getResource("/codegen/TestCodeGeneration-recdef.xml");
             InputStream inputStream = url.openStream();
             return RecDef.read(inputStream);
         }

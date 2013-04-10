@@ -55,5 +55,15 @@
                 </entry>
             </dictionary>
         </node-mapping>
+        <node-mapping inputPath="/input/leadup/record/list/member/zig" outputPath="/test/sub-one/events/event/combo">
+            <siblings>
+                <path>/input/leadup/record/list/member/zag</path>
+            </siblings>
+        </node-mapping>
+        <node-mapping inputPath="/input/leadup/record/list/member/body/parts/limbs/arms" outputPath="/test/sub-one/events/event/do-the/limbo">
+            <siblings>
+                <path>/input/leadup/record/list/member/body/parts/limbs/legs</path>
+            </siblings>
+        </node-mapping>
     </node-mappings>
 </rec-mapping>

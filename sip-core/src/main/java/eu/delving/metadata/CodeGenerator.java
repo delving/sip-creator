@@ -201,7 +201,7 @@ public class CodeGenerator {
                 trace();
                 codeOut.line_(
                         "%s %s { %s ->",
-                        toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
+                        toMapExpression(nodeMapping, path), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
                 );
                 groovyParams.push(getMapName(nodeMapping));
                 toMapNodeMapping(recDefNode, nodeMapping, groovyParams);
@@ -297,25 +297,13 @@ public class CodeGenerator {
 
     private void toLeafCode(RecDefNode recDefNode, NodeMapping nodeMapping, Stack<String> groovyParams) {
         if (nodeMapping.hasMap()) {
-            trace();
-            codeOut.line_(
-                    "%s %s { %s ->",
-                    toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
-            );
-            startBuilderCall(recDefNode, true, groovyParams);
-            codeOut.start(nodeMapping);
-            toLeafElementCode(nodeMapping, groovyParams);
-            codeOut.end(nodeMapping);
-            codeOut._line("}");
-            codeOut._line("}");
+            throw new RuntimeException("Cannot handle map here");
         }
-        else {
-            startBuilderCall(recDefNode, true, groovyParams);
-            codeOut.start(nodeMapping);
-            toLeafElementCode(nodeMapping, groovyParams);
-            codeOut.end(nodeMapping);
-            codeOut._line("}");
-        }
+        startBuilderCall(recDefNode, true, groovyParams);
+        codeOut.start(nodeMapping);
+        toLeafElementCode(nodeMapping, groovyParams);
+        codeOut.end(nodeMapping);
+        codeOut._line("}");
     }
 
     private void startBuilderCall(RecDefNode recDefNode, boolean absentFalse, Stack<String> groovyParams) {
@@ -401,27 +389,17 @@ public class CodeGenerator {
             toInnerLoop(nodeMapping, path.withRootRemoved(), groovyParams);
         }
         else {
-            boolean needLoop;
             if (nodeMapping.hasMap()) {
-                needLoop = !groovyParams.contains(getMapName(nodeMapping));
-                if (needLoop) {
-                    trace();
-                    codeOut.line_(
-                            "%s %s { %s ->",
-                            toMapExpression(nodeMapping), nodeMapping.getOperator().getCodeString(), getMapName(nodeMapping)
-                    );
-                }
+                throw new RuntimeException("Unable to handle map here");
             }
-            else {
-                String param = toLoopGroovyParam(path);
-                needLoop = !groovyParams.contains(param);
-                if (needLoop) {
-                    trace();
-                    codeOut.line_(
-                            "%s %s { %s ->",
-                            toLoopRef(path), nodeMapping.getOperator().getCodeString(), param
-                    );
-                }
+            String param = toLoopGroovyParam(path);
+            boolean needLoop = !groovyParams.contains(param);
+            if (needLoop) {
+                trace();
+                codeOut.line_(
+                        "%s %s { %s ->",
+                        toLoopRef(path), nodeMapping.getOperator().getCodeString(), param
+                );
             }
             toInnerLoop(nodeMapping, path.withRootRemoved(), groovyParams);
             if (needLoop) codeOut._line("}");
@@ -527,14 +505,15 @@ public class CodeGenerator {
         return toGroovyIdentifier(inner);
     }
 
-    private String toMapExpression(NodeMapping nodeMapping) {
+    private String toMapExpression(NodeMapping nodeMapping, Path path) {
         List<Path> paths = nodeMapping.getInputPaths();
         StringBuilder expression = new StringBuilder("(");
         Iterator<Path> walk = paths.iterator();
         while (walk.hasNext()) {
             Path inputPath = walk.next();
-            if (inputPath.size() < 2) throw new RuntimeException("Path too short");
-            expression.append(toLoopRef(inputPath));
+            Path loopPath = path.parent().child(inputPath.peek());
+            if (loopPath.size() != 2) throw new RuntimeException("Path must have length two");
+            expression.append(toLoopRef(loopPath));
             if (walk.hasNext()) expression.append(" | ");
         }
         expression.append(")");

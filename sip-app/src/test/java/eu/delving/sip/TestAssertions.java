@@ -32,14 +32,12 @@ import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaType;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.schema.util.FileSystemFetcher;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSOutput;
-import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.NamespaceContext;
@@ -65,7 +63,7 @@ public class TestAssertions {
     private GroovyCodeResource groovyCodeResource;
     private XPathFactory pathFactory;
     private Document modsDoc, icnDoc;
-    private DocContext modsContext, icnContext;
+    private DocContext modsContext;
     private SchemaRepository schemaRepository;
 
     @Before
@@ -74,35 +72,8 @@ public class TestAssertions {
         modsDoc = parseDoc("mods.xml");
         icnDoc = parseDoc("icn.xml");
         modsContext = new DocContext(modsDoc);
-        icnContext = new DocContext(icnDoc);
         pathFactory = XMLToolFactory.xpathFactory();
         schemaRepository = new SchemaRepository(new FileSystemFetcher(true));
-    }
-
-    private void dump(Document document) {
-        dump(document.getDocumentElement(), 0);
-        DOMImplementationLS ls = null;
-        try {
-            ls = (DOMImplementationLS) XMLToolFactory.documentBuilderFactory().newDocumentBuilder().getDOMImplementation();
-        }
-        catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-        LSSerializer lss = ls.createLSSerializer();
-        LSOutput lso = ls.createLSOutput();
-        lso.setByteStream(System.out);
-        lss.write(document, lso);
-    }
-
-    private void dump(Node node, int level) {
-        for (int walk = 0; walk < level; walk++) {
-            System.out.print("\t");
-        }
-        System.out.println(String.format("%d: %s:%s {%s}", node.getNodeType(), node.getPrefix(), node.getLocalName(), node.getNamespaceURI()));
-        NodeList kids = node.getChildNodes();
-        for (int walk = 0; walk < kids.getLength(); walk++) {
-            dump(kids.item(walk), level + 1);
-        }
     }
 
     @Test
@@ -113,13 +84,10 @@ public class TestAssertions {
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(icnDoc.getDocumentElement())) {
                 case NONE:
-                    System.out.println("OK: " + structureTest);
+//                    System.out.println("OK: " + structureTest);
                     break;
-                case REQUIRED:
-                    System.out.println("Required: " + structureTest);
-                    break;
-                case SINGULAR:
-                    System.out.println("Singular: " + structureTest);
+                default:
+                    Assert.fail();
                     break;
             }
         }
@@ -133,13 +101,10 @@ public class TestAssertions {
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(modsDoc)) {
                 case NONE:
-                    System.out.println("OK: " + structureTest);
+//                    System.out.println("OK: " + structureTest);
                     break;
-                case REQUIRED:
-                    System.out.println("Required: " + structureTest);
-                    break;
-                case SINGULAR:
-                    System.out.println("Singular: " + structureTest);
+                default:
+                    Assert.fail();
                     break;
             }
         }
@@ -149,9 +114,11 @@ public class TestAssertions {
     public void testStructure() throws XPathExpressionException {
         StructureTest.Factory factory = new StructureTest.Factory(pathFactory, modsContext);
         StructureTest structureTest = factory.create(Path.create("/mods:mods/mods:name/mods:namePart"), true, true);
-        System.out.println(structureTest + ": " + structureTest.getViolation(modsDoc));
+        Assert.assertEquals("Unexpected Violation", StructureTest.Violation.NONE, structureTest.getViolation(modsDoc));
+//        System.out.println(structureTest + ": " + structureTest.getViolation(modsDoc));
         structureTest = factory.create(Path.create("/mods:mods/mods:subject/@authority"), true, false);
-        System.out.println(structureTest + ": " + structureTest.getViolation(modsDoc));
+        Assert.assertEquals("Unexpected Violation", StructureTest.Violation.NONE, structureTest.getViolation(modsDoc));
+//        System.out.println(structureTest + ": " + structureTest.getViolation(modsDoc));
     }
 
     @Test
@@ -162,12 +129,11 @@ public class TestAssertions {
         AssertionTest.Factory factory = new AssertionTest.Factory(pathFactory, new DocContext(modsDoc), groovyCodeResource);
         List<AssertionTest> tests = new ArrayList<AssertionTest>();
         for (Assertion assertion : assertionList.assertions) tests.add(factory.create(assertion));
-        for (AssertionTest test : tests) {
-            String violation = test.getViolation(modsDoc);
-            if (violation != null) {
-                System.out.printf("%s: %s\n", test, violation);
-            }
-        }
+        // violation messages can be found in assertion-list.xml
+        Assert.assertTrue(tests.get(0).getViolation(modsDoc).contains("No florida found in the string Agricultural"));
+        Assert.assertTrue(tests.get(1).getViolation(modsDoc).contains("No florida found in Agricultural"));
+        Assert.assertTrue(tests.get(2).getViolation(modsDoc).contains("Improper value: Collection"));
+        Assert.assertTrue(tests.get(3).getViolation(modsDoc).contains("Authority 'dubious' is not divine!"));
     }
 
     private static XStream getStream() {
@@ -226,4 +192,30 @@ public class TestAssertions {
         File file = new File(modsResource.getFile());
         return XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(file);
     }
+
+//    private void dump(Document document) {
+//        dump(document.getDocumentElement(), 0);
+//        DOMImplementationLS ls = null;
+//        try {
+//            ls = (DOMImplementationLS) XMLToolFactory.documentBuilderFactory().newDocumentBuilder().getDOMImplementation();
+//        }
+//        catch (ParserConfigurationException e) {
+//            throw new RuntimeException(e);
+//        }
+//        LSSerializer lss = ls.createLSSerializer();
+//        LSOutput lso = ls.createLSOutput();
+//        lso.setByteStream(System.out);
+//        lss.write(document, lso);
+//    }
+//
+//    private void dump(Node node, int level) {
+//        for (int walk = 0; walk < level; walk++) {
+//            System.out.print("\t");
+//        }
+//        System.out.println(String.format("%d: %s:%s {%s}", node.getNodeType(), node.getPrefix(), node.getLocalName(), node.getNamespaceURI()));
+//        NodeList kids = node.getChildNodes();
+//        for (int walk = 0; walk < kids.getLength(); walk++) {
+//            dump(kids.item(walk), level + 1);
+//        }
+//    }
 }

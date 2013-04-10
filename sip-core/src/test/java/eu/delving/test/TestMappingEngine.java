@@ -91,8 +91,8 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("ese"));
         MappingResult result = mappingEngine.execute("validateESENode", input("ese"));
-        System.out.println(result.toXml());
-        System.out.println(result.toXmlAugmented());
+//        System.out.println(result.toXml());
+//        System.out.println(result.toXmlAugmented());
         Source source = new DOMSource(result.root());
         validator(new SchemaVersion("ese", "3.4.0")).validate(source);
     }
@@ -108,12 +108,12 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("abm"));
         MappingResult result = mappingEngine.execute("validateABMNode", input("abm"));
-        System.out.println(result.toXml());
+//        System.out.println(result.toXml());
         Source source = new DOMSource(result.root());
         Validator validator = validator(new SchemaVersion("abm", "1.0.5"));
         validator.validate(source);
-        System.out.println("SystemFields:");
-        System.out.println(result.copyFields());
+//        System.out.println("SystemFields:");
+//        System.out.println(result.copyFields());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces);
         MappingResult result = mappingEngine.execute("rawNode", input("raw"));
-        System.out.println(result.toXmlAugmented());
+//        System.out.println(result.toXmlAugmented());
     }
 
     @Test
