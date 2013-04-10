@@ -69,17 +69,20 @@ public class TestCoordinateConversion {
         for (String line : inputLines) {
             if (line.trim().isEmpty()) continue;
             String latLongString = functionCall(line, false);
-//            System.out.println(latLongString);
+            System.out.println(latLongString);
             checkLatLong(line, latLongString);
             String utmString = functionCall(line, true);
             Matcher matcher = utmPattern.matcher(utmString);
-            Assert.assertTrue("SRID format violation: "+utmString, matcher.matches());
+            Assert.assertTrue("SRID format violation: " + utmString, matcher.matches());
             String srid = matcher.group(1);
             String east = matcher.group(2);
             String north = matcher.group(3);
             UTMRef ref = new UTMRef(Double.parseDouble(east), Double.parseDouble(north), 'V', Integer.parseInt(srid) % 100);
             String latLongConverted = String.format("%f, %f", ref.toLatLng().getLat(), ref.toLatLng().getLng());
-//            System.out.println(String.format("SRID=%s;POINT(%s,%s) ==> %s", srid, east, north, latLongConverted));
+            System.out.println(String.format(
+                    "SRID=%s;POINT(%s,%s) ==> %s  (https://maps.google.com/maps?f=q&hl=en&geocode=&q=%s&ie=UTF8&z=10)",
+                    srid, east, north, latLongConverted, latLongConverted
+            ));
             checkLatLong(line, latLongConverted);
         }
     }
