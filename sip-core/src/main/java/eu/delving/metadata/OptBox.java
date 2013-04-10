@@ -33,38 +33,24 @@ import static eu.delving.metadata.OptRole.*;
 class OptBox {
     final OptRole role;
     final OptList optList;
-    final OptList.Opt opt;
-    final DynOpt dynOpt;
 
-    public static OptBox asRoot(OptList.Opt opt) {
-        return new OptBox(ROOT, null, opt, null);
+    public static OptBox forList(OptList list) {
+        return new OptBox(list.value == null ? VALUE : ROOT, list);
     }
 
-    public static OptBox asRoot(OptList optList) {
-        return new OptBox(ROOT, optList, null, null);
-    }
-
-    public static OptBox asDynamic(DynOpt dynOpt) {
-        return new OptBox(DYNAMIC, null, null, dynOpt);
-    }
-
-    private OptBox(OptRole role, OptList optList, OptList.Opt opt, DynOpt dynOpt) {
+    private OptBox(OptRole role, OptList optList) {
         this.role = role;
         this.optList = optList;
-        this.opt = opt;
-        this.dynOpt = dynOpt;
     }
 
     OptBox inRoleFor(Path path) {
-        if (role == UNASSIGNED_CHILD) {
+        if (role == CHILD) {
             path = path.withoutOpts(); // the list has paths without opts so this compares properly
-            OptList list = optList;
-            if (list == null && opt != null) list = opt.parent;
-            if (list == null) throw new RuntimeException("Unassigned child with no list to refer to");
-            if (pathMatch(list.key, path)) return new OptBox(KEY, optList, opt, null);
-            if (pathMatch(list.value, path)) return new OptBox(VALUE, optList, opt, null);
-            if (pathMatch(list.schema, path)) return new OptBox(SCHEMA, optList, opt, null);
-            if (pathMatch(list.schemaUri, path)) return new OptBox(SCHEMA_URI, optList, opt, null);
+            if (optList == null) throw new RuntimeException("Missing optList");
+            if (optList.value.equals(path.peek())) return new OptBox(VALUE, optList);
+            if (pathMatch(optList.key, path)) return new OptBox(KEY, optList);
+            if (pathMatch(optList.schema, path)) return new OptBox(SCHEMA, optList);
+            if (pathMatch(optList.schemaUri, path)) return new OptBox(SCHEMA_URI, optList);
         }
         return null;
     }
@@ -75,22 +61,11 @@ class OptBox {
 
     OptBox createDescendant() {
         if (role != ROOT) throw new RuntimeException();
-        return new OptBox(UNASSIGNED_CHILD, optList, opt, dynOpt);
+        return new OptBox(CHILD, optList);
     }
 
     public boolean isDictionary() {
-        return optList != null;
-    }
-
-    public boolean isChild() {
-        switch (role) {
-            case ABSENT:
-            case ROOT:
-            case DYNAMIC:
-                return false;
-            default:
-                return true;
-        }
+        return optList != null && optList.dictionary != null;
     }
 
     public String getDictionaryName() {
@@ -101,30 +76,22 @@ class OptBox {
         return optList.dictionary + index;
     }
 
-    public String toString() {
-        if (opt != null) {
-            switch (role) {
-                case ROOT:
-                    return opt.value == null ? opt.key : opt.value;
-                case DYNAMIC:
-                    return dynOpt.value;
-                case KEY:
-                    return opt.key;
-                case VALUE:
-                    return opt.value == null ? opt.key : opt.value;
-                case SCHEMA:
-                    return opt.schema;
-                case SCHEMA_URI:
-                    return opt.schemaUri;
-                default:
-                    return "OPT";
-            }
-        }
-        else if (dynOpt != null) {
-            return dynOpt.value;
+    public String getOptReference() {
+        if (role == ROOT) {
+            return String.format("OptList.Opt _found%s", optList.dictionary);
         }
         else {
-            return String.format("Dictionary %s", optList.dictionary);
+            return String.format("_found%s.%s", optList.dictionary, role.getFieldName());
         }
     }
+
+    public String toString() {
+        if (optList.dictionary != null) {
+            return String.format("Opt(%s/%s)", role, optList.dictionary);
+        }
+        else {
+            return String.format("Opt(%s)", role);
+        }
+    }
+
 }

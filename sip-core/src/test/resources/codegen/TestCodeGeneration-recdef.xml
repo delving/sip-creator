@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<record-definition prefix="test" version="0.0.0">
+    <namespaces>
+        <namespace prefix="test" uri="http://www.testicles.org" schema="http://www.testicles.org/hang.xsd"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="a"/>
+        <attr tag="b"/>
+        <attr tag="c"/>
+        <attr tag="d"/>
+        <attr tag="e"/>
+        <attr tag="xml:lang"/>
+        <attr tag="thekey"/>
+        <attr tag="theschema"/>
+        <attr tag="thevalue"/>
+        <attr tag="ordering"/>
+        <attr tag="sortorder"/>
+    </attrs>
+
+    <elems>
+        <elem tag="abc-link" attrs="a, b, c" fieldType="gumby"/>
+        <elem tag="ab" attrs="a, b"/>
+        <elem tag="actor" attrs="thekey, theschema"/>
+    </elems>
+
+    <root tag="test" attrs="d, sortorder" required="true">
+        <elem tag="id" attrs="e" required="true"/>
+        <elem tag="sub-one" attrs="xml:lang" required="true">
+            <elem tag="sub-two" elems="abc-link, ab"/>
+            <elem tag="events" singular="true" attrs="ordering">
+                <elem tag="event" elems="abc-link, actor" attrs="thekey, thevalue, theschema">
+                    <elem tag="combo"/>
+                    <elem tag="do-the">
+                        <elem tag="limbo"/>
+                    </elem>
+                </elem>
+            </elem>
+        </elem>
+    </root>
+
+    <field-markers>
+        <field-marker name="CREATOR"/>
+        <field-marker name="TITLE"/>
+        <field-marker name="DESCRIPTION"/>
+        <field-marker name="OWNER"/>
+        <field-marker name="PROVIDER"/>
+        <field-marker name="LANDING_PAGE"/>
+        <field-marker name="IMAGE_URL"/>
+        <field-marker name="THUMBNAIL"/>
+        <field-marker name="SPEC"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
+    </field-markers>
+
+    <opts>
+        <opt-list dictionary="EVENTTYPE" path="/test/sub-one/events/event" key="@thekey" value="@thevalue" schema="@theschema">
+            <opt key="man" value="Clay Man" schema="http://gumby-and-pokey.com/definitions"/>
+            <opt key="horse" value="Clay Horse" schema="http://gumby-and-pokey.com/definitions"/>
+            <opt key="savior" value="Jesus!" schema="http://theholybible.com/fiction"/>
+        </opt-list>
+        <opt-list dictionary="BULL" path="/test/sub-one/sub-two" key="abc-link/@a" value="abc-link">
+            <opt key="rv" value="reverse reverse"/>
+            <opt key="fw" value="forward forward"/>
+            <opt key="pause" value="Pause Pause!"/>
+        </opt-list>
+    </opts>
+</record-definition>

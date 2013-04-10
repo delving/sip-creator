@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="lido">
+    <facts>
+        <entry>
+            <string>something</string>
+            <string>gumby</string>
+        </entry>
+    </facts>
+    <node-mappings>
+        <node-mapping inputPath="/input/identi-fire/@source" outputPath="/lido/lidoRecID/@source"/>
+        <node-mapping inputPath="/input/category/conceptID" outputPath="/lido/category/conceptID"/>
+        <node-mapping inputPath="/input/category/conceptID/@type" outputPath="/lido/category/conceptID/@type"/>
+        <node-mapping inputPath="/input/category/term" outputPath="/lido/category/term"/>
+        <node-mapping inputPath="/input/category/term/@xml:lang" outputPath="/lido/category/term/@xml:lang"/>
+
+        <node-mapping inputPath="/input/identi-fire"
+                      outputPath="/lido/lidoRecID"/>
+        <node-mapping inputPath="/input/identi-fire/@type"
+                      outputPath="/lido/lidoRecID/@type"/>
+        <node-mapping inputPath="/input/story"
+                      outputPath="/lido/descriptiveMetadata"/>
+
+        <node-mapping inputPath="/input/story/@xml:lang"
+                      outputPath="/lido/descriptiveMetadata/@xml:lang"/>
+        <node-mapping inputPath="/input/story/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term"
+                      outputPath="/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term"/>
+        <node-mapping inputPath="/input/story/objectIdentificationWrap/titleWrap/titleSet/appellationValue"
+                      outputPath="/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue"/>
+
+        <node-mapping inputPath="/input/story/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/@type"
+                      outputPath="/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/@type"/>
+        <node-mapping inputPath="/input/story/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term/@addedSearchTerm"
+                      outputPath="/lido/descriptiveMetadata/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term/@addedSearchTerm"/>
+        <node-mapping inputPath="/input/story/objectClassificationWrap/classificationWrap/classification/@type"
+                      outputPath="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/@type"/>
+        <node-mapping inputPath="/input/story/objectClassificationWrap/classificationWrap/classification/term"
+                      outputPath="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term"/>
+        <node-mapping inputPath="/input/story/objectClassificationWrap/classificationWrap/classification/term/@addedSearchTerm"
+                      outputPath="/lido/descriptiveMetadata/objectClassificationWrap/classificationWrap/classification/term/@addedSearchTerm"/>
+        <node-mapping inputPath="/input/story/objectIdentificationWrap/titleWrap/titleSet/appellationValue/@pref"
+                      outputPath="/lido/descriptiveMetadata/objectIdentificationWrap/titleWrap/titleSet/appellationValue/@pref"/>
+        <node-mapping inputPath="/input/story/eventWrap/eventSet/event/eventType"
+                      outputPath="/lido/descriptiveMetadata/eventWrap/eventSet/event/eventType"/>
+        <node-mapping inputPath="/input/story/eventWrap/eventSet/event/eventType/term"
+                      outputPath="/lido/descriptiveMetadata/eventWrap/eventSet/event/eventType/term"/>
+        <node-mapping inputPath="/input/story/eventWrap/eventSet/event/eventType/term/@addedSearchTerm"
+                      outputPath="/lido/descriptiveMetadata/eventWrap/eventSet/event/eventType/term/@addedSearchTerm"/>
+        <node-mapping inputPath="/input/story/eventWrap/eventSet/event/eventActor/actorInRole/actor/nameActorSet/appellationValue"
+                      outputPath="/lido/descriptiveMetadata/eventWrap/eventSet/event/eventActor/actorInRole/actor/nameActorSet/appellationValue"/>
+
+
+        <node-mapping inputPath="/input/sticker"
+                      outputPath="/lido/administrativeMetadata"/>
+        <node-mapping inputPath="/input/sticker/@xml:lang"
+                      outputPath="/lido/administrativeMetadata/@xml:lang"/>
+        <node-mapping inputPath="/input/sticker/recordWrap"
+                      outputPath="/lido/administrativeMetadata/recordWrap"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordID"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordID"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordID/@type"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordID/@type"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordSource/legalBodyName/appellationValue"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordSource/legalBodyName/appellationValue"/>
+        <node-mapping inputPath="/facts/something"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordType/term"/>
+
+        <node-mapping inputPath="/input/sticker/recordWrap/recordType/term"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordType/term"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordType"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordRights/rightsType/term"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordRights/rightsHolder/legalBodyName/appellationValue"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordRights/rightsHolder/legalBodyName/appellationValue"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordInfoSet/recordInfoLink"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordInfoSet/recordInfoLink"/>
+        <node-mapping inputPath="/input/sticker/recordWrap/recordInfoSet/recordInfoLink/@formatResource"
+                      outputPath="/lido/administrativeMetadata/recordWrap/recordInfoSet/recordInfoLink/@formatResource"/>
+        <node-mapping inputPath="/input/sticker/resourceWrap/resourceSet/rightsResource/rightsHolder/legalBodyName/appellationValue"
+                      outputPath="/lido/administrativeMetadata/resourceWrap/resourceSet/rightsResource/rightsHolder/legalBodyName/appellationValue"/>
+
+    </node-mappings>
+</rec-mapping>
+

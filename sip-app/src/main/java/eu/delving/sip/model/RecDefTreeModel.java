@@ -21,8 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.OptList;
-
 /**
  * Special version of FilterTreeModel which knows about special rec def things.
  *
@@ -31,7 +29,6 @@ import eu.delving.metadata.OptList;
 
 public class RecDefTreeModel extends FilterTreeModel {
     private boolean attributesHidden;
-    private OptList.Opt selectedOpt;
 
     public RecDefTreeModel(FilterNode root) {
         super(root);
@@ -45,17 +42,6 @@ public class RecDefTreeModel extends FilterTreeModel {
         if (this.attributesHidden != attributesHidden) {
             this.attributesHidden = attributesHidden;
             refreshTree();
-        }
-    }
-
-    public OptList.Opt getSelectedOpt() {
-        return selectedOpt;
-    }
-
-    public void setSelectedOpt(OptList.Opt selectedOpt) {
-        if (this.selectedOpt != selectedOpt) {
-            this.selectedOpt = selectedOpt;
-            refreshTree(); // overkill, but ok
         }
     }
 }

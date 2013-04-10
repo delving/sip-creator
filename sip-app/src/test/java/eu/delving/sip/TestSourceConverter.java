@@ -120,9 +120,6 @@ public class TestSourceConverter {
         converter.parse(in, out, namespaces);
         String outputString = out.toString("UTF-8");
         String[] lines = outputString.split("\n");
-        for (String line : lines) {
-            System.out.println("\"" + line.replaceAll("\"", "\\\\\"") + "\",");
-        }
         String[] expect = {
                 "<?xml version='1.0' encoding='UTF-8'?>",
                 "<delving-sip-source xmlns:a=\"http://a\" xmlns:b=\"http://b\" xmlns:c=\"http://c\">",
@@ -159,9 +156,6 @@ public class TestSourceConverter {
         converter.parse(in, out, namespaces);
         String outputString = out.toString("UTF-8");
         String[] lines = outputString.split("\n");
-        for (String line : lines) {
-            System.out.println("\"" + line.replaceAll("\"", "\\\\\"") + "\",");
-        }
         String[] expect = {
                 "<?xml version='1.0' encoding='UTF-8'?>",
                 "<delving-sip-source xmlns:a=\"http://a\" xmlns:b=\"http://b\" xmlns:c=\"http://c\">",

@@ -92,7 +92,7 @@ public class MappingRunner {
         try {
             Binding binding = new Binding();
             DOMBuilder builder = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
-            binding.setVariable("_optLookup", recMapping.getRecDefTree().getRecDef().optLookup);
+            binding.setVariable("_optLookup", recMapping.getRecDefTree().getRecDef().valueOptLookup);
             binding.setVariable("output", builder);
             binding.setVariable("input", wrap(metadataRecord.getRootNode()));
             binding.setVariable("_facts", wrap(factsNode));

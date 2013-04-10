@@ -134,8 +134,6 @@ public class RecDef {
 
     public Elem root;
 
-    public List<Dict> dicts;
-
     public List<OptList> opts;
 
     @XStreamAlias("assertion-list")
@@ -147,7 +145,7 @@ public class RecDef {
     public List<Doc> docs;
 
     @XStreamOmitField
-    public Map<String, Map<String, OptList.Opt>> optLookup = new TreeMap<String, Map<String, OptList.Opt>>();
+    public Map<String, Map<String, OptList.Opt>> valueOptLookup = new TreeMap<String, Map<String, OptList.Opt>>();
 
     public SchemaVersion getSchemaVersion() {
         if (prefix == null || version == null) throw new IllegalArgumentException("Mapping lacks prefix or version");
@@ -238,8 +236,12 @@ public class RecDef {
         public void resolve(RecDefTree recDefTree) {
             path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
             RecDefNode node = recDefTree.getRecDefNode(path);
-            if (node == null) throw new RuntimeException("Cannot find path " + path);
-            if (name == null) throw new RuntimeException("Field marker must have a name: " + path);
+            if (node == null) {
+                throw new RuntimeException("Cannot find path " + path);
+            }
+            if (name == null) {
+                throw new RuntimeException("Field marker must have a name: " + path);
+            }
             for (String[] translation : BACKWARDS_COMPATIBILITY_REFRERENCE) {
                 if (translation[0].equals(name)) {
                     name = translation[1];

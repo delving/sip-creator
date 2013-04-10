@@ -109,7 +109,7 @@ public class LaunchFile {
             "  <jar href=\"lucene-spatial-3.1.0.jar\"/>",
             "</resources>",
             "<application-desc main-class=\"eu.delving.sip.Application\">",
-            "  <argument>" + USER + "</argument>",
+            "<argument>" + USER + "</argument>",
             "</application-desc>",
             "</jnlp>",
     };
