@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="test" schemaVersion="0.0.0">
+    <facts>
+        <entry>
+            <string>dogExists</string>
+            <string>true</string>
+        </entry>
+    </facts>
+    <node-mappings>
+        <node-mapping inputPath="/input/leadup/@orderofsort" outputPath="/test/@sortorder"/>
+        <node-mapping inputPath="/input/leadup/record/list/member" outputPath="/test/sub-one/events/event"/>
+        <node-mapping inputPath="/input/leadup/record/list/member/concept" outputPath="/test/sub-one/events/event/@thevalue">
+            <dictionary>
+                <entry>
+                    <string>superhero</string>
+                    <string>Clay Man</string>
+                </entry>
+                <entry>
+                    <string>savior</string>
+                    <string>Jesus!</string>
+                </entry>
+                <entry>
+                    <string>sidekick</string>
+                    <string>Clay Horse</string>
+                </entry>
+            </dictionary>
+        </node-mapping>
+        <node-mapping inputPath="/input/leadup/record/list/member/@index" outputPath="/test/sub-one/events/event/abc-link/@a"/>
+        <node-mapping inputPath="/input/leadup/@orderofsort" outputPath="/test/id">
+            <dictionary>
+                <entry>
+                    <string>thisaway</string>
+                    <string>reverse reverse</string>
+                </entry>
+                <entry>
+                    <string>thataway</string>
+                    <string>forward forward</string>
+                </entry>
+            </dictionary>
+        </node-mapping>
+        <node-mapping inputPath="/input/leadup/record/list/member/name" outputPath="/test/sub-one/events/event/actor">
+            <groovy-code>
+                <string>if (_name.contains(' ')) {</string>
+                <string>return _name.split(' ')</string>
+                <string>} else {</string>
+                <string>return _name.text()</string>
+                <string>}</string>
+            </groovy-code>
+        </node-mapping>
+        <node-mapping inputPath="/input/leadup/record/fromOne" outputPath="/test/sub-one/sub-two">
+            <dictionary>
+                <entry>
+                    <string>look this up</string>
+                    <string>forward forward</string>
+                </entry>
+            </dictionary>
+        </node-mapping>
+    </node-mappings>
+</rec-mapping>
