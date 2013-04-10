@@ -32,7 +32,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Part of the record definition
+ * Part of the record definition which attaches a list of options to an element.  When an option is chosen,
+ * there are a number of descendant elements and attributes that can be given the option's values.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
@@ -41,19 +42,16 @@ import java.util.TreeMap;
 public class OptList {
 
     @XStreamAsAttribute
-    public String displayName;
-
-    @XStreamAsAttribute
     public String dictionary;
 
     @XStreamAsAttribute
     public Path path;
 
     @XStreamAsAttribute
-    public Path key;
+    public Tag value;
 
     @XStreamAsAttribute
-    public Path value;
+    public Path key;
 
     @XStreamAsAttribute
     public Path schema;
@@ -67,22 +65,18 @@ public class OptList {
     public void resolve(RecDef recDef) {
         for (Opt opt : opts) opt.parent = this;
         if (path == null) throw new RuntimeException("No path for OptList: " + opts);
+        if (path.peek().isAttribute()) throw new RuntimeException("No option list on an attribute: " + path);
         path = path.withDefaultPrefix(recDef.prefix);
+        value = value == null ? path.peek() : value.defaultPrefix(recDef.prefix);
         key = resolveTag(path, key, recDef);
-        value = resolveTag(path, value, recDef);
         schema = resolveTag(path, schema, recDef);
         schemaUri = resolveTag(path, schemaUri, recDef);
-        if (path.peek().isAttribute()) {
-            throw new RuntimeException("An option list may not be connected to an attribute: " + path);
-        }
-        else {
-            RecDef.Elem elem = recDef.findElem(path);
-            elem.optList = this;
-            if (dictionary != null) {
-                Map<String, Opt> lookup = new TreeMap<String, Opt>();
-                for (Opt opt : opts) lookup.put(opt.value, opt);
-                recDef.optLookup.put(dictionary, lookup);
-            }
+        RecDef.Elem elem = recDef.findElem(path);
+        elem.optList = this;
+        if (dictionary != null) {
+            Map<String, Opt> valueLookup = new TreeMap<String, Opt>();
+            for (Opt opt : opts) valueLookup.put(opt.value, opt);
+            recDef.valueOptLookup.put(dictionary, valueLookup);
         }
     }
 
@@ -120,11 +114,6 @@ public class OptList {
         @XStreamAsAttribute
         public String schemaUri;
 
-        @XStreamAsAttribute
-        public boolean hidden;
-
-        public List<Dict> dicts;
-
         @XStreamOmitField
         public OptList parent;
 
@@ -132,6 +121,4 @@ public class OptList {
             return value == null ? key : value;
         }
     }
-
-
 }

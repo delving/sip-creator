@@ -155,6 +155,10 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-spatial</artifactId>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.igniterealtime.smack</groupId>-->
+            <!--<artifactId>smack</artifactId>-->
+        <!--</dependency>-->
     </dependencies>
 
 </project>

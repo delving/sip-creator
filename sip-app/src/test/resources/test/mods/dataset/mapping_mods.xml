@@ -59,6 +59,11 @@
       </node-mapping>
       <node-mapping inputPath="/input/dc:language" outputPath="/mods/language"/>
       <node-mapping inputPath="/input/dc:identifier" outputPath="/mods/location/url"/>
+      <node-mapping inputPath="/constant" outputPath="/mods/location/url/@access">
+          <groovy-code>
+              <string>&apos;raw object&apos;</string>
+          </groovy-code>
+      </node-mapping>
       <node-mapping inputPath="/input/dc:description" outputPath="/mods/note"/>
       <node-mapping inputPath="/input/dc:type" outputPath="/mods/subject/topic"/>
       <node-mapping inputPath="/constant" outputPath="/mods/mods:subject/@authority">

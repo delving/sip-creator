@@ -27,12 +27,13 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.SwingHelper;
-import org.antlr.stringtemplate.StringTemplate;
 
-import javax.swing.*;
+import javax.swing.JTree;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -40,8 +41,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import static eu.delving.sip.base.SwingHelper.HILIGHTED_COLOR;
-import static eu.delving.sip.base.SwingHelper.MAPPED_COLOR;
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * Represent an element of a record definition in the tree, including an HTML representation and the associated
@@ -105,21 +105,11 @@ public class RecDefTreeNode extends FilterNode {
     @Override
     public boolean passesFilter() {
         RecDefTreeModel recDefTreeModel = (RecDefTreeModel) filterModel;
-        if (recDefTreeModel.isAttributesHidden() && isAttr()) return false;
-        if (recDefNode.isHiddenOpt(recDefTreeModel.getSelectedOpt()) && !recDefNode.isPopulated())
-            return false;
-        return super.passesFilter();
+        return !(recDefTreeModel.isAttributesHidden() && isAttr()) && super.passesFilter();
     }
 
     public String toHtml() {
-        if (html == null) {
-            StringTemplate t = SwingHelper.getTemplate(recDefNode.isAttr() ? "recdef-attribute" : "recdef-element");
-            t.setAttribute("name", recDefNode.getTag());
-            t.setAttribute("doc", recDefNode.getDoc());
-            t.setAttribute("optList", recDefNode.getOptList());
-            t.setAttribute("nodeMappings", recDefNode.getNodeMappings().values());
-            html = t.toString();
-        }
+        if (html == null) html = recDefNodeToHTML(recDefNode);
         return html;
     }
 
@@ -231,7 +221,7 @@ public class RecDefTreeNode extends FilterNode {
                     setColor(sel, node);
                 }
                 if (!node.recDefNode.getNodeMappings().isEmpty()) {
-                    markNodeMappings(sel, node);
+                    markNodeMappings(node);
                 }
             }
             else {
@@ -254,7 +244,7 @@ public class RecDefTreeNode extends FilterNode {
             }
         }
 
-        private void markNodeMappings(boolean selected, RecDefTreeNode node) {
+        private void markNodeMappings(RecDefTreeNode node) {
             setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node)));
         }
 

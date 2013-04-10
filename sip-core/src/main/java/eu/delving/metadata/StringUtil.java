@@ -23,7 +23,10 @@ package eu.delving.metadata;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -36,7 +39,7 @@ import java.util.regex.Pattern;
 
 public class StringUtil {
 
-    private static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
+    public static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
 
     public static String csvEscapeXML(String value) {
         StringBuilder tag = new StringBuilder();
@@ -106,75 +109,12 @@ public class StringUtil {
         return strings;
     }
 
-    public static void toDictionaryCode(NodeMapping nodeMapping, CodeOut codeOut) {
-        if (!nodeMapping.hasDictionary()) return;
-        OptBox optBox = nodeMapping.recDefNode.getDictionaryOptBox();
-        if (optBox == null || optBox.isChild()) return;
-        int index = nodeMapping.getIndexWithinNode();
-        codeOut.line_(String.format("def Dictionary%s = [", optBox.getDictionaryName(index)));
-        Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
-        while (walk.hasNext()) {
-            Map.Entry<String, String> entry = walk.next();
-            codeOut.line(String.format("'''%s''':'''%s'''%s",
-                    StringUtil.sanitizeGroovy(entry.getKey()),
-                    StringUtil.sanitizeGroovy(entry.getValue()),
-                    walk.hasNext() ? "," : ""
-            ));
-        }
-        codeOut._line("]");
-        for (OptRole field : OptRole.getFields()) {
-            codeOut.line_("def lookup%s_%s = { value ->", optBox.getDictionaryName(index), field.getFieldName());
-            codeOut.line("   if (!value) return ''");
-            codeOut.line("   String optKey = Dictionary%s[value.sanitize()]", optBox.getDictionaryName(index));
-            codeOut.line("   if (!optKey) optKey = value");
-            codeOut.line("   Object opt = _optLookup['%s'][optKey]", optBox.getDictionaryName());
-            codeOut.line("   if (!opt) return ''");
-            codeOut.line("   opt.%s", field.getFieldName());
-            codeOut._line("}");
-        }
-    }
-
-    public static String toLoopGroovyParam(Path path) {
-        Tag inner = path.getTag(1);
-        return toGroovyIdentifier(inner);
-    }
-
-    public static String toLeafGroovyParam(Path path) {
-        Tag inner = path.getTag(0);
-        return toGroovyIdentifier(inner);
-    }
-
-    public static String toLoopRef(Path path) {
-        Tag outer = path.getTag(0);
-        Tag inner = path.getTag(1);
-        if (outer == null || inner == null) throw new RuntimeException("toLoopRef called on " + path);
-        return toGroovyIdentifier(outer) + toGroovyReference(inner);
-    }
-
-    public static String toMapExpression(NodeMapping nodeMapping) {
-        List<Path> paths = nodeMapping.getInputPaths();
-        StringBuilder expression = new StringBuilder("(");
-        Iterator<Path> walk = paths.iterator();
-        while (walk.hasNext()) {
-            Path inputPath = walk.next();
-            if (inputPath.size() < 2) throw new RuntimeException("Path too short");
-            expression.append(StringUtil.toLoopRef(inputPath));
-            if (walk.hasNext()) expression.append(" | ");
-        }
-        expression.append(")");
-        return expression.toString();
-    }
-
     public static String toGroovyIdentifier(Tag tag) {
         return "_" + StringUtil.tagToVariable(tag.toString()) + (tag.isDescendent() ? "_" + tag.getDescendency() : "");
     }
 
     public static String toGroovyFirstIdentifier(Tag tag) {
         return StringUtil.tagToVariable(tag.toString()) + (tag.isDescendent() ? "_" + tag.getDescendency() : "") + "_";
-    }
-
-    private static String toGroovyReference(Tag tag) {
-        return tag.isAttribute() ? String.format("['@%s']", tag.toString()) : "." + tagToVariable(tag.toString());
     }
 
     public static boolean isSimilarCode(String codeA, String codeB) {
@@ -248,25 +188,6 @@ public class StringUtil {
         return indent;
     }
 
-    public static List<String> getIfAbsentCode(List<String> groovyCode) {
-        List<String> code = null;
-        if (groovyCode != null) {
-            int braceLevel = 0;
-            for (String line : groovyCode) {
-                if (code != null) {
-                    braceLevel += StringUtil.braceCount(line);
-                    if (braceLevel <= 0) break;
-                    code.add(line);
-                }
-                else if (IF_ABSENT_PATTERN.matcher(line).matches()) {
-                    code = new ArrayList<String>();
-                    braceLevel++;
-                }
-            }
-        }
-        return code;
-    }
-
     private static final String PLAIN_ASCII =
             "AaEeIiOoUu"    // grave
                     + "AaEeIiOoUuYy"  // acute
@@ -307,24 +228,4 @@ public class StringUtil {
         return sb.toString();
     }
 
-    public static String sanitizeGroovy(String thing) {
-        return thing.replaceAll("'", "\\\\'")
-                .replaceAll("\n", " ")
-                .replaceAll(" +", " ");
-    }
-
-    public static int braceCount(String line) {
-        int count = 0;
-        for (int walk = 0; walk < line.length(); walk++) {
-            switch (line.charAt(walk)) {
-                case '{':
-                    count++;
-                    break;
-                case '}':
-                    count--;
-                    break;
-            }
-        }
-        return count;
-    }
 }

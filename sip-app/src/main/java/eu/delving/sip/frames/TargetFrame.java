@@ -25,7 +25,6 @@ import eu.delving.metadata.*;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
-import eu.delving.sip.menus.ShowOptionMenu;
 import eu.delving.sip.model.*;
 
 import javax.swing.*;
@@ -35,7 +34,10 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.*;
 
 import static eu.delving.sip.base.KeystrokeHelper.MENU_E;
@@ -75,25 +77,10 @@ public class TargetFrame extends FrameBase {
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
         treePanel.add(scrollVH("Record Definition", recDefTree));
-        ShowOptionMenu showOptionMenu = new ShowOptionMenu(sipModel, new ShowOptionMenu.Listener() {
-            @Override
-            public void optSelected(OptList.Opt opt) {
-                RecDefTreeModel model = (RecDefTreeModel) recDefTree.getModel();
-                model.setSelectedOpt(opt);
-                RecDefTreeNode root = (RecDefTreeNode) recDefTree.getModel().getRoot();
-                Path optPath = opt.parent.path.parent().child(opt.parent.path.peek().withOpt(opt.key));
-                root.showPath(recDefTree, optPath);
-            }
-        });
-        sipModel.getMappingModel().addSetListener(showOptionMenu);
-        JMenuBar bar = new JMenuBar();
-        bar.add(showOptionMenu);
         JMenu expand = new JMenu("View");
         expand.add(new ExpandRootAction());
         expand.add(hideAttributes);
         expand.add(autoFold);
-        bar.add(expand);
-        setJMenuBar(bar);
         wireUp();
     }
 
@@ -181,6 +168,7 @@ public class TargetFrame extends FrameBase {
                 if (rect != null && rect.contains(e.getX(), e.getY())) {
                     JPopupMenu menu = new JPopupMenu();
                     menu.add(new DuplicateElementAction());
+                    // todo: when there is a ROOT opt list, show the values to choose from (as well), and then set the value?
                     menu.show(recDefTree, rect.x + rect.width, rect.y + rect.height / 2);
                 }
             }
