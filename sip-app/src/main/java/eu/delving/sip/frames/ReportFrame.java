@@ -22,13 +22,11 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.util.List;
@@ -59,7 +57,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
     @Override
     public void reportsUpdated(ReportFileModel reportFileModel) {
-        List<ReportFileModel.ProcessingReport> reports = reportFileModel.getReports();
+        List<ReportFile> reports = reportFileModel.getReports();
         center.removeAll();
         switch (reports.size()) {
             case 0:
@@ -70,7 +68,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 break;
             default:
                 JTabbedPane tabs = new JTabbedPane();
-                for (ReportFileModel.ProcessingReport report : reports) {
+                for (ReportFile report : reports) {
                     tabs.addTab(report.getPrefix().toUpperCase(), createReportPanel(report));
                 }
                 center.add(tabs, BorderLayout.CENTER);
@@ -79,13 +77,11 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         center.validate();
     }
 
-    private JPanel createReportPanel(ReportFileModel.ProcessingReport report) {
-        JPanel p = new JPanel(new BorderLayout());
-        JList invalid = new JList(report.getInvalid());
-        JList summary = new JList(report.getSummary());
-        p.add(scrollV("Summary", summary), BorderLayout.NORTH);
-        p.add(scrollV("Invalid Records", invalid), BorderLayout.CENTER);
-        return p;
+    private JComponent createReportPanel(ReportFile report) {
+        JList content = new JList(report);
+        content.setPrototypeCellValue("Just a line perhaps");
+//        content.setFixedCellHeight();
+        return scrollV("Report", content);
     }
 
 

@@ -106,7 +106,7 @@ public interface DataSet extends Comparable<DataSet> {
 
     ReportWriter openReportWriter(RecDef recDef) throws StorageException;
 
-    List<String> getReport(String prefix) throws StorageException;
+    ReportFile getReport(String prefix) throws StorageException;
 
     void deleteSource() throws StorageException;
 

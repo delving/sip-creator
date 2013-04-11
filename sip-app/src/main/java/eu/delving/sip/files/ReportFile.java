@@ -21,11 +21,14 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.model.Feedback;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.AbstractListModel;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -39,50 +42,36 @@ import java.util.regex.Matcher;
  */
 
 public class ReportFile extends AbstractListModel {
-    private static final long BACKTRACK = 5000;
+    private static final long BACKTRACK = 10000;
+    private static final int MAX_CACHE = 1000;
+    private final String prefix;
     private RandomAccessFile randomAccess;
     private List<Rec> recs = new ArrayList<Rec>();
     private Rec lastRec;
+    private DataSet dataSet;
 
-    public ReportFile(File file) throws FileNotFoundException {
+    public ReportFile(File file, DataSet dataSet, String prefix) throws IOException {
         this.randomAccess = new RandomAccessFile(file, "r");
-    }
-
-    public void indexFile(int records) throws IOException {
-        randomAccess.seek(0L);
-        while (true) {
-            if (records-- <= 0) break;
-            Rec rec = new Rec();
-            rec.getLines();
-            if (lastRec == null) lastRec = rec;
-            recs.add(rec);
-        }
+        this.dataSet = dataSet;
+        this.prefix = prefix;
         long seekEnd = randomAccess.length() - BACKTRACK;
         if (seekEnd < 0) seekEnd = 0;
         randomAccess.seek(seekEnd);
         while (true) {
             Rec rec = new Rec();
-            rec.getLines();
+            rec.readIn(false);
             if (rec.getRecordNumber() < 0) break;
             lastRec = rec;
         }
     }
 
-    public Rec getRec(int recordNumber) throws IOException {
-        if (recordNumber < recs.size()) {
-            return recs.get(recordNumber);
-        }
-        if (lastRec == null || recordNumber > lastRec.recordNumber) return null;
-        Rec endRec = recs.get(recs.size()-1);
-        endRec.clear();
-        endRec.getLines();
-        while (recordNumber >= recs.size() - 1) {
-            Rec nextRec = new Rec();
-            nextRec.getLines();
-            if (nextRec.getRecordNumber() < 0) break;
-            recs.add(nextRec);
-        }
-        return recordNumber < recs.size() ? recs.get(recordNumber) : null;
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public boolean needsWork() {
+        for (Rec rec : recs) if (rec.needsReading()) return true;
+        return false;
     }
 
     @Override
@@ -92,64 +81,154 @@ public class ReportFile extends AbstractListModel {
 
     @Override
     public Object getElementAt(int index) {
-        try {
-            return getRec(index);
+        while (index >= recs.size()) {
+            recs.add(new Rec());
         }
-        catch (IOException e) {
-            return null;
+        Rec rec = recs.get(index);
+        rec.activate();
+        return rec;
+    }
+
+    public Fetch prepareFetch() {
+        Fetch fetch = new Fetch();
+        int index = 0;
+        for (Rec rec : recs) {
+            if (rec.needsReading()) {
+                fetch.recsToRead.add(rec);
+                fetch.lastIndex = index;
+            }
+            index++;
         }
+        return fetch;
+    }
+
+    public void maintainCache() {
+        int count = 0;
+        for (Rec rec : recs) if (rec.lines != null) count++;
+        long tenSecondsAgo = System.currentTimeMillis() - 10 * 60 * 1000;
+        if (count > MAX_CACHE) for (Rec rec : recs) if (rec.touch < tenSecondsAgo) {
+            rec.lines = null;
+        }
+    }
+
+    public class Fetch {
+        private List<Rec> recsToRead = new ArrayList<Rec>();
+        private int lastIndex;
+    }
+
+    public Work fetchRecords(final Fetch fetch, final Feedback feedback) {
+        return new Work.DataSetPrefixWork() {
+            @Override
+            public Job getJob() {
+                return Job.LOAD_REPORT;
+            }
+
+            @Override
+            public void run() {
+                if (fetch.recsToRead.isEmpty()) return;
+                List<Rec> safeRecs = new ArrayList<Rec>(recs);
+                Rec lastReadRec = null;
+                for (Rec rec : safeRecs) {
+                    if (rec.getRecordNumber() >= 0) {
+                        lastReadRec = rec;
+                    }
+                }
+                try {
+                    int from = 0;
+                    if (lastReadRec == null) {
+                        randomAccess.seek(0);
+                    }
+                    else {
+                        lastReadRec.clear();
+                        lastReadRec.readIn(true);
+                        from = lastReadRec.getRecordNumber();
+                    }
+                    for (int walk = from; walk <= fetch.lastIndex; walk++) {
+                        Rec rec = safeRecs.get(walk);
+                        rec.readIn(fetch.recsToRead.contains(rec));
+                    }
+                }
+                catch (IOException e) {
+                    feedback.alert("Unable to fetch records", e);
+                }
+            }
+
+            @Override
+            public String getPrefix() {
+                return prefix;
+            }
+
+            @Override
+            public DataSet getDataSet() {
+                return dataSet;
+            }
+        };
+    }
+
+    public void close() {
+        IOUtils.closeQuietly(randomAccess);
     }
 
     public class Rec {
         private int recordNumber = -1;
         private long seekPos = -1;
+        private long touch;
         private List<String> lines;
+        private ReportWriter.ReportType reportType;
 
         public int getRecordNumber() {
             return recordNumber;
         }
 
-        public List<String> getLines() throws IOException {
-            if (lines == null) {
-                if (seekPos >= 0 && randomAccess.getFilePointer() != seekPos) randomAccess.seek(seekPos);
-                lines = new ArrayList<String>();
-                boolean startFound = false;
-                while (true) {
-                    if (!startFound) seekPos = randomAccess.getFilePointer();
-                    String line = randomAccess.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    Matcher startMatcher = ReportWriter.START.matcher(line);
-                    if (startMatcher.matches()) {
-                        recordNumber = Integer.parseInt(startMatcher.group(1));
-                        startFound = true;
-                        continue;
-                    }
-                    if (startFound && ReportWriter.END.matcher(line).matches()) break;
-                    if (startFound) lines.add(line);
-                }
+        public void readIn(boolean keep) throws IOException {
+            if (seekPos < 0) {
+                seekPos = randomAccess.getFilePointer();
             }
-            return lines;
+            else if (randomAccess.getFilePointer() != seekPos) {
+                randomAccess.seek(seekPos);
+            }
+            final List<String> freshLines = keep ? new ArrayList<String>() : null;
+            boolean startFound = false;
+            while (true) {
+                String line = randomAccess.readLine();
+                if (line == null) break;
+                Matcher startMatcher = ReportWriter.START.matcher(line);
+                if (startMatcher.matches()) {
+                    recordNumber = Integer.parseInt(startMatcher.group(1));
+                    reportType = ReportWriter.ReportType.valueOf(startMatcher.group(2));
+                    startFound = true;
+                    continue;
+                }
+                if (startFound && ReportWriter.END.matcher(line).matches()) break;
+                if (startFound && freshLines != null) freshLines.add(line);
+            }
+            if (freshLines != null) Swing.Exec.later(new Swing() {
+                @Override
+                public void run() {
+                    lines = freshLines;
+                    fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
+                }
+            });
         }
 
         public String toString() {
-            return recordNumber + "\n" + StringUtils.join(lines, '\n');
+            if (lines == null) {
+                return "loading...";
+            }
+            return String.format("%6d %s %s", recordNumber, reportType, StringUtils.join(lines, ' '));
+        }
+
+        public boolean needsReading() {
+            return recordNumber < 0 && touch > 0;
         }
 
         public void clear() {
             lines = null;
         }
-    }
 
-    public static void main(String[] args) throws IOException {
-        File file = new File("/Users/gerald/DelvingSIPCreator/StandaloneDataSets/sffdf_delving/report_abm.txt");
-        ReportFile reportFile = new ReportFile(file);
-        reportFile.indexFile(10);
-        for (Rec rec : reportFile.recs) {
-            System.out.println(rec);
+        public void activate() {
+            touch = System.currentTimeMillis();
+            if (lines != null) return;
         }
-        System.out.println("size = "+ reportFile.getSize());
-        System.out.println(reportFile.getElementAt(1872));
     }
 }

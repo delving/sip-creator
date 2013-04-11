@@ -27,10 +27,7 @@ import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.ReportWriter;
-import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.*;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.lang.StringUtils;
@@ -363,7 +360,7 @@ public class TestSourceConverter {
         }
 
         @Override
-        public List<String> getReport(String prefix) throws StorageException {
+        public ReportFile getReport(String prefix) throws StorageException {
             return null;
         }
 

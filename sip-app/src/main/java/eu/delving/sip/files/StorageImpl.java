@@ -492,10 +492,10 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public List<String> getReport(String prefix) throws StorageException {
+        public ReportFile getReport(String prefix) throws StorageException {
             try {
                 File file = reportFile(here, prefix);
-                return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
+                return file.exists() ? new ReportFile(file, this, prefix)  : null;
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
