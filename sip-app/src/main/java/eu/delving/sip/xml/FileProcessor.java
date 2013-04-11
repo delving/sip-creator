@@ -28,12 +28,11 @@ import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
-import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.stats.Stats;
-import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,8 +47,6 @@ import java.io.*;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
-
-import static eu.delving.groovy.XmlNodePrinter.toXml;
 
 /**
  * Process an input file, mapping it to output records which are validated and used to gather statistics.
@@ -66,7 +63,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private DataSet dataSet;
     private RecMapping recMapping;
     private BitSet valid;
-    private PrintWriter reportWriter;
+    private ReportWriter reportWriter;
     private GroovyCodeResource groovyCodeResource;
     private ProgressListener progressListener;
     private Listener listener;
@@ -75,10 +72,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private int validCount, invalidCount, recordCount, recordNumber;
     private Stats stats;
     private File outputDirectory;
-    private XmlOutput xmlOutput;
+    private PrintWriter expertOutput;
     private int maxUniqueValueLength;
-    private String problemXML;
-    private String problemMessage;
     private SipModel sipModel;
 
     public interface Listener {
@@ -165,8 +160,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
             parser.setProgressListener(new FakeProgressListener());
             assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
-            reportWriter = getDataSet().openReportWriter(recMapping.getPrefix());
-            if (outputDirectory != null) xmlOutput = createXmlOutput();
+            reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
+            if (outputDirectory != null) expertOutput = createExpertOutput();
         }
         catch (Exception e) {
             feedback.alert("Initialization of file processor failed", e);
@@ -181,10 +176,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 this.recordNumber = record.getRecordNumber();
                 try {
                     Node node = mappingRunner.runMapping(record);
+                    MappingResult result = new MappingResultImpl(serializer, node, recDefTree()).resolve();
                     try {
                         Source source = new DOMSource(node);
                         validator.validate(source);
-                        MappingResult result = new MappingResultImpl(serializer, node, recDefTree()).resolve();
                         result.checkMissingFields();
                         for (AssertionTest assertionTest : assertionTests) {
                             String violation = assertionTest.getViolation(result.root());
@@ -193,11 +188,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         validCount++;
                         valid.set(record.getRecordNumber());
                         recordStatistics((Element) node, Path.create());
+                        if (expertOutput != null) {
+                            for (Map.Entry<String, List<String>> copyField : result.copyFields().entrySet()) {
+                                for (String value : copyField.getValue()) {
+                                    expertOutput.printf("%s = %s\n", copyField.getKey(), value);
+                                }
+                            }
+                            expertOutput.println("==");
+                        }
+                        reportWriter.valid(result);
                     }
                     catch (Exception e) {
                         invalidCount++;
-                        reportWriter.println(serializer.toXml(node, true));
-                        reportWriter.println("===");
+                        reportWriter.invalid(result);
                         if (!allowInvalid) {
                             switch (askHowToProceed(record.getRecordNumber())) {
                                 case ABORT:
@@ -210,27 +213,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                     break;
                                 case INVESTIGATE:
                                     aborted = true;
-                                    problemXML = serializer.toXml(node, true);
-                                    problemMessage = e.getMessage();
                                     listener.failed(this);
                                     break;
                             }
                         }
                     }
-                    if (xmlOutput != null) xmlOutput.write(node);
                 }
                 catch (DiscardRecordException e) {
                     invalidCount++;
-                    reportWriter.println("Discarded explicitly: " + e.getMessage());
-                    reportWriter.println(XmlNodePrinter.toXml(record.getRootNode()));
+                    reportWriter.discarded(record, e.getMessage());
                 }
                 catch (MappingException e) {
-                    reportWriter.println("Mapping exception!");
-                    reportWriter.println(XmlNodePrinter.toXml(e.getMetadataRecord().getRootNode()));
-                    e.printStackTrace(reportWriter);
+                    reportWriter.unexpected(record, e);
                     aborted = true;
-                    problemXML = toXml(e.getMetadataRecord().getRootNode());
-                    problemMessage = e.getMessage();
                     listener.failed(this);
                     break;
                 }
@@ -245,30 +240,16 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             feedback.alert("File processing problem", e);
         }
         finally {
-            finishReport();
-            if (xmlOutput != null) xmlOutput.finish();
-            IOUtils.closeQuietly(reportWriter);
+            if (expertOutput != null) expertOutput.close();
             if (aborted) {
+                reportWriter.abort();
                 listener.aborted(this);
             }
             else {
                 listener.succeeded(this);
+                reportWriter.finish(validCount, invalidCount);
             }
         }
-    }
-
-    private void finishReport() {
-        reportWriter.println(ReportFileModel.DIVIDER);
-        if (aborted) {
-            reportWriter.println("Validation was aborted!");
-        }
-        else {
-            reportWriter.println("Validation was completed:");
-            reportWriter.println("Total Valid Records: " + validCount);
-            reportWriter.println("Total Invalid Records: " + invalidCount);
-            reportWriter.println("Total Records: " + (validCount + invalidCount));
-        }
-        reportWriter.close();
     }
 
     private XmlOutput createXmlOutput() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
@@ -276,6 +257,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         File outputFile = new File(outputDirectory, fileName);
         OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
         return new XmlOutput(outputStream, recDef().getNamespaceMap());
+    }
+
+    private PrintWriter createExpertOutput() throws FileNotFoundException, UnsupportedEncodingException {
+        String fileName = String.format("%s-%s.txt", getDataSet().getSpec(), recMapping.getPrefix());
+        File outputFile = new File(outputDirectory, fileName);
+        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8"));
     }
 
     private RecDef recDef() {

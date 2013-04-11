@@ -183,7 +183,7 @@ public class MappingResultImpl implements MappingResult {
                 case Node.CDATA_SECTION_NODE:
                     break;
                 case Node.ELEMENT_NODE:
-                    Path path = getPath((Element) kid, false);
+                    Path path = getPath(kid, false);
                     RecDefNode recDefNode = recDefTree.getRecDefNode(path);
                     if (recDefNode != null) {
                         String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
@@ -210,7 +210,7 @@ public class MappingResultImpl implements MappingResult {
                 case Node.CDATA_SECTION_NODE:
                     break;
                 case Node.ELEMENT_NODE:
-                    Path path = getPath((Element) kid, true);
+                    Path path = getPath(kid, true);
                     RecDefNode recDefNode = recDefTree.getRecDefNode(path);
                     if (recDefNode != null && recDefNode.isLeafElem()) {
                         // todo: we have the recDefNode!

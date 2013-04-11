@@ -29,6 +29,7 @@ import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
@@ -357,7 +358,7 @@ public class TestSourceConverter {
         }
 
         @Override
-        public PrintWriter openReportWriter(String prefix) throws StorageException {
+        public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
             return null;
         }
 

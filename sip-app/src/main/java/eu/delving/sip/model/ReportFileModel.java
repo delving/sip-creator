@@ -25,9 +25,11 @@ import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+import javax.swing.ListModel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +42,6 @@ import java.util.List;
  */
 
 public class ReportFileModel {
-    public static final String DIVIDER = "<>=====<>=====<>";
     private SipModel sipModel;
     private Listener listener;
     private List<ProcessingReport> reports = new ArrayList<ProcessingReport>();
@@ -117,7 +118,7 @@ public class ReportFileModel {
                     else {
                         boolean seenDivider = false;
                         for (String line : report) {
-                            if (line.equals(DIVIDER)) {
+                            if (line.equals(ReportWriter.DIVIDER)) {
                                 seenDivider = true;
                             }
                             else if (seenDivider) {

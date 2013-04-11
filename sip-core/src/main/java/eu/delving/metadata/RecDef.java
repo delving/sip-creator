@@ -221,6 +221,12 @@ public class RecDef {
         return found;
     }
 
+    public enum LinkCheck {
+        PAGE,
+        IMAGE,
+        MOVIE
+    }
+
     @XStreamAlias("field-marker")
     public static class FieldMarker {
 
@@ -232,6 +238,9 @@ public class RecDef {
 
         @XStreamAsAttribute
         public Path path;
+
+        @XStreamAsAttribute
+        public LinkCheck linkCheck;
 
         public void resolve(RecDefTree recDefTree) {
             path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);

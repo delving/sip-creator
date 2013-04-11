@@ -481,10 +481,10 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public PrintWriter openReportWriter(String prefix) throws StorageException {
-            File file = new File(here, FileType.REPORT.getName(prefix));
+        public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
+            File file = new File(here, FileType.REPORT.getName(recDef.prefix));
             try {
-                return new PrintWriter(file);
+                return new ReportWriter(file, recDef.fieldMarkers);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
