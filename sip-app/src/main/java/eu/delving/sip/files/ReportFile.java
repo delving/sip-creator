@@ -89,12 +89,27 @@ public class ReportFile extends AbstractListModel {
         return rec;
     }
 
+    public void maintainCache() {
+        int count = 0;
+        for (Rec rec : recs) if (rec.lines != null) count++;
+        long tenSecondsAgo = System.currentTimeMillis() - 10 * 60 * 1000;
+        if (count > MAX_CACHE) {
+            for (Rec rec : recs) {
+                if (rec.lines == null) continue;
+                if (rec.touch < tenSecondsAgo) {
+                    rec.lines = null;
+                }
+            }
+        }
+    }
+
     public Fetch prepareFetch() {
         Fetch fetch = new Fetch();
         int index = 0;
         for (Rec rec : recs) {
             if (rec.needsReading()) {
                 fetch.recsToRead.add(rec);
+                if (fetch.firstIndex < 0) fetch.firstIndex = index;
                 fetch.lastIndex = index;
             }
             index++;
@@ -102,18 +117,9 @@ public class ReportFile extends AbstractListModel {
         return fetch;
     }
 
-    public void maintainCache() {
-        int count = 0;
-        for (Rec rec : recs) if (rec.lines != null) count++;
-        long tenSecondsAgo = System.currentTimeMillis() - 10 * 60 * 1000;
-        if (count > MAX_CACHE) for (Rec rec : recs) if (rec.touch < tenSecondsAgo) {
-            rec.lines = null;
-        }
-    }
-
     public class Fetch {
         private List<Rec> recsToRead = new ArrayList<Rec>();
-        private int lastIndex;
+        private int firstIndex = -1, lastIndex;
     }
 
     public Work fetchRecords(final Fetch fetch, final Feedback feedback) {
@@ -128,9 +134,13 @@ public class ReportFile extends AbstractListModel {
                 if (fetch.recsToRead.isEmpty()) return;
                 List<Rec> safeRecs = new ArrayList<Rec>(recs);
                 Rec lastReadRec = null;
+                boolean anyUnread = false;
                 for (Rec rec : safeRecs) {
                     if (rec.getRecordNumber() >= 0) {
                         lastReadRec = rec;
+                    }
+                    else {
+                        anyUnread = true;
                     }
                 }
                 try {
@@ -138,10 +148,13 @@ public class ReportFile extends AbstractListModel {
                     if (lastReadRec == null) {
                         randomAccess.seek(0);
                     }
-                    else {
-                        lastReadRec.clear();
-                        lastReadRec.readIn(true);
+                    else if (anyUnread) {
+                        lastReadRec.lines = null;
+                        lastReadRec.readIn(true); // re-read
                         from = lastReadRec.getRecordNumber();
+                    }
+                    else {
+                        from = fetch.firstIndex;
                     }
                     for (int walk = from; walk <= fetch.lastIndex; walk++) {
                         Rec rec = safeRecs.get(walk);
@@ -184,8 +197,10 @@ public class ReportFile extends AbstractListModel {
             if (seekPos < 0) {
                 seekPos = randomAccess.getFilePointer();
             }
-            else if (randomAccess.getFilePointer() != seekPos) {
-                randomAccess.seek(seekPos);
+            else {
+                if (randomAccess.getFilePointer() != seekPos) {
+                    randomAccess.seek(seekPos);
+                }
             }
             final List<String> freshLines = keep ? new ArrayList<String>() : null;
             boolean startFound = false;
@@ -194,7 +209,13 @@ public class ReportFile extends AbstractListModel {
                 if (line == null) break;
                 Matcher startMatcher = ReportWriter.START.matcher(line);
                 if (startMatcher.matches()) {
-                    recordNumber = Integer.parseInt(startMatcher.group(1));
+                    int startRecordNumber = Integer.parseInt(startMatcher.group(1));
+                    if (recordNumber < 0) {
+                        recordNumber = startRecordNumber;
+                    }
+                    else if (recordNumber != startRecordNumber) {
+                        throw new RuntimeException("What??" + recordNumber + "," + startRecordNumber);
+                    }
                     reportType = ReportWriter.ReportType.valueOf(startMatcher.group(2));
                     startFound = true;
                     continue;
@@ -213,22 +234,18 @@ public class ReportFile extends AbstractListModel {
 
         public String toString() {
             if (lines == null) {
-                return "loading...";
+                activate();
+                return "loading..." + recordNumber;
             }
             return String.format("%6d %s %s", recordNumber, reportType, StringUtils.join(lines, ' '));
         }
 
         public boolean needsReading() {
-            return recordNumber < 0 && touch > 0;
-        }
-
-        public void clear() {
-            lines = null;
+            return lines == null && touch > 0;
         }
 
         public void activate() {
             touch = System.currentTimeMillis();
-            if (lines != null) return;
         }
     }
 }
