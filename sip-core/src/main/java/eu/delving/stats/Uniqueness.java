@@ -21,106 +21,37 @@
 
 package eu.delving.stats;
 
-import java.io.*;
+import org.mapdb.DBMaker;
+
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
- * Tackling the difficult problem of testing uniqueness of the potentially very
- * numerous values of a field, within limited memory.
- * <p/>
- * This class has a threshold at which it gives up
- * on storing values in an in-memory set, and writes all values to a text file.
- * <p/>
- * Later, when the analysis storm is over, it can be called upon to re-read the
- * dumped values and give final judgement.
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
 public class Uniqueness {
-    private static final int HOLD_THRESHOLD = 50000;
+    private static final int HOLD_THRESHOLD = 5000;
     private Set<String> all = new HashSet<String>(HOLD_THRESHOLD * 3 / 2);
+    private boolean exceedsThreshold;
     private int maxValueSize;
-    private File tempFile;
-    private Writer out;
-    private int count;
 
     public Uniqueness(int maxValueSize) {
         this.maxValueSize = maxValueSize;
     }
 
     public boolean isStillUnique(String value) {
-        count++;
         if (value.length() > maxValueSize) value = value.substring(0, maxValueSize);
-        if (all != null) {
-            if (all.contains(value)) return false;
-            all.add(value);
-            if (all.size() > HOLD_THRESHOLD) {
-                try {
-                    tempFile = File.createTempFile("Uniqueness", ".tmp");
-                    System.out.println("Creating temporary file " + tempFile.getAbsolutePath());
-                    tempFile.deleteOnExit();
-                    out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
-                    for (String one : all) {
-                        out.write(one);
-                        out.write('\n');
-                    }
-                    all = null;
-                }
-                catch (IOException e) {
-                    throw new RuntimeException("Unable to create temporary file!", e);
-                }
-            }
-            return true;
+        if (all.contains(value)) return false;
+        all.add(value);
+        if (!exceedsThreshold && all.size() > HOLD_THRESHOLD) {
+            Set<String> dbSet = DBMaker.newTempHashSet();
+            dbSet.addAll(all);
+            all = dbSet;
+            exceedsThreshold = true;
         }
-        else {
-            try {
-                out.write(value);
-                out.write('\n');
-            }
-            catch (IOException e) {
-                throw new RuntimeException("Unable to write to temporary file!", e);
-            }
-            return true;
-        }
-    }
-
-    public Set<String> getRepeated() {
-        Set<String> repeated = new TreeSet<String>();
-        if (all != null) return repeated; // empty
-        try {
-            out.close();
-            out = null;
-            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(tempFile), "UTF-8"));
-            all = new HashSet<String>(count * 3 / 2);
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (all.contains(line)) {
-                    repeated.add(line);
-                    if (repeated.size() > 20) break;
-                }
-                all.add(line);
-            }
-            all = null;
-            in.close();
-            if (!tempFile.delete()) System.out.println("Unable to delete");
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Unable to work with temporary file!", e);
-        }
-        return repeated;
-    }
-
-    public void destroy() {
-        try {
-            if (out != null) out.close();
-            if (tempFile != null && !tempFile.delete()) {}
-        }
-        catch (IOException e) {
-            // nothing
-        }
+        return true;
     }
 
     public int getSize() {

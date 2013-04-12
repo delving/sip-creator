@@ -83,7 +83,7 @@ public class ReportFileModel {
         for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
             try {
                 ReportFile reportFile = dataSet.getReport(schemaVersion.getPrefix());
-                reportFiles.add(reportFile);
+                if (reportFile != null) reportFiles.add(reportFile);
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Cannot read report file for " + schemaVersion.getPrefix());
