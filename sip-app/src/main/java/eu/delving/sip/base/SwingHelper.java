@@ -53,6 +53,8 @@ public class SwingHelper {
     public static Color HILIGHTED_COLOR = new Color(255, 205, 205);
     public static Color LONG_TERM_JOB_COLOR = new Color(255, 180, 180);
     public static Color NORMAL_JOB_COLOR = new Color(200, 255, 200);
+    public static Color REPORT_OK = new Color(0, 50, 0);
+    public static Color REPORT_ERROR = new Color(50, 0, 0);
 
     public static final Icon ICON_VALUE = icon("value");
     public static final Icon ICON_COMPOSITE = icon("composite");

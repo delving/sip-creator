@@ -177,6 +177,7 @@ public class SipModel {
         dataSetModel.shutdown();
         mappingSaveTimer.shutdown();
         workModel.shutdown();
+        reportFileModel.shutdown();
     }
 
     public JDesktopPane getDesktop() {

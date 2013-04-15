@@ -22,11 +22,14 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.util.List;
@@ -78,10 +81,19 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     }
 
     private JComponent createReportPanel(ReportFile report) {
-        JList content = new JList(report);
-        content.setPrototypeCellValue("Just a line perhaps");
-//        content.setFixedCellHeight();
-        return scrollV("Report", content);
+        final JList list = report.createJList();
+        list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+                ReportFile.Rec rec = (ReportFile.Rec) list.getSelectedValue();
+                if (rec == null) return;
+                Work work = rec.checkLinks(sipModel.getFeedback());
+                if (work == null) return;
+                sipModel.exec(work);
+            }
+        });
+        return scrollV("Report", list);
     }
 
 

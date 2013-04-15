@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
 
 public class ReportWriter {
     public static final String DIVIDER = "::::::::::::::::::::::::::::::::::::::::";
-    public static Pattern START = Pattern.compile("<<(\\d+),([^>]+)>>");
+    public static Pattern START = Pattern.compile("<<(\\d+),([^>]+)>>(.*)");
     public static Pattern END = Pattern.compile("<<>>");
     public static Pattern LINK = Pattern.compile("<<<([^>]+)>>>(.*)");
     private XmlSerializer serializer = new XmlSerializer();
@@ -66,7 +66,7 @@ public class ReportWriter {
     }
 
     public void valid(MappingResult mappingResult) {
-        report(ReportType.VALID);
+        report(ReportType.VALID, "");
         for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
             if (fieldMarker.linkCheck == null) continue;
             List<String> values = mappingResult.copyFields().get(fieldMarker.name);
@@ -78,21 +78,21 @@ public class ReportWriter {
         terminate();
     }
 
-    public void invalid(MappingResult mappingResult) {
-        report(ReportType.INVALID);
+    public void invalid(MappingResult mappingResult, Exception e) {
+        report(ReportType.INVALID, e.getMessage());
         out.print(serializer.toXml(mappingResult.root(), true));
         terminate();
     }
 
     public void discarded(MetadataRecord inputRecord, String discardMessage) {
-        report(ReportType.DISCARDED);
+        report(ReportType.DISCARDED, discardMessage);
         out.println("Reason: " + discardMessage);
         out.print(XmlNodePrinter.toXml(inputRecord.getRootNode()));
         terminate();
     }
 
     public void unexpected(MetadataRecord inputRecord, MappingException exception) {
-        report(ReportType.UNEXPECTED);
+        report(ReportType.UNEXPECTED, exception.getMessage());
         exception.printStackTrace(out);
         out.print(XmlNodePrinter.toXml(inputRecord.getRootNode()));
         terminate();
@@ -112,8 +112,8 @@ public class ReportWriter {
         out.close();
     }
 
-    private void report(ReportType type) {
-        out.printf("<<%d,%s>>\n", recordNumber++, type);
+    private void report(ReportType type, String message) {
+        out.printf("<<%d,%s>>%s\n", recordNumber++, type, message);
     }
 
     private void terminate() {

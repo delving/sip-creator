@@ -69,6 +69,7 @@ public interface Work extends Runnable {
         SCAN_RECORDS(DATA_SET),
         PROCESS(DATA_SET_PREFIX),
         LOAD_REPORT(DATA_SET_PREFIX),
+        CHECK_LINK(DATA_SET_PREFIX),
         RELOAD_MAPPING(DATA_SET_PREFIX),
         DELETE_CACHES(DATA_SET_PREFIX),
 

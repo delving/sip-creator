@@ -200,7 +200,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     }
                     catch (Exception e) {
                         invalidCount++;
-                        reportWriter.invalid(result);
+                        reportWriter.invalid(result, e);
                         if (!allowInvalid) {
                             switch (askHowToProceed(record.getRecordNumber())) {
                                 case ABORT:
