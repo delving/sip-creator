@@ -370,7 +370,8 @@ public class CodeGenerator {
         }
         else if (path.size() == 1) {
             if (nodeMapping.hasMap()) {
-                codeOut.line(getMapUsage(nodeMapping));
+                String mapUsage = getMapUsage(nodeMapping);
+                codeOut.line(recDefNode.hasFunction()? String.format("%s(%s.toString())", recDefNode.getFunction(), mapUsage) : mapUsage);
             }
             else {
                 String sanitize = recDefNode.getFieldType().equalsIgnoreCase("link") ? ".sanitizeURI()" : "";
