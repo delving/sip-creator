@@ -26,19 +26,19 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
-import javax.swing.ListSelectionModel;
+import javax.swing.ListCellRenderer;
 import java.awt.Component;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -55,6 +55,7 @@ import static eu.delving.sip.files.ReportWriter.ReportType.VALID;
 public class ReportFile extends AbstractListModel {
     private static final long BACKTRACK = 10000;
     private static final int MAX_CACHE = 1000;
+    private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
     private final String prefix;
     private RandomAccessFile randomAccess;
     private List<Rec> recs = new ArrayList<Rec>();
@@ -79,6 +80,10 @@ public class ReportFile extends AbstractListModel {
 
     public void setLinkChecker(LinkChecker linkChecker) {
         this.linkChecker = linkChecker;
+    }
+
+    public LinkChecker getLinkChecker() {
+        return linkChecker;
     }
 
     public String getPrefix() {
@@ -196,7 +201,6 @@ public class ReportFile extends AbstractListModel {
 
     public void close() {
         IOUtils.closeQuietly(randomAccess);
-        if (linkChecker != null) linkChecker.close();
     }
 
     public class Rec {
@@ -205,7 +209,6 @@ public class ReportFile extends AbstractListModel {
         private long touch;
         private ReportWriter.ReportType reportType;
         private List<String> lines;
-        private List<LinkChecker.LinkCheck> linkChecks;
 
         public int getRecordNumber() {
             return recordNumber;
@@ -248,8 +251,8 @@ public class ReportFile extends AbstractListModel {
             });
         }
 
-        public Work checkLinks(final Feedback feedback) {
-            if (reportType != VALID || linkChecks != null) return null;
+        public Work checkLinks(final Feedback feedback, final Swing finished) {
+            if (reportType != VALID) return null;
             final List<String> safeLines = new ArrayList<String>(lines);
             return new Work.DataSetPrefixWork() {
                 @Override
@@ -275,18 +278,22 @@ public class ReportFile extends AbstractListModel {
                             Matcher matcher = ReportWriter.LINK.matcher(line);
                             if (!matcher.matches()) continue; // RuntimeException?
                             String url = matcher.group(2);
-                            checks.add(linkChecker.get(url));
-                        }
-                        Swing.Exec.later(new Swing() {
-                            @Override
-                            public void run() {
-                                linkChecks = checks;
-                                fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
+                            if (!linkChecker.contains(url)) {
+                                linkChecker.request(url);
+                                Swing.Exec.later(new Swing() {
+                                    @Override
+                                    public void run() {
+                                        fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
+                                    }
+                                });
                             }
-                        });
+                        }
                     }
                     catch (IOException e) {
                         feedback.alert("Unable to check link", e);
+                    }
+                    finally {
+                        Swing.Exec.later(finished);
                     }
                 }
             };
@@ -309,7 +316,11 @@ public class ReportFile extends AbstractListModel {
         }
     }
 
-    public static class RecCellRenderer extends DefaultListCellRenderer {
+    public ListCellRenderer getCellRenderer() {
+        return new RecCellRenderer();
+    }
+
+    private class RecCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             if (!(value instanceof Rec)) {
@@ -325,24 +336,24 @@ public class ReportFile extends AbstractListModel {
                 out.append(": ");
                 switch (rec.reportType) {
                     case VALID:
-                        if (rec.linkChecks == null) {
-                            out.append(rec.lines.size()).append(" links unchecked");
-                        }
-                        else {
-                            out.append(rec.lines.size()).append(" links ");
-                            int lineNumber = 0;
-                            for (String line: rec.lines) {
-                                Matcher matcher = ReportWriter.LINK.matcher(line);
-                                if (!matcher.matches()) continue; // RuntimeException?
-                                out.append(matcher.group(1));
-                                LinkChecker.LinkCheck linkCheck = rec.linkChecks.get(lineNumber);
-                                if (linkCheck.httpStatus == HttpStatus.SC_OK) {
-                                    out.append("\u2714 ");
+                        out.append(rec.lines.size()).append(" links ");
+                        for (String line : rec.lines) {
+                            Matcher matcher = ReportWriter.LINK.matcher(line);
+                            if (!matcher.matches()) continue; // RuntimeException?
+                            out.append(matcher.group(1));
+                            String url = matcher.group(2);
+                            if (linkChecker == null) {
+                                out.append(" ");
+                            }
+                            else {
+                                LinkChecker.LinkCheck linkCheck = linkChecker.lookup(url);
+                                if (linkCheck == null) {
+                                    out.append("? ");
                                 }
                                 else {
-                                    out.append("\u2716 ");
+                                    out.append(":").append(DATE_FORMAT.format(new Date(linkCheck.time)));
+                                    out.append(linkCheck.httpStatus == HttpStatus.SC_OK ? "\u2714 " : "\u2716 ");
                                 }
-                                lineNumber++;
                             }
                         }
                         break;
@@ -358,38 +369,42 @@ public class ReportFile extends AbstractListModel {
         }
     }
 
-    public JList createJList() {
-        JList list = new JList(this) {
-            @Override
-            public String getToolTipText(MouseEvent evt) {
-                int index = locationToIndex(evt.getPoint());
-                if (index < 0) return "?";
-                Rec rec = (Rec) getModel().getElementAt(index);
-                if (rec.lines == null) return "??";
-                switch (rec.reportType) {
-                    case VALID:
-                        StringBuilder out = new StringBuilder("<html>\n");
-                        int lineNumber = 0;
-                        for (String line : rec.lines) {
-                            out.append(StringEscapeUtils.escapeHtml(line));
-                            if (rec.linkChecks != null && lineNumber < rec.linkChecks.size()) {
-                                out.append(": checked ").append(rec.linkChecks.get(lineNumber));
-                            }
-                            else {
-                                out.append(": unchecked");
-                            }
-                            out.append("<br>\n");
-                            lineNumber++;
-                        }
-                        return out.toString();
-                    default:
-                        return "<html>\n" + StringUtils.join(rec.lines, "<br>\n");
+    public String toHtml(Rec rec) {
+        if (rec.lines == null) return "??";
+        StringBuilder out = new StringBuilder("<html><font size=\"+1\"\n");
+        switch (rec.reportType) {
+            case VALID:
+                out.append("<ul>\n");
+                for (String line : rec.lines) {
+                    out.append("<li>\n");
+                    Matcher matcher = ReportWriter.LINK.matcher(line);
+                    if (!matcher.matches()) continue; // RuntimeException?
+                    String url = matcher.group(2);
+                    out.append(StringEscapeUtils.escapeHtml(url)).append("\n");
+                    if (linkChecker == null || !linkChecker.contains(url)) {
+                        out.append("<ul><li>unchecked</li></ul>");
+                    }
+                    else {
+                        LinkChecker.LinkCheck linkCheck = linkChecker.lookup(url);
+                        out.append("<ul>\n");
+                        out.append(String.format("<li>Checked: %s</li>\n", DATE_FORMAT.format(new Date(linkCheck.time))));
+                        out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
+                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
+                        out.append(String.format("<li>File size: %d</li>\n", linkCheck.fileSize));
+                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.mimeType));
+                        out.append("</ul>\n");
+                    }
+                    out.append("</li>\n");
                 }
-            }
-        };
-        list.setPrototypeCellValue("One single line of something or other");
-        list.setCellRenderer(new RecCellRenderer());
-        list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        return list;
+                out.append("</ul>\n");
+                break;
+            default:
+                for (String line : rec.lines) {
+                    out.append(StringEscapeUtils.escapeHtml(line)).append("<br>");
+                }
+                break;
+        }
+        return out.toString();
     }
+
 }

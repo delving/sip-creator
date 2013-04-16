@@ -505,7 +505,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public LinkChecker getLinkChecker(HttpClient httpClient, String prefix) throws StorageException {
-            return new LinkChecker(httpClient, linkDbFile(here, prefix));
+            return new LinkChecker(httpClient, linkDbFile(here, prefix), this, prefix);
         }
 
         @Override
