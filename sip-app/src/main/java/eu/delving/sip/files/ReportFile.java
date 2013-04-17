@@ -345,10 +345,11 @@ public class ReportFile extends AbstractListModel {
             }
             else {
                 StringBuilder out = new StringBuilder();
+                out.append("<");
                 out.append(rec.getRecordNumber());
                 out.append(":");
                 out.append(rec.reportType);
-                out.append("&rarr; ");
+                out.append("> ");
                 switch (rec.reportType) {
                     case VALID:
                         out.append(rec.lines.size()).append(" links ");

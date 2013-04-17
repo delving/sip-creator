@@ -180,7 +180,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                     }
                 }
             });
-            add(scrollV("Records" + report.getPrefix().toUpperCase(), list), BorderLayout.CENTER);
+            add(scrollV("Output Records for " + report.getPrefix().toUpperCase(), list), BorderLayout.CENTER);
             add(createControls(), BorderLayout.SOUTH);
         }
 
