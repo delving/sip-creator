@@ -344,8 +344,11 @@ public class ReportFile extends AbstractListModel {
                 string = "Loading...";
             }
             else {
-                StringBuilder out = new StringBuilder(rec.reportType.toString());
-                out.append(": ");
+                StringBuilder out = new StringBuilder();
+                out.append(rec.getRecordNumber());
+                out.append(":");
+                out.append(rec.reportType);
+                out.append("&rarr; ");
                 switch (rec.reportType) {
                     case VALID:
                         out.append(rec.lines.size()).append(" links ");
@@ -383,7 +386,7 @@ public class ReportFile extends AbstractListModel {
 
     public String toHtml(Rec rec) {
         if (rec.lines == null) return "??";
-        StringBuilder out = new StringBuilder("<html><font size=\"+1\"\n");
+        StringBuilder out = new StringBuilder("<html><table cellpadding=20><tr><td><font size=\"+1\">\n");
         switch (rec.reportType) {
             case VALID:
                 out.append("<ul>\n");
@@ -392,7 +395,8 @@ public class ReportFile extends AbstractListModel {
                     Matcher matcher = ReportWriter.LINK.matcher(line);
                     if (!matcher.matches()) continue; // RuntimeException?
                     String url = matcher.group(2);
-                    out.append(StringEscapeUtils.escapeHtml(url)).append("\n");
+                    String link = String.format("<a href=\"%s\">%s<a>", url, StringEscapeUtils.escapeHtml(url));
+                    out.append(link).append("\n");
                     if (linkChecker == null || !linkChecker.contains(url)) {
                         out.append("<ul><li>unchecked</li></ul>");
                     }
@@ -416,6 +420,7 @@ public class ReportFile extends AbstractListModel {
                 }
                 break;
         }
+        out.append("</td></tr></table></font>");
         return out.toString();
     }
 

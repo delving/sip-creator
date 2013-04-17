@@ -23,6 +23,7 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.LinkChecker;
 import eu.delving.sip.files.ReportFile;
@@ -33,10 +34,7 @@ import eu.delving.sip.panels.HtmlPanel;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.*;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -70,6 +68,14 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         super(Which.REPORT, sipModel, "Report");
         listPanel.add(EMPTY_LABEL);
         sipModel.getReportFileModel().setListener(this);
+        htmlPanel.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    SwingHelper.launchURL(e.getURL());
+                }
+            }
+        });
     }
 
     @Override
@@ -105,7 +111,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 break;
         }
         listPanel.validate();
-        htmlPanel.setHtml("<html><h4>Select an item</h4>");
+        htmlPanel.setHtml("<html><font size=\"+1\">\n<br><br><center>Select an item in the list<");
     }
 
     private void linkFile(boolean load, Swing finished) {

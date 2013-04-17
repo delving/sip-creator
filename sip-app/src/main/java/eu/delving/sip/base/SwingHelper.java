@@ -23,7 +23,9 @@ package eu.delving.sip.base;
 
 import eu.delving.metadata.*;
 import eu.delving.stats.Stats;
+import org.apache.log4j.Logger;
 
+import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
@@ -34,6 +36,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
@@ -251,4 +254,26 @@ public class SwingHelper {
         }
         return out.toString();
     }
+
+
+    public static boolean launchURLFromXML(String urlFromXML) {
+        try {
+            return launchURL(new URL(urlFromXML.replaceAll("&amp;", "&")));
+        }
+        catch (MalformedURLException e1) {
+            return false;
+        }
+    }
+
+    public static boolean launchURL(URL url) {
+        try {
+            BasicService bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
+            return bs.showDocument(url);
+        }
+        catch (UnavailableServiceException ue) {
+            Logger.getLogger(SwingHelper.class).info("Launch " + url);
+            return false;
+        }
+    }
+
 }

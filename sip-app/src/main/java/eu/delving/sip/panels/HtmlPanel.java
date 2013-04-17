@@ -23,13 +23,17 @@ package eu.delving.sip.panels;
 
 import eu.delving.sip.base.SwingHelper;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
+import javax.swing.JPanel;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -50,6 +54,10 @@ public class HtmlPanel extends JPanel {
         view.setEditable(false);
         add(SwingHelper.scrollV(view));
         setPreferredSize(new Dimension(200, 200));
+    }
+
+    public void addHyperlinkListener(HyperlinkListener listener) {
+        view.addHyperlinkListener(listener);
     }
 
     public void setHtml(String html) {
