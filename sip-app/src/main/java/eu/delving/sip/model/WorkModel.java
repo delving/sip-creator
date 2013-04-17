@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 
@@ -304,7 +305,29 @@ public class WorkModel {
             else {
                 progressImpl = null;
             }
-            this.future = executor.submit(work);
+            if (work instanceof Work.SwingAfter) {
+                Work.SwingAfter swingAfter = (Work.SwingAfter) work;
+                final Swing after = swingAfter.getAfter();
+                if (after != null) {
+                    this.future = executor.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                work.run();
+                            }
+                            finally {
+                                Swing.Exec.later(after);
+                            }
+                        }
+                    });
+                }
+                else {
+                    this.future = executor.submit(work);
+                }
+            }
+            else {
+                this.future = executor.submit(work);
+            }
             this.start = new Date();
         }
 

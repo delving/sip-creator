@@ -112,7 +112,7 @@ public class LinkChecker {
                         map.put(entry.url, entry.linkCheck);
                     }
                     in.close();
-                    System.out.println("Loaded "+map.size()+" links");
+                    log.info("Loaded "+map.size()+" links");
                 }
                 catch (IOException e) {
                     feedback.alert("Unable to load links", e);
@@ -153,6 +153,7 @@ public class LinkChecker {
                         out.write('\n');
                     }
                     out.close();
+                    log.info("Saved "+map.size()+" links");
                 }
                 catch (IOException e) {
                     feedback.alert("Unable to save links", e);
@@ -224,6 +225,11 @@ public class LinkChecker {
                     "%d: %s",
                     httpStatus, REASON.getReason(httpStatus, null)
             );
+        }
+
+        @Override
+        public String toString() {
+            return getStatusReason();
         }
     }
 }

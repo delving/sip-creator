@@ -251,10 +251,13 @@ public class ReportFile extends AbstractListModel {
             });
         }
 
-        public Work checkLinks(final Feedback feedback, final Swing finished) {
+        public Work.SwingAfter checkLinks(final Feedback feedback) {
             if (reportType != VALID) return null;
+            if (lines == null) return null;
             final List<String> safeLines = new ArrayList<String>(lines);
-            return new Work.DataSetPrefixWork() {
+            return new Work.DataSetPrefixWorkSwingAfter() {
+                private Swing after;
+
                 @Override
                 public String getPrefix() {
                     return prefix;
@@ -273,28 +276,37 @@ public class ReportFile extends AbstractListModel {
                 @Override
                 public void run() {
                     try {
-                        final List<LinkChecker.LinkCheck> checks = new ArrayList<LinkChecker.LinkCheck>();
+                        boolean linkChecked = false;
                         for (String line : safeLines) {
                             Matcher matcher = ReportWriter.LINK.matcher(line);
                             if (!matcher.matches()) continue; // RuntimeException?
                             String url = matcher.group(2);
                             if (!linkChecker.contains(url)) {
                                 linkChecker.request(url);
-                                Swing.Exec.later(new Swing() {
-                                    @Override
-                                    public void run() {
-                                        fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
-                                    }
-                                });
+                                linkChecked = true;
                             }
                         }
+                        if (linkChecked) Swing.Exec.later(new Swing() {
+                            @Override
+                            public void run() {
+                                fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
+                            }
+                        });
+
                     }
                     catch (IOException e) {
                         feedback.alert("Unable to check link", e);
                     }
-                    finally {
-                        Swing.Exec.later(finished);
-                    }
+                }
+
+                @Override
+                public void setAfter(Swing after) {
+                    this.after = after;
+                }
+
+                @Override
+                public Swing getAfter() {
+                    return after;
                 }
             };
         }

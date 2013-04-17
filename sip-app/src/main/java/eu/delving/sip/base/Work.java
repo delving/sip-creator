@@ -108,4 +108,12 @@ public interface Work extends Runnable {
     public interface LongTermWork extends Work {
         void setProgressListener(ProgressListener progressListener);
     }
+
+    public interface SwingAfter extends Work {
+        void setAfter(Swing after);
+        Swing getAfter();
+    }
+
+    public interface DataSetPrefixWorkSwingAfter extends DataSetPrefixWork, SwingAfter {
+    }
 }
