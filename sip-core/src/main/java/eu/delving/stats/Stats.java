@@ -223,6 +223,11 @@ public class Stats {
         }
 
         public void finish() {
+            if (uniqueness != null) {
+                Set<String> repeated = uniqueness.getRepeated();
+                unique = repeated.isEmpty();
+                uniqueness.destroy();
+            }
             if (values != null) {
                 if (unique != null && unique) {
                     values = null;

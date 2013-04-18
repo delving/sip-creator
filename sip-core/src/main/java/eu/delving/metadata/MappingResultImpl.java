@@ -232,7 +232,7 @@ public class MappingResultImpl implements MappingResult {
 
     private void handleMarkedField(RecDefNode recDefNode, String value) {
         for (RecDef.FieldMarker fieldMarker : recDefNode.getFieldMarkers()) {
-            if (fieldMarker.name.startsWith(DELVING_PREFIX)) {
+            if (fieldMarker.name != null && fieldMarker.name.startsWith(DELVING_PREFIX)) {
                 putCopyField(fieldMarker.name, value);
             }
             else if ("search".equals(fieldMarker.type)) {
