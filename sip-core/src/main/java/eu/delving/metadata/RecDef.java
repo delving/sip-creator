@@ -134,8 +134,6 @@ public class RecDef {
 
     public Elem root;
 
-    public List<Dict> dicts;
-
     public List<OptList> opts;
 
     @XStreamAlias("assertion-list")
@@ -223,6 +221,23 @@ public class RecDef {
         return found;
     }
 
+    public enum Check {
+        LANDING_PAGE(true),
+        DIGITAL_OBJECT(true),
+        THUMBNAIL(true),
+        DEEP_ZOOM(true),
+        THESAURUS_REFERENCE(true),
+        LOD_REFERENCE(true),
+        GEO_COORDINATE(false),
+        DATE(false);
+
+        public final boolean fetch;
+
+        private Check(boolean fetch) {
+            this.fetch = fetch;
+        }
+    }
+
     @XStreamAlias("field-marker")
     public static class FieldMarker {
 
@@ -235,14 +250,20 @@ public class RecDef {
         @XStreamAsAttribute
         public Path path;
 
+        @XStreamAsAttribute
+        public Check check;
+
         public void resolve(RecDefTree recDefTree) {
             path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
             RecDefNode node = recDefTree.getRecDefNode(path);
-            if (node == null) throw new RuntimeException("Cannot find path " + path);
-            if (name == null) throw new RuntimeException("Field marker must have a name: " + path);
-            for (String[] translation : BACKWARDS_COMPATIBILITY_REFRERENCE) {
-                if (translation[0].equals(name)) {
-                    name = translation[1];
+            if (node == null) {
+                throw new RuntimeException("Cannot find path " + path);
+            }
+            if (name != null) {
+                for (String[] translation : BACKWARDS_COMPATIBILITY_REFRERENCE) {
+                    if (translation[0].equals(name)) {
+                        name = translation[1];
+                    }
                 }
             }
             node.addFieldMarker(this);
