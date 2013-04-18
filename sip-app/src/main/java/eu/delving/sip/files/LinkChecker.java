@@ -29,19 +29,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.EnglishReasonPhraseCatalog;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 
-import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.IOException;
 
 /**
  * Check links and use MapDB to maintain link checking results
@@ -50,21 +43,14 @@ import java.util.regex.Pattern;
  */
 
 public class LinkChecker {
-    private static final String CSV_HEADER = "\"URL\",\"Date\",\"HTTP Status\",\"File Size\",\"MIME Type\"";
-    private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static Logger log = Logger.getLogger(LinkChecker.class);
-    private static EnglishReasonPhraseCatalog REASON = EnglishReasonPhraseCatalog.INSTANCE;
-    private final DataSet dataSet;
-    private final String prefix;
     private final HttpClient httpClient;
     private HTreeMap<String, LinkCheck> map;
-    private File file;
+    private LinkFile linkFile;
 
-    public LinkChecker(HttpClient httpClient, File file, DataSet dataSet, String prefix) {
+    public LinkChecker(HttpClient httpClient, LinkFile linkFile) {
         this.httpClient = httpClient;
-        this.file = file;
-        this.dataSet = dataSet;
-        this.prefix = prefix;
+        this.linkFile = linkFile;
         this.map = DBMaker.newTempHashMap();
     }
 
@@ -83,86 +69,12 @@ public class LinkChecker {
         return linkCheck;
     }
 
-    public Work load(final Feedback feedback, final Swing finished) {
-        if (!file.exists()) return null;
-        return new Work.DataSetPrefixWork() {
-            @Override
-            public String getPrefix() {
-                return prefix;
-            }
-
-            @Override
-            public DataSet getDataSet() {
-                return dataSet;
-            }
-
-            @Override
-            public Job getJob() {
-                return Job.LOAD_LINKS;
-            }
-
-            @Override
-            public void run() {
-                try {
-                    BufferedReader in = new BufferedReader(new FileReader(file));
-                    String line = in.readLine();
-                    if (!CSV_HEADER.equals(line)) throw new IOException("Expected CSV Header");
-                    while ((line = in.readLine()) != null) {
-                        Entry entry = new Entry(line);
-                        map.put(entry.url, entry.linkCheck);
-                    }
-                    in.close();
-                    log.info("Loaded "+map.size()+" links");
-                }
-                catch (IOException e) {
-                    feedback.alert("Unable to load links", e);
-                }
-                finally {
-                    Swing.Exec.later(finished);
-                }
-            }
-        };
+    public Work load(Feedback feedback, Swing finished) {
+        return linkFile.load(map, feedback, finished);
     }
 
-    public Work save(final Feedback feedback, final Swing finished) {
-        return new Work.DataSetPrefixWork() {
-            @Override
-            public String getPrefix() {
-                return prefix;
-            }
-
-            @Override
-            public DataSet getDataSet() {
-                return dataSet;
-            }
-
-            @Override
-            public Job getJob() {
-                return Job.SAVE_LINKS;
-            }
-
-            @Override
-            public void run() {
-                try {
-                    FileWriter out = new FileWriter(file);
-                    out.write(CSV_HEADER);
-                    out.write('\n');
-                    for (Map.Entry<String, LinkCheck> mapEntry : map.entrySet()) {
-                        Entry entry = new Entry(mapEntry.getKey(), mapEntry.getValue());
-                        out.write(entry.toLine());
-                        out.write('\n');
-                    }
-                    out.close();
-                    log.info("Saved "+map.size()+" links");
-                }
-                catch (IOException e) {
-                    feedback.alert("Unable to save links", e);
-                }
-                finally {
-                    Swing.Exec.later(finished);
-                }
-            }
-        };
+    public Work save(Feedback feedback, Swing finished) {
+        return linkFile.save(map, feedback, finished);
     }
 
     private LinkCheck linkCheckRequest(String url) throws IOException {
@@ -180,56 +92,4 @@ public class LinkChecker {
         return linkCheck;
     }
 
-    public static class Entry {
-        public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
-        public String url;
-        public LinkCheck linkCheck;
-
-        public Entry(String url, LinkCheck linkCheck) {
-            this.url = url;
-            this.linkCheck = linkCheck;
-        }
-
-        public Entry(String line) {
-            Matcher matcher = LINK_CHECK_PATTERN.matcher(line);
-            if (!matcher.matches()) throw new RuntimeException("Unreadable line: " + line);
-            this.url = matcher.group(1);
-            this.linkCheck = new LinkCheck();
-            try {
-                linkCheck.time = DATE_FORMAT.parse(matcher.group(2)).getTime();
-            }
-            catch (ParseException e) {
-                throw new RuntimeException("Cannot parse date");
-            }
-            linkCheck.httpStatus = Integer.parseInt(matcher.group(3));
-            linkCheck.fileSize = Integer.parseInt(matcher.group(4));
-            linkCheck.mimeType = matcher.group(5);
-        }
-
-        public String toLine() {
-            return String.format(
-                    "\"%s\", \"%s\", %d, %d, \"%s\"",
-                    url, DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
-            );
-        }
-    }
-
-    public static class LinkCheck implements Serializable {
-        public int httpStatus;
-        public long time;
-        public int fileSize;
-        public String mimeType;
-
-        public String getStatusReason() {
-            return String.format(
-                    "%d: %s",
-                    httpStatus, REASON.getReason(httpStatus, null)
-            );
-        }
-
-        @Override
-        public String toString() {
-            return getStatusReason();
-        }
-    }
 }

@@ -21,17 +21,16 @@
 
 package eu.delving.sip;
 
+import eu.delving.sip.files.LinkCheck;
+import eu.delving.sip.files.LinkFile;
 import junit.framework.Assert;
 import org.junit.Test;
-
-import static eu.delving.sip.files.LinkChecker.Entry;
-import static eu.delving.sip.files.LinkChecker.LinkCheck;
 
 /**
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class TestLinkChecker {
+public class TestLinkFile {
     @Test
     public void formatTest()  {
         LinkCheck c = new LinkCheck();
@@ -40,9 +39,9 @@ public class TestLinkChecker {
         c.fileSize = -1;
         c.mimeType = "file/text";
         String url = "http://whatever";
-        Entry before = new Entry(url, c);
+        LinkFile.Entry before = new LinkFile.Entry(url, c);
         String line = before.toLine();
-        Entry after = new Entry(line);
+        LinkFile.Entry after = new LinkFile.Entry(line);
         Assert.assertEquals("CSV Format", line, after.toLine());
     }
 }

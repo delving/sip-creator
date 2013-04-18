@@ -21,6 +21,7 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
@@ -208,6 +209,7 @@ public class ReportFile extends AbstractListModel {
         private long seekPos = -1;
         private long touch;
         private ReportWriter.ReportType reportType;
+        private String error;
         private List<String> lines;
 
         public int getRecordNumber() {
@@ -236,6 +238,13 @@ public class ReportFile extends AbstractListModel {
                         throw new RuntimeException("What??" + recordNumber + "," + startRecordNumber);
                     }
                     reportType = ReportWriter.ReportType.valueOf(startMatcher.group(2));
+                    switch (reportType) {
+                        case INVALID:
+                        case DISCARDED:
+                        case UNEXPECTED:
+                            error = startMatcher.group(3);
+                            break;
+                    }
                     startFound = true;
                     continue;
                 }
@@ -280,6 +289,8 @@ public class ReportFile extends AbstractListModel {
                         for (String line : safeLines) {
                             Matcher matcher = ReportWriter.LINK.matcher(line);
                             if (!matcher.matches()) continue; // RuntimeException?
+                            RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
+                            if (!check.fetch) continue;
                             String url = matcher.group(2);
                             if (!linkChecker.contains(url)) {
                                 linkChecker.request(url);
@@ -356,25 +367,31 @@ public class ReportFile extends AbstractListModel {
                         for (String line : rec.lines) {
                             Matcher matcher = ReportWriter.LINK.matcher(line);
                             if (!matcher.matches()) continue; // RuntimeException?
-                            out.append(matcher.group(1));
-                            String url = matcher.group(2);
-                            if (linkChecker == null) {
-                                out.append(" ");
-                            }
-                            else {
-                                LinkChecker.LinkCheck linkCheck = linkChecker.lookup(url);
-                                if (linkCheck == null) {
-                                    out.append("? ");
+                            RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
+                            out.append(check);
+                            if (check.fetch) {
+                                String url = matcher.group(2);
+                                if (linkChecker == null) {
+                                    out.append(" ");
                                 }
                                 else {
-                                    out.append(":").append(DATE_FORMAT.format(new Date(linkCheck.time)));
-                                    out.append(linkCheck.httpStatus == HttpStatus.SC_OK ? "\u2714 " : "\u2716 ");
+                                    LinkCheck linkCheck = linkChecker.lookup(url);
+                                    if (linkCheck == null) {
+                                        out.append("? ");
+                                    }
+                                    else {
+                                        out.append(":").append(DATE_FORMAT.format(new Date(linkCheck.time)));
+                                        out.append(linkCheck.httpStatus == HttpStatus.SC_OK ? "\u2714 " : "\u2716 ");
+                                    }
                                 }
+                            }
+                            else {
+                                out.append(" \u2714 "); // it's present
                             }
                         }
                         break;
                     default:
-                        out.append(rec.lines.size()).append(" lines");
+                        out.append(rec.error);
                         break;
                 }
                 string = out.toString();
@@ -395,27 +412,56 @@ public class ReportFile extends AbstractListModel {
                     out.append("<li>\n");
                     Matcher matcher = ReportWriter.LINK.matcher(line);
                     if (!matcher.matches()) continue; // RuntimeException?
-                    String url = matcher.group(2);
-                    String link = String.format("<a href=\"%s\">%s<a>", url, StringEscapeUtils.escapeHtml(url));
-                    out.append(link).append("\n");
-                    if (linkChecker == null || !linkChecker.contains(url)) {
-                        out.append("<ul><li>unchecked</li></ul>");
-                    }
-                    else {
-                        LinkChecker.LinkCheck linkCheck = linkChecker.lookup(url);
-                        out.append("<ul>\n");
-                        out.append(String.format("<li>Checked: %s</li>\n", DATE_FORMAT.format(new Date(linkCheck.time))));
-                        out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
-                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
-                        out.append(String.format("<li>File size: %d</li>\n", linkCheck.fileSize));
-                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.mimeType));
-                        out.append("</ul>\n");
+                    RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
+                    out.append("<b>").append(check).append(":</b>");
+                    switch (check) {
+                        case LANDING_PAGE:
+                        case DIGITAL_OBJECT:
+                        case THUMBNAIL:
+                            String url = matcher.group(2);
+                            String link = String.format("<a href=\"%s\">%s<a>", url, StringEscapeUtils.escapeHtml(url));
+                            out.append(link).append("\n");
+                            if (linkChecker == null || !linkChecker.contains(url)) {
+                                out.append("<ul><li>unchecked</li></ul>");
+                            }
+                            else {
+                                LinkCheck linkCheck = linkChecker.lookup(url);
+                                out.append("<ul>\n");
+                                out.append(String.format("<li>Checked: %s</li>\n", DATE_FORMAT.format(new Date(linkCheck.time))));
+                                out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
+                                out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
+                                out.append(String.format("<li>File size: %d</li>\n", linkCheck.fileSize));
+                                out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.mimeType));
+                                out.append("</ul>\n");
+                            }
+                            break;
+                        case DEEP_ZOOM:
+                            out.append("?");
+                            break;
+                        case THESAURUS_REFERENCE:
+                            out.append("?");
+                            break;
+                        case LOD_REFERENCE:
+                            out.append("?");
+                            break;
+                        case GEO_COORDINATE:
+                            String coordinate = matcher.group(2);
+                            String coordLink = String.format(
+                                    "<a href=\"https://maps.google.com/maps?q=%s\">%s<a>",
+                                    coordinate, coordinate
+                            );
+                            out.append(coordLink);
+                            break;
+                        case DATE:
+                            out.append("?");
+                            break;
                     }
                     out.append("</li>\n");
                 }
                 out.append("</ul>\n");
                 break;
             default:
+                out.append("<b>").append(rec.error).append("</b>");
                 for (String line : rec.lines) {
                     out.append(StringEscapeUtils.escapeHtml(line)).append("<br>");
                 }
