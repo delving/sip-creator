@@ -22,17 +22,25 @@
 package eu.delving.sip.files;
 
 import eu.delving.MappingResult;
+import eu.delving.XMLToolFactory;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.groovy.XmlSerializer;
+import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
+import eu.delving.metadata.XPathContext;
+import net.sf.saxon.dom.DOMNodeList;
 import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Node;
 
+import javax.xml.xpath.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -46,6 +54,9 @@ public class ReportWriter {
     public static Pattern START = Pattern.compile("<<(\\d+),([^>]+)>>(.*)");
     public static Pattern END = Pattern.compile("<<>>");
     public static Pattern LINK = Pattern.compile("<<<([^>]+)>>>(.*)");
+    private XPathFactory pathFactory = XMLToolFactory.xpathFactory();
+    private XPathContext pathContext;
+    private Map<Path, XPathExpression> expressionMap = new HashMap<Path, XPathExpression>();
     private XmlSerializer serializer = new XmlSerializer();
     private File file;
     private List<RecDef.FieldMarker> fieldMarkers;
@@ -59,20 +70,26 @@ public class ReportWriter {
         UNEXPECTED
     }
 
-    public ReportWriter(File file, List<RecDef.FieldMarker> fieldMarkers) throws FileNotFoundException {
+    public ReportWriter(File file, List<RecDef.FieldMarker> fieldMarkers, XPathContext pathContext) throws FileNotFoundException, XPathExpressionException {
         this.file = file;
         this.fieldMarkers = fieldMarkers;
+        this.pathContext = pathContext;
+        for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
+            if (fieldMarker.check == null || fieldMarker.path == null) continue;
+            expressionMap.put(fieldMarker.path, createPath().compile(fieldMarker.path.toString()));
+        }
         this.out = new PrintWriter(file);
     }
 
-    public void valid(MappingResult mappingResult) {
+    public void valid(MappingResult mappingResult) throws XPathExpressionException {
         report(ReportType.VALID, "");
         for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
-            if (fieldMarker.check == null) continue;
-            List<String> values = mappingResult.copyFields().get(fieldMarker.name);
-            if (values == null) continue;
-            for (String value : values) {
-                out.printf("<<<%s>>>%s\n", fieldMarker.check, value);
+            if (fieldMarker.check == null || fieldMarker.path == null) continue;
+            XPathExpression expression = expressionMap.get(fieldMarker.path);
+            DOMNodeList nodeList = (DOMNodeList) expression.evaluate(mappingResult.root(), XPathConstants.NODESET);
+            for (int walk = 0; walk < nodeList.getLength(); walk++) {
+                Node node = nodeList.item(walk);
+                out.printf("<<<%s>>>%s\n", fieldMarker.check, node.getTextContent());
             }
         }
         terminate();
@@ -119,4 +136,11 @@ public class ReportWriter {
     private void terminate() {
         out.println("<<>>");
     }
+
+    private XPath createPath() {
+        XPath path = pathFactory.newXPath();
+        path.setNamespaceContext(pathContext);
+        return path;
+    }
+
 }

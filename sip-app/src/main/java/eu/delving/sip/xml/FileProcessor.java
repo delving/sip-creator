@@ -183,7 +183,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         result.checkMissingFields();
                         for (AssertionTest assertionTest : assertionTests) {
                             String violation = assertionTest.getViolation(result.root());
-                            if (violation != null) throw new Exception(violation);
+                            if (violation != null) throw new AssertionException(violation);
                         }
                         validCount++;
                         valid.set(record.getRecordNumber());

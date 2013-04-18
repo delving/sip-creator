@@ -259,12 +259,11 @@ public class RecDef {
             if (node == null) {
                 throw new RuntimeException("Cannot find path " + path);
             }
-            if (name == null) {
-                throw new RuntimeException("Field marker must have a name: " + path);
-            }
-            for (String[] translation : BACKWARDS_COMPATIBILITY_REFRERENCE) {
-                if (translation[0].equals(name)) {
-                    name = translation[1];
+            if (name != null) {
+                for (String[] translation : BACKWARDS_COMPATIBILITY_REFRERENCE) {
+                    if (translation[0].equals(name)) {
+                        name = translation[1];
+                    }
                 }
             }
             node.addFieldMarker(this);

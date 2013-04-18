@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -485,10 +486,13 @@ public class StorageImpl implements Storage {
         public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
             File file = new File(here, FileType.REPORT.getName(recDef.prefix));
             try {
-                return new ReportWriter(file, recDef.fieldMarkers);
+                return new ReportWriter(file, recDef.fieldMarkers, new XPathContext(recDef.namespaces));
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
+            }
+            catch (XPathExpressionException e) {
+                throw new StorageException("Cannot create xpath expression", e);
             }
         }
 
