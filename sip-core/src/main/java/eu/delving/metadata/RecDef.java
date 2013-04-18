@@ -221,10 +221,21 @@ public class RecDef {
         return found;
     }
 
-    public enum LinkCheck {
-        PAGE,
-        IMAGE,
-        MOVIE
+    public enum Check {
+        LANDING_PAGE(true),
+        DIGITAL_OBJECT(true),
+        THUMBNAIL(true),
+        DEEP_ZOOM(true),
+        THESAURUS_REFERENCE(true),
+        LOD_REFERENCE(true),
+        GEO_COORDINATE(false),
+        DATE(false);
+
+        public final boolean fetch;
+
+        private Check(boolean fetch) {
+            this.fetch = fetch;
+        }
     }
 
     @XStreamAlias("field-marker")
@@ -240,7 +251,7 @@ public class RecDef {
         public Path path;
 
         @XStreamAsAttribute
-        public LinkCheck linkCheck;
+        public Check check;
 
         public void resolve(RecDefTree recDefTree) {
             path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);

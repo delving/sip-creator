@@ -68,11 +68,11 @@ public class ReportWriter {
     public void valid(MappingResult mappingResult) {
         report(ReportType.VALID, "");
         for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
-            if (fieldMarker.linkCheck == null) continue;
+            if (fieldMarker.check == null) continue;
             List<String> values = mappingResult.copyFields().get(fieldMarker.name);
             if (values == null) continue;
             for (String value : values) {
-                out.printf("<<<%s>>>%s\n", fieldMarker.linkCheck, value);
+                out.printf("<<<%s>>>%s\n", fieldMarker.check, value);
             }
         }
         terminate();
