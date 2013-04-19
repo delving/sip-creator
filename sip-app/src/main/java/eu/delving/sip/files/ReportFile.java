@@ -87,6 +87,10 @@ public class ReportFile extends AbstractListModel {
         return linkChecker;
     }
 
+    public DataSet getDataSet() {
+        return dataSet;
+    }
+
     public String getPrefix() {
         return prefix;
     }

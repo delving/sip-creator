@@ -21,10 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
-import eu.delving.sip.base.Work;
+import eu.delving.sip.base.*;
 import eu.delving.sip.files.LinkChecker;
 import eu.delving.sip.files.LinkFile;
 import eu.delving.sip.files.ReportFile;
@@ -161,7 +158,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         }
 
         private JPanel createStatsPanel() {
-            JPanel p = new JPanel(new GridLayout(0, 1));
+            JPanel p = new JPanel(new GridLayout(1, 0));
             p.add(new PresenceStatsPanel(report));
             p.add(new LinkStatsPanel(report.getLinkChecker().getLinkFile()));
             return p;
@@ -274,14 +271,16 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         }
     }
 
-    private static class PresenceStatsPanel extends JPanel implements ReportFile.PresenceStatsCallback {
+    private class PresenceStatsPanel extends JPanel implements ReportFile.PresenceStatsCallback {
+        private JPanel center = new JPanel(new BorderLayout());
         private ReportFile reportFile;
 
         private PresenceStatsPanel(ReportFile reportFile) {
             super(new BorderLayout());
             this.reportFile = reportFile;
             setBorder(BorderFactory.createTitledBorder("Presence Statistics"));
-            add(new JLabel("soon"), BorderLayout.CENTER);
+            center.add(new JLabel("soon"));
+            add(center, BorderLayout.CENTER);
             add(new JButton(new GatherAction()), BorderLayout.SOUTH);
         }
 
@@ -293,25 +292,31 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setEnabled(false);
-                reportFile.gatherStats(PresenceStatsPanel.this, new Swing() {
+                Work work = reportFile.gatherStats(PresenceStatsPanel.this, new Swing() {
                     @Override
                     public void run() {
+                        center.removeAll();
+                        center.add(ReportChartHelper.createLinkChart(reportFile.getDataSet(), reportFile.getPrefix()));
+                        center.validate();
                         setEnabled(true);
                     }
                 });
+                sipModel.exec(work);
             }
         }
 
     }
 
-    private static class LinkStatsPanel extends JPanel implements LinkFile.LinkStatsCallback {
+    private class LinkStatsPanel extends JPanel implements LinkFile.LinkStatsCallback {
+        private JPanel center = new JPanel(new BorderLayout());
         private LinkFile linkFile;
 
         private LinkStatsPanel(LinkFile linkFile) {
             super(new BorderLayout());
             this.linkFile = linkFile;
             setBorder(BorderFactory.createTitledBorder("Link Statistics"));
-            add(new JLabel("soon"));
+            center.add(new JLabel("soon"));
+            add(center, BorderLayout.CENTER);
             add(new JButton(new GatherAction()), BorderLayout.SOUTH);
         }
 
@@ -323,12 +328,16 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setEnabled(false);
-                linkFile.gatherStats(LinkStatsPanel.this, new Swing() {
+                Work work = linkFile.gatherStats(LinkStatsPanel.this, new Swing() {
                     @Override
                     public void run() {
+                        center.removeAll();
+                        center.add(ReportChartHelper.createLinkChart(linkFile.getDataSet(), linkFile.getPrefix()));
+                        center.validate();
                         setEnabled(true);
                     }
                 });
+                sipModel.exec(work);
             }
         }
 

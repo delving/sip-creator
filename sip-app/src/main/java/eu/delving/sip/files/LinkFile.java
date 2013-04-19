@@ -54,6 +54,14 @@ public class LinkFile {
         this.prefix = prefix;
     }
 
+    public DataSet getDataSet() {
+        return dataSet;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
     public Work load(final Map<String, LinkCheck> map, final Feedback feedback, final Swing finished) {
         if (!file.exists()) return null;
         return new Work.DataSetPrefixWork() {
