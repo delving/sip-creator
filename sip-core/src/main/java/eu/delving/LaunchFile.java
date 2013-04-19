@@ -43,7 +43,7 @@ public class LaunchFile {
             out.append(line).append('\n');
         }
         try {
-            URL resource = LaunchFile.class.getResource("/LaunchFIle.txt");
+            URL resource = LaunchFile.class.getResource("/LaunchFile.txt");
             List<String> lines = IOUtils.readLines(resource.openStream(), "UTF-8");
             for (String line : lines) {
                 out.append(line).append('\n');
