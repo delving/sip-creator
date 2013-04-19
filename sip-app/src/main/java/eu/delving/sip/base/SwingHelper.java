@@ -23,20 +23,19 @@ package eu.delving.sip.base;
 
 import eu.delving.metadata.*;
 import eu.delving.stats.Stats;
-import org.apache.log4j.Logger;
 
-import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 
@@ -257,21 +256,15 @@ public class SwingHelper {
 
 
     public static boolean launchURLFromXML(String urlFromXML) {
-        try {
-            return launchURL(new URL(urlFromXML.replaceAll("&amp;", "&")));
-        }
-        catch (MalformedURLException e1) {
-            return false;
-        }
+        return launchURL(urlFromXML.replaceAll("&amp;", "&"));
     }
 
-    public static boolean launchURL(URL url) {
+    public static boolean launchURL(String urlString) {
         try {
-            BasicService bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
-            return bs.showDocument(url);
+            Desktop.getDesktop().browse(URI.create(urlString));
+            return true;
         }
-        catch (UnavailableServiceException ue) {
-            Logger.getLogger(SwingHelper.class).info("Launch " + url);
+        catch (IOException e) {
             return false;
         }
     }

@@ -72,7 +72,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    SwingHelper.launchURL(e.getURL());
+                    SwingHelper.launchURL(e.getURL().toString());
                 }
             }
         });
@@ -248,8 +248,5 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             loadAction.setEnabled(enabled);
             saveAction.setEnabled(enabled);
         }
-
-
     }
-
 }

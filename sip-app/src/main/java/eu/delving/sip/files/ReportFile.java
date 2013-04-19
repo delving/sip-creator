@@ -404,71 +404,93 @@ public class ReportFile extends AbstractListModel {
 
     public String toHtml(Rec rec) {
         if (rec.lines == null) return "??";
-        StringBuilder out = new StringBuilder("<html><table cellpadding=20><tr><td><font size=\"+1\">\n");
+        StringBuilder out = new StringBuilder("<html><table cellpadding=6>\n");
         switch (rec.reportType) {
             case VALID:
-                out.append("<ul>\n");
-                for (String line : rec.lines) {
-                    out.append("<li>\n");
-                    Matcher matcher = ReportWriter.LINK.matcher(line);
-                    if (!matcher.matches()) continue; // RuntimeException?
-                    RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
-                    out.append("<b>").append(check).append(":</b>");
-                    switch (check) {
-                        case LANDING_PAGE:
-                        case DIGITAL_OBJECT:
-                        case THUMBNAIL:
-                            String url = matcher.group(2);
-                            String link = String.format("<a href=\"%s\">%s<a>", url, StringEscapeUtils.escapeHtml(url));
-                            out.append(link).append("\n");
-                            if (linkChecker == null || !linkChecker.contains(url)) {
-                                out.append("<ul><li>unchecked</li></ul>");
-                            }
-                            else {
-                                LinkCheck linkCheck = linkChecker.lookup(url);
-                                out.append("<ul>\n");
-                                out.append(String.format("<li>Checked: %s</li>\n", DATE_FORMAT.format(new Date(linkCheck.time))));
-                                out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
-                                out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
-                                out.append(String.format("<li>File size: %d</li>\n", linkCheck.fileSize));
-                                out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.mimeType));
-                                out.append("</ul>\n");
-                            }
-                            break;
-                        case DEEP_ZOOM:
-                            out.append("?");
-                            break;
-                        case THESAURUS_REFERENCE:
-                            out.append("?");
-                            break;
-                        case LOD_REFERENCE:
-                            out.append("?");
-                            break;
-                        case GEO_COORDINATE:
-                            String coordinate = matcher.group(2);
-                            String coordLink = String.format(
-                                    "<a href=\"https://maps.google.com/maps?q=%s\">%s<a>",
-                                    coordinate, coordinate
-                            );
-                            out.append(coordLink);
-                            break;
-                        case DATE:
-                            out.append("?");
-                            break;
-                    }
-                    out.append("</li>\n");
-                }
-                out.append("</ul>\n");
+                validToHtml(rec, out);
                 break;
             default:
-                out.append("<b>").append(rec.error).append("</b>");
+                out.append("<tr><td>\n");
+                out.append("<b>").append(rec.error).append("</b><br><br>\n");
                 for (String line : rec.lines) {
-                    out.append(StringEscapeUtils.escapeHtml(line)).append("<br>");
+                    out.append(StringEscapeUtils.escapeHtml(line)).append("<br>\n");
                 }
+                out.append("</td></tr>\n");
                 break;
         }
-        out.append("</td></tr></table></font>");
+        out.append("</table>");
         return out.toString();
+    }
+
+    private void validToHtml(Rec rec, StringBuilder out) {
+        out.append("<table>\n");
+        for (String line : rec.lines) {
+            Matcher matcher = ReportWriter.LINK.matcher(line);
+            if (!matcher.matches()) continue; // RuntimeException?
+            RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
+            String content = matcher.group(2);
+            out.append("<tr><td>");
+            out.append(String.format("<table><tr><td><h2>%s</h2></td></tr><td>", check));
+            switch (check) {
+                case LANDING_PAGE:
+                case DIGITAL_OBJECT:
+                case THUMBNAIL:
+                    out.append(String.format(
+                            "<a href=\"%s\">%s<a><br>\n",
+                            content, StringEscapeUtils.escapeHtml(content))
+                    );
+                    if (linkChecker == null || !linkChecker.contains(content)) {
+                        out.append("<ul><li>unchecked</li></ul>");
+                    }
+                    else {
+                        if (check == RecDef.Check.THUMBNAIL) {
+                            out.append(String.format(
+                                    "<table cellpadding=10><tr><td><img src=\"%s\"/></td</tr></table><br>",
+                                    content
+                            ));
+                        }
+                        LinkCheck linkCheck = linkChecker.lookup(content);
+                        out.append("<ul>\n");
+                        out.append(String.format("<li>Checked: %s</li>\n", DATE_FORMAT.format(new Date(linkCheck.time))));
+                        out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
+                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
+                        out.append(String.format("<li>File size: %d</li>\n", linkCheck.fileSize));
+                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.mimeType));
+                        out.append("</ul>\n");
+                    }
+                    break;
+                case DEEP_ZOOM:
+                case THESAURUS_REFERENCE:
+                case LOD_REFERENCE:
+                    out.append(String.format(
+                            "<a href=\"%s\">%s<a><br>\n",
+                            content, StringEscapeUtils.escapeHtml(content))
+                    );
+                    out.append("<ul><li>not checking yet</li></ul>");
+                    break;
+                case GEO_COORDINATE:
+                    String thumbnail = String.format(
+                            "http://maps.google.com/maps/api/staticmap?center=%s&size=200x200&zoom=10&maptype=roadmap&format=jpg&sensor=false&markers=color:blue%%7Clabel:S%%7C%s",
+                            content, content
+                    );
+                    out.append(String.format(
+                            "<table cellpadding=10><tr><td><img src=\"%s\"/></td</tr></table><br>",
+                            thumbnail
+                    ));
+                    out.append(String.format(
+                            "<a href=\"https://maps.google.com/maps?q=%s\">%s<a><br>",
+                            content, content
+                    ));
+                    break;
+                case DATE:
+                    out.append(content);
+                    out.append("<ul><li>not checking yet</li></ul>");
+                    break;
+            }
+            out.append("</td></tr></table>");
+            out.append("</td><tr>");
+        }
+        out.append("</table>\n");
     }
 
 }
