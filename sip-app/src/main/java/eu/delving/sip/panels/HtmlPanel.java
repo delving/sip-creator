@@ -56,8 +56,9 @@ public class HtmlPanel extends JPanel {
         setPreferredSize(new Dimension(200, 200));
     }
 
-    public void addHyperlinkListener(HyperlinkListener listener) {
+    public HtmlPanel addHyperlinkListener(HyperlinkListener listener) {
         view.addHyperlinkListener(listener);
+        return this;
     }
 
     public void setHtml(String html) {

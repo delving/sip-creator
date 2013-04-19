@@ -423,14 +423,14 @@ public class ReportFile extends AbstractListModel {
     }
 
     private void validToHtml(Rec rec, StringBuilder out) {
-        out.append("<table>\n");
+        out.append("<table width='100%'>\n");
         for (String line : rec.lines) {
             Matcher matcher = ReportWriter.LINK.matcher(line);
             if (!matcher.matches()) continue; // RuntimeException?
             RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
             String content = matcher.group(2);
             out.append("<tr><td>");
-            out.append(String.format("<table><tr><td><h2>%s</h2></td></tr><td>", check));
+            out.append(String.format("<table width='100%%'><tr><td><h2>%s</h2></td></tr><td>", check));
             switch (check) {
                 case LANDING_PAGE:
                 case DIGITAL_OBJECT:
@@ -470,7 +470,7 @@ public class ReportFile extends AbstractListModel {
                     break;
                 case GEO_COORDINATE:
                     String thumbnail = String.format(
-                            "http://maps.google.com/maps/api/staticmap?center=%s&size=200x200&zoom=10&maptype=roadmap&format=jpg&sensor=false&markers=color:blue%%7Clabel:S%%7C%s",
+                            "http://maps.google.com/maps/api/staticmap?center=%s&size=400x400&zoom=10&maptype=roadmap&format=jpg&sensor=false&markers=color:blue%%7Clabel:S%%7C%s",
                             content, content
                     );
                     out.append(String.format(
@@ -493,4 +493,36 @@ public class ReportFile extends AbstractListModel {
         out.append("</table>\n");
     }
 
+    public interface PresenceStatsCallback {
+
+    }
+
+    public Work gatherStats(final PresenceStatsCallback callback, final Swing finished) {
+        return new Work.DataSetPrefixWork() {
+            @Override
+            public String getPrefix() {
+                return prefix;
+            }
+
+            @Override
+            public DataSet getDataSet() {
+                return dataSet;
+            }
+
+            @Override
+            public Job getJob() {
+                return Job.GATHER_PRESENCE_STATS;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    callback.hashCode(); // todo: give something back
+                }
+                finally {
+                    Swing.Exec.later(finished);
+                }
+            }
+        };
+    }
 }

@@ -138,6 +138,39 @@ public class LinkFile {
         };
     }
 
+    public interface LinkStatsCallback {
+
+    }
+
+    public Work gatherStats(final LinkStatsCallback callback, final Swing finished) {
+        return new Work.DataSetPrefixWork() {
+            @Override
+            public String getPrefix() {
+                return prefix;
+            }
+
+            @Override
+            public DataSet getDataSet() {
+                return dataSet;
+            }
+
+            @Override
+            public Job getJob() {
+                return Job.GATHER_LINK_STATS;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    callback.hashCode(); // todo: give something back
+                }
+                finally {
+                    Swing.Exec.later(finished);
+                }
+            }
+        };
+    }
+
     public static class Entry {
         public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
         public String url;

@@ -54,6 +54,10 @@ public class LinkChecker {
         this.map = DBMaker.newTempHashMap();
     }
 
+    public LinkFile getLinkFile() {
+        return linkFile;
+    }
+
     public boolean contains(String url) {
         return map.containsKey(url);
     }

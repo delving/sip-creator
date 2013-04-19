@@ -26,6 +26,7 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.LinkChecker;
+import eu.delving.sip.files.LinkFile;
 import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.ReportFileModel;
@@ -59,49 +60,38 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     private static final int VISIBLE_JUMP = 25;
     private static final int MAX_ACTIVE_CHECKS = 3;
     private static final JLabel EMPTY_LABEL = new JLabel("No reports available", JLabel.CENTER);
-    private JPanel listPanel = new JPanel(new BorderLayout());
-    private HtmlPanel htmlPanel = new HtmlPanel("Details");
+    private JPanel mainPanel = new JPanel(new BorderLayout());
     private int chosenReport = 0;
-    private ReportFile.Rec recShowing;
 
     public ReportFrame(SipModel sipModel) {
         super(Which.REPORT, sipModel, "Report");
-        listPanel.add(EMPTY_LABEL);
+        mainPanel.add(EMPTY_LABEL);
         sipModel.getReportFileModel().setListener(this);
-        htmlPanel.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    SwingHelper.launchURL(e.getURL().toString());
-                }
-            }
-        });
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.setLayout(new GridLayout(1, 0));
-        content.add(listPanel);
-        content.add(htmlPanel);
+        content.add(mainPanel);
     }
 
     @Override
     public void reportsUpdated(ReportFileModel reportFileModel) {
         List<ReportFile> reports = reportFileModel.getReports();
-        listPanel.removeAll();
+        mainPanel.removeAll();
+        chosenReport = 0;
         switch (reports.size()) {
             case 0:
-                listPanel.add(EMPTY_LABEL, BorderLayout.CENTER);
+                mainPanel.add(EMPTY_LABEL, BorderLayout.CENTER);
                 break;
             case 1:
-                listPanel.add(new ListPanel(reports.get(0)), BorderLayout.CENTER);
+                mainPanel.add(new ReportPanel(reports.get(0)), BorderLayout.CENTER);
                 break;
             default:
                 final JTabbedPane tabs = new JTabbedPane();
                 for (ReportFile report : reports) {
-                    tabs.addTab(report.getPrefix().toUpperCase(), new ListPanel(report));
+                    tabs.addTab(report.getPrefix().toUpperCase(), new ReportPanel(report));
                 }
-                listPanel.add(tabs, BorderLayout.CENTER);
+                mainPanel.add(tabs, BorderLayout.CENTER);
                 tabs.addChangeListener(new ChangeListener() {
                     @Override
                     public void stateChanged(ChangeEvent e) {
@@ -110,8 +100,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 });
                 break;
         }
-        listPanel.validate();
-        htmlPanel.setHtml("<html><font size=\"+1\">\n<br><br><center>Select an item in the list<");
+        mainPanel.validate();
     }
 
     private void linkFile(boolean load, Swing finished) {
@@ -124,7 +113,16 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         if (work != null) sipModel.exec(work);
     }
 
-    private class ListPanel extends JPanel implements ActionListener {
+    private class ReportPanel extends JPanel implements ActionListener {
+        private HtmlPanel htmlPanel = new HtmlPanel("Record Details").addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    SwingHelper.launchURL(e.getURL().toString());
+                }
+            }
+        });
+        private ReportFile.Rec recShowing;
         private List<Work> activeLinkChecks = new ArrayList<Work>();
         private ReportFile report;
         private JList list;
@@ -134,9 +132,56 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private Timer timer = new Timer(123, this);
         private int currentIndex;
 
-        private ListPanel(final ReportFile report) {
+        private ReportPanel(final ReportFile report) {
             super(new BorderLayout());
             this.report = report;
+            htmlPanel.setHtml("<html><font size=\"+1\"><br><br><center>Select an item in the list");
+            createList();
+            timer.setRepeats(true);
+            toggle.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        currentIndex = list.getSelectedIndex();
+                        linkFileSetEnabled(false);
+                        timer.start();
+                        list.setEnabled(false);
+                    }
+                    else {
+                        timer.stop();
+                        linkFileSetEnabled(true);
+                        list.setEnabled(true);
+                    }
+                }
+            });
+            JTabbedPane tabs = new JTabbedPane(JTabbedPane.BOTTOM);
+            tabs.addTab("Record Viewing", createListPanel());
+            tabs.addTab("Statistics", createStatsPanel());
+            add(tabs);
+        }
+
+        private JPanel createStatsPanel() {
+            JPanel p = new JPanel(new GridLayout(0, 1));
+            p.add(new PresenceStatsPanel(report));
+            p.add(new LinkStatsPanel(report.getLinkChecker().getLinkFile()));
+            return p;
+        }
+
+        private JPanel createListPanel() {
+            JPanel p = new JPanel(new GridLayout(1, 0));
+            p.add(createLeft());
+            p.add(htmlPanel);
+            return p;
+        }
+
+        private JPanel createLeft() {
+            JPanel p = new JPanel(new BorderLayout());
+            p.add(scrollV("Output Records for " + report.getPrefix().toUpperCase(), list), BorderLayout.CENTER);
+            p.add(createControls(), BorderLayout.SOUTH);
+            return p;
+        }
+
+        private void createList() {
             list = new JList(report);
             list.setCellRenderer(report.getCellRenderer());
             list.setPrototypeCellValue("One single line of something or other");
@@ -163,25 +208,6 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                     sipModel.exec(work);
                 }
             });
-            timer.setRepeats(true);
-            toggle.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        currentIndex = list.getSelectedIndex();
-                        linkFileSetEnabled(false);
-                        timer.start();
-                        list.setEnabled(false);
-                    }
-                    else {
-                        timer.stop();
-                        linkFileSetEnabled(true);
-                        list.setEnabled(true);
-                    }
-                }
-            });
-            add(scrollV("Output Records for " + report.getPrefix().toUpperCase(), list), BorderLayout.CENTER);
-            add(createControls(), BorderLayout.SOUTH);
         }
 
         private JPanel createControls() {
@@ -208,7 +234,6 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         }
 
         private class LoadAction extends AbstractAction {
-
             private LoadAction() {
                 super("Load Link Checks");
             }
@@ -220,14 +245,13 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                     @Override
                     public void run() {
                         linkFileSetEnabled(true);
-                        listPanel.repaint();
+                        mainPanel.repaint();
                     }
                 });
             }
         }
 
         private class SaveAction extends AbstractAction {
-
             private SaveAction() {
                 super("Save Link Checks");
             }
@@ -248,5 +272,66 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             loadAction.setEnabled(enabled);
             saveAction.setEnabled(enabled);
         }
+    }
+
+    private static class PresenceStatsPanel extends JPanel implements ReportFile.PresenceStatsCallback {
+        private ReportFile reportFile;
+
+        private PresenceStatsPanel(ReportFile reportFile) {
+            super(new BorderLayout());
+            this.reportFile = reportFile;
+            setBorder(BorderFactory.createTitledBorder("Presence Statistics"));
+            add(new JLabel("soon"), BorderLayout.CENTER);
+            add(new JButton(new GatherAction()), BorderLayout.SOUTH);
+        }
+
+        private class GatherAction extends AbstractAction {
+            private GatherAction() {
+                super("Gather presence statistics");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                setEnabled(false);
+                reportFile.gatherStats(PresenceStatsPanel.this, new Swing() {
+                    @Override
+                    public void run() {
+                        setEnabled(true);
+                    }
+                });
+            }
+        }
+
+    }
+
+    private static class LinkStatsPanel extends JPanel implements LinkFile.LinkStatsCallback {
+        private LinkFile linkFile;
+
+        private LinkStatsPanel(LinkFile linkFile) {
+            super(new BorderLayout());
+            this.linkFile = linkFile;
+            setBorder(BorderFactory.createTitledBorder("Link Statistics"));
+            add(new JLabel("soon"));
+            add(new JButton(new GatherAction()), BorderLayout.SOUTH);
+        }
+
+        private class GatherAction extends AbstractAction {
+            private GatherAction() {
+                super("Gather link statistics");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                setEnabled(false);
+                linkFile.gatherStats(LinkStatsPanel.this, new Swing() {
+                    @Override
+                    public void run() {
+                        setEnabled(true);
+                    }
+                });
+            }
+        }
+
+
     }
 }
