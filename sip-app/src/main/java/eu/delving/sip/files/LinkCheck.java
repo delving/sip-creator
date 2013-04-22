@@ -33,6 +33,9 @@ import java.io.Serializable;
 
 public class LinkCheck implements Serializable {
     private static EnglishReasonPhraseCatalog REASON = EnglishReasonPhraseCatalog.INSTANCE;
+    public String spec;
+    public String orgId;
+    public String localId;
     public int httpStatus;
     public long time;
     public int fileSize;

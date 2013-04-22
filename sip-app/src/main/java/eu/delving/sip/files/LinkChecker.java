@@ -66,8 +66,11 @@ public class LinkChecker {
         return map.get(url);
     }
 
-    public LinkCheck request(String url) throws IOException {
+    public LinkCheck request(String url, String spec, String orgId, String localId) throws IOException {
         LinkCheck linkCheck = linkCheckRequest(url);
+        linkCheck.spec = spec;
+        linkCheck.orgId = orgId;
+        linkCheck.localId = localId;
         log.info(String.format("Found %s by requesting: %s", url, linkCheck));
         map.put(url, linkCheck);
         return linkCheck;

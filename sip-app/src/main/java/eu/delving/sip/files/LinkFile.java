@@ -45,7 +45,7 @@ import static eu.delving.sip.files.LinkFile.FileSizeCategory.values;
  */
 
 public class LinkFile {
-    public static final String CSV_HEADER = "\"URL\",\"Date\",\"HTTP Status\",\"File Size\",\"MIME Type\"";
+    public static final String CSV_HEADER = "\"URL\",\"Spec\",\"Org ID\",\"Local ID\",\"Date\",\"HTTP Status\",\"File Size\",\"MIME Type\"";
     public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private Logger log = Logger.getLogger(getClass());
     private File file;
@@ -226,9 +226,14 @@ public class LinkFile {
 
         public String toLine() {
             return String.format(
-                    "\"%s\", \"%s\", %d, %d, \"%s\"",
-                    url, DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
+                    "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"",
+                    url, linkCheck.spec, linkCheck.orgId, linkCheck.localId,
+                    DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
             );
+//            return String.format(
+//                    "\"%s\", \"%s\", %d, %d, \"%s\"",
+//                    url, DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
+//            );
         }
     }
 

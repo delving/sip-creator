@@ -315,6 +315,9 @@ public class WorkModel {
                             try {
                                 work.run();
                             }
+                            catch (RuntimeException e) {
+                                e.printStackTrace();
+                            }
                             finally {
                                 Swing.Exec.later(after);
                             }

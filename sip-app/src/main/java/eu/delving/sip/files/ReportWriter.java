@@ -81,8 +81,8 @@ public class ReportWriter {
         this.out = new PrintWriter(file);
     }
 
-    public void valid(MappingResult mappingResult) throws XPathExpressionException {
-        report(ReportType.VALID, "");
+    public void valid(String id, MappingResult mappingResult) throws XPathExpressionException {
+        report(ReportType.VALID, id);
         for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
             if (fieldMarker.check == null || fieldMarker.path == null) continue;
             XPathExpression expression = expressionMap.get(fieldMarker.path);

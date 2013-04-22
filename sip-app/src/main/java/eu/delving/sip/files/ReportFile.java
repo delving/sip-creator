@@ -213,6 +213,7 @@ public class ReportFile extends AbstractListModel {
         private long seekPos = -1;
         private long touch;
         private ReportWriter.ReportType reportType;
+        private String localId;
         private String error;
         private List<String> lines;
 
@@ -243,6 +244,9 @@ public class ReportFile extends AbstractListModel {
                     }
                     reportType = ReportWriter.ReportType.valueOf(startMatcher.group(2));
                     switch (reportType) {
+                        case VALID:
+                            localId = startMatcher.group(3);
+                            break;
                         case INVALID:
                         case DISCARDED:
                         case UNEXPECTED:
@@ -297,7 +301,7 @@ public class ReportFile extends AbstractListModel {
                             if (!check.fetch) continue;
                             String url = matcher.group(2);
                             if (!linkChecker.contains(url)) {
-                                linkChecker.request(url);
+                                linkChecker.request(url, dataSet.getSpec(), dataSet.getOrganization(), localId);
                                 linkChecked = true;
                             }
                         }

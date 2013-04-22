@@ -196,7 +196,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                             }
                             expertOutput.println("==");
                         }
-                        reportWriter.valid(result);
+                        reportWriter.valid(record.getId(), result);
                     }
                     catch (Exception e) {
                         invalidCount++;
