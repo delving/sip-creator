@@ -22,6 +22,7 @@
 package eu.delving.sip.base;
 
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.LinkFile;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -71,8 +72,9 @@ public class ReportChartHelper {
         return finishBarChart(chart, new Color(218, 112, 214));
     }
 
-    public static ChartPanel createLinkChart(DataSet dataSet, String prefix) {
+    public static ChartPanel createLinkChart(DataSet dataSet, String prefix, LinkFile.LinkStats linkStats) {
         DefaultCategoryDataset data = new DefaultCategoryDataset();
+        // todo: build data from linkStats
         data.addValue(100, "Link", "Fake One");
         data.addValue(120, "Link", "Fake Two");
         JFreeChart chart = ChartFactory.createBarChart(

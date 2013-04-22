@@ -31,8 +31,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static eu.delving.sip.files.LinkFile.FileSizeCategory.NO_INFO;
+import static eu.delving.sip.files.LinkFile.FileSizeCategory.values;
 
 /**
  * The file of checked links, get stats
@@ -91,7 +95,7 @@ public class LinkFile {
                         map.put(entry.url, entry.linkCheck);
                     }
                     in.close();
-                    log.info("Loaded "+map.size()+" links");
+                    log.info("Loaded " + map.size() + " links");
                 }
                 catch (IOException e) {
                     feedback.alert("Unable to load links", e);
@@ -134,7 +138,7 @@ public class LinkFile {
                         count++;
                     }
                     out.close();
-                    log.info("Saved "+count+" links");
+                    log.info("Saved " + count + " links");
                 }
                 catch (IOException e) {
                     feedback.alert("Unable to save links", e);
@@ -147,10 +151,10 @@ public class LinkFile {
     }
 
     public interface LinkStatsCallback {
-
+        void linkStatistics(LinkStats linkStats);
     }
 
-    public Work gatherStats(final LinkStatsCallback callback, final Swing finished) {
+    public Work gatherStats(final Feedback feedback, final LinkStatsCallback callback, final Swing finished) {
         return new Work.DataSetPrefixWork() {
             @Override
             public String getPrefix() {
@@ -170,7 +174,22 @@ public class LinkFile {
             @Override
             public void run() {
                 try {
-                    callback.hashCode(); // todo: give something back
+                    LinkStats linkStats = new LinkStats();
+                    BufferedReader in = new BufferedReader(new FileReader(file));
+                    String line = in.readLine();
+                    if (!CSV_HEADER.equals(line)) throw new IOException("Expected CSV Header");
+                    int count = 0;
+                    while ((line = in.readLine()) != null) {
+                        Entry entry = new Entry(line);
+                        linkStats.consume(entry);
+                        count++;
+                    }
+                    in.close();
+                    log.info("Analyzed " + count + " links");
+                    callback.linkStatistics(linkStats);
+                }
+                catch (IOException e) {
+                    feedback.alert("Unable to analyze link stats", e);
                 }
                 finally {
                     Swing.Exec.later(finished);
@@ -213,4 +232,68 @@ public class LinkFile {
         }
     }
 
+    public enum FileSizeCategory {
+        HUGE(1000000),
+        MAX_10M(10000),
+        MAX_1M(1000),
+        MAX_500K(500),
+        MAX_250K(250),
+        MAX_100K(100),
+        MAX_50K(50),
+        NO_INFO(-1000000);
+
+        public final int maxKb;
+
+        private FileSizeCategory(int maxKb) {
+            this.maxKb = maxKb;
+        }
+    }
+
+    public static class LinkStats {
+
+        public final Map<String, Counter> mimeTypes = new TreeMap<String, Counter>();
+        public final Map<String, Counter> httpStatus = new TreeMap<String, Counter>();
+        public final Map<FileSizeCategory, Counter> fileSize = new TreeMap<FileSizeCategory, Counter>();
+
+        public void consume(Entry entry) {
+            captureMimeType(entry.linkCheck);
+            captureHTTPStatus(entry.linkCheck);
+            captureFileSizes(entry.linkCheck);
+        }
+
+        private void captureMimeType(LinkCheck linkCheck) {
+            Counter counter = mimeTypes.get(linkCheck.mimeType);
+            if (counter == null) mimeTypes.put(linkCheck.mimeType, counter = new Counter());
+            counter.count++;
+        }
+
+        private void captureHTTPStatus(LinkCheck linkCheck) {
+            String status = String.valueOf(linkCheck.httpStatus);
+            Counter counter = httpStatus.get(status);
+            if (counter == null) httpStatus.put(status, counter = new Counter());
+            counter.count++;
+        }
+
+        private void captureFileSizes(LinkCheck linkCheck) {
+            int size = linkCheck.fileSize;
+            FileSizeCategory foundCategory = NO_INFO;
+            for (FileSizeCategory category : values()) {
+                if (size > category.maxKb * 1024) continue;
+                foundCategory = category;
+                break;
+            }
+            Counter counter = fileSize.get(foundCategory);
+            if (counter == null) fileSize.put(foundCategory, counter = new Counter());
+            counter.count++;
+        }
+    }
+
+    public static class Counter {
+        int count;
+
+        @Override
+        public String toString() {
+            return String.valueOf(count);
+        }
+    }
 }

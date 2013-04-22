@@ -290,7 +290,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                     @Override
                     public void run() {
                         center.removeAll();
-                        center.add(ReportChartHelper.createLinkChart(reportFile.getDataSet(), reportFile.getPrefix()));
+                        center.add(ReportChartHelper.createPresenceChart(reportFile.getDataSet(), reportFile.getPrefix()));
                         center.validate();
                         setEnabled(true);
                     }
@@ -313,6 +313,18 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             add(new JButton(new GatherAction()), BorderLayout.SOUTH);
         }
 
+        @Override
+        public void linkStatistics(final LinkFile.LinkStats linkStats) {
+            sipModel.exec(new Swing() {
+                @Override
+                public void run() {
+                    center.removeAll();
+                    center.add(ReportChartHelper.createLinkChart(linkFile.getDataSet(), linkFile.getPrefix(), linkStats));
+                    center.validate();
+                }
+            });
+        }
+
         private class GatherAction extends AbstractAction {
             private GatherAction() {
                 super("Gather link statistics");
@@ -321,12 +333,9 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setEnabled(false);
-                Work work = linkFile.gatherStats(LinkStatsPanel.this, new Swing() {
+                Work work = linkFile.gatherStats(sipModel.getFeedback(), LinkStatsPanel.this, new Swing() {
                     @Override
                     public void run() {
-                        center.removeAll();
-                        center.add(ReportChartHelper.createLinkChart(linkFile.getDataSet(), linkFile.getPrefix()));
-                        center.validate();
                         setEnabled(true);
                     }
                 });
