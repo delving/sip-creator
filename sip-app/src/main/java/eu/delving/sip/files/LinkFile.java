@@ -45,7 +45,7 @@ import static eu.delving.sip.files.LinkFile.FileSizeCategory.values;
  */
 
 public class LinkFile {
-    public static final String CSV_HEADER = "\"URL\",\"Spec\",\"Org ID\",\"Local ID\",\"Date\",\"HTTP Status\",\"File Size\",\"MIME Type\"";
+    public static final String CSV_HEADER = "\"URL\", \"OK\", \"Spec\", \"Org ID\", \"Local ID\", \"Date\", \"HTTP Status\", \"File Size\", \"MIME Type\"";
     public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private Logger log = Logger.getLogger(getClass());
     private File file;
@@ -199,7 +199,7 @@ public class LinkFile {
     }
 
     public static class Entry {
-        public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
+        public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
         public String url;
         public LinkCheck linkCheck;
 
@@ -211,29 +211,29 @@ public class LinkFile {
         public Entry(String line) {
             Matcher matcher = LINK_CHECK_PATTERN.matcher(line);
             if (!matcher.matches()) throw new RuntimeException("Unreadable line: " + line);
-            this.url = matcher.group(1);
-            this.linkCheck = new LinkCheck();
+            url = matcher.group(1);
+            linkCheck = new LinkCheck();
+            linkCheck.ok = Boolean.parseBoolean(matcher.group(2));
+            linkCheck.spec = matcher.group(3);
+            linkCheck.orgId = matcher.group(4);
+            linkCheck.localId = matcher.group(5);
             try {
-                linkCheck.time = DATE_FORMAT.parse(matcher.group(2)).getTime();
+                linkCheck.time = DATE_FORMAT.parse(matcher.group(6)).getTime();
             }
             catch (ParseException e) {
                 throw new RuntimeException("Cannot parse date");
             }
-            linkCheck.httpStatus = Integer.parseInt(matcher.group(3));
-            linkCheck.fileSize = Integer.parseInt(matcher.group(4));
-            linkCheck.mimeType = matcher.group(5);
+            linkCheck.httpStatus = Integer.parseInt(matcher.group(7));
+            linkCheck.fileSize = Integer.parseInt(matcher.group(8));
+            linkCheck.mimeType = matcher.group(9);
         }
 
         public String toLine() {
             return String.format(
-                    "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"",
-                    url, linkCheck.spec, linkCheck.orgId, linkCheck.localId,
+                    "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"",
+                    url, linkCheck.ok, linkCheck.spec, linkCheck.orgId, linkCheck.localId,
                     DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
             );
-//            return String.format(
-//                    "\"%s\", \"%s\", %d, %d, \"%s\"",
-//                    url, DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
-//            );
         }
     }
 

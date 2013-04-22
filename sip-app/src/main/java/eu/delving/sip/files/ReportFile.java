@@ -389,15 +389,15 @@ public class ReportFile extends AbstractListModel {
                                     }
                                     else {
                                         out.append(":").append(DATE_FORMAT.format(new Date(linkCheck.time)));
-                                        boolean ok = linkCheck.httpStatus == HttpStatus.SC_OK;
+                                        linkCheck.ok = linkCheck.httpStatus == HttpStatus.SC_OK;
                                         switch (check) {
                                             case DEEP_ZOOM:
-                                                if (ok) {
-                                                    ok = "application/xml".equals(linkCheck.mimeType);
+                                                if (linkCheck.ok) {
+                                                    linkCheck.ok = "application/xml".equals(linkCheck.mimeType);
                                                 }
                                                 break;
                                         }
-                                        out.append(ok ? "\u2714 " : "\u2716 ");
+                                        out.append(linkCheck.ok ? "\u2714 " : "\u2716 ");
                                     }
                                 }
                             }
@@ -451,6 +451,9 @@ public class ReportFile extends AbstractListModel {
                 case LANDING_PAGE:
                 case DIGITAL_OBJECT:
                 case THUMBNAIL:
+                case DEEP_ZOOM:
+                case THESAURUS_REFERENCE:
+                case LOD_REFERENCE:
                     out.append(String.format(
                             "<a href=\"%s\">%s<a><br>\n",
                             content, StringEscapeUtils.escapeHtml(content))
@@ -467,6 +470,7 @@ public class ReportFile extends AbstractListModel {
                         }
                         LinkCheck linkCheck = linkChecker.lookup(content);
                         out.append("<ul>\n");
+                        out.append(String.format("<li>Ok: %s</li>\n", linkCheck.ok));
                         out.append(String.format("<li>Checked: %s</li>\n", DATE_FORMAT.format(new Date(linkCheck.time))));
                         out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
                         out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
@@ -474,15 +478,6 @@ public class ReportFile extends AbstractListModel {
                         out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.mimeType));
                         out.append("</ul>\n");
                     }
-                    break;
-                case DEEP_ZOOM:
-                case THESAURUS_REFERENCE:
-                case LOD_REFERENCE:
-                    out.append(String.format(
-                            "<a href=\"%s\">%s<a><br>\n",
-                            content, StringEscapeUtils.escapeHtml(content))
-                    );
-                    out.append("<ul><li>not checking yet</li></ul>");
                     break;
                 case GEO_COORDINATE:
                     String thumbnail = String.format(

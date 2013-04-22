@@ -40,6 +40,7 @@ public class LinkCheck implements Serializable {
     public long time;
     public int fileSize;
     public String mimeType;
+    public boolean ok;
 
     public String getStatusReason() {
         return String.format(

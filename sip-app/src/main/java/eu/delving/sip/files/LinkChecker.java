@@ -26,8 +26,10 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
@@ -88,6 +90,11 @@ public class LinkChecker {
         HttpHead head = new HttpHead(url);
         HttpResponse response = httpClient.execute(head);
         StatusLine status = response.getStatusLine();
+        if (status.getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+            HttpGet get = new HttpGet(url);
+            response = httpClient.execute(get);
+            status = response.getStatusLine();
+        }
         LinkCheck linkCheck = new LinkCheck();
         linkCheck.httpStatus = status.getStatusCode();
         linkCheck.time = System.currentTimeMillis();
