@@ -114,9 +114,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private HtmlPanel htmlPanel = new HtmlPanel("Record Details").addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    SwingHelper.launchURL(e.getURL().toString());
-                }
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) SwingHelper.launchURL(e.getURL().toString());
             }
         });
         private ReportFile.Rec recShowing;
@@ -218,16 +216,12 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (activeLinkChecks.size() >= MAX_ACTIVE_CHECKS) {
-                log.info("Active Links = " + activeLinkChecks.size() + ", waiting");
-                return;
-            }
+            if (activeLinkChecks.size() >= MAX_ACTIVE_CHECKS) return;
             int visible = Math.min(currentIndex + VISIBLE_JUMP, list.getModel().getSize() - 1);
-            if (list.getLastVisibleIndex() < currentIndex + VISIBLE_JUMP / 2) {
-                list.ensureIndexIsVisible(visible);
-            }
+            if (list.getLastVisibleIndex() < currentIndex + VISIBLE_JUMP / 2) list.ensureIndexIsVisible(visible);
             list.setSelectedIndex(currentIndex);
             currentIndex++;
+            if (currentIndex == list.getModel().getSize()) toggle.setSelected(false);
         }
 
         private class LoadAction extends AbstractAction {
@@ -304,7 +298,6 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 sipModel.exec(work);
             }
         }
-
     }
 
     private class LinkStatsPanel extends JPanel implements LinkFile.LinkStatsCallback {
@@ -340,7 +333,5 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 sipModel.exec(work);
             }
         }
-
-
     }
 }
