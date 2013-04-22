@@ -385,7 +385,15 @@ public class ReportFile extends AbstractListModel {
                                     }
                                     else {
                                         out.append(":").append(DATE_FORMAT.format(new Date(linkCheck.time)));
-                                        out.append(linkCheck.httpStatus == HttpStatus.SC_OK ? "\u2714 " : "\u2716 ");
+                                        boolean ok = linkCheck.httpStatus == HttpStatus.SC_OK;
+                                        switch (check) {
+                                            case DEEP_ZOOM:
+                                                if (ok) {
+                                                    ok = "application/xml".equals(linkCheck.mimeType);
+                                                }
+                                                break;
+                                        }
+                                        out.append(ok ? "\u2714 " : "\u2716 ");
                                     }
                                 }
                             }
