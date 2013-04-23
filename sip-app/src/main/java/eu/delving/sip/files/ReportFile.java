@@ -475,7 +475,7 @@ public class ReportFile extends AbstractListModel {
                         out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
                         out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
                         out.append(String.format("<li>File size: %d</li>\n", linkCheck.fileSize));
-                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.mimeType));
+                        out.append(String.format("<li>MIME type: %s</li>\n", linkCheck.mimeType));
                         out.append("</ul>\n");
                     }
                     break;
