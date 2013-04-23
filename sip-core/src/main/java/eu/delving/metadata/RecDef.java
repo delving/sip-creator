@@ -132,6 +132,9 @@ public class RecDef {
 
     public List<Elem> elems;
 
+    @XStreamAlias("elem-groups")
+    public List<ElemGroup> elemGroups;
+
     public Elem root;
 
     public List<OptList> opts;
@@ -177,13 +180,20 @@ public class RecDef {
         throw new RuntimeException(String.format("No attr group [%s] at %s", name, where));
     }
 
-    public Elem elem(Tag tag) {
+    public Elem elem(Tag tag, String where) {
         for (Elem elem : elems) {
             if (elem.tag.equals(tag)) {
                 return elem.deepCopy();
             }
         }
-        throw new RuntimeException(String.format("No elem [%s]", tag));
+        throw new RuntimeException(String.format("No elem [%s] at %s", tag, where));
+    }
+
+    public ElemGroup elemGroup(String name, String where) {
+        for (ElemGroup elemGroup : elemGroups) {
+            if (name.equals(elemGroup.name)) return elemGroup;
+        }
+        throw new RuntimeException(String.format("No elem group [%s] at %s", name, where));
     }
 
     public String getFieldType(Path path) {
@@ -431,6 +441,10 @@ public class RecDef {
         public String attrs;
 
         @XStreamAsAttribute
+        @XStreamAlias("elem-groups")
+        public String elemGroups;
+
+        @XStreamAsAttribute
         public String elems;
 
         @XStreamAsAttribute
@@ -522,9 +536,15 @@ public class RecDef {
             }
             if (elems != null) {
                 for (String localName : elems.split(DELIM)) {
-                    elemList.add(recDef.elem(Tag.element(recDef.prefix, localName, null)));
+                    elemList.add(recDef.elem(Tag.element(recDef.prefix, localName, null), path.toString()));
                 }
                 elems = null;
+            }
+            if (elemGroups != null) {
+                for (String name : elemGroups.split(DELIM)) {
+                    elemList.addAll(recDef.elemGroup(name, path.toString()).deepCopy().elems);
+                }
+                attrGroups = null;
             }
             if (!subelementsAdded) {
                 elemList.addAll(subelements);
@@ -563,5 +583,27 @@ public class RecDef {
             }
         }
     }
+
+    @XStreamAlias("elem-group")
+    public static class ElemGroup implements Cloneable {
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamImplicit
+        public List<Elem> elems = new ArrayList<Elem>();
+
+        public ElemGroup deepCopy() {
+            try {
+                ElemGroup clone = (ElemGroup) this.clone();
+                clone.elems = new ArrayList<Elem>();
+                for (Elem elem : elems) clone.elems.add(elem.deepCopy());
+                return clone;
+            }
+            catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 
 }
