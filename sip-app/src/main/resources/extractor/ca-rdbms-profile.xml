@@ -1,0 +1,2100 @@
+<delving-rdbms-profile>
+  <table name="ca_acl" cached="false">
+    <column name="acl_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="access" type="TINYINT"/>
+    <column name="notes" type="CHAR"/>
+    <column name="inherited_from_table_num" type="TINYINT"/>
+  </table>
+  <table name="ca_application_vars" cached="false"/>
+  <table name="ca_attribute_values" cached="false">
+    <column name="value_id" type="INTEGER"/>
+    <column name="element_id" type="SMALLINT"/>
+    <column name="attribute_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="value_longtext1" type="LONGVARCHAR"/>
+    <column name="value_longtext2" type="LONGVARCHAR"/>
+    <column name="value_blob" type="LONGVARBINARY"/>
+    <column name="value_decimal1" type="DECIMAL"/>
+    <column name="value_decimal2" type="DECIMAL"/>
+    <column name="value_integer1" type="INTEGER"/>
+  </table>
+  <table name="ca_attributes" cached="false">
+    <column name="attribute_id" type="INTEGER"/>
+    <column name="element_id" type="SMALLINT"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="table_num" type="TINYINT"/>
+  </table>
+  <table name="ca_batch_log" cached="false">
+    <column name="batch_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="log_datetime" type="INTEGER"/>
+    <column name="notes" type="LONGVARCHAR"/>
+    <column name="batch_type" type="CHAR"/>
+    <column name="table_num" type="TINYINT"/>
+  </table>
+  <table name="ca_batch_log_items" cached="false">
+    <column name="batch_id" type="INTEGER"/>
+    <column name="row_id" type="INTEGER"/>
+  </table>
+  <table name="ca_bookmark_folders" cached="false">
+    <column name="folder_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="user_id" type="INTEGER"/>
+  </table>
+  <table name="ca_bookmarks" cached="false">
+    <column name="bookmark_id" type="INTEGER"/>
+    <column name="folder_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="notes" type="LONGVARCHAR"/>
+    <column name="rank" type="SMALLINT"/>
+  </table>
+  <table name="ca_bundle_display_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="display_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_bundle_display_placements" cached="false">
+    <column name="placement_id" type="INTEGER"/>
+    <column name="display_id" type="INTEGER"/>
+    <column name="bundle_name" type="VARCHAR"/>
+    <column name="rank" type="INTEGER"/>
+  </table>
+  <table name="ca_bundle_displays" cached="false">
+    <column name="display_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="display_code" type="VARCHAR"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="is_system" type="TINYINT"/>
+  </table>
+  <table name="ca_bundle_displays_x_user_groups" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="display_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+  </table>
+  <table name="ca_bundle_displays_x_users" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="display_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+  </table>
+  <table name="ca_bundle_mapping_group_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_bundle_mapping_groups" cached="false">
+    <column name="group_id" type="INTEGER"/>
+    <column name="mapping_id" type="INTEGER"/>
+    <column name="group_code" type="VARCHAR"/>
+    <column name="ca_base_path" type="VARCHAR"/>
+    <column name="external_base_path" type="VARCHAR"/>
+    <column name="settings" type="LONGVARCHAR"/>
+    <column name="notes" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_bundle_mapping_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="mapping_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_bundle_mapping_rules" cached="false">
+    <column name="rule_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+    <column name="ca_path_suffix" type="VARCHAR"/>
+    <column name="external_path_suffix" type="VARCHAR"/>
+    <column name="settings" type="LONGVARCHAR"/>
+    <column name="notes" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_bundle_mappings" cached="false">
+    <column name="mapping_id" type="INTEGER"/>
+    <column name="direction" type="CHAR"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="mapping_code" type="VARCHAR"/>
+    <column name="target" type="VARCHAR"/>
+    <column name="access" type="TINYINT"/>
+  </table>
+  <table name="ca_change_log" cached="false">
+    <column name="log_id" type="BIGINT"/>
+    <column name="log_datetime" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="changetype" type="CHAR"/>
+    <column name="logged_table_num" type="TINYINT"/>
+    <column name="logged_row_id" type="INTEGER"/>
+    <column name="rolledback" type="TINYINT"/>
+    <column name="unit_id" type="CHAR"/>
+  </table>
+  <table name="ca_change_log_snapshots" cached="false">
+    <column name="log_id" type="BIGINT"/>
+  </table>
+  <table name="ca_change_log_subjects" cached="false">
+    <column name="log_id" type="BIGINT"/>
+    <column name="subject_table_num" type="TINYINT"/>
+  </table>
+  <table name="ca_collection_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_collections" cached="false">
+    <column name="collection_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="commenting_status" type="TINYINT"/>
+    <column name="tagging_status" type="TINYINT"/>
+    <column name="rating_status" type="TINYINT"/>
+    <column name="source_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="hier_collection_id" type="INTEGER"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+    <column name="deleted" type="TINYINT"/>
+    <column name="rank" type="INTEGER"/>
+  </table>
+  <table name="ca_collections_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="collection_left_id" type="INTEGER"/>
+    <column name="collection_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_collections_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_collections_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_commerce_communications" cached="false">
+    <column name="communication_id" type="INTEGER"/>
+    <column name="transaction_id" type="INTEGER"/>
+    <column name="source" type="CHAR"/>
+    <column name="communication_type" type="CHAR"/>
+    <column name="created_on" type="INTEGER"/>
+    <column name="from_user_id" type="INTEGER"/>
+    <column name="subject" type="VARCHAR"/>
+    <column name="message" type="LONGVARCHAR"/>
+    <column name="set_snapshot" type="LONGVARCHAR"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_commerce_communications_read_log" cached="false">
+    <column name="log_id" type="INTEGER"/>
+    <column name="communication_id" type="INTEGER"/>
+    <column name="read_on" type="INTEGER"/>
+  </table>
+  <table name="ca_commerce_fulfillment_events" cached="false">
+    <column name="event_id" type="INTEGER"/>
+    <column name="order_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="fulfillment_method" type="VARCHAR"/>
+    <column name="fulfillment_details" type="LONGVARBINARY"/>
+    <column name="occurred_on" type="INTEGER"/>
+  </table>
+  <table name="ca_commerce_order_items" cached="false">
+    <column name="item_id" type="INTEGER"/>
+    <column name="order_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="service" type="VARCHAR"/>
+    <column name="fullfillment_method" type="VARCHAR"/>
+    <column name="fee" type="DECIMAL"/>
+    <column name="tax" type="DECIMAL"/>
+    <column name="notes" type="LONGVARCHAR"/>
+    <column name="restrictions" type="LONGVARCHAR"/>
+    <column name="shipping_cost" type="DECIMAL"/>
+    <column name="handling_cost" type="DECIMAL"/>
+    <column name="shipping_notes" type="LONGVARCHAR"/>
+    <column name="refund_date" type="INTEGER"/>
+    <column name="refund_notes" type="LONGVARCHAR"/>
+    <column name="refund_amount" type="DECIMAL"/>
+    <column name="loan_checkout_date" type="INTEGER"/>
+    <column name="loan_due_date" type="INTEGER"/>
+    <column name="loan_return_date" type="INTEGER"/>
+    <column name="additional_fees" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_commerce_order_items_x_object_representations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+  </table>
+  <table name="ca_commerce_orders" cached="false">
+    <column name="order_id" type="INTEGER"/>
+    <column name="transaction_id" type="INTEGER"/>
+    <column name="created_on" type="INTEGER"/>
+    <column name="order_status" type="VARCHAR"/>
+    <column name="order_number" type="VARCHAR"/>
+    <column name="order_type" type="CHAR"/>
+    <column name="shipping_fname" type="VARCHAR"/>
+    <column name="shipping_lname" type="VARCHAR"/>
+    <column name="shipping_organization" type="VARCHAR"/>
+    <column name="shipping_address1" type="VARCHAR"/>
+    <column name="shipping_address2" type="VARCHAR"/>
+    <column name="shipping_city" type="VARCHAR"/>
+    <column name="shipping_zone" type="VARCHAR"/>
+    <column name="shipping_postal_code" type="VARCHAR"/>
+    <column name="shipping_country" type="VARCHAR"/>
+    <column name="shipping_phone" type="VARCHAR"/>
+    <column name="shipping_fax" type="VARCHAR"/>
+    <column name="shipping_email" type="VARCHAR"/>
+    <column name="billing_fname" type="VARCHAR"/>
+    <column name="billing_lname" type="VARCHAR"/>
+    <column name="billing_organization" type="VARCHAR"/>
+    <column name="billing_address1" type="VARCHAR"/>
+    <column name="billing_address2" type="VARCHAR"/>
+    <column name="billing_city" type="VARCHAR"/>
+    <column name="billing_zone" type="VARCHAR"/>
+    <column name="billing_postal_code" type="VARCHAR"/>
+    <column name="billing_country" type="VARCHAR"/>
+    <column name="billing_phone" type="VARCHAR"/>
+    <column name="billing_fax" type="VARCHAR"/>
+    <column name="billing_email" type="VARCHAR"/>
+    <column name="payment_method" type="VARCHAR"/>
+    <column name="payment_status" type="VARCHAR"/>
+    <column name="payment_details" type="LONGVARBINARY"/>
+    <column name="payment_response" type="LONGVARBINARY"/>
+    <column name="payment_received_on" type="INTEGER"/>
+    <column name="shipping_method" type="VARCHAR"/>
+    <column name="shipping_cost" type="DECIMAL"/>
+    <column name="handling_cost" type="DECIMAL"/>
+    <column name="shipping_notes" type="LONGVARCHAR"/>
+    <column name="shipping_date" type="INTEGER"/>
+    <column name="shipped_on_date" type="INTEGER"/>
+    <column name="sales_agent" type="VARCHAR"/>
+    <column name="additional_fees" type="LONGVARCHAR"/>
+    <column name="refund_date" type="INTEGER"/>
+    <column name="refund_notes" type="LONGVARCHAR"/>
+    <column name="refund_amount" type="DECIMAL"/>
+  </table>
+  <table name="ca_commerce_transactions" cached="false">
+    <column name="transaction_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="short_description" type="LONGVARCHAR"/>
+    <column name="notes" type="LONGVARCHAR"/>
+    <column name="set_id" type="INTEGER"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_data_exporter_items" cached="false">
+    <column name="item_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="exporter_id" type="INTEGER"/>
+    <column name="element" type="VARCHAR"/>
+    <column name="context" type="VARCHAR"/>
+    <column name="source" type="VARCHAR"/>
+    <column name="settings" type="LONGVARCHAR"/>
+    <column name="hier_item_id" type="INTEGER"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+  </table>
+  <table name="ca_data_exporter_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="exporter_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_data_exporters" cached="false">
+    <column name="exporter_id" type="INTEGER"/>
+    <column name="exporter_code" type="VARCHAR"/>
+    <column name="table_num" type="TINYINT"/>
+  </table>
+  <table name="ca_data_import_event_log" cached="false">
+    <column name="log_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="type_code" type="CHAR"/>
+    <column name="date_time" type="INTEGER"/>
+    <column name="message" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_data_import_events" cached="false">
+    <column name="event_id" type="INTEGER"/>
+    <column name="occurred_on" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="type_code" type="CHAR"/>
+  </table>
+  <table name="ca_data_import_items" cached="false">
+    <column name="item_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="source_ref" type="VARCHAR"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="type_code" type="CHAR"/>
+    <column name="started_on" type="INTEGER"/>
+    <column name="completed_on" type="INTEGER"/>
+    <column name="elapsed_time" type="DECIMAL"/>
+    <column name="success" type="TINYINT"/>
+  </table>
+  <table name="ca_data_importer_groups" cached="false">
+    <column name="group_id" type="INTEGER"/>
+    <column name="importer_id" type="INTEGER"/>
+    <column name="group_code" type="VARCHAR"/>
+    <column name="destination" type="VARCHAR"/>
+  </table>
+  <table name="ca_data_importer_items" cached="false">
+    <column name="item_id" type="INTEGER"/>
+    <column name="importer_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+    <column name="source" type="VARCHAR"/>
+    <column name="destination" type="VARCHAR"/>
+  </table>
+  <table name="ca_data_importer_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="importer_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_data_importer_log" cached="false">
+    <column name="log_id" type="INTEGER"/>
+    <column name="importer_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="log_datetime" type="INTEGER"/>
+    <column name="notes" type="LONGVARCHAR"/>
+    <column name="table_num" type="TINYINT"/>
+  </table>
+  <table name="ca_data_importer_log_items" cached="false">
+    <column name="log_item_id" type="INTEGER"/>
+    <column name="log_id" type="INTEGER"/>
+    <column name="log_datetime" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="type_code" type="CHAR"/>
+  </table>
+  <table name="ca_data_importers" cached="false">
+    <column name="importer_id" type="INTEGER"/>
+    <column name="importer_code" type="VARCHAR"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="settings" type="LONGVARCHAR"/>
+    <column name="worksheet" type="LONGVARBINARY"/>
+  </table>
+  <table name="ca_did_you_mean_ngrams" cached="false">
+    <column name="phrase_id" type="INTEGER"/>
+    <column name="ngram" type="VARCHAR"/>
+  </table>
+  <table name="ca_did_you_mean_phrases" cached="false">
+    <column name="phrase_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="phrase" type="VARCHAR"/>
+  </table>
+  <table name="ca_editor_ui_bundle_placement_type_restrictions" cached="false">
+    <column name="restriction_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="placement_id" type="INTEGER"/>
+    <column name="include_subtypes" type="TINYINT"/>
+    <column name="settings" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_editor_ui_bundle_placements" cached="false">
+    <column name="placement_id" type="INTEGER"/>
+    <column name="screen_id" type="INTEGER"/>
+    <column name="placement_code" type="VARCHAR"/>
+    <column name="bundle_name" type="VARCHAR"/>
+    <column name="rank" type="SMALLINT"/>
+  </table>
+  <table name="ca_editor_ui_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="ui_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_editor_ui_screen_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="screen_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_editor_ui_screen_type_restrictions" cached="false">
+    <column name="restriction_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="screen_id" type="INTEGER"/>
+    <column name="include_subtypes" type="TINYINT"/>
+    <column name="settings" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_editor_ui_screens" cached="false">
+    <column name="screen_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="ui_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="rank" type="SMALLINT"/>
+    <column name="is_default" type="TINYINT"/>
+    <column name="color" type="CHAR"/>
+    <column name="icon" type="LONGVARBINARY"/>
+    <column name="hier_left" type="DECIMAL"/>
+  </table>
+  <table name="ca_editor_ui_type_restrictions" cached="false">
+    <column name="restriction_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="ui_id" type="INTEGER"/>
+    <column name="include_subtypes" type="TINYINT"/>
+    <column name="settings" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_editor_uis" cached="false">
+    <column name="ui_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="is_system_ui" type="TINYINT"/>
+    <column name="editor_type" type="TINYINT"/>
+    <column name="editor_code" type="VARCHAR"/>
+    <column name="color" type="CHAR"/>
+  </table>
+  <table name="ca_editor_uis_x_user_groups" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="ui_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+  </table>
+  <table name="ca_editor_uis_x_users" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="ui_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+  </table>
+  <table name="ca_entities" cached="false">
+    <column name="entity_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="source_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="commenting_status" type="TINYINT"/>
+    <column name="tagging_status" type="TINYINT"/>
+    <column name="rating_status" type="TINYINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="life_sdatetime" type="DECIMAL"/>
+    <column name="life_edatetime" type="DECIMAL"/>
+    <column name="hier_entity_id" type="INTEGER"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_entities_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_entities_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="entity_left_id" type="INTEGER"/>
+    <column name="entity_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_entities_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_entities_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_entities_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_entities_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_entity_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="displayname" type="VARCHAR"/>
+    <column name="forename" type="VARCHAR"/>
+    <column name="other_forenames" type="VARCHAR"/>
+    <column name="middlename" type="VARCHAR"/>
+    <column name="surname" type="VARCHAR"/>
+    <column name="prefix" type="VARCHAR"/>
+    <column name="suffix" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_eventlog" cached="false">
+    <column name="date_time" type="INTEGER"/>
+    <column name="code" type="CHAR"/>
+    <column name="message" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_groups_x_roles" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+    <column name="role_id" type="SMALLINT"/>
+  </table>
+  <table name="ca_ips" cached="false">
+    <column name="ip_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="ip1" type="TINYINT"/>
+    <column name="ip2" type="TINYINT"/>
+    <column name="ip3" type="TINYINT"/>
+    <column name="ip4s" type="TINYINT"/>
+    <column name="ip4e" type="TINYINT"/>
+  </table>
+  <table name="ca_item_comments" cached="false">
+    <column name="comment_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="media1" type="LONGVARBINARY"/>
+    <column name="media2" type="LONGVARBINARY"/>
+    <column name="media3" type="LONGVARBINARY"/>
+    <column name="media4" type="LONGVARBINARY"/>
+    <column name="comment" type="LONGVARCHAR"/>
+    <column name="rating" type="TINYINT"/>
+    <column name="email" type="VARCHAR"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="created_on" type="INTEGER"/>
+    <column name="access" type="TINYINT"/>
+    <column name="ip_addr" type="VARCHAR"/>
+    <column name="moderated_on" type="INTEGER"/>
+  </table>
+  <table name="ca_item_tags" cached="false">
+    <column name="tag_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+  </table>
+  <table name="ca_item_view_counts" cached="false">
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+  </table>
+  <table name="ca_item_views" cached="false">
+    <column name="view_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="viewed_on" type="INTEGER"/>
+  </table>
+  <table name="ca_items_x_tags" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="tag_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="access" type="TINYINT"/>
+    <column name="ip_addr" type="CHAR"/>
+    <column name="created_on" type="INTEGER"/>
+    <column name="moderated_on" type="INTEGER"/>
+  </table>
+  <table name="ca_list_item_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name_singular" type="VARCHAR"/>
+    <column name="name_plural" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_list_items" cached="false">
+    <column name="item_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="list_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="item_value" type="VARCHAR"/>
+    <column name="rank" type="INTEGER"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="is_enabled" type="TINYINT"/>
+    <column name="is_default" type="TINYINT"/>
+    <column name="validation_format" type="VARCHAR"/>
+    <column name="color" type="CHAR"/>
+    <column name="icon" type="LONGVARBINARY"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+  </table>
+  <table name="ca_list_items_x_list_items" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="term_left_id" type="INTEGER"/>
+    <column name="term_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_list_labels" cached="false">
+    <column name="label_id" type="SMALLINT"/>
+    <column name="list_id" type="SMALLINT"/>
+    <column name="locale_id" type="SMALLINT"/>
+  </table>
+  <table name="ca_lists" cached="false">
+    <column name="list_id" type="SMALLINT"/>
+    <column name="list_code" type="VARCHAR"/>
+    <column name="is_system_list" type="TINYINT"/>
+    <column name="is_hierarchical" type="TINYINT"/>
+    <column name="use_as_vocabulary" type="TINYINT"/>
+  </table>
+  <table name="ca_loan_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_loans" cached="false">
+    <column name="loan_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="hier_loan_id" type="INTEGER"/>
+    <column name="status" type="TINYINT"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_loans_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_loans" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_left_id" type="INTEGER"/>
+    <column name="loan_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_notes" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_movements" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_object_lots" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_object_representations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_objects" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_loans_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="loan_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_locales" cached="false">
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="language" type="VARCHAR"/>
+    <column name="country" type="CHAR"/>
+    <column name="dialect" type="VARCHAR"/>
+  </table>
+  <table name="ca_metadata_element_labels" cached="false">
+    <column name="label_id" type="SMALLINT"/>
+    <column name="element_id" type="SMALLINT"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+  </table>
+  <table name="ca_metadata_elements" cached="false">
+    <column name="element_id" type="SMALLINT"/>
+    <column name="parent_id" type="SMALLINT"/>
+    <column name="list_id" type="SMALLINT"/>
+    <column name="element_code" type="VARCHAR"/>
+    <column name="documentation_url" type="VARCHAR"/>
+    <column name="datatype" type="TINYINT"/>
+    <column name="settings" type="LONGVARCHAR"/>
+    <column name="rank" type="SMALLINT"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+  </table>
+  <table name="ca_metadata_type_restrictions" cached="false">
+    <column name="restriction_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="element_id" type="SMALLINT"/>
+    <column name="settings" type="LONGVARCHAR"/>
+    <column name="include_subtypes" type="TINYINT"/>
+  </table>
+  <table name="ca_movement_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_movements" cached="false">
+    <column name="movement_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="status" type="TINYINT"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_movements_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_movements" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_left_id" type="INTEGER"/>
+    <column name="movement_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_notes" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_object_lots" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_object_representations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_objects" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_movements_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="movement_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_multipart_idno_sequences" cached="false">
+    <column name="idno_stub" type="VARCHAR"/>
+    <column name="format" type="VARCHAR"/>
+    <column name="element" type="VARCHAR"/>
+  </table>
+  <table name="ca_mysql_fulltext_search" cached="false">
+    <column name="index_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="field_table_num" type="TINYINT"/>
+    <column name="field_num" type="TINYINT"/>
+    <column name="field_row_id" type="INTEGER"/>
+    <column name="rel_type_id" type="SMALLINT"/>
+    <column name="fieldtext" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_object_event_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_object_events" cached="false">
+    <column name="event_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="planned_sdatetime" type="DECIMAL"/>
+    <column name="planned_edatetime" type="DECIMAL"/>
+    <column name="event_sdatetime" type="DECIMAL"/>
+  </table>
+  <table name="ca_object_events_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_events_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_events_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_events_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_events_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_object_lot_event_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_object_lot_events" cached="false">
+    <column name="event_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="planned_sdatetime" type="DECIMAL"/>
+    <column name="planned_edatetime" type="DECIMAL"/>
+    <column name="event_sdatetime" type="DECIMAL"/>
+  </table>
+  <table name="ca_object_lot_events_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_lot_events_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="event_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_lot_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_object_lots" cached="false">
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="lot_status_id" type="INTEGER"/>
+    <column name="idno_stub" type="VARCHAR"/>
+    <column name="idno_stub_sort" type="VARCHAR"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="commenting_status" type="TINYINT"/>
+    <column name="tagging_status" type="TINYINT"/>
+    <column name="rating_status" type="TINYINT"/>
+    <column name="extent" type="SMALLINT"/>
+    <column name="extent_units" type="VARCHAR"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_object_lots_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_lots_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_lots_x_object_representations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_lots_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_lots_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_lots_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_lots_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_representation_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_object_representation_multifiles" cached="false">
+    <column name="multifile_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="resource_path" type="LONGVARCHAR"/>
+    <column name="media" type="LONGVARBINARY"/>
+    <column name="media_metadata" type="LONGVARBINARY"/>
+    <column name="media_content" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_object_representations" cached="false">
+    <column name="representation_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="md5" type="VARCHAR"/>
+    <column name="mimetype" type="VARCHAR"/>
+    <column name="original_filename" type="VARCHAR"/>
+    <column name="media" type="LONGVARBINARY"/>
+    <column name="media_metadata" type="LONGVARBINARY"/>
+    <column name="media_content" type="LONGVARBINARY"/>
+    <column name="deleted" type="TINYINT"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="commenting_status" type="TINYINT"/>
+    <column name="tagging_status" type="TINYINT"/>
+    <column name="rating_status" type="TINYINT"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+  </table>
+  <table name="ca_object_representations_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_representations_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_representations_x_object_representations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_left_id" type="INTEGER"/>
+    <column name="representation_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_notes" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_representations_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_representations_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_representations_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_object_representations_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_objects" cached="false">
+    <column name="object_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="lot_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="source_id" type="INTEGER"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="commenting_status" type="TINYINT"/>
+    <column name="tagging_status" type="TINYINT"/>
+    <column name="rating_status" type="TINYINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="acquisition_type_id" type="INTEGER"/>
+    <column name="item_status_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="hier_object_id" type="INTEGER"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="extent" type="INTEGER"/>
+    <column name="extent_units" type="VARCHAR"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+    <column name="deleted" type="TINYINT"/>
+    <column name="rank" type="INTEGER"/>
+    <column name="acl_inherit_from_ca_collections" type="TINYINT"/>
+  </table>
+  <table name="ca_objects_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_objects_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_objects_x_object_representations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="is_primary" type="TINYINT"/>
+  </table>
+  <table name="ca_objects_x_objects" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="object_left_id" type="INTEGER"/>
+    <column name="object_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_notes" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_objects_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_objects_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_objects_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_objects_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_occurrence_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_occurrences" cached="false">
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="commenting_status" type="TINYINT"/>
+    <column name="tagging_status" type="TINYINT"/>
+    <column name="rating_status" type="TINYINT"/>
+    <column name="source_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="hier_occurrence_id" type="INTEGER"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_occurrences_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_occurrences_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_left_id" type="INTEGER"/>
+    <column name="occurrence_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_occurrences_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_occurrences_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_place_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_places" cached="false">
+    <column name="place_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="source_id" type="INTEGER"/>
+    <column name="hierarchy_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="commenting_status" type="TINYINT"/>
+    <column name="tagging_status" type="TINYINT"/>
+    <column name="rating_status" type="TINYINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="lifespan_sdate" type="DECIMAL"/>
+    <column name="lifespan_edate" type="DECIMAL"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+    <column name="deleted" type="TINYINT"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+  </table>
+  <table name="ca_places_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_places_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_places_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="place_left_id" type="INTEGER"/>
+    <column name="place_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_places_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_places_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_relationship_relationships" cached="false">
+    <column name="reification_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="relationship_table_num" type="TINYINT"/>
+    <column name="relation_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+  </table>
+  <table name="ca_relationship_type_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="typename" type="VARCHAR"/>
+    <column name="typename_reverse" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_relationship_types" cached="false">
+    <column name="type_id" type="SMALLINT"/>
+    <column name="parent_id" type="SMALLINT"/>
+    <column name="sub_type_left_id" type="INTEGER"/>
+    <column name="sub_type_right_id" type="INTEGER"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="hier_type_id" type="SMALLINT"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="type_code" type="VARCHAR"/>
+    <column name="rank" type="SMALLINT"/>
+  </table>
+  <table name="ca_representation_annotation_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="annotation_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_representation_annotations" cached="false">
+    <column name="annotation_id" type="INTEGER"/>
+    <column name="representation_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="type_code" type="VARCHAR"/>
+    <column name="props" type="LONGVARCHAR"/>
+    <column name="preview" type="LONGVARBINARY"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="status" type="TINYINT"/>
+  </table>
+  <table name="ca_representation_annotations_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="annotation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_representation_annotations_x_objects" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="annotation_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_representation_annotations_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="annotation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_representation_annotations_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="annotation_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_representation_annotations_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="annotation_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_schema_updates" cached="false">
+    <column name="version_num" type="INTEGER"/>
+  </table>
+  <table name="ca_search_form_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="form_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_search_form_placements" cached="false">
+    <column name="placement_id" type="INTEGER"/>
+    <column name="form_id" type="INTEGER"/>
+    <column name="bundle_name" type="VARCHAR"/>
+    <column name="rank" type="INTEGER"/>
+  </table>
+  <table name="ca_search_forms" cached="false">
+    <column name="form_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="form_code" type="VARCHAR"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="is_system" type="TINYINT"/>
+  </table>
+  <table name="ca_search_forms_x_user_groups" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="form_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+  </table>
+  <table name="ca_search_forms_x_users" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="form_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+  </table>
+  <table name="ca_search_log" cached="false">
+    <column name="search_id" type="INTEGER"/>
+    <column name="log_datetime" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="search_expression" type="VARCHAR"/>
+    <column name="num_hits" type="INTEGER"/>
+    <column name="form_id" type="INTEGER"/>
+    <column name="ip_addr" type="CHAR"/>
+    <column name="details" type="LONGVARCHAR"/>
+    <column name="execution_time" type="DECIMAL"/>
+  </table>
+  <table name="ca_set_item_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+  </table>
+  <table name="ca_set_items" cached="false">
+    <column name="item_id" type="INTEGER"/>
+    <column name="set_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="rank" type="INTEGER"/>
+  </table>
+  <table name="ca_set_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="set_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+  </table>
+  <table name="ca_sets" cached="false">
+    <column name="set_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="hier_set_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="commenting_status" type="TINYINT"/>
+    <column name="tagging_status" type="TINYINT"/>
+    <column name="rating_status" type="TINYINT"/>
+    <column name="set_code" type="VARCHAR"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+    <column name="access" type="TINYINT"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_sets_x_user_groups" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="set_id" type="INTEGER"/>
+    <column name="group_id" type="INTEGER"/>
+    <column name="access" type="TINYINT"/>
+    <column name="sdatetime" type="INTEGER"/>
+  </table>
+  <table name="ca_sets_x_users" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="set_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="access" type="TINYINT"/>
+    <column name="sdatetime" type="INTEGER"/>
+  </table>
+  <table name="ca_sql_search_ngrams" cached="false">
+    <column name="word_id" type="INTEGER"/>
+    <column name="ngram" type="CHAR"/>
+  </table>
+  <table name="ca_sql_search_word_index" cached="false">
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="field_table_num" type="TINYINT"/>
+    <column name="field_num" type="SMALLINT"/>
+    <column name="field_row_id" type="INTEGER"/>
+    <column name="rel_type_id" type="SMALLINT"/>
+    <column name="word_id" type="INTEGER"/>
+    <column name="boost" type="TINYINT"/>
+  </table>
+  <table name="ca_sql_search_words" cached="false">
+    <column name="word_id" type="INTEGER"/>
+    <column name="word" type="VARCHAR"/>
+    <column name="stem" type="VARCHAR"/>
+  </table>
+  <table name="ca_storage_location_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="name_sort" type="VARCHAR"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_storage_locations" cached="false">
+    <column name="location_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="is_template" type="TINYINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="color" type="CHAR"/>
+    <column name="icon" type="LONGVARBINARY"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="status" type="TINYINT"/>
+    <column name="deleted" type="TINYINT"/>
+  </table>
+  <table name="ca_storage_locations_x_storage_locations" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="location_left_id" type="INTEGER"/>
+    <column name="location_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_notes" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_storage_locations_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="location_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_task_queue" cached="false">
+    <column name="task_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="row_key" type="CHAR"/>
+    <column name="entity_key" type="CHAR"/>
+    <column name="created_on" type="INTEGER"/>
+    <column name="started_on" type="INTEGER"/>
+    <column name="completed_on" type="INTEGER"/>
+    <column name="priority" type="SMALLINT"/>
+    <column name="handler" type="VARCHAR"/>
+    <column name="parameters" type="LONGVARCHAR"/>
+    <column name="notes" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_tour_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="tour_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name_sort" type="VARCHAR"/>
+  </table>
+  <table name="ca_tour_stop_labels" cached="false">
+    <column name="label_id" type="INTEGER"/>
+    <column name="stop_id" type="INTEGER"/>
+    <column name="locale_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+  </table>
+  <table name="ca_tour_stops" cached="false">
+    <column name="stop_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="tour_id" type="INTEGER"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="idno" type="VARCHAR"/>
+    <column name="idno_sort" type="VARCHAR"/>
+    <column name="rank" type="INTEGER"/>
+    <column name="hier_left" type="DECIMAL"/>
+    <column name="hier_right" type="DECIMAL"/>
+    <column name="hier_stop_id" type="INTEGER"/>
+    <column name="color" type="CHAR"/>
+    <column name="icon" type="LONGVARBINARY"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+  </table>
+  <table name="ca_tour_stops_x_collections" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="collection_id" type="INTEGER"/>
+    <column name="stop_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_tour_stops_x_entities" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="entity_id" type="INTEGER"/>
+    <column name="stop_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_tour_stops_x_objects" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="object_id" type="INTEGER"/>
+    <column name="stop_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_tour_stops_x_occurrences" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="occurrence_id" type="INTEGER"/>
+    <column name="stop_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_tour_stops_x_places" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="place_id" type="INTEGER"/>
+    <column name="stop_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_tour_stops_x_tour_stops" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="stop_left_id" type="INTEGER"/>
+    <column name="stop_right_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_notes" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_tour_stops_x_vocabulary_terms" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="item_id" type="INTEGER"/>
+    <column name="stop_id" type="INTEGER"/>
+    <column name="type_id" type="SMALLINT"/>
+    <column name="source_info" type="LONGVARCHAR"/>
+    <column name="sdatetime" type="DECIMAL"/>
+    <column name="edatetime" type="DECIMAL"/>
+    <column name="label_left_id" type="INTEGER"/>
+    <column name="label_right_id" type="INTEGER"/>
+  </table>
+  <table name="ca_tours" cached="false">
+    <column name="tour_id" type="INTEGER"/>
+    <column name="tour_code" type="VARCHAR"/>
+    <column name="type_id" type="INTEGER"/>
+    <column name="rank" type="INTEGER"/>
+    <column name="color" type="CHAR"/>
+    <column name="icon" type="LONGVARBINARY"/>
+    <column name="access" type="TINYINT"/>
+    <column name="status" type="TINYINT"/>
+  </table>
+  <table name="ca_user_groups" cached="false">
+    <column name="group_id" type="INTEGER"/>
+    <column name="parent_id" type="INTEGER"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="code" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="rank" type="SMALLINT"/>
+    <column name="vars" type="LONGVARCHAR"/>
+    <column name="hier_left" type="DECIMAL"/>
+  </table>
+  <table name="ca_user_notes" cached="false">
+    <column name="note_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="bundle_name" type="VARCHAR"/>
+    <column name="note" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_user_roles" cached="false">
+    <column name="role_id" type="SMALLINT"/>
+    <column name="name" type="VARCHAR"/>
+    <column name="code" type="VARCHAR"/>
+    <column name="description" type="LONGVARCHAR"/>
+    <column name="rank" type="SMALLINT"/>
+    <column name="vars" type="LONGVARCHAR"/>
+  </table>
+  <table name="ca_users" cached="false">
+    <column name="user_id" type="INTEGER"/>
+    <column name="user_name" type="VARCHAR"/>
+    <column name="userclass" type="TINYINT"/>
+    <column name="password" type="VARCHAR"/>
+    <column name="fname" type="VARCHAR"/>
+    <column name="lname" type="VARCHAR"/>
+    <column name="email" type="VARCHAR"/>
+    <column name="sms_number" type="VARCHAR"/>
+    <column name="vars" type="LONGVARCHAR"/>
+    <column name="volatile_vars" type="LONGVARCHAR"/>
+    <column name="active" type="TINYINT"/>
+    <column name="confirmed_on" type="INTEGER"/>
+    <column name="confirmation_key" type="CHAR"/>
+    <column name="registered_on" type="INTEGER"/>
+  </table>
+  <table name="ca_users_x_groups" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+  </table>
+  <table name="ca_users_x_roles" cached="false">
+    <column name="relation_id" type="INTEGER"/>
+    <column name="user_id" type="INTEGER"/>
+    <column name="role_id" type="SMALLINT"/>
+  </table>
+  <table name="ca_watch_list" cached="false">
+    <column name="watch_id" type="INTEGER"/>
+    <column name="table_num" type="TINYINT"/>
+    <column name="row_id" type="INTEGER"/>
+  </table>
+</delving-rdbms-profile>
