@@ -29,6 +29,7 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HtmlPanel;
+import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -273,6 +274,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     private class PresenceStatsPanel extends JPanel implements ReportFile.PresenceStatsCallback {
         private JPanel center = new JPanel(new BorderLayout());
         private ReportFile reportFile;
+        private ChartPanel presencePanel;
 
         private PresenceStatsPanel(ReportFile reportFile) {
             super(new BorderLayout());
@@ -283,6 +285,11 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             add(new JButton(new GatherAction()), BorderLayout.SOUTH);
         }
 
+        @Override
+        public void presenceCounts(int[] presence, int totalRecords) {
+            presencePanel = ReportChartHelper.createPresenceChart(reportFile.getDataSet(), reportFile.getPrefix(), presence, totalRecords);
+        }
+
         private class GatherAction extends AbstractAction {
             private GatherAction() {
                 super("Gather presence statistics");
@@ -291,11 +298,11 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setEnabled(false);
-                Work work = reportFile.gatherStats(PresenceStatsPanel.this, new Swing() {
+                Work work = reportFile.gatherStats(PresenceStatsPanel.this, sipModel.getFeedback(), new Swing() {
                     @Override
                     public void run() {
                         center.removeAll();
-                        center.add(ReportChartHelper.createPresenceChart(reportFile.getDataSet(), reportFile.getPrefix()));
+                        center.add(presencePanel);
                         center.validate();
                         setEnabled(true);
                     }

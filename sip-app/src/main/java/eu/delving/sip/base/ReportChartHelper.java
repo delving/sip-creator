@@ -21,6 +21,7 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.LinkFile;
 import org.jfree.chart.ChartFactory;
@@ -55,15 +56,17 @@ import static org.jfree.ui.TextAnchor.CENTER_RIGHT;
 
 public class ReportChartHelper {
 
-    public static ChartPanel createPresenceChart(DataSet dataSet, String prefix) {
+    public static ChartPanel createPresenceChart(DataSet dataSet, String prefix, int [] presence, int totalRecords) {
         DefaultCategoryDataset data = new DefaultCategoryDataset();
-        //data.addValue(counter.count, "Count", counter.value);
-        data.addValue(100, "Presence", "Fake One");
-        data.addValue(120, "Presence", "Fake Two");
+        int index = 0;
+        for (RecDef.Check check : RecDef.Check.values()) {
+            data.addValue(presence[index], "Presence", check);
+            index++;
+        }
         JFreeChart chart = ChartFactory.createBarChart(
                 String.format("Field presence in %s / %s", dataSet.getSpec(), prefix),
                 "Field",
-                "Record count",
+                String.format("Record count of %d records", totalRecords),
                 data,
                 PlotOrientation.VERTICAL,
                 false, true, false

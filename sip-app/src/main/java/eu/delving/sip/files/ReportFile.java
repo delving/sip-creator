@@ -22,6 +22,8 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.RecDef;
+import eu.delving.sip.base.CancelException;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
@@ -35,10 +37,9 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import java.awt.Component;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -55,17 +56,19 @@ import static eu.delving.sip.files.ReportWriter.ReportType.VALID;
 public class ReportFile extends AbstractListModel {
     private static final long BACKTRACK = 10000;
     private static final int MAX_CACHE = 1000;
+    private final DataSet dataSet;
     private final String prefix;
+    private final File reportFile;
     private RandomAccessFile randomAccess;
     private List<Rec> recs = new ArrayList<Rec>();
     private Rec lastRec;
-    private DataSet dataSet;
     private LinkFile linkFile;
     private LinkChecker linkChecker;
     private ResultLinkChecks resultLinkChecks;
 
     public ReportFile(File reportFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
-        this.randomAccess = new RandomAccessFile(reportFile, "r");
+        this.reportFile = reportFile;
+        this.randomAccess = new RandomAccessFile(this.reportFile, "r");
         this.linkFile = new LinkFile(linkFile, dataSet, prefix);
         this.dataSet = dataSet;
         this.prefix = prefix;
@@ -235,7 +238,7 @@ public class ReportFile extends AbstractListModel {
                 randomAccess.seek(seekPos);
             }
             final List<String> freshLines = keep ? new ArrayList<String>() : null;
-            boolean startFound = false;
+            boolean within = false;
             while (true) {
                 String line = randomAccess.readLine();
                 if (line == null) break;
@@ -259,11 +262,11 @@ public class ReportFile extends AbstractListModel {
                             error = startMatcher.group(3);
                             break;
                     }
-                    startFound = true;
+                    within = true;
                     continue;
                 }
-                if (startFound && ReportWriter.END.matcher(line).matches()) break;
-                if (startFound && freshLines != null) freshLines.add(line);
+                if (within && ReportWriter.END.matcher(line).matches()) break;
+                if (within && freshLines != null) freshLines.add(line);
             }
             if (freshLines != null) Swing.Exec.later(new Swing() {
                 @Override
@@ -395,35 +398,90 @@ public class ReportFile extends AbstractListModel {
     }
 
     public interface PresenceStatsCallback {
-
+        void presenceCounts(int [] presence, int totalRecords);
     }
 
-    public Work gatherStats(final PresenceStatsCallback callback, final Swing finished) {
-        return new Work.DataSetPrefixWork() {
-            @Override
-            public String getPrefix() {
-                return prefix;
-            }
+    public Work gatherStats(final PresenceStatsCallback callback, final Feedback feedback, final Swing finished) {
+        return new StatisicsGatherer(callback, feedback, finished);
+    }
 
-            @Override
-            public DataSet getDataSet() {
-                return dataSet;
-            }
+    private class StatisicsGatherer implements Work.DataSetPrefixWork, Work.LongTermWork {
+        private final PresenceStatsCallback callback;
+        private final Feedback feedback;
+        private final Swing finished;
+        private ProgressListener progressListener;
 
-            @Override
-            public Job getJob() {
-                return Job.GATHER_PRESENCE_STATS;
-            }
+        private StatisicsGatherer(PresenceStatsCallback callback, Feedback feedback, Swing finished) {
+            this.callback = callback;
+            this.feedback = feedback;
+            this.finished = finished;
+        }
 
-            @Override
-            public void run() {
-                try {
-                    callback.hashCode(); // todo: give something back
+        @Override
+        public String getPrefix() {
+            return prefix;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.GATHER_PRESENCE_STATS;
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            this.progressListener.prepareFor(lastRec.getRecordNumber());
+        }
+
+        @Override
+        public void run() {
+            try {
+                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(reportFile), "UTF-8"));
+                boolean within = false;
+                int [] presence = new int[RecDef.Check.values().length];
+                boolean [] contains = new boolean[RecDef.Check.values().length];
+                while (true) {
+                    String line = in.readLine();
+                    if (line == null) break;
+                    Matcher startMatcher = ReportWriter.START.matcher(line);
+                    if (startMatcher.matches()) {
+                        int recordNumber = Integer.parseInt(startMatcher.group(1));
+                        progressListener.setProgress(recordNumber);
+                        ReportWriter.ReportType reportType = ReportWriter.ReportType.valueOf(startMatcher.group(2));
+                        if (reportType != VALID) continue;
+                        within = true;
+                        Arrays.fill(contains, false);
+                        continue;
+                    }
+                    if (within) {
+                        if (ReportWriter.END.matcher(line).matches()) {
+                            for (int walk=0; walk<contains.length; walk++) {
+                                if (contains[walk]) presence[walk]++;
+                            }
+                            continue;
+                        }
+                        Matcher matcher = ReportWriter.LINK.matcher(line);
+                        if (!matcher.matches()) continue; // RuntimeException?
+                        RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
+                        contains[check.ordinal()] = true;
+                    }
                 }
-                finally {
-                    Swing.Exec.later(finished);
-                }
+                callback.presenceCounts(presence, lastRec.getRecordNumber()+1);
             }
-        };
+            catch (IOException e) {
+                feedback.alert("Unable to gather output statistics", e);
+            }
+            catch (CancelException e) {
+                feedback.alert("Cancelled output statistics gathering");
+            }
+            finally {
+                Swing.Exec.later(finished);
+            }
+        }
     }
 }
